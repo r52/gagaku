@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/index.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(ChangeNotifierProvider(
+    create: (context) => MangaDexModel(),
+    child: MaterialApp(
+      title: 'Gagaku',
+      theme: ThemeData(
+          brightness: Brightness.dark,
+          primarySwatch: Colors.amber,
+          visualDensity: VisualDensity.adaptivePlatformDensity),
+      debugShowCheckedModeBanner: false,
+      home: GagakuApp(),
+    ),
+  ));
+}
+
+class GagakuApp extends StatefulWidget {
+  const GagakuApp({Key? key}) : super(key: key);
+
+  @override
+  _GagakuAppState createState() => _GagakuAppState();
+}
+
+class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
+  final RestorableInt _selectedIndex = RestorableInt(0);
+
+  @override
+  String get restorationId => 'gagaku_app';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_selectedIndex, 'tab_index');
+  }
+
+  @override
+  void dispose() {
+    _selectedIndex.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedItem = <Widget>[
+      MangaDexHomePage(
+        restorationId: restorationId,
+      ),
+      Center(child: Text('Local')), // TODO local
+      Center(child: Text('Web')), // TODO web
+      Center(child: Text('Settings')) // TODO settings
+    ];
+
+    return Scaffold(
+        body: Row(
+      children: [
+        NavigationRail(
+          leading: Column(
+            children: [
+              const CircleAvatar(
+                backgroundImage: AssetImage('assets/icon.png'),
+              ),
+              Text('Gagaku')
+            ],
+          ),
+          onDestinationSelected: (index) {
+            setState(() {
+              _selectedIndex.value = index;
+            });
+          },
+          selectedIndex: _selectedIndex.value,
+          labelType: NavigationRailLabelType.selected,
+          destinations: [
+            NavigationRailDestination(
+                icon: const Icon(Icons.menu_book_outlined),
+                selectedIcon: const Icon(Icons.menu_book),
+                label: Text('MangaDex')),
+            NavigationRailDestination(
+                icon: const Icon(Icons.photo_album_outlined),
+                selectedIcon: const Icon(Icons.photo_album),
+                label: Text('Local Gallery')),
+            NavigationRailDestination(
+                icon: const Icon(
+                  Icons.language_outlined,
+                ),
+                selectedIcon: const Icon(Icons.language),
+                label: Text('Web Gallery')),
+            NavigationRailDestination(
+                icon: const Icon(
+                  Icons.settings_outlined,
+                ),
+                selectedIcon: const Icon(Icons.settings),
+                label: Text('Settings')),
+          ],
+        ),
+        const VerticalDivider(
+          thickness: 1,
+          width: 1,
+        ),
+        Expanded(child: selectedItem[_selectedIndex.value])
+      ],
+    ));
+  }
+}
