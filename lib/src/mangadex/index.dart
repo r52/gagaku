@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
@@ -56,7 +58,7 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
       ];
 
       final selectedItem = <Widget>[
-        MangaDexMainWidget(),
+        MangaDexMangaFeed(),
         Center(child: Text('Feed')) // TODO: Feed
       ];
 
@@ -116,22 +118,56 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
   }
 }
 
-class MangaDexMainWidget extends StatefulWidget {
-  MangaDexMainWidget({Key? key}) : super(key: key);
+class MangaDexMangaFeed extends StatefulWidget {
+  MangaDexMangaFeed({Key? key}) : super(key: key);
 
   @override
-  _MangaDexMainWidgetState createState() => _MangaDexMainWidgetState();
+  _MangaDexMangaFeedState createState() => _MangaDexMangaFeedState();
 }
 
-class _MangaDexMainWidgetState extends State<MangaDexMainWidget> {
-  Future<Iterable<Manga>> _fetchManga() async {
+class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
+  late Future<Iterable<Manga>> _mangaList;
+
+  var _scrollController = ScrollController();
+  var _chapterOffset = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _mangaList = _fetchMangaFeed(0);
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge) {
+        if (_scrollController.position.pixels != 0) {
+          setState(() {
+            _chapterOffset += MangaDexEndpoints.apiQueryLimit;
+            _mangaList = _fetchMangaFeed(_chapterOffset);
+          });
+        }
+      }
+    });
+  }
+
+  Future<Iterable<Manga>> _fetchMangaFeed(int offset) async {
     var chapters = await Provider.of<MangaDexModel>(context, listen: false)
-        .fetchChapterFeed();
+        .fetchChapterFeed(offset, true);
 
     var mangaIds = chapters.map((e) => e.mangaId).toSet();
 
     return Provider.of<MangaDexModel>(context, listen: false)
         .fetchManga(mangaIds);
+  }
+
+  Future<void> _refreshMangaFeed() async {
+    await Provider.of<MangaDexModel>(context, listen: false)
+        .invalidateCacheItem(CacheLists.latestChapters);
+
+    // Refresh
+    setState(() {
+      _chapterOffset = 0;
+      _mangaList = _fetchMangaFeed(_chapterOffset);
+    });
   }
 
   @override
@@ -140,10 +176,32 @@ class _MangaDexMainWidgetState extends State<MangaDexMainWidget> {
       return Scaffold(
         body: Center(
           child: FutureBuilder<Iterable<Manga>>(
-            future: _fetchManga(),
+            future: _mangaList,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return MangaList(mangaList: snapshot.data!.toList());
+                return ScrollConfiguration(
+                    behavior:
+                        ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    }),
+                    child: RefreshIndicator(
+                        onRefresh: () async {
+                          await _refreshMangaFeed();
+                        },
+                        child: GridView.extent(
+                          controller: _scrollController,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          restorationId: 'manga_list_grid_offset',
+                          maxCrossAxisExtent: 300,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          padding: const EdgeInsets.all(8),
+                          childAspectRatio: 0.7,
+                          children: snapshot.data!
+                              .map((manga) => _GridMangaItem(manga: manga))
+                              .toList(),
+                        )));
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
@@ -157,32 +215,6 @@ class _MangaDexMainWidgetState extends State<MangaDexMainWidget> {
         ),
       );
     });
-  }
-}
-
-class MangaList extends StatelessWidget {
-  const MangaList({Key? key, required this.mangaList}) : super(key: key);
-
-  final List<Manga> mangaList;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text('Latest Updates'),
-      ),
-      body: GridView.count(
-        restorationId: 'manga_list_grid_offset',
-        crossAxisCount: 4,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        padding: const EdgeInsets.all(8),
-        childAspectRatio: 1,
-        children:
-            mangaList.map((manga) => _GridMangaItem(manga: manga)).toList(),
-      ),
-    );
   }
 }
 
@@ -213,7 +245,9 @@ class _GridMangaItem extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: CachedNetworkImage(
         imageUrl: manga.getCovertArtUrl(),
-        placeholder: (context, url) => CircularProgressIndicator(),
+        placeholder: (context, url) => const Center(
+          child: CircularProgressIndicator(),
+        ),
         errorWidget: (context, url, error) => Icon(Icons.error),
       ),
     );

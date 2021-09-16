@@ -147,7 +147,7 @@ class MangaDexModel extends ChangeNotifier {
     return Token();
   }
 
-  void refreshCurrentToken() async {
+  Future<void> refreshCurrentToken() async {
     if (_token.isValid && _loggedIn) {
       Token tok = await refreshToken(_token.refresh);
       if (tok.isValid) {
@@ -200,14 +200,27 @@ class MangaDexModel extends ChangeNotifier {
     return false;
   }
 
-  Future<Iterable<Chapter>> fetchChapterFeed([int offset = 0]) async {
+  /// Fetches the latest chapters feed of the MangaDex user
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiQueryLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// If [wholeList] is true, the operation always returns the entire list
+  /// up to the latest data requested by offset. Otherwise, the range of items
+  /// from [offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length))
+  /// is returned. Ranged return may be empty if the latest fetch returned
+  /// all available data (list.length < apiQueryLimit)
+  Future<Iterable<Chapter>> fetchChapterFeed(
+      [int offset = 0, bool wholeList = false]) async {
     if (!_token.isValid || !_loggedIn) {
       throw Exception(
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_token.expired) {
-      refreshCurrentToken();
+      await refreshCurrentToken();
     }
 
     var list = <Chapter>[];
@@ -219,16 +232,25 @@ class MangaDexModel extends ChangeNotifier {
           _cache.getSpecialList<Chapter>(CacheLists.latestChapters).toList();
 
       // If requested offset is less than the total length of the cached list,
-      // return the cropped list of range [offset, min(offset + apiQueryLimit, cached.length)]
+      // return the cropped list of range [offset, min(offset + apiQueryLimit, cached.length))
+      // (or the entire list if requested)
       if (offset < cached.length) {
-        return cached.getRange(offset,
-            min(offset + MangaDexEndpoints.apiQueryLimit, cached.length));
+        if (!wholeList) {
+          return cached.getRange(offset,
+              min(offset + MangaDexEndpoints.apiQueryLimit, cached.length));
+        } else {
+          return cached;
+        }
       }
 
       // If cache.length < apiQueryLimit, then the latest fetch returned
-      // all available data, so return nothing
+      // all available data, so return nothing (or the entire list if requested)
       if (cached.length < MangaDexEndpoints.apiQueryLimit) {
-        return [];
+        if (!wholeList) {
+          return [];
+        } else {
+          return cached;
+        }
       }
 
       // Otherwise, if offset >= cache.length and cache.length >= apiQueryLimit,
@@ -270,13 +292,28 @@ class MangaDexModel extends ChangeNotifier {
       // Cache the list
       _cache.putSpecialList(CacheLists.latestChapters, list, false);
 
-      return list;
+      if (!wholeList) {
+        return list.getRange(
+            offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length));
+      } else {
+        return list;
+      }
     }
 
     // Throw if failure
     throw Exception("Failed to download chapters");
   }
 
+  /// Invalidates a cache item so that it can be refreshed from the API
+  ///
+  /// [item] - key of the item to be invalidated
+  Future<void> invalidateCacheItem(String item) async {
+    if (_cache.exists(item)) {
+      _cache.remove(item);
+    }
+  }
+
+  /// Fetches manga data of the given [uuids]
   Future<Iterable<Manga>> fetchManga(Iterable<String> uuids) async {
     if (!_token.isValid || !_loggedIn) {
       throw Exception(
@@ -284,7 +321,7 @@ class MangaDexModel extends ChangeNotifier {
     }
 
     if (_token.expired) {
-      refreshCurrentToken();
+      await refreshCurrentToken();
     }
 
     Set<Manga> list = Set<Manga>();
