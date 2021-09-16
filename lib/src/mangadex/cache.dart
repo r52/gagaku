@@ -4,22 +4,22 @@
 
 import 'package:gagaku/src/mangadex/api.dart';
 
-const _cacheExpiration = 10; //minutes
-
 class CacheEntry<T> {
-  T _entry;
-  DateTime _created;
+  final T _entry;
+  final DateTime _created;
+  final int _cacheExpiration; // in minutes
 
   T get entry => _entry;
   DateTime get created => _created;
   bool get expired =>
       (DateTime.now().difference(_created).inMinutes > _cacheExpiration);
 
-  CacheEntry(this._entry) : _created = DateTime.now();
+  CacheEntry(this._entry, [this._cacheExpiration = 10])
+      : _created = DateTime.now();
 }
 
 class CacheManager {
-  static const _preferredMaxEntries = 1000;
+  static const _preferredMaxEntries = 10000;
 
   /// Cache of API data
   Map<String, CacheEntry<dynamic>> _cache = Map<String, CacheEntry<dynamic>>();
@@ -75,7 +75,8 @@ class CacheManager {
 
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
   void putAllAPIResolved(Iterable<MangaDexAPIData> list) {
-    final resolved = list.map((e) => MapEntry(e.id, CacheEntry(e)));
+    final resolved =
+        list.map((e) => MapEntry(e.id, CacheEntry(e, e.cacheExpiration)));
     _cache.addEntries(resolved);
 
     if (_cache.length > _preferredMaxEntries) {
@@ -83,14 +84,17 @@ class CacheManager {
     }
   }
 
-  /// Adds all API data from a [list] into the cache, resolving its ids automatically,
-  /// as a part of a special query given by [key]
-  void putSpecialList(String key, Iterable<MangaDexAPIData> list) {
+  /// Adds all API data from a [list] into the cache, resolving its ids automatically
+  /// if requested, as a part of a special query given by [key]
+  void putSpecialList(String key, Iterable<MangaDexAPIData> list,
+      [bool resolve = true]) {
     // Transform data list to a list of uuids
     final ids = list.map((e) => e.id).toList();
     _cache[key] = CacheEntry(ids); // Just overwrite it
 
-    putAllAPIResolved(list);
+    if (resolve) {
+      putAllAPIResolved(list);
+    }
   }
 
   /// Gets all API data that is a part of a special query given by [key]

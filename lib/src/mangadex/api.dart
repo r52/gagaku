@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:developer' as dev;
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ enum CoverArtQuality { best, medium, small }
 
 abstract class MangaDexEndpoints {
   static final api = Uri.https('api.mangadex.org', '');
+
+  static const apiQueryLimit = 100;
 
   static const login = '/auth/login';
   static const logout = '/auth/logout';
@@ -30,8 +33,9 @@ abstract class CacheLists {
 class Token {
   final String session;
   final String refresh;
+  final DateTime createdAt;
 
-  Token({this.session = "", this.refresh = ""});
+  Token({this.session = "", this.refresh = ""}) : createdAt = DateTime.now();
 
   factory Token.fromJson(Map<String, dynamic> json) {
     return new Token(
@@ -43,6 +47,8 @@ class Token {
   }
 
   bool get isValid => (this.session.isNotEmpty && this.refresh.isNotEmpty);
+  bool get expired =>
+      (DateTime.now().difference(this.createdAt).inMinutes > 14);
 }
 
 class MangaDexModel extends ChangeNotifier {
@@ -194,16 +200,47 @@ class MangaDexModel extends ChangeNotifier {
     return false;
   }
 
-  Future<Iterable<Chapter>> fetchLatestChapters() async {
+  Future<Iterable<Chapter>> fetchChapterFeed([int offset = 0]) async {
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_token.expired) {
+      refreshCurrentToken();
+    }
+
+    var list = <Chapter>[];
+
     // Grab it from the cache if it exists
     if (_cache.exists(CacheLists.latestChapters)) {
       // dev.log('Getting latest chapters from cache');
-      return _cache.getSpecialList<Chapter>(CacheLists.latestChapters);
+      var cached =
+          _cache.getSpecialList<Chapter>(CacheLists.latestChapters).toList();
+
+      // If requested offset is less than the total length of the cached list,
+      // return the cropped list of range [offset, min(offset + apiQueryLimit, cached.length)]
+      if (offset < cached.length) {
+        return cached.getRange(offset,
+            min(offset + MangaDexEndpoints.apiQueryLimit, cached.length));
+      }
+
+      // If cache.length < apiQueryLimit, then the latest fetch returned
+      // all available data, so return nothing
+      if (cached.length < MangaDexEndpoints.apiQueryLimit) {
+        return [];
+      }
+
+      // Otherwise, if offset >= cache.length and cache.length >= apiQueryLimit,
+      // then we need to fetch more data from the api
+      list.addAll(cached);
     }
 
-    // Otherwise download it
+    // Download missing data
     // dev.log('Downloading latest chapters');
     final queryParams = {
+      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+      'offset': offset.toString(),
       'translatedLanguage[]': _translatedLanguages,
       'originalLanguage[]': _originalLanguage,
       'contentRating[]': _contentRating,
@@ -220,35 +257,44 @@ class MangaDexModel extends ChangeNotifier {
       // dev.log('response', error: response.body);
       final Map<String, dynamic> body = jsonDecode(response.body);
 
-      List<dynamic> chlist = body['results'];
+      List<dynamic> chlist = body['data'];
 
-      var list = chlist.map((json) => Chapter.fromJson(json)).toList();
+      var result = chlist.map((json) => Chapter.fromJson(json)).toList();
 
-      // Cache the result
-      _cache.putSpecialList(CacheLists.latestChapters, list);
+      // Cache the data
+      _cache.putAllAPIResolved(result);
+
+      // Add data to the list
+      list.addAll(result);
+
+      // Cache the list
+      _cache.putSpecialList(CacheLists.latestChapters, list, false);
 
       return list;
     }
 
-    return [];
+    // Throw if failure
+    throw Exception("Failed to download chapters");
   }
 
   Future<Iterable<Manga>> fetchManga(Iterable<String> uuids) async {
-    List<Manga> list = [];
-    List<String> fetch = [];
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
 
-    uuids.forEach((id) {
-      if (_cache.exists(id)) {
-        list.add(_cache.get<Manga>(id));
-      } else {
-        fetch.add(id);
-      }
-    });
+    if (_token.expired) {
+      refreshCurrentToken();
+    }
+
+    Set<Manga> list = Set<Manga>();
+
+    var fetch = uuids.where((id) => (!_cache.exists(id)));
 
     if (fetch.length > 0) {
       // dev.log('Retrieving Manga info');
       final queryParams = {
-        'limit': '100',
+        'limit': max(fetch.length, MangaDexEndpoints.apiQueryLimit).toString(),
         'order[latestUploadedChapter]': 'desc',
         'availableTranslatedLanguage[]': _translatedLanguages,
         'originalLanguage[]': _originalLanguage,
@@ -267,16 +313,20 @@ class MangaDexModel extends ChangeNotifier {
         // dev.log('response', error: response.body);
         final Map<String, dynamic> body = jsonDecode(response.body);
 
-        List<dynamic> mlist = body['results'];
+        List<dynamic> mlist = body['data'];
 
-        var ml = mlist.map((json) => Manga.fromJson(json)).toList();
+        var results = mlist.map((json) => Manga.fromJson(json)).toList();
 
-        list.addAll(ml);
-
-        // Cache the result
-        _cache.putAllAPIResolved(list);
+        // Cache the data
+        _cache.putAllAPIResolved(results);
       }
     }
+
+    // Craft the list
+    uuids.forEach((id) {
+      // Assume that all elements are cache satisfied at this point
+      list.add(_cache.get<Manga>(id));
+    });
 
     return list;
   }
@@ -298,8 +348,11 @@ class MangaDexClient extends http.BaseClient {
 abstract class MangaDexAPIData {
   final String id;
   final String type;
+  final int _cacheExpiration;
 
-  MangaDexAPIData._(this.id, this.type);
+  int get cacheExpiration => _cacheExpiration;
+
+  MangaDexAPIData._(this.id, this.type, this._cacheExpiration);
 }
 
 class Chapter extends MangaDexAPIData {
@@ -337,49 +390,45 @@ class Chapter extends MangaDexAPIData {
       required this.mangaId,
       this.userId,
       this.groupId})
-      : super._(id, 'chapter');
+      : super._(id, 'chapter', 65535);
 
-  factory Chapter.fromJson(Map<String, dynamic> json) {
-    if (json['result'] == 'ok') {
-      Map<String, dynamic> data = json['data'];
+  factory Chapter.fromJson(Map<String, dynamic> data) {
+    if (data['type'] == 'chapter') {
+      Map<String, dynamic> attr = data['attributes'];
 
-      if (data['type'] == 'chapter') {
-        Map<String, dynamic> attr = data['attributes'];
+      String mangaId = '';
+      String groupId = '';
+      String userId = '';
 
-        String mangaId = '';
-        String groupId = '';
-        String userId = '';
+      List<Map<String, dynamic>> relations =
+          List<Map<String, dynamic>>.from(data['relationships']);
+      relations.forEach((r) {
+        if (r['type'] == 'manga') {
+          mangaId = r['id'];
+        } else if (r['type'] == 'user') {
+          userId = r['id'];
+        } else if (r['type'] == 'scanlation_group') {
+          groupId = r['id'];
+        }
+      });
 
-        List<Map<String, dynamic>> relations =
-            List<Map<String, dynamic>>.from(data['relationships']);
-        relations.forEach((r) {
-          if (r['type'] == 'manga') {
-            mangaId = r['id'];
-          } else if (r['type'] == 'user') {
-            userId = r['id'];
-          } else if (r['type'] == 'scanlation_group') {
-            groupId = r['id'];
-          }
-        });
-
-        return Chapter(
-            id: data['id'],
-            volume: attr['volume'],
-            chapter: attr['chapter'],
-            title: attr['title'],
-            translatedLanguage: attr['translatedLanguage'],
-            hash: attr['hash'],
-            data: List<String>.from(attr['data']),
-            dataSaver: List<String>.from(attr['dataSaver']),
-            externalUrl: attr['externalUrl'],
-            publishAt: DateTime.parse(attr['publishAt']),
-            createdAt: DateTime.parse(attr['publishAt']),
-            updatedAt: DateTime.parse(attr['publishAt']),
-            version: attr['version'],
-            mangaId: mangaId,
-            userId: userId,
-            groupId: groupId);
-      }
+      return Chapter(
+          id: data['id'],
+          volume: attr['volume'],
+          chapter: attr['chapter'],
+          title: attr['title'],
+          translatedLanguage: attr['translatedLanguage'],
+          hash: attr['hash'],
+          data: List<String>.from(attr['data']),
+          dataSaver: List<String>.from(attr['dataSaver']),
+          externalUrl: attr['externalUrl'],
+          publishAt: DateTime.parse(attr['publishAt']),
+          createdAt: DateTime.parse(attr['publishAt']),
+          updatedAt: DateTime.parse(attr['publishAt']),
+          version: attr['version'],
+          mangaId: mangaId,
+          userId: userId,
+          groupId: groupId);
     }
 
     throw ArgumentError('Unexpected data retrieval failure');
@@ -430,67 +479,63 @@ class Manga extends MangaDexAPIData {
       this.authorId,
       this.artistId,
       required this.coverArt})
-      : super._(id, 'manga');
+      : super._(id, 'manga', 30);
 
-  factory Manga.fromJson(Map<String, dynamic> json) {
-    if (json['result'] == 'ok') {
-      Map<String, dynamic> data = json['data'];
+  factory Manga.fromJson(Map<String, dynamic> data) {
+    if (data['type'] == 'manga') {
+      Map<String, dynamic> attr = data['attributes'];
 
-      if (data['type'] == 'manga') {
-        Map<String, dynamic> attr = data['attributes'];
+      // Tags
+      List<Map<String, dynamic>> tagData =
+          List<Map<String, dynamic>>.from(attr['tags']);
 
-        // Tags
-        List<Map<String, dynamic>> tagData =
-            List<Map<String, dynamic>>.from(attr['tags']);
+      var tags = tagData.map((e) => Tag.fromJson(e)).toList();
 
-        var tags = tagData.map((e) => Tag.fromJson(e)).toList();
+      String authorId = '';
+      String artistId = '';
+      String coverArt = '';
 
-        String authorId = '';
-        String artistId = '';
-        String coverArt = '';
+      // Cover Art
+      List<Map<String, dynamic>> relations =
+          List<Map<String, dynamic>>.from(data['relationships']);
+      relations.forEach((r) {
+        if (r['type'] == 'author') {
+          authorId = r['id'];
+        } else if (r['type'] == 'artist') {
+          artistId = r['id'];
+        } else if (r['type'] == 'cover_art') {
+          Map<String, dynamic> caattrs = r['attributes'];
+          coverArt = caattrs['fileName'];
+        }
+      });
 
-        // Cover Art
-        List<Map<String, dynamic>> relations =
-            List<Map<String, dynamic>>.from(data['relationships']);
-        relations.forEach((r) {
-          if (r['type'] == 'author') {
-            authorId = r['id'];
-          } else if (r['type'] == 'artist') {
-            artistId = r['id'];
-          } else if (r['type'] == 'cover_art') {
-            Map<String, dynamic> caattrs = r['attributes'];
-            coverArt = caattrs['fileName'];
-          }
-        });
+      // Alt titles
+      List<Map<String, dynamic>> alt =
+          List<Map<String, dynamic>>.from(attr['altTitles']);
+      List<LocalizedString> altTitles = alt
+          .map((e) => Map.castFrom<String, dynamic, String, String>(e))
+          .toList();
 
-        // Alt titles
-        List<Map<String, dynamic>> alt =
-            List<Map<String, dynamic>>.from(attr['altTitles']);
-        List<LocalizedString> altTitles = alt
-            .map((e) => Map.castFrom<String, dynamic, String, String>(e))
-            .toList();
-
-        return Manga(
-            id: data['id'],
-            title: Map.castFrom(attr['title']),
-            altTitles: altTitles,
-            description: Map.castFrom(attr['description']),
-            links: Map.castFrom(attr['links']),
-            originalLanguage: attr['originalLanguage'],
-            lastVolume: attr['lastVolume'],
-            lastChapter: attr['lastChapter'],
-            publicationDemographic: attr['publicationDemographic'],
-            status: attr['status'],
-            year: attr['year'],
-            contentRating: attr['contentRating'],
-            tags: tags,
-            createdAt: DateTime.parse(attr['createdAt']),
-            updatedAt: DateTime.parse(attr['updatedAt']),
-            version: attr['version'],
-            authorId: authorId,
-            artistId: artistId,
-            coverArt: coverArt);
-      }
+      return Manga(
+          id: data['id'],
+          title: Map.castFrom(attr['title']),
+          altTitles: altTitles,
+          description: Map.castFrom(attr['description']),
+          links: Map.castFrom(attr['links']),
+          originalLanguage: attr['originalLanguage'],
+          lastVolume: attr['lastVolume'],
+          lastChapter: attr['lastChapter'],
+          publicationDemographic: attr['publicationDemographic'],
+          status: attr['status'],
+          year: attr['year'],
+          contentRating: attr['contentRating'],
+          tags: tags,
+          createdAt: DateTime.parse(attr['createdAt']),
+          updatedAt: DateTime.parse(attr['updatedAt']),
+          version: attr['version'],
+          authorId: authorId,
+          artistId: artistId,
+          coverArt: coverArt);
     }
 
     throw ArgumentError('Unexpected data retrieval failure');
@@ -524,7 +569,7 @@ class Tag extends MangaDexAPIData {
       required this.name,
       required this.group,
       required this.version})
-      : super._(id, 'tag');
+      : super._(id, 'tag', 65535);
 
   factory Tag.fromJson(Map<String, dynamic> json) {
     if (json['type'] == 'tag') {

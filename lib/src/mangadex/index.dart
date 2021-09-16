@@ -126,7 +126,7 @@ class MangaDexMainWidget extends StatefulWidget {
 class _MangaDexMainWidgetState extends State<MangaDexMainWidget> {
   Future<Iterable<Manga>> _fetchManga() async {
     var chapters = await Provider.of<MangaDexModel>(context, listen: false)
-        .fetchLatestChapters();
+        .fetchChapterFeed();
 
     var mangaIds = chapters.map((e) => e.mangaId).toSet();
 
