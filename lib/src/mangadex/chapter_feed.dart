@@ -47,6 +47,9 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
     var mangas = await Provider.of<MangaDexModel>(context, listen: false)
         .fetchManga(mangaIds);
 
+    await Provider.of<MangaDexModel>(context, listen: false)
+        .fetchReadChapters(mangas);
+
     var mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
     // Craft feed items
@@ -84,6 +87,7 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
                     }),
                     child: RefreshIndicator(
                         onRefresh: () async {
+                          // TODO refresh
                           //await _refreshMangaFeed();
                         },
                         child: ListView.builder(
@@ -138,8 +142,16 @@ class _ChapterFeedItem extends StatelessWidget {
         title += ' - ' + e.title!;
       }
 
+      if (manga.readChaptersRetrieved) {
+        e.read = manga.readChapters.contains(e.id);
+      }
+
       return OutlinedButton(
-          style: OutlinedButton.styleFrom(backgroundColor: Colors.grey[900]),
+          style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.grey[900],
+              primary: (e.read
+                  ? Theme.of(context).backgroundColor
+                  : Theme.of(context).colorScheme.primary)),
           onPressed: () async {
             // TODO READER!!!!
             print('tapped chapter ' + title + '; id=' + e.id);
@@ -147,9 +159,9 @@ class _ChapterFeedItem extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                e.read ? Icons.done : Icons.radio_button_unchecked,
+                e.read ? Icons.check : Icons.circle,
                 color: e.read ? Colors.green : Colors.blue,
-                size: 10,
+                size: e.read ? 15 : 10,
               ),
               SizedBox(width: 5),
               Text(title),

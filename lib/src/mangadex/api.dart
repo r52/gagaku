@@ -24,6 +24,8 @@ abstract class MangaDexEndpoints {
 
   static const feed = '/user/follows/manga/feed';
   static const manga = '/manga';
+  static const getRead = '/manga/read';
+  static const setRead = '/chapter/{id}/read';
 }
 
 abstract class CacheLists {
@@ -356,6 +358,9 @@ class MangaDexModel extends ChangeNotifier {
 
         // Cache the data
         _cache.putAllAPIResolved(results);
+      } else {
+        // Throw if failure
+        throw Exception("Failed to download manga data");
       }
     }
 
@@ -366,6 +371,52 @@ class MangaDexModel extends ChangeNotifier {
     });
 
     return list;
+  }
+
+  /// Fetches read chapter data of given [mangas]
+  Future<void> fetchReadChapters(Iterable<Manga> mangas) async {
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_token.expired) {
+      await refreshCurrentToken();
+    }
+
+    var fetch = mangas
+        .where((manga) => (!manga.readChaptersRetrieved))
+        .map((e) => e.id);
+
+    if (fetch.length > 0) {
+      final queryParams = {'ids[]': fetch, 'grouped': 'true'};
+
+      final uri = MangaDexEndpoints.api.replace(
+          path: MangaDexEndpoints.getRead, queryParameters: queryParams);
+
+      final response = await _client!.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+
+        var clist = body['data'] as Map<String, dynamic>;
+
+        var mangaMap =
+            Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
+
+        clist.forEach((key, value) {
+          if (mangaMap.containsKey(key)) {
+            mangaMap[key]!.readChaptersRetrieved = true;
+
+            var chaptersRead = List<String>.from(value);
+            mangaMap[key]!.readChapters.addAll(chaptersRead);
+          }
+        });
+      } else {
+        // Throw if failure
+        throw Exception("Failed to download read chapters data");
+      }
+    }
   }
 }
 
@@ -497,6 +548,9 @@ class Manga extends MangaDexAPIData {
 
   // Only store the primary cover returned by the API
   final String coverArt;
+
+  bool readChaptersRetrieved = false;
+  Set<String> readChapters = Set<String>();
 
   Manga(
       {required String id,
