@@ -148,9 +148,9 @@ class _ChapterFeedItem extends StatelessWidget {
 
       return OutlinedButton(
           style: OutlinedButton.styleFrom(
-              backgroundColor: Colors.grey[900],
+              backgroundColor: Theme.of(context).colorScheme.surface,
               primary: (e.read
-                  ? Theme.of(context).backgroundColor
+                  ? Theme.of(context).colorScheme.background
                   : Theme.of(context).colorScheme.primary)),
           onPressed: () async {
             // TODO READER!!!!
@@ -201,7 +201,7 @@ class _ChapterFeedItem extends StatelessWidget {
                   children: [
                     TextButton(
                         style: TextButton.styleFrom(
-                            primary: Colors.white,
+                            primary: Theme.of(context).colorScheme.onSurface,
                             textStyle: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         onPressed: () async {

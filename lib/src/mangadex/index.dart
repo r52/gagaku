@@ -102,6 +102,7 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
           items: bottomNavigationBarItems,
           currentIndex: _currentIndex.value,
           type: BottomNavigationBarType.fixed,
+          fixedColor: Theme.of(context).colorScheme.primary,
           onTap: (index) {
             setState(() {
               _currentIndex.value = index;

@@ -9,9 +9,15 @@ void main() {
     child: MaterialApp(
       title: 'Gagaku',
       theme: ThemeData(
+          brightness: Brightness.light,
+          primarySwatch: Colors.deepOrange,
+          visualDensity: VisualDensity.adaptivePlatformDensity),
+      darkTheme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: Colors.amber,
           visualDensity: VisualDensity.adaptivePlatformDensity),
+      themeMode: ThemeMode
+          .dark, // ThemeMode.system doesn't work on Windows https://github.com/flutter/flutter/issues/54612
       debugShowCheckedModeBanner: false,
       home: GagakuApp(),
     ),
@@ -48,9 +54,9 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
       MangaDexHomePage(
         restorationId: restorationId,
       ),
-      Center(child: Text('Local')), // TODO local
-      Center(child: Text('Web')), // TODO web
-      Center(child: Text('Settings')) // TODO settings
+      const Center(child: Text('Local')), // TODO local
+      const Center(child: Text('Web')), // TODO web
+      const Center(child: Text('Settings')) // TODO settings
     ];
 
     return Scaffold(
