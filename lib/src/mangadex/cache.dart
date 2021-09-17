@@ -63,9 +63,13 @@ class CacheManager {
   }
 
   /// Inserts a single entry into the cache if it doesn't [exists]
-  void put(String key, dynamic val) {
+  /// If [overwrite] is true, then the entry is inserted regardless, overwriting
+  /// existing values
+  void put(String key, dynamic val, bool overwrite, [int expiry = 10]) {
     if (!exists(key)) {
-      _cache.putIfAbsent(key, () => CacheEntry(val));
+      _cache.putIfAbsent(key, () => CacheEntry(val, expiry));
+    } else if (overwrite) {
+      _cache[key] = CacheEntry(val, expiry);
     }
 
     if (_cache.length > _preferredMaxEntries) {

@@ -85,13 +85,13 @@ class MangaDexModel extends ChangeNotifier {
       if (t.isValid) {
         Token tok = await refreshToken(t.refresh);
         if (tok.isValid) {
-          setToken(tok);
+          await setToken(tok);
         }
       }
     }
   }
 
-  void setToken(Token tkn) async {
+  Future<void> setToken(Token tkn) async {
     _token = tkn;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -112,7 +112,7 @@ class MangaDexModel extends ChangeNotifier {
     }
   }
 
-  void removeToken() async {
+  Future<void> removeToken() async {
     _token = Token();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -151,9 +151,9 @@ class MangaDexModel extends ChangeNotifier {
     if (_token.isValid && _loggedIn) {
       Token tok = await refreshToken(_token.refresh);
       if (tok.isValid) {
-        setToken(tok);
+        await setToken(tok);
       } else {
-        removeToken();
+        await removeToken();
       }
     }
   }
@@ -173,7 +173,7 @@ class MangaDexModel extends ChangeNotifier {
         Token t = Token.fromJson(body['token']);
 
         if (t.isValid) {
-          setToken(t);
+          await setToken(t);
           return true;
         }
       }
@@ -191,7 +191,7 @@ class MangaDexModel extends ChangeNotifier {
         Map<String, dynamic> body = jsonDecode(response.body);
 
         if (body['result'] == 'ok') {
-          removeToken();
+          await removeToken();
           return true;
         }
       }
@@ -313,7 +313,7 @@ class MangaDexModel extends ChangeNotifier {
     }
   }
 
-  /// Fetches manga data of the given [uuids]
+  /// Fetches manga data of the given manga [uuids]
   Future<Iterable<Manga>> fetchManga(Iterable<String> uuids) async {
     if (!_token.isValid || !_loggedIn) {
       throw Exception(
@@ -409,6 +409,8 @@ class Chapter extends MangaDexAPIData {
   final String mangaId;
   final String? userId;
   final String? groupId;
+
+  bool read = false;
 
   Chapter(
       {required String id,
