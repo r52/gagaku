@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MangaDexReaderWidget extends StatefulWidget {
-  const MangaDexReaderWidget({Key? key, required this.chapter})
+  const MangaDexReaderWidget(
+      {Key? key, required this.chapter, required this.manga})
       : super(key: key);
 
   final Chapter chapter;
+  final Manga manga;
 
   @override
   _MangaDexReaderState createState() => _MangaDexReaderState();
@@ -24,7 +26,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
 
   var _currentPage = 0;
 
-  Future<void> saveReaderSettings() async {
+  Future<void> _saveReaderSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('reader.fitWidth', _settings.fitWidth);
     await prefs.setBool('reader.rightToLeft', _settings.rightToLeft);
@@ -50,7 +52,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
             showProgressBar: showProgressBar);
       });
 
-      setTabToCurrentPage(false);
+      _setTabToCurrentPage(false);
     });
 
     var dataSaver =
@@ -78,7 +80,10 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
       List<Image> pages = chData.map((e) {
         var url = server + e;
         return Image(
-            image: CachedNetworkImageProvider(url), loadingBuilder: loadFunc);
+          image: CachedNetworkImageProvider(url),
+          loadingBuilder: loadFunc,
+          fit: BoxFit.cover,
+        );
       }).toList();
       return pages;
     });
@@ -101,16 +106,16 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     super.dispose();
   }
 
-  void setReaderSettings(ReaderSettings settings) {
+  void _setReaderSettings(ReaderSettings settings) {
     setState(() {
       _settings = settings;
     });
 
-    setTabToCurrentPage(false);
-    saveReaderSettings();
+    _setTabToCurrentPage(false);
+    _saveReaderSettings();
   }
 
-  void setTabToCurrentPage([bool animate = true]) {
+  void _setTabToCurrentPage([bool animate = true]) {
     var index = _currentPage;
 
     if (_settings.rightToLeft) {
@@ -124,31 +129,42 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     }
   }
 
-  void changePage(int page) {
+  void _changePage(int page) {
     setState(() {
       _currentPage = page;
     });
 
-    setTabToCurrentPage();
+    _setTabToCurrentPage();
   }
 
-  void onTapLeft() {
+  void _onTapLeft() {
     if (_settings.rightToLeft) {
-      changePage(_currentPage + 1);
+      _changePage(_currentPage + 1);
     } else {
       if (_currentPage > 0) {
-        changePage(_currentPage - 1);
+        _changePage(_currentPage - 1);
       }
     }
   }
 
-  void onTapRight() {
+  void _onTapRight() {
     if (_settings.rightToLeft) {
       if (_currentPage > 0) {
-        changePage(_currentPage - 1);
+        _changePage(_currentPage - 1);
       }
     } else {
-      changePage(_currentPage + 1);
+      _changePage(_currentPage + 1);
+    }
+  }
+
+  void _handleOnTapDown(TapDownDetails details) {
+    var halfwidth = context.size!.width / 2;
+    var tapx = details.localPosition.dx;
+
+    if (tapx < halfwidth) {
+      _onTapLeft();
+    } else {
+      _onTapRight();
     }
   }
 
@@ -173,7 +189,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(),
-        title: Text(title),
+        title: Text(widget.manga.title['en']! + title),
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -193,7 +209,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                   avatar: Icon(Icons.height),
                   label: Text(_settings.fitWidth ? 'Fit Width' : 'Fit Height'),
                   onPressed: () {
-                    setReaderSettings(
+                    _setReaderSettings(
                         _settings.copyWith(fitWidth: !_settings.fitWidth));
                   }),
               const SizedBox(height: 10.0),
@@ -205,7 +221,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                       ? 'Right to Left'
                       : 'Left to Right'),
                   onPressed: () {
-                    setReaderSettings(_settings.copyWith(
+                    _setReaderSettings(_settings.copyWith(
                         rightToLeft: !_settings.rightToLeft));
                   }),
               const SizedBox(height: 10.0),
@@ -215,7 +231,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                       : Icons.donut_small_outlined),
                   label: Text('Progress Bar'),
                   onPressed: () {
-                    setReaderSettings(_settings.copyWith(
+                    _setReaderSettings(_settings.copyWith(
                         showProgressBar: !_settings.showProgressBar));
                   }),
             ],
@@ -230,21 +246,12 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
             var imageViewer = InteractiveViewer(
                 constrained: !_settings.fitWidth,
                 minScale: 0.1,
-                maxScale: 10.0,
+                maxScale: 4.0,
                 child: snapshot.data!.elementAt(_currentPage));
 
             return GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTapDown: (deets) {
-                  var halfwidth = context.size!.width / 2;
-                  var tapx = deets.localPosition.dx;
-
-                  if (tapx < halfwidth) {
-                    onTapLeft();
-                  } else {
-                    onTapRight();
-                  }
-                },
+                onTapDown: _handleOnTapDown,
                 child: Container(child: Center(child: imageViewer)));
           } else if (snapshot.hasError) {
             ScaffoldMessenger.of(context)

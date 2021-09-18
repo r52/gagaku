@@ -180,6 +180,7 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
               MaterialPageRoute(
                 builder: (context) => MangaDexReaderWidget(
                   chapter: e,
+                  manga: widget.state.manga,
                 ),
               ),
             );
