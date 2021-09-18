@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/reader.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MangaDexReaderWidget extends StatefulWidget {
   const MangaDexReaderWidget(
@@ -26,13 +25,6 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
 
   var _currentPage = 0;
 
-  Future<void> _saveReaderSettings() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('reader.fitWidth', _settings.fitWidth);
-    await prefs.setBool('reader.rightToLeft', _settings.rightToLeft);
-    await prefs.setBool('reader.showProgressBar', _settings.showProgressBar);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -40,16 +32,9 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     _tabController = TabController(
         initialIndex: 0, length: widget.chapter.data.length, vsync: this);
 
-    SharedPreferences.getInstance().then((prefs) {
-      bool fitWidth = prefs.getBool('reader.fitWidth') ?? false;
-      bool rightToLeft = prefs.getBool('reader.rightToLeft') ?? false;
-      bool showProgressBar = prefs.getBool('reader.showProgressBar') ?? false;
-
+    ReaderSettings.load().then((settings) {
       setState(() {
-        _settings = ReaderSettings(
-            fitWidth: fitWidth,
-            rightToLeft: rightToLeft,
-            showProgressBar: showProgressBar);
+        _settings = settings;
       });
 
       _setTabToCurrentPage(false);
@@ -99,7 +84,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     });
 
     _setTabToCurrentPage(false);
-    _saveReaderSettings();
+    _settings.save();
   }
 
   void _setTabToCurrentPage([bool animate = true]) {
@@ -160,11 +145,11 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     String title = '';
 
     if (widget.chapter.chapter != null) {
-      title += 'Chapter ' + widget.chapter.chapter!;
+      title += 'Chapter ${widget.chapter.chapter!}';
     }
 
     if (widget.chapter.title != null) {
-      title += ' - ' + widget.chapter.title!;
+      title += ' - ${widget.chapter.title!}';
     }
 
     var pageTabs = List<Tab>.generate(
@@ -176,7 +161,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(),
-        title: Text(widget.manga.title['en']! + title),
+        title: Text('${widget.manga.title['en']!} - ${title}'),
         actions: [
           Builder(
             builder: (context) => IconButton(
