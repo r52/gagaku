@@ -63,30 +63,17 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
         .then((server) {
       var chData = dataSaver ? widget.chapter.dataSaver : widget.chapter.data;
 
-      var loadFunc = (BuildContext context, Widget child,
-          ImageChunkEvent? loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        }
-        return Center(
-            child: CircularProgressIndicator(
-          value: loadingProgress.expectedTotalBytes != null
-              ? loadingProgress.cumulativeBytesLoaded /
-                  loadingProgress.expectedTotalBytes!
-              : null,
-        ));
-      };
-
       List<Image> pages = chData.map((e) {
         var url = server + e;
         return Image(
           image: CachedNetworkImageProvider(url),
-          loadingBuilder: loadFunc,
           fit: BoxFit.cover,
         );
       }).toList();
       return pages;
     });
+
+    // TODO: mark chapter as read
   }
 
   @override

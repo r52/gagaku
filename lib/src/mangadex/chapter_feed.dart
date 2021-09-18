@@ -217,21 +217,13 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
                         '; id=' +
                         widget.state.manga.id);
                   },
-                  child: Image(
-                      image: CachedNetworkImageProvider(widget.state.coverArt),
-                      width: 128.0,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        }
-                        return Center(
-                            child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ));
-                      }),
+                  child: CachedNetworkImage(
+                      imageUrl: widget.state.coverArt,
+                      placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      width: 128.0),
                 ),
                 Expanded(
                     child: Column(

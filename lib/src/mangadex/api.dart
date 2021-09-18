@@ -62,7 +62,7 @@ class MangaDexModel extends ChangeNotifier {
 
   CacheManager _cache = CacheManager();
 
-  // TODO: Settings
+  // TODO: MangaDex Settings
   List<String> _translatedLanguages = ['en'];
   List<String> _originalLanguage = ['ja'];
   List<String> _contentRating = [
