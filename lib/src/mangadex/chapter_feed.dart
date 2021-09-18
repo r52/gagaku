@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/reader.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -77,6 +78,17 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
     return wlist;
   }
 
+  Future<void> _refreshFeed() async {
+    await Provider.of<MangaDexModel>(context, listen: false)
+        .invalidateCacheItem(CacheLists.latestChapters);
+
+    // Refresh
+    setState(() {
+      _chapterOffset = 0;
+      _items = _fetchChapters(0);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<MangaDexModel>(builder: (context, mdx, child) {
@@ -94,8 +106,7 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
                     }),
                     child: RefreshIndicator(
                         onRefresh: () async {
-                          // TODO refresh
-                          //await _refreshMangaFeed();
+                          await _refreshFeed();
                         },
                         child: ListView.builder(
                           controller: _scrollController,
@@ -158,8 +169,14 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
                   ? Theme.of(context).colorScheme.background
                   : Theme.of(context).colorScheme.primary)),
           onPressed: () async {
-            // TODO READER!!!!
-            print('tapped chapter ' + title + '; id=' + e.id);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MangaDexReaderWidget(
+                  chapter: e,
+                ),
+              ),
+            );
           },
           child: Row(
             children: [
@@ -186,20 +203,29 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextButton(
-                    onPressed: () async {
-                      // TODO: manga view
-                      print('tapped manga ' +
-                          widget.state.manga.title['en']! +
-                          '; id=' +
-                          widget.state.manga.id);
-                    },
-                    child: CachedNetworkImage(
-                        imageUrl: widget.state.coverArt,
-                        placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                        width: 128.0)),
+                  onPressed: () async {
+                    // TODO: manga view
+                    print('tapped manga ' +
+                        widget.state.manga.title['en']! +
+                        '; id=' +
+                        widget.state.manga.id);
+                  },
+                  child: Image(
+                      image: CachedNetworkImageProvider(widget.state.coverArt),
+                      width: 128.0,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                            child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ));
+                      }),
+                ),
                 Expanded(
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

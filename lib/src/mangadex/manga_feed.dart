@@ -46,7 +46,7 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
         .fetchManga(mangaIds);
   }
 
-  Future<void> _refreshMangaFeed() async {
+  Future<void> _refreshFeed() async {
     await Provider.of<MangaDexModel>(context, listen: false)
         .invalidateCacheItem(CacheLists.latestChapters);
 
@@ -74,7 +74,7 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
                     }),
                     child: RefreshIndicator(
                         onRefresh: () async {
-                          await _refreshMangaFeed();
+                          await _refreshFeed();
                         },
                         child: GridView.extent(
                           controller: _scrollController,
@@ -131,13 +131,20 @@ class _GridMangaItem extends StatelessWidget {
     final Widget image = Material(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       clipBehavior: Clip.antiAlias,
-      child: CachedNetworkImage(
-        imageUrl: manga.getCovertArtUrl(),
-        placeholder: (context, url) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        errorWidget: (context, url, error) => Icon(Icons.error),
-      ),
+      child: Image(
+          image: CachedNetworkImageProvider(manga.getCovertArtUrl()),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            }
+            return Center(
+                child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ));
+          }),
     );
 
     return InkWell(

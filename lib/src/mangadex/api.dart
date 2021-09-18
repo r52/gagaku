@@ -26,6 +26,7 @@ abstract class MangaDexEndpoints {
   static const manga = '/manga';
   static const getRead = '/manga/read';
   static const setRead = '/chapter/{id}/read';
+  static const server = '/at-home/server/{id}';
 }
 
 abstract class CacheLists {
@@ -76,6 +77,7 @@ class MangaDexModel extends ChangeNotifier {
   Token get token => _token;
   bool get loggedIn => _loggedIn;
   MangaDexClient? get client => _client;
+  bool get dataSaver => _dataSaver;
 
   void init() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -417,6 +419,26 @@ class MangaDexModel extends ChangeNotifier {
         throw Exception("Failed to download read chapters data");
       }
     }
+  }
+
+  /// Fetches the relay server for [chapter] pages
+  Future<String> getChapterServer(Chapter chapter) async {
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id));
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = jsonDecode(response.body);
+      var baseUrl = body['baseUrl'] as String;
+
+      var chapterUrl =
+          '$baseUrl/${_dataSaver ? 'data-saver' : 'data'}/${chapter.hash}/';
+
+      return chapterUrl;
+    }
+
+    throw Exception("Failed to get relay server");
   }
 }
 
