@@ -53,21 +53,28 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
     var mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
     // Craft feed items
-    List<_ChapterFeedItem> list = [];
+    List<_ChapterFeedItemData> dlist = [];
 
     chapters.forEach((chapter) {
-      _ChapterFeedItem? item;
-      if (list.isNotEmpty && list.last.mangaId == chapter.mangaId) {
-        item = list.last;
+      _ChapterFeedItemData? item;
+      if (dlist.isNotEmpty && dlist.last.mangaId == chapter.mangaId) {
+        item = dlist.last;
       } else {
-        item = new _ChapterFeedItem(manga: mangaMap[chapter.mangaId]!);
-        list.add(item);
+        item = new _ChapterFeedItemData(manga: mangaMap[chapter.mangaId]!);
+        dlist.add(item);
       }
 
       item.chapters.add(chapter);
     });
 
-    return list;
+    // Craft widgets
+    var wlist = dlist
+        .map((e) => _ChapterFeedItem(
+              state: e,
+            ))
+        .toList();
+
+    return wlist;
   }
 
   @override
@@ -117,21 +124,19 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
   }
 }
 
-class _ChapterFeedItem extends StatelessWidget {
-  _ChapterFeedItem({Key? key, required this.manga})
-      : mangaId = manga.id,
-        coverArt = manga.getCovertArtUrl(quality: CoverArtQuality.small),
-        super(key: key);
+class _ChapterFeedItem extends StatefulWidget {
+  _ChapterFeedItem({Key? key, required this.state}) : super(key: key);
 
-  final Manga manga;
-  final String mangaId;
-  final String coverArt;
-
-  List<Chapter> chapters = [];
+  final _ChapterFeedItemData state;
 
   @override
+  _ChapterFeedItemState createState() => _ChapterFeedItemState();
+}
+
+class _ChapterFeedItemState extends State<_ChapterFeedItem> {
+  @override
   Widget build(BuildContext context) {
-    var chapterBtns = chapters.map((e) {
+    var chapterBtns = widget.state.chapters.map((e) {
       String title = '';
 
       if (e.chapter != null) {
@@ -142,8 +147,8 @@ class _ChapterFeedItem extends StatelessWidget {
         title += ' - ' + e.title!;
       }
 
-      if (manga.readChaptersRetrieved) {
-        e.read = manga.readChapters.contains(e.id);
+      if (widget.state.manga.readChaptersRetrieved) {
+        e.read = widget.state.manga.readChapters.contains(e.id);
       }
 
       return OutlinedButton(
@@ -184,12 +189,12 @@ class _ChapterFeedItem extends StatelessWidget {
                     onPressed: () async {
                       // TODO: manga view
                       print('tapped manga ' +
-                          manga.title['en']! +
+                          widget.state.manga.title['en']! +
                           '; id=' +
-                          manga.id);
+                          widget.state.manga.id);
                     },
                     child: CachedNetworkImage(
-                        imageUrl: coverArt,
+                        imageUrl: widget.state.coverArt,
                         placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -207,11 +212,11 @@ class _ChapterFeedItem extends StatelessWidget {
                         onPressed: () async {
                           // TODO: manga view
                           print('tapped manga ' +
-                              manga.title['en']! +
+                              widget.state.manga.title['en']! +
                               '; id=' +
-                              manga.id);
+                              widget.state.manga.id);
                         },
-                        child: Text(manga.title['en']!)),
+                        child: Text(widget.state.manga.title['en']!)),
                     Divider(),
                     ...chapterBtns
                   ],
@@ -219,4 +224,16 @@ class _ChapterFeedItem extends StatelessWidget {
               ],
             )));
   }
+}
+
+class _ChapterFeedItemData {
+  _ChapterFeedItemData({required this.manga})
+      : mangaId = manga.id,
+        coverArt = manga.getCovertArtUrl(quality: CoverArtQuality.small);
+
+  final Manga manga;
+  final String mangaId;
+  final String coverArt;
+
+  List<Chapter> chapters = [];
 }

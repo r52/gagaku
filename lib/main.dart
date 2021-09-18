@@ -19,6 +19,7 @@ void main() {
       themeMode: ThemeMode
           .dark, // ThemeMode.system doesn't work on Windows https://github.com/flutter/flutter/issues/54612
       debugShowCheckedModeBanner: false,
+      restorationScopeId: 'gagaku_root',
       home: GagakuApp(),
     ),
   ));
