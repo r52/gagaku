@@ -48,14 +48,9 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
             fitWidth: fitWidth,
             rightToLeft: rightToLeft,
             showProgressBar: showProgressBar);
-
-        if (_settings.rightToLeft) {
-          _tabController.index =
-              (widget.chapter.data.length - 1) - _tabController.index;
-        } else {
-          _tabController.index = _currentPage;
-        }
       });
+
+      setTabToCurrentPage(false);
     });
 
     var dataSaver =
@@ -129,36 +124,32 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     }
   }
 
-  void onTapLeft() {
-    if (_settings.rightToLeft) {
-      setState(() {
-        _currentPage += 1;
-      });
-    } else {
-      if (_currentPage > 0) {
-        setState(() {
-          _currentPage -= 1;
-        });
-      }
-    }
+  void changePage(int page) {
+    setState(() {
+      _currentPage = page;
+    });
 
     setTabToCurrentPage();
+  }
+
+  void onTapLeft() {
+    if (_settings.rightToLeft) {
+      changePage(_currentPage + 1);
+    } else {
+      if (_currentPage > 0) {
+        changePage(_currentPage - 1);
+      }
+    }
   }
 
   void onTapRight() {
     if (_settings.rightToLeft) {
       if (_currentPage > 0) {
-        setState(() {
-          _currentPage -= 1;
-        });
+        changePage(_currentPage - 1);
       }
     } else {
-      setState(() {
-        _currentPage += 1;
-      });
+      changePage(_currentPage + 1);
     }
-
-    setTabToCurrentPage();
   }
 
   @override
@@ -173,7 +164,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
       title += ' - ' + widget.chapter.title!;
     }
 
-    var tabs = List<Tab>.generate(
+    var pageTabs = List<Tab>.generate(
         widget.chapter.data.length,
         (int index) => Tab(
               text: (index + 1).toString(),
@@ -286,7 +277,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                   _currentPage = index;
                 });
               },
-              tabs: [...(_settings.rightToLeft ? tabs.reversed : tabs)],
+              tabs: [...(_settings.rightToLeft ? pageTabs.reversed : pageTabs)],
             )
           : null,
     );
