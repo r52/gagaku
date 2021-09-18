@@ -195,6 +195,23 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
               SizedBox(width: 5),
               Text(title),
               Spacer(),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[850],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    Icon(Icons.group, size: 20),
+                    SizedBox(width: 5),
+                    Text(e.groupName)
+                  ],
+                ),
+              ),
+              SizedBox(width: 10),
               Icon(Icons.schedule, size: 20),
               SizedBox(width: 5),
               Text(timeago.format(e.publishAt))

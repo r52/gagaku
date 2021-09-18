@@ -270,7 +270,8 @@ class MangaDexModel extends ChangeNotifier {
       'translatedLanguage[]': _translatedLanguages,
       'originalLanguage[]': _originalLanguage,
       'contentRating[]': _contentRating,
-      'order[publishAt]': 'desc'
+      'order[publishAt]': 'desc',
+      'includes[]': 'scanlation_group'
     };
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
@@ -482,6 +483,7 @@ class Chapter extends MangaDexAPIData {
   final String mangaId;
   final String? userId;
   final String? groupId;
+  final String groupName;
 
   bool read = false;
 
@@ -501,7 +503,8 @@ class Chapter extends MangaDexAPIData {
       required this.publishAt,
       required this.mangaId,
       this.userId,
-      this.groupId})
+      this.groupId,
+      required this.groupName})
       : super._(id, 'chapter', 65535);
 
   factory Chapter.fromJson(Map<String, dynamic> data) {
@@ -510,6 +513,7 @@ class Chapter extends MangaDexAPIData {
 
       String mangaId = '';
       String groupId = '';
+      String groupName = 'No Group';
       String userId = '';
 
       List<Map<String, dynamic>> relations =
@@ -521,6 +525,8 @@ class Chapter extends MangaDexAPIData {
           userId = r['id'];
         } else if (r['type'] == 'scanlation_group') {
           groupId = r['id'];
+          Map<String, dynamic> cattrs = r['attributes'];
+          groupName = cattrs['name'];
         }
       });
 
@@ -540,7 +546,8 @@ class Chapter extends MangaDexAPIData {
           version: attr['version'],
           mangaId: mangaId,
           userId: userId,
-          groupId: groupId);
+          groupId: groupId,
+          groupName: groupName);
     }
 
     throw ArgumentError('Unexpected data retrieval failure');
