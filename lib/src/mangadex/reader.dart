@@ -256,7 +256,13 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                 },
                 child: Container(child: Center(child: imageViewer)));
           } else if (snapshot.hasError) {
-            // TODO toast
+            ScaffoldMessenger.of(context)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(SnackBar(
+                content: Text('${snapshot.error}'),
+                backgroundColor: Colors.red,
+              ));
+
             return Text('${snapshot.error}');
           }
 

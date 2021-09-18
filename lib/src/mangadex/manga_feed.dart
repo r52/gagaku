@@ -90,7 +90,13 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
                               .toList(),
                         )));
               } else if (snapshot.hasError) {
-                // TODO toast
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text('${snapshot.error}'),
+                    backgroundColor: Colors.red,
+                  ));
+
                 return Text('${snapshot.error}');
               }
 
