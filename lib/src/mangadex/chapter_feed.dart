@@ -154,10 +154,12 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
     final theme = Theme.of(context);
 
     var chapterBtns = widget.state.chapters.map((e) {
-      return ChapterButtonWidget(
-        chapter: e,
-        manga: widget.state.manga,
-      );
+      return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: ChapterButtonWidget(
+            chapter: e,
+            manga: widget.state.manga,
+          ));
     }).toList();
 
     return Card(
