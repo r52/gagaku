@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/manga_view.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexMangaFeed extends StatefulWidget {
@@ -59,56 +60,54 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MangaDexModel>(builder: (context, mdx, child) {
-      return Scaffold(
-        body: Center(
-          child: FutureBuilder<Iterable<Manga>>(
-            future: _mangaList,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ScrollConfiguration(
-                    behavior:
-                        ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: RefreshIndicator(
-                        onRefresh: () async {
-                          await _refreshFeed();
-                        },
-                        child: GridView.extent(
-                          controller: _scrollController,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          restorationId: 'manga_list_grid_offset',
-                          maxCrossAxisExtent: 300,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          padding: const EdgeInsets.all(8),
-                          childAspectRatio: 0.7,
-                          children: snapshot.data!
-                              .map((manga) => _GridMangaItem(manga: manga))
-                              .toList(),
-                        )));
-              } else if (snapshot.hasError) {
-                ScaffoldMessenger.of(context)
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(SnackBar(
-                    content: Text('${snapshot.error}'),
-                    backgroundColor: Colors.red,
-                  ));
+    return Scaffold(
+      body: Center(
+        child: FutureBuilder<Iterable<Manga>>(
+          future: _mangaList,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ScrollConfiguration(
+                  behavior:
+                      ScrollConfiguration.of(context).copyWith(dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                  }),
+                  child: RefreshIndicator(
+                      onRefresh: () async {
+                        await _refreshFeed();
+                      },
+                      child: GridView.extent(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        restorationId: 'manga_list_grid_offset',
+                        maxCrossAxisExtent: 300,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        padding: const EdgeInsets.all(8),
+                        childAspectRatio: 0.7,
+                        children: snapshot.data!
+                            .map((manga) => _GridMangaItem(manga: manga))
+                            .toList(),
+                      )));
+            } else if (snapshot.hasError) {
+              ScaffoldMessenger.of(context)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(SnackBar(
+                  content: Text('${snapshot.error}'),
+                  backgroundColor: Colors.red,
+                ));
 
-                return Text('${snapshot.error}');
-              }
+              return Text('${snapshot.error}');
+            }
 
-              // By default, show a loading spinner.
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            },
-          ),
+            // By default, show a loading spinner.
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
@@ -148,8 +147,7 @@ class _GridMangaItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        // TODO: manga view
-        print('tapped manga ' + manga.title['en']! + '; id=' + manga.id);
+        Navigator.push(context, createMangaViewRoute(manga));
       },
       child: GridTile(
         footer: Material(

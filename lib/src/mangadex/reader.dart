@@ -4,6 +4,28 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/reader.dart';
 import 'package:provider/provider.dart';
 
+Route createReaderRoute(Chapter chapter, Manga manga) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        MangaDexReaderWidget(
+      chapter: chapter,
+      manga: manga,
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
 class MangaDexReaderWidget extends StatefulWidget {
   const MangaDexReaderWidget(
       {Key? key, required this.chapter, required this.manga})
@@ -161,7 +183,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(),
-        title: Text('${widget.manga.title['en']!} - ${title}'),
+        title: Text('${widget.manga.title['en']!} - $title'),
         actions: [
           Builder(
             builder: (context) => IconButton(

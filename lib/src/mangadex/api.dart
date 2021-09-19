@@ -27,6 +27,7 @@ abstract class MangaDexEndpoints {
   static const getRead = '/manga/read';
   static const setRead = '/chapter/{id}/read';
   static const server = '/at-home/server/{id}';
+  static const mangaFeed = '/manga/{id}/feed';
 }
 
 abstract class CacheLists {
@@ -306,7 +307,7 @@ class MangaDexModel extends ChangeNotifier {
     }
 
     // Throw if failure
-    throw Exception("Failed to download chapters");
+    throw Exception("Failed to download latest chapters");
   }
 
   /// Invalidates a cache item so that it can be refreshed from the API
@@ -440,6 +441,111 @@ class MangaDexModel extends ChangeNotifier {
     }
 
     throw Exception("Failed to get relay server");
+  }
+
+  /// Fetches the latest chapters of a specific [manga]
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiQueryLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// If [wholeList] is true, the operation always returns the entire list
+  /// up to the latest data requested by offset. Otherwise, the range of items
+  /// from [offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length))
+  /// is returned. Ranged return may be empty if the latest fetch returned
+  /// all available data (list.length < apiQueryLimit)
+  Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
+      [int offset = 0, bool wholeList = false]) async {
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_token.expired) {
+      await refreshCurrentToken();
+    }
+
+    var list = <Chapter>[];
+
+    // Grab it from the cache if it exists
+    if (manga.chaptersRetrieved) {
+      var cached = manga.chapters.map((e) {
+        return _cache.get<Chapter>(e);
+      }).toList();
+
+      // If requested offset is less than the total length of the cached list,
+      // return the cropped list of range [offset, min(offset + apiQueryLimit, cached.length))
+      // (or the entire list if requested)
+      if (offset < cached.length) {
+        if (!wholeList) {
+          return cached.getRange(offset,
+              min(offset + MangaDexEndpoints.apiQueryLimit, cached.length));
+        } else {
+          return cached;
+        }
+      }
+
+      // If cache.length < apiQueryLimit, then the latest fetch returned
+      // all available data, so return nothing (or the entire list if requested)
+      if (cached.length < MangaDexEndpoints.apiQueryLimit) {
+        if (!wholeList) {
+          return [];
+        } else {
+          return cached;
+        }
+      }
+
+      // Otherwise, if offset >= cache.length and cache.length >= apiQueryLimit,
+      // then we need to fetch more data from the api
+      list.addAll(cached);
+    }
+
+    // Download missing data
+    // dev.log('Downloading latest chapters');
+    final queryParams = {
+      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+      'offset': offset.toString(),
+      'translatedLanguage[]': _translatedLanguages,
+      'originalLanguage[]': _originalLanguage,
+      'contentRating[]': _contentRating,
+      'order[chapter]': 'desc',
+      'includes[]': 'scanlation_group'
+    };
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
+        queryParameters: queryParams);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      // dev.log('response', error: response.body);
+      final Map<String, dynamic> body = jsonDecode(response.body);
+
+      List<dynamic> chlist = body['data'];
+
+      var result = chlist.map((json) => Chapter.fromJson(json)).toList();
+
+      // Cache the data
+      _cache.putAllAPIResolved(result);
+
+      // Add data to the list
+      list.addAll(result);
+
+      // Cache the list
+      manga.chaptersRetrieved = true;
+      manga.chapters = list.map((e) => e.id).toList();
+
+      if (!wholeList) {
+        return list.getRange(
+            offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length));
+      } else {
+        return list;
+      }
+    }
+
+    // Throw if failure
+    throw Exception("Failed to download manga chapters");
   }
 }
 
@@ -580,6 +686,9 @@ class Manga extends MangaDexAPIData {
 
   bool readChaptersRetrieved = false;
   Set<String> readChapters = Set<String>();
+
+  bool chaptersRetrieved = false;
+  List<String> chapters = [];
 
   Manga(
       {required String id,

@@ -4,9 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
-import 'package:gagaku/src/mangadex/reader.dart';
+import 'package:gagaku/src/mangadex/manga_view.dart';
+import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class MangaDexChapterFeed extends StatefulWidget {
   MangaDexChapterFeed({Key? key}) : super(key: key);
@@ -91,53 +91,51 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MangaDexModel>(builder: (context, mdx, child) {
-      return Scaffold(
-        body: Center(
-          child: FutureBuilder<Iterable<_ChapterFeedItem>>(
-            future: _items,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ScrollConfiguration(
-                    behavior:
-                        ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: RefreshIndicator(
-                        onRefresh: () async {
-                          await _refreshFeed();
+    return Scaffold(
+      body: Center(
+        child: FutureBuilder<Iterable<_ChapterFeedItem>>(
+          future: _items,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ScrollConfiguration(
+                  behavior:
+                      ScrollConfiguration.of(context).copyWith(dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                  }),
+                  child: RefreshIndicator(
+                      onRefresh: () async {
+                        await _refreshFeed();
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        restorationId: 'chapter_list_offset',
+                        padding: const EdgeInsets.all(8),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return snapshot.data!.elementAt(index);
                         },
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          restorationId: 'chapter_list_offset',
-                          padding: const EdgeInsets.all(8),
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return snapshot.data!.elementAt(index);
-                          },
-                        )));
-              } else if (snapshot.hasError) {
-                ScaffoldMessenger.of(context)
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(SnackBar(
-                    content: Text('${snapshot.error}'),
-                    backgroundColor: Colors.red,
-                  ));
+                      )));
+            } else if (snapshot.hasError) {
+              ScaffoldMessenger.of(context)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(SnackBar(
+                  content: Text('${snapshot.error}'),
+                  backgroundColor: Colors.red,
+                ));
 
-                return Text('${snapshot.error}');
-              }
+              return Text('${snapshot.error}');
+            }
 
-              // By default, show a loading spinner.
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            },
-          ),
+            // By default, show a loading spinner.
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
@@ -153,70 +151,13 @@ class _ChapterFeedItem extends StatefulWidget {
 class _ChapterFeedItemState extends State<_ChapterFeedItem> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     var chapterBtns = widget.state.chapters.map((e) {
-      String title = '';
-
-      if (e.chapter != null) {
-        title += 'Chapter ' + e.chapter!;
-      }
-
-      if (e.title != null) {
-        title += ' - ' + e.title!;
-      }
-
-      if (widget.state.manga.readChaptersRetrieved) {
-        e.read = widget.state.manga.readChapters.contains(e.id);
-      }
-
-      return OutlinedButton(
-          style: OutlinedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              primary: (e.read
-                  ? Theme.of(context).colorScheme.background
-                  : Theme.of(context).colorScheme.primary)),
-          onPressed: () async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MangaDexReaderWidget(
-                  chapter: e,
-                  manga: widget.state.manga,
-                ),
-              ),
-            );
-          },
-          child: Row(
-            children: [
-              Icon(
-                e.read ? Icons.check : Icons.circle,
-                color: e.read ? Colors.green : Colors.blue,
-                size: e.read ? 15 : 10,
-              ),
-              SizedBox(width: 5),
-              Text(title),
-              Spacer(),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[850],
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-                alignment: Alignment.center,
-                child: Row(
-                  children: [
-                    Icon(Icons.group, size: 20),
-                    SizedBox(width: 5),
-                    Text(e.groupName)
-                  ],
-                ),
-              ),
-              SizedBox(width: 10),
-              Icon(Icons.schedule, size: 20),
-              SizedBox(width: 5),
-              Text(timeago.format(e.publishAt))
-            ],
-          ));
+      return ChapterButtonWidget(
+        chapter: e,
+        manga: widget.state.manga,
+      );
     }).toList();
 
     return Card(
@@ -228,11 +169,8 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
               children: [
                 TextButton(
                   onPressed: () async {
-                    // TODO: manga view
-                    print('tapped manga ' +
-                        widget.state.manga.title['en']! +
-                        '; id=' +
-                        widget.state.manga.id);
+                    Navigator.push(
+                        context, createMangaViewRoute(widget.state.manga));
                   },
                   child: CachedNetworkImage(
                       imageUrl: widget.state.coverArt,
@@ -248,15 +186,12 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
                   children: [
                     TextButton(
                         style: TextButton.styleFrom(
-                            primary: Theme.of(context).colorScheme.onSurface,
+                            primary: theme.colorScheme.onSurface,
                             textStyle: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         onPressed: () async {
-                          // TODO: manga view
-                          print('tapped manga ' +
-                              widget.state.manga.title['en']! +
-                              '; id=' +
-                              widget.state.manga.id);
+                          Navigator.push(context,
+                              createMangaViewRoute(widget.state.manga));
                         },
                         child: Text(widget.state.manga.title['en']!)),
                     Divider(),
