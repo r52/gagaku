@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/reader.dart';
 import 'package:provider/provider.dart';
@@ -40,12 +41,15 @@ class MangaDexReaderWidget extends StatefulWidget {
 
 class _MangaDexReaderState extends State<MangaDexReaderWidget>
     with TickerProviderStateMixin {
+  final FocusNode _focusNode = FocusNode();
   ReaderSettings _settings = ReaderSettings();
 
   late TabController _tabController;
   late Future<List<Image>> _pages;
 
   var _currentPage = 0;
+
+  final _swipeSensitivity = 8;
 
   @override
   void initState() {
@@ -106,6 +110,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
   @override
   void dispose() {
     _tabController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -142,11 +147,11 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
 
   void _onTapLeft() {
     if (_settings.rightToLeft) {
-      _changePage(_currentPage + 1);
-    } else {
-      if (_currentPage > 0) {
-        _changePage(_currentPage - 1);
+      if (_currentPage < widget.chapter.data.length - 1) {
+        _changePage(_currentPage + 1);
       }
+    } else if (_currentPage > 0) {
+      _changePage(_currentPage - 1);
     }
   }
 
@@ -155,18 +160,38 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
       if (_currentPage > 0) {
         _changePage(_currentPage - 1);
       }
-    } else {
+    } else if (_currentPage < widget.chapter.data.length - 1) {
       _changePage(_currentPage + 1);
     }
   }
 
   void _handleOnTapDown(TapDownDetails details) {
+    _focusNode.requestFocus();
+
     var halfwidth = context.size!.width / 2;
     var tapx = details.localPosition.dx;
 
     if (tapx < halfwidth) {
       _onTapLeft();
     } else {
+      _onTapRight();
+    }
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
+        _onTapLeft();
+      } else if (event.physicalKey == PhysicalKeyboardKey.arrowRight) {
+        _onTapRight();
+      }
+    }
+  }
+
+  void _handleHorizontalDragEnd(DragEndDetails details) {
+    if (details.primaryVelocity! < -_swipeSensitivity) {
+      _onTapLeft();
+    } else if (details.primaryVelocity! > _swipeSensitivity) {
       _onTapRight();
     }
   }
@@ -237,6 +262,16 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                     _setReaderSettings(_settings.copyWith(
                         showProgressBar: !_settings.showProgressBar));
                   }),
+              const SizedBox(height: 10.0),
+              ActionChip(
+                  avatar: Icon(_settings.swipeToChangePage
+                      ? Icons.swipe
+                      : Icons.swap_calls_outlined),
+                  label: Text('Swipe to change page'),
+                  onPressed: () {
+                    _setReaderSettings(_settings.copyWith(
+                        swipeToChangePage: !_settings.swipeToChangePage));
+                  }),
             ],
           ),
         ),
@@ -252,10 +287,15 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                 maxScale: 4.0,
                 child: snapshot.data!.elementAt(_currentPage));
 
-            return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTapDown: _handleOnTapDown,
-                child: Container(child: Center(child: imageViewer)));
+            return KeyboardListener(
+                autofocus: true,
+                focusNode: _focusNode,
+                onKeyEvent: _handleKeyEvent,
+                child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapDown: _handleOnTapDown,
+                    onHorizontalDragEnd: _handleHorizontalDragEnd,
+                    child: Container(child: Center(child: imageViewer))));
           } else if (snapshot.hasError) {
             ScaffoldMessenger.of(context)
               ..removeCurrentSnackBar()

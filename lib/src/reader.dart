@@ -15,20 +15,27 @@ class ReaderSettings {
   final bool showProgressBar;
   static const _showProgressBarKey = 'reader.showProgressBar';
 
+  /// Whether swiping left or right changes the page (default false)
+  final bool swipeToChangePage;
+  static const _swipeToChangePage = 'reader.swipeToChangePage';
+
   ReaderSettings(
       {this.fitWidth = false,
       this.rightToLeft = false,
-      this.showProgressBar = false});
+      this.showProgressBar = false,
+      this.swipeToChangePage = false});
 
   ReaderSettings copyWith({
     bool? fitWidth,
     bool? rightToLeft,
     bool? showProgressBar,
+    bool? swipeToChangePage,
   }) {
     return ReaderSettings(
       fitWidth: fitWidth ?? this.fitWidth,
       rightToLeft: rightToLeft ?? this.rightToLeft,
       showProgressBar: showProgressBar ?? this.showProgressBar,
+      swipeToChangePage: swipeToChangePage ?? this.swipeToChangePage,
     );
   }
 
@@ -37,11 +44,13 @@ class ReaderSettings {
     bool fitWidth = prefs.getBool(_fitWidthKey) ?? false;
     bool rightToLeft = prefs.getBool(_rightToLeftKey) ?? false;
     bool showProgressBar = prefs.getBool(_showProgressBarKey) ?? false;
+    bool swipeToChangePage = prefs.getBool(_swipeToChangePage) ?? false;
 
     return ReaderSettings(
         fitWidth: fitWidth,
         rightToLeft: rightToLeft,
-        showProgressBar: showProgressBar);
+        showProgressBar: showProgressBar,
+        swipeToChangePage: swipeToChangePage);
   }
 
   Future<void> save() async {
@@ -49,5 +58,6 @@ class ReaderSettings {
     await prefs.setBool(_fitWidthKey, fitWidth);
     await prefs.setBool(_rightToLeftKey, rightToLeft);
     await prefs.setBool(_showProgressBarKey, showProgressBar);
+    await prefs.setBool(_swipeToChangePage, swipeToChangePage);
   }
 }

@@ -92,7 +92,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                           pinned: true,
                           snap: false,
                           floating: false,
-                          expandedHeight: 200.0,
+                          expandedHeight: 160.0,
                           flexibleSpace: FlexibleSpaceBar(
                             title: Text(
                               '${widget.manga.title['en']!}',
