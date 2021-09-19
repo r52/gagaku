@@ -122,14 +122,15 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                             ),
                           ),
                         ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: Text('TODO'), // TODO
-                            ),
-                          ),
-                        ),
+                        // TODO manga view data/commands
+                        // const SliverToBoxAdapter(
+                        //   child: SizedBox(
+                        //     height: 50,
+                        //     child: Center(
+                        //       child: Text('TODO'),
+                        //     ),
+                        //   ),
+                        // ),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {

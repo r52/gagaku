@@ -80,7 +80,16 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
       return pages;
     });
 
-    // TODO: mark chapter as read
+    // Mark as read if not read
+    if (!widget.chapter.read) {
+      Provider.of<MangaDexModel>(context, listen: false)
+          .setChapterRead(widget.chapter, true)
+          .then((result) {
+        if (result) {
+          widget.manga.readChapters.add(widget.chapter.id);
+        }
+      });
+    }
   }
 
   @override

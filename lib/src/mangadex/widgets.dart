@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/reader.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ChapterButtonWidget extends StatefulWidget {
@@ -38,13 +39,31 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
     return ListTile(
         onTap: () {
           Navigator.push(
-              context, createReaderRoute(widget.chapter, widget.manga));
+                  context, createReaderRoute(widget.chapter, widget.manga))
+              .then((value) {
+            // Refresh this when reader view is closed to update read status
+            setState(() {});
+          });
         },
         tileColor: theme.backgroundColor,
         dense: true,
         leading: IconButton(
-          onPressed: () {
-            // TODO mark chapter as read
+          onPressed: () async {
+            bool set = !widget.chapter.read;
+            bool result =
+                await Provider.of<MangaDexModel>(context, listen: false)
+                    .setChapterRead(widget.chapter, set);
+
+            if (result) {
+              // Refresh
+              setState(() {
+                if (set) {
+                  widget.manga.readChapters.add(widget.chapter.id);
+                } else {
+                  widget.manga.readChapters.remove(widget.chapter.id);
+                }
+              });
+            }
           },
           padding: const EdgeInsets.all(0.0),
           splashRadius: 15,

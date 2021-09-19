@@ -547,6 +547,40 @@ class MangaDexModel extends ChangeNotifier {
     // Throw if failure
     throw Exception("Failed to download manga chapters");
   }
+
+  Future<bool> setChapterRead(Chapter chapter, bool setRead) async {
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_token.expired) {
+      await refreshCurrentToken();
+    }
+
+    if (chapter.read == setRead) {
+      // Nothing to do, and shouldn't get here
+      return true;
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.setRead.replaceFirst('{id}', chapter.id));
+
+    http.Response response;
+
+    if (setRead) {
+      response = await _client!.post(uri);
+    } else {
+      response = await _client!.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      // Success
+      return true;
+    }
+
+    return false;
+  }
 }
 
 class MangaDexClient extends http.BaseClient {
