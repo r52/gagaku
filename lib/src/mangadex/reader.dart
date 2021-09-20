@@ -1,8 +1,12 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/reader.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 Route createReaderRoute(Chapter chapter, Manga manga) {
@@ -27,6 +31,14 @@ Route createReaderRoute(Chapter chapter, Manga manga) {
   );
 }
 
+class ReaderScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
+}
+
 class MangaDexReaderWidget extends StatefulWidget {
   const MangaDexReaderWidget(
       {Key? key, required this.chapter, required this.manga})
@@ -39,31 +51,24 @@ class MangaDexReaderWidget extends StatefulWidget {
   _MangaDexReaderState createState() => _MangaDexReaderState();
 }
 
-class _MangaDexReaderState extends State<MangaDexReaderWidget>
-    with TickerProviderStateMixin {
+class _MangaDexReaderState extends State<MangaDexReaderWidget> {
   final FocusNode _focusNode = FocusNode();
   ReaderSettings _settings = ReaderSettings();
 
-  late TabController _tabController;
-  late Future<List<Image>> _pages;
+  final PageController _pageController = PageController(initialPage: 0);
+  final PhotoViewScaleStateController _scaleStateController =
+      PhotoViewScaleStateController();
 
-  var _currentPage = 0;
-
-  final _swipeSensitivity = 8;
+  late Future<List<ImageProvider>> _pages;
 
   @override
   void initState() {
     super.initState();
 
-    _tabController = TabController(
-        initialIndex: 0, length: widget.chapter.data.length, vsync: this);
-
     ReaderSettings.load().then((settings) {
       setState(() {
         _settings = settings;
       });
-
-      _setTabToCurrentPage(false);
     });
 
     var dataSaver =
@@ -74,12 +79,9 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
         .then((server) {
       var chData = dataSaver ? widget.chapter.dataSaver : widget.chapter.data;
 
-      List<Image> pages = chData.map((e) {
+      List<ImageProvider> pages = chData.map((e) {
         var url = server + e;
-        return Image(
-          image: CachedNetworkImageProvider(url),
-          fit: BoxFit.cover,
-        );
+        return CachedNetworkImageProvider(url);
       }).toList();
       return pages;
     });
@@ -102,14 +104,15 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
 
     _pages.then((pages) {
       pages.forEach((element) {
-        precacheImage(element.image, context);
+        precacheImage(element, context);
       });
     });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _scaleStateController.dispose();
+    _pageController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -119,64 +122,40 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
       _settings = settings;
     });
 
-    _setTabToCurrentPage(false);
     _settings.save();
-  }
-
-  void _setTabToCurrentPage([bool animate = true]) {
-    var index = _currentPage;
-
-    if (_settings.rightToLeft) {
-      index = (widget.chapter.data.length - 1) - index;
-    }
-
-    if (animate) {
-      _tabController.animateTo(index);
-    } else {
-      _tabController.index = index;
-    }
-  }
-
-  void _changePage(int page) {
-    setState(() {
-      _currentPage = page;
-    });
-
-    _setTabToCurrentPage();
   }
 
   void _onTapLeft() {
     if (_settings.rightToLeft) {
-      if (_currentPage < widget.chapter.data.length - 1) {
-        _changePage(_currentPage + 1);
+      if (_pageController.page! < widget.chapter.data.length - 1) {
+        _pageController.jumpToPage(_pageController.page!.round() + 1);
       }
-    } else if (_currentPage > 0) {
-      _changePage(_currentPage - 1);
+    } else if (_pageController.page! > 0) {
+      _pageController.jumpToPage(_pageController.page!.round() - 1);
     }
   }
 
   void _onTapRight() {
     if (_settings.rightToLeft) {
-      if (_currentPage > 0) {
-        _changePage(_currentPage - 1);
+      if (_pageController.page! > 0) {
+        _pageController.jumpToPage(_pageController.page!.round() - 1);
       }
-    } else if (_currentPage < widget.chapter.data.length - 1) {
-      _changePage(_currentPage + 1);
+    } else if (_pageController.page! < widget.chapter.data.length - 1) {
+      _pageController.jumpToPage(_pageController.page!.round() + 1);
     }
   }
 
-  void _handleOnTapDown(TapDownDetails details) {
+  void _handlePhotoViewOnTapDown(BuildContext context, TapDownDetails details,
+      PhotoViewControllerValue value) {
     _focusNode.requestFocus();
 
-    if (!_settings.swipeToChangePage) {
-      var quarterwidth = context.size!.width / 4;
-      var tapx = details.localPosition.dx;
+    var tapx = details.localPosition.dx;
+    var tapwidth = context.size!.width / 2.5;
 
-      if (tapx < quarterwidth) {
-        _onTapLeft();
-      } else if (tapx > context.size!.width - quarterwidth) {
-        _onTapRight();
-      }
+    if (tapx < tapwidth) {
+      _onTapLeft();
+    } else if (tapx > context.size!.width - tapwidth) {
+      _onTapRight();
     }
   }
 
@@ -186,16 +165,6 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
         _onTapLeft();
       } else if (event.physicalKey == PhysicalKeyboardKey.arrowRight) {
         _onTapRight();
-      }
-    }
-  }
-
-  void _handleHorizontalDragEnd(DragEndDetails details) {
-    if (_settings.swipeToChangePage) {
-      if (details.primaryVelocity! < -_swipeSensitivity) {
-        _onTapRight();
-      } else if (details.primaryVelocity! > _swipeSensitivity) {
-        _onTapLeft();
       }
     }
   }
@@ -212,11 +181,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
       title += ' - ${widget.chapter.title!}';
     }
 
-    var pageTabs = List<Tab>.generate(
-        widget.chapter.data.length,
-        (int index) => Tab(
-              text: (index + 1).toString(),
-            ));
+    var platformIsMobile = Platform.isIOS || Platform.isAndroid;
 
     return Scaffold(
       appBar: AppBar(
@@ -239,10 +204,15 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
             children: <Widget>[
               ActionChip(
                   avatar: Icon(Icons.height),
-                  label: Text(_settings.fitWidth ? 'Fit Width' : 'Fit Height'),
+                  label:
+                      Text(_settings.fitWidth ? 'Fill Screen' : 'Fit Height'),
                   onPressed: () {
                     _setReaderSettings(
                         _settings.copyWith(fitWidth: !_settings.fitWidth));
+
+                    _scaleStateController.scaleState = _settings.fitWidth
+                        ? PhotoViewScaleState.covering
+                        : PhotoViewScaleState.initial;
                   }),
               const SizedBox(height: 10.0),
               ActionChip(
@@ -266,42 +236,68 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
                     _setReaderSettings(_settings.copyWith(
                         showProgressBar: !_settings.showProgressBar));
                   }),
-              const SizedBox(height: 10.0),
-              ActionChip(
-                  avatar: Icon(_settings.swipeToChangePage
-                      ? Icons.swipe
-                      : Icons.swipe_outlined),
-                  label: Text(_settings.swipeToChangePage
-                      ? 'Swipe to change page'
-                      : 'Tap to change page'),
-                  onPressed: () {
-                    _setReaderSettings(_settings.copyWith(
-                        swipeToChangePage: !_settings.swipeToChangePage));
-                  }),
+              // const SizedBox(height: 10.0),
+              // ActionChip(
+              //     avatar: Icon(_settings.swipeToChangePage
+              //         ? Icons.swipe
+              //         : Icons.swipe_outlined),
+              //     label: Text(_settings.swipeToChangePage
+              //         ? 'Swipe to change page'
+              //         : 'Tap to change page'),
+              //     onPressed: () {
+              //       _setReaderSettings(_settings.copyWith(
+              //           swipeToChangePage: !_settings.swipeToChangePage));
+              //     }),
             ],
           ),
         ),
       ),
       endDrawerEnableOpenDragGesture: false,
-      body: FutureBuilder<List<Image>>(
+      body: FutureBuilder<List<ImageProvider>>(
         future: _pages,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var imageViewer = InteractiveViewer(
-                constrained: !_settings.fitWidth,
-                minScale: 0.1,
-                maxScale: 4.0,
-                child: snapshot.data!.elementAt(_currentPage));
-
             return KeyboardListener(
-                autofocus: true,
-                focusNode: _focusNode,
-                onKeyEvent: _handleKeyEvent,
-                child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTapDown: _handleOnTapDown,
-                    onHorizontalDragEnd: _handleHorizontalDragEnd,
-                    child: Container(child: Center(child: imageViewer))));
+              autofocus: true,
+              focusNode: _focusNode,
+              onKeyEvent: _handleKeyEvent,
+              child: Container(
+                child: PageView.builder(
+                  reverse: _settings.rightToLeft,
+                  scrollBehavior: ReaderScrollBehavior(),
+                  scrollDirection: Axis.horizontal,
+                  controller: _pageController,
+                  itemCount: snapshot.data!.length,
+                  onPageChanged: (int index) {
+                    _focusNode.requestFocus();
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    ImageProvider imageProvider = snapshot.data![index];
+
+                    return PhotoView(
+                      imageProvider: imageProvider,
+                      loadingBuilder: (context, progress) => Center(
+                        child: Container(
+                          width: 20.0,
+                          height: 20.0,
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      backgroundDecoration: BoxDecoration(color: Colors.black),
+                      customSize: MediaQuery.of(context).size,
+                      enableRotation: false,
+                      scaleStateController: _scaleStateController,
+                      minScale: PhotoViewComputedScale.contained * 1.0,
+                      maxScale: PhotoViewComputedScale.covered * 2.0,
+                      initialScale: PhotoViewComputedScale.contained,
+                      basePosition: Alignment.center,
+                      onTapDown:
+                          !platformIsMobile ? _handlePhotoViewOnTapDown : null,
+                    );
+                  },
+                ),
+              ),
+            );
           } else if (snapshot.hasError) {
             ScaffoldMessenger.of(context)
               ..removeCurrentSnackBar()
@@ -319,23 +315,93 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
           );
         },
       ),
-      bottomNavigationBar: _settings.showProgressBar
-          ? TabBar(
-              indicatorColor: Theme.of(context).colorScheme.primary,
-              controller: _tabController,
-              isScrollable: false,
-              onTap: (index) {
-                if (_settings.rightToLeft) {
-                  index = (widget.chapter.data.length - 1) - index;
+      bottomSheet: _settings.showProgressBar
+          ? ProgressIndicator(
+              reverse: _settings.rightToLeft,
+              controller: _pageController,
+              itemCount: widget.chapter.data.length,
+              color: Theme.of(context).colorScheme.primary,
+              onPageSelected: (index) {
+                if (_pageController.hasClients) {
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
                 }
-
-                setState(() {
-                  _currentPage = index;
-                });
               },
-              tabs: [...(_settings.rightToLeft ? pageTabs.reversed : pageTabs)],
             )
           : null,
     );
+  }
+}
+
+class ProgressIndicator extends AnimatedWidget {
+  ProgressIndicator({
+    required this.controller,
+    required this.itemCount,
+    required this.onPageSelected,
+    required this.reverse,
+    this.color: Colors.white,
+  }) : super(listenable: controller);
+
+  final PageController controller;
+  final int itemCount;
+  final ValueChanged<int> onPageSelected;
+  final Color color;
+  final bool reverse;
+
+  static const double _barHeight = 8.0;
+
+  Widget _buildSection(int index) {
+    var secColor = Colors.transparent;
+
+    if (index == 0) {
+      secColor = color;
+    } else if (controller.hasClients) {
+      secColor = (controller.page! >= index ? color : Colors.transparent);
+    }
+
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+        color: Colors.transparent,
+        alignment: Alignment.bottomCenter,
+        child: Material(
+          color: secColor,
+          type: MaterialType.canvas,
+          child: Container(
+            height: _barHeight,
+            child: InkWell(
+              onTap: () => onPageSelected(index),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget build(BuildContext context) {
+    var sections = List<Widget>.generate(itemCount, _buildSection);
+
+    return Container(
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+        height: 30.0,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          stops: [0.0, 0.7],
+          colors: [
+            Colors.black,
+            Colors.transparent,
+          ],
+        )),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [...(reverse ? sections.reversed : sections)],
+        ));
   }
 }

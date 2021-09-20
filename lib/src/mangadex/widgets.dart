@@ -48,7 +48,8 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
         },
         tileColor: theme.backgroundColor,
         dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+        contentPadding:
+            EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 16.0)),
         minLeadingWidth: 0.0,
         leading: IconButton(
           onPressed: () async {

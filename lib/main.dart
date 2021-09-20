@@ -11,11 +11,15 @@ void main() {
       theme: ThemeData(
           brightness: Brightness.light,
           primarySwatch: Colors.deepOrange,
-          visualDensity: VisualDensity.adaptivePlatformDensity),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          bottomSheetTheme:
+              BottomSheetThemeData(backgroundColor: Colors.transparent)),
       darkTheme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: Colors.amber,
-          visualDensity: VisualDensity.adaptivePlatformDensity),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          bottomSheetTheme:
+              BottomSheetThemeData(backgroundColor: Colors.transparent)),
       themeMode: ThemeMode
           .dark, // ThemeMode.system doesn't work on Windows https://github.com/flutter/flutter/issues/54612
       debugShowCheckedModeBanner: false,
