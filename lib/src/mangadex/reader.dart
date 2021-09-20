@@ -168,13 +168,15 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
   void _handleOnTapDown(TapDownDetails details) {
     _focusNode.requestFocus();
 
-    var halfwidth = context.size!.width / 2;
-    var tapx = details.localPosition.dx;
+    if (!_settings.swipeToChangePage) {
+      var quarterwidth = context.size!.width / 4;
+      var tapx = details.localPosition.dx;
 
-    if (tapx < halfwidth) {
-      _onTapLeft();
-    } else {
-      _onTapRight();
+      if (tapx < quarterwidth) {
+        _onTapLeft();
+      } else if (tapx > context.size!.width - quarterwidth) {
+        _onTapRight();
+      }
     }
   }
 
@@ -189,10 +191,12 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
   }
 
   void _handleHorizontalDragEnd(DragEndDetails details) {
-    if (details.primaryVelocity! < -_swipeSensitivity) {
-      _onTapLeft();
-    } else if (details.primaryVelocity! > _swipeSensitivity) {
-      _onTapRight();
+    if (_settings.swipeToChangePage) {
+      if (details.primaryVelocity! < -_swipeSensitivity) {
+        _onTapRight();
+      } else if (details.primaryVelocity! > _swipeSensitivity) {
+        _onTapLeft();
+      }
     }
   }
 
@@ -266,8 +270,10 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget>
               ActionChip(
                   avatar: Icon(_settings.swipeToChangePage
                       ? Icons.swipe
-                      : Icons.swap_calls_outlined),
-                  label: Text('Swipe to change page'),
+                      : Icons.swipe_outlined),
+                  label: Text(_settings.swipeToChangePage
+                      ? 'Swipe to change page'
+                      : 'Tap to change page'),
                   onPressed: () {
                     _setReaderSettings(_settings.copyWith(
                         swipeToChangePage: !_settings.swipeToChangePage));

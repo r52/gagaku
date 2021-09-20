@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexLoginWidget extends StatefulWidget {
-  const MangaDexLoginWidget({required this.builder});
+  const MangaDexLoginWidget({required this.builder, required this.topScaffold});
+
+  final GlobalKey<ScaffoldState> topScaffold;
   final Widget Function(BuildContext context) builder;
 
   @override
@@ -22,18 +24,33 @@ class _MangaDexLoginState extends State<MangaDexLoginWidget> {
       }
 
       return Scaffold(
+          appBar: AppBar(
+            leading: Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () {
+                    widget.topScaffold.currentState!.openDrawer();
+                  },
+                  tooltip:
+                      MaterialLocalizations.of(context).openAppDrawerTooltip,
+                );
+              },
+            ),
+            title: Text('MangaDex'),
+          ),
           body: Center(
               child: ElevatedButton(
-        onPressed: () async {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MangaDexLoginScreen(),
-            ),
-          );
-        },
-        child: const Text('Login to MangaDex'),
-      )));
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MangaDexLoginScreen(),
+                ),
+              );
+            },
+            child: const Text('Login to MangaDex'),
+          )));
     });
   }
 }

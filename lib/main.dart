@@ -35,6 +35,8 @@ class GagakuApp extends StatefulWidget {
 class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
   final RestorableInt _selectedIndex = RestorableInt(0);
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   String get restorationId => 'gagaku_app';
 
@@ -53,7 +55,7 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
   Widget build(BuildContext context) {
     final selectedItem = <Widget>[
       MangaDexHomePage(
-        restorationId: restorationId,
+        topScaffold: _scaffoldKey,
       ),
       const Center(child: Text('Local')), // TODO local
       const Center(child: Text('Web')), // TODO web
@@ -61,9 +63,9 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
     ];
 
     return Scaffold(
-        body: Row(
-      children: [
-        NavigationRail(
+      key: _scaffoldKey,
+      drawer: Drawer(
+        child: NavigationRail(
           leading: Column(
             children: [
               const CircleAvatar(
@@ -78,7 +80,7 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
             });
           },
           selectedIndex: _selectedIndex.value,
-          labelType: NavigationRailLabelType.selected,
+          labelType: NavigationRailLabelType.all,
           destinations: [
             NavigationRailDestination(
                 icon: const Icon(Icons.menu_book_outlined),
@@ -102,12 +104,8 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
                 label: Text('Settings')),
           ],
         ),
-        const VerticalDivider(
-          thickness: 1,
-          width: 1,
-        ),
-        Expanded(child: selectedItem[_selectedIndex.value])
-      ],
-    ));
+      ),
+      body: selectedItem[_selectedIndex.value],
+    );
   }
 }

@@ -151,6 +151,7 @@ class _ChapterFeedItem extends StatefulWidget {
 class _ChapterFeedItemState extends State<_ChapterFeedItem> {
   @override
   Widget build(BuildContext context) {
+    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
     final theme = Theme.of(context);
 
     var chapterBtns = widget.state.chapters.map((e) {
@@ -180,7 +181,7 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
                             child: CircularProgressIndicator(),
                           ),
                       errorWidget: (context, url, error) => Icon(Icons.error),
-                      width: 128.0),
+                      width: screenSizeSmall ? 80.0 : 128.0),
                 ),
                 Expanded(
                     child: Column(

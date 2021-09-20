@@ -19,6 +19,7 @@ class ChapterButtonWidget extends StatefulWidget {
 class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
   @override
   Widget build(BuildContext context) {
+    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
     final theme = Theme.of(context);
 
     String title = '';
@@ -47,6 +48,8 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
         },
         tileColor: theme.backgroundColor,
         dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+        minLeadingWidth: 0.0,
         leading: IconButton(
           onPressed: () async {
             bool set = !widget.chapter.read;
@@ -73,6 +76,7 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
             widget.chapter.read ? Icons.check : Icons.circle,
             color: widget.chapter.read ? Colors.green : Colors.blue,
           ),
+          constraints: BoxConstraints(minWidth: 20.0, minHeight: 20.0),
         ),
         title: Text(
           title,
@@ -81,33 +85,42 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
                   ? theme.highlightColor
                   : theme.colorScheme.primary)),
         ),
-        trailing: FittedBox(
-          fit: BoxFit.fill,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.canvasColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-                alignment: Alignment.center,
+        trailing: !screenSizeSmall
+            ? FittedBox(
+                fit: BoxFit.fill,
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.group, size: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.canvasColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2.0, horizontal: 6.0),
+                      alignment: Alignment.center,
+                      child: Row(
+                        children: [
+                          Icon(Icons.group, size: 20),
+                          SizedBox(width: 5),
+                          Text(widget.chapter.groupName)
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(Icons.schedule, size: 20),
                     SizedBox(width: 5),
-                    Text(widget.chapter.groupName)
+                    Text(timeago.format(widget.chapter.publishAt))
                   ],
                 ),
-              ),
-              SizedBox(width: 10),
-              Icon(Icons.schedule, size: 20),
-              SizedBox(width: 5),
-              Text(timeago.format(widget.chapter.publishAt))
-            ],
-          ),
-        ));
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.schedule, size: 15),
+                  SizedBox(width: 5),
+                  Text(timeago.format(widget.chapter.publishAt))
+                ],
+              ));
   }
 }
