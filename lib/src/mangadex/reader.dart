@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
