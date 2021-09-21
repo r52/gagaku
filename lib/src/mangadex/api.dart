@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/cache.dart';
+import 'package:gagaku/src/mangadex/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -63,24 +64,17 @@ class MangaDexModel extends ChangeNotifier {
 
   CacheManager _cache = CacheManager();
 
-  // TODO: MangaDex Settings
-  List<String> _translatedLanguages = ['en'];
-  List<String> _originalLanguage = ['ja'];
-  List<String> _contentRating = [
-    'safe',
-    'suggestive',
-    'erotica',
-    'pornographic'
-  ];
-  bool _dataSaver = false;
+  MangaDexSettings _settings = MangaDexSettings();
 
   // Getters
+  MangaDexSettings get settings => _settings;
   Token get token => _token;
   bool get loggedIn => _loggedIn;
   MangaDexClient? get client => _client;
-  bool get dataSaver => _dataSaver;
 
   void init() async {
+    _settings = await MangaDexSettings.load();
+
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     String? tokstr = _prefs.getString('token');
     if (tokstr != null) {
@@ -94,6 +88,18 @@ class MangaDexModel extends ChangeNotifier {
         }
       }
     }
+  }
+
+  Future<void> setSettings(MangaDexSettings settings) async {
+    _settings = settings;
+
+    // Save settings
+    await _settings.save();
+
+    // Invalidate cache all of cache
+    _cache.clearAll();
+
+    notifyListeners();
   }
 
   Future<void> setToken(Token tkn) async {
@@ -268,9 +274,12 @@ class MangaDexModel extends ChangeNotifier {
     final queryParams = {
       'limit': MangaDexEndpoints.apiQueryLimit.toString(),
       'offset': offset.toString(),
-      'translatedLanguage[]': _translatedLanguages,
-      'originalLanguage[]': _originalLanguage,
-      'contentRating[]': _contentRating,
+      'translatedLanguage[]':
+          _settings.translatedLanguages.map((e) => e.toString()).toList(),
+      'originalLanguage[]':
+          _settings.originalLanguage.map((e) => e.toString()).toList(),
+      'contentRating[]':
+          _settings.contentRating.map((e) => describeEnum(e)).toList(),
       'order[publishAt]': 'desc',
       'includes[]': 'scanlation_group'
     };
@@ -339,9 +348,9 @@ class MangaDexModel extends ChangeNotifier {
       final queryParams = {
         'limit': max(fetch.length, MangaDexEndpoints.apiQueryLimit).toString(),
         'order[latestUploadedChapter]': 'desc',
-        'availableTranslatedLanguage[]': _translatedLanguages,
-        'originalLanguage[]': _originalLanguage,
-        'contentRating[]': _contentRating,
+        // 'availableTranslatedLanguage[]': _translatedLanguages,
+        // 'originalLanguage[]': _originalLanguage,
+        // 'contentRating[]': _contentRating,
         'includes[]': 'cover_art',
         'ids[]': fetch
       };
@@ -435,7 +444,7 @@ class MangaDexModel extends ChangeNotifier {
       var baseUrl = body['baseUrl'] as String;
 
       var chapterUrl =
-          '$baseUrl/${_dataSaver ? 'data-saver' : 'data'}/${chapter.hash}/';
+          '$baseUrl/${_settings.dataSaver ? 'data-saver' : 'data'}/${chapter.hash}/';
 
       return chapterUrl;
     }
@@ -506,9 +515,12 @@ class MangaDexModel extends ChangeNotifier {
     final queryParams = {
       'limit': MangaDexEndpoints.apiQueryLimit.toString(),
       'offset': offset.toString(),
-      'translatedLanguage[]': _translatedLanguages,
-      'originalLanguage[]': _originalLanguage,
-      'contentRating[]': _contentRating,
+      'translatedLanguage[]':
+          _settings.translatedLanguages.map((e) => e.toString()).toList(),
+      'originalLanguage[]':
+          _settings.originalLanguage.map((e) => e.toString()).toList(),
+      'contentRating[]':
+          _settings.contentRating.map((e) => describeEnum(e)).toList(),
       'order[chapter]': 'desc',
       'includes[]': 'scanlation_group'
     };

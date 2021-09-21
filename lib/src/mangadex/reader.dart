@@ -72,7 +72,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
     });
 
     var dataSaver =
-        Provider.of<MangaDexModel>(context, listen: false).dataSaver;
+        Provider.of<MangaDexModel>(context, listen: false).settings.dataSaver;
 
     _pages = Provider.of<MangaDexModel>(context, listen: false)
         .getChapterServer(widget.chapter)

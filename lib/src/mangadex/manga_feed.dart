@@ -66,6 +66,10 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
           future: _mangaList,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              if (snapshot.data!.length == 0) {
+                return const Center(child: Text('Find some manga to follow!'));
+              }
+
               return ScrollConfiguration(
                   behavior:
                       ScrollConfiguration.of(context).copyWith(dragDevices: {
