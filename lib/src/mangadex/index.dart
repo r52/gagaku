@@ -5,6 +5,7 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/chapter_feed.dart';
 import 'package:gagaku/src/mangadex/login.dart';
 import 'package:gagaku/src/mangadex/manga_feed.dart';
+import 'package:gagaku/src/mangadex/settings.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexHomePage extends StatefulWidget {
@@ -80,6 +81,19 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
               actions: [
                 ButtonBar(
                   children: [
+                    Tooltip(
+                        message: 'MangaDex Settings',
+                        child: IconButton(
+                          icon: Icon(Icons.settings),
+                          onPressed: () async {
+                            Navigator.push(
+                                context,
+                                createMangaDexSettingsRoute(
+                                    Provider.of<MangaDexModel>(context,
+                                            listen: false)
+                                        .settings));
+                          },
+                        )),
                     Tooltip(
                         message: 'Logout',
                         child: Consumer<MangaDexModel>(

@@ -1,5 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:gagaku/src/mangadex/api.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as dev;
 
 enum ContentRating { safe, suggestive, erotica, pornographic }
 
@@ -13,6 +17,15 @@ class Language {
   String toString() {
     return code;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Language &&
+      other.runtimeType == runtimeType &&
+      other.code == code;
+
+  @override
+  int get hashCode => code.hashCode;
 }
 
 class Languages {
@@ -119,7 +132,8 @@ class MangaDexSettings {
     var originalLanguage =
         originalLanguageList.map((e) => Languages.get(e)).toSet();
 
-    var contentRatingList = prefs.getStringList(_contentRatingKey) ?? [];
+    var contentRatingList = prefs.getStringList(_contentRatingKey) ??
+        ['safe', 'suggestive', 'erotica'];
     var contentRating = contentRatingList
         .map((e) => ContentRating.values
             .firstWhere((element) => describeEnum(element) == e))
@@ -147,5 +161,252 @@ class MangaDexSettings {
     await prefs.setStringList(_originalLanguageKey, originalLanguageList);
     await prefs.setStringList(_contentRatingKey, contentRatingList);
     await prefs.setBool(_dataSaverKey, dataSaver);
+  }
+}
+
+Route createMangaDexSettingsRoute(MangaDexSettings settings) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        MangaDexSettingsWidget(
+      settings: settings,
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+class MangaDexSettingsWidget extends StatefulWidget {
+  MangaDexSettingsWidget({Key? key, required this.settings}) : super(key: key);
+
+  final MangaDexSettings settings;
+
+  @override
+  _MangaDexSettingsWidgetState createState() => _MangaDexSettingsWidgetState();
+}
+
+class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
+        ),
+        title: Text('MangaDex Settings'),
+        actions: [
+          ButtonBar(
+            children: [
+              Tooltip(
+                message: 'Save Settings',
+                child: Consumer<MangaDexModel>(
+                  builder: (context, mdx, child) {
+                    return IconButton(
+                      color: theme.colorScheme.primary,
+                      icon: Icon(Icons.save),
+                      onPressed: () {
+                        mdx.setSettings(widget.settings);
+
+                        Navigator.pop(context, true);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          children: <Widget>[
+            SettingCardWidget(
+              title: Text(
+                'Chapter Language Filter',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                  'The default language the filter for chapter list is set to. Changing the filter in chapter list will not modify this value.'),
+              builder: (context) {
+                return Center(
+                  child: Wrap(
+                    children: [
+                      for (final lang in Languages.languages.values)
+                        Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: FilterChip(
+                              label: Text(lang.name),
+                              selected: widget.settings.translatedLanguages
+                                  .contains(lang),
+                              onSelected: (value) {
+                                setState(() {
+                                  if (value) {
+                                    widget.settings.translatedLanguages
+                                        .add(lang);
+                                  } else {
+                                    widget.settings.translatedLanguages
+                                        .remove(lang);
+                                  }
+                                });
+                              }),
+                        )
+                    ],
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(
+                'Original Language Filter',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                  'Only show titles originally published in these languages. If no languages are selected, no filter will be applied.'),
+              builder: (context) {
+                return Center(
+                  child: Wrap(
+                    children: [
+                      for (final lang in Languages.languages.values)
+                        Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: FilterChip(
+                              label: Text(lang.name),
+                              selected: widget.settings.originalLanguage
+                                  .contains(lang),
+                              onSelected: (value) {
+                                setState(() {
+                                  if (value) {
+                                    widget.settings.originalLanguage.add(lang);
+                                  } else {
+                                    widget.settings.originalLanguage
+                                        .remove(lang);
+                                  }
+                                });
+                              }),
+                        )
+                    ],
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(
+                'Content Filter',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              builder: (context) {
+                return Center(
+                  child: Wrap(
+                    children: [
+                      for (final content in ContentRating.values)
+                        Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: FilterChip(
+                              label: Text(describeEnum(content)),
+                              selected: widget.settings.contentRating
+                                  .contains(content),
+                              onSelected: (value) {
+                                setState(() {
+                                  if (value) {
+                                    widget.settings.contentRating.add(content);
+                                  } else {
+                                    widget.settings.contentRating
+                                        .remove(content);
+                                  }
+                                });
+                              }),
+                        )
+                    ],
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(
+                'Data Saver',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              builder: (context) {
+                return Center(
+                  child: Switch(
+                    value: widget.settings.dataSaver,
+                    onChanged: (value) {
+                      setState(() {
+                        widget.settings.dataSaver = value;
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SettingCardWidget extends StatefulWidget {
+  const SettingCardWidget(
+      {required this.title, this.subtitle, required this.builder});
+
+  final Widget title;
+  final Widget? subtitle;
+  final Widget Function(BuildContext context) builder;
+
+  @override
+  _SettingCardWidgetState createState() => _SettingCardWidgetState();
+}
+
+class _SettingCardWidgetState extends State<SettingCardWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(6),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+                child: Column(
+              children: [
+                widget.title,
+                SizedBox(
+                  height: (widget.subtitle != null ? 10 : 0),
+                ),
+                (widget.subtitle != null ? widget.subtitle! : SizedBox())
+              ],
+            )),
+            Expanded(child: widget.builder(context))
+          ],
+        ),
+      ),
+    );
   }
 }

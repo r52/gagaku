@@ -348,9 +348,12 @@ class MangaDexModel extends ChangeNotifier {
       final queryParams = {
         'limit': max(fetch.length, MangaDexEndpoints.apiQueryLimit).toString(),
         'order[latestUploadedChapter]': 'desc',
-        // 'availableTranslatedLanguage[]': _translatedLanguages,
-        // 'originalLanguage[]': _originalLanguage,
-        // 'contentRating[]': _contentRating,
+        'availableTranslatedLanguage[]':
+            _settings.translatedLanguages.map((e) => e.toString()).toList(),
+        'originalLanguage[]':
+            _settings.originalLanguage.map((e) => e.toString()).toList(),
+        'contentRating[]':
+            _settings.contentRating.map((e) => describeEnum(e)).toList(),
         'includes[]': 'cover_art',
         'ids[]': fetch
       };
