@@ -212,17 +212,14 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
             children: [
               Tooltip(
                 message: 'Save Settings',
-                child: Consumer<MangaDexModel>(
-                  builder: (context, mdx, child) {
-                    return IconButton(
-                      color: theme.colorScheme.primary,
-                      icon: Icon(Icons.save),
-                      onPressed: () {
-                        mdx.setSettings(widget.settings);
+                child: IconButton(
+                  color: theme.colorScheme.primary,
+                  icon: Icon(Icons.save),
+                  onPressed: () {
+                    Provider.of<MangaDexModel>(context, listen: false)
+                        .setSettings(widget.settings);
 
-                        Navigator.pop(context, true);
-                      },
-                    );
+                    Navigator.pop(context, true);
                   },
                 ),
               ),

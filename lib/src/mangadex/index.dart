@@ -96,20 +96,19 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
                         )),
                     Tooltip(
                         message: 'Logout',
-                        child: Consumer<MangaDexModel>(
-                          builder: (context, mdx, child) {
-                            return IconButton(
-                              color: Theme.of(context).colorScheme.primary,
-                              icon: Icon(Icons.logout),
-                              onPressed: () async {
-                                final result = await mdx.logout();
+                        child: IconButton(
+                          color: Theme.of(context).colorScheme.primary,
+                          icon: Icon(Icons.logout),
+                          onPressed: () async {
+                            final result = await Provider.of<MangaDexModel>(
+                                    context,
+                                    listen: false)
+                                .logout();
 
-                                if (!result) {
-                                  // Shouldn't ever fail to logout
-                                  throw Exception('Failed to logout');
-                                }
-                              },
-                            );
+                            if (!result) {
+                              // Shouldn't ever fail to logout
+                              throw Exception('Failed to logout');
+                            }
                           },
                         ))
                   ],

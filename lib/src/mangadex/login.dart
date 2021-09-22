@@ -107,39 +107,40 @@ class _MangaDexLoginScreenState extends State<MangaDexLoginScreen> {
                     Navigator.pop(context);
                   },
                 ),
-                Consumer<MangaDexModel>(builder: (context, mdx, child) {
-                  return ElevatedButton(
-                    child: const Text('LOGIN'),
-                    onPressed: () async {
-                      if (_usernameController.text.isNotEmpty &&
-                          _passwordController.text.isNotEmpty) {
-                        final loginSuccess = await mdx.login(
-                            _usernameController.text, _passwordController.text);
+                ElevatedButton(
+                  child: const Text('LOGIN'),
+                  onPressed: () async {
+                    if (_usernameController.text.isNotEmpty &&
+                        _passwordController.text.isNotEmpty) {
+                      final loginSuccess = await Provider.of<MangaDexModel>(
+                              context,
+                              listen: false)
+                          .login(_usernameController.text,
+                              _passwordController.text);
 
-                        if (loginSuccess) {
-                          _usernameController.clear();
-                          _passwordController.clear();
-                          Navigator.pop(context);
-                        } else {
-                          ScaffoldMessenger.of(context)
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(SnackBar(
-                              content: Text('Failed to login.'),
-                              backgroundColor: Colors.red,
-                            ));
-                        }
+                      if (loginSuccess) {
+                        _usernameController.clear();
+                        _passwordController.clear();
+                        Navigator.pop(context);
                       } else {
                         ScaffoldMessenger.of(context)
                           ..removeCurrentSnackBar()
                           ..showSnackBar(SnackBar(
-                            content:
-                                Text('Username and Password cannot be empty.'),
+                            content: Text('Failed to login.'),
                             backgroundColor: Colors.red,
                           ));
                       }
-                    },
-                  );
-                }),
+                    } else {
+                      ScaffoldMessenger.of(context)
+                        ..removeCurrentSnackBar()
+                        ..showSnackBar(SnackBar(
+                          content:
+                              Text('Username and Password cannot be empty.'),
+                          backgroundColor: Colors.red,
+                        ));
+                    }
+                  },
+                ),
               ],
             ),
           ],
