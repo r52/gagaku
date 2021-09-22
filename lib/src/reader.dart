@@ -1,3 +1,9 @@
+import 'dart:io' show Platform;
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReaderSettings {
@@ -61,5 +67,306 @@ class ReaderSettings {
     await prefs.setBool(_rightToLeftKey, rightToLeft);
     await prefs.setBool(_showProgressBarKey, showProgressBar);
     // await prefs.setBool(_swipeToChangePage, swipeToChangePage);
+  }
+}
+
+class ReaderWidget extends StatefulWidget {
+  ReaderWidget({
+    Key? key,
+    required this.pages,
+    required this.pageCount,
+    required this.title,
+  }) : super(key: key);
+
+  final Iterable<ImageProvider> pages;
+  final int pageCount;
+  final String title;
+
+  @override
+  _ReaderWidgetState createState() => _ReaderWidgetState();
+}
+
+class _ReaderWidgetState extends State<ReaderWidget> {
+  final FocusNode _focusNode = FocusNode();
+  ReaderSettings _settings = ReaderSettings();
+
+  final PageController _pageController = PageController(initialPage: 0);
+  final PhotoViewScaleStateController _scaleStateController =
+      PhotoViewScaleStateController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    ReaderSettings.load().then((settings) {
+      setState(() {
+        _settings = settings;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _scaleStateController.dispose();
+    _pageController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _setReaderSettings(ReaderSettings settings) {
+    setState(() {
+      _settings = settings;
+    });
+
+    _settings.save();
+  }
+
+  void _onTapLeft() {
+    if (_settings.rightToLeft) {
+      if (_pageController.page! < widget.pages.length - 1) {
+        _pageController.jumpToPage(_pageController.page!.round() + 1);
+      }
+    } else if (_pageController.page! > 0) {
+      _pageController.jumpToPage(_pageController.page!.round() - 1);
+    }
+  }
+
+  void _onTapRight() {
+    if (_settings.rightToLeft) {
+      if (_pageController.page! > 0) {
+        _pageController.jumpToPage(_pageController.page!.round() - 1);
+      }
+    } else if (_pageController.page! < widget.pages.length - 1) {
+      _pageController.jumpToPage(_pageController.page!.round() + 1);
+    }
+  }
+
+  void _handlePhotoViewOnTapDown(BuildContext context, TapDownDetails details,
+      PhotoViewControllerValue value) {
+    _focusNode.requestFocus();
+
+    var tapx = details.localPosition.dx;
+    var tapwidth = context.size!.width / 2.5;
+
+    if (tapx < tapwidth) {
+      _onTapLeft();
+    } else if (tapx > context.size!.width - tapwidth) {
+      _onTapRight();
+    }
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
+        _onTapLeft();
+      } else if (event.physicalKey == PhysicalKeyboardKey.arrowRight) {
+        _onTapRight();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final platformIsMobile = Platform.isIOS || Platform.isAndroid;
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(),
+        title: Text(widget.title),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              tooltip: 'Reader Settings',
+            ),
+          ),
+        ],
+      ),
+      endDrawer: Drawer(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ActionChip(
+                  avatar: Icon(Icons.height),
+                  label:
+                      Text(_settings.fitWidth ? 'Fill Screen' : 'Fit Height'),
+                  onPressed: () {
+                    _setReaderSettings(
+                        _settings.copyWith(fitWidth: !_settings.fitWidth));
+
+                    _scaleStateController.scaleState = _settings.fitWidth
+                        ? PhotoViewScaleState.covering
+                        : PhotoViewScaleState.initial;
+                  }),
+              const SizedBox(height: 10.0),
+              ActionChip(
+                  avatar: Icon(_settings.rightToLeft
+                      ? Icons.arrow_back
+                      : Icons.arrow_forward),
+                  label: Text(_settings.rightToLeft
+                      ? 'Right to Left'
+                      : 'Left to Right'),
+                  onPressed: () {
+                    _setReaderSettings(_settings.copyWith(
+                        rightToLeft: !_settings.rightToLeft));
+                  }),
+              const SizedBox(height: 10.0),
+              ActionChip(
+                  avatar: Icon(_settings.showProgressBar
+                      ? Icons.donut_small
+                      : Icons.donut_small_outlined),
+                  label: Text('Progress Bar'),
+                  onPressed: () {
+                    _setReaderSettings(_settings.copyWith(
+                        showProgressBar: !_settings.showProgressBar));
+                  }),
+            ],
+          ),
+        ),
+      ),
+      endDrawerEnableOpenDragGesture: false,
+      body: KeyboardListener(
+        autofocus: true,
+        focusNode: _focusNode,
+        onKeyEvent: _handleKeyEvent,
+        child: Container(
+          child: PageView.builder(
+            reverse: _settings.rightToLeft,
+            scrollBehavior: ReaderScrollBehavior(),
+            scrollDirection: Axis.horizontal,
+            controller: _pageController,
+            itemCount: widget.pageCount,
+            onPageChanged: (int index) {
+              _focusNode.requestFocus();
+            },
+            itemBuilder: (BuildContext context, int index) {
+              ImageProvider imageProvider = widget.pages.elementAt(index);
+
+              return PhotoView(
+                imageProvider: imageProvider,
+                loadingBuilder: (context, progress) => Center(
+                  child: Container(
+                    width: 20.0,
+                    height: 20.0,
+                    child: CircularProgressIndicator(
+                      value: progress == null
+                          ? null
+                          : progress.cumulativeBytesLoaded /
+                              progress.expectedTotalBytes!,
+                    ),
+                  ),
+                ),
+                backgroundDecoration: BoxDecoration(color: Colors.black),
+                customSize: MediaQuery.of(context).size,
+                enableRotation: false,
+                scaleStateController: _scaleStateController,
+                minScale: PhotoViewComputedScale.contained * 1.0,
+                maxScale: PhotoViewComputedScale.covered * 2.0,
+                initialScale: PhotoViewComputedScale.contained,
+                basePosition: Alignment.center,
+                onTapDown: !platformIsMobile ? _handlePhotoViewOnTapDown : null,
+              );
+            },
+          ),
+        ),
+      ),
+      bottomSheet: _settings.showProgressBar
+          ? ProgressIndicator(
+              reverse: _settings.rightToLeft,
+              controller: _pageController,
+              itemCount: widget.pages.length,
+              color: Theme.of(context).colorScheme.primary,
+              onPageSelected: (index) {
+                if (_pageController.hasClients) {
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+            )
+          : null,
+    );
+  }
+}
+
+class ReaderScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
+}
+
+class ProgressIndicator extends AnimatedWidget {
+  ProgressIndicator({
+    required this.controller,
+    required this.itemCount,
+    required this.onPageSelected,
+    required this.reverse,
+    this.color: Colors.white,
+  }) : super(listenable: controller);
+
+  final PageController controller;
+  final int itemCount;
+  final ValueChanged<int> onPageSelected;
+  final Color color;
+  final bool reverse;
+
+  static const double _barHeight = 8.0;
+
+  Widget _buildSection(int index) {
+    var secColor = Colors.transparent;
+
+    if (index == 0) {
+      secColor = color;
+    } else if (controller.hasClients) {
+      secColor = (controller.page! >= index ? color : Colors.transparent);
+    }
+
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+        color: Colors.transparent,
+        alignment: Alignment.bottomCenter,
+        child: Material(
+          color: secColor,
+          type: MaterialType.canvas,
+          child: Container(
+            height: _barHeight,
+            child: InkWell(
+              onTap: () => onPageSelected(index),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget build(BuildContext context) {
+    var sections = List<Widget>.generate(itemCount, _buildSection);
+
+    return Container(
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+        height: 30.0,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          stops: [0.0, 0.7],
+          colors: [
+            Colors.black,
+            Colors.transparent,
+          ],
+        )),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [...(reverse ? sections.reversed : sections)],
+        ));
   }
 }
