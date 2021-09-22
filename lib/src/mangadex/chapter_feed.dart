@@ -156,53 +156,64 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
 
     var chapterBtns = widget.state.chapters.map((e) {
       return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2.0),
-          child: ChapterButtonWidget(
-            chapter: e,
-            manga: widget.state.manga,
-          ));
+        padding: const EdgeInsets.symmetric(vertical: 2.0),
+        child: ChapterButtonWidget(
+          chapter: e,
+          manga: widget.state.manga,
+          link: Text(
+            widget.state.manga.title['en']!,
+            style: TextStyle(fontSize: 24),
+          ),
+          onLinkPressed: () {
+            Navigator.push(context, createMangaViewRoute(widget.state.manga));
+          },
+        ),
+      );
     }).toList();
 
     return Card(
-        margin: const EdgeInsets.all(6),
-        child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextButton(
-                  onPressed: () async {
-                    Navigator.push(
-                        context, createMangaViewRoute(widget.state.manga));
-                  },
-                  child: CachedNetworkImage(
-                      imageUrl: widget.state.coverArt,
-                      placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
-                      width: screenSizeSmall ? 80.0 : 128.0),
-                ),
-                Expanded(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextButton(
-                        style: TextButton.styleFrom(
-                            primary: theme.colorScheme.onSurface,
-                            textStyle: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        onPressed: () async {
-                          Navigator.push(context,
-                              createMangaViewRoute(widget.state.manga));
-                        },
-                        child: Text(widget.state.manga.title['en']!)),
-                    Divider(),
-                    ...chapterBtns
-                  ],
-                ))
-              ],
-            )));
+      margin: const EdgeInsets.all(6),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () async {
+                Navigator.push(
+                    context, createMangaViewRoute(widget.state.manga));
+              },
+              child: CachedNetworkImage(
+                  imageUrl: widget.state.coverArt,
+                  placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  width: screenSizeSmall ? 80.0 : 128.0),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextButton(
+                      style: TextButton.styleFrom(
+                          primary: theme.colorScheme.onSurface,
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        Navigator.push(
+                            context, createMangaViewRoute(widget.state.manga));
+                      },
+                      child: Text(widget.state.manga.title['en']!)),
+                  Divider(),
+                  ...chapterBtns
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
 

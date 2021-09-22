@@ -76,75 +76,82 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ScrollConfiguration(
-                    behavior:
-                        ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      slivers: <Widget>[
-                        SliverAppBar(
-                          pinned: true,
-                          snap: false,
-                          floating: false,
-                          expandedHeight: 160.0,
-                          flexibleSpace: FlexibleSpaceBar(
-                            title: Text(
-                              '${widget.manga.title['en']!}',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                shadows: <Shadow>[
-                                  Shadow(
-                                    offset: Offset(2.0, 2.0),
-                                    blurRadius: 1.0,
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                  ),
-                                ],
+                  behavior:
+                      ScrollConfiguration.of(context).copyWith(dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                  }),
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: <Widget>[
+                      SliverAppBar(
+                        pinned: true,
+                        snap: false,
+                        floating: false,
+                        expandedHeight: 160.0,
+                        flexibleSpace: FlexibleSpaceBar(
+                          title: Text(
+                            '${widget.manga.title['en']!}',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              shadows: <Shadow>[
+                                Shadow(
+                                  offset: Offset(2.0, 2.0),
+                                  blurRadius: 1.0,
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                ),
+                              ],
+                            ),
+                          ),
+                          background: CachedNetworkImage(
+                            colorBlendMode: BlendMode.modulate,
+                            color: Colors.grey,
+                            fit: BoxFit.cover,
+                            imageUrl: widget.manga.getCovertArtUrl(),
+                            placeholder: (context, url) => Container(
+                              child: const Center(
+                                child: CircularProgressIndicator(),
                               ),
                             ),
-                            background: CachedNetworkImage(
-                              colorBlendMode: BlendMode.modulate,
-                              color: Colors.grey,
-                              fit: BoxFit.cover,
-                              imageUrl: widget.manga.getCovertArtUrl(),
-                              placeholder: (context, url) => Container(
-                                  child: const Center(
-                                child: CircularProgressIndicator(),
-                              )),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
-                            ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
                           ),
                         ),
-                        // TODO manga view data/commands
-                        // const SliverToBoxAdapter(
-                        //   child: SizedBox(
-                        //     height: 50,
-                        //     child: Center(
-                        //       child: Text('TODO'),
-                        //     ),
-                        //   ),
-                        // ),
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              var e = snapshot.data!.elementAt(index);
+                      ),
+                      // TODO manga view data/commands
+                      // const SliverToBoxAdapter(
+                      //   child: SizedBox(
+                      //     height: 50,
+                      //     child: Center(
+                      //       child: Text('TODO'),
+                      //     ),
+                      //   ),
+                      // ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                            var e = snapshot.data!.elementAt(index);
 
-                              return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2.0),
-                                  child: ChapterButtonWidget(
-                                    chapter: e,
-                                    manga: widget.manga,
-                                  ));
-                            },
-                            childCount: snapshot.data!.length,
-                          ),
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 2.0),
+                              child: ChapterButtonWidget(
+                                chapter: e,
+                                manga: widget.manga,
+                                link: Text(
+                                  widget.manga.title['en']!,
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                              ),
+                            );
+                          },
+                          childCount: snapshot.data!.length,
                         ),
-                      ],
-                    ));
+                      ),
+                    ],
+                  ),
+                );
               } else if (snapshot.hasError) {
                 ScaffoldMessenger.of(context)
                   ..removeCurrentSnackBar()

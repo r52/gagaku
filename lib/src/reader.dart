@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+typedef LinkPressedCallback = void Function()?;
+
 class ReaderPage {
   final String url;
   final String key;
@@ -84,11 +86,15 @@ class ReaderWidget extends StatefulWidget {
     required this.pages,
     required this.pageCount,
     required this.title,
+    this.link,
+    this.onLinkPressed,
   }) : super(key: key);
 
   final Iterable<ReaderPage> pages;
   final int pageCount;
   final String title;
+  final Widget? link;
+  final LinkPressedCallback? onLinkPressed;
 
   @override
   _ReaderWidgetState createState() => _ReaderWidgetState();
@@ -110,6 +116,10 @@ class _ReaderWidgetState extends State<ReaderWidget> {
       setState(() {
         _settings = settings;
       });
+    });
+
+    _pageController.addListener(() {
+      setState(() {});
     });
   }
 
@@ -175,6 +185,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final platformIsMobile = Platform.isIOS || Platform.isAndroid;
 
     return Scaffold(
@@ -196,10 +207,47 @@ class _ReaderWidgetState extends State<ReaderWidget> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              (widget.link != null
+                  ? TextButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                          ..pop()
+                          ..pop();
+
+                        if (widget.onLinkPressed != null) {
+                          widget.onLinkPressed!();
+                        }
+                      },
+                      child: widget.link!)
+                  : SizedBox.shrink()),
+              DropdownButton<int>(
+                value: (_pageController.hasClients
+                    ? _pageController.page!.toInt()
+                    : _pageController.initialPage),
+                icon: const Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: TextStyle(color: theme.colorScheme.primary),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (int? index) {
+                  if (_pageController.hasClients && index != null) {
+                    _pageController.jumpToPage(index);
+                  }
+                },
+                items: List<DropdownMenuItem<int>>.generate(
+                    widget.pageCount,
+                    (int index) => DropdownMenuItem<int>(
+                        value: index, child: Text((index + 1).toString()))),
+              ),
+              const Divider(),
+              const SizedBox(height: 10.0),
               ActionChip(
-                  avatar: Icon(Icons.height),
-                  label:
-                      Text(_settings.fitWidth ? 'Fill Screen' : 'Fit Height'),
+                  avatar: Icon(
+                      _settings.fitWidth ? Icons.fit_screen : Icons.height),
+                  label: Text(_settings.fitWidth ? 'Fit Screen' : 'Fit Height'),
                   onPressed: () {
                     _setReaderSettings(
                         _settings.copyWith(fitWidth: !_settings.fitWidth));
@@ -305,7 +353,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
               reverse: _settings.rightToLeft,
               controller: _pageController,
               itemCount: widget.pages.length,
-              color: Theme.of(context).colorScheme.primary,
+              color: theme.colorScheme.primary,
               onPageSelected: (index) {
                 if (_pageController.hasClients) {
                   _pageController.animateToPage(
@@ -366,8 +414,11 @@ class ProgressIndicator extends AnimatedWidget {
           type: MaterialType.canvas,
           child: Container(
             height: _barHeight,
-            child: InkWell(
-              onTap: () => onPageSelected(index),
+            child: Tooltip(
+              message: (index + 1).toString(),
+              child: InkWell(
+                onTap: () => onPageSelected(index),
+              ),
             ),
           ),
         ),

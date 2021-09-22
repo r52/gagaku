@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/reader.dart';
 import 'package:gagaku/src/mangadex/settings.dart';
+import 'package:gagaku/src/reader.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ChapterButtonWidget extends StatefulWidget {
-  const ChapterButtonWidget(
-      {Key? key, required this.chapter, required this.manga})
-      : super(key: key);
+  const ChapterButtonWidget({
+    Key? key,
+    required this.chapter,
+    required this.manga,
+    this.link,
+    this.onLinkPressed,
+  }) : super(key: key);
 
   final Chapter chapter;
   final Manga manga;
+  final Widget? link;
+  final LinkPressedCallback? onLinkPressed;
 
   @override
   _ChapterButtonWidgetState createState() => _ChapterButtonWidgetState();
@@ -40,8 +47,10 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
 
     return ListTile(
         onTap: () {
-          Navigator.push(context,
-                  createMangaDexReaderRoute(widget.chapter, widget.manga))
+          Navigator.push(
+                  context,
+                  createMangaDexReaderRoute(widget.chapter, widget.manga,
+                      widget.link, widget.onLinkPressed))
               .then((value) {
             // Refresh this when reader view is closed to update read status
             setState(() {});

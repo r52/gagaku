@@ -6,12 +6,15 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/reader.dart';
 import 'package:provider/provider.dart';
 
-Route createMangaDexReaderRoute(Chapter chapter, Manga manga) {
+Route createMangaDexReaderRoute(Chapter chapter, Manga manga, Widget? link,
+    LinkPressedCallback? onLinkPressed) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) =>
         MangaDexReaderWidget(
       chapter: chapter,
       manga: manga,
+      link: link,
+      onLinkPressed: onLinkPressed,
     ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);
@@ -29,12 +32,18 @@ Route createMangaDexReaderRoute(Chapter chapter, Manga manga) {
 }
 
 class MangaDexReaderWidget extends StatefulWidget {
-  const MangaDexReaderWidget(
-      {Key? key, required this.chapter, required this.manga})
-      : super(key: key);
+  const MangaDexReaderWidget({
+    Key? key,
+    required this.chapter,
+    required this.manga,
+    this.link,
+    this.onLinkPressed,
+  }) : super(key: key);
 
   final Chapter chapter;
   final Manga manga;
+  final Widget? link;
+  final LinkPressedCallback? onLinkPressed;
 
   @override
   _MangaDexReaderState createState() => _MangaDexReaderState();
@@ -109,9 +118,12 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return ReaderWidget(
-              pages: snapshot.data!,
-              pageCount: snapshot.data!.length,
-              title: '${widget.manga.title['en']!} - $title');
+            pages: snapshot.data!,
+            pageCount: snapshot.data!.length,
+            title: '${widget.manga.title['en']!} - $title',
+            link: widget.link,
+            onLinkPressed: widget.onLinkPressed,
+          );
         } else if (snapshot.hasError) {
           ScaffoldMessenger.of(context)
             ..removeCurrentSnackBar()
