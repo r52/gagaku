@@ -1,10 +1,18 @@
 import 'dart:io' show Platform;
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class ReaderPage {
+  final String url;
+  final String key;
+
+  const ReaderPage({required this.url, required this.key});
+}
 
 class ReaderSettings {
   /// If true, the reader fits the page to widget width, otherwise
@@ -78,7 +86,7 @@ class ReaderWidget extends StatefulWidget {
     required this.title,
   }) : super(key: key);
 
-  final Iterable<ImageProvider> pages;
+  final Iterable<ReaderPage> pages;
   final int pageCount;
   final String title;
 
@@ -242,31 +250,51 @@ class _ReaderWidgetState extends State<ReaderWidget> {
               _focusNode.requestFocus();
             },
             itemBuilder: (BuildContext context, int index) {
-              ImageProvider imageProvider = widget.pages.elementAt(index);
+              var page = widget.pages.elementAt(index);
 
-              return PhotoView(
-                imageProvider: imageProvider,
-                loadingBuilder: (context, progress) => Center(
-                  child: Container(
-                    width: 20.0,
-                    height: 20.0,
-                    child: CircularProgressIndicator(
-                      value: progress == null
-                          ? null
-                          : progress.cumulativeBytesLoaded /
-                              progress.expectedTotalBytes!,
-                    ),
-                  ),
+              return CachedNetworkImage(
+                imageUrl: page.url,
+                cacheKey: page.key,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
                 ),
-                backgroundDecoration: BoxDecoration(color: Colors.black),
-                customSize: MediaQuery.of(context).size,
-                enableRotation: false,
-                scaleStateController: _scaleStateController,
-                minScale: PhotoViewComputedScale.contained * 1.0,
-                maxScale: PhotoViewComputedScale.covered * 2.0,
-                initialScale: PhotoViewComputedScale.contained,
-                basePosition: Alignment.center,
-                onTapDown: !platformIsMobile ? _handlePhotoViewOnTapDown : null,
+                imageBuilder: (context, provider) {
+                  return PhotoView(
+                    imageProvider: provider,
+                    // loadingBuilder: (context, progress) => Center(
+                    //   child: Column(
+                    //     mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: [
+                    //       Text(
+                    //           'Downloading pages... ${progress != null ? '${progress.cumulativeBytesLoaded} / ${progress.expectedTotalBytes!} bytes' : ''}'),
+                    //       SizedBox(
+                    //         height: 10,
+                    //       ),
+                    //       Container(
+                    //         width: 20.0,
+                    //         height: 20.0,
+                    //         child: CircularProgressIndicator(
+                    //           value: progress == null
+                    //               ? null
+                    //               : progress.cumulativeBytesLoaded /
+                    //                   progress.expectedTotalBytes!,
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    backgroundDecoration: BoxDecoration(color: Colors.black),
+                    customSize: MediaQuery.of(context).size,
+                    enableRotation: false,
+                    scaleStateController: _scaleStateController,
+                    minScale: PhotoViewComputedScale.contained * 1.0,
+                    maxScale: PhotoViewComputedScale.covered * 2.0,
+                    initialScale: PhotoViewComputedScale.contained,
+                    basePosition: Alignment.center,
+                    onTapDown:
+                        !platformIsMobile ? _handlePhotoViewOnTapDown : null,
+                  );
+                },
               );
             },
           ),

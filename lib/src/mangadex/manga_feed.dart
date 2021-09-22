@@ -138,7 +138,7 @@ class _GridMangaItem extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       clipBehavior: Clip.antiAlias,
       child: CachedNetworkImage(
-        imageUrl: manga.getCovertArtUrl(),
+        imageUrl: manga.getCovertArtUrl(quality: CoverArtQuality.medium),
         placeholder: (context, url) => const Center(
           child: CircularProgressIndicator(),
         ),

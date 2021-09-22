@@ -41,7 +41,7 @@ class MangaDexReaderWidget extends StatefulWidget {
 }
 
 class _MangaDexReaderState extends State<MangaDexReaderWidget> {
-  late Future<List<ImageProvider>> _pages;
+  late Future<List<ReaderPage>> _pages;
 
   @override
   void initState() {
@@ -55,9 +55,9 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
         .then((server) {
       var chData = dataSaver ? widget.chapter.dataSaver : widget.chapter.data;
 
-      List<ImageProvider> pages = chData.map((e) {
+      List<ReaderPage> pages = chData.map((e) {
         var url = server + e;
-        return CachedNetworkImageProvider(url);
+        return ReaderPage(url: url, key: e);
       }).toList();
       return pages;
     });
@@ -80,7 +80,9 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
 
     _pages.then((pages) {
       pages.forEach((element) {
-        precacheImage(element, context);
+        precacheImage(
+            CachedNetworkImageProvider(element.url, cacheKey: element.key),
+            context);
       });
     });
   }
@@ -102,7 +104,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
       title += ' - ${widget.chapter.title!}';
     }
 
-    return FutureBuilder<List<ImageProvider>>(
+    return FutureBuilder<List<ReaderPage>>(
       future: _pages,
       builder: (context, snapshot) {
         if (snapshot.hasData) {

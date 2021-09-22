@@ -209,7 +209,7 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
 class _ChapterFeedItemData {
   _ChapterFeedItemData({required this.manga})
       : mangaId = manga.id,
-        coverArt = manga.getCovertArtUrl(quality: CoverArtQuality.small);
+        coverArt = manga.getCovertArtUrl(quality: CoverArtQuality.medium);
 
   final Manga manga;
   final String mangaId;
