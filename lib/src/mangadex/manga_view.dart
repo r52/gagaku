@@ -39,8 +39,6 @@ class MangaDexMangaViewWidget extends StatefulWidget {
 }
 
 class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
-  late Future<Iterable<Chapter>> _chapterList;
-
   var _scrollController = ScrollController();
   var _chapterOffset = 0;
 
@@ -48,35 +46,33 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
   void initState() {
     super.initState();
 
-    _chapterList = _fetchChapters(0);
-
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
           setState(() {
             _chapterOffset += MangaDexEndpoints.apiQueryLimit;
-            _chapterList = _fetchChapters(_chapterOffset);
           });
         }
       }
     });
   }
 
-  Future<Iterable<Chapter>> _fetchChapters(int offset) async {
+  Future<Iterable<Chapter>> _fetchChapters(
+      MangaDexModel model, int offset) async {
     if (!widget.manga.readChaptersRetrieved) {
-      await Provider.of<MangaDexModel>(context, listen: false)
-          .fetchReadChapters([widget.manga]);
+      await model.fetchReadChapters([widget.manga]);
     }
 
-    return Provider.of<MangaDexModel>(context, listen: false)
-        .fetchMangaChapters(widget.manga, offset, true);
+    return model.fetchMangaChapters(widget.manga, offset, true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FutureBuilder<Iterable<Chapter>>(
-            future: _chapterList,
+      body: Consumer<MangaDexModel>(
+        builder: (context, mdx, child) {
+          return FutureBuilder<Iterable<Chapter>>(
+            future: _fetchChapters(mdx, _chapterOffset),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ScrollConfiguration(
@@ -164,6 +160,10 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
               return const Center(
                 child: CircularProgressIndicator(),
               );
-            }));
+            },
+          );
+        },
+      ),
+    );
   }
 }

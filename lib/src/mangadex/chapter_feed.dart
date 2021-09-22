@@ -16,8 +16,6 @@ class MangaDexChapterFeed extends StatefulWidget {
 }
 
 class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
-  late Future<Iterable<_ChapterFeedItem>> _items;
-
   var _scrollController = ScrollController();
   var _chapterOffset = 0;
 
@@ -25,31 +23,26 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
   void initState() {
     super.initState();
 
-    _items = _fetchChapters(0);
-
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
           setState(() {
             _chapterOffset += MangaDexEndpoints.apiQueryLimit;
-            _items = _fetchChapters(_chapterOffset);
           });
         }
       }
     });
   }
 
-  Future<Iterable<_ChapterFeedItem>> _fetchChapters(int offset) async {
-    var chapters = await Provider.of<MangaDexModel>(context, listen: false)
-        .fetchChapterFeed(offset, true);
+  Future<Iterable<_ChapterFeedItem>> _fetchChapters(
+      MangaDexModel model, int offset) async {
+    var chapters = await model.fetchChapterFeed(offset, true);
 
     var mangaIds = chapters.map((e) => e.mangaId).toSet();
 
-    var mangas = await Provider.of<MangaDexModel>(context, listen: false)
-        .fetchManga(mangaIds);
+    var mangas = await model.fetchManga(mangaIds);
 
-    await Provider.of<MangaDexModel>(context, listen: false)
-        .fetchReadChapters(mangas);
+    await model.fetchReadChapters(mangas);
 
     var mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
@@ -78,14 +71,12 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
     return wlist;
   }
 
-  Future<void> _refreshFeed() async {
-    await Provider.of<MangaDexModel>(context, listen: false)
-        .invalidateCacheItem(CacheLists.latestChapters);
+  Future<void> _refreshFeed(MangaDexModel model) async {
+    await model.invalidateCacheItem(CacheLists.latestChapters);
 
     // Refresh
     setState(() {
       _chapterOffset = 0;
-      _items = _fetchChapters(0);
     });
   }
 
@@ -93,48 +84,53 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder<Iterable<_ChapterFeedItem>>(
-          future: _items,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data!.length == 0) {
-                return const Center(child: Text('Find some manga to follow!'));
-              }
+        child: Consumer<MangaDexModel>(
+          builder: (context, mdx, child) {
+            return FutureBuilder<Iterable<_ChapterFeedItem>>(
+              future: _fetchChapters(mdx, _chapterOffset),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data!.length == 0) {
+                    return const Center(
+                        child: Text('Find some manga to follow!'));
+                  }
 
-              return ScrollConfiguration(
-                  behavior:
-                      ScrollConfiguration.of(context).copyWith(dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
-                  }),
-                  child: RefreshIndicator(
-                      onRefresh: () async {
-                        await _refreshFeed();
-                      },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        restorationId: 'chapter_list_offset',
-                        padding: const EdgeInsets.all(8),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return snapshot.data!.elementAt(index);
-                        },
-                      )));
-            } else if (snapshot.hasError) {
-              ScaffoldMessenger.of(context)
-                ..removeCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                  content: Text('${snapshot.error}'),
-                  backgroundColor: Colors.red,
-                ));
+                  return ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(dragDevices: {
+                        PointerDeviceKind.touch,
+                        PointerDeviceKind.mouse,
+                      }),
+                      child: RefreshIndicator(
+                          onRefresh: () async {
+                            await _refreshFeed(mdx);
+                          },
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            restorationId: 'chapter_list_offset',
+                            padding: const EdgeInsets.all(8),
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return snapshot.data!.elementAt(index);
+                            },
+                          )));
+                } else if (snapshot.hasError) {
+                  ScaffoldMessenger.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(SnackBar(
+                      content: Text('${snapshot.error}'),
+                      backgroundColor: Colors.red,
+                    ));
 
-              return Text('${snapshot.error}');
-            }
+                  return Text('${snapshot.error}');
+                }
 
-            // By default, show a loading spinner.
-            return const Center(
-              child: CircularProgressIndicator(),
+                // By default, show a loading spinner.
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
             );
           },
         ),

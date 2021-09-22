@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as dev;
 
 enum ContentRating { safe, suggestive, erotica, pornographic }
 
@@ -78,8 +77,6 @@ class Languages {
   static Language get(String code) {
     return _languages[code]!;
   }
-
-  static final english = _languages['en']!;
 }
 
 class MangaDexSettings {

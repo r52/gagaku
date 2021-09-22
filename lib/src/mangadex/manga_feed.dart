@@ -14,8 +14,6 @@ class MangaDexMangaFeed extends StatefulWidget {
 }
 
 class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
-  late Future<Iterable<Manga>> _mangaList;
-
   var _scrollController = ScrollController();
   var _chapterOffset = 0;
 
@@ -23,38 +21,32 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
   void initState() {
     super.initState();
 
-    _mangaList = _fetchMangaFeed(0);
-
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
           setState(() {
             _chapterOffset += MangaDexEndpoints.apiQueryLimit;
-            _mangaList = _fetchMangaFeed(_chapterOffset);
           });
         }
       }
     });
   }
 
-  Future<Iterable<Manga>> _fetchMangaFeed(int offset) async {
-    var chapters = await Provider.of<MangaDexModel>(context, listen: false)
-        .fetchChapterFeed(offset, true);
+  Future<Iterable<Manga>> _fetchMangaFeed(
+      MangaDexModel model, int offset) async {
+    var chapters = await model.fetchChapterFeed(offset, true);
 
     var mangaIds = chapters.map((e) => e.mangaId).toSet();
 
-    return Provider.of<MangaDexModel>(context, listen: false)
-        .fetchManga(mangaIds);
+    return model.fetchManga(mangaIds);
   }
 
-  Future<void> _refreshFeed() async {
-    await Provider.of<MangaDexModel>(context, listen: false)
-        .invalidateCacheItem(CacheLists.latestChapters);
+  Future<void> _refreshFeed(MangaDexModel model) async {
+    await model.invalidateCacheItem(CacheLists.latestChapters);
 
     // Refresh
     setState(() {
       _chapterOffset = 0;
-      _mangaList = _fetchMangaFeed(_chapterOffset);
     });
   }
 
@@ -62,51 +54,56 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder<Iterable<Manga>>(
-          future: _mangaList,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data!.length == 0) {
-                return const Center(child: Text('Find some manga to follow!'));
-              }
+        child: Consumer<MangaDexModel>(
+          builder: (context, mdx, child) {
+            return FutureBuilder<Iterable<Manga>>(
+              future: _fetchMangaFeed(mdx, _chapterOffset),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data!.length == 0) {
+                    return const Center(
+                        child: Text('Find some manga to follow!'));
+                  }
 
-              return ScrollConfiguration(
-                  behavior:
-                      ScrollConfiguration.of(context).copyWith(dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
-                  }),
-                  child: RefreshIndicator(
-                      onRefresh: () async {
-                        await _refreshFeed();
-                      },
-                      child: GridView.extent(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        restorationId: 'manga_list_grid_offset',
-                        maxCrossAxisExtent: 300,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        padding: const EdgeInsets.all(8),
-                        childAspectRatio: 0.7,
-                        children: snapshot.data!
-                            .map((manga) => _GridMangaItem(manga: manga))
-                            .toList(),
-                      )));
-            } else if (snapshot.hasError) {
-              ScaffoldMessenger.of(context)
-                ..removeCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                  content: Text('${snapshot.error}'),
-                  backgroundColor: Colors.red,
-                ));
+                  return ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(dragDevices: {
+                        PointerDeviceKind.touch,
+                        PointerDeviceKind.mouse,
+                      }),
+                      child: RefreshIndicator(
+                          onRefresh: () async {
+                            await _refreshFeed(mdx);
+                          },
+                          child: GridView.extent(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            restorationId: 'manga_list_grid_offset',
+                            maxCrossAxisExtent: 300,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                            padding: const EdgeInsets.all(8),
+                            childAspectRatio: 0.7,
+                            children: snapshot.data!
+                                .map((manga) => _GridMangaItem(manga: manga))
+                                .toList(),
+                          )));
+                } else if (snapshot.hasError) {
+                  ScaffoldMessenger.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(SnackBar(
+                      content: Text('${snapshot.error}'),
+                      backgroundColor: Colors.red,
+                    ));
 
-              return Text('${snapshot.error}');
-            }
+                  return Text('${snapshot.error}');
+                }
 
-            // By default, show a loading spinner.
-            return const Center(
-              child: CircularProgressIndicator(),
+                // By default, show a loading spinner.
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
             );
           },
         ),
