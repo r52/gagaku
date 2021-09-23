@@ -7,7 +7,7 @@ import 'package:gagaku/src/mangadex/manga_view.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexMangaFeed extends StatefulWidget {
-  MangaDexMangaFeed({Key? key}) : super(key: key);
+  const MangaDexMangaFeed({Key? key}) : super(key: key);
 
   @override
   _MangaDexMangaFeedState createState() => _MangaDexMangaFeedState();

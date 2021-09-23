@@ -13,10 +13,22 @@ typedef LocalizedString = Map<String, String>;
 
 enum CoverArtQuality { best, medium, small }
 
+enum MangaStatus { none, ongoing, completed, hiatus, cancelled }
+
+enum MangaReadingStatus {
+  reading,
+  on_hold,
+  plan_to_read,
+  dropped,
+  re_reading,
+  completed
+}
+
 abstract class MangaDexEndpoints {
   static final api = Uri.https('api.mangadex.org', '');
 
   static const apiQueryLimit = 100;
+  static const apiSearchLimit = 10;
 
   static const login = '/auth/login';
   static const logout = '/auth/logout';
@@ -388,6 +400,69 @@ class MangaDexModel extends ChangeNotifier {
     return list;
   }
 
+  /// Searches for manga using the MangaDex API with the search term [searchTerm].
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiSearchLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// If [existing] is supplied, the operation returns the list supplied by
+  /// [existing] plus any new data returned from the API
+  Future<Iterable<Manga>> searchManga(String searchTerm,
+      [int offset = 0, Set<Manga>? existing]) async {
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_token.expired) {
+      await refreshCurrentToken();
+    }
+
+    Set<Manga> list = Set<Manga>();
+
+    if (existing != null) {
+      list.addAll(existing);
+    }
+
+    final queryParams = {
+      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
+      'offset': offset.toString(),
+      'order[latestUploadedChapter]': 'desc',
+      'availableTranslatedLanguage[]':
+          _settings.translatedLanguages.map((e) => e.toString()).toList(),
+      'originalLanguage[]':
+          _settings.originalLanguage.map((e) => e.toString()).toList(),
+      'contentRating[]':
+          _settings.contentRating.map((e) => describeEnum(e)).toList(),
+      'includes[]': 'cover_art',
+      'title': searchTerm
+    };
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = jsonDecode(response.body);
+
+      List<dynamic> mlist = body['data'];
+
+      var results = mlist.map((json) => Manga.fromJson(json)).toList();
+
+      list.addAll(results);
+
+      // Cache the data
+      _cache.putAllAPIResolved(results);
+    } else {
+      // Throw if failure
+      throw Exception("Failed to download manga data");
+    }
+
+    return list;
+  }
+
   /// Fetches read chapter data of given [mangas]
   Future<void> fetchReadChapters(Iterable<Manga> mangas) async {
     if (!_token.isValid || !_loggedIn) {
@@ -413,6 +488,16 @@ class MangaDexModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
+
+        if (body['data'] is List) {
+          // Since grouped = true, if the api returns a List, then the result
+          // is null
+          mangas.forEach((m) {
+            m.readChaptersRetrieved = true;
+          });
+
+          return;
+        }
 
         var clist = body['data'] as Map<String, dynamic>;
 
@@ -562,6 +647,7 @@ class MangaDexModel extends ChangeNotifier {
     throw Exception("Failed to download manga chapters");
   }
 
+  /// Sets the chapter read status [setRead] of the [chapter]
   Future<bool> setChapterRead(Chapter chapter, bool setRead) async {
     if (!_token.isValid || !_loggedIn) {
       throw Exception(
@@ -712,15 +798,15 @@ class Manga extends MangaDexAPIData {
   final LocalizedString title;
   final List<LocalizedString> altTitles;
   final LocalizedString description;
-  final Map<String, String> links;
+  final Map<String, String>? links;
   final String originalLanguage;
 
   final String? lastVolume;
   final String? lastChapter;
   final String? publicationDemographic;
-  final String? status;
+  final MangaStatus status;
   final int? year;
-  final String contentRating;
+  final ContentRating contentRating;
   final List<Tag> tags;
   final int version;
   final DateTime createdAt;
@@ -743,12 +829,12 @@ class Manga extends MangaDexAPIData {
       required this.title,
       required this.altTitles,
       required this.description,
-      required this.links,
+      this.links,
       required this.originalLanguage,
       this.lastVolume,
       this.lastChapter,
       this.publicationDemographic,
-      this.status,
+      required this.status,
       this.year,
       required this.contentRating,
       required this.tags,
@@ -795,19 +881,27 @@ class Manga extends MangaDexAPIData {
           .map((e) => Map.castFrom<String, dynamic, String, String>(e))
           .toList();
 
+      var status = (attr['status'] != null
+          ? MangaStatus.values
+              .firstWhere((element) => describeEnum(element) == attr['status'])
+          : MangaStatus.none);
+
+      var contentRating = ContentRating.values.firstWhere(
+          (element) => describeEnum(element) == attr['contentRating']);
+
       return Manga(
           id: data['id'],
           title: Map.castFrom(attr['title']),
           altTitles: altTitles,
           description: Map.castFrom(attr['description']),
-          links: Map.castFrom(attr['links']),
+          links: attr['links'] != null ? Map.castFrom(attr['links']) : null,
           originalLanguage: attr['originalLanguage'],
           lastVolume: attr['lastVolume'],
           lastChapter: attr['lastChapter'],
           publicationDemographic: attr['publicationDemographic'],
-          status: attr['status'],
+          status: status,
           year: attr['year'],
-          contentRating: attr['contentRating'],
+          contentRating: contentRating,
           tags: tags,
           createdAt: DateTime.parse(attr['createdAt']),
           updatedAt: DateTime.parse(attr['updatedAt']),

@@ -81,7 +81,7 @@ class ReaderSettings {
 }
 
 class ReaderWidget extends StatefulWidget {
-  ReaderWidget({
+  const ReaderWidget({
     Key? key,
     required this.pages,
     required this.pageCount,

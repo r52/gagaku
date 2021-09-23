@@ -5,6 +5,7 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/chapter_feed.dart';
 import 'package:gagaku/src/mangadex/login.dart';
 import 'package:gagaku/src/mangadex/manga_feed.dart';
+import 'package:gagaku/src/mangadex/search.dart';
 import 'package:gagaku/src/mangadex/settings.dart';
 import 'package:provider/provider.dart';
 
@@ -82,35 +83,46 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
                 ButtonBar(
                   children: [
                     Tooltip(
-                        message: 'MangaDex Settings',
-                        child: IconButton(
-                          icon: Icon(Icons.settings),
-                          onPressed: () async {
-                            Navigator.push(
-                                context,
-                                createMangaDexSettingsRoute(
-                                    Provider.of<MangaDexModel>(context,
-                                            listen: false)
-                                        .settings));
-                          },
-                        )),
+                      message: 'Search Manga',
+                      child: IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: () {
+                          Navigator.push(context, createMangaDexSearchRoute());
+                        },
+                      ),
+                    ),
                     Tooltip(
-                        message: 'Logout',
-                        child: IconButton(
-                          color: Theme.of(context).colorScheme.primary,
-                          icon: Icon(Icons.logout),
-                          onPressed: () async {
-                            final result = await Provider.of<MangaDexModel>(
-                                    context,
-                                    listen: false)
-                                .logout();
+                      message: 'MangaDex Settings',
+                      child: IconButton(
+                        icon: Icon(Icons.settings),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              createMangaDexSettingsRoute(
+                                  Provider.of<MangaDexModel>(context,
+                                          listen: false)
+                                      .settings));
+                        },
+                      ),
+                    ),
+                    Tooltip(
+                      message: 'Logout',
+                      child: IconButton(
+                        color: Theme.of(context).colorScheme.primary,
+                        icon: Icon(Icons.logout),
+                        onPressed: () async {
+                          final result = await Provider.of<MangaDexModel>(
+                                  context,
+                                  listen: false)
+                              .logout();
 
-                            if (!result) {
-                              // Shouldn't ever fail to logout
-                              throw Exception('Failed to logout');
-                            }
-                          },
-                        ))
+                          if (!result) {
+                            // Shouldn't ever fail to logout
+                            throw Exception('Failed to logout');
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 )
               ],
