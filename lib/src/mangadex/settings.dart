@@ -194,6 +194,7 @@ class MangaDexSettingsWidget extends StatefulWidget {
 class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
   @override
   Widget build(BuildContext context) {
+    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -227,7 +228,7 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          children: <Widget>[
+          children: [
             SettingCardWidget(
               title: Text(
                 'Chapter Language Filter',
@@ -244,8 +245,11 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
                     children: [
                       for (final lang in Languages.languages.values)
                         Padding(
-                          padding: const EdgeInsets.all(4),
+                          padding: screenSizeSmall
+                              ? const EdgeInsets.symmetric(horizontal: 2)
+                              : const EdgeInsets.all(4),
                           child: FilterChip(
+                              // labelPadding: const EdgeInsets.all(0),
                               label: Text(lang.name),
                               selected: widget.settings.translatedLanguages
                                   .contains(lang),
@@ -282,7 +286,9 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
                     children: [
                       for (final lang in Languages.languages.values)
                         Padding(
-                          padding: const EdgeInsets.all(4),
+                          padding: screenSizeSmall
+                              ? const EdgeInsets.symmetric(horizontal: 2)
+                              : const EdgeInsets.all(4),
                           child: FilterChip(
                               label: Text(lang.name),
                               selected: widget.settings.originalLanguage
@@ -317,7 +323,9 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
                     children: [
                       for (final content in ContentRating.values)
                         Padding(
-                          padding: const EdgeInsets.all(4),
+                          padding: screenSizeSmall
+                              ? const EdgeInsets.symmetric(horizontal: 2)
+                              : const EdgeInsets.all(4),
                           child: FilterChip(
                               label: Text(describeEnum(content)),
                               selected: widget.settings.contentRating
@@ -381,25 +389,38 @@ class SettingCardWidget extends StatefulWidget {
 class _SettingCardWidgetState extends State<SettingCardWidget> {
   @override
   Widget build(BuildContext context) {
+    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
+
     return Card(
       margin: const EdgeInsets.all(6),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-                child: Column(
-              children: [
-                widget.title,
-                SizedBox(
-                  height: (widget.subtitle != null ? 10 : 0),
-                ),
-                (widget.subtitle != null ? widget.subtitle! : SizedBox())
-              ],
-            )),
-            Expanded(child: widget.builder(context))
-          ],
-        ),
+        child: screenSizeSmall
+            ? Column(
+                children: [
+                  widget.title,
+                  SizedBox(
+                    height: (widget.subtitle != null ? 10 : 0),
+                  ),
+                  (widget.subtitle != null ? widget.subtitle! : SizedBox()),
+                  widget.builder(context)
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                      child: Column(
+                    children: [
+                      widget.title,
+                      SizedBox(
+                        height: (widget.subtitle != null ? 10 : 0),
+                      ),
+                      (widget.subtitle != null ? widget.subtitle! : SizedBox())
+                    ],
+                  )),
+                  Expanded(child: widget.builder(context))
+                ],
+              ),
       ),
     );
   }
