@@ -76,8 +76,8 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
       Provider.of<MangaDexModel>(context, listen: false)
           .setChapterRead(widget.chapter, true)
           .then((result) {
-        if (result) {
-          widget.manga.readChapters.add(widget.chapter.id);
+        if (result && widget.manga.readChapters != null) {
+          widget.manga.readChapters!.add(widget.chapter.id);
         }
       });
     }

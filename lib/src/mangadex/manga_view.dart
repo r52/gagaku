@@ -59,7 +59,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
 
   Future<Iterable<Chapter>> _fetchChapters(
       MangaDexModel model, int offset) async {
-    if (!widget.manga.readChaptersRetrieved) {
+    if (widget.manga.readChapters == null) {
       await model.fetchReadChapters([widget.manga]);
     }
 

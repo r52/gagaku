@@ -40,9 +40,9 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
       title += ' - ${widget.chapter.title!}';
     }
 
-    if (widget.manga.readChaptersRetrieved) {
+    if (widget.manga.readChapters != null) {
       widget.chapter.read =
-          widget.manga.readChapters.contains(widget.chapter.id);
+          widget.manga.readChapters!.contains(widget.chapter.id);
     }
 
     return ListTile(
@@ -68,13 +68,18 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
                 await Provider.of<MangaDexModel>(context, listen: false)
                     .setChapterRead(widget.chapter, set);
 
+            // Sanity check
+            if (widget.manga.readChapters == null) {
+              widget.manga.readChapters = Set<String>();
+            }
+
             if (result) {
               // Refresh
               setState(() {
                 if (set) {
-                  widget.manga.readChapters.add(widget.chapter.id);
+                  widget.manga.readChapters!.add(widget.chapter.id);
                 } else {
-                  widget.manga.readChapters.remove(widget.chapter.id);
+                  widget.manga.readChapters!.remove(widget.chapter.id);
                 }
               });
             }

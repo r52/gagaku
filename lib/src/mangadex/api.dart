@@ -474,9 +474,8 @@ class MangaDexModel extends ChangeNotifier {
       await refreshCurrentToken();
     }
 
-    var fetch = mangas
-        .where((manga) => (!manga.readChaptersRetrieved))
-        .map((e) => e.id);
+    var fetch =
+        mangas.where((manga) => (manga.readChapters == null)).map((e) => e.id);
 
     if (fetch.length > 0) {
       final queryParams = {'ids[]': fetch, 'grouped': 'true'};
@@ -493,7 +492,7 @@ class MangaDexModel extends ChangeNotifier {
           // Since grouped = true, if the api returns a List, then the result
           // is null
           mangas.forEach((m) {
-            m.readChaptersRetrieved = true;
+            m.readChapters = Set<String>();
           });
 
           return;
@@ -506,10 +505,8 @@ class MangaDexModel extends ChangeNotifier {
 
         clist.forEach((key, value) {
           if (mangaMap.containsKey(key)) {
-            mangaMap[key]!.readChaptersRetrieved = true;
-
-            var chaptersRead = List<String>.from(value);
-            mangaMap[key]!.readChapters.addAll(chaptersRead);
+            var chaptersRead = List<String>.of(value);
+            mangaMap[key]!.readChapters = Set<String>.of(chaptersRead);
           }
         });
       } else {
@@ -818,8 +815,7 @@ class Manga extends MangaDexAPIData {
   // Only store the primary cover returned by the API
   final String coverArt;
 
-  bool readChaptersRetrieved = false;
-  Set<String> readChapters = Set<String>();
+  Set<String>? readChapters;
 
   bool chaptersRetrieved = false;
   List<String> chapters = [];
