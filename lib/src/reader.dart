@@ -159,7 +159,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
     }
   }
 
-  void _handlePhotoViewOnTapDown(BuildContext context, TapDownDetails details,
+  void _handlePhotoViewOnTap(BuildContext context, TapUpDetails details,
       PhotoViewControllerValue value) {
     _focusNode.requestFocus();
 
@@ -339,8 +339,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                     maxScale: PhotoViewComputedScale.covered * 2.0,
                     initialScale: PhotoViewComputedScale.contained,
                     basePosition: Alignment.center,
-                    onTapDown:
-                        !platformIsMobile ? _handlePhotoViewOnTapDown : null,
+                    onTapUp: !platformIsMobile ? _handlePhotoViewOnTap : null,
                   );
                 },
               );
