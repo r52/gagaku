@@ -24,6 +24,17 @@ enum MangaReadingStatus {
   completed
 }
 
+abstract class MangaDexStrings {
+  static const readingStatus = [
+    'Reading',
+    'On Hold',
+    'Plan to Read',
+    'Dropped',
+    'Re-reading',
+    'Completed'
+  ];
+}
+
 abstract class MangaDexEndpoints {
   static final api = Uri.https('api.mangadex.org', '');
 
@@ -562,8 +573,8 @@ class MangaDexModel extends ChangeNotifier {
     var list = <Chapter>[];
 
     // Grab it from the cache if it exists
-    if (manga.chaptersRetrieved) {
-      var cached = manga.chapters.map((e) {
+    if (manga.chapters != null) {
+      var cached = manga.chapters!.map((e) {
         return _cache.get<Chapter>(e);
       }).toList();
 
@@ -629,7 +640,6 @@ class MangaDexModel extends ChangeNotifier {
       list.addAll(result);
 
       // Cache the list
-      manga.chaptersRetrieved = true;
       manga.chapters = list.map((e) => e.id).toList();
 
       if (!wholeList) {
@@ -817,8 +827,7 @@ class Manga extends MangaDexAPIData {
 
   Set<String>? readChapters;
 
-  bool chaptersRetrieved = false;
-  List<String> chapters = [];
+  List<String>? chapters;
 
   Manga(
       {required String id,
