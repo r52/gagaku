@@ -59,6 +59,14 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
 
   Future<Iterable<Chapter>> _fetchChapters(
       MangaDexModel model, int offset) async {
+    if (widget.manga.userFollowing == null) {
+      await model.getMangaFollowing(widget.manga);
+    }
+
+    if (widget.manga.userReadStatus == null) {
+      await model.getMangaReadingStatus(widget.manga);
+    }
+
     if (widget.manga.readChapters == null) {
       await model.fetchReadChapters([widget.manga]);
     }
@@ -119,15 +127,114 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                           ),
                         ),
                       ),
-                      // TODO manga view data/commands
-                      // const SliverToBoxAdapter(
-                      //   child: SizedBox(
-                      //     height: 50,
-                      //     child: Center(
-                      //       child: Text('TODO'),
-                      //     ),
-                      //   ),
-                      // ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ...(() {
+                                if (!widget.manga.userFollowing! &&
+                                    widget.manga.userReadStatus ==
+                                        MangaReadingStatus.none) {
+                                  return [
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        bool success =
+                                            await mdx.setMangaReadingStatus(
+                                                widget.manga,
+                                                MangaReadingStatus
+                                                    .plan_to_read);
+
+                                        if (success) {
+                                          success = await mdx.setMangaFollowing(
+                                              widget.manga, false);
+                                        }
+
+                                        if (success) {
+                                          setState(() {});
+                                        }
+                                      },
+                                      child: Text('Add to Library'),
+                                    )
+                                  ];
+                                } else {
+                                  return [
+                                    Tooltip(
+                                      message: widget.manga.userFollowing!
+                                          ? 'Unfollow Manga'
+                                          : 'Follow Manga',
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          bool set =
+                                              !widget.manga.userFollowing!;
+                                          bool success =
+                                              await mdx.setMangaFollowing(
+                                                  widget.manga, set);
+
+                                          if (success) {
+                                            setState(() {});
+                                          }
+                                        },
+                                        child: Icon(widget.manga.userFollowing!
+                                            ? Icons.favorite
+                                            : Icons.favorite_border),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    DropdownButton<MangaReadingStatus>(
+                                      value: widget.manga.userReadStatus,
+                                      icon: const Icon(Icons.expand_more),
+                                      iconSize: 24,
+                                      elevation: 16,
+                                      underline: Container(
+                                        height: 2,
+                                        color: Colors.deepOrangeAccent,
+                                      ),
+                                      onChanged:
+                                          (MangaReadingStatus? status) async {
+                                        if (status != null) {
+                                          bool success =
+                                              await mdx.setMangaReadingStatus(
+                                                  widget.manga, status);
+
+                                          if (success &&
+                                              status ==
+                                                  MangaReadingStatus.none) {
+                                            success =
+                                                await mdx.setMangaFollowing(
+                                                    widget.manga, false);
+                                          }
+
+                                          if (success) {
+                                            setState(() {});
+                                          }
+                                        }
+                                      },
+                                      items: List<
+                                          DropdownMenuItem<
+                                              MangaReadingStatus>>.generate(
+                                        MangaReadingStatus.values.length,
+                                        (int index) => DropdownMenuItem<
+                                            MangaReadingStatus>(
+                                          value: MangaReadingStatus.values
+                                              .elementAt(index),
+                                          child: Text(
+                                            MangaDexStrings.readingStatus
+                                                .elementAt(index),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ];
+                                }
+                              }())
+                            ],
+                          ),
+                        ),
+                      ),
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {

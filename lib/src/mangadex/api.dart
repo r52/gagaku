@@ -16,6 +16,7 @@ enum CoverArtQuality { best, medium, small }
 enum MangaStatus { none, ongoing, completed, hiatus, cancelled }
 
 enum MangaReadingStatus {
+  none,
   reading,
   on_hold,
   plan_to_read,
@@ -26,6 +27,7 @@ enum MangaReadingStatus {
 
 abstract class MangaDexStrings {
   static const readingStatus = [
+    'Remove from Library',
     'Reading',
     'On Hold',
     'Plan to Read',
@@ -782,6 +784,7 @@ class MangaDexModel extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       // Success
+      manga.userFollowing = setFollow;
       return true;
     }
 
@@ -812,15 +815,20 @@ class MangaDexModel extends ChangeNotifier {
       Map<String, dynamic> body = jsonDecode(response.body);
 
       if (body['result'] == 'ok') {
-        MangaReadingStatus status = MangaReadingStatus.values
-            .firstWhere((element) => describeEnum(element) == body['status']);
+        MangaReadingStatus status = MangaReadingStatus.none;
+
+        if (body['status'] != null) {
+          status = MangaReadingStatus.values
+              .firstWhere((element) => describeEnum(element) == body['status']);
+        }
 
         manga.userReadStatus = status;
 
         return manga.userReadStatus!;
       }
     } else if (response.statusCode == 404) {
-      return null;
+      manga.userReadStatus = MangaReadingStatus.none;
+      return manga.userReadStatus!;
     }
 
     // Throw if failure
@@ -844,13 +852,17 @@ class MangaDexModel extends ChangeNotifier {
       return true;
     }
 
-    final queryParams = {'status': describeEnum(status)};
+    final params = {
+      'status':
+          (status == MangaReadingStatus.none ? null : describeEnum(status))
+    };
 
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id),
-        queryParameters: queryParams);
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
-    var response = await _client!.post(uri);
+    var response = await _client!.post(uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(params));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> body = jsonDecode(response.body);

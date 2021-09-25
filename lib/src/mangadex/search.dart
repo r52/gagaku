@@ -114,6 +114,7 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
                         expandedHeight: 80.0,
                         flexibleSpace: FlexibleSpaceBar(
                           title: TextField(
+                            autofocus: true,
                             onChanged: _onSearchChanged,
                             decoration: InputDecoration(
                               icon: Icon(Icons.search),

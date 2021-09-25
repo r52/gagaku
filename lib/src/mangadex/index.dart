@@ -64,6 +64,8 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
             MangaDexChapterFeed()
           ];
 
+          // TODO library view
+
           return Scaffold(
             appBar: AppBar(
               leading: Builder(

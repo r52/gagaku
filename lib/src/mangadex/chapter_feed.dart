@@ -96,25 +96,27 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
                   }
 
                   return ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context)
-                          .copyWith(dragDevices: {
-                        PointerDeviceKind.touch,
-                        PointerDeviceKind.mouse,
-                      }),
-                      child: RefreshIndicator(
-                          onRefresh: () async {
-                            await _refreshFeed(mdx);
-                          },
-                          child: ListView.builder(
-                            controller: _scrollController,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            restorationId: 'chapter_list_offset',
-                            padding: const EdgeInsets.all(8),
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return snapshot.data!.elementAt(index);
-                            },
-                          )));
+                    behavior:
+                        ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    }),
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        await _refreshFeed(mdx);
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        restorationId: 'chapter_list_offset',
+                        padding: const EdgeInsets.all(6),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return snapshot.data!.elementAt(index);
+                        },
+                      ),
+                    ),
+                  );
                 } else if (snapshot.hasError) {
                   ScaffoldMessenger.of(context)
                     ..removeCurrentSnackBar()
