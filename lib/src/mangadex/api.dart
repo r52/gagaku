@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 
 typedef LocalizedString = Map<String, String>;
 
+typedef LibraryMap = Map<String, MangaReadingStatus>;
+
 enum CoverArtQuality { best, medium, small }
 
 enum MangaStatus { none, ongoing, completed, hiatus, cancelled }
@@ -73,10 +75,14 @@ abstract class MangaDexEndpoints {
 
   /// User manga reading status. {id} = [Manga.id]
   static const status = '/manga/{id}/status';
+
+  /// Get all Manga reading status for logged User
+  static const library = '/manga/status';
 }
 
 abstract class CacheLists {
   static const latestChapters = 'latestChapters';
+  static const library = 'userLibrary';
 }
 
 class Token {
@@ -875,6 +881,49 @@ class MangaDexModel extends ChangeNotifier {
     }
 
     return false;
+  }
+
+  /// Fetches the user's manga library
+  Future<LibraryMap?> fetchUserLibrary() async {
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_token.expired) {
+      await refreshCurrentToken();
+    }
+
+    if (_cache.exists(CacheLists.library)) {
+      return _cache.get<LibraryMap>(CacheLists.library);
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = jsonDecode(response.body);
+
+      if (body['statuses'] is List) {
+        // If the api returns a List, then the result is null
+        return null;
+      }
+
+      var mlist = body['statuses'] as Map<String, dynamic>;
+
+      var libMap = mlist.map((key, value) => MapEntry(
+          key,
+          MangaReadingStatus.values
+              .firstWhere((element) => describeEnum(element) == value)));
+
+      _cache.put(CacheLists.library, libMap, true);
+
+      return libMap;
+    } else {
+      // Throw if failure
+      throw Exception("Failed to download user library data");
+    }
   }
 }
 
