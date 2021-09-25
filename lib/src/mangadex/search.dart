@@ -50,9 +50,12 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
-          setState(() {
-            _searchOffset += MangaDexEndpoints.apiSearchLimit;
-          });
+          if (_results.length ==
+              _searchOffset + MangaDexEndpoints.apiSearchLimit) {
+            setState(() {
+              _searchOffset += MangaDexEndpoints.apiSearchLimit;
+            });
+          }
         }
       }
     });
