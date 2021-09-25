@@ -16,6 +16,7 @@ class MangaDexMangaFeed extends StatefulWidget {
 class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
   var _scrollController = ScrollController();
   var _chapterOffset = 0;
+  var _resultLength = 0;
 
   @override
   void initState() {
@@ -24,9 +25,12 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
-          setState(() {
-            _chapterOffset += MangaDexEndpoints.apiQueryLimit;
-          });
+          if (_resultLength ==
+              _chapterOffset + MangaDexEndpoints.apiQueryLimit) {
+            setState(() {
+              _chapterOffset += MangaDexEndpoints.apiQueryLimit;
+            });
+          }
         }
       }
     });
@@ -35,6 +39,7 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
   Future<Iterable<Manga>> _fetchMangaFeed(
       MangaDexModel model, int offset) async {
     var chapters = await model.fetchChapterFeed(offset, true);
+    _resultLength = chapters.length;
 
     var mangaIds = chapters.map((e) => e.mangaId).toSet();
 
@@ -46,6 +51,7 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
 
     // Refresh
     setState(() {
+      _resultLength = 0;
       _chapterOffset = 0;
     });
   }
