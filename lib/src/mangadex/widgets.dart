@@ -45,7 +45,15 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
           widget.manga.readChapters!.contains(widget.chapter.id);
     }
 
-    return ListTile(
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+              color: widget.chapter.read ? theme.backgroundColor : Colors.blue,
+              width: 4.0),
+        ),
+      ),
+      child: ListTile(
         onTap: () {
           Navigator.push(
                   context,
@@ -58,8 +66,9 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
         },
         tileColor: theme.backgroundColor,
         dense: true,
+        minVerticalPadding: 0.0,
         contentPadding:
-            EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 16.0)),
+            EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
         minLeadingWidth: 0.0,
         leading: IconButton(
           onPressed: () async {
@@ -86,12 +95,13 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
           },
           padding: const EdgeInsets.all(0.0),
           splashRadius: 15,
-          iconSize: widget.chapter.read ? 15 : 10,
+          iconSize: 20,
           tooltip: widget.chapter.read ? 'Unmark as read' : 'Mark as read',
           icon: Icon(
-            widget.chapter.read ? Icons.check : Icons.circle,
-            color: widget.chapter.read ? Colors.green : Colors.blue,
-          ),
+              widget.chapter.read ? Icons.visibility_off : Icons.visibility,
+              color: (widget.chapter.read
+                  ? theme.highlightColor
+                  : theme.primaryIconTheme.color)),
           constraints: BoxConstraints(minWidth: 20.0, minHeight: 20.0),
         ),
         title: Text(
@@ -117,10 +127,11 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
                       alignment: Alignment.center,
                       child: Row(
                         children: [
-                          Icon(Icons.language, size: 20),
+                          Icon(Icons.language, size: 18),
                           SizedBox(width: 5),
                           Text(Languages.get(widget.chapter.translatedLanguage)
-                              .name)
+                              .toString()
+                              .toUpperCase())
                         ],
                       ),
                     ),
@@ -155,6 +166,8 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
                   SizedBox(width: 5),
                   Text(timeago.format(widget.chapter.publishAt))
                 ],
-              ));
+              ),
+      ),
+    );
   }
 }
