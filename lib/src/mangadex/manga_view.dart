@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/settings.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -134,6 +135,24 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                           ),
                         ),
                       ),
+                      if (widget.manga.description.length > 0)
+                        SliverToBoxAdapter(
+                          child: ExpansionTile(
+                            title: Text('Synopsis'),
+                            children: [
+                              for (final entry
+                                  in widget.manga.description.entries)
+                                ExpansionTile(
+                                  title: Text(Languages.get(entry.key).name),
+                                  children: [
+                                    Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Text(entry.value))
+                                  ],
+                                )
+                            ],
+                          ),
+                        ),
                       SliverToBoxAdapter(
                         child: SizedBox(
                           height: 50,
@@ -193,7 +212,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                     ),
                                     DropdownButton<MangaReadingStatus>(
                                       value: widget.manga.userReadStatus,
-                                      icon: const Icon(Icons.expand_more),
+                                      icon: const Icon(Icons.arrow_drop_down),
                                       iconSize: 24,
                                       elevation: 16,
                                       underline: Container(
