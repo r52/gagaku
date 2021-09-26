@@ -111,15 +111,33 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
                       onRefresh: () async {
                         await _refreshFeed(mdx);
                       },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        restorationId: 'chapter_list_offset',
-                        padding: const EdgeInsets.all(6),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return snapshot.data!.elementAt(index);
-                        },
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 10.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Latest Chapters',
+                                  style: TextStyle(fontSize: 24),
+                                )
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              restorationId: 'chapter_list_offset',
+                              padding: const EdgeInsets.all(6),
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                return snapshot.data!.elementAt(index);
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );

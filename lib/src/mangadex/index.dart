@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/chapter_feed.dart';
+import 'package:gagaku/src/mangadex/library.dart';
 import 'package:gagaku/src/mangadex/login.dart';
 import 'package:gagaku/src/mangadex/manga_feed.dart';
 import 'package:gagaku/src/mangadex/search.dart';
@@ -56,15 +57,18 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
             BottomNavigationBarItem(
               icon: const Icon(Icons.feed),
               label: 'Chapter Feed',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.collections),
+              label: 'Library',
             )
           ];
 
           final selectedItem = <Widget>[
             MangaDexMangaFeed(),
-            MangaDexChapterFeed()
+            MangaDexChapterFeed(),
+            MangaDexLibraryView()
           ];
-
-          // TODO library view
 
           return Scaffold(
             appBar: AppBar(

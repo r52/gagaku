@@ -401,10 +401,10 @@ class MangaDexModel extends ChangeNotifier {
       var queryParams = {
         'limit': MangaDexEndpoints.apiQueryLimit.toString(),
         'order[latestUploadedChapter]': 'desc',
-        'availableTranslatedLanguage[]':
-            _settings.translatedLanguages.map((e) => e.toString()).toList(),
-        'originalLanguage[]':
-            _settings.originalLanguage.map((e) => e.toString()).toList(),
+        // 'availableTranslatedLanguage[]':
+        //     _settings.translatedLanguages.map((e) => e.toString()).toList(),
+        // 'originalLanguage[]':
+        //     _settings.originalLanguage.map((e) => e.toString()).toList(),
         'contentRating[]':
             _settings.contentRating.map((e) => describeEnum(e)).toList(),
         'includes[]': 'cover_art'
@@ -1166,6 +1166,10 @@ class Manga extends MangaDexAPIData {
   }
 
   String getCovertArtUrl({CoverArtQuality quality = CoverArtQuality.best}) {
+    if (coverArt.isEmpty) {
+      return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
+    }
+
     String url = "https://uploads.mangadex.org/covers/$id/$coverArt";
 
     switch (quality) {

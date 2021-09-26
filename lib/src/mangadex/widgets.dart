@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/manga_view.dart';
 import 'package:gagaku/src/mangadex/reader.dart';
 import 'package:gagaku/src/mangadex/settings.dart';
 import 'package:gagaku/src/reader.dart';
@@ -167,6 +169,61 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
                   Text(timeago.format(widget.chapter.publishAt))
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _GridTitleText extends StatelessWidget {
+  const _GridTitleText(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.none,
+      alignment: AlignmentDirectional.centerStart,
+      child: Text(text),
+    );
+  }
+}
+
+class GridMangaItem extends StatelessWidget {
+  const GridMangaItem({Key? key, required this.manga}) : super(key: key);
+
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget image = Material(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      clipBehavior: Clip.antiAlias,
+      child: CachedNetworkImage(
+        imageUrl: manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+        placeholder: (context, url) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        errorWidget: (context, url, error) => Icon(Icons.error),
+      ),
+    );
+
+    return InkWell(
+      onTap: () {
+        Navigator.push(context, createMangaViewRoute(manga));
+      },
+      child: GridTile(
+        footer: Material(
+          color: Colors.transparent,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: GridTileBar(
+              backgroundColor: Colors.black45,
+              title: _GridTitleText(manga.title['en']!)),
+        ),
+        child: image,
       ),
     );
   }

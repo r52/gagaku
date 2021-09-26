@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
-import 'package:gagaku/src/mangadex/manga_view.dart';
+import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexMangaFeed extends StatefulWidget {
@@ -72,28 +71,48 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
                   }
 
                   return ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context)
-                          .copyWith(dragDevices: {
-                        PointerDeviceKind.touch,
-                        PointerDeviceKind.mouse,
-                      }),
-                      child: RefreshIndicator(
-                          onRefresh: () async {
-                            await _refreshFeed(mdx);
-                          },
-                          child: GridView.extent(
-                            controller: _scrollController,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            restorationId: 'manga_list_grid_offset',
-                            maxCrossAxisExtent: 300,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                            padding: const EdgeInsets.all(8),
-                            childAspectRatio: 0.7,
-                            children: snapshot.data!
-                                .map((manga) => _GridMangaItem(manga: manga))
-                                .toList(),
-                          )));
+                    behavior:
+                        ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    }),
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        await _refreshFeed(mdx);
+                      },
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 10.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Latest Updates',
+                                  style: TextStyle(fontSize: 24),
+                                )
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: GridView.extent(
+                              controller: _scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              restorationId: 'manga_list_grid_offset',
+                              maxCrossAxisExtent: 300,
+                              mainAxisSpacing: 8,
+                              crossAxisSpacing: 8,
+                              padding: const EdgeInsets.all(8),
+                              childAspectRatio: 0.7,
+                              children: snapshot.data!
+                                  .map((manga) => GridMangaItem(manga: manga))
+                                  .toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 } else if (snapshot.hasError) {
                   ScaffoldMessenger.of(context)
                     ..removeCurrentSnackBar()
@@ -113,61 +132,6 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _GridTitleText extends StatelessWidget {
-  const _GridTitleText(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.none,
-      alignment: AlignmentDirectional.centerStart,
-      child: Text(text),
-    );
-  }
-}
-
-class _GridMangaItem extends StatelessWidget {
-  const _GridMangaItem({Key? key, required this.manga}) : super(key: key);
-
-  final Manga manga;
-
-  @override
-  Widget build(BuildContext context) {
-    final Widget image = Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      clipBehavior: Clip.antiAlias,
-      child: CachedNetworkImage(
-        imageUrl: manga.getCovertArtUrl(quality: CoverArtQuality.medium),
-        placeholder: (context, url) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        errorWidget: (context, url, error) => Icon(Icons.error),
-      ),
-    );
-
-    return InkWell(
-      onTap: () {
-        Navigator.push(context, createMangaViewRoute(manga));
-      },
-      child: GridTile(
-        footer: Material(
-          color: Colors.transparent,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: GridTileBar(
-              backgroundColor: Colors.black45,
-              title: _GridTitleText(manga.title['en']!)),
-        ),
-        child: image,
       ),
     );
   }
