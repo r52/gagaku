@@ -13,11 +13,11 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
 class IconTextChip extends StatelessWidget {
   const IconTextChip({
     Key? key,
-    required this.icon,
+    this.icon,
     required this.text,
   }) : super(key: key);
 
-  final Widget icon;
+  final Widget? icon;
   final Widget text;
 
   @override
@@ -32,8 +32,37 @@ class IconTextChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       alignment: Alignment.center,
       child: Row(
-        children: [icon, SizedBox(width: 5), text],
+        children: [
+          if (icon != null) ...[icon!, SizedBox(width: 5)],
+          text,
+        ],
       ),
+    );
+  }
+}
+
+class Styles {
+  static Widget slideTransitionBuilder(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
+    const begin = Offset(0.0, 1.0);
+    const end = Offset.zero;
+    const curve = Curves.ease;
+
+    var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+    return SlideTransition(
+      position: animation.drive(tween),
+      child: child,
+    );
+  }
+
+  static Route buildSlideTransitionRoute(RoutePageBuilder builder) {
+    return PageRouteBuilder(
+      pageBuilder: builder,
+      transitionsBuilder: slideTransitionBuilder,
     );
   }
 }

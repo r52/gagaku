@@ -1,29 +1,15 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
+import 'package:gagaku/src/ui.dart';
 import 'package:provider/provider.dart';
 
 Route createMangaDexSearchRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        MangaDexSearchWidget(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
+  return Styles.buildSlideTransitionRoute(
+      (context, animation, secondaryAnimation) => MangaDexSearchWidget());
 }
 
 class MangaDexSearchWidget extends StatefulWidget {

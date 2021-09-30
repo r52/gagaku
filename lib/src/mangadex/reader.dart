@@ -1,34 +1,19 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/reader.dart';
+import 'package:gagaku/src/ui.dart';
 import 'package:provider/provider.dart';
 
 Route createMangaDexReaderRoute(Chapter chapter, Manga manga, Widget? link,
     LinkPressedCallback? onLinkPressed) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        MangaDexReaderWidget(
-      chapter: chapter,
-      manga: manga,
-      link: link,
-      onLinkPressed: onLinkPressed,
-    ),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
+  return Styles.buildSlideTransitionRoute(
+      (context, animation, secondaryAnimation) => MangaDexReaderWidget(
+            chapter: chapter,
+            manga: manga,
+            link: link,
+            onLinkPressed: onLinkPressed,
+          ));
 }
 
 class MangaDexReaderWidget extends StatefulWidget {

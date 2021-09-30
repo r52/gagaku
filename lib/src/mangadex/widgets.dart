@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +35,7 @@ class ChapterButtonWidget extends StatefulWidget {
 class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
   @override
   Widget build(BuildContext context) {
-    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
     String title = '';
@@ -377,7 +375,7 @@ class _GridMangaDetailedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
     return Card(

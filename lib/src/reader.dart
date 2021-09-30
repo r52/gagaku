@@ -1,10 +1,8 @@
-import 'dart:io' show Platform;
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/src/ui.dart';
+import 'package:gagaku/src/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -187,7 +185,6 @@ class _ReaderWidgetState extends State<ReaderWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final platformIsMobile = Platform.isIOS || Platform.isAndroid;
 
     return Scaffold(
       appBar: AppBar(
@@ -340,7 +337,9 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                     maxScale: PhotoViewComputedScale.covered * 2.0,
                     initialScale: PhotoViewComputedScale.contained,
                     basePosition: Alignment.center,
-                    onTapUp: !platformIsMobile ? _handlePhotoViewOnTap : null,
+                    onTapUp: DeviceContext.isDesktop()
+                        ? _handlePhotoViewOnTap
+                        : null,
                   );
                 },
               );

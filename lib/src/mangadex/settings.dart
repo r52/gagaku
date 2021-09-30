@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/ui.dart';
+import 'package:gagaku/src/util.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -162,24 +164,10 @@ class MangaDexSettings {
 }
 
 Route createMangaDexSettingsRoute(MangaDexSettings settings) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        MangaDexSettingsWidget(
-      settings: settings,
-    ),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
+  return Styles.buildSlideTransitionRoute(
+      (context, animation, secondaryAnimation) => MangaDexSettingsWidget(
+            settings: settings,
+          ));
 }
 
 class MangaDexSettingsWidget extends StatefulWidget {
@@ -194,7 +182,7 @@ class MangaDexSettingsWidget extends StatefulWidget {
 class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
   @override
   Widget build(BuildContext context) {
-    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -389,7 +377,7 @@ class SettingCardWidget extends StatefulWidget {
 class _SettingCardWidgetState extends State<SettingCardWidget> {
   @override
   Widget build(BuildContext context) {
-    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return Card(
       margin: const EdgeInsets.all(6),

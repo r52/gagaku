@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/manga_view.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
+import 'package:gagaku/src/util.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexChapterFeed extends StatefulWidget {
@@ -177,7 +178,7 @@ class _ChapterFeedItem extends StatefulWidget {
 class _ChapterFeedItemState extends State<_ChapterFeedItem> {
   @override
   Widget build(BuildContext context) {
-    final bool screenSizeSmall = MediaQuery.of(context).size.width <= 480;
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
     var chapterBtns = widget.state.chapters.map((e) {
