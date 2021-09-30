@@ -84,6 +84,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO more manga info
     return Scaffold(
       body: Consumer<MangaDexModel>(
         builder: (context, mdx, child) {

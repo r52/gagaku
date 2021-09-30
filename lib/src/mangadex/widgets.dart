@@ -165,7 +165,7 @@ class MangaListWidget extends StatefulWidget {
     Key? key,
     required this.title,
     required this.items,
-    //this.leading = const <Widget>[],
+    this.leading = const <Widget>[],
     this.defaultView = MangaListView.grid,
     this.restorationId,
     this.physics,
@@ -174,7 +174,7 @@ class MangaListWidget extends StatefulWidget {
 
   final Widget title;
   final Iterable<Manga> items;
-  //final List<Widget> leading;
+  final List<Widget> leading;
   final MangaListView defaultView;
   final String? restorationId;
   final ScrollPhysics? physics;
@@ -219,14 +219,16 @@ class _MangaListWidgetState extends State<MangaListWidget> {
     switch (_mangaListView) {
       case MangaListView.list:
         view = SliverList(
-          delegate:
-              SliverChildBuilderDelegate((BuildContext context, int index) {
-            var manga = widget.items.elementAt(index);
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              var manga = widget.items.elementAt(index);
 
-            return _ListMangaItem(
-              manga: manga,
-            );
-          }),
+              return _ListMangaItem(
+                manga: manga,
+              );
+            },
+            childCount: widget.items.length,
+          ),
         );
         break;
       case MangaListView.detailed:
@@ -261,7 +263,7 @@ class _MangaListWidgetState extends State<MangaListWidget> {
       physics: widget.physics,
       restorationId: widget.restorationId,
       slivers: [
-        //...widget.leading,
+        ...widget.leading,
         SliverToBoxAdapter(
           child: Padding(
             padding:
