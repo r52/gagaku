@@ -4,10 +4,11 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gagaku/src/ui.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-typedef LinkPressedCallback = void Function()?;
+typedef LinkPressedCallback = void Function();
 
 class ReaderPage {
   final String url;
@@ -290,7 +291,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
         child: Container(
           child: PageView.builder(
             reverse: _settings.rightToLeft,
-            scrollBehavior: ReaderScrollBehavior(),
+            scrollBehavior: MouseTouchScrollBehavior(),
             scrollDirection: Axis.horizontal,
             controller: _pageController,
             itemCount: widget.pageCount,
@@ -366,14 +367,6 @@ class _ReaderWidgetState extends State<ReaderWidget> {
           : null,
     );
   }
-}
-
-class ReaderScrollBehavior extends MaterialScrollBehavior {
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      };
 }
 
 class ProgressIndicator extends AnimatedWidget {

@@ -16,7 +16,6 @@ class MangaDexLibraryView extends StatefulWidget {
 }
 
 class _MangaDexLibraryViewState extends State<MangaDexLibraryView> {
-  var _scrollController = ScrollController();
   var _type = MangaReadingStatus.reading;
   var _mangaOffset = 0;
   var _totalResultsLength = 0;
@@ -27,19 +26,6 @@ class _MangaDexLibraryViewState extends State<MangaDexLibraryView> {
   @override
   void initState() {
     super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.atEdge) {
-        if (_scrollController.position.pixels != 0) {
-          if (_cachedResults.length ==
-              _mangaOffset + MangaDexEndpoints.apiQueryLimit) {
-            setState(() {
-              _mangaOffset += MangaDexEndpoints.apiQueryLimit;
-            });
-          }
-        }
-      }
-    });
   }
 
   Future<Iterable<Manga>> _fetchLibraryFeed(
@@ -88,71 +74,63 @@ class _MangaDexLibraryViewState extends State<MangaDexLibraryView> {
               future: _fetchLibraryFeed(mdx, _type, _mangaOffset),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return ScrollConfiguration(
-                    behavior:
-                        ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 10.0),
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              ...MangaReadingStatus.values
-                                  .skip(1)
-                                  .map((e) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        child: ChoiceChip(
-                                          label: Text(MangaDexStrings
-                                              .readingStatus
-                                              .elementAt(e.index)),
-                                          labelStyle: TextStyle(
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 10.0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            ToggleButtons(
+                              children: [
+                                ...MangaReadingStatus.values
+                                    .skip(1)
+                                    .map((e) => Text(
+                                          MangaDexStrings.readingStatus
+                                              .elementAt(e.index),
+                                          style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
-                                          selected: _type == e,
-                                          onSelected: (value) {
-                                            _selectType(e);
-                                          },
-                                        ),
-                                      ))
-                                  .toList()
-                            ],
-                          ),
+                                        ))
+                                    .toList()
+                              ],
+                              isSelected: List<bool>.generate(
+                                  MangaReadingStatus.values.skip(1).length,
+                                  (index) => _type.index == (index + 1)),
+                              onPressed: (index) {
+                                setState(() {
+                                  _selectType(MangaReadingStatus.values
+                                      .skip(1)
+                                      .elementAt(index));
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 10.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                '$_totalResultsLength Mangas',
-                                style: TextStyle(fontSize: 24),
-                              )
-                            ],
+                      ),
+                      Expanded(
+                        child: MangaListWidget(
+                          items: snapshot.data!,
+                          title: Text(
+                            '$_totalResultsLength Mangas',
+                            style: TextStyle(fontSize: 24),
                           ),
+                          restorationId: 'manga_library_grid_offset',
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          defaultView: MangaListView.grid,
+                          onAtEdge: () {
+                            if (_cachedResults.length ==
+                                _mangaOffset +
+                                    MangaDexEndpoints.apiQueryLimit) {
+                              setState(() {
+                                _mangaOffset += MangaDexEndpoints.apiQueryLimit;
+                              });
+                            }
+                          },
                         ),
-                        Expanded(
-                          child: GridView.extent(
-                            controller: _scrollController,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            restorationId: 'manga_library_grid_offset',
-                            maxCrossAxisExtent: 300,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                            padding: const EdgeInsets.all(8),
-                            childAspectRatio: 0.7,
-                            children: snapshot.data!
-                                .map((manga) => GridMangaItem(manga: manga))
-                                .toList(),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 } else if (snapshot.hasError) {
                   ScaffoldMessenger.of(context)

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
@@ -13,26 +11,12 @@ class MangaDexMangaFeed extends StatefulWidget {
 }
 
 class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
-  var _scrollController = ScrollController();
   var _chapterOffset = 0;
   var _resultLength = 0;
 
   @override
   void initState() {
     super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.atEdge) {
-        if (_scrollController.position.pixels != 0) {
-          if (_resultLength ==
-              _chapterOffset + MangaDexEndpoints.apiQueryLimit) {
-            setState(() {
-              _chapterOffset += MangaDexEndpoints.apiQueryLimit;
-            });
-          }
-        }
-      }
-    });
   }
 
   Future<Iterable<Manga>> _fetchMangaFeed(
@@ -70,47 +54,27 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
                         child: Text('Find some manga to follow!'));
                   }
 
-                  return ScrollConfiguration(
-                    behavior:
-                        ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        await _refreshFeed(mdx);
-                      },
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 10.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Latest Updates',
-                                  style: TextStyle(fontSize: 24),
-                                )
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: GridView.extent(
-                              controller: _scrollController,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              restorationId: 'manga_list_grid_offset',
-                              maxCrossAxisExtent: 300,
-                              mainAxisSpacing: 8,
-                              crossAxisSpacing: 8,
-                              padding: const EdgeInsets.all(8),
-                              childAspectRatio: 0.7,
-                              children: snapshot.data!
-                                  .map((manga) => GridMangaItem(manga: manga))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await _refreshFeed(mdx);
+                    },
+                    child: MangaListWidget(
+                      items: snapshot.data!,
+                      title: Text(
+                        'Latest Updates',
+                        style: TextStyle(fontSize: 24),
                       ),
+                      restorationId: 'manga_list_grid_offset',
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      defaultView: MangaListView.grid,
+                      onAtEdge: () {
+                        if (_resultLength ==
+                            _chapterOffset + MangaDexEndpoints.apiQueryLimit) {
+                          setState(() {
+                            _chapterOffset += MangaDexEndpoints.apiQueryLimit;
+                          });
+                        }
+                      },
                     ),
                   );
                 } else if (snapshot.hasError) {
