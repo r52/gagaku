@@ -407,7 +407,7 @@ class MangaDexModel extends ChangeNotifier {
         //     _settings.originalLanguage.map((e) => e.toString()).toList(),
         'contentRating[]':
             _settings.contentRating.map((e) => describeEnum(e)).toList(),
-        'includes[]': 'cover_art'
+        'includes[]': ['cover_art', 'author', 'artist']
       };
 
       while (end < fetch.length) {
@@ -485,7 +485,7 @@ class MangaDexModel extends ChangeNotifier {
           _settings.originalLanguage.map((e) => e.toString()).toList(),
       'contentRating[]':
           _settings.contentRating.map((e) => describeEnum(e)).toList(),
-      'includes[]': 'cover_art',
+      'includes[]': ['cover_art', 'author', 'artist'],
       'title': searchTerm
     };
     final uri = MangaDexEndpoints.api
@@ -1057,7 +1057,9 @@ class Manga extends MangaDexAPIData {
   final DateTime updatedAt;
 
   final String? authorId;
+  final String? author;
   final String? artistId;
+  final String? artist;
 
   // Only store the primary cover returned by the API
   final String coverArt;
@@ -1094,6 +1096,8 @@ class Manga extends MangaDexAPIData {
       required this.updatedAt,
       this.authorId,
       this.artistId,
+      this.author,
+      this.artist,
       required this.coverArt})
       : super._(id, 'manga', 30);
 
@@ -1109,6 +1113,8 @@ class Manga extends MangaDexAPIData {
 
       String authorId = '';
       String artistId = '';
+      String author = '';
+      String artist = '';
       String coverArt = '';
 
       // Cover Art
@@ -1117,8 +1123,12 @@ class Manga extends MangaDexAPIData {
       relations.forEach((r) {
         if (r['type'] == 'author') {
           authorId = r['id'];
+          Map<String, dynamic> caattrs = r['attributes'];
+          author = caattrs['name'];
         } else if (r['type'] == 'artist') {
           artistId = r['id'];
+          Map<String, dynamic> caattrs = r['attributes'];
+          artist = caattrs['name'];
         } else if (r['type'] == 'cover_art') {
           Map<String, dynamic> caattrs = r['attributes'];
           coverArt = caattrs['fileName'];
@@ -1159,6 +1169,8 @@ class Manga extends MangaDexAPIData {
           version: attr['version'],
           authorId: authorId,
           artistId: artistId,
+          author: author,
+          artist: artist,
           coverArt: coverArt);
     }
 
