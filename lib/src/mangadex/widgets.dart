@@ -351,7 +351,7 @@ class _ListMangaItem extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      _MangaStatusChip(
+                      MangaStatusChip(
                         status: manga.status,
                       ),
                       // TODO: rest of the info as they become available
@@ -424,7 +424,7 @@ class _GridMangaDetailedItem extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            _MangaStatusChip(status: manga.status),
+                            MangaStatusChip(status: manga.status),
                             // TODO: rest of the info as they become available
                           ],
                         ),
@@ -506,8 +506,8 @@ class _GridMangaItem extends StatelessWidget {
   }
 }
 
-class _MangaStatusChip extends StatelessWidget {
-  const _MangaStatusChip({Key? key, required this.status}) : super(key: key);
+class MangaStatusChip extends StatelessWidget {
+  const MangaStatusChip({Key? key, required this.status}) : super(key: key);
 
   final MangaStatus status;
 
