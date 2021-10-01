@@ -60,6 +60,18 @@ extension MangaReadingStatusExt on MangaReadingStatus {
   }
 }
 
+enum TagGroup { theme, genre, format, content }
+
+extension TagGroupExt on TagGroup {
+  String get name => describeEnum(this);
+
+  String get formatted => this.name.capitalize();
+
+  static TagGroup parse(String key) {
+    return TagGroup.values.firstWhere((element) => element.name == key);
+  }
+}
+
 class Language {
   final String name;
   final String code;
@@ -303,7 +315,7 @@ class Manga extends MangaDexAPIData {
       required this.coverArt})
       : super._(id, 'manga', 30);
 
-  factory Manga.fromJson(Map<String, dynamic> data) {
+  factory Manga.fromJson(Map<String, dynamic> data, Map<String, Tag> tagMap) {
     if (data['type'] == 'manga') {
       Map<String, dynamic> attr = data['attributes'];
 
@@ -311,7 +323,7 @@ class Manga extends MangaDexAPIData {
       List<Map<String, dynamic>> tagData =
           List<Map<String, dynamic>>.from(attr['tags']);
 
-      var tags = tagData.map((e) => Tag.fromJson(e)).toList();
+      var tags = tagData.map((e) => tagMap[e['id'] as String]!).toList();
 
       String authorId = '';
       String artistId = '';
@@ -401,7 +413,7 @@ class Manga extends MangaDexAPIData {
 
 class Tag extends MangaDexAPIData {
   final LocalizedString name;
-  final String group;
+  final TagGroup group;
   final int version;
 
   Tag(
@@ -418,7 +430,7 @@ class Tag extends MangaDexAPIData {
       return Tag(
         id: json['id'],
         name: Map.castFrom(attr['name']),
-        group: attr['group'],
+        group: TagGroupExt.parse(attr['group']),
         version: attr['version'],
       );
     }

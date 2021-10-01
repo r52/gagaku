@@ -280,7 +280,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                             ),
                           if (widget.manga.artist != null)
                             ExpansionTile(
-                              title: Text('Author'),
+                              title: Text('Artist'),
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(8),
@@ -323,7 +323,8 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                   color: theme.backgroundColor,
                                   child: Row(
                                     children: widget.manga.tags
-                                        .where((tag) => tag.group == 'genre')
+                                        .where((tag) =>
+                                            tag.group == TagGroup.genre)
                                         .map((e) => IconTextChip(
                                             text: Text(e.name['en']!)))
                                         .toList(),
@@ -340,7 +341,8 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                   color: theme.backgroundColor,
                                   child: Row(
                                     children: widget.manga.tags
-                                        .where((tag) => tag.group == 'theme')
+                                        .where((tag) =>
+                                            tag.group == TagGroup.theme)
                                         .map((e) => IconTextChip(
                                             text: Text(e.name['en']!)))
                                         .toList(),

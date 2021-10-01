@@ -19,7 +19,7 @@ class CacheEntry<T> {
 }
 
 class CacheManager {
-  static const _preferredMaxEntries = 10000;
+  static const _preferredMaxEntries = 20000;
 
   /// Cache of API data
   Map<String, CacheEntry<dynamic>> _cache = Map<String, CacheEntry<dynamic>>();

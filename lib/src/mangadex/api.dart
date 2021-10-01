@@ -370,6 +370,10 @@ class MangaDexModel extends ChangeNotifier {
     if (fetch.length > 0) {
       // dev.log('Retrieving Manga info');
 
+      var tags = await getTagList();
+      var tagMap =
+          Map.fromEntries(tags.map((e) => MapEntry<String, Tag>(e.id, e)));
+
       int start = 0, end = 0;
 
       var queryParams = {
@@ -402,7 +406,8 @@ class MangaDexModel extends ChangeNotifier {
 
           List<dynamic> mlist = body['data'];
 
-          var results = mlist.map((json) => Manga.fromJson(json)).toList();
+          var results =
+              mlist.map((json) => Manga.fromJson(json, tagMap)).toList();
 
           // Cache the data
           _cache.putAllAPIResolved(results);
@@ -448,6 +453,10 @@ class MangaDexModel extends ChangeNotifier {
       list.addAll(existing);
     }
 
+    var tags = await getTagList();
+    var tagMap =
+        Map.fromEntries(tags.map((e) => MapEntry<String, Tag>(e.id, e)));
+
     final queryParams = {
       'limit': MangaDexEndpoints.apiSearchLimit.toString(),
       'offset': offset.toString(),
@@ -470,7 +479,7 @@ class MangaDexModel extends ChangeNotifier {
 
       List<dynamic> mlist = body['data'];
 
-      var results = mlist.map((json) => Manga.fromJson(json)).toList();
+      var results = mlist.map((json) => Manga.fromJson(json, tagMap)).toList();
 
       list.addAll(results);
 
@@ -887,6 +896,43 @@ class MangaDexModel extends ChangeNotifier {
       _cache.put(CacheLists.library, libMap, true);
 
       return libMap;
+    } else {
+      // Throw if failure
+      throw Exception("Failed to download user library data");
+    }
+  }
+
+  /// Retrieve all MangaDex tags
+  Future<Iterable<Tag>> getTagList() async {
+    if (!_token.isValid || !_loggedIn) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_token.expired) {
+      await refreshCurrentToken();
+    }
+
+    if (_cache.exists(CacheLists.tags)) {
+      return _cache.getSpecialList<Tag>(CacheLists.tags);
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = jsonDecode(response.body);
+
+      List<dynamic> tlist = body['data'];
+
+      var result = tlist.map((json) => Tag.fromJson(json)).toList();
+
+      // Cache the data and list
+      _cache.putSpecialList(CacheLists.tags, result,
+          resolve: true, expiry: 65535);
+
+      return result;
     } else {
       // Throw if failure
       throw Exception("Failed to download user library data");
