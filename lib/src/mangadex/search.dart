@@ -23,7 +23,6 @@ class MangaDexSearchWidget extends StatefulWidget {
 class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
   Timer? _debounce;
 
-  var _scrollController = ScrollController();
   var _searchOffset = 0;
   String _searchTerm = '';
   Set<Manga> _results = Set<Manga>();
@@ -31,19 +30,6 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
   @override
   void initState() {
     super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.atEdge) {
-        if (_scrollController.position.pixels != 0) {
-          if (_results.length ==
-              _searchOffset + MangaDexEndpoints.apiSearchLimit) {
-            setState(() {
-              _searchOffset += MangaDexEndpoints.apiSearchLimit;
-            });
-          }
-        }
-      }
-    });
   }
 
   @override

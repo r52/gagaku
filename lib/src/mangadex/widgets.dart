@@ -212,49 +212,6 @@ class _MangaListWidgetState extends State<MangaListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget view;
-
-    switch (_mangaListView) {
-      case MangaListView.list:
-        view = SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              var manga = widget.items.elementAt(index);
-
-              return _ListMangaItem(
-                manga: manga,
-              );
-            },
-            childCount: widget.items.length,
-          ),
-        );
-        break;
-      case MangaListView.detailed:
-        view = SliverGrid.extent(
-          maxCrossAxisExtent: 1200,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 3,
-          children: widget.items
-              .map((manga) => _GridMangaDetailedItem(manga: manga))
-              .toList(),
-        );
-
-        break;
-      case MangaListView.grid:
-      default:
-        view = SliverGrid.extent(
-          maxCrossAxisExtent: 300,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 0.7,
-          children: widget.items
-              .map((manga) => _GridMangaItem(manga: manga))
-              .toList(),
-        );
-        break;
-    }
-
     return CustomScrollView(
       controller: _scrollController,
       scrollBehavior: MouseTouchScrollBehavior(),
@@ -294,7 +251,45 @@ class _MangaListWidgetState extends State<MangaListWidget> {
             ),
           ),
         ),
-        view,
+        (() {
+          switch (_mangaListView) {
+            case MangaListView.list:
+              return SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    var manga = widget.items.elementAt(index);
+
+                    return _ListMangaItem(
+                      manga: manga,
+                    );
+                  },
+                  childCount: widget.items.length,
+                ),
+              );
+            case MangaListView.detailed:
+              return SliverGrid.extent(
+                maxCrossAxisExtent: 1024,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 3,
+                children: widget.items
+                    .map((manga) => _GridMangaDetailedItem(manga: manga))
+                    .toList(),
+              );
+
+            case MangaListView.grid:
+            default:
+              return SliverGrid.extent(
+                maxCrossAxisExtent: 256,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 0.7,
+                children: widget.items
+                    .map((manga) => _GridMangaItem(manga: manga))
+                    .toList(),
+              );
+          }
+        }()),
       ],
     );
   }
@@ -321,7 +316,8 @@ class _ListMangaItem extends StatelessWidget {
                 Navigator.push(context, createMangaViewRoute(manga));
               },
               child: CachedNetworkImage(
-                imageUrl: manga.getCovertArtUrl(quality: CoverArtQuality.small),
+                imageUrl:
+                    manga.getCovertArtUrl(quality: CoverArtQuality.medium),
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -411,7 +407,7 @@ class _GridMangaDetailedItem extends StatelessWidget {
                     },
                     child: CachedNetworkImage(
                         imageUrl: manga.getCovertArtUrl(
-                            quality: CoverArtQuality.small),
+                            quality: CoverArtQuality.medium),
                         placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -451,21 +447,6 @@ class _GridMangaDetailedItem extends StatelessWidget {
   }
 }
 
-class _GridTitleText extends StatelessWidget {
-  const _GridTitleText(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.none,
-      alignment: AlignmentDirectional.centerStart,
-      child: Text(text),
-    );
-  }
-}
-
 class _GridMangaItem extends StatelessWidget {
   const _GridMangaItem({Key? key, required this.manga}) : super(key: key);
 
@@ -482,6 +463,7 @@ class _GridMangaItem extends StatelessWidget {
           child: CircularProgressIndicator(),
         ),
         errorWidget: (context, url, error) => Icon(Icons.error),
+        width: 256.0,
       ),
     );
 
@@ -493,12 +475,18 @@ class _GridMangaItem extends StatelessWidget {
         footer: Material(
           color: Colors.transparent,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+            borderRadius:
+                const BorderRadius.vertical(bottom: const Radius.circular(4)),
           ),
           clipBehavior: Clip.antiAlias,
           child: GridTileBar(
-              backgroundColor: Colors.black45,
-              title: _GridTitleText(manga.title['en']!)),
+            backgroundColor: Colors.black45,
+            title: FittedBox(
+              fit: BoxFit.none,
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(manga.title['en']!),
+            ),
+          ),
         ),
         child: image,
       ),
