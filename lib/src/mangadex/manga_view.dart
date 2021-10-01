@@ -4,6 +4,7 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/settings.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:gagaku/src/ui.dart';
+import 'package:gagaku/src/util.dart';
 import 'package:provider/provider.dart';
 
 Route createMangaViewRoute(Manga manga) {
@@ -69,7 +70,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO more manga info
+    final theme = Theme.of(context);
     return Scaffold(
       body: Consumer<MangaDexModel>(
         builder: (context, mdx, child) {
@@ -126,17 +127,114 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                               ExpansionTile(
                                 title: Text(Languages.get(entry.key).name),
                                 children: [
-                                  Padding(
-                                      padding: const EdgeInsets.all(8),
-                                      child: Text(entry.value))
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    color: theme.backgroundColor,
+                                    child: Text(entry.value),
+                                  ),
                                 ],
                               )
                           ],
                         ),
                       ),
                     SliverToBoxAdapter(
-                      child: SizedBox(
+                      child: ExpansionTile(
+                        title: Text('Info'),
+                        children: [
+                          if (widget.manga.author != null)
+                            ExpansionTile(
+                              title: Text('Author'),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  color: theme.backgroundColor,
+                                  child: Row(
+                                    children: [
+                                      IconTextChip(
+                                        text: Text(widget.manga.author!),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (widget.manga.artist != null)
+                            ExpansionTile(
+                              title: Text('Author'),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  color: theme.backgroundColor,
+                                  child: Row(
+                                    children: [
+                                      IconTextChip(
+                                        text: Text(widget.manga.artist!),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (widget.manga.publicationDemographic != null)
+                            ExpansionTile(
+                              title: Text('Demograhic'),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  color: theme.backgroundColor,
+                                  child: Row(
+                                    children: [
+                                      IconTextChip(
+                                        text: Text(widget
+                                            .manga.publicationDemographic!
+                                            .capitalize()),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (widget.manga.tags.isNotEmpty)
+                            ExpansionTile(
+                              title: Text('Genres'),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  color: theme.backgroundColor,
+                                  child: Row(
+                                    children: widget.manga.tags
+                                        .where((tag) => tag.group == 'genre')
+                                        .map((e) => IconTextChip(
+                                            text: Text(e.name['en']!)))
+                                        .toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (widget.manga.tags.isNotEmpty)
+                            ExpansionTile(
+                              title: Text('Themes'),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  color: theme.backgroundColor,
+                                  child: Row(
+                                    children: widget.manga.tags
+                                        .where((tag) => tag.group == 'theme')
+                                        .map((e) => IconTextChip(
+                                            text: Text(e.name['en']!)))
+                                        .toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Container(
                         height: 50,
+                        color: theme.cardColor,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
