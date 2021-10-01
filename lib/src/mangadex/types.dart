@@ -10,6 +10,8 @@ enum ContentRating { safe, suggestive, erotica, pornographic }
 extension ContentRatingExt on ContentRating {
   String get name => describeEnum(this);
 
+  String get formatted => this.name.capitalize();
+
   static ContentRating parse(String key) {
     return ContentRating.values.firstWhere((element) => element.name == key);
   }
@@ -139,6 +141,15 @@ abstract class MangaDexAPIData {
   int get cacheExpiration => _cacheExpiration;
 
   MangaDexAPIData._(this.id, this.type, this._cacheExpiration);
+
+  @override
+  bool operator ==(Object other) =>
+      other is MangaDexAPIData &&
+      other.runtimeType == runtimeType &&
+      other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class Chapter extends MangaDexAPIData {
