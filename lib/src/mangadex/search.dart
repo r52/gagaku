@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:gagaku/src/ui.dart';
 import 'package:provider/provider.dart';

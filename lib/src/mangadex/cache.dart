@@ -2,7 +2,7 @@
 /// Mainly to stop gagaku from querying the API for the same stuff
 /// too often.
 
-import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/types.dart';
 
 class CacheEntry<T> {
   final T _entry;
@@ -91,10 +91,10 @@ class CacheManager {
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
   /// if requested, as a part of a special query given by [key]
   void putSpecialList(String key, Iterable<MangaDexAPIData> list,
-      [bool resolve = true]) {
+      {bool resolve = true, int expiry = 10}) {
     // Transform data list to a list of uuids
     final ids = list.map((e) => e.id).toList();
-    _cache[key] = CacheEntry(ids); // Just overwrite it
+    _cache[key] = CacheEntry(ids, expiry); // Just overwrite it
 
     if (resolve) {
       putAllAPIResolved(list);

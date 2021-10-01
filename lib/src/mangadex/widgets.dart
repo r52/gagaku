@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/manga_view.dart';
 import 'package:gagaku/src/mangadex/reader.dart';
-import 'package:gagaku/src/mangadex/settings.dart';
+import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/reader.dart';
 import 'package:gagaku/src/ui.dart';
 import 'package:gagaku/src/util.dart';
@@ -537,7 +537,7 @@ class _MangaStatusChip extends StatelessWidget {
         size: 10,
       ),
       text: Text(
-        describeEnum(status).capitalize(),
+        status.formatted,
       ),
     );
   }

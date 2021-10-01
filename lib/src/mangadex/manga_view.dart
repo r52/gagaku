@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
-import 'package:gagaku/src/mangadex/settings.dart';
+import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:gagaku/src/ui.dart';
 import 'package:gagaku/src/util.dart';
@@ -323,8 +323,9 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                         value: MangaReadingStatus.values
                                             .elementAt(index),
                                         child: Text(
-                                          MangaDexStrings.readingStatus
-                                              .elementAt(index),
+                                          MangaReadingStatus.values
+                                              .elementAt(index)
+                                              .formatted,
                                         ),
                                       ),
                                     ),

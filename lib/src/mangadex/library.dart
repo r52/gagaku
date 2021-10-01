@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -87,8 +88,7 @@ class _MangaDexLibraryViewState extends State<MangaDexLibraryView> {
                                 ...MangaReadingStatus.values
                                     .skip(1)
                                     .map((e) => Text(
-                                          MangaDexStrings.readingStatus
-                                              .elementAt(e.index),
+                                          e.formatted,
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),

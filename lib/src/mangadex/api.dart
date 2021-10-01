@@ -6,38 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/cache.dart';
 import 'package:gagaku/src/mangadex/settings.dart';
+import 'package:gagaku/src/mangadex/types.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
-typedef LocalizedString = Map<String, String>;
-
-typedef LibraryMap = Map<String, MangaReadingStatus>;
-
-enum CoverArtQuality { best, medium, small }
-
-enum MangaStatus { none, ongoing, completed, hiatus, cancelled }
-
-enum MangaReadingStatus {
-  none,
-  reading,
-  on_hold,
-  plan_to_read,
-  dropped,
-  re_reading,
-  completed
-}
-
-abstract class MangaDexStrings {
-  static const readingStatus = [
-    'Remove from Library',
-    'Reading',
-    'On Hold',
-    'Plan to Read',
-    'Dropped',
-    'Re-reading',
-    'Completed'
-  ];
-}
 
 abstract class MangaDexEndpoints {
   static final api = Uri.https('api.mangadex.org', '');
@@ -78,11 +49,15 @@ abstract class MangaDexEndpoints {
 
   /// Get all Manga reading status for logged User
   static const library = '/manga/status';
+
+  /// Gets the universal tag list
+  static const tag = '/manga/tag';
 }
 
 abstract class CacheLists {
   static const latestChapters = 'latestChapters';
   static const library = 'userLibrary';
+  static const tags = 'tags';
 }
 
 class Token {
@@ -328,8 +303,7 @@ class MangaDexModel extends ChangeNotifier {
           _settings.translatedLanguages.map((e) => e.toString()).toList(),
       'originalLanguage[]':
           _settings.originalLanguage.map((e) => e.toString()).toList(),
-      'contentRating[]':
-          _settings.contentRating.map((e) => describeEnum(e)).toList(),
+      'contentRating[]': _settings.contentRating.map((e) => e.name).toList(),
       'order[publishAt]': 'desc',
       'includes[]': 'scanlation_group'
     };
@@ -355,7 +329,7 @@ class MangaDexModel extends ChangeNotifier {
       list.addAll(result);
 
       // Cache the list
-      _cache.putSpecialList(CacheLists.latestChapters, list, false);
+      _cache.putSpecialList(CacheLists.latestChapters, list, resolve: false);
 
       if (!wholeList) {
         return list.getRange(
@@ -405,8 +379,7 @@ class MangaDexModel extends ChangeNotifier {
         //     _settings.translatedLanguages.map((e) => e.toString()).toList(),
         // 'originalLanguage[]':
         //     _settings.originalLanguage.map((e) => e.toString()).toList(),
-        'contentRating[]':
-            _settings.contentRating.map((e) => describeEnum(e)).toList(),
+        'contentRating[]': _settings.contentRating.map((e) => e.name).toList(),
         'includes[]': ['cover_art', 'author', 'artist']
       };
 
@@ -478,13 +451,12 @@ class MangaDexModel extends ChangeNotifier {
     final queryParams = {
       'limit': MangaDexEndpoints.apiSearchLimit.toString(),
       'offset': offset.toString(),
-      'order[latestUploadedChapter]': 'desc',
+      'order[relevance]': 'desc',
       'availableTranslatedLanguage[]':
           _settings.translatedLanguages.map((e) => e.toString()).toList(),
       'originalLanguage[]':
           _settings.originalLanguage.map((e) => e.toString()).toList(),
-      'contentRating[]':
-          _settings.contentRating.map((e) => describeEnum(e)).toList(),
+      'contentRating[]': _settings.contentRating.map((e) => e.name).toList(),
       'includes[]': ['cover_art', 'author', 'artist'],
       'title': searchTerm
     };
@@ -652,8 +624,7 @@ class MangaDexModel extends ChangeNotifier {
           _settings.translatedLanguages.map((e) => e.toString()).toList(),
       'originalLanguage[]':
           _settings.originalLanguage.map((e) => e.toString()).toList(),
-      'contentRating[]':
-          _settings.contentRating.map((e) => describeEnum(e)).toList(),
+      'contentRating[]': _settings.contentRating.map((e) => e.name).toList(),
       'order[chapter]': 'desc',
       'includes[]': 'scanlation_group'
     };
@@ -824,8 +795,7 @@ class MangaDexModel extends ChangeNotifier {
         MangaReadingStatus status = MangaReadingStatus.none;
 
         if (body['status'] != null) {
-          status = MangaReadingStatus.values
-              .firstWhere((element) => describeEnum(element) == body['status']);
+          status = MangaReadingStatusExt.parse(body['status']);
         }
 
         manga.userReadStatus = status;
@@ -859,8 +829,7 @@ class MangaDexModel extends ChangeNotifier {
     }
 
     final params = {
-      'status':
-          (status == MangaReadingStatus.none ? null : describeEnum(status))
+      'status': (status == MangaReadingStatus.none ? null : status.name)
     };
 
     final uri = MangaDexEndpoints.api
@@ -912,10 +881,8 @@ class MangaDexModel extends ChangeNotifier {
 
       var mlist = body['statuses'] as Map<String, dynamic>;
 
-      var libMap = mlist.map((key, value) => MapEntry(
-          key,
-          MangaReadingStatus.values
-              .firstWhere((element) => describeEnum(element) == value)));
+      var libMap = mlist.map(
+          (key, value) => MapEntry(key, MangaReadingStatusExt.parse(value)));
 
       _cache.put(CacheLists.library, libMap, true);
 
@@ -937,292 +904,5 @@ class MangaDexClient extends http.BaseClient {
     request.headers[HttpHeaders.authorizationHeader] =
         'Bearer ' + token.session;
     return _inner.send(request);
-  }
-}
-
-abstract class MangaDexAPIData {
-  final String id;
-  final String type;
-  final int _cacheExpiration;
-
-  int get cacheExpiration => _cacheExpiration;
-
-  MangaDexAPIData._(this.id, this.type, this._cacheExpiration);
-}
-
-class Chapter extends MangaDexAPIData {
-  final String? volume;
-  final String? chapter;
-  final String? title;
-  final String translatedLanguage;
-  final String hash;
-  final List<String> data;
-  final List<String> dataSaver;
-  final String? externalUrl;
-  final int version;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final DateTime publishAt;
-
-  final String mangaId;
-  final String? userId;
-  final String? groupId;
-  final String groupName;
-
-  bool read = false;
-
-  Chapter(
-      {required String id,
-      this.volume,
-      this.chapter,
-      this.title,
-      required this.translatedLanguage,
-      required this.hash,
-      required this.data,
-      required this.dataSaver,
-      this.externalUrl,
-      required this.version,
-      required this.createdAt,
-      required this.updatedAt,
-      required this.publishAt,
-      required this.mangaId,
-      this.userId,
-      this.groupId,
-      required this.groupName})
-      : super._(id, 'chapter', 65535);
-
-  factory Chapter.fromJson(Map<String, dynamic> data) {
-    if (data['type'] == 'chapter') {
-      Map<String, dynamic> attr = data['attributes'];
-
-      String mangaId = '';
-      String groupId = '';
-      String groupName = 'No Group';
-      String userId = '';
-
-      List<Map<String, dynamic>> relations =
-          List<Map<String, dynamic>>.from(data['relationships']);
-      relations.forEach((r) {
-        if (r['type'] == 'manga') {
-          mangaId = r['id'];
-        } else if (r['type'] == 'user') {
-          userId = r['id'];
-        } else if (r['type'] == 'scanlation_group') {
-          groupId = r['id'];
-          Map<String, dynamic> cattrs = r['attributes'];
-          groupName = cattrs['name'];
-        }
-      });
-
-      return Chapter(
-          id: data['id'],
-          volume: attr['volume'],
-          chapter: attr['chapter'],
-          title: attr['title'],
-          translatedLanguage: attr['translatedLanguage'],
-          hash: attr['hash'],
-          data: List<String>.from(attr['data']),
-          dataSaver: List<String>.from(attr['dataSaver']),
-          externalUrl: attr['externalUrl'],
-          publishAt: DateTime.parse(attr['publishAt']),
-          createdAt: DateTime.parse(attr['publishAt']),
-          updatedAt: DateTime.parse(attr['publishAt']),
-          version: attr['version'],
-          mangaId: mangaId,
-          userId: userId,
-          groupId: groupId,
-          groupName: groupName);
-    }
-
-    throw ArgumentError('Unexpected data retrieval failure');
-  }
-}
-
-class Manga extends MangaDexAPIData {
-  final LocalizedString title;
-  final List<LocalizedString> altTitles;
-  final LocalizedString description;
-  final Map<String, String>? links;
-  final String originalLanguage;
-
-  final String? lastVolume;
-  final String? lastChapter;
-  final String? publicationDemographic;
-  final MangaStatus status;
-  final int? year;
-  final ContentRating contentRating;
-  final List<Tag> tags;
-  final int version;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  final String? authorId;
-  final String? author;
-  final String? artistId;
-  final String? artist;
-
-  // Only store the primary cover returned by the API
-  final String coverArt;
-
-  // User data
-
-  /// List of user's read chapters of this manga
-  Set<String>? readChapters;
-
-  /// List of readable chapters
-  List<String>? chapters;
-
-  /// User follows this manga?
-  bool? userFollowing;
-
-  MangaReadingStatus? userReadStatus;
-
-  Manga(
-      {required String id,
-      required this.title,
-      required this.altTitles,
-      required this.description,
-      this.links,
-      required this.originalLanguage,
-      this.lastVolume,
-      this.lastChapter,
-      this.publicationDemographic,
-      required this.status,
-      this.year,
-      required this.contentRating,
-      required this.tags,
-      required this.version,
-      required this.createdAt,
-      required this.updatedAt,
-      this.authorId,
-      this.artistId,
-      this.author,
-      this.artist,
-      required this.coverArt})
-      : super._(id, 'manga', 30);
-
-  factory Manga.fromJson(Map<String, dynamic> data) {
-    if (data['type'] == 'manga') {
-      Map<String, dynamic> attr = data['attributes'];
-
-      // Tags
-      List<Map<String, dynamic>> tagData =
-          List<Map<String, dynamic>>.from(attr['tags']);
-
-      var tags = tagData.map((e) => Tag.fromJson(e)).toList();
-
-      String authorId = '';
-      String artistId = '';
-      String author = '';
-      String artist = '';
-      String coverArt = '';
-
-      // Cover Art
-      List<Map<String, dynamic>> relations =
-          List<Map<String, dynamic>>.from(data['relationships']);
-      relations.forEach((r) {
-        if (r['type'] == 'author') {
-          authorId = r['id'];
-          Map<String, dynamic> caattrs = r['attributes'];
-          author = caattrs['name'];
-        } else if (r['type'] == 'artist') {
-          artistId = r['id'];
-          Map<String, dynamic> caattrs = r['attributes'];
-          artist = caattrs['name'];
-        } else if (r['type'] == 'cover_art') {
-          Map<String, dynamic> caattrs = r['attributes'];
-          coverArt = caattrs['fileName'];
-        }
-      });
-
-      // Alt titles
-      List<Map<String, dynamic>> alt =
-          List<Map<String, dynamic>>.from(attr['altTitles']);
-      List<LocalizedString> altTitles = alt
-          .map((e) => Map.castFrom<String, dynamic, String, String>(e))
-          .toList();
-
-      var status = (attr['status'] != null
-          ? MangaStatus.values
-              .firstWhere((element) => describeEnum(element) == attr['status'])
-          : MangaStatus.none);
-
-      var contentRating = ContentRating.values.firstWhere(
-          (element) => describeEnum(element) == attr['contentRating']);
-
-      return Manga(
-          id: data['id'],
-          title: Map.castFrom(attr['title']),
-          altTitles: altTitles,
-          description: Map.castFrom(attr['description']),
-          links: attr['links'] != null ? Map.castFrom(attr['links']) : null,
-          originalLanguage: attr['originalLanguage'],
-          lastVolume: attr['lastVolume'],
-          lastChapter: attr['lastChapter'],
-          publicationDemographic: attr['publicationDemographic'],
-          status: status,
-          year: attr['year'],
-          contentRating: contentRating,
-          tags: tags,
-          createdAt: DateTime.parse(attr['createdAt']),
-          updatedAt: DateTime.parse(attr['updatedAt']),
-          version: attr['version'],
-          authorId: authorId,
-          artistId: artistId,
-          author: author,
-          artist: artist,
-          coverArt: coverArt);
-    }
-
-    throw ArgumentError('Unexpected data retrieval failure');
-  }
-
-  String getCovertArtUrl({CoverArtQuality quality = CoverArtQuality.best}) {
-    if (coverArt.isEmpty) {
-      return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
-    }
-
-    String url = "https://uploads.mangadex.org/covers/$id/$coverArt";
-
-    switch (quality) {
-      case CoverArtQuality.best:
-        break;
-      case CoverArtQuality.medium:
-        url += '.512.jpg';
-        break;
-      case CoverArtQuality.small:
-        url += '.256.jpg';
-        break;
-    }
-
-    return url;
-  }
-}
-
-class Tag extends MangaDexAPIData {
-  final LocalizedString name;
-  final String group;
-  final int version;
-
-  Tag(
-      {required String id,
-      required this.name,
-      required this.group,
-      required this.version})
-      : super._(id, 'tag', 65535);
-
-  factory Tag.fromJson(Map<String, dynamic> json) {
-    if (json['type'] == 'tag') {
-      Map<String, dynamic> attr = json['attributes'];
-
-      return Tag(
-        id: json['id'],
-        name: Map.castFrom(attr['name']),
-        group: attr['group'],
-        version: attr['version'],
-      );
-    }
-
-    throw ArgumentError('Unexpected data retrieval failure');
   }
 }

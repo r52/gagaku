@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
+import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/reader.dart';
 import 'package:gagaku/src/ui.dart';
 import 'package:provider/provider.dart';
