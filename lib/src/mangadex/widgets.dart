@@ -128,7 +128,7 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
                     IconTextChip(
                       icon: Icon(Icons.language, size: 18),
                       text: Text(
-                        Languages.get(widget.chapter.translatedLanguage)
+                        widget.chapter.translatedLanguage
                             .toString()
                             .toUpperCase(),
                       ),

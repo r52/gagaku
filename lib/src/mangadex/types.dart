@@ -5,6 +5,8 @@ typedef LocalizedString = Map<String, String>;
 
 typedef LibraryMap = Map<String, MangaReadingStatus>;
 
+enum CoverArtQuality { best, medium, small }
+
 enum ContentRating { safe, suggestive, erotica, pornographic }
 
 extension ContentRatingExt on ContentRating {
@@ -17,7 +19,17 @@ extension ContentRatingExt on ContentRating {
   }
 }
 
-enum CoverArtQuality { best, medium, small }
+enum MangaDemographic { shounen, shoujo, josei, seinen }
+
+extension MangaDemographicExt on MangaDemographic {
+  String get name => describeEnum(this);
+
+  String get formatted => this.name.capitalize();
+
+  static MangaDemographic parse(String key) {
+    return MangaDemographic.values.firstWhere((element) => element.name == key);
+  }
+}
 
 enum MangaStatus { none, ongoing, completed, hiatus, cancelled }
 
@@ -168,7 +180,7 @@ class Chapter extends MangaDexAPIData {
   final String? volume;
   final String? chapter;
   final String? title;
-  final String translatedLanguage;
+  final Language translatedLanguage;
   final String hash;
   final List<String> data;
   final List<String> dataSaver;
@@ -233,7 +245,7 @@ class Chapter extends MangaDexAPIData {
           volume: attr['volume'],
           chapter: attr['chapter'],
           title: attr['title'],
-          translatedLanguage: attr['translatedLanguage'],
+          translatedLanguage: Languages.get(attr['translatedLanguage']),
           hash: attr['hash'],
           data: List<String>.from(attr['data']),
           dataSaver: List<String>.from(attr['dataSaver']),
@@ -257,11 +269,11 @@ class Manga extends MangaDexAPIData {
   final List<LocalizedString> altTitles;
   final LocalizedString description;
   final Map<String, String>? links;
-  final String originalLanguage;
+  final Language originalLanguage;
 
   final String? lastVolume;
   final String? lastChapter;
-  final String? publicationDemographic;
+  final MangaDemographic? publicationDemographic;
   final MangaStatus status;
   final int? year;
   final ContentRating contentRating;
@@ -356,25 +368,23 @@ class Manga extends MangaDexAPIData {
           .map((e) => Map.castFrom<String, dynamic, String, String>(e))
           .toList();
 
-      var status = (attr['status'] != null
-          ? MangaStatusExt.parse(attr['status'])
-          : MangaStatus.none);
-
-      var contentRating = ContentRatingExt.parse(attr['contentRating']);
-
       return Manga(
           id: data['id'],
           title: Map.castFrom(attr['title']),
           altTitles: altTitles,
           description: Map.castFrom(attr['description']),
           links: attr['links'] != null ? Map.castFrom(attr['links']) : null,
-          originalLanguage: attr['originalLanguage'],
+          originalLanguage: Languages.get(attr['originalLanguage']),
           lastVolume: attr['lastVolume'],
           lastChapter: attr['lastChapter'],
-          publicationDemographic: attr['publicationDemographic'],
-          status: status,
+          publicationDemographic: attr['publicationDemographic'] != null
+              ? MangaDemographicExt.parse(attr['publicationDemographic'])
+              : null,
+          status: attr['status'] != null
+              ? MangaStatusExt.parse(attr['status'])
+              : MangaStatus.none,
           year: attr['year'],
-          contentRating: contentRating,
+          contentRating: ContentRatingExt.parse(attr['contentRating']),
           tags: tags,
           createdAt: DateTime.parse(attr['createdAt']),
           updatedAt: DateTime.parse(attr['updatedAt']),

@@ -4,7 +4,6 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
 import 'package:gagaku/src/ui.dart';
-import 'package:gagaku/src/util.dart';
 import 'package:provider/provider.dart';
 
 Route createMangaViewRoute(Manga manga) {
@@ -305,9 +304,8 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                   child: Row(
                                     children: [
                                       IconTextChip(
-                                        text: Text(widget
-                                            .manga.publicationDemographic!
-                                            .capitalize()),
+                                        text: Text(widget.manga
+                                            .publicationDemographic!.formatted),
                                       )
                                     ],
                                   ),
