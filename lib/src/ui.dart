@@ -15,10 +15,12 @@ class IconTextChip extends StatelessWidget {
     Key? key,
     this.icon,
     required this.text,
+    this.color,
   }) : super(key: key);
 
   final Widget? icon;
   final Widget text;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class IconTextChip extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.canvasColor,
+        color: (color != null ? color : theme.canvasColor),
         borderRadius: BorderRadius.circular(6),
       ),
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
