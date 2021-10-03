@@ -139,7 +139,7 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
               title: Text(
@@ -149,8 +149,7 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text(
-                  'The default language the filter for chapter list is set to. Changing the filter in chapter list will not modify this value.'),
+              subtitle: Text('Show only chapters from these languages.'),
               builder: (context) {
                 return Center(
                   child: Wrap(
@@ -239,7 +238,7 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
                               ? const EdgeInsets.symmetric(horizontal: 2)
                               : const EdgeInsets.all(4),
                           child: FilterChip(
-                              label: Text(content.name),
+                              label: Text(content.formatted),
                               selected: widget.settings.contentRating
                                   .contains(content),
                               onSelected: (value) {
@@ -268,13 +267,20 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
               ),
               builder: (context) {
                 return Center(
-                  child: Switch(
-                    value: widget.settings.dataSaver,
-                    onChanged: (value) {
-                      setState(() {
-                        widget.settings.dataSaver = value;
-                      });
-                    },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Off'),
+                      Switch(
+                        value: widget.settings.dataSaver,
+                        onChanged: (value) {
+                          setState(() {
+                            widget.settings.dataSaver = value;
+                          });
+                        },
+                      ),
+                      Text('On'),
+                    ],
                   ),
                 );
               },
@@ -303,39 +309,41 @@ class _SettingCardWidgetState extends State<SettingCardWidget> {
   Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
+    if (screenSizeSmall) {
+      return ExpansionTile(
+        title: widget.title,
+        subtitle: widget.subtitle,
+        children: [
+          Container(
+            color: Theme.of(context).cardColor,
+            child: Center(
+              child: widget.builder(context),
+            ),
+          )
+        ],
+      );
+    }
+
     return Card(
       margin: const EdgeInsets.all(6),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
                 children: [
                   widget.title,
                   SizedBox(
                     height: (widget.subtitle != null ? 10 : 0),
                   ),
-                  (widget.subtitle != null ? widget.subtitle! : SizedBox()),
-                  widget.builder(context)
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        widget.title,
-                        SizedBox(
-                          height: (widget.subtitle != null ? 10 : 0),
-                        ),
-                        (widget.subtitle != null
-                            ? widget.subtitle!
-                            : SizedBox())
-                      ],
-                    ),
-                  ),
-                  Expanded(child: widget.builder(context))
+                  (widget.subtitle != null ? widget.subtitle! : SizedBox())
                 ],
               ),
+            ),
+            Expanded(child: widget.builder(context))
+          ],
+        ),
       ),
     );
   }
