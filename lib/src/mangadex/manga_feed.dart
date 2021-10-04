@@ -16,11 +16,6 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
   var _chapterOffset = 0;
   var _resultLength = 0;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Future<Iterable<Manga>> _fetchMangaFeed(
       MangaDexModel model, int offset) async {
     var chapters = await model.fetchChapterFeed(offset, true);

@@ -6,13 +6,17 @@ import 'package:gagaku/src/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const _precacheCount = 5;
+
 typedef LinkPressedCallback = void Function();
 
 class ReaderPage {
   final String url;
   final String key;
 
-  const ReaderPage({required this.url, required this.key});
+  bool cached = false;
+
+  ReaderPage({required this.url, required this.key});
 }
 
 class ReaderSettings {
@@ -119,6 +123,34 @@ class _ReaderWidgetState extends State<ReaderWidget> {
 
     _pageController.addListener(() {
       setState(() {});
+
+      if (_pageController.page! % _precacheCount == _precacheCount - 2 ||
+          !widget.pages.elementAt(_pageController.page!.toInt()).cached) {
+        widget.pages
+            .skip(_pageController.page!.toInt())
+            .skipWhile((page) => page.cached == true)
+            .take(_precacheCount)
+            .forEach((element) {
+          cachePage(element);
+        });
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    widget.pages.take(_precacheCount).forEach((element) {
+      cachePage(element);
+    });
+  }
+
+  void cachePage(ReaderPage page) {
+    precacheImage(
+            CachedNetworkImageProvider(page.url, cacheKey: page.key), context)
+        .then((value) {
+      page.cached = true;
     });
   }
 

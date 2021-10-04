@@ -61,8 +61,8 @@ class Styles {
     );
   }
 
-  static Route buildSlideTransitionRoute(RoutePageBuilder builder) {
-    return PageRouteBuilder(
+  static Route<T> buildSlideTransitionRoute<T>(RoutePageBuilder builder) {
+    return PageRouteBuilder<T>(
       pageBuilder: builder,
       transitionsBuilder: slideTransitionBuilder,
     );

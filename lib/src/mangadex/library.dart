@@ -22,13 +22,7 @@ class _MangaDexLibraryViewState extends State<MangaDexLibraryView> {
   var _mangaOffset = 0;
   var _totalResultsLength = 0;
 
-  //List<String> _results = [];
   Set<Manga> _cachedResults = Set<Manga>();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<Iterable<Manga>> _fetchLibraryFeed(
       MangaDexModel model, MangaReadingStatus type, int offset) async {

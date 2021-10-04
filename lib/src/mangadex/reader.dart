@@ -70,19 +70,6 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _pages.then((pages) {
-      pages.forEach((element) {
-        precacheImage(
-            CachedNetworkImageProvider(element.url, cacheKey: element.key),
-            context);
-      });
-    });
-  }
-
-  @override
   void dispose() {
     super.dispose();
   }

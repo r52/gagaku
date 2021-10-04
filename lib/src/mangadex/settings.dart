@@ -292,7 +292,7 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
   }
 }
 
-class SettingCardWidget extends StatefulWidget {
+class SettingCardWidget extends StatelessWidget {
   const SettingCardWidget(
       {required this.title, this.subtitle, required this.builder});
 
@@ -301,23 +301,18 @@ class SettingCardWidget extends StatefulWidget {
   final Widget Function(BuildContext context) builder;
 
   @override
-  _SettingCardWidgetState createState() => _SettingCardWidgetState();
-}
-
-class _SettingCardWidgetState extends State<SettingCardWidget> {
-  @override
   Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     if (screenSizeSmall) {
       return ExpansionTile(
-        title: widget.title,
-        subtitle: widget.subtitle,
+        title: title,
+        subtitle: subtitle,
         children: [
           Container(
             color: Theme.of(context).cardColor,
             child: Center(
-              child: widget.builder(context),
+              child: builder(context),
             ),
           )
         ],
@@ -333,15 +328,15 @@ class _SettingCardWidgetState extends State<SettingCardWidget> {
             Expanded(
               child: Column(
                 children: [
-                  widget.title,
+                  title,
                   SizedBox(
-                    height: (widget.subtitle != null ? 10 : 0),
+                    height: (subtitle != null ? 10 : 0),
                   ),
-                  (widget.subtitle != null ? widget.subtitle! : SizedBox())
+                  (subtitle != null ? subtitle! : SizedBox())
                 ],
               ),
             ),
-            Expanded(child: widget.builder(context))
+            Expanded(child: builder(context))
           ],
         ),
       ),
