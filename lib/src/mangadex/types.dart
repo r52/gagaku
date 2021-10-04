@@ -138,6 +138,15 @@ extension FilterOrderExt on FilterOrder {
 }
 
 class MangaFilters {
+  MangaFilters({
+    this.includedTags = const {},
+    this.excludedTags = const {},
+    this.status = const {},
+    this.publicationDemographic = const {},
+    this.contentRating = const {},
+    this.order = FilterOrder.relevance_desc,
+  });
+
   Set<Tag> includedTags = Set();
   Set<Tag> excludedTags = Set();
 
@@ -146,6 +155,17 @@ class MangaFilters {
   Set<ContentRating> contentRating = Set();
 
   FilterOrder order = FilterOrder.relevance_desc;
+
+  MangaFilters copy() {
+    return MangaFilters(
+      includedTags: this.includedTags,
+      excludedTags: this.excludedTags,
+      status: this.status,
+      publicationDemographic: this.publicationDemographic,
+      contentRating: this.contentRating,
+      order: this.order,
+    );
+  }
 
   Map<String, Object> getMap() {
     var params = <String, Object>{};
