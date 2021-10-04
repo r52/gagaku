@@ -67,4 +67,10 @@ class Styles {
       transitionsBuilder: slideTransitionBuilder,
     );
   }
+
+  static Widget buildCenterSpinner() {
+    return const Center(
+      child: const CircularProgressIndicator(),
+    );
+  }
 }

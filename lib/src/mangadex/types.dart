@@ -84,6 +84,99 @@ extension TagGroupExt on TagGroup {
   }
 }
 
+enum FilterOrder {
+  relevance_asc,
+  relevance_desc,
+  followedCount_asc,
+  followedCount_desc,
+  latestUploadedChapter_asc,
+  latestUploadedChapter_desc,
+  updatedAt_asc,
+  updatedAt_desc,
+  createdAt_asc,
+  createdAt_desc,
+  year_asc,
+  year_desc,
+  title_asc,
+  title_desc,
+}
+
+extension FilterOrderExt on FilterOrder {
+  String get formatted => const [
+        'Worst Match',
+        'Best Match',
+        'Fewest Follows',
+        'Most Follows',
+        'Oldest Upload',
+        'Latest Upload',
+        'Oldest Update',
+        'Latest Update',
+        'Oldest Added',
+        'Recently Added',
+        'Year Ascending',
+        'Year Descending',
+        'Title Ascending',
+        'Title Descending',
+      ].elementAt(this.index);
+
+  MapEntry<String, Object> get entry => const [
+        MapEntry('order[relevance]', 'asc'),
+        MapEntry('order[relevance]', 'desc'),
+        MapEntry('order[followedCount]', 'asc'),
+        MapEntry('order[followedCount]', 'desc'),
+        MapEntry('order[latestUploadedChapter]', 'asc'),
+        MapEntry('order[latestUploadedChapter]', 'desc'),
+        MapEntry('order[updatedAt]', 'asc'),
+        MapEntry('order[updatedAt]', 'desc'),
+        MapEntry('order[createdAt]', 'asc'),
+        MapEntry('order[createdAt]', 'desc'),
+        MapEntry('order[year]', 'asc'),
+        MapEntry('order[year]', 'desc'),
+        MapEntry('order[title]', 'asc'),
+        MapEntry('order[title]', 'desc'),
+      ].elementAt(this.index);
+}
+
+class MangaFilters {
+  Set<Tag> includedTags = Set();
+  Set<Tag> excludedTags = Set();
+
+  Set<MangaStatus> status = Set();
+  Set<MangaDemographic> publicationDemographic = Set();
+  Set<ContentRating> contentRating = Set();
+
+  FilterOrder order = FilterOrder.relevance_desc;
+
+  Map<String, Object> getMap() {
+    var params = <String, Object>{};
+
+    if (includedTags.isNotEmpty) {
+      params['includedTags[]'] = includedTags.map((e) => e.id).toList();
+    }
+
+    if (excludedTags.isNotEmpty) {
+      params['excludedTags[]'] = excludedTags.map((e) => e.id).toList();
+    }
+
+    if (status.isNotEmpty) {
+      params['status[]'] = status.map((e) => e.name).toList();
+    }
+
+    if (publicationDemographic.isNotEmpty) {
+      params['publicationDemographic[]'] =
+          publicationDemographic.map((e) => e.name).toList();
+    }
+
+    if (contentRating.isNotEmpty) {
+      params['contentRating[]'] = contentRating.map((e) => e.name).toList();
+    }
+
+    params.addEntries([order.entry]);
+
+    return params;
+  }
+}
+
 class Language {
   final String name;
   final String code;

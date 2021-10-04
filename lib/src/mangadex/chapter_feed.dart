@@ -7,6 +7,7 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/manga_view.dart';
 import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
+import 'package:gagaku/src/ui.dart';
 import 'package:gagaku/src/util.dart';
 import 'package:provider/provider.dart';
 
@@ -97,6 +98,11 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
             return FutureBuilder<Iterable<_ChapterFeedItem>>(
               future: _fetchChapters(mdx, _chapterOffset),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.none ||
+                    snapshot.connectionState == ConnectionState.waiting) {
+                  return Styles.buildCenterSpinner();
+                }
+
                 if (snapshot.hasData) {
                   if (snapshot.data!.length == 0) {
                     return const Center(
@@ -154,10 +160,7 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
                   return Text('${snapshot.error}');
                 }
 
-                // By default, show a loading spinner.
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return Styles.buildCenterSpinner();
               },
             );
           },
@@ -193,7 +196,11 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
             style: TextStyle(fontSize: 24),
           ),
           onLinkPressed: () {
-            Navigator.push(context, createMangaViewRoute(widget.state.manga));
+            Navigator.push(context, createMangaViewRoute(widget.state.manga))
+                .then((value) {
+              // Refresh when the view is closed
+              setState(() {});
+            });
           },
         ),
       );
@@ -209,13 +216,15 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
             TextButton(
               onPressed: () async {
                 Navigator.push(
-                    context, createMangaViewRoute(widget.state.manga));
+                        context, createMangaViewRoute(widget.state.manga))
+                    .then((value) {
+                  // Refresh when the view is closed
+                  setState(() {});
+                });
               },
               child: CachedNetworkImage(
                   imageUrl: widget.state.coverArt,
-                  placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                  placeholder: (context, url) => Styles.buildCenterSpinner(),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                   width: screenSizeSmall ? 80.0 : 128.0),
             ),
@@ -229,8 +238,12 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
                           textStyle: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       onPressed: () async {
-                        Navigator.push(
-                            context, createMangaViewRoute(widget.state.manga));
+                        Navigator.push(context,
+                                createMangaViewRoute(widget.state.manga))
+                            .then((value) {
+                          // Refresh when the view is closed
+                          setState(() {});
+                        });
                       },
                       child: Text(widget.state.manga.title['en']!)),
                   Divider(),

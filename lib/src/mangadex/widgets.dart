@@ -318,9 +318,7 @@ class _ListMangaItem extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl:
                     manga.getCovertArtUrl(quality: CoverArtQuality.medium),
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                placeholder: (context, url) => Styles.buildCenterSpinner(),
                 errorWidget: (context, url, error) => Icon(Icons.error),
                 width: 80.0,
               ),
@@ -408,9 +406,8 @@ class _GridMangaDetailedItem extends StatelessWidget {
                     child: CachedNetworkImage(
                         imageUrl: manga.getCovertArtUrl(
                             quality: CoverArtQuality.medium),
-                        placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                        placeholder: (context, url) =>
+                            Styles.buildCenterSpinner(),
                         errorWidget: (context, url, error) => Icon(Icons.error),
                         width: screenSizeSmall ? 80.0 : 128.0),
                   ),
@@ -459,9 +456,7 @@ class _GridMangaItem extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: CachedNetworkImage(
         imageUrl: manga.getCovertArtUrl(quality: CoverArtQuality.medium),
-        placeholder: (context, url) => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        placeholder: (context, url) => Styles.buildCenterSpinner(),
         errorWidget: (context, url, error) => Icon(Icons.error),
         width: 256.0,
       ),

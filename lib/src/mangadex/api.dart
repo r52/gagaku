@@ -436,8 +436,12 @@ class MangaDexModel extends ChangeNotifier {
   ///
   /// If [existing] is supplied, the operation returns the list supplied by
   /// [existing] plus any new data returned from the API
-  Future<Iterable<Manga>> searchManga(String searchTerm,
-      [int offset = 0, Set<Manga>? existing]) async {
+  Future<Iterable<Manga>> searchManga(
+    String searchTerm, {
+    required MangaFilters filter,
+    int offset = 0,
+    Set<Manga>? existing,
+  }) async {
     if (!_token.isValid || !_loggedIn) {
       throw Exception(
           "Data fetch called on invalid token/login. Shouldn't ever get here");
@@ -457,10 +461,9 @@ class MangaDexModel extends ChangeNotifier {
     var tagMap =
         Map.fromEntries(tags.map((e) => MapEntry<String, Tag>(e.id, e)));
 
-    final queryParams = {
+    var queryParams = {
       'limit': MangaDexEndpoints.apiSearchLimit.toString(),
       'offset': offset.toString(),
-      'order[relevance]': 'desc',
       'availableTranslatedLanguage[]':
           _settings.translatedLanguages.map((e) => e.toString()).toList(),
       'originalLanguage[]':
@@ -469,6 +472,9 @@ class MangaDexModel extends ChangeNotifier {
       'includes[]': ['cover_art', 'author', 'artist'],
       'title': searchTerm
     };
+
+    queryParams.addAll(filter.getMap());
+
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
 

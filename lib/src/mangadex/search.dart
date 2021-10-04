@@ -26,6 +26,7 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
   var _searchOffset = 0;
   String _searchTerm = '';
   Set<Manga> _results = Set<Manga>();
+  MangaFilters _filter = MangaFilters();
 
   @override
   void initState() {
@@ -38,13 +39,14 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
     super.dispose();
   }
 
-  Future<Iterable<Manga>> _searchManga(
-      MangaDexModel model, String searchTerm, int offset) async {
+  Future<Iterable<Manga>> _searchManga(MangaDexModel model, String searchTerm,
+      MangaFilters filter, int offset) async {
     // if (searchTerm.isEmpty) {
     //   return [];
     // }
 
-    var manga = await model.searchManga(searchTerm, offset, _results);
+    var manga = await model.searchManga(searchTerm,
+        filter: filter, offset: offset, existing: _results);
     _results.addAll(manga);
 
     return _results;
@@ -66,7 +68,7 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
       body: Consumer<MangaDexModel>(
         builder: (context, mdx, child) {
           return FutureBuilder<Iterable<Manga>>(
-            future: _searchManga(mdx, _searchTerm, _searchOffset),
+            future: _searchManga(mdx, _searchTerm, _filter, _searchOffset),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return MangaListWidget(
@@ -91,15 +93,25 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
                       floating: false,
                       expandedHeight: 80.0,
                       flexibleSpace: FlexibleSpaceBar(
-                        title: TextField(
-                          autofocus: true,
-                          onChanged: _onSearchChanged,
-                          decoration: InputDecoration(
-                            icon: Icon(Icons.search),
-                            hintText: 'Search MangaDex...',
+                          title: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              autofocus: true,
+                              onChanged: _onSearchChanged,
+                              decoration: InputDecoration(
+                                icon: Icon(Icons.search),
+                                hintText: 'Search MangaDex...',
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: Icon(Icons.filter_list),
+                            label: Text('Filters'),
+                          ),
+                        ],
+                      )),
                     ),
                     // TODO search filters?
                     // const SliverToBoxAdapter(
@@ -123,10 +135,7 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
                 return Text('${snapshot.error}');
               }
 
-              // By default, show a loading spinner.
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return Styles.buildCenterSpinner();
             },
           );
         },

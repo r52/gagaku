@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
+import 'package:gagaku/src/ui.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexLibraryView extends StatefulWidget {
@@ -143,10 +144,7 @@ class _MangaDexLibraryViewState extends State<MangaDexLibraryView> {
                   return Text('${snapshot.error}');
                 }
 
-                // By default, show a loading spinner.
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return Styles.buildCenterSpinner();
               },
             );
           },

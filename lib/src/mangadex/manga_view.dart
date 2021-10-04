@@ -108,9 +108,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                           imageUrl: widget.manga
                               .getCovertArtUrl(quality: CoverArtQuality.medium),
                           placeholder: (context, url) => Container(
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                            child: Styles.buildCenterSpinner(),
                           ),
                           errorWidget: (context, url, error) =>
                               Icon(Icons.error),
@@ -385,9 +383,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
               }
 
               // By default, show a loading spinner.
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return Styles.buildCenterSpinner();
             },
           );
         },

@@ -301,9 +301,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
               return CachedNetworkImage(
                 imageUrl: page.url,
                 cacheKey: page.key,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                placeholder: (context, url) => Styles.buildCenterSpinner(),
                 imageBuilder: (context, provider) {
                   return PhotoView(
                     imageProvider: provider,

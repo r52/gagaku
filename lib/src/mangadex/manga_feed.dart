@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/types.dart';
 import 'package:gagaku/src/mangadex/widgets.dart';
+import 'package:gagaku/src/ui.dart';
 import 'package:provider/provider.dart';
 
 class MangaDexMangaFeed extends StatefulWidget {
@@ -49,6 +50,11 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
             return FutureBuilder<Iterable<Manga>>(
               future: _fetchMangaFeed(mdx, _chapterOffset),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.none ||
+                    snapshot.connectionState == ConnectionState.waiting) {
+                  return Styles.buildCenterSpinner();
+                }
+
                 if (snapshot.hasData) {
                   if (snapshot.data!.length == 0) {
                     return const Center(
@@ -89,10 +95,7 @@ class _MangaDexMangaFeedState extends State<MangaDexMangaFeed> {
                   return Text('${snapshot.error}');
                 }
 
-                // By default, show a loading spinner.
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return Styles.buildCenterSpinner();
               },
             );
           },
