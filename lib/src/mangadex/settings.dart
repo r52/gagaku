@@ -21,15 +21,19 @@ class MangaDexSettings {
   static const _dataSaverKey = 'mangadex.dataSaver';
 
   MangaDexSettings({
-    this.translatedLanguages = const {},
-    this.originalLanguage = const {},
-    this.contentRating = const {
-      ContentRating.safe,
-      ContentRating.suggestive,
-      ContentRating.erotica
-    },
-    this.dataSaver = false,
-  });
+    Set<Language>? translatedLanguages,
+    Set<Language>? originalLanguage,
+    Set<ContentRating>? contentRating,
+    bool? dataSaver,
+  })  : translatedLanguages = translatedLanguages ?? {},
+        originalLanguage = originalLanguage ?? {},
+        contentRating = contentRating ??
+            {
+              ContentRating.safe,
+              ContentRating.suggestive,
+              ContentRating.erotica
+            },
+        dataSaver = dataSaver ?? false;
 
   MangaDexSettings copyWith({
     Set<Language>? translatedLanguages,

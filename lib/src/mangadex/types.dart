@@ -139,22 +139,27 @@ extension FilterOrderExt on FilterOrder {
 
 class MangaFilters {
   MangaFilters({
-    this.includedTags = const {},
-    this.excludedTags = const {},
-    this.status = const {},
-    this.publicationDemographic = const {},
-    this.contentRating = const {},
-    this.order = FilterOrder.relevance_desc,
-  });
+    Set<Tag>? includedTags,
+    Set<Tag>? excludedTags,
+    Set<MangaStatus>? status,
+    Set<MangaDemographic>? publicationDemographic,
+    Set<ContentRating>? contentRating,
+    FilterOrder? order,
+  })  : includedTags = includedTags ?? {},
+        excludedTags = excludedTags ?? {},
+        status = status ?? {},
+        publicationDemographic = publicationDemographic ?? {},
+        contentRating = contentRating ?? {},
+        order = order ?? FilterOrder.relevance_desc;
 
-  Set<Tag> includedTags = Set();
-  Set<Tag> excludedTags = Set();
+  Set<Tag> includedTags;
+  Set<Tag> excludedTags;
 
-  Set<MangaStatus> status = Set();
-  Set<MangaDemographic> publicationDemographic = Set();
-  Set<ContentRating> contentRating = Set();
+  Set<MangaStatus> status;
+  Set<MangaDemographic> publicationDemographic;
+  Set<ContentRating> contentRating;
 
-  FilterOrder order = FilterOrder.relevance_desc;
+  FilterOrder order;
 
   MangaFilters copy() {
     return MangaFilters(
