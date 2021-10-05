@@ -52,6 +52,7 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
     _debounce = Timer(const Duration(milliseconds: 750), () {
       setState(() {
         _searchTerm = query;
+        _searchOffset = 0;
         _results.clear();
       });
     });
@@ -81,6 +82,7 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
                       if (order != null) {
                         setState(() {
                           _filter.order = order;
+                          _searchOffset = 0;
                           _results.clear();
                         });
                       }
@@ -136,6 +138,7 @@ class _MangaDexSearchWidgetState extends State<MangaDexSearchWidget> {
                               if (result != null) {
                                 setState(() {
                                   _filter = result;
+                                  _searchOffset = 0;
                                   _results.clear();
                                 });
                               }
