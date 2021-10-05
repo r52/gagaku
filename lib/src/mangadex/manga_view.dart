@@ -88,7 +88,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                       expandedHeight: 180.0,
                       flexibleSpace: FlexibleSpaceBar(
                         title: Text(
-                          '${widget.manga.title['en']!}',
+                          '${widget.manga.title.entries.first.value}',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -321,8 +321,13 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                     children: widget.manga.tags
                                         .where((tag) =>
                                             tag.group == TagGroup.genre)
-                                        .map((e) => IconTextChip(
-                                            text: Text(e.name['en']!)))
+                                        .map((e) => Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 2),
+                                              child: IconTextChip(
+                                                  text: Text(e.name['en']!)),
+                                            ))
                                         .toList(),
                                   ),
                                 ),
@@ -339,14 +344,29 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                     children: widget.manga.tags
                                         .where((tag) =>
                                             tag.group == TagGroup.theme)
-                                        .map((e) => IconTextChip(
-                                            text: Text(e.name['en']!)))
+                                        .map((e) => Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 2),
+                                              child: IconTextChip(
+                                                  text: Text(e.name['en']!)),
+                                            ))
                                         .toList(),
                                   ),
                                 ),
                               ],
                             ),
                         ],
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        color: theme.cardColor,
+                        child: Text(
+                          'Chapters',
+                          style: TextStyle(fontSize: 24),
+                        ),
                       ),
                     ),
                     SliverList(
@@ -360,7 +380,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                               chapter: e,
                               manga: widget.manga,
                               link: Text(
-                                widget.manga.title['en']!,
+                                widget.manga.title.entries.first.value,
                                 style: TextStyle(fontSize: 24),
                               ),
                             ),

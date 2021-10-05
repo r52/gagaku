@@ -338,7 +338,7 @@ class _ListMangaItem extends StatelessWidget {
                     onPressed: () async {
                       Navigator.push(context, createMangaViewRoute(manga));
                     },
-                    child: Text(manga.title['en']!),
+                    child: Text(manga.title.entries.first.value),
                   ),
                   const SizedBox(
                     height: 10,
@@ -388,7 +388,7 @@ class _GridMangaDetailedItem extends StatelessWidget {
                 Navigator.push(context, createMangaViewRoute(manga));
               },
               child: Text(
-                manga.title['en']!,
+                manga.title.entries.first.value,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -479,7 +479,7 @@ class _GridMangaItem extends StatelessWidget {
             title: FittedBox(
               fit: BoxFit.none,
               alignment: AlignmentDirectional.centerStart,
-              child: Text(manga.title['en']!),
+              child: Text(manga.title.entries.first.value),
             ),
           ),
         ),

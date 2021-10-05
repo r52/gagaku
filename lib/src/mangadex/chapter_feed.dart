@@ -192,7 +192,7 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
           chapter: e,
           manga: widget.state.manga,
           link: Text(
-            widget.state.manga.title['en']!,
+            widget.state.manga.title.entries.first.value,
             style: TextStyle(fontSize: 24),
           ),
           onLinkPressed: () {
@@ -245,7 +245,8 @@ class _ChapterFeedItemState extends State<_ChapterFeedItem> {
                           setState(() {});
                         });
                       },
-                      child: Text(widget.state.manga.title['en']!)),
+                      child:
+                          Text(widget.state.manga.title.entries.first.value)),
                   Divider(),
                   ...chapterBtns
                 ],

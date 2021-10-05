@@ -93,7 +93,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
           return ReaderWidget(
             pages: snapshot.data!,
             pageCount: snapshot.data!.length,
-            title: '${widget.manga.title['en']!} - $title',
+            title: '${widget.manga.title.entries.first.value} - $title',
             link: widget.link,
             onLinkPressed: widget.onLinkPressed,
           );
