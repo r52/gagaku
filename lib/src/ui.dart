@@ -64,10 +64,7 @@ class TriStateChip extends StatelessWidget {
       this.shadowColor,
       this.selectedColor,
       this.unselectedColor})
-      : assert(label != null),
-        assert(clipBehavior != null),
-        assert(autofocus != null),
-        assert(onChanged != null),
+      : assert(onChanged != null),
         assert(elevation == null || elevation >= 0.0),
         super(key: key);
 

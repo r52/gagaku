@@ -6,8 +6,6 @@ import 'package:gagaku/src/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const _precacheCount = 5;
-
 typedef LinkPressedCallback = void Function();
 
 class ReaderPage {
@@ -19,6 +17,7 @@ class ReaderPage {
   ReaderPage({required this.url, required this.key});
 }
 
+// TODO top to bottom
 class ReaderSettings {
   /// If true, the reader fits the page to widget width, otherwise
   /// it is contrained to widget height (default)
@@ -38,24 +37,31 @@ class ReaderSettings {
   // final bool swipeToChangePage;
   // static const _swipeToChangePage = 'reader.swipeToChangePage';
 
+  /// The number of images/pages to preload
+  final int precacheCount;
+  static const _precacheCountKey = 'reader.precacheCount';
+
   ReaderSettings({
     this.fitWidth = false,
     this.rightToLeft = false,
     this.showProgressBar = false,
     // this.swipeToChangePage = false,
+    this.precacheCount = 3,
   });
 
   ReaderSettings copyWith({
     bool? fitWidth,
     bool? rightToLeft,
     bool? showProgressBar,
-    bool? swipeToChangePage,
+    //bool? swipeToChangePage,
+    int? precacheCount,
   }) {
     return ReaderSettings(
       fitWidth: fitWidth ?? this.fitWidth,
       rightToLeft: rightToLeft ?? this.rightToLeft,
       showProgressBar: showProgressBar ?? this.showProgressBar,
       // swipeToChangePage: swipeToChangePage ?? this.swipeToChangePage,
+      precacheCount: precacheCount ?? this.precacheCount,
     );
   }
 
@@ -65,12 +71,14 @@ class ReaderSettings {
     bool rightToLeft = prefs.getBool(_rightToLeftKey) ?? false;
     bool showProgressBar = prefs.getBool(_showProgressBarKey) ?? false;
     // bool swipeToChangePage = prefs.getBool(_swipeToChangePage) ?? false;
+    int precacheCount = prefs.getInt(_precacheCountKey) ?? 3;
 
     return ReaderSettings(
       fitWidth: fitWidth,
       rightToLeft: rightToLeft,
       showProgressBar: showProgressBar,
       // swipeToChangePage: swipeToChangePage,
+      precacheCount: precacheCount,
     );
   }
 
@@ -80,6 +88,7 @@ class ReaderSettings {
     await prefs.setBool(_rightToLeftKey, rightToLeft);
     await prefs.setBool(_showProgressBarKey, showProgressBar);
     // await prefs.setBool(_swipeToChangePage, swipeToChangePage);
+    await prefs.setInt(_precacheCountKey, precacheCount);
   }
 }
 
@@ -124,12 +133,15 @@ class _ReaderWidgetState extends State<ReaderWidget> {
     _pageController.addListener(() {
       setState(() {});
 
-      if (_pageController.page! % _precacheCount == _precacheCount - 2 ||
+      if (_pageController.page! % _settings.precacheCount ==
+              _settings.precacheCount - 2 ||
           !widget.pages.elementAt(_pageController.page!.toInt()).cached) {
         widget.pages
             .skip(_pageController.page!.toInt())
             .skipWhile((page) => page.cached == true)
-            .take(_precacheCount)
+            .take(_settings.precacheCount > 9
+                ? widget.pageCount
+                : _settings.precacheCount)
             .forEach((element) {
           cachePage(element);
         });
@@ -141,7 +153,11 @@ class _ReaderWidgetState extends State<ReaderWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    widget.pages.take(_precacheCount).forEach((element) {
+    widget.pages
+        .take(_settings.precacheCount > 9
+            ? widget.pageCount
+            : _settings.precacheCount)
+        .forEach((element) {
       cachePage(element);
     });
   }
@@ -173,20 +189,20 @@ class _ReaderWidgetState extends State<ReaderWidget> {
   void _onTapLeft() {
     if (_settings.rightToLeft) {
       if (_pageController.page! < widget.pages.length - 1) {
-        _pageController.jumpToPage(_pageController.page!.round() + 1);
+        _pageController.jumpToPage(_pageController.page!.toInt() + 1);
       }
     } else if (_pageController.page! > 0) {
-      _pageController.jumpToPage(_pageController.page!.round() - 1);
+      _pageController.jumpToPage(_pageController.page!.toInt() - 1);
     }
   }
 
   void _onTapRight() {
     if (_settings.rightToLeft) {
       if (_pageController.page! > 0) {
-        _pageController.jumpToPage(_pageController.page!.round() - 1);
+        _pageController.jumpToPage(_pageController.page!.toInt() - 1);
       }
     } else if (_pageController.page! < widget.pages.length - 1) {
-      _pageController.jumpToPage(_pageController.page!.round() + 1);
+      _pageController.jumpToPage(_pageController.page!.toInt() + 1);
     }
   }
 
@@ -250,27 +266,59 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                       },
                       child: widget.link!)
                   : SizedBox.shrink()),
-              DropdownButton<int>(
-                value: (_pageController.hasClients
-                    ? _pageController.page!.toInt()
-                    : _pageController.initialPage),
-                icon: const Icon(Icons.arrow_downward),
-                iconSize: 24,
-                elevation: 16,
-                style: TextStyle(color: theme.colorScheme.primary),
-                underline: Container(
-                  height: 2,
-                  color: Colors.deepPurpleAccent,
-                ),
-                onChanged: (int? index) {
-                  if (_pageController.hasClients && index != null) {
-                    _pageController.jumpToPage(index);
-                  }
-                },
-                items: List<DropdownMenuItem<int>>.generate(
-                    widget.pageCount,
-                    (int index) => DropdownMenuItem<int>(
-                        value: index, child: Text((index + 1).toString()))),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: (_pageController.hasClients &&
+                            _pageController.page!.toInt() > 0)
+                        ? () {
+                            _pageController
+                                .jumpToPage(_pageController.page!.toInt() - 1);
+                          }
+                        : null,
+                    child: Text('Previous Page'),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  DropdownButton<int>(
+                    value: (_pageController.hasClients
+                        ? _pageController.page!.toInt()
+                        : _pageController.initialPage),
+                    icon: const Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: theme.colorScheme.primary),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (int? index) {
+                      if (_pageController.hasClients && index != null) {
+                        _pageController.jumpToPage(index);
+                      }
+                    },
+                    items: List<DropdownMenuItem<int>>.generate(
+                        widget.pageCount,
+                        (int index) => DropdownMenuItem<int>(
+                            value: index, child: Text((index + 1).toString()))),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  OutlinedButton(
+                    onPressed: (_pageController.hasClients &&
+                            _pageController.page!.toInt() <
+                                widget.pageCount - 1)
+                        ? () {
+                            _pageController
+                                .jumpToPage(_pageController.page!.toInt() + 1);
+                          }
+                        : null,
+                    child: Text('Next Page'),
+                  ),
+                ],
               ),
               const Divider(),
               const SizedBox(height: 10.0),
@@ -308,6 +356,40 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                     _setReaderSettings(_settings.copyWith(
                         showProgressBar: !_settings.showProgressBar));
                   }),
+              const SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Page Preload'),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  DropdownButton<int>(
+                    value: _settings.precacheCount,
+                    icon: const Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (int? value) {
+                      if (value != null) {
+                        _setReaderSettings(
+                            _settings.copyWith(precacheCount: value));
+                      }
+                    },
+                    items: List<DropdownMenuItem<int>>.generate(
+                      10,
+                      (int index) => DropdownMenuItem<int>(
+                        value: index + 1,
+                        child: Text(
+                            (index + 1 > 9) ? 'Max' : (index + 1).toString()),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),

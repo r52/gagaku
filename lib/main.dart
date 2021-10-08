@@ -63,7 +63,6 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
       ),
       const Center(child: Text('Local')), // TODO local
       const Center(child: Text('Web')), // TODO web
-      const Center(child: Text('Settings')) // TODO settings
     ];
 
     return Scaffold(
