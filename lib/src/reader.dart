@@ -6,6 +6,30 @@ import 'package:gagaku/src/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum ReaderDirection {
+  leftToRight,
+  rightToLeft,
+  topToBottom,
+}
+
+extension ReaderDirectionExt on ReaderDirection {
+  Icon get icon => const [
+        Icon(Icons.arrow_forward),
+        Icon(Icons.arrow_back),
+        Icon(Icons.arrow_downward),
+      ].elementAt(this.index);
+
+  String get formatted => const [
+        'Left to Right',
+        'Right to Left',
+        'Top to Bottom',
+      ].elementAt(this.index);
+
+  static ReaderDirection parse(int index) {
+    return ReaderDirection.values.elementAt(index);
+  }
+}
+
 class ReaderPage {
   final String url;
   final String key;
@@ -15,17 +39,15 @@ class ReaderPage {
   ReaderPage({required this.url, required this.key});
 }
 
-// TODO top to bottom
 class ReaderSettings {
   /// If true, the reader fits the page to widget width, otherwise
   /// it is contrained to widget height (default)
   final bool fitWidth;
   static const _fitWidthKey = 'reader.fitWidth';
 
-  /// If true, page increments right to left, otherwise
-  /// it increments left to right (default)
-  final bool rightToLeft;
-  static const _rightToLeftKey = 'reader.rightToLeft';
+  /// Reader direction
+  final ReaderDirection direction;
+  static const _directionKey = 'reader.direction';
 
   /// Displays progress bar if true (default false)
   final bool showProgressBar;
@@ -45,7 +67,7 @@ class ReaderSettings {
 
   ReaderSettings({
     this.fitWidth = false,
-    this.rightToLeft = false,
+    this.direction = ReaderDirection.leftToRight,
     this.showProgressBar = false,
     this.clickToTurn = true,
     this.swipeGestures = true,
@@ -54,7 +76,7 @@ class ReaderSettings {
 
   ReaderSettings copyWith({
     bool? fitWidth,
-    bool? rightToLeft,
+    ReaderDirection? direction,
     bool? showProgressBar,
     bool? clickToTurn,
     bool? swipeGestures,
@@ -62,7 +84,7 @@ class ReaderSettings {
   }) {
     return ReaderSettings(
       fitWidth: fitWidth ?? this.fitWidth,
-      rightToLeft: rightToLeft ?? this.rightToLeft,
+      direction: direction ?? this.direction,
       showProgressBar: showProgressBar ?? this.showProgressBar,
       clickToTurn: clickToTurn ?? this.clickToTurn,
       swipeGestures: swipeGestures ?? this.swipeGestures,
@@ -73,7 +95,8 @@ class ReaderSettings {
   static Future<ReaderSettings> load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool fitWidth = prefs.getBool(_fitWidthKey) ?? false;
-    bool rightToLeft = prefs.getBool(_rightToLeftKey) ?? false;
+    var direction =
+        prefs.getInt(_directionKey) ?? ReaderDirection.leftToRight.index;
     bool showProgressBar = prefs.getBool(_showProgressBarKey) ?? false;
     bool clickToTurn =
         prefs.getBool(_clickToTurnKey) ?? DeviceContext.isDesktop()
@@ -84,7 +107,7 @@ class ReaderSettings {
 
     return ReaderSettings(
       fitWidth: fitWidth,
-      rightToLeft: rightToLeft,
+      direction: ReaderDirectionExt.parse(direction),
       showProgressBar: showProgressBar,
       clickToTurn: clickToTurn,
       swipeGestures: swipeGestures,
@@ -95,7 +118,7 @@ class ReaderSettings {
   Future<void> save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_fitWidthKey, fitWidth);
-    await prefs.setBool(_rightToLeftKey, rightToLeft);
+    await prefs.setInt(_directionKey, direction.index);
     await prefs.setBool(_showProgressBarKey, showProgressBar);
     await prefs.setBool(_clickToTurnKey, clickToTurn);
     await prefs.setBool(_swipeGesturesKey, swipeGestures);
@@ -198,22 +221,76 @@ class _ReaderWidgetState extends State<ReaderWidget> {
   }
 
   void _onTapLeft() {
-    if (_settings.rightToLeft) {
-      if (_pageController.page! < widget.pages.length - 1) {
-        _pageController.jumpToPage(_pageController.page!.toInt() + 1);
-      }
-    } else if (_pageController.page! > 0) {
-      _pageController.jumpToPage(_pageController.page!.toInt() - 1);
+    switch (_settings.direction) {
+      case ReaderDirection.leftToRight:
+        if (_pageController.page! > 0) {
+          _pageController.jumpToPage(_pageController.page!.toInt() - 1);
+        }
+        break;
+      case ReaderDirection.rightToLeft:
+        if (_pageController.page! < widget.pages.length - 1) {
+          _pageController.jumpToPage(_pageController.page!.toInt() + 1);
+        } else {
+          Navigator.of(context).pop();
+        }
+        break;
+      case ReaderDirection.topToBottom:
+      default:
+        // Do nothing
+        break;
     }
   }
 
   void _onTapRight() {
-    if (_settings.rightToLeft) {
-      if (_pageController.page! > 0) {
-        _pageController.jumpToPage(_pageController.page!.toInt() - 1);
-      }
-    } else if (_pageController.page! < widget.pages.length - 1) {
-      _pageController.jumpToPage(_pageController.page!.toInt() + 1);
+    switch (_settings.direction) {
+      case ReaderDirection.leftToRight:
+        if (_pageController.page! < widget.pages.length - 1) {
+          _pageController.jumpToPage(_pageController.page!.toInt() + 1);
+        } else {
+          Navigator.of(context).pop();
+        }
+        break;
+      case ReaderDirection.rightToLeft:
+        if (_pageController.page! > 0) {
+          _pageController.jumpToPage(_pageController.page!.toInt() - 1);
+        }
+        break;
+      case ReaderDirection.topToBottom:
+      default:
+        // Do nothing
+        break;
+    }
+  }
+
+  void _onTapTop() {
+    switch (_settings.direction) {
+      case ReaderDirection.topToBottom:
+        if (_pageController.page! > 0) {
+          _pageController.jumpToPage(_pageController.page!.toInt() - 1);
+        }
+        break;
+      case ReaderDirection.leftToRight:
+      case ReaderDirection.rightToLeft:
+      default:
+        // Do nothing
+        break;
+    }
+  }
+
+  void _onTapBottom() {
+    switch (_settings.direction) {
+      case ReaderDirection.topToBottom:
+        if (_pageController.page! < widget.pages.length - 1) {
+          _pageController.jumpToPage(_pageController.page!.toInt() + 1);
+        } else {
+          Navigator.of(context).pop();
+        }
+        break;
+      case ReaderDirection.leftToRight:
+      case ReaderDirection.rightToLeft:
+      default:
+        // Do nothing
+        break;
     }
   }
 
@@ -221,24 +298,49 @@ class _ReaderWidgetState extends State<ReaderWidget> {
       PhotoViewControllerValue value) {
     _focusNode.requestFocus();
 
-    var tapx = details.localPosition.dx;
-    var tapwidth = context.size!.width / 2.5;
+    var taploc = details.localPosition.dx;
+    var viewport = context.size!.width;
 
-    if (tapx < tapwidth) {
-      _onTapLeft();
-    } else if (tapx > context.size!.width - tapwidth) {
-      _onTapRight();
+    if (_settings.direction == ReaderDirection.topToBottom) {
+      taploc = details.localPosition.dy;
+      viewport = context.size!.height;
     }
-  }
 
-  void _handleKeyEvent(KeyEvent event) {
-    if (event is KeyDownEvent) {
-      if (event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
+    var tapmargin = viewport / 2.5;
+
+    if (taploc < tapmargin) {
+      if (_settings.direction == ReaderDirection.topToBottom) {
+        _onTapTop();
+      } else {
         _onTapLeft();
-      } else if (event.physicalKey == PhysicalKeyboardKey.arrowRight) {
+      }
+    } else if (taploc > viewport - tapmargin) {
+      if (_settings.direction == ReaderDirection.topToBottom) {
+        _onTapBottom();
+      } else {
         _onTapRight();
       }
     }
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
+        _onTapLeft();
+        return KeyEventResult.handled;
+      } else if (event.physicalKey == PhysicalKeyboardKey.arrowRight) {
+        _onTapRight();
+        return KeyEventResult.handled;
+      } else if (event.physicalKey == PhysicalKeyboardKey.arrowUp) {
+        _onTapTop();
+        return KeyEventResult.handled;
+      } else if (event.physicalKey == PhysicalKeyboardKey.arrowDown) {
+        _onTapBottom();
+        return KeyEventResult.handled;
+      }
+    }
+
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -262,8 +364,11 @@ class _ReaderWidgetState extends State<ReaderWidget> {
       endDrawer: Drawer(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
+              const SizedBox(
+                height: 20,
+              ),
               (widget.link != null
                   ? TextButton(
                       onPressed: () {
@@ -332,6 +437,10 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                 ],
               ),
               const Divider(),
+              Text(
+                'Reader Settings',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10.0),
               ActionChip(
                   avatar: Icon(
@@ -346,17 +455,23 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                         : PhotoViewScaleState.initial;
                   }),
               const SizedBox(height: 10.0),
-              ActionChip(
-                  avatar: Icon(_settings.rightToLeft
-                      ? Icons.arrow_back
-                      : Icons.arrow_forward),
-                  label: Text(_settings.rightToLeft
-                      ? 'Right to Left'
-                      : 'Left to Right'),
-                  onPressed: () {
-                    _setReaderSettings(_settings.copyWith(
-                        rightToLeft: !_settings.rightToLeft));
-                  }),
+              Wrap(
+                alignment: WrapAlignment.center,
+                children: [
+                  for (final dir in ReaderDirection.values)
+                    ChoiceChip(
+                      avatar: dir.icon,
+                      label: Text(dir.formatted),
+                      selected: _settings.direction == dir,
+                      onSelected: (value) {
+                        if (value) {
+                          _setReaderSettings(
+                              _settings.copyWith(direction: dir));
+                        }
+                      },
+                    ),
+                ],
+              ),
               const SizedBox(height: 10.0),
               ActionChip(
                   avatar: Icon(_settings.showProgressBar
@@ -393,7 +508,6 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                     _setReaderSettings(_settings.copyWith(
                         clickToTurn: !_settings.clickToTurn));
                   }),
-              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -432,19 +546,21 @@ class _ReaderWidgetState extends State<ReaderWidget> {
         ),
       ),
       endDrawerEnableOpenDragGesture: false,
-      body: KeyboardListener(
+      body: Focus(
         autofocus: true,
         focusNode: _focusNode,
         onKeyEvent: _handleKeyEvent,
         child: Container(
           child: PageView.builder(
             allowImplicitScrolling: true,
-            reverse: _settings.rightToLeft,
+            reverse: _settings.direction == ReaderDirection.rightToLeft,
             physics: !_settings.swipeGestures
                 ? NeverScrollableScrollPhysics()
                 : null,
             scrollBehavior: MouseTouchScrollBehavior(),
-            scrollDirection: Axis.horizontal,
+            scrollDirection: _settings.direction == ReaderDirection.topToBottom
+                ? Axis.vertical
+                : Axis.horizontal,
             controller: _pageController,
             itemCount: widget.pageCount,
             onPageChanged: (int index) {
@@ -460,28 +576,6 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                 imageBuilder: (context, provider) {
                   return PhotoView(
                     imageProvider: provider,
-                    // loadingBuilder: (context, progress) => Center(
-                    //   child: Column(
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     children: [
-                    //       Text(
-                    //           'Downloading pages... ${progress != null ? '${progress.cumulativeBytesLoaded} / ${progress.expectedTotalBytes!} bytes' : ''}'),
-                    //       SizedBox(
-                    //         height: 10,
-                    //       ),
-                    //       Container(
-                    //         width: 20.0,
-                    //         height: 20.0,
-                    //         child: CircularProgressIndicator(
-                    //           value: progress == null
-                    //               ? null
-                    //               : progress.cumulativeBytesLoaded /
-                    //                   progress.expectedTotalBytes!,
-                    //         ),
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
                     backgroundDecoration: BoxDecoration(color: Colors.black),
                     customSize: MediaQuery.of(context).size,
                     enableRotation: false,
@@ -501,7 +595,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
       ),
       bottomSheet: _settings.showProgressBar
           ? ProgressIndicator(
-              reverse: _settings.rightToLeft,
+              reverse: _settings.direction == ReaderDirection.rightToLeft,
               controller: _pageController,
               itemCount: widget.pages.length,
               color: theme.colorScheme.primary,
