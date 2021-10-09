@@ -33,6 +33,10 @@ class ReaderSettings {
   final bool showProgressBar;
   static const _showProgressBarKey = 'reader.showProgressBar';
 
+  /// Enable click/tap to turn page gesture
+  final bool clickToTurn;
+  static const _clickToTurnKey = 'reader.clickToTurn';
+
   /// Enable swipe gestures
   final bool swipeGestures;
   static const _swipeGesturesKey = 'reader.swipeGestures';
@@ -45,6 +49,7 @@ class ReaderSettings {
     this.fitWidth = false,
     this.rightToLeft = false,
     this.showProgressBar = false,
+    this.clickToTurn = true,
     this.swipeGestures = true,
     this.precacheCount = 3,
   });
@@ -53,6 +58,7 @@ class ReaderSettings {
     bool? fitWidth,
     bool? rightToLeft,
     bool? showProgressBar,
+    bool? clickToTurn,
     bool? swipeGestures,
     int? precacheCount,
   }) {
@@ -60,6 +66,7 @@ class ReaderSettings {
       fitWidth: fitWidth ?? this.fitWidth,
       rightToLeft: rightToLeft ?? this.rightToLeft,
       showProgressBar: showProgressBar ?? this.showProgressBar,
+      clickToTurn: clickToTurn ?? this.clickToTurn,
       swipeGestures: swipeGestures ?? this.swipeGestures,
       precacheCount: precacheCount ?? this.precacheCount,
     );
@@ -70,6 +77,10 @@ class ReaderSettings {
     bool fitWidth = prefs.getBool(_fitWidthKey) ?? false;
     bool rightToLeft = prefs.getBool(_rightToLeftKey) ?? false;
     bool showProgressBar = prefs.getBool(_showProgressBarKey) ?? false;
+    bool clickToTurn =
+        prefs.getBool(_clickToTurnKey) ?? DeviceContext.isDesktop()
+            ? true
+            : false;
     bool swipeGestures = prefs.getBool(_swipeGesturesKey) ?? true;
     int precacheCount = prefs.getInt(_precacheCountKey) ?? 3;
 
@@ -77,6 +88,7 @@ class ReaderSettings {
       fitWidth: fitWidth,
       rightToLeft: rightToLeft,
       showProgressBar: showProgressBar,
+      clickToTurn: clickToTurn,
       swipeGestures: swipeGestures,
       precacheCount: precacheCount,
     );
@@ -87,6 +99,7 @@ class ReaderSettings {
     await prefs.setBool(_fitWidthKey, fitWidth);
     await prefs.setBool(_rightToLeftKey, rightToLeft);
     await prefs.setBool(_showProgressBarKey, showProgressBar);
+    await prefs.setBool(_clickToTurnKey, clickToTurn);
     await prefs.setBool(_swipeGesturesKey, swipeGestures);
     await prefs.setInt(_precacheCountKey, precacheCount);
   }
@@ -370,6 +383,19 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                         swipeGestures: !_settings.swipeGestures));
                   }),
               const SizedBox(height: 10.0),
+              ActionChip(
+                  avatar: Icon(
+                    Icons.mouse,
+                    color: _settings.clickToTurn
+                        ? theme.iconTheme.color
+                        : theme.chipTheme.disabledColor,
+                  ),
+                  label: Text('Click/Tap to Turn Page'),
+                  onPressed: () {
+                    _setReaderSettings(_settings.copyWith(
+                        clickToTurn: !_settings.clickToTurn));
+                  }),
+              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -465,9 +491,8 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                     maxScale: PhotoViewComputedScale.covered * 2.0,
                     initialScale: PhotoViewComputedScale.contained,
                     basePosition: Alignment.center,
-                    onTapUp: DeviceContext.isDesktop()
-                        ? _handlePhotoViewOnTap
-                        : null,
+                    onTapUp:
+                        _settings.clickToTurn ? _handlePhotoViewOnTap : null,
                   );
                 },
               );
