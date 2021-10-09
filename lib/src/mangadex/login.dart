@@ -24,23 +24,22 @@ class _MangaDexLoginState extends State<MangaDexLoginWidget> {
       }
 
       return Scaffold(
-          appBar: AppBar(
-            leading: Builder(
-              builder: (BuildContext context) {
-                return IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () {
-                    widget.topScaffold.currentState!.openDrawer();
-                  },
-                  tooltip:
-                      MaterialLocalizations.of(context).openAppDrawerTooltip,
-                );
-              },
-            ),
-            title: Text('MangaDex'),
+        appBar: AppBar(
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  widget.topScaffold.currentState!.openDrawer();
+                },
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              );
+            },
           ),
-          body: Center(
-              child: ElevatedButton(
+          title: Text('MangaDex'),
+        ),
+        body: Center(
+          child: ElevatedButton.icon(
             onPressed: () async {
               Navigator.push(
                 context,
@@ -49,8 +48,13 @@ class _MangaDexLoginState extends State<MangaDexLoginWidget> {
                 ),
               );
             },
-            child: const Text('Login to MangaDex'),
-          )));
+            label: const Text('Login to MangaDex'),
+            icon: Icon(
+              Icons.https,
+            ),
+          ),
+        ),
+      );
     });
   }
 }

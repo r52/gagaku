@@ -245,6 +245,7 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                                 title: Text(Languages.get(entry.key).name),
                                 children: [
                                   Container(
+                                    width: double.infinity,
                                     padding: const EdgeInsets.all(8),
                                     color: theme.backgroundColor,
                                     child: Text(entry.value),

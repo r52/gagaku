@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/index.dart';
+import 'package:gagaku/src/web/index.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -62,7 +63,9 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
         topScaffold: _scaffoldKey,
       ),
       const Center(child: Text('Local')), // TODO local
-      const Center(child: Text('Web')), // TODO web
+      WebGalleryHomePage(
+        topScaffold: _scaffoldKey,
+      ),
     ];
 
     return Scaffold(
@@ -99,12 +102,6 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
                 ),
                 selectedIcon: const Icon(Icons.language),
                 label: Text('Web Gallery')),
-            NavigationRailDestination(
-                icon: const Icon(
-                  Icons.settings_outlined,
-                ),
-                selectedIcon: const Icon(Icons.settings),
-                label: Text('Settings')),
           ],
         ),
       ),
