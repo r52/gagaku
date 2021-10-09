@@ -33,9 +33,9 @@ class ReaderSettings {
   final bool showProgressBar;
   static const _showProgressBarKey = 'reader.showProgressBar';
 
-  /// Whether swiping left or right changes the page (default false)
-  // final bool swipeToChangePage;
-  // static const _swipeToChangePage = 'reader.swipeToChangePage';
+  /// Enable swipe gestures
+  final bool swipeGestures;
+  static const _swipeGesturesKey = 'reader.swipeGestures';
 
   /// The number of images/pages to preload
   final int precacheCount;
@@ -45,7 +45,7 @@ class ReaderSettings {
     this.fitWidth = false,
     this.rightToLeft = false,
     this.showProgressBar = false,
-    // this.swipeToChangePage = false,
+    this.swipeGestures = true,
     this.precacheCount = 3,
   });
 
@@ -53,14 +53,14 @@ class ReaderSettings {
     bool? fitWidth,
     bool? rightToLeft,
     bool? showProgressBar,
-    //bool? swipeToChangePage,
+    bool? swipeGestures,
     int? precacheCount,
   }) {
     return ReaderSettings(
       fitWidth: fitWidth ?? this.fitWidth,
       rightToLeft: rightToLeft ?? this.rightToLeft,
       showProgressBar: showProgressBar ?? this.showProgressBar,
-      // swipeToChangePage: swipeToChangePage ?? this.swipeToChangePage,
+      swipeGestures: swipeGestures ?? this.swipeGestures,
       precacheCount: precacheCount ?? this.precacheCount,
     );
   }
@@ -70,14 +70,14 @@ class ReaderSettings {
     bool fitWidth = prefs.getBool(_fitWidthKey) ?? false;
     bool rightToLeft = prefs.getBool(_rightToLeftKey) ?? false;
     bool showProgressBar = prefs.getBool(_showProgressBarKey) ?? false;
-    // bool swipeToChangePage = prefs.getBool(_swipeToChangePage) ?? false;
+    bool swipeGestures = prefs.getBool(_swipeGesturesKey) ?? true;
     int precacheCount = prefs.getInt(_precacheCountKey) ?? 3;
 
     return ReaderSettings(
       fitWidth: fitWidth,
       rightToLeft: rightToLeft,
       showProgressBar: showProgressBar,
-      // swipeToChangePage: swipeToChangePage,
+      swipeGestures: swipeGestures,
       precacheCount: precacheCount,
     );
   }
@@ -87,7 +87,7 @@ class ReaderSettings {
     await prefs.setBool(_fitWidthKey, fitWidth);
     await prefs.setBool(_rightToLeftKey, rightToLeft);
     await prefs.setBool(_showProgressBarKey, showProgressBar);
-    // await prefs.setBool(_swipeToChangePage, swipeToChangePage);
+    await prefs.setBool(_swipeGesturesKey, swipeGestures);
     await prefs.setInt(_precacheCountKey, precacheCount);
   }
 }
@@ -357,6 +357,19 @@ class _ReaderWidgetState extends State<ReaderWidget> {
                         showProgressBar: !_settings.showProgressBar));
                   }),
               const SizedBox(height: 10.0),
+              ActionChip(
+                  avatar: Icon(
+                    Icons.swipe,
+                    color: _settings.swipeGestures
+                        ? theme.iconTheme.color
+                        : theme.chipTheme.disabledColor,
+                  ),
+                  label: Text('Swipe Gestures'),
+                  onPressed: () {
+                    _setReaderSettings(_settings.copyWith(
+                        swipeGestures: !_settings.swipeGestures));
+                  }),
+              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -402,6 +415,9 @@ class _ReaderWidgetState extends State<ReaderWidget> {
         child: Container(
           child: PageView.builder(
             reverse: _settings.rightToLeft,
+            physics: !_settings.swipeGestures
+                ? NeverScrollableScrollPhysics()
+                : null,
             scrollBehavior: MouseTouchScrollBehavior(),
             scrollDirection: Axis.horizontal,
             controller: _pageController,
