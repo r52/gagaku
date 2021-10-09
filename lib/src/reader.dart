@@ -6,8 +6,6 @@ import 'package:gagaku/src/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-typedef LinkPressedCallback = void Function();
-
 class ReaderPage {
   final String url;
   final String key;
@@ -119,7 +117,7 @@ class ReaderWidget extends StatefulWidget {
   final int pageCount;
   final String title;
   final Widget? link;
-  final LinkPressedCallback? onLinkPressed;
+  final VoidCallback? onLinkPressed;
 
   @override
   _ReaderWidgetState createState() => _ReaderWidgetState();
@@ -440,6 +438,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
         onKeyEvent: _handleKeyEvent,
         child: Container(
           child: PageView.builder(
+            allowImplicitScrolling: true,
             reverse: _settings.rightToLeft,
             physics: !_settings.swipeGestures
                 ? NeverScrollableScrollPhysics()

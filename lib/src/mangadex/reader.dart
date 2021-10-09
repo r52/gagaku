@@ -5,8 +5,8 @@ import 'package:gagaku/src/reader.dart';
 import 'package:gagaku/src/ui.dart';
 import 'package:provider/provider.dart';
 
-Route createMangaDexReaderRoute(Chapter chapter, Manga manga, Widget? link,
-    LinkPressedCallback? onLinkPressed) {
+Route createMangaDexReaderRoute(
+    Chapter chapter, Manga manga, Widget? link, VoidCallback? onLinkPressed) {
   return Styles.buildSlideTransitionRoute(
       (context, animation, secondaryAnimation) => MangaDexReaderWidget(
             chapter: chapter,
@@ -28,7 +28,7 @@ class MangaDexReaderWidget extends StatefulWidget {
   final Chapter chapter;
   final Manga manga;
   final Widget? link;
-  final LinkPressedCallback? onLinkPressed;
+  final VoidCallback? onLinkPressed;
 
   @override
   _MangaDexReaderState createState() => _MangaDexReaderState();

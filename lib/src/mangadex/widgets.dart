@@ -5,7 +5,6 @@ import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/manga_view.dart';
 import 'package:gagaku/src/mangadex/reader.dart';
 import 'package:gagaku/src/mangadex/types.dart';
-import 'package:gagaku/src/reader.dart';
 import 'package:gagaku/src/ui.dart';
 import 'package:gagaku/src/util.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +25,7 @@ class ChapterButtonWidget extends StatefulWidget {
   final Chapter chapter;
   final Manga manga;
   final Widget? link;
-  final LinkPressedCallback? onLinkPressed;
+  final VoidCallback? onLinkPressed;
 
   @override
   _ChapterButtonWidgetState createState() => _ChapterButtonWidgetState();

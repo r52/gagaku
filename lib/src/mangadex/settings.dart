@@ -335,7 +335,7 @@ class SettingCardWidget extends StatelessWidget {
                   SizedBox(
                     height: (subtitle != null ? 10 : 0),
                   ),
-                  (subtitle != null ? subtitle! : SizedBox())
+                  subtitle ?? SizedBox(),
                 ],
               ),
             ),

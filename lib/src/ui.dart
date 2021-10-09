@@ -28,7 +28,7 @@ class IconTextChip extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: (color != null ? color : theme.canvasColor),
+        color: color ?? theme.canvasColor,
         borderRadius: BorderRadius.circular(6),
       ),
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
