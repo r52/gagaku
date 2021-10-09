@@ -111,7 +111,6 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
   @override
   Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -126,9 +125,9 @@ class _MangaDexSettingsWidgetState extends State<MangaDexSettingsWidget> {
             children: [
               Tooltip(
                 message: 'Save Settings',
-                child: IconButton(
-                  color: theme.colorScheme.primary,
+                child: ElevatedButton.icon(
                   icon: Icon(Icons.save),
+                  label: Text('Save Settings'),
                   onPressed: () {
                     Provider.of<MangaDexModel>(context, listen: false)
                         .setSettings(widget.settings);
