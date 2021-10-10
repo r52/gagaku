@@ -97,6 +97,10 @@ class MangaDexModel extends ChangeNotifier {
   bool get loggedIn => _loggedIn;
   MangaDexClient? get client => _client;
 
+  MangaDexModel() : super() {
+    init();
+  }
+
   void init() async {
     _settings = await MangaDexSettings.load();
 

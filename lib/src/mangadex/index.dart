@@ -40,8 +40,6 @@ class _MangaDexHomePageState extends State<MangaDexHomePage>
   @override
   void initState() {
     super.initState();
-
-    Provider.of<MangaDexModel>(context, listen: false).init();
   }
 
   @override
