@@ -201,10 +201,10 @@ class _ChapterButtonWidgetState extends State<ChapterButtonWidget> {
               context,
               createWebGalleryReaderRoute(
                   getImgurSource(widget.chapter.groups.entries.first.value),
-                  title,
-                  widget.manga,
-                  widget.link,
-                  widget.onLinkPressed));
+                  title: title,
+                  manga: widget.manga,
+                  link: widget.link,
+                  onLinkPressed: widget.onLinkPressed));
         },
         tileColor: theme.backgroundColor,
         dense: true,

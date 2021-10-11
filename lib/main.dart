@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/src/local/index.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/index.dart';
 import 'package:gagaku/src/web/index.dart';
@@ -62,7 +63,9 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
       MangaDexHomePage(
         topScaffold: _scaffoldKey,
       ),
-      const Center(child: Text('Local')), // TODO local
+      LocalLibraryHomePage(
+        topScaffold: _scaffoldKey,
+      ),
       WebGalleryHomePage(
         topScaffold: _scaffoldKey,
       ),
@@ -89,19 +92,22 @@ class _GagakuAppState extends State<GagakuApp> with RestorationMixin {
           labelType: NavigationRailLabelType.all,
           destinations: [
             NavigationRailDestination(
-                icon: const Icon(Icons.menu_book_outlined),
-                selectedIcon: const Icon(Icons.menu_book),
-                label: Text('MangaDex')),
+              icon: const Icon(Icons.menu_book_outlined),
+              selectedIcon: const Icon(Icons.menu_book),
+              label: Text('MangaDex'),
+            ),
             NavigationRailDestination(
-                icon: const Icon(Icons.photo_album_outlined),
-                selectedIcon: const Icon(Icons.photo_album),
-                label: Text('Local Gallery')),
+              icon: const Icon(Icons.photo_album_outlined),
+              selectedIcon: const Icon(Icons.photo_album),
+              label: Text('Local Library'),
+            ),
             NavigationRailDestination(
-                icon: const Icon(
-                  Icons.language_outlined,
-                ),
-                selectedIcon: const Icon(Icons.language),
-                label: Text('Web Gallery')),
+              icon: const Icon(
+                Icons.language_outlined,
+              ),
+              selectedIcon: const Icon(Icons.language),
+              label: Text('Web Gallery'),
+            ),
           ],
         ),
       ),

@@ -22,8 +22,7 @@ class _WebGalleryHomePageState extends State<WebGalleryHomePage> {
   }
 
   Future<void> _openImgur(String src) async {
-    Navigator.push(
-        context, createWebGalleryReaderRoute(src, null, null, null, null));
+    Navigator.push(context, createWebGalleryReaderRoute(src));
   }
 
   Future<bool> _parseUrl(String url) async {
