@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/types.dart';
@@ -51,7 +52,8 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
 
       List<ReaderPage> pages = chData.map((e) {
         var url = server + e;
-        return ReaderPage(url: url, key: e);
+        return ReaderPage(
+            provider: CachedNetworkImageProvider(url, cacheKey: e));
       }).toList();
       return pages;
     });

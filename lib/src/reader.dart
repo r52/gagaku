@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/src/ui.dart';
@@ -31,12 +30,11 @@ extension ReaderDirectionExt on ReaderDirection {
 }
 
 class ReaderPage {
-  final String url;
-  final String key;
+  final ImageProvider provider;
 
   bool cached = false;
 
-  ReaderPage({required this.url, required this.key});
+  ReaderPage({required this.provider});
 }
 
 class ReaderSettings {
@@ -154,6 +152,9 @@ class _ReaderWidgetState extends State<ReaderWidget> {
   final PhotoViewScaleStateController _scaleStateController =
       PhotoViewScaleStateController();
 
+  int get _getPrecacheCount =>
+      _settings.precacheCount > 9 ? widget.pageCount : _settings.precacheCount;
+
   @override
   void initState() {
     super.initState();
@@ -173,9 +174,7 @@ class _ReaderWidgetState extends State<ReaderWidget> {
         widget.pages
             .skip(_pageController.page!.toInt())
             .skipWhile((page) => page.cached == true)
-            .take(_settings.precacheCount > 9
-                ? widget.pageCount
-                : _settings.precacheCount)
+            .take(_getPrecacheCount)
             .forEach((element) {
           cachePage(element);
         });
@@ -187,19 +186,13 @@ class _ReaderWidgetState extends State<ReaderWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    widget.pages
-        .take(_settings.precacheCount > 9
-            ? widget.pageCount
-            : _settings.precacheCount)
-        .forEach((element) {
+    widget.pages.take(_getPrecacheCount).forEach((element) {
       cachePage(element);
     });
   }
 
   void cachePage(ReaderPage page) {
-    precacheImage(
-            CachedNetworkImageProvider(page.url, cacheKey: page.key), context)
-        .then((value) {
+    precacheImage(page.provider, context).then((value) {
       page.cached = true;
     });
   }
@@ -569,25 +562,18 @@ class _ReaderWidgetState extends State<ReaderWidget> {
             itemBuilder: (BuildContext context, int index) {
               var page = widget.pages.elementAt(index);
 
-              return CachedNetworkImage(
-                imageUrl: page.url,
-                cacheKey: page.key,
-                placeholder: (context, url) => Styles.buildCenterSpinner(),
-                imageBuilder: (context, provider) {
-                  return PhotoView(
-                    imageProvider: provider,
-                    backgroundDecoration: BoxDecoration(color: Colors.black),
-                    customSize: MediaQuery.of(context).size,
-                    enableRotation: false,
-                    scaleStateController: _scaleStateController,
-                    minScale: PhotoViewComputedScale.contained * 1.0,
-                    maxScale: PhotoViewComputedScale.covered * 2.0,
-                    initialScale: PhotoViewComputedScale.contained,
-                    basePosition: Alignment.center,
-                    onTapUp:
-                        _settings.clickToTurn ? _handlePhotoViewOnTap : null,
-                  );
-                },
+              return PhotoView(
+                imageProvider: page.provider,
+                backgroundDecoration: BoxDecoration(color: Colors.black),
+                customSize: MediaQuery.of(context).size,
+                enableRotation: false,
+                scaleStateController: _scaleStateController,
+                minScale: PhotoViewComputedScale.contained * 1.0,
+                maxScale: PhotoViewComputedScale.covered * 2.0,
+                initialScale: PhotoViewComputedScale.contained,
+                basePosition: Alignment.center,
+                onTapUp: _settings.clickToTurn ? _handlePhotoViewOnTap : null,
+                loadingBuilder: (context, event) => Styles.buildCenterSpinner(),
               );
             },
           ),

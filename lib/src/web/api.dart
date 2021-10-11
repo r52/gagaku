@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:gagaku/src/reader.dart';
 import 'package:gagaku/src/web/types.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,7 +20,7 @@ class WebGalleryAPI {
     throw Exception("Failed to download manga data");
   }
 
-  static Future<List<ReaderPage>> getImgurPages(String src) async {
+  static Future<List<String>> getImgurPages(String src) async {
     final response = await http
         .get(Uri.parse('https://cubari.moe/read/api/imgur/chapter/$src/'));
 
@@ -29,8 +28,7 @@ class WebGalleryAPI {
       var body = jsonDecode(response.body);
 
       if (body is List) {
-        var pageList =
-            body.map((e) => ReaderPage(url: e['src'], key: e['src'])).toList();
+        var pageList = body.map((e) => e['src'] as String).toList();
 
         return pageList;
       }

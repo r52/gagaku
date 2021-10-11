@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/web/api.dart';
 import 'package:gagaku/src/web/types.dart';
@@ -47,6 +48,15 @@ class _WebGalleryReaderState extends State<WebGalleryReaderWidget> {
     super.dispose();
   }
 
+  Future<List<ReaderPage>> _getPages(String src) async {
+    final pages = await WebGalleryAPI.getImgurPages(src);
+
+    return pages
+        .map((e) =>
+            ReaderPage(provider: CachedNetworkImageProvider(e, cacheKey: e)))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     String title = widget.source;
@@ -56,7 +66,7 @@ class _WebGalleryReaderState extends State<WebGalleryReaderWidget> {
     }
 
     return FutureBuilder<List<ReaderPage>>(
-      future: WebGalleryAPI.getImgurPages(widget.source),
+      future: _getPages(widget.source),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return ReaderWidget(
