@@ -85,21 +85,41 @@ class _MangaDexLoginScreenState extends State<MangaDexLoginScreen> {
               ],
             ),
             const SizedBox(height: 120.0),
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                filled: true,
-                labelText: 'Username',
+            AutofillGroup(
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      labelText: 'Username',
+                    ),
+                    autofillHints: const [AutofillHints.username],
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (String? value) {
+                      return (value == null || value.isEmpty)
+                          ? 'Username cannot be empty.'
+                          : null;
+                    },
+                  ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      labelText: 'Password',
+                    ),
+                    obscureText: true,
+                    autofillHints: const [AutofillHints.password],
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (String? value) {
+                      return (value == null || value.isEmpty)
+                          ? 'Password cannot be empty.'
+                          : null;
+                    },
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12.0),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(
-                filled: true,
-                labelText: 'Password',
-              ),
-              obscureText: true,
             ),
             ButtonBar(
               children: <Widget>[
@@ -123,9 +143,9 @@ class _MangaDexLoginScreenState extends State<MangaDexLoginScreen> {
                               _passwordController.text);
 
                       if (loginSuccess) {
+                        Navigator.pop(context);
                         _usernameController.clear();
                         _passwordController.clear();
-                        Navigator.pop(context);
                       } else {
                         ScaffoldMessenger.of(context)
                           ..removeCurrentSnackBar()
