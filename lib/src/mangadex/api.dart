@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/src/mangadex/cache.dart';
 import 'package:gagaku/src/mangadex/settings.dart';
