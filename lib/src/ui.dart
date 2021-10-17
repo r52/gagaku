@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:gagaku/src/util.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -140,6 +141,58 @@ class TriStateChip extends StatelessWidget {
       materialTapTargetSize: materialTapTargetSize,
       elevation: elevation,
       shadowColor: shadowColor,
+    );
+  }
+}
+
+class SettingCardWidget extends StatelessWidget {
+  const SettingCardWidget(
+      {required this.title, this.subtitle, required this.builder});
+
+  final Widget title;
+  final Widget? subtitle;
+  final Widget Function(BuildContext context) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+
+    if (screenSizeSmall) {
+      return ExpansionTile(
+        title: title,
+        subtitle: subtitle,
+        children: [
+          Container(
+            color: Theme.of(context).cardColor,
+            child: Center(
+              child: builder(context),
+            ),
+          )
+        ],
+      );
+    }
+
+    return Card(
+      margin: const EdgeInsets.all(6),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  title,
+                  SizedBox(
+                    height: (subtitle != null ? 10 : 0),
+                  ),
+                  subtitle ?? SizedBox(),
+                ],
+              ),
+            ),
+            Expanded(child: builder(context))
+          ],
+        ),
+      ),
     );
   }
 }
