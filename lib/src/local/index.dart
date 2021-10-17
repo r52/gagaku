@@ -1,11 +1,14 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/src/local/api.dart';
 import 'package:gagaku/src/local/archive_reader.dart';
+import 'package:gagaku/src/local/settings.dart';
+import 'package:gagaku/src/local/types.dart';
+import 'package:gagaku/src/local/widgets.dart';
+import 'package:gagaku/src/ui.dart';
+import 'package:provider/provider.dart';
 
-enum LocalLibraryAction {
-  import,
-  open,
-}
+enum LocalLibraryAction { import, open, rescan }
 
 class LocalLibraryHomePage extends StatefulWidget {
   LocalLibraryHomePage({Key? key, required this.topScaffold}) : super(key: key);
@@ -29,6 +32,10 @@ class _LocalLibraryHomePageState extends State<LocalLibraryHomePage> {
 
       Navigator.push(context, createArchiveReaderRoute(path));
     }
+  }
+
+  Future<Iterable<LocalManga>> _fetchManga(LocalDatabaseModel model) async {
+    return model.getAllMangas();
   }
 
   @override
@@ -58,6 +65,11 @@ class _LocalLibraryHomePageState extends State<LocalLibraryHomePage> {
                       await _readArchive();
                       break;
                     case LocalLibraryAction.import:
+                      // TODO import
+                      break;
+                    case LocalLibraryAction.rescan:
+                      // TODO rescan
+                      break;
                     default:
                       break;
                   }
@@ -68,35 +80,117 @@ class _LocalLibraryHomePageState extends State<LocalLibraryHomePage> {
                     value: LocalLibraryAction.import,
                     child: ListTile(
                       leading: const Icon(Icons.library_add),
-                      title: Text('Import to Library'),
+                      title: Text('Import Manga to Library'),
                     ),
                   ),
                   const PopupMenuItem<LocalLibraryAction>(
                     value: LocalLibraryAction.open,
                     child: ListTile(
                       leading: const Icon(Icons.folder_open),
-                      title: Text('Read from Archive'),
+                      title: Text('Read Archive without Importing'),
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<LocalLibraryAction>(
+                    value: LocalLibraryAction.rescan,
+                    child: ListTile(
+                      leading: const Icon(Icons.refresh),
+                      title: Text('Re-scan Library Directory'),
                     ),
                   ),
                 ],
-              )
+              ),
+              Tooltip(
+                message: 'Settings',
+                child: IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        createLocalLibrarySettingsRoute(
+                            Provider.of<LocalDatabaseModel>(context,
+                                    listen: false)
+                                .settings));
+                  },
+                ),
+              ),
             ],
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              onPressed: () async {
-                await _readArchive();
-              },
-              icon: const Icon(Icons.folder_open),
-              label: const Text('Read from Archive'),
-            ),
-          ],
-        ),
+      body: Consumer<LocalDatabaseModel>(
+        builder: (context, mdx, child) {
+          return FutureBuilder<Iterable<LocalManga>>(
+            future: _fetchManga(mdx),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.none ||
+                  snapshot.connectionState == ConnectionState.waiting) {
+                return Styles.buildCenterSpinner();
+              }
+
+              if (snapshot.hasData) {
+                if (snapshot.data!.length == 0) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Library is empty!'),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () async {},
+                          icon: const Icon(Icons.library_add),
+                          label: const Text('Import Manga to Library'),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text('or'),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            await _readArchive();
+                          },
+                          icon: const Icon(Icons.folder_open),
+                          label: const Text('Read Archive without Importing'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    setState(() {});
+                  },
+                  child: MangaListWidget(
+                    items: snapshot.data!,
+                    title: Text(
+                      'Local Library',
+                      style: TextStyle(fontSize: 24),
+                    ),
+                    restorationId: 'local_manga_list_grid_offset',
+                    physics: const AlwaysScrollableScrollPhysics(),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text('${snapshot.error}'),
+                    backgroundColor: Colors.red,
+                  ));
+
+                return Text('${snapshot.error}');
+              }
+
+              return Styles.buildCenterSpinner();
+            },
+          );
+        },
       ),
     );
   }

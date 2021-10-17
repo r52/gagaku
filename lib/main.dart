@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/src/local/api.dart';
 import 'package:gagaku/src/local/index.dart';
 import 'package:gagaku/src/mangadex/api.dart';
 import 'package:gagaku/src/mangadex/index.dart';
+import 'package:gagaku/src/util.dart';
 import 'package:gagaku/src/web/index.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => MangaDexModel(),
+  if (DeviceContext.isDesktop()) {
+    // Initialize FFI
+    sqfliteFfiInit();
+    // Change the default factory
+    databaseFactory = databaseFactoryFfi;
+  }
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => MangaDexModel()),
+      ChangeNotifierProvider(create: (context) => LocalDatabaseModel()),
+    ],
     child: MaterialApp(
       title: 'Gagaku',
       theme: ThemeData(
