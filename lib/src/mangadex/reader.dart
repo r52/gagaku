@@ -42,18 +42,13 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
   void initState() {
     super.initState();
 
-    var dataSaver =
-        Provider.of<MangaDexModel>(context, listen: false).settings.dataSaver;
-
     _pages = Provider.of<MangaDexModel>(context, listen: false)
         .getChapterServer(widget.chapter)
-        .then((server) {
-      var chData = dataSaver ? widget.chapter.dataSaver : widget.chapter.data;
-
-      List<ReaderPage> pages = chData.map((e) {
-        var url = server + e;
+        .then((data) {
+      List<ReaderPage> pages = data.pages.map((page) {
+        var url = data.baseUrl + page;
         return ReaderPage(
-            provider: CachedNetworkImageProvider(url, cacheKey: e));
+            provider: CachedNetworkImageProvider(url, cacheKey: page));
       }).toList();
       return pages;
     });

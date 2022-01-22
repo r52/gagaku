@@ -299,9 +299,7 @@ class Chapter extends MangaDexAPIData {
   final String? chapter;
   final String? title;
   final Language translatedLanguage;
-  final String hash;
-  final List<String> data;
-  final List<String> dataSaver;
+  final String? uploader;
   final String? externalUrl;
   final int version;
   final DateTime createdAt;
@@ -321,9 +319,7 @@ class Chapter extends MangaDexAPIData {
       this.chapter,
       this.title,
       required this.translatedLanguage,
-      required this.hash,
-      required this.data,
-      required this.dataSaver,
+      this.uploader,
       this.externalUrl,
       required this.version,
       required this.createdAt,
@@ -364,9 +360,7 @@ class Chapter extends MangaDexAPIData {
           chapter: attr['chapter'],
           title: attr['title'],
           translatedLanguage: Languages.get(attr['translatedLanguage']),
-          hash: attr['hash'],
-          data: List<String>.from(attr['data']),
-          dataSaver: List<String>.from(attr['dataSaver']),
+          uploader: attr['uploader'],
           externalUrl: attr['externalUrl'],
           publishAt: DateTime.parse(attr['publishAt']),
           createdAt: DateTime.parse(attr['publishAt']),
@@ -380,6 +374,16 @@ class Chapter extends MangaDexAPIData {
 
     throw ArgumentError('Unexpected data retrieval failure');
   }
+}
+
+class ChapterAPIData {
+  final String baseUrl;
+  final List<String> pages;
+
+  ChapterAPIData({
+    required this.baseUrl,
+    required this.pages,
+  });
 }
 
 class Manga extends MangaDexAPIData {

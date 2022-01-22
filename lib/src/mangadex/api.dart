@@ -556,7 +556,7 @@ class MangaDexModel extends ChangeNotifier {
   }
 
   /// Fetches the relay server for [chapter] pages
-  Future<String> getChapterServer(Chapter chapter) async {
+  Future<ChapterAPIData> getChapterServer(Chapter chapter) async {
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id));
 
@@ -565,11 +565,21 @@ class MangaDexModel extends ChangeNotifier {
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = jsonDecode(response.body);
       var baseUrl = body['baseUrl'] as String;
+      var chapter = body['chapter'] as Map<String, dynamic>;
 
       var chapterUrl =
-          '$baseUrl/${_settings.dataSaver ? 'data-saver' : 'data'}/${chapter.hash}/';
+          '$baseUrl/${_settings.dataSaver ? 'data-saver' : 'data'}/${chapter['hash']}/';
 
-      return chapterUrl;
+      var plist = chapter['data'] as List<dynamic>;
+
+      if (_settings.dataSaver) {
+        plist = chapter['dataSaver'] as List<dynamic>;
+      }
+
+      var data =
+          ChapterAPIData(baseUrl: chapterUrl, pages: List<String>.from(plist));
+
+      return data;
     }
 
     throw Exception("Failed to get relay server");
