@@ -36,8 +36,7 @@ void main() {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           bottomSheetTheme:
               BottomSheetThemeData(backgroundColor: Colors.transparent)),
-      themeMode: ThemeMode
-          .dark, // ThemeMode.system doesn't work on Windows https://github.com/flutter/flutter/issues/54612
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       restorationScopeId: 'gagaku_root',
       home: GagakuApp(),
