@@ -523,3 +523,33 @@ class MangaStatusChip extends StatelessWidget {
     );
   }
 }
+
+class ContentRatingChip extends StatelessWidget {
+  const ContentRatingChip({Key? key, required this.rating}) : super(key: key);
+
+  final ContentRating rating;
+
+  @override
+  Widget build(BuildContext context) {
+    var iconColor = Colors.orange;
+
+    switch (rating) {
+      case ContentRating.suggestive:
+        break;
+      case ContentRating.safe:
+        iconColor = Colors.green;
+        break;
+      case ContentRating.erotica:
+      case ContentRating.pornographic:
+        iconColor = Colors.red;
+        break;
+    }
+
+    return IconTextChip(
+      color: iconColor,
+      text: Text(
+        rating.formatted,
+      ),
+    );
+  }
+}

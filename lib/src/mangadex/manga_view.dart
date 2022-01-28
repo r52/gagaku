@@ -226,10 +226,8 @@ class _MangaDexMangaViewWidgetState extends State<MangaDexMangaViewWidget> {
                             const SizedBox(
                               width: 10,
                             ),
-                            IconTextChip(
-                                text:
-                                    Text(widget.manga.contentRating.formatted),
-                                color: Colors.red)
+                            ContentRatingChip(
+                                rating: widget.manga.contentRating),
                           ],
                         ),
                       ),
