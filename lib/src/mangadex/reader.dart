@@ -92,6 +92,7 @@ class _MangaDexReaderState extends State<MangaDexReaderWidget> {
             title: '${widget.manga.title.entries.first.value} - $title',
             link: widget.link,
             onLinkPressed: widget.onLinkPressed,
+            externalUrl: widget.chapter.externalUrl,
           );
         } else if (snapshot.hasError) {
           ScaffoldMessenger.of(context)

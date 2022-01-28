@@ -4,6 +4,7 @@ import 'package:gagaku/src/ui.dart';
 import 'package:gagaku/src/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum ReaderDirection {
   leftToRight,
@@ -132,6 +133,7 @@ class ReaderWidget extends StatefulWidget {
     required this.title,
     this.link,
     this.onLinkPressed,
+    this.externalUrl,
   }) : super(key: key);
 
   final Iterable<ReaderPage> pages;
@@ -139,6 +141,7 @@ class ReaderWidget extends StatefulWidget {
   final String title;
   final Widget? link;
   final VoidCallback? onLinkPressed;
+  final String? externalUrl;
 
   @override
   _ReaderWidgetState createState() => _ReaderWidgetState();
@@ -544,39 +547,61 @@ class _ReaderWidgetState extends State<ReaderWidget> {
         focusNode: _focusNode,
         onKeyEvent: _handleKeyEvent,
         child: Container(
-          child: PageView.builder(
-            allowImplicitScrolling: true,
-            reverse: _settings.direction == ReaderDirection.rightToLeft,
-            physics: !_settings.swipeGestures
-                ? NeverScrollableScrollPhysics()
-                : null,
-            scrollBehavior: MouseTouchScrollBehavior(),
-            scrollDirection: _settings.direction == ReaderDirection.topToBottom
-                ? Axis.vertical
-                : Axis.horizontal,
-            controller: _pageController,
-            itemCount: widget.pageCount,
-            onPageChanged: (int index) {
-              _focusNode.requestFocus();
-            },
-            itemBuilder: (BuildContext context, int index) {
-              var page = widget.pages.elementAt(index);
+          child: (widget.pages.isEmpty && widget.externalUrl != null)
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Read on external site:'),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (!await launch(widget.externalUrl!))
+                            throw 'Could not launch ${widget.externalUrl!}';
+                        },
+                        child: Text(widget.externalUrl!),
+                      ),
+                    ],
+                  ),
+                )
+              : PageView.builder(
+                  allowImplicitScrolling: true,
+                  reverse: _settings.direction == ReaderDirection.rightToLeft,
+                  physics: !_settings.swipeGestures
+                      ? NeverScrollableScrollPhysics()
+                      : null,
+                  scrollBehavior: MouseTouchScrollBehavior(),
+                  scrollDirection:
+                      _settings.direction == ReaderDirection.topToBottom
+                          ? Axis.vertical
+                          : Axis.horizontal,
+                  controller: _pageController,
+                  itemCount: widget.pageCount,
+                  onPageChanged: (int index) {
+                    _focusNode.requestFocus();
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    var page = widget.pages.elementAt(index);
 
-              return PhotoView(
-                imageProvider: page.provider,
-                backgroundDecoration: BoxDecoration(color: Colors.black),
-                customSize: MediaQuery.of(context).size,
-                enableRotation: false,
-                scaleStateController: _scaleStateController,
-                minScale: PhotoViewComputedScale.contained * 1.0,
-                maxScale: PhotoViewComputedScale.covered * 2.0,
-                initialScale: PhotoViewComputedScale.contained,
-                basePosition: Alignment.center,
-                onTapUp: _settings.clickToTurn ? _handlePhotoViewOnTap : null,
-                loadingBuilder: (context, event) => Styles.buildCenterSpinner(),
-              );
-            },
-          ),
+                    return PhotoView(
+                      imageProvider: page.provider,
+                      backgroundDecoration: BoxDecoration(color: Colors.black),
+                      customSize: MediaQuery.of(context).size,
+                      enableRotation: false,
+                      scaleStateController: _scaleStateController,
+                      minScale: PhotoViewComputedScale.contained * 1.0,
+                      maxScale: PhotoViewComputedScale.covered * 2.0,
+                      initialScale: PhotoViewComputedScale.contained,
+                      basePosition: Alignment.center,
+                      onTapUp:
+                          _settings.clickToTurn ? _handlePhotoViewOnTap : null,
+                      loadingBuilder: (context, event) =>
+                          Styles.buildCenterSpinner(),
+                    );
+                  },
+                ),
         ),
       ),
       bottomSheet: _settings.showProgressBar
