@@ -97,6 +97,11 @@ class _MangaDexChapterFeedState extends State<MangaDexChapterFeed> {
             return FutureBuilder<Iterable<_ChapterFeedItem>>(
               future: _fetchChapters(mdx, _chapterOffset),
               builder: (context, snapshot) {
+                if (_resultLength == 0 &&
+                    snapshot.connectionState != ConnectionState.done) {
+                  return Styles.buildCenterSpinner();
+                }
+
                 if (snapshot.hasData) {
                   if (snapshot.data!.length == 0) {
                     return const Center(
