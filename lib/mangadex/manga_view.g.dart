@@ -7,7 +7,7 @@ part of 'manga_view.dart';
 // **************************************************************************
 
 String _$fetchMangaViewChaptersHash() =>
-    r'3d176ece0b1bf2e9b617b27c5db691cf953ed5d5';
+    r'cb827b418135592e1554e594c38f1a497fafed90';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -46,11 +46,9 @@ class FetchMangaViewChaptersFamily
   /// See also [fetchMangaViewChapters].
   FetchMangaViewChaptersProvider call(
     Manga manga,
-    int offset,
   ) {
     return FetchMangaViewChaptersProvider(
       manga,
-      offset,
     );
   }
 
@@ -60,7 +58,6 @@ class FetchMangaViewChaptersFamily
   ) {
     return call(
       provider.manga,
-      provider.offset,
     );
   }
 
@@ -85,12 +82,10 @@ class FetchMangaViewChaptersProvider
   /// See also [fetchMangaViewChapters].
   FetchMangaViewChaptersProvider(
     this.manga,
-    this.offset,
   ) : super.internal(
           (ref) => fetchMangaViewChapters(
             ref,
             manga,
-            offset,
           ),
           from: fetchMangaViewChaptersProvider,
           name: r'fetchMangaViewChaptersProvider',
@@ -104,20 +99,16 @@ class FetchMangaViewChaptersProvider
         );
 
   final Manga manga;
-  final int offset;
 
   @override
   bool operator ==(Object other) {
-    return other is FetchMangaViewChaptersProvider &&
-        other.manga == manga &&
-        other.offset == offset;
+    return other is FetchMangaViewChaptersProvider && other.manga == manga;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, manga.hashCode);
-    hash = _SystemHash.combine(hash, offset.hashCode);
 
     return _SystemHash.finish(hash);
   }

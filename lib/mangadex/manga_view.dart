@@ -29,15 +29,12 @@ class FetchMangaChaptersResult {
 
 @riverpod
 Future<FetchMangaChaptersResult> fetchMangaViewChapters(
-    FetchMangaViewChaptersRef ref, Manga manga, int offset) async {
+    FetchMangaViewChaptersRef ref, Manga manga) async {
   final following = await ref.watch(fetchFollowingMangaProvider(manga).future);
   final reading = await ref.watch(fetchReadingStatusProvider(manga).future);
   final readChapters =
       await ref.watch(fetchReadChaptersProvider([manga]).future);
-  final chapters =
-      await ref.watch(fetchMangaChaptersProvider(manga, offset).future);
-
-  // TODO fix offset list
+  final chapters = await ref.watch(mangaChaptersProvider(manga).future);
 
   return FetchMangaChaptersResult(chapters, following, reading, readChapters);
 }
@@ -53,24 +50,18 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final api = ref.watch(mangadexProvider);
     final scrollController = useScrollController();
     final refresh = useState(0);
-    final offset = useState(0);
-    final resultLength = useRef(0);
     final theme = Theme.of(context);
 
     final author = useRef(manga.getAuthor());
     final artist = useRef(manga.getArtist());
 
-    final result =
-        ref.watch(fetchMangaViewChaptersProvider(manga, offset.value));
+    final result = ref.watch(fetchMangaViewChaptersProvider(manga));
 
     useEffect(() {
       void controllerAtEdge() {
         if (scrollController.position.atEdge) {
           if (scrollController.position.pixels != 0) {
-            if (resultLength.value ==
-                offset.value + MangaDexEndpoints.apiQueryLimit) {
-              offset.value += MangaDexEndpoints.apiQueryLimit;
-            }
+            ref.read(mangaChaptersProvider(manga).notifier).getMore();
           }
         }
       }
@@ -81,9 +72,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
     return Scaffold(
       body: result.when(
+        skipLoadingOnReload: true,
         data: (result) {
-          resultLength.value = result.chapters.length;
-
           return CustomScrollView(
             controller: scrollController,
             scrollBehavior: MouseTouchScrollBehavior(),

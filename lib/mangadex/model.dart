@@ -301,6 +301,9 @@ class MangaDexModel {
   /// from [offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length))
   /// is returned. Ranged return may be empty if the latest fetch returned
   /// all available data (list.length < apiQueryLimit)
+  ///
+  /// Do not use directly. The provider [latestChaptersFeedProvider] should be
+  /// used instead as it provides auto state management.
   Future<Iterable<Chapter>> fetchChapterFeed(
       [int offset = 0, bool wholeList = false]) async {
     if (!loggedIn()) {
@@ -417,10 +420,6 @@ class MangaDexModel {
 
     if (fetch.isNotEmpty) {
       // dev.log('Retrieving Manga info');
-
-      // var tags = await getTagList();
-      // var tagMap =
-      //     Map.fromEntries(tags.map((e) => MapEntry<String, Tag>(e.id, e)));
 
       int start = 0, end = 0;
 
@@ -643,13 +642,11 @@ class MangaDexModel {
   ///
   /// [offset] denotes the nth item to start fetching from.
   ///
-  /// If [wholeList] is true, the operation always returns the entire list
-  /// up to the latest data requested by offset. Otherwise, the range of items
-  /// from [offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length))
-  /// is returned. Ranged return may be empty if the latest fetch returned
-  /// all available data (list.length < apiQueryLimit)
+  /// Do not use directly. The [mangaChaptersProvider] provider should
+  /// be used instead as it provides results caching and auto state
+  /// management.
   Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
-      [int offset = 0, bool wholeList = false]) async {
+      [int offset = 0]) async {
     if (!loggedIn()) {
       throw Exception(
           "Data fetch called on invalid token/login. Shouldn't ever get here");
@@ -696,12 +693,7 @@ class MangaDexModel {
       // Add data to the list
       list.addAll(result.data);
 
-      if (!wholeList) {
-        return list.getRange(
-            offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length));
-      } else {
-        return list;
-      }
+      return list;
     }
 
     // Throw if failure
@@ -789,15 +781,47 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
   }
 }
 
-@riverpod
-Future<Iterable<Chapter>> fetchMangaChapters(
-    FetchMangaChaptersRef ref, Manga manga, int offset) async {
-  final api = ref.watch(mangadexProvider);
-  var chapters = await api.fetchMangaChapters(manga, offset, true);
+@Riverpod(keepAlive: true)
+class MangaChapters extends _$MangaChapters {
+  int _offset = 0;
 
-  ref.keepAlive();
+  ///Fetch the manga chapters list based on offset
+  Future<List<Chapter>> _fetchMangaChapters(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    var chapters = await api.fetchMangaChapters(manga, offset);
 
-  return chapters;
+    return chapters.toList();
+  }
+
+  @override
+  FutureOr<List<Chapter>> build(Manga manga) async {
+    return _fetchMangaChapters(0);
+  }
+
+  /// Fetch more latest chapters if more data exists
+  Future<void> getMore() async {
+    var oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    // If there is more content, get more
+    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        _offset += MangaDexEndpoints.apiQueryLimit;
+        var chapters = await _fetchMangaChapters(_offset);
+        return [...oldstate!, ...chapters];
+      });
+    }
+
+    // Otherwise, do nothing because there is no more content
+  }
+
+  /// Clears the list and refetch from the beginning
+  Future<void> clear() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      _offset = 0;
+      return _fetchMangaChapters(_offset);
+    });
+  }
 }
 
 @riverpod
