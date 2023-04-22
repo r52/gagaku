@@ -49,8 +49,8 @@ abstract class MangaDexEndpoints {
   /// Manga read markers. Returns chapter ids
   static const getRead = '/manga/read';
 
-  /// Mark chapter read. {id} = [Chapter.id]
-  static const setRead = '/chapter/{id}/read';
+  /// Mark chapters read/unread. {id} = [Manga.id]
+  static const setRead = '/manga/{id}/read';
 
   /// Get server URL. {id} = [Chapter.id]
   static const server = '/at-home/server/{id}';
@@ -428,9 +428,9 @@ class MangaDexModel {
         'limit': MangaDexEndpoints.apiQueryLimit.toString(),
         'order[latestUploadedChapter]': 'desc',
         // 'availableTranslatedLanguage[]':
-        //     _settings.translatedLanguages.map((e) => e.toString()).toList(),
+        //     _settings.translatedLanguages.map(const LanguageConverter().toJson).toList(),
         // 'originalLanguage[]':
-        //     _settings.originalLanguage.map((e) => e.toString()).toList(),
+        //     _settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
         'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
         'includes[]': ['cover_art', 'author', 'artist']
       };
@@ -471,6 +471,366 @@ class MangaDexModel {
 
     return list;
   }
+
+  /// Gets whether or not the user is following [manga]
+  Future<bool> getMangaFollowing(Manga manga) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id));
+
+    var response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      // User follows the manga
+      return true;
+    } else if (response.statusCode == 404) {
+      // User doesn't follow the manga
+      return false;
+    }
+
+    // Throw if failure
+    throw Exception("Failed to retrieve manga following status");
+  }
+
+  /// Sets the manga's following status [setFollow] of the [manga]
+  Future<bool> setMangaFollowing(Manga manga, bool setFollow) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.setFollow.replaceFirst('{id}', manga.id));
+
+    http.Response response;
+
+    if (setFollow) {
+      response = await _client!.post(uri);
+    } else {
+      response = await _client!.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      // Success
+      return true;
+    }
+
+    return false;
+  }
+
+  /// Gets the user's reading status for [manga]
+  Future<MangaReadingStatus?> getMangaReadingStatus(Manga manga) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
+
+    var response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        MangaReadingStatus status = MangaReadingStatus.reading;
+
+        if (body['status'] != null) {
+          status = MangaReadingStatusExt.parse(body['status']);
+        }
+
+        return status;
+      }
+    } else if (response.statusCode == 404) {
+      return null;
+    }
+
+    // Throw if failure
+    throw Exception("Failed to retrieve manga reading status");
+  }
+
+  /// Sets the manga's reading status [status] of the [manga]
+  Future<bool> setMangaReadingStatus(
+      Manga manga, MangaReadingStatus? status) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    final params = {'status': (status?.name)};
+
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
+
+    var response = await _client!.post(uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(params));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Fetches read chapter data of given [mangas]
+  Future<Set<String>> fetchReadChapters(Iterable<Manga> mangas) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    var fetch = mangas.map((e) => e.id);
+
+    if (fetch.isNotEmpty) {
+      final queryParams = {'ids[]': fetch};
+
+      final uri = MangaDexEndpoints.api.replace(
+          path: MangaDexEndpoints.getRead, queryParameters: queryParams);
+
+      final response = await _client!.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+
+        var clist = body['data'] as List<dynamic>;
+
+        var strlist = clist.map((e) => e.toString());
+
+        return strlist.toSet();
+      } else {
+        // Throw if failure
+        throw Exception("Failed to download read chapters data");
+      }
+    }
+
+    return {};
+  }
+
+  /// Fetches the latest chapters of a specific [manga]
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiQueryLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// If [wholeList] is true, the operation always returns the entire list
+  /// up to the latest data requested by offset. Otherwise, the range of items
+  /// from [offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length))
+  /// is returned. Ranged return may be empty if the latest fetch returned
+  /// all available data (list.length < apiQueryLimit)
+  Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
+      [int offset = 0, bool wholeList = false]) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    var list = <Chapter>[];
+
+    final settings = ref.read(mdConfigProvider);
+
+    // Download missing data
+    // dev.log('Downloading latest chapters');
+    final queryParams = {
+      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+      'offset': offset.toString(),
+      'translatedLanguage[]': settings.translatedLanguages
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'originalLanguage[]': settings.originalLanguage
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
+      'order[chapter]': 'desc',
+      'includes[]': 'scanlation_group'
+    };
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
+        queryParameters: queryParams);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      // dev.log('response', error: response.body);
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      final result = ChapterList.fromJson(body);
+
+      // Cache the data
+      _cache.putAllAPIResolved(result.data);
+
+      // Add data to the list
+      list.addAll(result.data);
+
+      if (!wholeList) {
+        return list.getRange(
+            offset, min(offset + MangaDexEndpoints.apiQueryLimit, list.length));
+      } else {
+        return list;
+      }
+    }
+
+    // Throw if failure
+    throw Exception("Failed to download manga chapters");
+  }
+
+  /// Sets the chapter read status [setRead] of the [chapters]
+  Future<bool> setChaptersRead(
+      Manga manga, Iterable<Chapter> chapters, bool setRead) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    Map<String, dynamic> params = {};
+
+    if (setRead) {
+      params['chapterIdsRead'] = chapters.map((e) => e.id).toList();
+    } else {
+      params['chapterIdsUnread'] = chapters.map((e) => e.id).toList();
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id));
+
+    var response = await _client!.post(uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(params));
+
+    if (response.statusCode == 200) {
+      // Success
+      return true;
+    }
+
+    return false;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class LatestChaptersFeed extends _$LatestChaptersFeed {
+  int _offset = 0;
+
+  ///Fetch the latest chapters list based on offset
+  Future<List<Chapter>> _fetchLatestChapters(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    var chapters = await api.fetchChapterFeed(offset, true);
+
+    return chapters.toList();
+  }
+
+  @override
+  FutureOr<List<Chapter>> build() async {
+    return _fetchLatestChapters(0);
+  }
+
+  /// Fetch more latest chapters if more data exists
+  Future<void> getMore() async {
+    var oldstate =
+        state.maybeWhen(data: (data) => data.length, orElse: () => 0);
+    // If there is more content, get more
+    if (oldstate == _offset + MangaDexEndpoints.apiQueryLimit) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        _offset += MangaDexEndpoints.apiQueryLimit;
+        return _fetchLatestChapters(_offset);
+      });
+    }
+
+    // Otherwise, do nothing because there is no more content
+  }
+
+  /// Clears the list and refetch from the beginning
+  Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      api.invalidateCacheItem(CacheLists.latestChapters);
+      _offset = 0;
+      return _fetchLatestChapters(_offset);
+    });
+  }
+}
+
+@riverpod
+Future<Iterable<Chapter>> fetchMangaChapters(
+    FetchMangaChaptersRef ref, Manga manga, int offset) async {
+  final api = ref.watch(mangadexProvider);
+  var chapters = await api.fetchMangaChapters(manga, offset, true);
+
+  ref.keepAlive();
+
+  return chapters;
+}
+
+@riverpod
+Future<MangaReadingStatus?> fetchReadingStatus(
+    FetchReadingStatusRef ref, Manga manga) async {
+  final api = ref.watch(mangadexProvider);
+  var status = await api.getMangaReadingStatus(manga);
+
+  ref.keepAlive();
+
+  return status;
+}
+
+@riverpod
+Future<bool> fetchFollowingManga(
+    FetchFollowingMangaRef ref, Manga manga) async {
+  final api = ref.watch(mangadexProvider);
+  var status = await api.getMangaFollowing(manga);
+
+  ref.keepAlive();
+
+  return status;
+}
+
+@riverpod
+Future<Set<String>> fetchReadChapters(
+    FetchReadChaptersRef ref, Iterable<Manga> mangas) async {
+  final api = ref.watch(mangadexProvider);
+  var list = await api.fetchReadChapters(mangas);
+
+  ref.keepAlive();
+
+  return list;
 }
 
 @riverpod
@@ -501,17 +861,6 @@ class AuthControl extends _$AuthControl {
       return api.loggedIn();
     });
   }
-}
-
-@riverpod
-Future<Iterable<Chapter>> fetchChapterFeed(
-    FetchChapterFeedRef ref, int offset) async {
-  final api = ref.watch(mangadexProvider);
-  var chapters = await api.fetchChapterFeed(offset, true);
-
-  ref.keepAlive();
-
-  return chapters;
 }
 
 // Deprecated stuff

@@ -2,15 +2,160 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
+import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import 'types.dart';
 
 enum MangaListView { grid, list, detailed }
 
 final mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
+
+class ChapterButtonWidget extends HookConsumerWidget {
+  const ChapterButtonWidget({
+    super.key,
+    required this.chapter,
+    required this.manga,
+    required this.readChapters,
+    this.link,
+    this.onLinkPressed,
+  });
+
+  final Chapter chapter;
+  final Manga manga;
+  final Set<String> readChapters;
+  final Widget? link;
+  final VoidCallback? onLinkPressed;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final api = ref.watch(mangadexProvider);
+    final read = useRef(false);
+    final refresh = useState(0);
+    final readChaptersL = useState(readChapters);
+
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final theme = Theme.of(context);
+
+    String title = '';
+
+    if (chapter.attributes.chapter != null) {
+      title += 'Chapter ${chapter.attributes.chapter!}';
+    }
+
+    if (chapter.attributes.title != null) {
+      title += ' - ${chapter.attributes.title!}';
+    }
+
+    read.value = readChaptersL.value.contains(chapter.id);
+
+    final groups = useRef(chapter.getGroups());
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+              color: read.value ? theme.colorScheme.background : Colors.blue,
+              width: 4.0),
+        ),
+      ),
+      child: ListTile(
+        onTap: () {
+          // TODO reader
+          // Navigator.push(
+          //         context,
+          //         createMangaDexReaderRoute(
+          //             chapter, manga, link, onLinkPressed))
+          //     .then((value) {
+          //   // Refresh this when reader view is closed to update read status
+          //   refresh.value++;
+          // });
+        },
+        tileColor: theme.colorScheme.background,
+        dense: true,
+        minVerticalPadding: 0.0,
+        contentPadding:
+            EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
+        minLeadingWidth: 0.0,
+        leading: IconButton(
+          onPressed: () async {
+            bool set = !read.value;
+            bool result = await api.setChaptersRead(manga, [chapter], set);
+
+            if (result) {
+              // Refresh
+              if (set) {
+                readChaptersL.value = {...readChaptersL.value, chapter.id};
+              } else {
+                readChaptersL.value = readChaptersL.value
+                    .where((element) => element != chapter.id)
+                    .toSet();
+              }
+            }
+          },
+          padding: const EdgeInsets.all(0.0),
+          splashRadius: 15,
+          iconSize: 20,
+          tooltip: read.value ? 'Unmark as read' : 'Mark as read',
+          icon: Icon(read.value ? Icons.visibility_off : Icons.visibility,
+              color: (read.value
+                  ? theme.highlightColor
+                  : theme.primaryIconTheme.color)),
+          constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+              color: (read.value
+                  ? theme.highlightColor
+                  : theme.colorScheme.primary)),
+        ),
+        trailing: !screenSizeSmall
+            ? FittedBox(
+                fit: BoxFit.fill,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconTextChip(
+                      icon: const Icon(Icons.language, size: 18),
+                      text: Text(
+                        chapter.attributes.translatedLanguage.name,
+                      ),
+                    ),
+                    for (var g in groups.value) ...[
+                      const SizedBox(width: 2),
+                      IconTextChip(
+                        icon: const Icon(Icons.group, size: 20),
+                        text: Text(g),
+                      ),
+                    ],
+                    // const SizedBox(width: 2),
+                    // IconTextChip(
+                    //   icon: const Icon(Icons.group, size: 20),
+                    //   text: Text(widget.chapter.groupName),
+                    // ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.schedule, size: 20),
+                    const SizedBox(width: 5),
+                    Text(timeago.format(chapter.attributes.publishAt))
+                  ],
+                ),
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.schedule, size: 15),
+                  const SizedBox(width: 5),
+                  Text(timeago.format(chapter.attributes.publishAt))
+                ],
+              ),
+      ),
+    );
+  }
+}
 
 class MangaListWidget extends HookConsumerWidget {
   const MangaListWidget({

@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/util.dart';
@@ -21,10 +23,43 @@ extension ContentRatingExt on ContentRating {
 
 enum MangaDemographic { shounen, shoujo, josei, seinen }
 
+extension MangaDemographicExt on MangaDemographic {
+  String get formatted => name.capitalize();
+
+  static MangaDemographic parse(String key) {
+    return MangaDemographic.values.firstWhere((element) => element.name == key);
+  }
+}
+
 enum MangaStatus { completed, ongoing, cancelled, hiatus }
 
 extension MangaStatusExt on MangaStatus {
   String get formatted => name.capitalize();
+}
+
+enum MangaReadingStatus {
+  reading,
+  on_hold,
+  plan_to_read,
+  dropped,
+  re_reading,
+  completed
+}
+
+extension MangaReadingStatusExt on MangaReadingStatus {
+  String get formatted => const [
+        'Reading',
+        'On Hold',
+        'Plan to Read',
+        'Dropped',
+        'Re-reading',
+        'Completed'
+      ].elementAt(index);
+
+  static MangaReadingStatus parse(String key) {
+    return MangaReadingStatus.values
+        .firstWhere((element) => element.name == key);
+  }
 }
 
 enum TagGroup { content, format, genre, theme }
@@ -126,6 +161,8 @@ class ChapterList with _$ChapterList {
 
 @freezed
 class Chapter with _$Chapter {
+  const Chapter._();
+
   const factory Chapter({
     required String id,
     required ChapterAttributes attributes,
@@ -134,6 +171,23 @@ class Chapter with _$Chapter {
 
   factory Chapter.fromJson(Map<String, dynamic> json) =>
       _$ChapterFromJson(json);
+
+  Iterable<String> getGroups() {
+    var groups = relationships.where((element) => element.maybeWhen(
+        group: (id, attributes) => true, orElse: () => false));
+
+    var groupNames = <String>{};
+    if (groups.isNotEmpty) {
+      for (var g in groups) {
+        groupNames.add(g.maybeWhen(
+            group: (id, attributes) => attributes.name, orElse: () => ''));
+      }
+
+      return groupNames;
+    }
+
+    return ["No Group"];
+  }
 }
 
 @freezed
@@ -300,6 +354,34 @@ class Manga with _$Manga {
     }
 
     return coverArt;
+  }
+
+  String? getAuthor() {
+    var authorRs = relationships.where((element) => element.maybeWhen(
+        author: (id, attributes) => true, orElse: () => false));
+
+    if (authorRs.isNotEmpty) {
+      var rel = authorRs.first.maybeWhen(
+          author: (id, attributes) => attributes, orElse: () => null);
+
+      return rel?.name;
+    }
+
+    return null;
+  }
+
+  String? getArtist() {
+    var artistRs = relationships.where((element) => element.maybeWhen(
+        artist: (id, attributes) => true, orElse: () => false));
+
+    if (artistRs.isNotEmpty) {
+      var rel = artistRs.first.maybeWhen(
+          artist: (id, attributes) => attributes, orElse: () => null);
+
+      return rel?.name;
+    }
+
+    return null;
   }
 }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -8,17 +7,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_feed.g.dart';
 
-class FeedResults {
-  const FeedResults(this.list, this.length);
+class FetchMangaFeedResults {
+  const FetchMangaFeedResults(this.list, this.length);
 
   final Iterable<Manga> list;
   final int length;
 }
 
 @riverpod
-Future<FeedResults> fetchMangaFeed(FetchMangaFeedRef ref, int offset) async {
+Future<FetchMangaFeedResults> fetchMangaFeed(FetchMangaFeedRef ref) async {
   final api = ref.watch(mangadexProvider);
-  final chapters = await ref.watch(fetchChapterFeedProvider(offset).future);
+
+  final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
   var mangaids = chapters.map((e) {
     for (var r in e.relationships) {
@@ -37,7 +37,7 @@ Future<FeedResults> fetchMangaFeed(FetchMangaFeedRef ref, int offset) async {
 
   ref.keepAlive();
 
-  return FeedResults(mangas, chapters.length);
+  return FetchMangaFeedResults(mangas, chapters.length);
 }
 
 class MangaDexMangaFeed extends HookConsumerWidget {
@@ -45,13 +45,12 @@ class MangaDexMangaFeed extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final offset = useState(0);
-
-    final results = ref.watch(fetchMangaFeedProvider(offset.value));
+    final results = ref.watch(fetchMangaFeedProvider);
 
     return Scaffold(
       body: Center(
         child: results.when(
+            skipLoadingOnReload: true,
             data: (result) {
               if (result.list.isEmpty) {
                 return const Text('Find some manga to follow!');
@@ -59,10 +58,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
 
               return RefreshIndicator(
                 onRefresh: () async {
-                  await ref
-                      .read(mangadexProvider)
-                      .invalidateCacheItem(CacheLists.latestChapters);
-                  offset.value = 0;
+                  ref.read(latestChaptersFeedProvider.notifier).clear();
                 },
                 child: MangaListWidget(
                   items: result.list,
@@ -72,10 +68,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
                   ),
                   physics: const AlwaysScrollableScrollPhysics(),
                   onAtEdge: () {
-                    if (result.length ==
-                        offset.value + MangaDexEndpoints.apiQueryLimit) {
-                      offset.value += MangaDexEndpoints.apiQueryLimit;
-                    }
+                    ref.read(latestChaptersFeedProvider.notifier).getMore();
                   },
                 ),
               );

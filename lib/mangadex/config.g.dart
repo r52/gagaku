@@ -52,7 +52,7 @@ const _$ContentRatingEnumMap = {
 // RiverpodGenerator
 // **************************************************************************
 
-String _$mdConfigHash() => r'fba4b8328fed8ff8a538fbdf38323b0991538773';
+String _$mdConfigHash() => r'422f9d65f920b9d170177915dd44611f9081332b';
 
 /// See also [MdConfig].
 @ProviderFor(MdConfig)

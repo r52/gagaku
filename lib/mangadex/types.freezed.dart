@@ -443,12 +443,13 @@ class __$$_ChapterCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_Chapter with DiagnosticableTreeMixin implements _Chapter {
+class _$_Chapter extends _Chapter with DiagnosticableTreeMixin {
   const _$_Chapter(
       {required this.id,
       required this.attributes,
       required final List<Relationship> relationships})
-      : _relationships = relationships;
+      : _relationships = relationships,
+        super._();
 
   factory _$_Chapter.fromJson(Map<String, dynamic> json) =>
       _$$_ChapterFromJson(json);
@@ -511,11 +512,12 @@ class _$_Chapter with DiagnosticableTreeMixin implements _Chapter {
   }
 }
 
-abstract class _Chapter implements Chapter {
+abstract class _Chapter extends Chapter {
   const factory _Chapter(
       {required final String id,
       required final ChapterAttributes attributes,
       required final List<Relationship> relationships}) = _$_Chapter;
+  const _Chapter._() : super._();
 
   factory _Chapter.fromJson(Map<String, dynamic> json) = _$_Chapter.fromJson;
 

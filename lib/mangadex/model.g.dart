@@ -6,7 +6,8 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchChapterFeedHash() => r'3ad78da1661a8838c5c31addf3da6b98459bb0e3';
+String _$fetchMangaChaptersHash() =>
+    r'1231df78ba99b7652e908926790ff8c5da302ce9';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,31 +30,34 @@ class _SystemHash {
   }
 }
 
-typedef FetchChapterFeedRef = AutoDisposeFutureProviderRef<Iterable<Chapter>>;
+typedef FetchMangaChaptersRef = AutoDisposeFutureProviderRef<Iterable<Chapter>>;
 
-/// See also [fetchChapterFeed].
-@ProviderFor(fetchChapterFeed)
-const fetchChapterFeedProvider = FetchChapterFeedFamily();
+/// See also [fetchMangaChapters].
+@ProviderFor(fetchMangaChapters)
+const fetchMangaChaptersProvider = FetchMangaChaptersFamily();
 
-/// See also [fetchChapterFeed].
-class FetchChapterFeedFamily extends Family<AsyncValue<Iterable<Chapter>>> {
-  /// See also [fetchChapterFeed].
-  const FetchChapterFeedFamily();
+/// See also [fetchMangaChapters].
+class FetchMangaChaptersFamily extends Family<AsyncValue<Iterable<Chapter>>> {
+  /// See also [fetchMangaChapters].
+  const FetchMangaChaptersFamily();
 
-  /// See also [fetchChapterFeed].
-  FetchChapterFeedProvider call(
+  /// See also [fetchMangaChapters].
+  FetchMangaChaptersProvider call(
+    Manga manga,
     int offset,
   ) {
-    return FetchChapterFeedProvider(
+    return FetchMangaChaptersProvider(
+      manga,
       offset,
     );
   }
 
   @override
-  FetchChapterFeedProvider getProviderOverride(
-    covariant FetchChapterFeedProvider provider,
+  FetchMangaChaptersProvider getProviderOverride(
+    covariant FetchMangaChaptersProvider provider,
   ) {
     return call(
+      provider.manga,
       provider.offset,
     );
   }
@@ -70,47 +74,320 @@ class FetchChapterFeedFamily extends Family<AsyncValue<Iterable<Chapter>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'fetchChapterFeedProvider';
+  String? get name => r'fetchMangaChaptersProvider';
 }
 
-/// See also [fetchChapterFeed].
-class FetchChapterFeedProvider
+/// See also [fetchMangaChapters].
+class FetchMangaChaptersProvider
     extends AutoDisposeFutureProvider<Iterable<Chapter>> {
-  /// See also [fetchChapterFeed].
-  FetchChapterFeedProvider(
+  /// See also [fetchMangaChapters].
+  FetchMangaChaptersProvider(
+    this.manga,
     this.offset,
   ) : super.internal(
-          (ref) => fetchChapterFeed(
+          (ref) => fetchMangaChapters(
             ref,
+            manga,
             offset,
           ),
-          from: fetchChapterFeedProvider,
-          name: r'fetchChapterFeedProvider',
+          from: fetchMangaChaptersProvider,
+          name: r'fetchMangaChaptersProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$fetchChapterFeedHash,
-          dependencies: FetchChapterFeedFamily._dependencies,
+                  : _$fetchMangaChaptersHash,
+          dependencies: FetchMangaChaptersFamily._dependencies,
           allTransitiveDependencies:
-              FetchChapterFeedFamily._allTransitiveDependencies,
+              FetchMangaChaptersFamily._allTransitiveDependencies,
         );
 
+  final Manga manga;
   final int offset;
 
   @override
   bool operator ==(Object other) {
-    return other is FetchChapterFeedProvider && other.offset == offset;
+    return other is FetchMangaChaptersProvider &&
+        other.manga == manga &&
+        other.offset == offset;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, manga.hashCode);
     hash = _SystemHash.combine(hash, offset.hashCode);
 
     return _SystemHash.finish(hash);
   }
 }
 
+String _$fetchReadingStatusHash() =>
+    r'06fbd3ffc745c0218ede8362707ac1e90e73d557';
+typedef FetchReadingStatusRef
+    = AutoDisposeFutureProviderRef<MangaReadingStatus?>;
+
+/// See also [fetchReadingStatus].
+@ProviderFor(fetchReadingStatus)
+const fetchReadingStatusProvider = FetchReadingStatusFamily();
+
+/// See also [fetchReadingStatus].
+class FetchReadingStatusFamily extends Family<AsyncValue<MangaReadingStatus?>> {
+  /// See also [fetchReadingStatus].
+  const FetchReadingStatusFamily();
+
+  /// See also [fetchReadingStatus].
+  FetchReadingStatusProvider call(
+    Manga manga,
+  ) {
+    return FetchReadingStatusProvider(
+      manga,
+    );
+  }
+
+  @override
+  FetchReadingStatusProvider getProviderOverride(
+    covariant FetchReadingStatusProvider provider,
+  ) {
+    return call(
+      provider.manga,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'fetchReadingStatusProvider';
+}
+
+/// See also [fetchReadingStatus].
+class FetchReadingStatusProvider
+    extends AutoDisposeFutureProvider<MangaReadingStatus?> {
+  /// See also [fetchReadingStatus].
+  FetchReadingStatusProvider(
+    this.manga,
+  ) : super.internal(
+          (ref) => fetchReadingStatus(
+            ref,
+            manga,
+          ),
+          from: fetchReadingStatusProvider,
+          name: r'fetchReadingStatusProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchReadingStatusHash,
+          dependencies: FetchReadingStatusFamily._dependencies,
+          allTransitiveDependencies:
+              FetchReadingStatusFamily._allTransitiveDependencies,
+        );
+
+  final Manga manga;
+
+  @override
+  bool operator ==(Object other) {
+    return other is FetchReadingStatusProvider && other.manga == manga;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, manga.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$fetchFollowingMangaHash() =>
+    r'6177e9e4654b826d1c0e440403da773ee57e0f3c';
+typedef FetchFollowingMangaRef = AutoDisposeFutureProviderRef<bool>;
+
+/// See also [fetchFollowingManga].
+@ProviderFor(fetchFollowingManga)
+const fetchFollowingMangaProvider = FetchFollowingMangaFamily();
+
+/// See also [fetchFollowingManga].
+class FetchFollowingMangaFamily extends Family<AsyncValue<bool>> {
+  /// See also [fetchFollowingManga].
+  const FetchFollowingMangaFamily();
+
+  /// See also [fetchFollowingManga].
+  FetchFollowingMangaProvider call(
+    Manga manga,
+  ) {
+    return FetchFollowingMangaProvider(
+      manga,
+    );
+  }
+
+  @override
+  FetchFollowingMangaProvider getProviderOverride(
+    covariant FetchFollowingMangaProvider provider,
+  ) {
+    return call(
+      provider.manga,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'fetchFollowingMangaProvider';
+}
+
+/// See also [fetchFollowingManga].
+class FetchFollowingMangaProvider extends AutoDisposeFutureProvider<bool> {
+  /// See also [fetchFollowingManga].
+  FetchFollowingMangaProvider(
+    this.manga,
+  ) : super.internal(
+          (ref) => fetchFollowingManga(
+            ref,
+            manga,
+          ),
+          from: fetchFollowingMangaProvider,
+          name: r'fetchFollowingMangaProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchFollowingMangaHash,
+          dependencies: FetchFollowingMangaFamily._dependencies,
+          allTransitiveDependencies:
+              FetchFollowingMangaFamily._allTransitiveDependencies,
+        );
+
+  final Manga manga;
+
+  @override
+  bool operator ==(Object other) {
+    return other is FetchFollowingMangaProvider && other.manga == manga;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, manga.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$fetchReadChaptersHash() => r'dfdbef9bff8401e931a30a707199574c4d35c1e0';
+typedef FetchReadChaptersRef = AutoDisposeFutureProviderRef<Set<String>>;
+
+/// See also [fetchReadChapters].
+@ProviderFor(fetchReadChapters)
+const fetchReadChaptersProvider = FetchReadChaptersFamily();
+
+/// See also [fetchReadChapters].
+class FetchReadChaptersFamily extends Family<AsyncValue<Set<String>>> {
+  /// See also [fetchReadChapters].
+  const FetchReadChaptersFamily();
+
+  /// See also [fetchReadChapters].
+  FetchReadChaptersProvider call(
+    Iterable<Manga> mangas,
+  ) {
+    return FetchReadChaptersProvider(
+      mangas,
+    );
+  }
+
+  @override
+  FetchReadChaptersProvider getProviderOverride(
+    covariant FetchReadChaptersProvider provider,
+  ) {
+    return call(
+      provider.mangas,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'fetchReadChaptersProvider';
+}
+
+/// See also [fetchReadChapters].
+class FetchReadChaptersProvider extends AutoDisposeFutureProvider<Set<String>> {
+  /// See also [fetchReadChapters].
+  FetchReadChaptersProvider(
+    this.mangas,
+  ) : super.internal(
+          (ref) => fetchReadChapters(
+            ref,
+            mangas,
+          ),
+          from: fetchReadChaptersProvider,
+          name: r'fetchReadChaptersProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchReadChaptersHash,
+          dependencies: FetchReadChaptersFamily._dependencies,
+          allTransitiveDependencies:
+              FetchReadChaptersFamily._allTransitiveDependencies,
+        );
+
+  final Iterable<Manga> mangas;
+
+  @override
+  bool operator ==(Object other) {
+    return other is FetchReadChaptersProvider && other.mangas == mangas;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, mangas.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$latestChaptersFeedHash() =>
+    r'0390a3bbc44ca109dbcf72bd524a7c98e77de281';
+
+/// See also [LatestChaptersFeed].
+@ProviderFor(LatestChaptersFeed)
+final latestChaptersFeedProvider =
+    AsyncNotifierProvider<LatestChaptersFeed, List<Chapter>>.internal(
+  LatestChaptersFeed.new,
+  name: r'latestChaptersFeedProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$latestChaptersFeedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$LatestChaptersFeed = AsyncNotifier<List<Chapter>>;
 String _$authControlHash() => r'f8be09eda62cb7aef4301595371cdb20bc07059e';
 
 /// See also [AuthControl].

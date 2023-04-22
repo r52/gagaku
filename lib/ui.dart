@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/util.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -38,6 +39,58 @@ class IconTextChip extends StatelessWidget {
           children: [
             if (icon != null) ...[icon!, const SizedBox(width: 5)],
             text,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SettingCardWidget extends StatelessWidget {
+  const SettingCardWidget(
+      {super.key, required this.title, this.subtitle, required this.builder});
+
+  final Widget title;
+  final Widget? subtitle;
+  final Widget Function(BuildContext context) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+
+    if (screenSizeSmall) {
+      return ExpansionTile(
+        title: title,
+        subtitle: subtitle,
+        children: [
+          Container(
+            color: Theme.of(context).cardColor,
+            child: Center(
+              child: builder(context),
+            ),
+          )
+        ],
+      );
+    }
+
+    return Card(
+      margin: const EdgeInsets.all(6),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  title,
+                  SizedBox(
+                    height: (subtitle != null ? 10 : 0),
+                  ),
+                  subtitle ?? const SizedBox(),
+                ],
+              ),
+            ),
+            Expanded(child: builder(context))
           ],
         ),
       ),

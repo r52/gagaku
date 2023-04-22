@@ -4,6 +4,7 @@ import 'package:gagaku/drawer.dart';
 import 'package:gagaku/mangadex/login_old.dart';
 import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/model.dart';
+import 'package:gagaku/mangadex/settings.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MangaDexHome extends ConsumerWidget {
@@ -47,6 +48,15 @@ class MangaDexHome extends ConsumerWidget {
             actions: [
               ButtonBar(
                 children: [
+                  Tooltip(
+                    message: 'MangaDex Settings',
+                    child: IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () {
+                        Navigator.push(context, createMangaDexSettingsRoute());
+                      },
+                    ),
+                  ),
                   Tooltip(
                     message: 'Logout',
                     child: IconButton(
