@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/model.dart';
+import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -64,15 +65,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
           ),
           child: ListTile(
             onTap: () {
-              // TODO reader
-              // Navigator.push(
-              //         context,
-              //         createMangaDexReaderRoute(
-              //             chapter, manga, link, onLinkPressed))
-              //     .then((value) {
-              //   // Refresh this when reader view is closed to update read status
-              //   refresh.value++;
-              // });
+              Navigator.push(
+                      context,
+                      createMangaDexReaderRoute(
+                          chapter, manga, link, onLinkPressed))
+                  .then((value) {
+                // Refresh this when reader view is closed to update read status
+                refresh.value++;
+              });
             },
             tileColor: theme.colorScheme.background,
             dense: true,

@@ -142,13 +142,13 @@ class MangaDexChapterFeed extends HookConsumerWidget {
   }
 }
 
-class _ChapterFeedItem extends HookConsumerWidget {
+class _ChapterFeedItem extends HookWidget {
   const _ChapterFeedItem({required this.state});
 
   final _ChapterFeedItemData state;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final refresh = useState(0);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);

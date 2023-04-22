@@ -598,6 +598,9 @@ class MangaDexModel {
   }
 
   /// Fetches read chapter data of given [mangas]
+  ///
+  /// Do not use directly. Prefer [readChaptersProvider] for its caching and
+  /// state management.
   Future<Set<String>> fetchReadChapters(Iterable<Manga> mangas) async {
     if (!loggedIn()) {
       throw Exception(
@@ -733,6 +736,36 @@ class MangaDexModel {
     }
 
     return false;
+  }
+
+  /// Fetches the relay server for [chapter] pages
+  Future<PageData> getChapterServer(Chapter chapter) async {
+    final settings = ref.read(mdConfigProvider);
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id));
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      var apidat = ChapterAPI.fromJson(body);
+
+      var chapterUrl = apidat.getUrl(settings.dataSaver);
+
+      var plist = apidat.chapter.data;
+
+      if (settings.dataSaver) {
+        plist = apidat.chapter.dataSaver;
+      }
+
+      var data = PageData(chapterUrl, plist);
+
+      return data;
+    }
+
+    throw Exception("Failed to get relay server");
   }
 }
 

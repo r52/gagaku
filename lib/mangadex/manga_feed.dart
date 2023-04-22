@@ -40,39 +40,40 @@ class MangaDexMangaFeed extends HookConsumerWidget {
 
     return Center(
       child: results.when(
-          skipLoadingOnReload: true,
-          data: (result) {
-            if (result.list.isEmpty) {
-              return const Text('Find some manga to follow!');
-            }
+        skipLoadingOnReload: true,
+        data: (result) {
+          if (result.list.isEmpty) {
+            return const Text('Find some manga to follow!');
+          }
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                ref.read(latestChaptersFeedProvider.notifier).clear();
-              },
-              child: MangaListWidget(
-                items: result.list,
-                title: const Text(
-                  'Latest Updates',
-                  style: TextStyle(fontSize: 24),
-                ),
-                physics: const AlwaysScrollableScrollPhysics(),
-                onAtEdge: () {
-                  ref.read(latestChaptersFeedProvider.notifier).getMore();
-                },
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.read(latestChaptersFeedProvider.notifier).clear();
+            },
+            child: MangaListWidget(
+              items: result.list,
+              title: const Text(
+                'Latest Updates',
+                style: TextStyle(fontSize: 24),
               ),
-            );
-          },
-          error: (err, stack) {
-            ScaffoldMessenger.of(context)
-              ..removeCurrentSnackBar()
-              ..showSnackBar(SnackBar(
-                content: Text('$err'),
-                backgroundColor: Colors.red,
-              ));
-            return Text('Error: $err');
-          },
-          loading: () => const CircularProgressIndicator()),
+              physics: const AlwaysScrollableScrollPhysics(),
+              onAtEdge: () {
+                ref.read(latestChaptersFeedProvider.notifier).getMore();
+              },
+            ),
+          );
+        },
+        error: (err, stack) {
+          ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: Text('$err'),
+              backgroundColor: Colors.red,
+            ));
+          return Text('Error: $err');
+        },
+        loading: () => const CircularProgressIndicator(),
+      ),
     );
   }
 }

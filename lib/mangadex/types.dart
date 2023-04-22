@@ -443,6 +443,13 @@ class TagAttributes with _$TagAttributes {
       _$TagAttributesFromJson(json);
 }
 
+class PageData {
+  const PageData(this.baseUrl, this.pages);
+
+  final String baseUrl;
+  final List<String> pages;
+}
+
 // Deprecated old style login types
 @freezed
 class OldToken with _$OldToken {
