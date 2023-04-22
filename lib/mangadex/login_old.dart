@@ -128,8 +128,10 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                           .login(
                               usernameController.text, passwordController.text);
 
+                      if (!context.mounted) return;
+
                       if (loginSuccess) {
-                        Navigator.pop(context);
+                        Navigator.of(context).pop();
                         usernameController.clear();
                         passwordController.clear();
                       } else {

@@ -17,26 +17,23 @@ Route createMangaViewRoute(Manga manga) {
           ));
 }
 
-class FetchMangaChaptersResult {
-  FetchMangaChaptersResult(
-      this.chapters, this.following, this.reading, this.readChapters);
+@riverpod
+Future<_FetchMangaChaptersResult> _fetchMangaViewChapters(
+    _FetchMangaViewChaptersRef ref, Manga manga) async {
+  final following = await ref.watch(fetchFollowingMangaProvider(manga).future);
+  final reading = await ref.watch(fetchReadingStatusProvider(manga).future);
+  ref.read(readChaptersProvider.notifier).get([manga]);
+  final chapters = await ref.watch(mangaChaptersProvider(manga).future);
+
+  return _FetchMangaChaptersResult(chapters, following, reading);
+}
+
+class _FetchMangaChaptersResult {
+  _FetchMangaChaptersResult(this.chapters, this.following, this.reading);
 
   Iterable<Chapter> chapters;
   bool following;
   MangaReadingStatus? reading;
-  Set<String> readChapters;
-}
-
-@riverpod
-Future<FetchMangaChaptersResult> fetchMangaViewChapters(
-    FetchMangaViewChaptersRef ref, Manga manga) async {
-  final following = await ref.watch(fetchFollowingMangaProvider(manga).future);
-  final reading = await ref.watch(fetchReadingStatusProvider(manga).future);
-  final readChapters =
-      await ref.watch(fetchReadChaptersProvider([manga]).future);
-  final chapters = await ref.watch(mangaChaptersProvider(manga).future);
-
-  return FetchMangaChaptersResult(chapters, following, reading, readChapters);
 }
 
 class MangaDexMangaViewWidget extends HookConsumerWidget {
@@ -55,7 +52,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final author = useRef(manga.getAuthor());
     final artist = useRef(manga.getArtist());
 
-    final result = ref.watch(fetchMangaViewChaptersProvider(manga));
+    final result = ref.watch(_fetchMangaViewChaptersProvider(manga));
 
     useEffect(() {
       void controllerAtEdge() {
@@ -367,7 +364,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       child: ChapterButtonWidget(
                         chapter: e,
                         manga: manga,
-                        readChapters: result.readChapters,
                         link: Text(
                           manga.attributes.title.get('en'),
                           style: const TextStyle(fontSize: 24),

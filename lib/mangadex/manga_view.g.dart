@@ -7,7 +7,7 @@ part of 'manga_view.dart';
 // **************************************************************************
 
 String _$fetchMangaViewChaptersHash() =>
-    r'cb827b418135592e1554e594c38f1a497fafed90';
+    r'57fe386748330c6a4b0d7b733e31119507c815f8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,31 +30,31 @@ class _SystemHash {
   }
 }
 
-typedef FetchMangaViewChaptersRef
-    = AutoDisposeFutureProviderRef<FetchMangaChaptersResult>;
+typedef _FetchMangaViewChaptersRef
+    = AutoDisposeFutureProviderRef<_FetchMangaChaptersResult>;
 
-/// See also [fetchMangaViewChapters].
-@ProviderFor(fetchMangaViewChapters)
-const fetchMangaViewChaptersProvider = FetchMangaViewChaptersFamily();
+/// See also [_fetchMangaViewChapters].
+@ProviderFor(_fetchMangaViewChapters)
+const _fetchMangaViewChaptersProvider = _FetchMangaViewChaptersFamily();
 
-/// See also [fetchMangaViewChapters].
-class FetchMangaViewChaptersFamily
-    extends Family<AsyncValue<FetchMangaChaptersResult>> {
-  /// See also [fetchMangaViewChapters].
-  const FetchMangaViewChaptersFamily();
+/// See also [_fetchMangaViewChapters].
+class _FetchMangaViewChaptersFamily
+    extends Family<AsyncValue<_FetchMangaChaptersResult>> {
+  /// See also [_fetchMangaViewChapters].
+  const _FetchMangaViewChaptersFamily();
 
-  /// See also [fetchMangaViewChapters].
-  FetchMangaViewChaptersProvider call(
+  /// See also [_fetchMangaViewChapters].
+  _FetchMangaViewChaptersProvider call(
     Manga manga,
   ) {
-    return FetchMangaViewChaptersProvider(
+    return _FetchMangaViewChaptersProvider(
       manga,
     );
   }
 
   @override
-  FetchMangaViewChaptersProvider getProviderOverride(
-    covariant FetchMangaViewChaptersProvider provider,
+  _FetchMangaViewChaptersProvider getProviderOverride(
+    covariant _FetchMangaViewChaptersProvider provider,
   ) {
     return call(
       provider.manga,
@@ -73,36 +73,36 @@ class FetchMangaViewChaptersFamily
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'fetchMangaViewChaptersProvider';
+  String? get name => r'_fetchMangaViewChaptersProvider';
 }
 
-/// See also [fetchMangaViewChapters].
-class FetchMangaViewChaptersProvider
-    extends AutoDisposeFutureProvider<FetchMangaChaptersResult> {
-  /// See also [fetchMangaViewChapters].
-  FetchMangaViewChaptersProvider(
+/// See also [_fetchMangaViewChapters].
+class _FetchMangaViewChaptersProvider
+    extends AutoDisposeFutureProvider<_FetchMangaChaptersResult> {
+  /// See also [_fetchMangaViewChapters].
+  _FetchMangaViewChaptersProvider(
     this.manga,
   ) : super.internal(
-          (ref) => fetchMangaViewChapters(
+          (ref) => _fetchMangaViewChapters(
             ref,
             manga,
           ),
-          from: fetchMangaViewChaptersProvider,
-          name: r'fetchMangaViewChaptersProvider',
+          from: _fetchMangaViewChaptersProvider,
+          name: r'_fetchMangaViewChaptersProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
                   : _$fetchMangaViewChaptersHash,
-          dependencies: FetchMangaViewChaptersFamily._dependencies,
+          dependencies: _FetchMangaViewChaptersFamily._dependencies,
           allTransitiveDependencies:
-              FetchMangaViewChaptersFamily._allTransitiveDependencies,
+              _FetchMangaViewChaptersFamily._allTransitiveDependencies,
         );
 
   final Manga manga;
 
   @override
   bool operator ==(Object other) {
-    return other is FetchMangaViewChaptersProvider && other.manga == manga;
+    return other is _FetchMangaViewChaptersProvider && other.manga == manga;
   }
 
   @override

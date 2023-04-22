@@ -798,7 +798,7 @@ class MangaChapters extends _$MangaChapters {
     return _fetchMangaChapters(0);
   }
 
-  /// Fetch more latest chapters if more data exists
+  /// Fetch more chapters if more data exists
   Future<void> getMore() async {
     var oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
     // If there is more content, get more
@@ -824,6 +824,61 @@ class MangaChapters extends _$MangaChapters {
   }
 }
 
+@Riverpod(keepAlive: true)
+class ReadChapters extends _$ReadChapters {
+  ///Fetch the latest chapters list based on offset
+  Future<Set<String>> _fetchReadChapters(Iterable<Manga> mangas) async {
+    final api = ref.watch(mangadexProvider);
+    var list = await api.fetchReadChapters(mangas);
+
+    return list;
+  }
+
+  @override
+  FutureOr<Set<String>> build() async {
+    return {};
+  }
+
+  /// Fetch read chapters for the provided list of mangas
+  Future<void> get(Iterable<Manga> mangas) async {
+    var oldstate =
+        state.maybeWhen(data: (data) => data, orElse: () => <String>{});
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      var chapters = await _fetchReadChapters(mangas);
+      return {...oldstate, ...chapters};
+    });
+  }
+
+  /// Sets a list of chapters for a manga read or unread
+  Future<void> set(
+      Manga manga, Iterable<Chapter> chapters, bool setRead) async {
+    final chapIdSet = chapters.map((e) => e.id).toSet();
+    final api = ref.watch(mangadexProvider);
+
+    var oldstate =
+        state.maybeWhen(data: (data) => data, orElse: () => <String>{});
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      bool result = await api.setChaptersRead(manga, chapters, setRead);
+
+      if (result) {
+        // Refresh
+        if (setRead) {
+          return {...oldstate, ...chapIdSet};
+        } else {
+          return oldstate
+              .where((element) => !chapIdSet.contains(element))
+              .toSet();
+        }
+      }
+
+      return oldstate;
+    });
+  }
+}
+
 @riverpod
 Future<MangaReadingStatus?> fetchReadingStatus(
     FetchReadingStatusRef ref, Manga manga) async {
@@ -844,17 +899,6 @@ Future<bool> fetchFollowingManga(
   ref.keepAlive();
 
   return status;
-}
-
-@riverpod
-Future<Set<String>> fetchReadChapters(
-    FetchReadChaptersRef ref, Iterable<Manga> mangas) async {
-  final api = ref.watch(mangadexProvider);
-  var list = await api.fetchReadChapters(mangas);
-
-  ref.keepAlive();
-
-  return list;
 }
 
 @riverpod

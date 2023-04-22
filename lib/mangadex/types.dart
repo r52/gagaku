@@ -188,6 +188,18 @@ class Chapter with _$Chapter {
 
     return ["No Group"];
   }
+
+  String getMangaID() {
+    var mangas = relationships.where((element) =>
+        element.maybeWhen(manga: (id) => true, orElse: () => false));
+
+    if (mangas.isNotEmpty) {
+      var m = mangas.first.maybeWhen(manga: (id) => id, orElse: () => '');
+      return m;
+    }
+
+    return '';
+  }
 }
 
 @freezed
