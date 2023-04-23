@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
@@ -283,12 +283,10 @@ class _GridMangaItem extends StatelessWidget {
     final Widget image = Material(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       clipBehavior: Clip.antiAlias,
-      child: CachedNetworkImage(
-        imageUrl: manga.getCovertArtUrl(quality: CoverArtQuality.medium),
-        placeholder: (context, url) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+      child: ExtendedImage.network(
+        manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+        cache: true,
+        loadStateChanged: extendedImageLoadStateHandler,
         width: 256.0,
       ),
     );
@@ -361,14 +359,10 @@ class _GridMangaDetailedItem extends StatelessWidget {
                     onPressed: () async {
                       Navigator.push(context, createMangaViewRoute(manga));
                     },
-                    child: CachedNetworkImage(
-                        imageUrl: manga.getCovertArtUrl(
-                            quality: CoverArtQuality.medium),
-                        placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                    child: ExtendedImage.network(
+                        manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                        cache: true,
+                        loadStateChanged: extendedImageLoadStateHandler,
                         width: screenSizeSmall ? 80.0 : 128.0),
                   ),
                   Expanded(
@@ -434,13 +428,10 @@ class _ListMangaItem extends StatelessWidget {
               onPressed: () async {
                 Navigator.push(context, createMangaViewRoute(manga));
               },
-              child: CachedNetworkImage(
-                imageUrl:
-                    manga.getCovertArtUrl(quality: CoverArtQuality.medium),
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+              child: ExtendedImage.network(
+                manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                cache: true,
+                loadStateChanged: extendedImageLoadStateHandler,
                 width: 80.0,
               ),
             ),

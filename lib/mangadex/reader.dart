@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -13,12 +12,13 @@ part 'reader.g.dart';
 Route createMangaDexReaderRoute(
     Chapter chapter, Manga manga, Widget? link, VoidCallback? onLinkPressed) {
   return Styles.buildSlideTransitionRoute(
-      (context, animation, secondaryAnimation) => MangaDexReaderWidget(
-            chapter: chapter,
-            manga: manga,
-            link: link,
-            onLinkPressed: onLinkPressed,
-          ));
+    (context, animation, secondaryAnimation) => MangaDexReaderWidget(
+      chapter: chapter,
+      manga: manga,
+      link: link,
+      onLinkPressed: onLinkPressed,
+    ),
+  );
 }
 
 @riverpod
@@ -30,7 +30,7 @@ Future<List<ReaderPage>> _fetchChapterPages(
   var pages = mpages.pages.map((pageUrl) {
     var url = mpages.baseUrl + pageUrl;
     return ReaderPage(
-      provider: CachedNetworkImageProvider(url, cacheKey: pageUrl),
+      provider: NetworkImage(url),
     );
   }).toList();
 
@@ -96,10 +96,12 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       error: (err, stackTrace) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
-          ..showSnackBar(SnackBar(
-            content: Text('$err'),
-            backgroundColor: Colors.red,
-          ));
+          ..showSnackBar(
+            SnackBar(
+              content: Text('$err'),
+              backgroundColor: Colors.red,
+            ),
+          );
 
         return Text('Error: $err');
       },

@@ -8,27 +8,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'manga_feed.g.dart';
 
 @riverpod
-Future<_FetchMangaFeedResults> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
+Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   final api = ref.watch(mangadexProvider);
-
   final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
   var mangaids = chapters.map((e) => e.getMangaID()).toSet();
-
   mangaids.removeWhere((element) => element.isEmpty);
 
   var mangas = await api.fetchManga(mangaids);
 
   ref.keepAlive();
 
-  return _FetchMangaFeedResults(mangas, chapters.length);
-}
-
-class _FetchMangaFeedResults {
-  const _FetchMangaFeedResults(this.list, this.length);
-
-  final Iterable<Manga> list;
-  final int length;
+  return mangas;
 }
 
 class MangaDexMangaFeed extends HookConsumerWidget {
@@ -42,7 +33,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
       child: results.when(
         skipLoadingOnReload: true,
         data: (result) {
-          if (result.list.isEmpty) {
+          if (result.isEmpty) {
             return const Text('Find some manga to follow!');
           }
 
@@ -51,15 +42,14 @@ class MangaDexMangaFeed extends HookConsumerWidget {
               ref.read(latestChaptersFeedProvider.notifier).clear();
             },
             child: MangaListWidget(
-              items: result.list,
+              items: result,
               title: const Text(
                 'Latest Updates',
                 style: TextStyle(fontSize: 24),
               ),
               physics: const AlwaysScrollableScrollPhysics(),
-              onAtEdge: () {
-                ref.read(latestChaptersFeedProvider.notifier).getMore();
-              },
+              onAtEdge: () =>
+                  ref.read(latestChaptersFeedProvider.notifier).getMore(),
             ),
           );
         },

@@ -8,6 +8,7 @@ part 'types.freezed.dart';
 part 'types.g.dart';
 
 typedef LocalizedString = Map<String, String>;
+typedef LibraryMap = Map<String, MangaReadingStatus>;
 
 extension LocalizedStringExt on LocalizedString {
   String get(String code) {
@@ -465,6 +466,6 @@ class OldToken with _$OldToken {
 
   final DateTime createdAt = DateTime.now();
 
-  bool get expired => (DateTime.now().difference(createdAt).inMinutes > 14);
+  bool get expired => (DateTime.now().difference(createdAt).inMinutes > 10);
   bool get isValid => (session.isNotEmpty && refresh.isNotEmpty);
 }

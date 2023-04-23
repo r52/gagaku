@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -6,6 +6,7 @@ import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -189,12 +190,8 @@ class _ChapterFeedItem extends HookWidget {
                   refresh.value++;
                 });
               },
-              child: CachedNetworkImage(
-                  imageUrl: state.coverArt,
-                  placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+              child: ExtendedImage.network(state.coverArt,
+                  loadStateChanged: extendedImageLoadStateHandler,
                   width: screenSizeSmall ? 80.0 : 128.0),
             ),
             Expanded(

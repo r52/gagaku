@@ -324,6 +324,102 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<Set<String>>;
+String _$userLibraryHash() => r'42214a56de6a0a58c90bdca6d34a3423e6e3922e';
+
+abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
+  late final MangaReadingStatus status;
+
+  FutureOr<Iterable<Manga>> build(
+    MangaReadingStatus status,
+  );
+}
+
+/// See also [UserLibrary].
+@ProviderFor(UserLibrary)
+const userLibraryProvider = UserLibraryFamily();
+
+/// See also [UserLibrary].
+class UserLibraryFamily extends Family<AsyncValue<Iterable<Manga>>> {
+  /// See also [UserLibrary].
+  const UserLibraryFamily();
+
+  /// See also [UserLibrary].
+  UserLibraryProvider call(
+    MangaReadingStatus status,
+  ) {
+    return UserLibraryProvider(
+      status,
+    );
+  }
+
+  @override
+  UserLibraryProvider getProviderOverride(
+    covariant UserLibraryProvider provider,
+  ) {
+    return call(
+      provider.status,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'userLibraryProvider';
+}
+
+/// See also [UserLibrary].
+class UserLibraryProvider
+    extends AsyncNotifierProviderImpl<UserLibrary, Iterable<Manga>> {
+  /// See also [UserLibrary].
+  UserLibraryProvider(
+    this.status,
+  ) : super.internal(
+          () => UserLibrary()..status = status,
+          from: userLibraryProvider,
+          name: r'userLibraryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$userLibraryHash,
+          dependencies: UserLibraryFamily._dependencies,
+          allTransitiveDependencies:
+              UserLibraryFamily._allTransitiveDependencies,
+        );
+
+  final MangaReadingStatus status;
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserLibraryProvider && other.status == status;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, status.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+
+  @override
+  FutureOr<Iterable<Manga>> runNotifierBuild(
+    covariant UserLibrary notifier,
+  ) {
+    return notifier.build(
+      status,
+    );
+  }
+}
+
 String _$authControlHash() => r'f8be09eda62cb7aef4301595371cdb20bc07059e';
 
 /// See also [AuthControl].

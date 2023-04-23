@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
+import 'package:gagaku/mangadex/library.dart';
 import 'package:gagaku/mangadex/login_old.dart';
 import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -34,9 +35,7 @@ class MangaDexHome extends ConsumerWidget {
     const tabs = <Widget>[
       MangaDexMangaFeed(),
       MangaDexChapterFeed(),
-      Center(
-        child: Text("Library Feed"),
-      )
+      MangaDexLibraryView(),
     ];
 
     return MangaDexLoginWidget(

@@ -450,24 +450,14 @@ class ReaderWidget extends HookConsumerWidget {
                   itemBuilder: (BuildContext context, int index) {
                     var page = pages.elementAt(index);
 
-                    var image = Image(
-                      image: page.provider,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        }
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      },
-                    );
-
-                    image.image.resolve(const ImageConfiguration()).addListener(
+                    page.provider
+                        .resolve(const ImageConfiguration())
+                        .addListener(
                       ImageStreamListener(
-                        (ImageInfo image, bool synchronousCall) {
+                        (ImageInfo info, bool synchronousCall) {
                           scaleFactor.value =
                               (MediaQuery.of(context).size.width /
-                                  image.image.width.toDouble());
+                                  info.image.width.toDouble());
                           resetImageFit();
                         },
                       ),
@@ -482,7 +472,40 @@ class ReaderWidget extends HookConsumerWidget {
                         transformationController: transformController,
                         minScale: 0.1,
                         maxScale: 5,
-                        child: image,
+                        child: Image(
+                          image: page.provider,
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) {
+                              return child;
+                            }
+
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(SnackBar(
+                                content: Text('$error'),
+                                backgroundColor: Colors.red,
+                              ));
+
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      // TODO somehow reload?
+                                    },
+                                    child: const Text('Error loading page'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     );
                   },

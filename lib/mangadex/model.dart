@@ -155,6 +155,10 @@ class MangaDexModel {
   // }
 
   Future<void> refreshToken() async {
+    // Clear old data
+    _token = null;
+    _client = null;
+
     final storage = Hive.box(gagakuBox);
     String? strken = await storage.get('oldtoken') as String?;
 
@@ -436,7 +440,7 @@ class MangaDexModel {
 
       while (end < fetch.length) {
         start = end;
-        end += min(fetch.length, MangaDexEndpoints.apiQueryLimit);
+        end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
 
         queryParams['ids[]'] = fetch.getRange(start, end);
 
@@ -740,6 +744,11 @@ class MangaDexModel {
 
   /// Fetches the relay server for [chapter] pages
   Future<PageData> getChapterServer(Chapter chapter) async {
+    // If chapter links to external site, return nothing
+    if (chapter.attributes.externalUrl != null) {
+      return const PageData('', []);
+    }
+
     final settings = ref.read(mdConfigProvider);
 
     final uri = MangaDexEndpoints.api.replace(
@@ -766,6 +775,47 @@ class MangaDexModel {
     }
 
     throw Exception("Failed to get relay server");
+  }
+
+  /// Fetches the user's manga library
+  Future<LibraryMap?> fetchUserLibrary() async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    if (_cache.exists(CacheLists.library)) {
+      return _cache.get<LibraryMap>(CacheLists.library);
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = jsonDecode(response.body);
+
+      if (body['statuses'] is List) {
+        // If the api returns a List, then the result is null
+        return null;
+      }
+
+      var mlist = body['statuses'] as Map<String, dynamic>;
+
+      var libMap = mlist.map(
+          (key, value) => MapEntry(key, MangaReadingStatusExt.parse(value)));
+
+      _cache.put(CacheLists.library, libMap, true);
+
+      return libMap;
+    }
+
+    // Throw if failure
+    throw Exception("Failed to download user library data");
   }
 }
 
@@ -908,6 +958,69 @@ class ReadChapters extends _$ReadChapters {
       }
 
       return oldstate;
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class UserLibrary extends _$UserLibrary {
+  int _total = 0;
+  int _offset = 0;
+
+  ///Fetch the manga chapters list based on offset
+  Future<Iterable<Manga>> _fetchUserLibrary() async {
+    final api = ref.watch(mangadexProvider);
+
+    final library = await api.fetchUserLibrary();
+
+    if (library == null) {
+      return [];
+    }
+
+    final results = library.entries
+        .where((element) => element.value == status)
+        .map((e) => e.key)
+        .toList();
+
+    _total = results.length;
+
+    var range = min(results.length, _offset + MangaDexEndpoints.apiQueryLimit);
+    var mangas = await api.fetchManga(results.getRange(_offset, range));
+
+    return mangas;
+  }
+
+  @override
+  FutureOr<Iterable<Manga>> build(MangaReadingStatus status) async {
+    return _fetchUserLibrary();
+  }
+
+  int total() {
+    return _total;
+  }
+
+  /// Fetch more chapters if more data exists
+  Future<void> getMore() async {
+    var oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    // If there is more content, get more
+    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        _offset += MangaDexEndpoints.apiQueryLimit;
+        var mangas = await _fetchUserLibrary();
+        return [...oldstate!, ...mangas];
+      });
+    }
+
+    // Otherwise, do nothing because there is no more content
+  }
+
+  /// Clears the list and refetch from the beginning
+  Future<void> clear() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      _offset = 0;
+      return _fetchUserLibrary();
     });
   }
 }

@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -12,9 +12,10 @@ part 'manga_view.g.dart';
 
 Route createMangaViewRoute(Manga manga) {
   return Styles.buildSlideTransitionRoute(
-      (context, animation, secondaryAnimation) => MangaDexMangaViewWidget(
-            manga: manga,
-          ));
+    (context, animation, secondaryAnimation) => MangaDexMangaViewWidget(
+      manga: manga,
+    ),
+  );
 }
 
 @riverpod
@@ -95,17 +96,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       ],
                     ),
                   ),
-                  background: CachedNetworkImage(
+                  background: ExtendedImage.network(
+                    manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                    cache: true,
                     colorBlendMode: BlendMode.modulate,
                     color: Colors.grey,
                     fit: BoxFit.cover,
-                    imageUrl:
-                        manga.getCovertArtUrl(quality: CoverArtQuality.medium),
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                    loadStateChanged: extendedImageLoadStateHandler,
                   ),
                 ),
                 actions: [

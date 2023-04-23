@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/util.dart';
@@ -121,5 +122,37 @@ class Styles {
       pageBuilder: builder,
       transitionsBuilder: slideTransitionBuilder,
     );
+  }
+}
+
+Widget? extendedImageLoadStateHandler(ExtendedImageState state) {
+  switch (state.extendedImageLoadState) {
+    case LoadState.loading:
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    case LoadState.completed:
+      return null;
+    case LoadState.failed:
+      return GestureDetector(
+        child: Stack(
+          fit: StackFit.expand,
+          children: const <Widget>[
+            Icon(Icons.error),
+            Positioned(
+              bottom: 0.0,
+              left: 0.0,
+              right: 0.0,
+              child: Text(
+                "Image load failed",
+                textAlign: TextAlign.center,
+              ),
+            )
+          ],
+        ),
+        // onTap: () {
+        //   state.reLoadImage();
+        // },
+      );
   }
 }
