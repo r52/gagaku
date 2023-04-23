@@ -30,17 +30,26 @@ class ReaderWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final focusNode = useFocusNode();
-    final refresh = useState(0);
     final pageController = usePageController(initialPage: 0);
     final transformController = useTransformationController();
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
-    final scaleFactor = useRef(0.0);
+    final scaleFactor =
+        useRef(List<double>.generate(pages.length, (index) => 0.0));
+    final initialized = useRef(false);
 
     void cachePage(ReaderPage page) {
-      precacheImage(page.provider, context).then((value) {
-        page.cached = true;
-      });
+      precacheImage(page.provider, context);
+      page.cached = true;
+    }
+
+    void resetImageFit(int index) {
+      if (settings.fitWidth) {
+        transformController.value =
+            Matrix4.identity() * scaleFactor.value[index];
+      } else {
+        transformController.value = Matrix4.identity();
+      }
     }
 
     final precacheCount = useCallback(() {
@@ -54,25 +63,30 @@ class ReaderWidget extends HookConsumerWidget {
     }, [settings]);
 
     useEffect(() {
-      void cacheCheck() {
-        refresh.value++;
+      void pageCallback() {
+        if (pageController.hasClients && pageController.page != null) {
+          resetImageFit(pageController.page!.toInt());
+        }
 
-        if (pageController.page! % settings.precacheCount ==
-                settings.precacheCount - 2 ||
-            !pages.elementAt(pageController.page!.toInt()).cached) {
-          pages
-              .skip(pageController.page!.toInt())
-              .skipWhile((page) => page.cached == true)
-              .take(precacheCount())
-              .forEach((element) {
-            cachePage(element);
-          });
+        if (pageController.page != null &&
+            pageController.page!.toInt() + 1 < pages.length &&
+            !pages.elementAt(pageController.page!.toInt() + 1).cached) {
+          while (!pages.elementAt(pageController.page!.toInt() + 1).cached) {
+            pages
+                .skipWhile((page) => page.cached)
+                .take(precacheCount())
+                .forEach((element) {
+              if (!element.cached) {
+                cachePage(element);
+              }
+            });
+          }
         }
       }
 
-      pageController.addListener(cacheCheck);
-      return () => pageController.removeListener(cacheCheck);
-    }, [pageController]);
+      pageController.addListener(pageCallback);
+      return () => pageController.removeListener(pageCallback);
+    }, [pageController, settings]);
 
     void onTapLeft() {
       switch (settings.direction) {
@@ -196,14 +210,6 @@ class ReaderWidget extends HookConsumerWidget {
       }
     }
 
-    void resetImageFit() {
-      if (settings.fitWidth) {
-        transformController.value = Matrix4.identity() * scaleFactor.value;
-      } else {
-        transformController.value = Matrix4.identity();
-      }
-    }
-
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: AppBar(
@@ -309,6 +315,17 @@ class ReaderWidget extends HookConsumerWidget {
                     ref
                         .read(readerSettingsProvider.notifier)
                         .save(settings.copyWith(fitWidth: set));
+
+                    if (pageController.hasClients &&
+                        pageController.page != null) {
+                      // Manually set this because settings haven't finished updating
+                      if (set) {
+                        transformController.value = Matrix4.identity() *
+                            scaleFactor.value[pageController.page!.toInt()];
+                      } else {
+                        transformController.value = Matrix4.identity();
+                      }
+                    }
                   }),
               const SizedBox(height: 10.0),
               Wrap(
@@ -449,7 +466,7 @@ class ReaderWidget extends HookConsumerWidget {
                     var page = pages.elementAt(index);
 
                     return GestureDetector(
-                      onDoubleTap: () => resetImageFit(),
+                      onDoubleTap: () => resetImageFit(index),
                       onTapUp:
                           settings.clickToTurn ? handleImageViewOnTap : null,
                       child: InteractiveViewer(
@@ -467,12 +484,17 @@ class ReaderWidget extends HookConsumerWidget {
                                 );
                               case LoadState.completed:
                                 {
-                                  scaleFactor.value =
+                                  scaleFactor.value[index] =
                                       (MediaQuery.of(context).size.width /
                                           state.extendedImageInfo!.image.width
                                               .toDouble());
-                                  Future.delayed(
-                                      Duration.zero, () => resetImageFit());
+
+                                  if (!initialized.value) {
+                                    initialized.value = true;
+                                    Future.delayed(Duration.zero, () {
+                                      resetImageFit(0);
+                                    });
+                                  }
 
                                   return null;
                                 }
@@ -600,7 +622,7 @@ class ProgressIndicator extends AnimatedWidget {
             gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
-          stops: [0.0, 0.7],
+          stops: [0.0, 0.6],
           colors: [
             Colors.black,
             Colors.transparent,
