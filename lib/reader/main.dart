@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -308,8 +309,6 @@ class ReaderWidget extends HookConsumerWidget {
                     ref
                         .read(readerSettingsProvider.notifier)
                         .save(settings.copyWith(fitWidth: set));
-
-                    resetImageFit();
                   }),
               const SizedBox(height: 10.0),
               Wrap(
@@ -445,23 +444,9 @@ class ReaderWidget extends HookConsumerWidget {
                   itemCount: pageCount,
                   onPageChanged: (int index) {
                     focusNode.requestFocus();
-                    resetImageFit();
                   },
                   itemBuilder: (BuildContext context, int index) {
                     var page = pages.elementAt(index);
-
-                    page.provider
-                        .resolve(const ImageConfiguration())
-                        .addListener(
-                      ImageStreamListener(
-                        (ImageInfo info, bool synchronousCall) {
-                          scaleFactor.value =
-                              (MediaQuery.of(context).size.width /
-                                  info.image.width.toDouble());
-                          resetImageFit();
-                        },
-                      ),
-                    );
 
                     return GestureDetector(
                       onDoubleTap: () => resetImageFit(),
@@ -472,38 +457,58 @@ class ReaderWidget extends HookConsumerWidget {
                         transformationController: transformController,
                         minScale: 0.1,
                         maxScale: 5,
-                        child: Image(
+                        child: ExtendedImage(
                           image: page.provider,
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) {
-                              return child;
-                            }
+                          loadStateChanged: (state) {
+                            switch (state.extendedImageLoadState) {
+                              case LoadState.loading:
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              case LoadState.completed:
+                                {
+                                  scaleFactor.value =
+                                      (MediaQuery.of(context).size.width /
+                                          state.extendedImageInfo!.image.width
+                                              .toDouble());
+                                  Future.delayed(
+                                      Duration.zero, () => resetImageFit());
 
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            ScaffoldMessenger.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(SnackBar(
-                                content: Text('$error'),
-                                backgroundColor: Colors.red,
-                              ));
+                                  return null;
+                                }
+                              case LoadState.failed:
+                                {
+                                  ScaffoldMessenger.of(context)
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Image load failed'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
 
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      // TODO somehow reload?
+                                  return GestureDetector(
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: const <Widget>[
+                                        Icon(Icons.error),
+                                        Positioned(
+                                          bottom: 0.0,
+                                          left: 0.0,
+                                          right: 0.0,
+                                          child: Text(
+                                            "Image load failed. Tap to retry",
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      state.reLoadImage();
                                     },
-                                    child: const Text('Error loading page'),
-                                  ),
-                                ],
-                              ),
-                            );
+                                  );
+                                }
+                            }
                           },
                         ),
                       ),

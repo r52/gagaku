@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -30,7 +31,7 @@ Future<List<ReaderPage>> _fetchChapterPages(
   var pages = mpages.pages.map((pageUrl) {
     var url = mpages.baseUrl + pageUrl;
     return ReaderPage(
-      provider: NetworkImage(url),
+      provider: ExtendedNetworkImageProvider(url),
     );
   }).toList();
 
