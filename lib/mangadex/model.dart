@@ -367,6 +367,7 @@ class MangaDexModel {
       'originalLanguage[]': settings.originalLanguage
           .map(const LanguageConverter().toJson)
           .toList(),
+      'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[publishAt]': 'desc',
       'includes[]': 'scanlation_group'
