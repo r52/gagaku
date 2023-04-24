@@ -6,8 +6,17 @@ import 'package:gagaku/mangadex/library.dart';
 import 'package:gagaku/mangadex/login_old.dart';
 import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/model.dart';
+import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+enum MangaDexTab {
+  mangaFeed,
+  chapterFeed,
+  libraryView,
+}
+
+final _mangadexTabProvider = StateProvider((ref) => MangaDexTab.mangaFeed);
 
 class MangaDexHome extends ConsumerWidget {
   const MangaDexHome({super.key});
@@ -15,7 +24,7 @@ class MangaDexHome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final tab = ref.watch(mangadexTabProvider);
+    final tab = ref.watch(_mangadexTabProvider);
 
     const bottomNavigationBarItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
@@ -46,6 +55,15 @@ class MangaDexHome extends ConsumerWidget {
             actions: [
               ButtonBar(
                 children: [
+                  Tooltip(
+                    message: 'Search Manga',
+                    child: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        Navigator.push(context, createMangaDexSearchRoute());
+                      },
+                    ),
+                  ),
                   Tooltip(
                     message: 'MangaDex Settings',
                     child: IconButton(
@@ -88,7 +106,7 @@ class MangaDexHome extends ConsumerWidget {
             type: BottomNavigationBarType.fixed,
             fixedColor: Theme.of(context).colorScheme.primary,
             onTap: (index) {
-              ref.read(mangadexTabProvider.notifier).state =
+              ref.read(_mangadexTabProvider.notifier).state =
                   MangaDexTab.values[index];
             },
           ),

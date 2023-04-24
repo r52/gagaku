@@ -6,6 +6,84 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$_MangaFilters _$$_MangaFiltersFromJson(Map<String, dynamic> json) =>
+    _$_MangaFilters(
+      includedTags: (json['includedTags'] as List<dynamic>?)
+              ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
+              .toSet() ??
+          const {},
+      excludedTags: (json['excludedTags'] as List<dynamic>?)
+              ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
+              .toSet() ??
+          const {},
+      status: (json['status'] as List<dynamic>?)
+              ?.map((e) => $enumDecode(_$MangaStatusEnumMap, e))
+              .toSet() ??
+          const {},
+      publicationDemographic: (json['publicationDemographic'] as List<dynamic>?)
+              ?.map((e) => $enumDecode(_$MangaDemographicEnumMap, e))
+              .toSet() ??
+          const {},
+      contentRating: (json['contentRating'] as List<dynamic>?)
+              ?.map((e) => $enumDecode(_$ContentRatingEnumMap, e))
+              .toSet() ??
+          const {},
+      order: $enumDecodeNullable(_$FilterOrderEnumMap, json['order']) ??
+          FilterOrder.relevance_desc,
+    );
+
+Map<String, dynamic> _$$_MangaFiltersToJson(_$_MangaFilters instance) =>
+    <String, dynamic>{
+      'includedTags': instance.includedTags.toList(),
+      'excludedTags': instance.excludedTags.toList(),
+      'status': instance.status.map((e) => _$MangaStatusEnumMap[e]!).toList(),
+      'publicationDemographic': instance.publicationDemographic
+          .map((e) => _$MangaDemographicEnumMap[e]!)
+          .toList(),
+      'contentRating': instance.contentRating
+          .map((e) => _$ContentRatingEnumMap[e]!)
+          .toList(),
+      'order': _$FilterOrderEnumMap[instance.order]!,
+    };
+
+const _$MangaStatusEnumMap = {
+  MangaStatus.completed: 'completed',
+  MangaStatus.ongoing: 'ongoing',
+  MangaStatus.cancelled: 'cancelled',
+  MangaStatus.hiatus: 'hiatus',
+};
+
+const _$MangaDemographicEnumMap = {
+  MangaDemographic.shounen: 'shounen',
+  MangaDemographic.shoujo: 'shoujo',
+  MangaDemographic.josei: 'josei',
+  MangaDemographic.seinen: 'seinen',
+};
+
+const _$ContentRatingEnumMap = {
+  ContentRating.safe: 'safe',
+  ContentRating.suggestive: 'suggestive',
+  ContentRating.erotica: 'erotica',
+  ContentRating.pornographic: 'pornographic',
+};
+
+const _$FilterOrderEnumMap = {
+  FilterOrder.relevance_asc: 'relevance_asc',
+  FilterOrder.relevance_desc: 'relevance_desc',
+  FilterOrder.followedCount_asc: 'followedCount_asc',
+  FilterOrder.followedCount_desc: 'followedCount_desc',
+  FilterOrder.latestUploadedChapter_asc: 'latestUploadedChapter_asc',
+  FilterOrder.latestUploadedChapter_desc: 'latestUploadedChapter_desc',
+  FilterOrder.updatedAt_asc: 'updatedAt_asc',
+  FilterOrder.updatedAt_desc: 'updatedAt_desc',
+  FilterOrder.createdAt_asc: 'createdAt_asc',
+  FilterOrder.createdAt_desc: 'createdAt_desc',
+  FilterOrder.year_asc: 'year_asc',
+  FilterOrder.year_desc: 'year_desc',
+  FilterOrder.title_asc: 'title_asc',
+  FilterOrder.title_desc: 'title_desc',
+};
+
 _$_ChapterList _$$_ChapterListFromJson(Map<String, dynamic> json) =>
     _$_ChapterList(
       (json['data'] as List<dynamic>)
@@ -298,27 +376,6 @@ Map<String, dynamic> _$$_MangaAttributesToJson(_$_MangaAttributes instance) =>
       'updatedAt': const TimestampSerializer().toJson(instance.updatedAt),
     };
 
-const _$MangaDemographicEnumMap = {
-  MangaDemographic.shounen: 'shounen',
-  MangaDemographic.shoujo: 'shoujo',
-  MangaDemographic.josei: 'josei',
-  MangaDemographic.seinen: 'seinen',
-};
-
-const _$MangaStatusEnumMap = {
-  MangaStatus.completed: 'completed',
-  MangaStatus.ongoing: 'ongoing',
-  MangaStatus.cancelled: 'cancelled',
-  MangaStatus.hiatus: 'hiatus',
-};
-
-const _$ContentRatingEnumMap = {
-  ContentRating.safe: 'safe',
-  ContentRating.suggestive: 'suggestive',
-  ContentRating.erotica: 'erotica',
-  ContentRating.pornographic: 'pornographic',
-};
-
 _$_Tag _$$_TagFromJson(Map<String, dynamic> json) => _$_Tag(
       id: json['id'] as String,
       attributes:
@@ -350,6 +407,20 @@ const _$TagGroupEnumMap = {
   TagGroup.genre: 'genre',
   TagGroup.theme: 'theme',
 };
+
+_$_TagResponse _$$_TagResponseFromJson(Map<String, dynamic> json) =>
+    _$_TagResponse(
+      (json['data'] as List<dynamic>)
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      json['total'] as int,
+    );
+
+Map<String, dynamic> _$$_TagResponseToJson(_$_TagResponse instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'total': instance.total,
+    };
 
 _$_OldToken _$$_OldTokenFromJson(Map<String, dynamic> json) => _$_OldToken(
       session: json['session'] as String,

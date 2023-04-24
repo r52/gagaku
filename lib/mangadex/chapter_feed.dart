@@ -24,7 +24,7 @@ Future<List<_ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
 
   var mangas = await api.fetchManga(mangaIds);
 
-  ref.read(readChaptersProvider.notifier).get(mangas);
+  ref.watch(readChaptersProvider.notifier).get(mangas);
 
   var mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 

@@ -26,10 +26,6 @@ enum MangaDemographic { shounen, shoujo, josei, seinen }
 
 extension MangaDemographicExt on MangaDemographic {
   String get formatted => name.capitalize();
-
-  static MangaDemographic parse(String key) {
-    return MangaDemographic.values.firstWhere((element) => element.name == key);
-  }
 }
 
 enum MangaStatus { completed, ongoing, cancelled, hiatus }
@@ -65,7 +61,118 @@ extension MangaReadingStatusExt on MangaReadingStatus {
 
 enum TagGroup { content, format, genre, theme }
 
+extension TagGroupExt on TagGroup {
+  String get formatted => name.capitalize();
+}
+
 enum CoverArtQuality { best, medium, small }
+
+enum FilterOrder {
+  relevance_asc,
+  relevance_desc,
+  followedCount_asc,
+  followedCount_desc,
+  latestUploadedChapter_asc,
+  latestUploadedChapter_desc,
+  updatedAt_asc,
+  updatedAt_desc,
+  createdAt_asc,
+  createdAt_desc,
+  year_asc,
+  year_desc,
+  title_asc,
+  title_desc,
+}
+
+extension FilterOrderExt on FilterOrder {
+  String get formatted => const [
+        'Worst Match',
+        'Best Match',
+        'Fewest Follows',
+        'Most Follows',
+        'Oldest Upload',
+        'Latest Upload',
+        'Oldest Update',
+        'Latest Update',
+        'Oldest Added',
+        'Recently Added',
+        'Year Ascending',
+        'Year Descending',
+        'Title Ascending',
+        'Title Descending',
+      ].elementAt(index);
+
+  MapEntry<String, Object> get entry => const [
+        MapEntry('order[relevance]', 'asc'),
+        MapEntry('order[relevance]', 'desc'),
+        MapEntry('order[followedCount]', 'asc'),
+        MapEntry('order[followedCount]', 'desc'),
+        MapEntry('order[latestUploadedChapter]', 'asc'),
+        MapEntry('order[latestUploadedChapter]', 'desc'),
+        MapEntry('order[updatedAt]', 'asc'),
+        MapEntry('order[updatedAt]', 'desc'),
+        MapEntry('order[createdAt]', 'asc'),
+        MapEntry('order[createdAt]', 'desc'),
+        MapEntry('order[year]', 'asc'),
+        MapEntry('order[year]', 'desc'),
+        MapEntry('order[title]', 'asc'),
+        MapEntry('order[title]', 'desc'),
+      ].elementAt(index);
+}
+
+@freezed
+class MangaFilters with _$MangaFilters {
+  const MangaFilters._();
+
+  const factory MangaFilters({
+    @Default({}) Set<Tag> includedTags,
+    @Default({}) Set<Tag> excludedTags,
+    @Default({}) Set<MangaStatus> status,
+    @Default({}) Set<MangaDemographic> publicationDemographic,
+    @Default({}) Set<ContentRating> contentRating,
+    @Default(FilterOrder.relevance_desc) FilterOrder order,
+  }) = _MangaFilters;
+
+  factory MangaFilters.fromJson(Map<String, dynamic> json) =>
+      _$MangaFiltersFromJson(json);
+
+  Map<String, dynamic> getMap() {
+    var params = <String, dynamic>{};
+
+    if (includedTags.isNotEmpty) {
+      params['includedTags[]'] = includedTags.map((e) => e.id).toList();
+    }
+
+    if (excludedTags.isNotEmpty) {
+      params['excludedTags[]'] = excludedTags.map((e) => e.id).toList();
+    }
+
+    if (status.isNotEmpty) {
+      params['status[]'] = status.map((e) => e.name).toList();
+    }
+
+    if (publicationDemographic.isNotEmpty) {
+      params['publicationDemographic[]'] =
+          publicationDemographic.map((e) => e.name).toList();
+    }
+
+    if (contentRating.isNotEmpty) {
+      params['contentRating[]'] = contentRating.map((e) => e.name).toList();
+    }
+
+    params.addEntries([order.entry]);
+
+    return params;
+  }
+}
+
+@freezed
+class MangaSearchParameters with _$MangaSearchParameters {
+  const factory MangaSearchParameters({
+    required String query,
+    required MangaFilters filter,
+  }) = _MangaSearchParameters;
+}
 
 class TimestampSerializer implements JsonConverter<DateTime, dynamic> {
   const TimestampSerializer();
@@ -442,6 +549,17 @@ class TagAttributes with _$TagAttributes {
 
   factory TagAttributes.fromJson(Map<String, dynamic> json) =>
       _$TagAttributesFromJson(json);
+}
+
+@freezed
+class TagResponse with _$TagResponse {
+  const factory TagResponse(
+    List<Tag> data,
+    int total,
+  ) = _TagResponse;
+
+  factory TagResponse.fromJson(Map<String, dynamic> json) =>
+      _$TagResponseFromJson(json);
 }
 
 class PageData {

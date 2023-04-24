@@ -6,7 +6,7 @@ part of 'chapter_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchChaptersHash() => r'87402dfee34377491ad0d6969bbb44ceb26c7266';
+String _$fetchChaptersHash() => r'9623f81beeac7482de0afe865e4a52fae6e4184a';
 
 /// See also [_fetchChapters].
 @ProviderFor(_fetchChapters)

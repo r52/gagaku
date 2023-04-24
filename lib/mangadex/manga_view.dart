@@ -23,7 +23,7 @@ Future<_FetchMangaChaptersResult> _fetchMangaViewChapters(
     _FetchMangaViewChaptersRef ref, Manga manga) async {
   final following = await ref.watch(fetchFollowingMangaProvider(manga).future);
   final reading = await ref.watch(fetchReadingStatusProvider(manga).future);
-  ref.read(readChaptersProvider.notifier).get([manga]);
+  ref.watch(readChaptersProvider.notifier).get([manga]);
   final chapters = await ref.watch(mangaChaptersProvider(manga).future);
 
   return _FetchMangaChaptersResult(chapters, following, reading);

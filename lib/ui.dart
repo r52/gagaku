@@ -47,6 +47,107 @@ class IconTextChip extends StatelessWidget {
   }
 }
 
+class TriStateChip extends StatelessWidget {
+  const TriStateChip(
+      {Key? key,
+      required this.label,
+      this.labelStyle,
+      this.labelPadding,
+      required this.value,
+      required this.onChanged,
+      this.side,
+      this.shape,
+      this.clipBehavior = Clip.none,
+      this.focusNode,
+      this.autofocus = false,
+      this.backgroundColor,
+      this.padding,
+      this.visualDensity,
+      this.materialTapTargetSize,
+      this.elevation,
+      this.shadowColor,
+      this.selectedColor,
+      this.unselectedColor})
+      : assert(onChanged != null),
+        assert(elevation == null || elevation >= 0.0),
+        super(key: key);
+
+  final Widget label;
+  final TextStyle? labelStyle;
+  final EdgeInsetsGeometry? labelPadding;
+  final BorderSide? side;
+  final OutlinedBorder? shape;
+  final Clip clipBehavior;
+  final FocusNode? focusNode;
+  final bool autofocus;
+  final Color? backgroundColor;
+  final EdgeInsetsGeometry? padding;
+  final VisualDensity? visualDensity;
+  final MaterialTapTargetSize? materialTapTargetSize;
+  final double? elevation;
+  final Color? shadowColor;
+
+  final bool? value;
+  final ValueChanged<bool?>? onChanged;
+  final Color? selectedColor;
+  final Color? unselectedColor;
+
+  void _onPressed() {
+    switch (value) {
+      case null:
+        onChanged!(true);
+        break;
+      case true:
+        onChanged!(false);
+        break;
+      case false:
+        onChanged!(null);
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    assert(debugCheckHasMaterial(context));
+
+    Widget? avatar;
+    Color? bgColor = backgroundColor;
+
+    switch (value) {
+      case null:
+        break;
+      case true:
+        avatar = const Icon(Icons.add);
+        bgColor = selectedColor;
+        break;
+      case false:
+        avatar = const Icon(Icons.remove);
+        bgColor = unselectedColor;
+        break;
+    }
+
+    return RawChip(
+      avatar: avatar,
+      label: label,
+      onPressed: _onPressed,
+      labelStyle: labelStyle,
+      backgroundColor: bgColor,
+      side: side,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      padding: padding,
+      visualDensity: visualDensity,
+      labelPadding: labelPadding,
+      isEnabled: true,
+      materialTapTargetSize: materialTapTargetSize,
+      elevation: elevation,
+      shadowColor: shadowColor,
+    );
+  }
+}
+
 class SettingCardWidget extends StatelessWidget {
   const SettingCardWidget(
       {super.key, required this.title, this.subtitle, required this.builder});

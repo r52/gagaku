@@ -16,14 +16,6 @@ import '../model.dart';
 
 part 'model.g.dart';
 
-enum MangaDexTab {
-  mangaFeed,
-  chapterFeed,
-  libraryView,
-}
-
-final mangadexTabProvider = StateProvider((ref) => MangaDexTab.mangaFeed);
-
 abstract class MangaDexEndpoints {
   static final api = Uri.https('api.mangadex.org', '');
 
@@ -818,6 +810,108 @@ class MangaDexModel {
     // Throw if failure
     throw Exception("Failed to download user library data");
   }
+
+  /// Retrieve all MangaDex tags
+  Future<Iterable<Tag>> getTagList() async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    if (_cache.exists(CacheLists.tags)) {
+      return _cache.getSpecialList<Tag>(CacheLists.tags);
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      var result = TagResponse.fromJson(body);
+
+      // Cache the data and list
+      _cache.putSpecialList(CacheLists.tags, result.data,
+          resolve: true, expiry: 65535);
+
+      return result.data;
+    }
+
+    // Throw if failure
+    throw Exception("Failed to download user library data");
+  }
+
+  /// Searches for manga using the MangaDex API with the search term [searchTerm].
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiSearchLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  Future<List<Manga>> searchManga(
+    String searchTerm, {
+    required MangaFilters filter,
+    int offset = 0,
+  }) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    // Return nothing if empty search term
+    if (searchTerm.isEmpty) {
+      return [];
+    }
+
+    final settings = ref.read(mdConfigProvider);
+
+    List<Manga> list = [];
+
+    Map<String, dynamic> queryParams = {
+      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
+      'offset': offset.toString(),
+      'availableTranslatedLanguage[]': settings.translatedLanguages
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'originalLanguage[]': settings.originalLanguage
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
+      'includes[]': ['cover_art', 'author', 'artist'],
+      'title': searchTerm
+    };
+
+    queryParams.addAll(filter.getMap());
+
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
+
+    final response = await _client!.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      var mlist = MangaList.fromJson(body);
+
+      list.addAll(mlist.data);
+
+      // Cache the data
+      _cache.putAllAPIResolved(mlist.data);
+    } else {
+      // Throw if failure
+      throw Exception("Failed to download manga data");
+    }
+
+    return list;
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -1023,6 +1117,58 @@ class UserLibrary extends _$UserLibrary {
       _offset = 0;
       return _fetchUserLibrary();
     });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class TagList extends _$TagList {
+  ///Fetch the global tag list
+  Future<Iterable<Tag>> _fetchTagList() async {
+    final api = ref.watch(mangadexProvider);
+
+    final list = await api.getTagList();
+
+    return list;
+  }
+
+  @override
+  FutureOr<Iterable<Tag>> build() async {
+    return _fetchTagList();
+  }
+}
+
+@riverpod
+class MangaSearch extends _$MangaSearch {
+  int _offset = 0;
+
+  Future<List<Manga>> _searchManga() async {
+    final api = ref.watch(mangadexProvider);
+
+    final manga = await api.searchManga(params.query,
+        filter: params.filter, offset: _offset);
+
+    return manga;
+  }
+
+  @override
+  FutureOr<List<Manga>> build(MangaSearchParameters params) async {
+    return _searchManga();
+  }
+
+  /// Fetch more if more data exists
+  Future<void> getMore() async {
+    var oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    // If there is more content, get more
+    if (oldstate?.length == _offset + MangaDexEndpoints.apiSearchLimit) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        _offset += MangaDexEndpoints.apiSearchLimit;
+        var list = await _searchManga();
+        return [...oldstate!, ...list];
+      });
+    }
+
+    // Otherwise, do nothing because there is no more content
   }
 }
 

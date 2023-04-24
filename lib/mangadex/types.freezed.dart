@@ -14,6 +14,477 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
+MangaFilters _$MangaFiltersFromJson(Map<String, dynamic> json) {
+  return _MangaFilters.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MangaFilters {
+  Set<Tag> get includedTags => throw _privateConstructorUsedError;
+  Set<Tag> get excludedTags => throw _privateConstructorUsedError;
+  Set<MangaStatus> get status => throw _privateConstructorUsedError;
+  Set<MangaDemographic> get publicationDemographic =>
+      throw _privateConstructorUsedError;
+  Set<ContentRating> get contentRating => throw _privateConstructorUsedError;
+  FilterOrder get order => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MangaFiltersCopyWith<MangaFilters> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MangaFiltersCopyWith<$Res> {
+  factory $MangaFiltersCopyWith(
+          MangaFilters value, $Res Function(MangaFilters) then) =
+      _$MangaFiltersCopyWithImpl<$Res, MangaFilters>;
+  @useResult
+  $Res call(
+      {Set<Tag> includedTags,
+      Set<Tag> excludedTags,
+      Set<MangaStatus> status,
+      Set<MangaDemographic> publicationDemographic,
+      Set<ContentRating> contentRating,
+      FilterOrder order});
+}
+
+/// @nodoc
+class _$MangaFiltersCopyWithImpl<$Res, $Val extends MangaFilters>
+    implements $MangaFiltersCopyWith<$Res> {
+  _$MangaFiltersCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? includedTags = null,
+    Object? excludedTags = null,
+    Object? status = null,
+    Object? publicationDemographic = null,
+    Object? contentRating = null,
+    Object? order = null,
+  }) {
+    return _then(_value.copyWith(
+      includedTags: null == includedTags
+          ? _value.includedTags
+          : includedTags // ignore: cast_nullable_to_non_nullable
+              as Set<Tag>,
+      excludedTags: null == excludedTags
+          ? _value.excludedTags
+          : excludedTags // ignore: cast_nullable_to_non_nullable
+              as Set<Tag>,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as Set<MangaStatus>,
+      publicationDemographic: null == publicationDemographic
+          ? _value.publicationDemographic
+          : publicationDemographic // ignore: cast_nullable_to_non_nullable
+              as Set<MangaDemographic>,
+      contentRating: null == contentRating
+          ? _value.contentRating
+          : contentRating // ignore: cast_nullable_to_non_nullable
+              as Set<ContentRating>,
+      order: null == order
+          ? _value.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as FilterOrder,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_MangaFiltersCopyWith<$Res>
+    implements $MangaFiltersCopyWith<$Res> {
+  factory _$$_MangaFiltersCopyWith(
+          _$_MangaFilters value, $Res Function(_$_MangaFilters) then) =
+      __$$_MangaFiltersCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {Set<Tag> includedTags,
+      Set<Tag> excludedTags,
+      Set<MangaStatus> status,
+      Set<MangaDemographic> publicationDemographic,
+      Set<ContentRating> contentRating,
+      FilterOrder order});
+}
+
+/// @nodoc
+class __$$_MangaFiltersCopyWithImpl<$Res>
+    extends _$MangaFiltersCopyWithImpl<$Res, _$_MangaFilters>
+    implements _$$_MangaFiltersCopyWith<$Res> {
+  __$$_MangaFiltersCopyWithImpl(
+      _$_MangaFilters _value, $Res Function(_$_MangaFilters) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? includedTags = null,
+    Object? excludedTags = null,
+    Object? status = null,
+    Object? publicationDemographic = null,
+    Object? contentRating = null,
+    Object? order = null,
+  }) {
+    return _then(_$_MangaFilters(
+      includedTags: null == includedTags
+          ? _value._includedTags
+          : includedTags // ignore: cast_nullable_to_non_nullable
+              as Set<Tag>,
+      excludedTags: null == excludedTags
+          ? _value._excludedTags
+          : excludedTags // ignore: cast_nullable_to_non_nullable
+              as Set<Tag>,
+      status: null == status
+          ? _value._status
+          : status // ignore: cast_nullable_to_non_nullable
+              as Set<MangaStatus>,
+      publicationDemographic: null == publicationDemographic
+          ? _value._publicationDemographic
+          : publicationDemographic // ignore: cast_nullable_to_non_nullable
+              as Set<MangaDemographic>,
+      contentRating: null == contentRating
+          ? _value._contentRating
+          : contentRating // ignore: cast_nullable_to_non_nullable
+              as Set<ContentRating>,
+      order: null == order
+          ? _value.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as FilterOrder,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_MangaFilters extends _MangaFilters with DiagnosticableTreeMixin {
+  const _$_MangaFilters(
+      {final Set<Tag> includedTags = const {},
+      final Set<Tag> excludedTags = const {},
+      final Set<MangaStatus> status = const {},
+      final Set<MangaDemographic> publicationDemographic = const {},
+      final Set<ContentRating> contentRating = const {},
+      this.order = FilterOrder.relevance_desc})
+      : _includedTags = includedTags,
+        _excludedTags = excludedTags,
+        _status = status,
+        _publicationDemographic = publicationDemographic,
+        _contentRating = contentRating,
+        super._();
+
+  factory _$_MangaFilters.fromJson(Map<String, dynamic> json) =>
+      _$$_MangaFiltersFromJson(json);
+
+  final Set<Tag> _includedTags;
+  @override
+  @JsonKey()
+  Set<Tag> get includedTags {
+    if (_includedTags is EqualUnmodifiableSetView) return _includedTags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_includedTags);
+  }
+
+  final Set<Tag> _excludedTags;
+  @override
+  @JsonKey()
+  Set<Tag> get excludedTags {
+    if (_excludedTags is EqualUnmodifiableSetView) return _excludedTags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_excludedTags);
+  }
+
+  final Set<MangaStatus> _status;
+  @override
+  @JsonKey()
+  Set<MangaStatus> get status {
+    if (_status is EqualUnmodifiableSetView) return _status;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_status);
+  }
+
+  final Set<MangaDemographic> _publicationDemographic;
+  @override
+  @JsonKey()
+  Set<MangaDemographic> get publicationDemographic {
+    if (_publicationDemographic is EqualUnmodifiableSetView)
+      return _publicationDemographic;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_publicationDemographic);
+  }
+
+  final Set<ContentRating> _contentRating;
+  @override
+  @JsonKey()
+  Set<ContentRating> get contentRating {
+    if (_contentRating is EqualUnmodifiableSetView) return _contentRating;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_contentRating);
+  }
+
+  @override
+  @JsonKey()
+  final FilterOrder order;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaFilters(includedTags: $includedTags, excludedTags: $excludedTags, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaFilters'))
+      ..add(DiagnosticsProperty('includedTags', includedTags))
+      ..add(DiagnosticsProperty('excludedTags', excludedTags))
+      ..add(DiagnosticsProperty('status', status))
+      ..add(
+          DiagnosticsProperty('publicationDemographic', publicationDemographic))
+      ..add(DiagnosticsProperty('contentRating', contentRating))
+      ..add(DiagnosticsProperty('order', order));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_MangaFilters &&
+            const DeepCollectionEquality()
+                .equals(other._includedTags, _includedTags) &&
+            const DeepCollectionEquality()
+                .equals(other._excludedTags, _excludedTags) &&
+            const DeepCollectionEquality().equals(other._status, _status) &&
+            const DeepCollectionEquality().equals(
+                other._publicationDemographic, _publicationDemographic) &&
+            const DeepCollectionEquality()
+                .equals(other._contentRating, _contentRating) &&
+            (identical(other.order, order) || other.order == order));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_includedTags),
+      const DeepCollectionEquality().hash(_excludedTags),
+      const DeepCollectionEquality().hash(_status),
+      const DeepCollectionEquality().hash(_publicationDemographic),
+      const DeepCollectionEquality().hash(_contentRating),
+      order);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_MangaFiltersCopyWith<_$_MangaFilters> get copyWith =>
+      __$$_MangaFiltersCopyWithImpl<_$_MangaFilters>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_MangaFiltersToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MangaFilters extends MangaFilters {
+  const factory _MangaFilters(
+      {final Set<Tag> includedTags,
+      final Set<Tag> excludedTags,
+      final Set<MangaStatus> status,
+      final Set<MangaDemographic> publicationDemographic,
+      final Set<ContentRating> contentRating,
+      final FilterOrder order}) = _$_MangaFilters;
+  const _MangaFilters._() : super._();
+
+  factory _MangaFilters.fromJson(Map<String, dynamic> json) =
+      _$_MangaFilters.fromJson;
+
+  @override
+  Set<Tag> get includedTags;
+  @override
+  Set<Tag> get excludedTags;
+  @override
+  Set<MangaStatus> get status;
+  @override
+  Set<MangaDemographic> get publicationDemographic;
+  @override
+  Set<ContentRating> get contentRating;
+  @override
+  FilterOrder get order;
+  @override
+  @JsonKey(ignore: true)
+  _$$_MangaFiltersCopyWith<_$_MangaFilters> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$MangaSearchParameters {
+  String get query => throw _privateConstructorUsedError;
+  MangaFilters get filter => throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $MangaSearchParametersCopyWith<MangaSearchParameters> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MangaSearchParametersCopyWith<$Res> {
+  factory $MangaSearchParametersCopyWith(MangaSearchParameters value,
+          $Res Function(MangaSearchParameters) then) =
+      _$MangaSearchParametersCopyWithImpl<$Res, MangaSearchParameters>;
+  @useResult
+  $Res call({String query, MangaFilters filter});
+
+  $MangaFiltersCopyWith<$Res> get filter;
+}
+
+/// @nodoc
+class _$MangaSearchParametersCopyWithImpl<$Res,
+        $Val extends MangaSearchParameters>
+    implements $MangaSearchParametersCopyWith<$Res> {
+  _$MangaSearchParametersCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? query = null,
+    Object? filter = null,
+  }) {
+    return _then(_value.copyWith(
+      query: null == query
+          ? _value.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      filter: null == filter
+          ? _value.filter
+          : filter // ignore: cast_nullable_to_non_nullable
+              as MangaFilters,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $MangaFiltersCopyWith<$Res> get filter {
+    return $MangaFiltersCopyWith<$Res>(_value.filter, (value) {
+      return _then(_value.copyWith(filter: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$_MangaSearchParametersCopyWith<$Res>
+    implements $MangaSearchParametersCopyWith<$Res> {
+  factory _$$_MangaSearchParametersCopyWith(_$_MangaSearchParameters value,
+          $Res Function(_$_MangaSearchParameters) then) =
+      __$$_MangaSearchParametersCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String query, MangaFilters filter});
+
+  @override
+  $MangaFiltersCopyWith<$Res> get filter;
+}
+
+/// @nodoc
+class __$$_MangaSearchParametersCopyWithImpl<$Res>
+    extends _$MangaSearchParametersCopyWithImpl<$Res, _$_MangaSearchParameters>
+    implements _$$_MangaSearchParametersCopyWith<$Res> {
+  __$$_MangaSearchParametersCopyWithImpl(_$_MangaSearchParameters _value,
+      $Res Function(_$_MangaSearchParameters) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? query = null,
+    Object? filter = null,
+  }) {
+    return _then(_$_MangaSearchParameters(
+      query: null == query
+          ? _value.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      filter: null == filter
+          ? _value.filter
+          : filter // ignore: cast_nullable_to_non_nullable
+              as MangaFilters,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_MangaSearchParameters
+    with DiagnosticableTreeMixin
+    implements _MangaSearchParameters {
+  const _$_MangaSearchParameters({required this.query, required this.filter});
+
+  @override
+  final String query;
+  @override
+  final MangaFilters filter;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaSearchParameters(query: $query, filter: $filter)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaSearchParameters'))
+      ..add(DiagnosticsProperty('query', query))
+      ..add(DiagnosticsProperty('filter', filter));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_MangaSearchParameters &&
+            (identical(other.query, query) || other.query == query) &&
+            (identical(other.filter, filter) || other.filter == filter));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, query, filter);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_MangaSearchParametersCopyWith<_$_MangaSearchParameters> get copyWith =>
+      __$$_MangaSearchParametersCopyWithImpl<_$_MangaSearchParameters>(
+          this, _$identity);
+}
+
+abstract class _MangaSearchParameters implements MangaSearchParameters {
+  const factory _MangaSearchParameters(
+      {required final String query,
+      required final MangaFilters filter}) = _$_MangaSearchParameters;
+
+  @override
+  String get query;
+  @override
+  MangaFilters get filter;
+  @override
+  @JsonKey(ignore: true)
+  _$$_MangaSearchParametersCopyWith<_$_MangaSearchParameters> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 /// @nodoc
 mixin _$Language {
   String get name => throw _privateConstructorUsedError;
@@ -4452,6 +4923,175 @@ abstract class _TagAttributes implements TagAttributes {
   @override
   @JsonKey(ignore: true)
   _$$_TagAttributesCopyWith<_$_TagAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+TagResponse _$TagResponseFromJson(Map<String, dynamic> json) {
+  return _TagResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$TagResponse {
+  List<Tag> get data => throw _privateConstructorUsedError;
+  int get total => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $TagResponseCopyWith<TagResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TagResponseCopyWith<$Res> {
+  factory $TagResponseCopyWith(
+          TagResponse value, $Res Function(TagResponse) then) =
+      _$TagResponseCopyWithImpl<$Res, TagResponse>;
+  @useResult
+  $Res call({List<Tag> data, int total});
+}
+
+/// @nodoc
+class _$TagResponseCopyWithImpl<$Res, $Val extends TagResponse>
+    implements $TagResponseCopyWith<$Res> {
+  _$TagResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Tag>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_TagResponseCopyWith<$Res>
+    implements $TagResponseCopyWith<$Res> {
+  factory _$$_TagResponseCopyWith(
+          _$_TagResponse value, $Res Function(_$_TagResponse) then) =
+      __$$_TagResponseCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<Tag> data, int total});
+}
+
+/// @nodoc
+class __$$_TagResponseCopyWithImpl<$Res>
+    extends _$TagResponseCopyWithImpl<$Res, _$_TagResponse>
+    implements _$$_TagResponseCopyWith<$Res> {
+  __$$_TagResponseCopyWithImpl(
+      _$_TagResponse _value, $Res Function(_$_TagResponse) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_$_TagResponse(
+      null == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Tag>,
+      null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_TagResponse with DiagnosticableTreeMixin implements _TagResponse {
+  const _$_TagResponse(final List<Tag> data, this.total) : _data = data;
+
+  factory _$_TagResponse.fromJson(Map<String, dynamic> json) =>
+      _$$_TagResponseFromJson(json);
+
+  final List<Tag> _data;
+  @override
+  List<Tag> get data {
+    if (_data is EqualUnmodifiableListView) return _data;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_data);
+  }
+
+  @override
+  final int total;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'TagResponse(data: $data, total: $total)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'TagResponse'))
+      ..add(DiagnosticsProperty('data', data))
+      ..add(DiagnosticsProperty('total', total));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_TagResponse &&
+            const DeepCollectionEquality().equals(other._data, _data) &&
+            (identical(other.total, total) || other.total == total));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_data), total);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_TagResponseCopyWith<_$_TagResponse> get copyWith =>
+      __$$_TagResponseCopyWithImpl<_$_TagResponse>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_TagResponseToJson(
+      this,
+    );
+  }
+}
+
+abstract class _TagResponse implements TagResponse {
+  const factory _TagResponse(final List<Tag> data, final int total) =
+      _$_TagResponse;
+
+  factory _TagResponse.fromJson(Map<String, dynamic> json) =
+      _$_TagResponse.fromJson;
+
+  @override
+  List<Tag> get data;
+  @override
+  int get total;
+  @override
+  @JsonKey(ignore: true)
+  _$$_TagResponseCopyWith<_$_TagResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

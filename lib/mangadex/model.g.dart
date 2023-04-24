@@ -420,6 +420,117 @@ class UserLibraryProvider
   }
 }
 
+String _$tagListHash() => r'0a1fc9b1354d4786d8aac74ab1a13e872b6e9e1b';
+
+/// See also [TagList].
+@ProviderFor(TagList)
+final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
+  TagList.new,
+  name: r'tagListProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$tagListHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$TagList = AsyncNotifier<Iterable<Tag>>;
+String _$mangaSearchHash() => r'a3163dd6ef59fd08598e6aa978eb87d2bae7b22f';
+
+abstract class _$MangaSearch
+    extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
+  late final MangaSearchParameters params;
+
+  FutureOr<List<Manga>> build(
+    MangaSearchParameters params,
+  );
+}
+
+/// See also [MangaSearch].
+@ProviderFor(MangaSearch)
+const mangaSearchProvider = MangaSearchFamily();
+
+/// See also [MangaSearch].
+class MangaSearchFamily extends Family<AsyncValue<List<Manga>>> {
+  /// See also [MangaSearch].
+  const MangaSearchFamily();
+
+  /// See also [MangaSearch].
+  MangaSearchProvider call(
+    MangaSearchParameters params,
+  ) {
+    return MangaSearchProvider(
+      params,
+    );
+  }
+
+  @override
+  MangaSearchProvider getProviderOverride(
+    covariant MangaSearchProvider provider,
+  ) {
+    return call(
+      provider.params,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mangaSearchProvider';
+}
+
+/// See also [MangaSearch].
+class MangaSearchProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<MangaSearch, List<Manga>> {
+  /// See also [MangaSearch].
+  MangaSearchProvider(
+    this.params,
+  ) : super.internal(
+          () => MangaSearch()..params = params,
+          from: mangaSearchProvider,
+          name: r'mangaSearchProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$mangaSearchHash,
+          dependencies: MangaSearchFamily._dependencies,
+          allTransitiveDependencies:
+              MangaSearchFamily._allTransitiveDependencies,
+        );
+
+  final MangaSearchParameters params;
+
+  @override
+  bool operator ==(Object other) {
+    return other is MangaSearchProvider && other.params == params;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, params.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+
+  @override
+  FutureOr<List<Manga>> runNotifierBuild(
+    covariant MangaSearch notifier,
+  ) {
+    return notifier.build(
+      params,
+    );
+  }
+}
+
 String _$authControlHash() => r'f8be09eda62cb7aef4301595371cdb20bc07059e';
 
 /// See also [AuthControl].
