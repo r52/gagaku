@@ -48,6 +48,9 @@ class WebGalleryHome extends HookConsumerWidget {
           await openManga(manga);
         } else if (type == 'imgur') {
           await openImgur(proxy[1]);
+        } else {
+          // Don't support other proxies (like mangadex)
+          return false;
         }
       }
 
@@ -128,7 +131,7 @@ class WebGalleryHome extends HookConsumerWidget {
                     ScaffoldMessenger.of(context)
                       ..removeCurrentSnackBar()
                       ..showSnackBar(const SnackBar(
-                        content: Text('Failed to parse URL.'),
+                        content: Text('Unsupported URL'),
                         backgroundColor: Colors.red,
                       ));
                   }
