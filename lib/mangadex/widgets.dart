@@ -13,7 +13,7 @@ import 'types.dart';
 
 enum MangaListView { grid, list, detailed }
 
-final mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
+final _mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
 
 class ChapterButtonWidget extends HookConsumerWidget {
   const ChapterButtonWidget({
@@ -178,7 +178,7 @@ class MangaListWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = useScrollController();
-    final view = ref.watch(mangaListViewProvider);
+    final view = ref.watch(_mangaListViewProvider);
 
     useEffect(() {
       void controllerAtEdge() {
@@ -211,7 +211,7 @@ class MangaListWidget extends HookConsumerWidget {
                   isSelected: List<bool>.generate(MangaListView.values.length,
                       (index) => view.index == index),
                   onPressed: (index) {
-                    ref.read(mangaListViewProvider.notifier).state =
+                    ref.read(_mangaListViewProvider.notifier).state =
                         MangaListView.values.elementAt(index);
                   },
                   children: const [

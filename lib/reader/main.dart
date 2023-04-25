@@ -473,7 +473,7 @@ class ReaderWidget extends HookConsumerWidget {
                         constrained: !settings.fitWidth,
                         transformationController: transformController,
                         minScale: 0.1,
-                        maxScale: 5,
+                        maxScale: 10,
                         child: ExtendedImage(
                           image: page.provider,
                           loadStateChanged: (state) {
