@@ -3930,7 +3930,7 @@ class __$$_MangaCopyWithImpl<$Res> extends _$MangaCopyWithImpl<$Res, _$_Manga>
 /// @nodoc
 @JsonSerializable()
 class _$_Manga extends _Manga with DiagnosticableTreeMixin {
-  const _$_Manga(
+  _$_Manga(
       {required this.id,
       required this.attributes,
       required final List<Relationship> relationships})
@@ -3999,11 +3999,11 @@ class _$_Manga extends _Manga with DiagnosticableTreeMixin {
 }
 
 abstract class _Manga extends Manga {
-  const factory _Manga(
+  factory _Manga(
       {required final String id,
       required final MangaAttributes attributes,
       required final List<Relationship> relationships}) = _$_Manga;
-  const _Manga._() : super._();
+  _Manga._() : super._();
 
   factory _Manga.fromJson(Map<String, dynamic> json) = _$_Manga.fromJson;
 

@@ -439,15 +439,19 @@ class MangaList with _$MangaList {
 
 @freezed
 class Manga with _$Manga {
-  const Manga._();
+  Manga._();
 
-  const factory Manga({
+  factory Manga({
     required String id,
     required MangaAttributes attributes,
     required List<Relationship> relationships,
   }) = _Manga;
 
   factory Manga.fromJson(Map<String, dynamic> json) => _$MangaFromJson(json);
+
+  late final String? author = getAuthor();
+  late final String? artist = getArtist();
+  late final longStrip = isLongStrip();
 
   String getCovertArtUrl({CoverArtQuality quality = CoverArtQuality.best}) {
     var coverArt =
@@ -502,6 +506,20 @@ class Manga with _$Manga {
     }
 
     return null;
+  }
+
+  bool isLongStrip() {
+    final tags = attributes.tags;
+
+    final lstag = tags.where((e) =>
+        e.attributes.group == TagGroup.format &&
+        e.attributes.name.get('en') == "Long Strip");
+
+    if (lstag.isNotEmpty) {
+      return true;
+    }
+
+    return false;
   }
 }
 

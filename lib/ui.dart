@@ -240,15 +240,10 @@ Widget? extendedImageLoadStateHandler(ExtendedImageState state) {
           fit: StackFit.expand,
           children: const <Widget>[
             Icon(Icons.error),
-            Positioned(
-              bottom: 0.0,
-              left: 0.0,
-              right: 0.0,
-              child: Text(
-                "Image load failed",
-                textAlign: TextAlign.center,
-              ),
-            )
+            Text(
+              "Image load failed",
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
         // onTap: () {

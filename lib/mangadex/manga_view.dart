@@ -50,9 +50,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final refresh = useState(0);
     final theme = Theme.of(context);
 
-    final author = useRef(manga.getAuthor());
-    final artist = useRef(manga.getArtist());
-
     final result = ref.watch(_fetchMangaViewChaptersProvider(manga));
 
     useEffect(() {
@@ -240,7 +237,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 child: ExpansionTile(
                   title: const Text('Info'),
                   children: [
-                    if (author.value != null)
+                    if (manga.author != null)
                       ExpansionTile(
                         title: const Text('Author'),
                         children: [
@@ -250,14 +247,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             child: Row(
                               children: [
                                 IconTextChip(
-                                  text: Text(author.value!),
+                                  text: Text(manga.author!),
                                 )
                               ],
                             ),
                           ),
                         ],
                       ),
-                    if (artist.value != null)
+                    if (manga.artist != null)
                       ExpansionTile(
                         title: const Text('Artist'),
                         children: [
@@ -267,7 +264,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             child: Row(
                               children: [
                                 IconTextChip(
-                                  text: Text(artist.value!),
+                                  text: Text(manga.artist!),
                                 )
                               ],
                             ),
