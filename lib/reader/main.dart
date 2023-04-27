@@ -130,11 +130,15 @@ class ReaderWidget extends HookConsumerWidget {
       }
     }
 
-    void onTapTop() {
+    void onTapTop(double offset) {
       switch (settings.direction) {
         case ReaderDirection.topToBottom:
           if (pageController.page! > 0) {
-            pageController.jumpToPage(pageController.page!.toInt() - 1);
+            pageController.animateTo(
+              pageController.position.pixels - offset,
+              duration: const Duration(milliseconds: 10),
+              curve: Curves.easeInOut,
+            );
           }
           break;
         case ReaderDirection.leftToRight:
@@ -145,11 +149,15 @@ class ReaderWidget extends HookConsumerWidget {
       }
     }
 
-    void onTapBottom() {
+    void onTapBottom(double offset) {
       switch (settings.direction) {
         case ReaderDirection.topToBottom:
           if (pageController.page! < pages.length - 1) {
-            pageController.jumpToPage(pageController.page!.toInt() + 1);
+            pageController.animateTo(
+              pageController.position.pixels + offset,
+              duration: const Duration(milliseconds: 10),
+              curve: Curves.easeInOut,
+            );
           } else {
             Navigator.of(context).pop();
           }
@@ -171,10 +179,30 @@ class ReaderWidget extends HookConsumerWidget {
           onTapRight();
           return KeyEventResult.handled;
         } else if (event.physicalKey == PhysicalKeyboardKey.arrowUp) {
-          onTapTop();
+          onTapTop(250);
           return KeyEventResult.handled;
         } else if (event.physicalKey == PhysicalKeyboardKey.arrowDown) {
-          onTapBottom();
+          onTapBottom(250);
+          return KeyEventResult.handled;
+        } else if (event.physicalKey == PhysicalKeyboardKey.pageUp) {
+          onTapTop(1000);
+          return KeyEventResult.handled;
+        } else if (event.physicalKey == PhysicalKeyboardKey.pageDown) {
+          onTapBottom(1000);
+          return KeyEventResult.handled;
+        }
+      } else if (event is KeyRepeatEvent) {
+        if (event.physicalKey == PhysicalKeyboardKey.arrowUp) {
+          onTapTop(250);
+          return KeyEventResult.handled;
+        } else if (event.physicalKey == PhysicalKeyboardKey.arrowDown) {
+          onTapBottom(250);
+          return KeyEventResult.handled;
+        } else if (event.physicalKey == PhysicalKeyboardKey.pageUp) {
+          onTapTop(1000);
+          return KeyEventResult.handled;
+        } else if (event.physicalKey == PhysicalKeyboardKey.pageDown) {
+          onTapBottom(1000);
           return KeyEventResult.handled;
         }
       }
@@ -196,16 +224,16 @@ class ReaderWidget extends HookConsumerWidget {
       var tapmargin = viewport / 2.5;
 
       if (taploc < tapmargin) {
-        if (settings.direction == ReaderDirection.topToBottom) {
-          onTapTop();
-        } else {
+        if (settings.direction != ReaderDirection.topToBottom) {
           onTapLeft();
+        } else {
+          // Do something else
         }
       } else if (taploc > viewport - tapmargin) {
-        if (settings.direction == ReaderDirection.topToBottom) {
-          onTapBottom();
-        } else {
+        if (settings.direction != ReaderDirection.topToBottom) {
           onTapRight();
+        } else {
+          // Do something else
         }
       }
     }
@@ -457,6 +485,8 @@ class ReaderWidget extends HookConsumerWidget {
                       settings.direction == ReaderDirection.topToBottom
                           ? Axis.vertical
                           : Axis.horizontal,
+                  // pageSnapping:
+                  //     settings.direction != ReaderDirection.topToBottom,
                   controller: pageController,
                   itemCount: pageCount,
                   onPageChanged: (int index) {
@@ -489,7 +519,8 @@ class ReaderWidget extends HookConsumerWidget {
                                           state.extendedImageInfo!.image.width
                                               .toDouble());
 
-                                  if (!initialized.value) {
+                                  if (!initialized.value &&
+                                      scaleFactor.value[0] != 0.0) {
                                     initialized.value = true;
                                     Future.delayed(Duration.zero, () {
                                       resetImageFit(0);
@@ -514,15 +545,10 @@ class ReaderWidget extends HookConsumerWidget {
                                       fit: StackFit.expand,
                                       children: const <Widget>[
                                         Icon(Icons.error),
-                                        Positioned(
-                                          bottom: 0.0,
-                                          left: 0.0,
-                                          right: 0.0,
-                                          child: Text(
-                                            "Image load failed. Tap to retry",
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        )
+                                        Text(
+                                          "Image load failed. Tap to retry",
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ],
                                     ),
                                     onTap: () {
