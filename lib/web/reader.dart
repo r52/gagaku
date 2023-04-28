@@ -71,6 +71,7 @@ class WebGalleryReaderWidget extends ConsumerWidget {
           pages: pages,
           pageCount: pages.length,
           title: name,
+          isLongStrip: false, // TODO figure this out
           link: link,
           onLinkPressed: onLinkPressed,
         );

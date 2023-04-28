@@ -1,20 +1,24 @@
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/reader/config.dart';
+import 'package:gagaku/reader/controller_hooks.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
 class ReaderWidget extends HookConsumerWidget {
-  const ReaderWidget({
+  ReaderWidget({
     super.key,
     required this.pages,
     required this.pageCount,
     required this.title,
+    required this.isLongStrip,
     this.link,
     this.onLinkPressed,
     this.externalUrl,
@@ -23,53 +27,81 @@ class ReaderWidget extends HookConsumerWidget {
   final Iterable<ReaderPage> pages;
   final int pageCount;
   final String title;
+  final bool isLongStrip;
   final Widget? link;
   final VoidCallback? onLinkPressed;
   final String? externalUrl;
 
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
+  final ItemScrollController itemScrollController = ItemScrollController();
+
+  ItemPosition? _getListViewFirstShownPage(Iterable<ItemPosition> positions) {
+    if (positions.isNotEmpty) {
+      // Determine the first visible item by finding the item with the
+      // smallest trailing edge that is greater than 0.  i.e. the first
+      // item whose trailing edge in visible in the viewport.
+      return positions
+          .where((ItemPosition position) => position.itemTrailingEdge > 0)
+          .reduce((ItemPosition min, ItemPosition position) =>
+              position.itemTrailingEdge < min.itemTrailingEdge
+                  ? position
+                  : min);
+    }
+
+    return null;
+  }
+
+  ItemPosition? _getListViewLastShownPage(Iterable<ItemPosition> positions) {
+    if (positions.isNotEmpty) {
+      // Determine the last visible item by finding the item with the
+      // greatest leading edge that is less than 1.  i.e. the last
+      // item whose leading edge in visible in the viewport.
+      return positions
+          .where((ItemPosition position) => position.itemLeadingEdge < 1)
+          .reduce((ItemPosition max, ItemPosition position) =>
+              position.itemLeadingEdge > max.itemLeadingEdge ? position : max);
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final refresh = useState(0);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
-    final transformController = useTransformationController();
+    final scaleStateController = usePhotoViewScaleStateController();
+    final viewController = usePhotoViewController();
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
-    final scaleFactor =
-        useRef(List<double>.generate(pages.length, (index) => 0.0));
-    final initialized = useRef(false);
+    final currentPage = useValueNotifier(0);
 
     void cachePage(ReaderPage page) {
       precacheImage(page.provider, context);
       page.cached = true;
     }
 
-    void resetImageFit(int index) {
-      if (settings.fitWidth) {
-        transformController.value =
-            Matrix4.identity() * scaleFactor.value[index];
-      } else {
-        transformController.value = Matrix4.identity();
-      }
-    }
-
     final precacheCount = useCallback(() {
       return settings.precacheCount > 9 ? pageCount : settings.precacheCount;
     }, [settings]);
 
-    useCallback(() {
+    final runOnce = useCallback(() {
       pages.take(precacheCount()).forEach((element) {
         cachePage(element);
       });
+
+      return null;
     }, [settings]);
 
     useEffect(() {
       void pageCallback() {
-        if (pageController.hasClients && pageController.page != null) {
-          resetImageFit(pageController.page!.toInt());
+        if (pageController.page != null) {
+          currentPage.value = pageController.page!.toInt();
         }
 
         if (pageController.page != null &&
-            pageController.page!.toInt() + 1 < pages.length &&
+            pageController.page!.toInt() + 1 < pageCount &&
             !pages.elementAt(pageController.page!.toInt() + 1).cached) {
           while (!pages.elementAt(pageController.page!.toInt() + 1).cached) {
             pages
@@ -88,16 +120,98 @@ class ReaderWidget extends HookConsumerWidget {
       return () => pageController.removeListener(pageCallback);
     }, [pageController, settings]);
 
-    void onTapLeft() {
+    useEffect(() {
+      void listPosCb() {
+        final positions = itemPositionsListener.itemPositions.value;
+
+        final min = _getListViewFirstShownPage(positions);
+
+        if (min != null) {
+          currentPage.value = min.index;
+
+          if (min.index + 1 < pageCount &&
+              !pages.elementAt(min.index + 1).cached) {
+            while (!pages.elementAt(min.index + 1).cached) {
+              pages
+                  .skipWhile((page) => page.cached)
+                  .take(precacheCount())
+                  .forEach((element) {
+                if (!element.cached) {
+                  cachePage(element);
+                }
+              });
+            }
+          }
+        }
+      }
+
+      itemPositionsListener.itemPositions.addListener(listPosCb);
+      return () =>
+          itemPositionsListener.itemPositions.removeListener(listPosCb);
+    }, [settings]);
+
+    useEffect(() {
+      void pageCb() {
+        refresh.value++;
+      }
+
+      currentPage.addListener(pageCb);
+      return () => currentPage.removeListener(pageCb);
+    }, []);
+
+    void jumpToPage(int page) {
+      assert(page >= 0 && page < pageCount);
+      if (isLongStrip) {
+        if (itemScrollController.isAttached) {
+          itemScrollController.jumpTo(index: page);
+        }
+      } else {
+        if (pageController.hasClients) {
+          pageController.jumpToPage(page);
+        }
+      }
+    }
+
+    void animateToPage(
+      int page, {
+      required Duration duration,
+      required Curve curve,
+    }) {
+      assert(page >= 0 && page < pageCount);
+      if (isLongStrip) {
+        if (itemScrollController.isAttached) {
+          itemScrollController.scrollTo(
+              index: page, duration: duration, curve: curve);
+        }
+      } else {
+        if (pageController.hasClients) {
+          pageController.animateToPage(page, duration: duration, curve: curve);
+        }
+      }
+    }
+
+    void jumpToPreviousPage() {
+      if (currentPage.value > 0) {
+        jumpToPage(currentPage.value - 1);
+      }
+    }
+
+    void jumpToNextPage() {
+      if (currentPage.value < pageCount - 1) {
+        jumpToPage(currentPage.value + 1);
+      }
+    }
+
+    KeyEventResult onTapLeft() {
+      if (isLongStrip) return KeyEventResult.handled;
+
       switch (settings.direction) {
         case ReaderDirection.leftToRight:
-          if (pageController.page! > 0) {
-            pageController.jumpToPage(pageController.page!.toInt() - 1);
-          }
+          jumpToPreviousPage();
           break;
         case ReaderDirection.rightToLeft:
-          if (pageController.page! < pages.length - 1) {
-            pageController.jumpToPage(pageController.page!.toInt() + 1);
+          if (currentPage.value < pageCount - 1) {
+            jumpToNextPage();
           } else {
             Navigator.of(context).pop();
           }
@@ -107,117 +221,164 @@ class ReaderWidget extends HookConsumerWidget {
           // Do nothing
           break;
       }
+
+      return KeyEventResult.handled;
     }
 
-    void onTapRight() {
+    KeyEventResult onTapRight() {
+      if (isLongStrip) return KeyEventResult.handled;
+
       switch (settings.direction) {
         case ReaderDirection.leftToRight:
-          if (pageController.page! < pages.length - 1) {
-            pageController.jumpToPage(pageController.page!.toInt() + 1);
+          if (currentPage.value < pageCount - 1) {
+            jumpToNextPage();
           } else {
             Navigator.of(context).pop();
           }
           break;
         case ReaderDirection.rightToLeft:
-          if (pageController.page! > 0) {
-            pageController.jumpToPage(pageController.page!.toInt() - 1);
-          }
+          jumpToPreviousPage();
           break;
         case ReaderDirection.topToBottom:
         default:
           // Do nothing
           break;
       }
+
+      return KeyEventResult.handled;
     }
 
-    void onTapTop(double offset) {
+    KeyEventResult onTapTop(double offset) {
+      if (isLongStrip) {
+        final positions = itemPositionsListener.itemPositions.value;
+        final min = _getListViewFirstShownPage(positions);
+
+        if (min != null) {
+          var off = offset / MediaQuery.of(context).size.height;
+
+          if (min.index == 0 && min.itemLeadingEdge + off > 0.0) {
+            off = min.itemLeadingEdge.abs();
+          }
+
+          itemScrollController.jumpTo(
+              index: min.index, alignment: min.itemLeadingEdge + off);
+        }
+
+        return KeyEventResult.handled;
+      }
+
       switch (settings.direction) {
         case ReaderDirection.topToBottom:
-          if (pageController.page! > 0) {
-            pageController.animateTo(
-              pageController.position.pixels - offset,
-              duration: const Duration(milliseconds: 10),
-              curve: Curves.easeInOut,
-            );
+          final oldpos = viewController.position;
+          viewController.position =
+              viewController.position + Offset(0.0, offset);
+
+          if (viewController.position == oldpos) {
+            // At edge
+            if (currentPage.value > 0) {
+              jumpToPreviousPage();
+            }
           }
           break;
         case ReaderDirection.leftToRight:
         case ReaderDirection.rightToLeft:
+          viewController.position =
+              viewController.position + Offset(0.0, offset);
+          break;
         default:
           // Do nothing
           break;
       }
+
+      return KeyEventResult.handled;
     }
 
-    void onTapBottom(double offset) {
-      switch (settings.direction) {
-        case ReaderDirection.topToBottom:
-          if (pageController.page! < pages.length - 1) {
-            pageController.animateTo(
-              pageController.position.pixels + offset,
-              duration: const Duration(milliseconds: 10),
-              curve: Curves.easeInOut,
-            );
-          } else {
+    KeyEventResult onTapBottom(double offset) {
+      if (isLongStrip) {
+        final positions = itemPositionsListener.itemPositions.value;
+        final max = _getListViewLastShownPage(positions);
+
+        if (max != null) {
+          final off = offset / MediaQuery.of(context).size.height;
+
+          if (max.index == pageCount - 1 && max.itemTrailingEdge == 1.0) {
             Navigator.of(context).pop();
+          } else {
+            itemScrollController.jumpTo(
+                index: max.index, alignment: max.itemLeadingEdge - off);
+          }
+        }
+
+        return KeyEventResult.handled;
+      }
+
+      switch (settings.direction) {
+        case ReaderDirection.topToBottom:
+          final oldpos = viewController.position;
+          viewController.position =
+              viewController.position - Offset(0.0, offset);
+
+          if (viewController.position == oldpos) {
+            // At edge
+            if (currentPage.value < pageCount - 1) {
+              jumpToNextPage();
+            } else {
+              Navigator.of(context).pop();
+            }
           }
           break;
         case ReaderDirection.leftToRight:
         case ReaderDirection.rightToLeft:
+          viewController.position =
+              viewController.position - Offset(0.0, offset);
+          break;
         default:
           // Do nothing
           break;
       }
+
+      return KeyEventResult.handled;
     }
 
     KeyEventResult handleKeyEvent(FocusNode node, KeyEvent event) {
       if (event is KeyDownEvent) {
         if (event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
-          onTapLeft();
-          return KeyEventResult.handled;
+          return onTapLeft();
         } else if (event.physicalKey == PhysicalKeyboardKey.arrowRight) {
-          onTapRight();
-          return KeyEventResult.handled;
+          return onTapRight();
         } else if (event.physicalKey == PhysicalKeyboardKey.arrowUp) {
-          onTapTop(250);
-          return KeyEventResult.handled;
+          return onTapTop(250);
         } else if (event.physicalKey == PhysicalKeyboardKey.arrowDown) {
-          onTapBottom(250);
-          return KeyEventResult.handled;
+          return onTapBottom(250);
         } else if (event.physicalKey == PhysicalKeyboardKey.pageUp) {
-          onTapTop(1000);
-          return KeyEventResult.handled;
+          return onTapTop(1000);
         } else if (event.physicalKey == PhysicalKeyboardKey.pageDown) {
-          onTapBottom(1000);
-          return KeyEventResult.handled;
+          return onTapBottom(1000);
         }
       } else if (event is KeyRepeatEvent) {
         if (event.physicalKey == PhysicalKeyboardKey.arrowUp) {
-          onTapTop(250);
-          return KeyEventResult.handled;
+          return onTapTop(250);
         } else if (event.physicalKey == PhysicalKeyboardKey.arrowDown) {
-          onTapBottom(250);
-          return KeyEventResult.handled;
+          return onTapBottom(250);
         } else if (event.physicalKey == PhysicalKeyboardKey.pageUp) {
-          onTapTop(1000);
-          return KeyEventResult.handled;
+          return onTapTop(1000);
         } else if (event.physicalKey == PhysicalKeyboardKey.pageDown) {
-          onTapBottom(1000);
-          return KeyEventResult.handled;
+          return onTapBottom(1000);
         }
       }
 
       return KeyEventResult.ignored;
     }
 
-    void handleImageViewOnTap(TapUpDetails details) {
+    void handleImageViewOnTap(BuildContext context, TapUpDetails details,
+        PhotoViewControllerValue value) {
       focusNode.requestFocus();
 
       var taploc = details.localPosition.dx;
       var viewport = context.size!.width;
 
       if (settings.direction == ReaderDirection.topToBottom) {
-        taploc = details.localPosition.dy;
+        taploc = details.globalPosition.dy;
         viewport = context.size!.height;
       }
 
@@ -227,13 +388,13 @@ class ReaderWidget extends HookConsumerWidget {
         if (settings.direction != ReaderDirection.topToBottom) {
           onTapLeft();
         } else {
-          // Do something else
+          jumpToPreviousPage();
         }
       } else if (taploc > viewport - tapmargin) {
         if (settings.direction != ReaderDirection.topToBottom) {
           onTapRight();
         } else {
-          // Do something else
+          jumpToNextPage();
         }
       }
     }
@@ -278,12 +439,8 @@ class ReaderWidget extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   OutlinedButton(
-                    onPressed: (pageController.hasClients &&
-                            pageController.page!.toInt() > 0)
-                        ? () {
-                            pageController
-                                .jumpToPage(pageController.page!.toInt() - 1);
-                          }
+                    onPressed: (currentPage.value > 0)
+                        ? () => jumpToPreviousPage()
                         : null,
                     child: const Text('Previous Page'),
                   ),
@@ -291,9 +448,7 @@ class ReaderWidget extends HookConsumerWidget {
                     width: 10,
                   ),
                   DropdownButton<int>(
-                    value: (pageController.hasClients
-                        ? pageController.page!.toInt()
-                        : pageController.initialPage),
+                    value: currentPage.value,
                     icon: const Icon(Icons.arrow_downward),
                     iconSize: 24,
                     elevation: 16,
@@ -303,8 +458,8 @@ class ReaderWidget extends HookConsumerWidget {
                       color: Colors.deepPurpleAccent,
                     ),
                     onChanged: (int? index) {
-                      if (pageController.hasClients && index != null) {
-                        pageController.jumpToPage(index);
+                      if (index != null) {
+                        jumpToPage(index);
                       }
                     },
                     items: List<DropdownMenuItem<int>>.generate(
@@ -316,12 +471,8 @@ class ReaderWidget extends HookConsumerWidget {
                     width: 10,
                   ),
                   OutlinedButton(
-                    onPressed: (pageController.hasClients &&
-                            pageController.page!.toInt() < pageCount - 1)
-                        ? () {
-                            pageController
-                                .jumpToPage(pageController.page!.toInt() + 1);
-                          }
+                    onPressed: (currentPage.value < pageCount - 1)
+                        ? () => jumpToNextPage()
                         : null,
                     child: const Text('Next Page'),
                   ),
@@ -332,60 +483,50 @@ class ReaderWidget extends HookConsumerWidget {
                 'Reader Settings',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
+              if (!isLongStrip) ...[
+                const SizedBox(height: 10.0),
+                ActionChip(
+                  avatar: const Icon(Icons.fit_screen),
+                  label: const Text('Toggle Page Size'),
+                  onPressed: () {
+                    scaleStateController.scaleState =
+                        defaultScaleStateCycle(scaleStateController.scaleState);
+                  },
+                ),
+                const SizedBox(height: 10.0),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  children: [
+                    for (final dir in ReaderDirection.values)
+                      ChoiceChip(
+                        avatar: dir.icon,
+                        label: Text(dir.formatted),
+                        selected: settings.direction == dir,
+                        onSelected: (value) {
+                          if (value) {
+                            ref
+                                .read(readerSettingsProvider.notifier)
+                                .save(settings.copyWith(direction: dir));
+                          }
+                        },
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 10.0),
               ActionChip(
-                  avatar:
-                      Icon(settings.fitWidth ? Icons.fit_screen : Icons.height),
-                  label: Text(settings.fitWidth ? 'Fit Screen' : 'Fit Height'),
-                  onPressed: () {
-                    bool set = !settings.fitWidth;
-
-                    ref
-                        .read(readerSettingsProvider.notifier)
-                        .save(settings.copyWith(fitWidth: set));
-
-                    if (pageController.hasClients &&
-                        pageController.page != null) {
-                      // Manually set this because settings haven't finished updating
-                      if (set) {
-                        transformController.value = Matrix4.identity() *
-                            scaleFactor.value[pageController.page!.toInt()];
-                      } else {
-                        transformController.value = Matrix4.identity();
-                      }
-                    }
-                  }),
-              const SizedBox(height: 10.0),
-              Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  for (final dir in ReaderDirection.values)
-                    ChoiceChip(
-                      avatar: dir.icon,
-                      label: Text(dir.formatted),
-                      selected: settings.direction == dir,
-                      onSelected: (value) {
-                        if (value) {
-                          ref
-                              .read(readerSettingsProvider.notifier)
-                              .save(settings.copyWith(direction: dir));
-                        }
-                      },
-                    ),
-                ],
+                avatar: Icon(settings.showProgressBar
+                    ? Icons.donut_small
+                    : Icons.donut_small_outlined),
+                label: const Text('Progress Bar'),
+                onPressed: () {
+                  ref.read(readerSettingsProvider.notifier).save(settings
+                      .copyWith(showProgressBar: !settings.showProgressBar));
+                },
               ),
-              const SizedBox(height: 10.0),
-              ActionChip(
-                  avatar: Icon(settings.showProgressBar
-                      ? Icons.donut_small
-                      : Icons.donut_small_outlined),
-                  label: const Text('Progress Bar'),
-                  onPressed: () {
-                    ref.read(readerSettingsProvider.notifier).save(settings
-                        .copyWith(showProgressBar: !settings.showProgressBar));
-                  }),
-              const SizedBox(height: 10.0),
-              ActionChip(
+              if (!isLongStrip) ...[
+                const SizedBox(height: 10.0),
+                ActionChip(
                   avatar: Icon(
                     Icons.swipe,
                     color: settings.swipeGestures
@@ -396,9 +537,10 @@ class ReaderWidget extends HookConsumerWidget {
                   onPressed: () {
                     ref.read(readerSettingsProvider.notifier).save(settings
                         .copyWith(swipeGestures: !settings.swipeGestures));
-                  }),
-              const SizedBox(height: 10.0),
-              ActionChip(
+                  },
+                ),
+                const SizedBox(height: 10.0),
+                ActionChip(
                   avatar: Icon(
                     Icons.mouse,
                     color: settings.clickToTurn
@@ -409,7 +551,9 @@ class ReaderWidget extends HookConsumerWidget {
                   onPressed: () {
                     ref.read(readerSettingsProvider.notifier).save(
                         settings.copyWith(clickToTurn: !settings.clickToTurn));
-                  }),
+                  },
+                ),
+              ],
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -454,132 +598,110 @@ class ReaderWidget extends HookConsumerWidget {
         focusNode: focusNode,
         onKeyEvent: handleKeyEvent,
         child: Container(
-          child: (pages.isEmpty && externalUrl != null)
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Read on external site:'),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (!await launchUrl(Uri.parse(externalUrl!))) {
-                            throw 'Could not launch ${externalUrl!}';
-                          }
-                        },
-                        child: Text(externalUrl!),
-                      ),
-                    ],
-                  ),
-                )
-              : PageView.builder(
-                  allowImplicitScrolling: true,
-                  reverse: settings.direction == ReaderDirection.rightToLeft,
-                  physics: !settings.swipeGestures
-                      ? const NeverScrollableScrollPhysics()
-                      : null,
-                  scrollBehavior: MouseTouchScrollBehavior(),
-                  scrollDirection:
-                      settings.direction == ReaderDirection.topToBottom
-                          ? Axis.vertical
-                          : Axis.horizontal,
-                  // pageSnapping:
-                  //     settings.direction != ReaderDirection.topToBottom,
-                  controller: pageController,
-                  itemCount: pageCount,
-                  onPageChanged: (int index) {
-                    focusNode.requestFocus();
-                  },
-                  itemBuilder: (BuildContext context, int index) {
-                    var page = pages.elementAt(index);
-
-                    return GestureDetector(
-                      onDoubleTap: () => resetImageFit(index),
-                      onTapUp:
-                          settings.clickToTurn ? handleImageViewOnTap : null,
-                      child: InteractiveViewer(
-                        constrained: !settings.fitWidth,
-                        transformationController: transformController,
-                        minScale: 0.1,
-                        maxScale: 10,
-                        child: ExtendedImage(
-                          image: page.provider,
-                          loadStateChanged: (state) {
-                            switch (state.extendedImageLoadState) {
-                              case LoadState.loading:
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              case LoadState.completed:
-                                {
-                                  scaleFactor.value[index] =
-                                      (MediaQuery.of(context).size.width /
-                                          state.extendedImageInfo!.image.width
-                                              .toDouble());
-
-                                  if (!initialized.value &&
-                                      scaleFactor.value[0] != 0.0) {
-                                    initialized.value = true;
-                                    Future.delayed(Duration.zero, () {
-                                      resetImageFit(0);
-                                    });
-                                  }
-
-                                  return null;
-                                }
-                              case LoadState.failed:
-                                {
-                                  ScaffoldMessenger.of(context)
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Image load failed'),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-
-                                  return GestureDetector(
-                                    child: Stack(
-                                      fit: StackFit.expand,
-                                      children: const <Widget>[
-                                        Icon(Icons.error),
-                                        Text(
-                                          "Image load failed. Tap to retry",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      state.reLoadImage();
-                                    },
-                                  );
-                                }
-                            }
-                          },
-                        ),
-                      ),
-                    );
-                  },
+          child: (() {
+            if (pages.isEmpty && externalUrl != null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Read on external site:'),
+                    const SizedBox(
+                      height: 10.0,
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (!await launchUrl(Uri.parse(externalUrl!))) {
+                          throw 'Could not launch ${externalUrl!}';
+                        }
+                      },
+                      child: Text(externalUrl!),
+                    ),
+                  ],
                 ),
+              );
+            }
+
+            if (isLongStrip) {
+              return ScrollablePositionedList.builder(
+                itemScrollController: itemScrollController,
+                itemPositionsListener: itemPositionsListener,
+                itemCount: pageCount,
+                itemBuilder: (BuildContext context, int index) {
+                  var page = pages.elementAt(index);
+
+                  return PhotoView(
+                    imageProvider: page.provider,
+                    backgroundDecoration:
+                        const BoxDecoration(color: Colors.black),
+                    enableRotation: false,
+                    disableGestures: true,
+                    customSize: MediaQuery.of(context).size,
+                    minScale: PhotoViewComputedScale.contained * 1.0,
+                    maxScale: PhotoViewComputedScale.covered * 5.0,
+                    initialScale: DeviceContext.screenWidthSmall(context)
+                        ? PhotoViewComputedScale.covered
+                        : PhotoViewComputedScale.covered * 0.5,
+                    basePosition: Alignment.topCenter,
+                    tightMode: true,
+                    loadingBuilder: (context, event) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                },
+              );
+            }
+
+            return PageView.builder(
+              allowImplicitScrolling: true,
+              reverse: settings.direction == ReaderDirection.rightToLeft,
+              physics: (!settings.swipeGestures)
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
+              scrollBehavior: MouseTouchScrollBehavior(),
+              scrollDirection: settings.direction == ReaderDirection.topToBottom
+                  ? Axis.vertical
+                  : Axis.horizontal,
+              controller: pageController,
+              itemCount: pageCount,
+              onPageChanged: (int index) {
+                focusNode.requestFocus();
+              },
+              itemBuilder: (BuildContext context, int index) {
+                var page = pages.elementAt(index);
+
+                return PhotoView(
+                  imageProvider: page.provider,
+                  backgroundDecoration:
+                      const BoxDecoration(color: Colors.black),
+                  enableRotation: false,
+                  scaleStateController: scaleStateController,
+                  controller: viewController,
+                  minScale: PhotoViewComputedScale.contained * 1.0,
+                  maxScale: PhotoViewComputedScale.covered * 5.0,
+                  initialScale: PhotoViewComputedScale.contained,
+                  basePosition: Alignment.topCenter,
+                  onTapUp: settings.clickToTurn ? handleImageViewOnTap : null,
+                  loadingBuilder: (context, event) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              },
+            );
+          })(),
         ),
       ),
       bottomSheet: settings.showProgressBar
           ? ProgressIndicator(
-              reverse: settings.direction == ReaderDirection.rightToLeft,
-              controller: pageController,
-              itemCount: pages.length,
+              reverse: !isLongStrip &&
+                  settings.direction == ReaderDirection.rightToLeft,
+              currentPage: currentPage,
+              itemCount: pageCount,
               color: theme.colorScheme.primary,
-              onPageSelected: (index) {
-                if (pageController.hasClients) {
-                  pageController.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut,
-                  );
-                }
-              },
+              onPageSelected: (index) => animateToPage(
+                index,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+              ),
             )
           : null,
     );
@@ -589,14 +711,14 @@ class ReaderWidget extends HookConsumerWidget {
 class ProgressIndicator extends AnimatedWidget {
   const ProgressIndicator({
     super.key,
-    required this.controller,
+    required this.currentPage,
     required this.itemCount,
     required this.onPageSelected,
     required this.reverse,
     this.color = Colors.white,
-  }) : super(listenable: controller);
+  }) : super(listenable: currentPage);
 
-  final PageController controller;
+  final ValueNotifier<int> currentPage;
   final int itemCount;
   final ValueChanged<int> onPageSelected;
   final Color color;
@@ -609,8 +731,8 @@ class ProgressIndicator extends AnimatedWidget {
 
     if (index == 0) {
       secColor = color;
-    } else if (controller.hasClients && controller.page != null) {
-      secColor = (controller.page! >= index ? color : Colors.transparent);
+    } else {
+      secColor = (currentPage.value >= index ? color : Colors.transparent);
     }
 
     return Expanded(
