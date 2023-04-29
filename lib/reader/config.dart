@@ -12,10 +12,6 @@ part 'config.g.dart';
 @freezed
 class ReaderConfig with _$ReaderConfig {
   const factory ReaderConfig({
-    /// If true, the reader fits the page to widget width, otherwise
-    /// it is contrained to widget height (default)
-    @Default(false) bool fitWidth,
-
     /// Reader direction
     @Default(ReaderDirection.leftToRight) ReaderDirection direction,
 

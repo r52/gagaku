@@ -8,7 +8,6 @@ part of 'config.dart';
 
 _$_ReaderConfig _$$_ReaderConfigFromJson(Map<String, dynamic> json) =>
     _$_ReaderConfig(
-      fitWidth: json['fitWidth'] as bool? ?? false,
       direction:
           $enumDecodeNullable(_$ReaderDirectionEnumMap, json['direction']) ??
               ReaderDirection.leftToRight,
@@ -20,7 +19,6 @@ _$_ReaderConfig _$$_ReaderConfigFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$_ReaderConfigToJson(_$_ReaderConfig instance) =>
     <String, dynamic>{
-      'fitWidth': instance.fitWidth,
       'direction': _$ReaderDirectionEnumMap[instance.direction]!,
       'showProgressBar': instance.showProgressBar,
       'clickToTurn': instance.clickToTurn,

@@ -20,10 +20,6 @@ ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ReaderConfig {
-  /// If true, the reader fits the page to widget width, otherwise
-  /// it is contrained to widget height (default)
-  bool get fitWidth => throw _privateConstructorUsedError;
-
   /// Reader direction
   ReaderDirection get direction => throw _privateConstructorUsedError;
 
@@ -52,8 +48,7 @@ abstract class $ReaderConfigCopyWith<$Res> {
       _$ReaderConfigCopyWithImpl<$Res, ReaderConfig>;
   @useResult
   $Res call(
-      {bool fitWidth,
-      ReaderDirection direction,
+      {ReaderDirection direction,
       bool showProgressBar,
       bool clickToTurn,
       bool swipeGestures,
@@ -73,7 +68,6 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? fitWidth = null,
     Object? direction = null,
     Object? showProgressBar = null,
     Object? clickToTurn = null,
@@ -81,10 +75,6 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
     Object? precacheCount = null,
   }) {
     return _then(_value.copyWith(
-      fitWidth: null == fitWidth
-          ? _value.fitWidth
-          : fitWidth // ignore: cast_nullable_to_non_nullable
-              as bool,
       direction: null == direction
           ? _value.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -118,8 +108,7 @@ abstract class _$$_ReaderConfigCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool fitWidth,
-      ReaderDirection direction,
+      {ReaderDirection direction,
       bool showProgressBar,
       bool clickToTurn,
       bool swipeGestures,
@@ -137,7 +126,6 @@ class __$$_ReaderConfigCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? fitWidth = null,
     Object? direction = null,
     Object? showProgressBar = null,
     Object? clickToTurn = null,
@@ -145,10 +133,6 @@ class __$$_ReaderConfigCopyWithImpl<$Res>
     Object? precacheCount = null,
   }) {
     return _then(_$_ReaderConfig(
-      fitWidth: null == fitWidth
-          ? _value.fitWidth
-          : fitWidth // ignore: cast_nullable_to_non_nullable
-              as bool,
       direction: null == direction
           ? _value.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -177,8 +161,7 @@ class __$$_ReaderConfigCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_ReaderConfig implements _ReaderConfig {
   const _$_ReaderConfig(
-      {this.fitWidth = false,
-      this.direction = ReaderDirection.leftToRight,
+      {this.direction = ReaderDirection.leftToRight,
       this.showProgressBar = false,
       this.clickToTurn = true,
       this.swipeGestures = true,
@@ -186,12 +169,6 @@ class _$_ReaderConfig implements _ReaderConfig {
 
   factory _$_ReaderConfig.fromJson(Map<String, dynamic> json) =>
       _$$_ReaderConfigFromJson(json);
-
-  /// If true, the reader fits the page to widget width, otherwise
-  /// it is contrained to widget height (default)
-  @override
-  @JsonKey()
-  final bool fitWidth;
 
   /// Reader direction
   @override
@@ -220,7 +197,7 @@ class _$_ReaderConfig implements _ReaderConfig {
 
   @override
   String toString() {
-    return 'ReaderConfig(fitWidth: $fitWidth, direction: $direction, showProgressBar: $showProgressBar, clickToTurn: $clickToTurn, swipeGestures: $swipeGestures, precacheCount: $precacheCount)';
+    return 'ReaderConfig(direction: $direction, showProgressBar: $showProgressBar, clickToTurn: $clickToTurn, swipeGestures: $swipeGestures, precacheCount: $precacheCount)';
   }
 
   @override
@@ -228,8 +205,6 @@ class _$_ReaderConfig implements _ReaderConfig {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_ReaderConfig &&
-            (identical(other.fitWidth, fitWidth) ||
-                other.fitWidth == fitWidth) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             (identical(other.showProgressBar, showProgressBar) ||
@@ -244,8 +219,8 @@ class _$_ReaderConfig implements _ReaderConfig {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, fitWidth, direction,
-      showProgressBar, clickToTurn, swipeGestures, precacheCount);
+  int get hashCode => Object.hash(runtimeType, direction, showProgressBar,
+      clickToTurn, swipeGestures, precacheCount);
 
   @JsonKey(ignore: true)
   @override
@@ -263,8 +238,7 @@ class _$_ReaderConfig implements _ReaderConfig {
 
 abstract class _ReaderConfig implements ReaderConfig {
   const factory _ReaderConfig(
-      {final bool fitWidth,
-      final ReaderDirection direction,
+      {final ReaderDirection direction,
       final bool showProgressBar,
       final bool clickToTurn,
       final bool swipeGestures,
@@ -273,11 +247,6 @@ abstract class _ReaderConfig implements ReaderConfig {
   factory _ReaderConfig.fromJson(Map<String, dynamic> json) =
       _$_ReaderConfig.fromJson;
 
-  @override
-
-  /// If true, the reader fits the page to widget width, otherwise
-  /// it is contrained to widget height (default)
-  bool get fitWidth;
   @override
 
   /// Reader direction
