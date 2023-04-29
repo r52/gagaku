@@ -114,7 +114,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
                         IconTextChip(
                           icon: const Icon(Icons.language, size: 18),
                           text: Text(
-                            chapter.attributes.translatedLanguage.name,
+                            chapter.attributes.translatedLanguage.code
+                                .toUpperCase(),
                           ),
                         ),
                         for (var g in chapter.getGroups()) ...[
@@ -122,6 +123,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
                           IconTextChip(
                             icon: const Icon(Icons.group, size: 20),
                             text: Text(g),
+                          ),
+                        ],
+                        if (chapter.attributes.externalUrl != null) ...[
+                          const SizedBox(width: 4),
+                          const IconTextChip(
+                            icon: Icon(Icons.check,
+                                color: Colors.amber, size: 20),
+                            text: Text('Official Publisher'),
                           ),
                         ],
                         const SizedBox(width: 10),

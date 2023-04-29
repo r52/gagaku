@@ -23,4 +23,9 @@ class DeviceContext {
     // Somewhat arbitrary measurement but w/e
     return MediaQuery.of(context).size.width <= 480;
   }
+
+  static bool isPortraitMode(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.height > size.width;
+  }
 }

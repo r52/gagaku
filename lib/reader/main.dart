@@ -638,7 +638,7 @@ class ReaderWidget extends HookConsumerWidget {
                     customSize: MediaQuery.of(context).size,
                     minScale: PhotoViewComputedScale.contained * 1.0,
                     maxScale: PhotoViewComputedScale.covered * 5.0,
-                    initialScale: DeviceContext.screenWidthSmall(context)
+                    initialScale: DeviceContext.isPortraitMode(context)
                         ? PhotoViewComputedScale.covered
                         : PhotoViewComputedScale.covered * 0.5,
                     basePosition: Alignment.topCenter,
