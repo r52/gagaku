@@ -19,11 +19,12 @@ class MainDrawer extends ConsumerWidget {
             ),
             child: Center(
               child: Column(
-                children: const [
+                children: [
                   CircleAvatar(
-                    backgroundImage: AssetImage('assets/icon.png'),
+                    foregroundImage: const AssetImage('assets/icon.png'),
+                    backgroundColor: theme.colorScheme.onBackground,
                   ),
-                  Text('Gagaku')
+                  const Text('Gagaku')
                 ],
               ),
             ),
