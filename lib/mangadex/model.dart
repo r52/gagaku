@@ -1189,6 +1189,9 @@ class MangaSearch extends _$MangaSearch {
 
     final manga = await api.searchManga(params.query,
         filter: params.filter, offset: _offset);
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    ref.read(statisticsProvider.notifier).get(manga);
 
     return manga;
   }
@@ -1236,7 +1239,7 @@ class Statistics extends _$Statistics {
         data: (data) => data, orElse: () => <String, MangaStatistics>{});
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final mg = mangas.takeWhile((m) => !oldstate.containsKey(m.id));
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
       final map = await _fetchStatistics(mg);
       return {...oldstate, ...map};
     });
