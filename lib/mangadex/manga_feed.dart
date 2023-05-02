@@ -12,10 +12,10 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   final api = ref.watch(mangadexProvider);
   final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
-  var mangaids = chapters.map((e) => e.getMangaID()).toSet();
+  final mangaids = chapters.map((e) => e.getMangaID()).toSet();
   mangaids.removeWhere((element) => element.isEmpty);
 
-  var mangas = await api.fetchManga(mangaids);
+  final mangas = await api.fetchManga(mangaids);
 
   ref.keepAlive();
 

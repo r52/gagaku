@@ -16,22 +16,21 @@ part 'chapter_feed.g.dart';
 @riverpod
 Future<List<_ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
-  var chapters = await ref.watch(latestChaptersFeedProvider.future);
+  final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
-  var mangaIds = chapters.map((e) => e.getMangaID()).toSet();
-
+  final mangaIds = chapters.map((e) => e.getMangaID()).toSet();
   mangaIds.removeWhere((element) => element.isEmpty);
 
-  var mangas = await api.fetchManga(mangaIds);
+  final mangas = await api.fetchManga(mangaIds);
 
   ref.watch(readChaptersProvider.notifier).get(mangas);
 
-  var mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
+  final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
   // Craft feed items
   List<_ChapterFeedItemData> dlist = [];
 
-  for (var chapter in chapters) {
+  for (final chapter in chapters) {
     final cid = chapter.getMangaID();
     _ChapterFeedItemData? item;
     if (dlist.isNotEmpty && dlist.last.mangaId == cid) {
@@ -45,7 +44,7 @@ Future<List<_ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
   }
 
   // Craft widgets
-  var wlist = dlist
+  final wlist = dlist
       .map((e) => _ChapterFeedItem(
             state: e,
           ))
