@@ -104,7 +104,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 ),
                 actions: [
                   ...(() {
-                    if (!result.following && result.reading == null) {
+                    if (!result.following || result.reading == null) {
                       return [
                         ElevatedButton(
                           onPressed: () async {
@@ -129,14 +129,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     } else {
                       return [
                         Tooltip(
-                          message: result.following
-                              ? 'Unfollow Manga'
-                              : 'Follow Manga',
+                          message: 'Remove from Library',
                           child: ElevatedButton(
                             onPressed: () async {
-                              bool set = !result.following;
                               bool success =
-                                  await api.setMangaFollowing(manga, set);
+                                  await api.setMangaFollowing(manga, false);
 
                               if (success) {
                                 success = await api.setMangaReadingStatus(
@@ -147,9 +144,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 refresh.value++;
                               }
                             },
-                            child: Icon(result.following
-                                ? Icons.favorite
-                                : Icons.favorite_border),
+                            child: const Icon(Icons.favorite),
                           ),
                         ),
                         const SizedBox(
