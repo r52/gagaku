@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/mangadex/main.dart';
@@ -6,7 +8,16 @@ import 'package:gagaku/web/main.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+class GHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)..maxConnectionsPerHost = 5;
+  }
+}
+
 void main() async {
+  HttpOverrides.global = GHttpOverrides();
+
   await Hive.initFlutter();
   await Hive.openBox(gagakuBox);
   runApp(const ProviderScope(child: App()));
