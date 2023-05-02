@@ -422,6 +422,67 @@ Map<String, dynamic> _$$_TagResponseToJson(_$_TagResponse instance) =>
       'total': instance.total,
     };
 
+_$_MangaStatisticsResponse _$$_MangaStatisticsResponseFromJson(
+        Map<String, dynamic> json) =>
+    _$_MangaStatisticsResponse(
+      (json['statistics'] as Map<String, dynamic>).map(
+        (k, e) =>
+            MapEntry(k, MangaStatistics.fromJson(e as Map<String, dynamic>)),
+      ),
+    );
+
+Map<String, dynamic> _$$_MangaStatisticsResponseToJson(
+        _$_MangaStatisticsResponse instance) =>
+    <String, dynamic>{
+      'statistics': instance.statistics,
+    };
+
+_$_MangaStatistics _$$_MangaStatisticsFromJson(Map<String, dynamic> json) =>
+    _$_MangaStatistics(
+      comments: json['comments'] == null
+          ? null
+          : StatisticsDetailsComments.fromJson(
+              json['comments'] as Map<String, dynamic>),
+      rating: StatisticsDetailsRating.fromJson(
+          json['rating'] as Map<String, dynamic>),
+      follows: json['follows'] as int,
+    );
+
+Map<String, dynamic> _$$_MangaStatisticsToJson(_$_MangaStatistics instance) =>
+    <String, dynamic>{
+      'comments': instance.comments,
+      'rating': instance.rating,
+      'follows': instance.follows,
+    };
+
+_$_StatisticsDetailsComments _$$_StatisticsDetailsCommentsFromJson(
+        Map<String, dynamic> json) =>
+    _$_StatisticsDetailsComments(
+      threadId: json['threadId'] as int,
+      repliesCount: json['repliesCount'] as int,
+    );
+
+Map<String, dynamic> _$$_StatisticsDetailsCommentsToJson(
+        _$_StatisticsDetailsComments instance) =>
+    <String, dynamic>{
+      'threadId': instance.threadId,
+      'repliesCount': instance.repliesCount,
+    };
+
+_$_StatisticsDetailsRating _$$_StatisticsDetailsRatingFromJson(
+        Map<String, dynamic> json) =>
+    _$_StatisticsDetailsRating(
+      average: (json['average'] as num?)?.toDouble(),
+      bayesian: (json['bayesian'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$$_StatisticsDetailsRatingToJson(
+        _$_StatisticsDetailsRating instance) =>
+    <String, dynamic>{
+      'average': instance.average,
+      'bayesian': instance.bayesian,
+    };
+
 _$_OldToken _$$_OldTokenFromJson(Map<String, dynamic> json) => _$_OldToken(
       session: json['session'] as String,
       refresh: json['refresh'] as String,

@@ -531,6 +531,21 @@ class MangaSearchProvider
   }
 }
 
+String _$statisticsHash() => r'24df63bc9c7588418c0f52dd3120e036188a6236';
+
+/// See also [Statistics].
+@ProviderFor(Statistics)
+final statisticsProvider =
+    AsyncNotifierProvider<Statistics, Map<String, MangaStatistics>>.internal(
+  Statistics.new,
+  name: r'statisticsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$statisticsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Statistics = AsyncNotifier<Map<String, MangaStatistics>>;
 String _$authControlHash() => r'f8be09eda62cb7aef4301595371cdb20bc07059e';
 
 /// See also [AuthControl].

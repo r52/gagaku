@@ -327,16 +327,17 @@ class _GridMangaItem extends StatelessWidget {
   }
 }
 
-class _GridMangaDetailedItem extends StatelessWidget {
+class _GridMangaDetailedItem extends ConsumerWidget {
   const _GridMangaDetailedItem({Key? key, required this.manga})
       : super(key: key);
 
   final Manga manga;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
+    final stats = ref.watch(statisticsProvider);
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -382,7 +383,71 @@ class _GridMangaDetailedItem extends StatelessWidget {
                         Row(
                           children: [
                             MangaStatusChip(status: manga.attributes.status),
-                            // TODO: rest of the manga info when available in the api
+                            ...stats.when(
+                              skipLoadingOnReload: true,
+                              data: (data) {
+                                if (data.containsKey(manga.id)) {
+                                  return [
+                                    const SizedBox(
+                                      width: 4,
+                                    ),
+                                    IconTextChip(
+                                      icon: const Icon(
+                                        Icons.star_border,
+                                        color: Colors.amber,
+                                        size: 18,
+                                      ),
+                                      text: Text(
+                                        data[manga.id]!
+                                            .rating
+                                            .bayesian
+                                            .toStringAsFixed(2),
+                                        style: const TextStyle(
+                                          color: Colors.amber,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 4,
+                                    ),
+                                    IconTextChip(
+                                      icon: const Icon(
+                                        Icons.bookmark_outline,
+                                        size: 18,
+                                      ),
+                                      text: Text(
+                                        data[manga.id]!.follows.toString(),
+                                      ),
+                                    ),
+                                  ];
+                                }
+
+                                return [
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  const IconTextChip(
+                                    text: Text('Error Retrieving Stats'),
+                                  )
+                                ];
+                              },
+                              error: (obj, stack) => [
+                                const SizedBox(
+                                  width: 4,
+                                ),
+                                const IconTextChip(
+                                  text: Text('Error Retrieving Stats'),
+                                )
+                              ],
+                              loading: () => [
+                                const SizedBox(
+                                  width: 4,
+                                ),
+                                const IconTextChip(
+                                  text: CircularProgressIndicator(),
+                                )
+                              ],
+                            ),
                           ],
                         ),
                         Wrap(
@@ -418,14 +483,15 @@ class _GridMangaDetailedItem extends StatelessWidget {
   }
 }
 
-class _ListMangaItem extends StatelessWidget {
+class _ListMangaItem extends ConsumerWidget {
   const _ListMangaItem({Key? key, required this.manga}) : super(key: key);
 
   final Manga manga;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final stats = ref.watch(statisticsProvider);
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -470,7 +536,71 @@ class _ListMangaItem extends StatelessWidget {
                       MangaStatusChip(
                         status: manga.attributes.status,
                       ),
-                      // TODO: rest of the manga info when available in the api
+                      ...stats.when(
+                        skipLoadingOnReload: true,
+                        data: (data) {
+                          if (data.containsKey(manga.id)) {
+                            return [
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              IconTextChip(
+                                icon: const Icon(
+                                  Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 18,
+                                ),
+                                text: Text(
+                                  data[manga.id]!
+                                      .rating
+                                      .bayesian
+                                      .toStringAsFixed(2),
+                                  style: const TextStyle(
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              IconTextChip(
+                                icon: const Icon(
+                                  Icons.bookmark_outline,
+                                  size: 18,
+                                ),
+                                text: Text(
+                                  data[manga.id]!.follows.toString(),
+                                ),
+                              ),
+                            ];
+                          }
+
+                          return [
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            const IconTextChip(
+                              text: Text('Error Retrieving Stats'),
+                            )
+                          ];
+                        },
+                        error: (obj, stack) => [
+                          const SizedBox(
+                            width: 4,
+                          ),
+                          const IconTextChip(
+                            text: Text('Error Retrieving Stats'),
+                          )
+                        ],
+                        loading: () => [
+                          const SizedBox(
+                            width: 4,
+                          ),
+                          const IconTextChip(
+                            text: CircularProgressIndicator(),
+                          )
+                        ],
+                      ),
                     ],
                   )
                 ],

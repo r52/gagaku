@@ -7,7 +7,7 @@ part of 'manga_view.dart';
 // **************************************************************************
 
 String _$fetchMangaViewChaptersHash() =>
-    r'0606c1f2ec4fa3acb3ba2d9a0a143d3551dc8201';
+    r'd4f8d6a1db7a36c307df6848746bd6c61ce480d5';
 
 /// Copied from Dart SDK
 class _SystemHash {

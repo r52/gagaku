@@ -583,6 +583,50 @@ class TagResponse with _$TagResponse {
       _$TagResponseFromJson(json);
 }
 
+@freezed
+class MangaStatisticsResponse with _$MangaStatisticsResponse {
+  const factory MangaStatisticsResponse(
+    Map<String, MangaStatistics> statistics,
+  ) = _MangaStatisticsResponse;
+
+  factory MangaStatisticsResponse.fromJson(Map<String, dynamic> json) =>
+      _$MangaStatisticsResponseFromJson(json);
+}
+
+@freezed
+class MangaStatistics with _$MangaStatistics {
+  const factory MangaStatistics({
+    StatisticsDetailsComments? comments,
+    required StatisticsDetailsRating rating,
+    required int follows,
+  }) = _MangaStatistics;
+
+  factory MangaStatistics.fromJson(Map<String, dynamic> json) =>
+      _$MangaStatisticsFromJson(json);
+}
+
+@freezed
+class StatisticsDetailsComments with _$StatisticsDetailsComments {
+  const factory StatisticsDetailsComments({
+    required int threadId,
+    required int repliesCount,
+  }) = _StatisticsDetailsComments;
+
+  factory StatisticsDetailsComments.fromJson(Map<String, dynamic> json) =>
+      _$StatisticsDetailsCommentsFromJson(json);
+}
+
+@freezed
+class StatisticsDetailsRating with _$StatisticsDetailsRating {
+  const factory StatisticsDetailsRating({
+    double? average,
+    required double bayesian,
+  }) = _StatisticsDetailsRating;
+
+  factory StatisticsDetailsRating.fromJson(Map<String, dynamic> json) =>
+      _$StatisticsDetailsRatingFromJson(json);
+}
+
 class PageData {
   const PageData(this.baseUrl, this.pages);
 

@@ -22,8 +22,17 @@ Route createMangaViewRoute(Manga manga) {
 Future<_FetchMangaChaptersResult> _fetchMangaViewChapters(
     _FetchMangaViewChaptersRef ref, Manga manga) async {
   final following = await ref.watch(fetchFollowingMangaProvider(manga).future);
+  await Future.delayed(const Duration(milliseconds: 100));
+
   final reading = await ref.watch(fetchReadingStatusProvider(manga).future);
+  await Future.delayed(const Duration(milliseconds: 100));
+
   ref.watch(readChaptersProvider.notifier).get([manga]);
+  await Future.delayed(const Duration(milliseconds: 100));
+
+  ref.watch(statisticsProvider.notifier).get([manga]);
+  await Future.delayed(const Duration(milliseconds: 100));
+
   final chapters = await ref.watch(mangaChaptersProvider(manga).future);
 
   return _FetchMangaChaptersResult(chapters, following, reading);
@@ -51,6 +60,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final result = ref.watch(_fetchMangaViewChaptersProvider(manga));
+    final stats = ref.watch(statisticsProvider);
 
     useEffect(() {
       void controllerAtEdge() {
@@ -204,6 +214,71 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         width: 10,
                       ),
                       ContentRatingChip(rating: manga.attributes.contentRating),
+                      ...stats.when(
+                        skipLoadingOnReload: true,
+                        data: (data) {
+                          if (data.containsKey(manga.id)) {
+                            return [
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              IconTextChip(
+                                icon: const Icon(
+                                  Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 18,
+                                ),
+                                text: Text(
+                                  data[manga.id]!
+                                      .rating
+                                      .bayesian
+                                      .toStringAsFixed(2),
+                                  style: const TextStyle(
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              IconTextChip(
+                                icon: const Icon(
+                                  Icons.bookmark_outline,
+                                  size: 18,
+                                ),
+                                text: Text(
+                                  data[manga.id]!.follows.toString(),
+                                ),
+                              ),
+                            ];
+                          }
+
+                          return [
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            const IconTextChip(
+                              text: Text('Error Retrieving Stats'),
+                            )
+                          ];
+                        },
+                        error: (obj, stack) => [
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          const IconTextChip(
+                            text: Text('Error Retrieving Stats'),
+                          )
+                        ],
+                        loading: () => [
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          const IconTextChip(
+                            text: CircularProgressIndicator(),
+                          )
+                        ],
+                      ),
                     ],
                   ),
                 ),

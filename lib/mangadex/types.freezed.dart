@@ -5115,6 +5115,733 @@ abstract class _TagResponse implements TagResponse {
       throw _privateConstructorUsedError;
 }
 
+MangaStatisticsResponse _$MangaStatisticsResponseFromJson(
+    Map<String, dynamic> json) {
+  return _MangaStatisticsResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MangaStatisticsResponse {
+  Map<String, MangaStatistics> get statistics =>
+      throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MangaStatisticsResponseCopyWith<MangaStatisticsResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MangaStatisticsResponseCopyWith<$Res> {
+  factory $MangaStatisticsResponseCopyWith(MangaStatisticsResponse value,
+          $Res Function(MangaStatisticsResponse) then) =
+      _$MangaStatisticsResponseCopyWithImpl<$Res, MangaStatisticsResponse>;
+  @useResult
+  $Res call({Map<String, MangaStatistics> statistics});
+}
+
+/// @nodoc
+class _$MangaStatisticsResponseCopyWithImpl<$Res,
+        $Val extends MangaStatisticsResponse>
+    implements $MangaStatisticsResponseCopyWith<$Res> {
+  _$MangaStatisticsResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? statistics = null,
+  }) {
+    return _then(_value.copyWith(
+      statistics: null == statistics
+          ? _value.statistics
+          : statistics // ignore: cast_nullable_to_non_nullable
+              as Map<String, MangaStatistics>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_MangaStatisticsResponseCopyWith<$Res>
+    implements $MangaStatisticsResponseCopyWith<$Res> {
+  factory _$$_MangaStatisticsResponseCopyWith(_$_MangaStatisticsResponse value,
+          $Res Function(_$_MangaStatisticsResponse) then) =
+      __$$_MangaStatisticsResponseCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({Map<String, MangaStatistics> statistics});
+}
+
+/// @nodoc
+class __$$_MangaStatisticsResponseCopyWithImpl<$Res>
+    extends _$MangaStatisticsResponseCopyWithImpl<$Res,
+        _$_MangaStatisticsResponse>
+    implements _$$_MangaStatisticsResponseCopyWith<$Res> {
+  __$$_MangaStatisticsResponseCopyWithImpl(_$_MangaStatisticsResponse _value,
+      $Res Function(_$_MangaStatisticsResponse) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? statistics = null,
+  }) {
+    return _then(_$_MangaStatisticsResponse(
+      null == statistics
+          ? _value._statistics
+          : statistics // ignore: cast_nullable_to_non_nullable
+              as Map<String, MangaStatistics>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_MangaStatisticsResponse
+    with DiagnosticableTreeMixin
+    implements _MangaStatisticsResponse {
+  const _$_MangaStatisticsResponse(
+      final Map<String, MangaStatistics> statistics)
+      : _statistics = statistics;
+
+  factory _$_MangaStatisticsResponse.fromJson(Map<String, dynamic> json) =>
+      _$$_MangaStatisticsResponseFromJson(json);
+
+  final Map<String, MangaStatistics> _statistics;
+  @override
+  Map<String, MangaStatistics> get statistics {
+    if (_statistics is EqualUnmodifiableMapView) return _statistics;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_statistics);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaStatisticsResponse(statistics: $statistics)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaStatisticsResponse'))
+      ..add(DiagnosticsProperty('statistics', statistics));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_MangaStatisticsResponse &&
+            const DeepCollectionEquality()
+                .equals(other._statistics, _statistics));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_statistics));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_MangaStatisticsResponseCopyWith<_$_MangaStatisticsResponse>
+      get copyWith =>
+          __$$_MangaStatisticsResponseCopyWithImpl<_$_MangaStatisticsResponse>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_MangaStatisticsResponseToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MangaStatisticsResponse implements MangaStatisticsResponse {
+  const factory _MangaStatisticsResponse(
+          final Map<String, MangaStatistics> statistics) =
+      _$_MangaStatisticsResponse;
+
+  factory _MangaStatisticsResponse.fromJson(Map<String, dynamic> json) =
+      _$_MangaStatisticsResponse.fromJson;
+
+  @override
+  Map<String, MangaStatistics> get statistics;
+  @override
+  @JsonKey(ignore: true)
+  _$$_MangaStatisticsResponseCopyWith<_$_MangaStatisticsResponse>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+MangaStatistics _$MangaStatisticsFromJson(Map<String, dynamic> json) {
+  return _MangaStatistics.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MangaStatistics {
+  StatisticsDetailsComments? get comments => throw _privateConstructorUsedError;
+  StatisticsDetailsRating get rating => throw _privateConstructorUsedError;
+  int get follows => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MangaStatisticsCopyWith<MangaStatistics> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MangaStatisticsCopyWith<$Res> {
+  factory $MangaStatisticsCopyWith(
+          MangaStatistics value, $Res Function(MangaStatistics) then) =
+      _$MangaStatisticsCopyWithImpl<$Res, MangaStatistics>;
+  @useResult
+  $Res call(
+      {StatisticsDetailsComments? comments,
+      StatisticsDetailsRating rating,
+      int follows});
+
+  $StatisticsDetailsCommentsCopyWith<$Res>? get comments;
+  $StatisticsDetailsRatingCopyWith<$Res> get rating;
+}
+
+/// @nodoc
+class _$MangaStatisticsCopyWithImpl<$Res, $Val extends MangaStatistics>
+    implements $MangaStatisticsCopyWith<$Res> {
+  _$MangaStatisticsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? comments = freezed,
+    Object? rating = null,
+    Object? follows = null,
+  }) {
+    return _then(_value.copyWith(
+      comments: freezed == comments
+          ? _value.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as StatisticsDetailsComments?,
+      rating: null == rating
+          ? _value.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as StatisticsDetailsRating,
+      follows: null == follows
+          ? _value.follows
+          : follows // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $StatisticsDetailsCommentsCopyWith<$Res>? get comments {
+    if (_value.comments == null) {
+      return null;
+    }
+
+    return $StatisticsDetailsCommentsCopyWith<$Res>(_value.comments!, (value) {
+      return _then(_value.copyWith(comments: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $StatisticsDetailsRatingCopyWith<$Res> get rating {
+    return $StatisticsDetailsRatingCopyWith<$Res>(_value.rating, (value) {
+      return _then(_value.copyWith(rating: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$_MangaStatisticsCopyWith<$Res>
+    implements $MangaStatisticsCopyWith<$Res> {
+  factory _$$_MangaStatisticsCopyWith(
+          _$_MangaStatistics value, $Res Function(_$_MangaStatistics) then) =
+      __$$_MangaStatisticsCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {StatisticsDetailsComments? comments,
+      StatisticsDetailsRating rating,
+      int follows});
+
+  @override
+  $StatisticsDetailsCommentsCopyWith<$Res>? get comments;
+  @override
+  $StatisticsDetailsRatingCopyWith<$Res> get rating;
+}
+
+/// @nodoc
+class __$$_MangaStatisticsCopyWithImpl<$Res>
+    extends _$MangaStatisticsCopyWithImpl<$Res, _$_MangaStatistics>
+    implements _$$_MangaStatisticsCopyWith<$Res> {
+  __$$_MangaStatisticsCopyWithImpl(
+      _$_MangaStatistics _value, $Res Function(_$_MangaStatistics) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? comments = freezed,
+    Object? rating = null,
+    Object? follows = null,
+  }) {
+    return _then(_$_MangaStatistics(
+      comments: freezed == comments
+          ? _value.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as StatisticsDetailsComments?,
+      rating: null == rating
+          ? _value.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as StatisticsDetailsRating,
+      follows: null == follows
+          ? _value.follows
+          : follows // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_MangaStatistics
+    with DiagnosticableTreeMixin
+    implements _MangaStatistics {
+  const _$_MangaStatistics(
+      {this.comments, required this.rating, required this.follows});
+
+  factory _$_MangaStatistics.fromJson(Map<String, dynamic> json) =>
+      _$$_MangaStatisticsFromJson(json);
+
+  @override
+  final StatisticsDetailsComments? comments;
+  @override
+  final StatisticsDetailsRating rating;
+  @override
+  final int follows;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaStatistics(comments: $comments, rating: $rating, follows: $follows)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaStatistics'))
+      ..add(DiagnosticsProperty('comments', comments))
+      ..add(DiagnosticsProperty('rating', rating))
+      ..add(DiagnosticsProperty('follows', follows));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_MangaStatistics &&
+            (identical(other.comments, comments) ||
+                other.comments == comments) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.follows, follows) || other.follows == follows));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, comments, rating, follows);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_MangaStatisticsCopyWith<_$_MangaStatistics> get copyWith =>
+      __$$_MangaStatisticsCopyWithImpl<_$_MangaStatistics>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_MangaStatisticsToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MangaStatistics implements MangaStatistics {
+  const factory _MangaStatistics(
+      {final StatisticsDetailsComments? comments,
+      required final StatisticsDetailsRating rating,
+      required final int follows}) = _$_MangaStatistics;
+
+  factory _MangaStatistics.fromJson(Map<String, dynamic> json) =
+      _$_MangaStatistics.fromJson;
+
+  @override
+  StatisticsDetailsComments? get comments;
+  @override
+  StatisticsDetailsRating get rating;
+  @override
+  int get follows;
+  @override
+  @JsonKey(ignore: true)
+  _$$_MangaStatisticsCopyWith<_$_MangaStatistics> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+StatisticsDetailsComments _$StatisticsDetailsCommentsFromJson(
+    Map<String, dynamic> json) {
+  return _StatisticsDetailsComments.fromJson(json);
+}
+
+/// @nodoc
+mixin _$StatisticsDetailsComments {
+  int get threadId => throw _privateConstructorUsedError;
+  int get repliesCount => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $StatisticsDetailsCommentsCopyWith<StatisticsDetailsComments> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $StatisticsDetailsCommentsCopyWith<$Res> {
+  factory $StatisticsDetailsCommentsCopyWith(StatisticsDetailsComments value,
+          $Res Function(StatisticsDetailsComments) then) =
+      _$StatisticsDetailsCommentsCopyWithImpl<$Res, StatisticsDetailsComments>;
+  @useResult
+  $Res call({int threadId, int repliesCount});
+}
+
+/// @nodoc
+class _$StatisticsDetailsCommentsCopyWithImpl<$Res,
+        $Val extends StatisticsDetailsComments>
+    implements $StatisticsDetailsCommentsCopyWith<$Res> {
+  _$StatisticsDetailsCommentsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? threadId = null,
+    Object? repliesCount = null,
+  }) {
+    return _then(_value.copyWith(
+      threadId: null == threadId
+          ? _value.threadId
+          : threadId // ignore: cast_nullable_to_non_nullable
+              as int,
+      repliesCount: null == repliesCount
+          ? _value.repliesCount
+          : repliesCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_StatisticsDetailsCommentsCopyWith<$Res>
+    implements $StatisticsDetailsCommentsCopyWith<$Res> {
+  factory _$$_StatisticsDetailsCommentsCopyWith(
+          _$_StatisticsDetailsComments value,
+          $Res Function(_$_StatisticsDetailsComments) then) =
+      __$$_StatisticsDetailsCommentsCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int threadId, int repliesCount});
+}
+
+/// @nodoc
+class __$$_StatisticsDetailsCommentsCopyWithImpl<$Res>
+    extends _$StatisticsDetailsCommentsCopyWithImpl<$Res,
+        _$_StatisticsDetailsComments>
+    implements _$$_StatisticsDetailsCommentsCopyWith<$Res> {
+  __$$_StatisticsDetailsCommentsCopyWithImpl(
+      _$_StatisticsDetailsComments _value,
+      $Res Function(_$_StatisticsDetailsComments) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? threadId = null,
+    Object? repliesCount = null,
+  }) {
+    return _then(_$_StatisticsDetailsComments(
+      threadId: null == threadId
+          ? _value.threadId
+          : threadId // ignore: cast_nullable_to_non_nullable
+              as int,
+      repliesCount: null == repliesCount
+          ? _value.repliesCount
+          : repliesCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_StatisticsDetailsComments
+    with DiagnosticableTreeMixin
+    implements _StatisticsDetailsComments {
+  const _$_StatisticsDetailsComments(
+      {required this.threadId, required this.repliesCount});
+
+  factory _$_StatisticsDetailsComments.fromJson(Map<String, dynamic> json) =>
+      _$$_StatisticsDetailsCommentsFromJson(json);
+
+  @override
+  final int threadId;
+  @override
+  final int repliesCount;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'StatisticsDetailsComments(threadId: $threadId, repliesCount: $repliesCount)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'StatisticsDetailsComments'))
+      ..add(DiagnosticsProperty('threadId', threadId))
+      ..add(DiagnosticsProperty('repliesCount', repliesCount));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_StatisticsDetailsComments &&
+            (identical(other.threadId, threadId) ||
+                other.threadId == threadId) &&
+            (identical(other.repliesCount, repliesCount) ||
+                other.repliesCount == repliesCount));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, threadId, repliesCount);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_StatisticsDetailsCommentsCopyWith<_$_StatisticsDetailsComments>
+      get copyWith => __$$_StatisticsDetailsCommentsCopyWithImpl<
+          _$_StatisticsDetailsComments>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_StatisticsDetailsCommentsToJson(
+      this,
+    );
+  }
+}
+
+abstract class _StatisticsDetailsComments implements StatisticsDetailsComments {
+  const factory _StatisticsDetailsComments(
+      {required final int threadId,
+      required final int repliesCount}) = _$_StatisticsDetailsComments;
+
+  factory _StatisticsDetailsComments.fromJson(Map<String, dynamic> json) =
+      _$_StatisticsDetailsComments.fromJson;
+
+  @override
+  int get threadId;
+  @override
+  int get repliesCount;
+  @override
+  @JsonKey(ignore: true)
+  _$$_StatisticsDetailsCommentsCopyWith<_$_StatisticsDetailsComments>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+StatisticsDetailsRating _$StatisticsDetailsRatingFromJson(
+    Map<String, dynamic> json) {
+  return _StatisticsDetailsRating.fromJson(json);
+}
+
+/// @nodoc
+mixin _$StatisticsDetailsRating {
+  double? get average => throw _privateConstructorUsedError;
+  double get bayesian => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $StatisticsDetailsRatingCopyWith<StatisticsDetailsRating> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $StatisticsDetailsRatingCopyWith<$Res> {
+  factory $StatisticsDetailsRatingCopyWith(StatisticsDetailsRating value,
+          $Res Function(StatisticsDetailsRating) then) =
+      _$StatisticsDetailsRatingCopyWithImpl<$Res, StatisticsDetailsRating>;
+  @useResult
+  $Res call({double? average, double bayesian});
+}
+
+/// @nodoc
+class _$StatisticsDetailsRatingCopyWithImpl<$Res,
+        $Val extends StatisticsDetailsRating>
+    implements $StatisticsDetailsRatingCopyWith<$Res> {
+  _$StatisticsDetailsRatingCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? average = freezed,
+    Object? bayesian = null,
+  }) {
+    return _then(_value.copyWith(
+      average: freezed == average
+          ? _value.average
+          : average // ignore: cast_nullable_to_non_nullable
+              as double?,
+      bayesian: null == bayesian
+          ? _value.bayesian
+          : bayesian // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_StatisticsDetailsRatingCopyWith<$Res>
+    implements $StatisticsDetailsRatingCopyWith<$Res> {
+  factory _$$_StatisticsDetailsRatingCopyWith(_$_StatisticsDetailsRating value,
+          $Res Function(_$_StatisticsDetailsRating) then) =
+      __$$_StatisticsDetailsRatingCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({double? average, double bayesian});
+}
+
+/// @nodoc
+class __$$_StatisticsDetailsRatingCopyWithImpl<$Res>
+    extends _$StatisticsDetailsRatingCopyWithImpl<$Res,
+        _$_StatisticsDetailsRating>
+    implements _$$_StatisticsDetailsRatingCopyWith<$Res> {
+  __$$_StatisticsDetailsRatingCopyWithImpl(_$_StatisticsDetailsRating _value,
+      $Res Function(_$_StatisticsDetailsRating) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? average = freezed,
+    Object? bayesian = null,
+  }) {
+    return _then(_$_StatisticsDetailsRating(
+      average: freezed == average
+          ? _value.average
+          : average // ignore: cast_nullable_to_non_nullable
+              as double?,
+      bayesian: null == bayesian
+          ? _value.bayesian
+          : bayesian // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_StatisticsDetailsRating
+    with DiagnosticableTreeMixin
+    implements _StatisticsDetailsRating {
+  const _$_StatisticsDetailsRating({this.average, required this.bayesian});
+
+  factory _$_StatisticsDetailsRating.fromJson(Map<String, dynamic> json) =>
+      _$$_StatisticsDetailsRatingFromJson(json);
+
+  @override
+  final double? average;
+  @override
+  final double bayesian;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'StatisticsDetailsRating(average: $average, bayesian: $bayesian)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'StatisticsDetailsRating'))
+      ..add(DiagnosticsProperty('average', average))
+      ..add(DiagnosticsProperty('bayesian', bayesian));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_StatisticsDetailsRating &&
+            (identical(other.average, average) || other.average == average) &&
+            (identical(other.bayesian, bayesian) ||
+                other.bayesian == bayesian));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, average, bayesian);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_StatisticsDetailsRatingCopyWith<_$_StatisticsDetailsRating>
+      get copyWith =>
+          __$$_StatisticsDetailsRatingCopyWithImpl<_$_StatisticsDetailsRating>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_StatisticsDetailsRatingToJson(
+      this,
+    );
+  }
+}
+
+abstract class _StatisticsDetailsRating implements StatisticsDetailsRating {
+  const factory _StatisticsDetailsRating(
+      {final double? average,
+      required final double bayesian}) = _$_StatisticsDetailsRating;
+
+  factory _StatisticsDetailsRating.fromJson(Map<String, dynamic> json) =
+      _$_StatisticsDetailsRating.fromJson;
+
+  @override
+  double? get average;
+  @override
+  double get bayesian;
+  @override
+  @JsonKey(ignore: true)
+  _$$_StatisticsDetailsRatingCopyWith<_$_StatisticsDetailsRating>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
 OldToken _$OldTokenFromJson(Map<String, dynamic> json) {
   return _OldToken.fromJson(json);
 }

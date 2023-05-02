@@ -64,6 +64,9 @@ abstract class MangaDexEndpoints {
 
   /// Gets the universal tag list
   static const tag = '/manga/tag';
+
+  /// Gets statistics for given manga
+  static const statistics = '/statistics/manga';
 }
 
 abstract class CacheLists {
@@ -843,7 +846,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to download user library data");
+    throw Exception("Failed to download tag list");
   }
 
   /// Searches for manga using the MangaDex API with the search term [searchTerm].
@@ -907,10 +910,50 @@ class MangaDexModel {
       _cache.putAllAPIResolved(mlist.data);
     } else {
       // Throw if failure
-      throw Exception("Failed to download manga data");
+      throw Exception("Failed to search manga");
     }
 
     return list;
+  }
+
+  /// Fetches statistics of given [mangas]
+  ///
+  /// Do not use directly. Prefer [statisticsProvider] for its caching and
+  /// state management.
+  Future<Map<String, MangaStatistics>> fetchStatistics(
+      Iterable<Manga> mangas) async {
+    if (!loggedIn()) {
+      throw Exception(
+          "Data fetch called on invalid token/login. Shouldn't ever get here");
+    }
+
+    if (_tokenExpired(_token!)) {
+      await refreshToken();
+    }
+
+    var fetch = mangas.map((e) => e.id);
+
+    if (fetch.isNotEmpty) {
+      final queryParams = {'manga[]': fetch.toList()};
+
+      final uri = MangaDexEndpoints.api.replace(
+          path: MangaDexEndpoints.statistics, queryParameters: queryParams);
+
+      final response = await _client!.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+
+        final resp = MangaStatisticsResponse.fromJson(body);
+
+        return resp.statistics;
+      } else {
+        // Throw if failure
+        throw Exception("Failed to download manga statistics");
+      }
+    }
+
+    return {};
   }
 }
 
@@ -1169,6 +1212,34 @@ class MangaSearch extends _$MangaSearch {
     }
 
     // Otherwise, do nothing because there is no more content
+  }
+}
+
+@Riverpod(keepAlive: true)
+class Statistics extends _$Statistics {
+  Future<Map<String, MangaStatistics>> _fetchStatistics(
+      Iterable<Manga> mangas) async {
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchStatistics(mangas);
+
+    return map;
+  }
+
+  @override
+  FutureOr<Map<String, MangaStatistics>> build() async {
+    return {};
+  }
+
+  /// Fetch statistics for the provided list of mangas
+  Future<void> get(Iterable<Manga> mangas) async {
+    final oldstate = state.maybeWhen(
+        data: (data) => data, orElse: () => <String, MangaStatistics>{});
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final mg = mangas.takeWhile((m) => !oldstate.containsKey(m.id));
+      final map = await _fetchStatistics(mg);
+      return {...oldstate, ...map};
+    });
   }
 }
 
