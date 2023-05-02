@@ -30,6 +30,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   animations: ^2.0.7
+  dash_flags: ^0.1.1
   extended_image: ^7.0.2
   flutter:
     sdk: flutter

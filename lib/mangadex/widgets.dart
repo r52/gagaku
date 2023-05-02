@@ -8,6 +8,7 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:dash_flags/dash_flags.dart' as dashflag;
 
 import 'types.dart';
 
@@ -112,10 +113,10 @@ class ChapterButtonWidget extends HookConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconTextChip(
-                          icon: const Icon(Icons.language, size: 18),
-                          text: Text(
-                            chapter.attributes.translatedLanguage.code
-                                .toUpperCase(),
+                          text: dashflag.CountryFlag(
+                            country: dashflag.Country.fromCode(
+                                chapter.attributes.translatedLanguage.flag),
+                            height: 18,
                           ),
                         ),
                         for (var g in chapter.getGroups()) ...[

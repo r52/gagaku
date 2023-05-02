@@ -489,6 +489,7 @@ abstract class _MangaSearchParameters implements MangaSearchParameters {
 mixin _$Language {
   String get name => throw _privateConstructorUsedError;
   String get code => throw _privateConstructorUsedError;
+  String get flag => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $LanguageCopyWith<Language> get copyWith =>
@@ -500,7 +501,7 @@ abstract class $LanguageCopyWith<$Res> {
   factory $LanguageCopyWith(Language value, $Res Function(Language) then) =
       _$LanguageCopyWithImpl<$Res, Language>;
   @useResult
-  $Res call({String name, String code});
+  $Res call({String name, String code, String flag});
 }
 
 /// @nodoc
@@ -518,6 +519,7 @@ class _$LanguageCopyWithImpl<$Res, $Val extends Language>
   $Res call({
     Object? name = null,
     Object? code = null,
+    Object? flag = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -527,6 +529,10 @@ class _$LanguageCopyWithImpl<$Res, $Val extends Language>
       code: null == code
           ? _value.code
           : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      flag: null == flag
+          ? _value.flag
+          : flag // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
@@ -539,7 +545,7 @@ abstract class _$$_LanguageCopyWith<$Res> implements $LanguageCopyWith<$Res> {
       __$$_LanguageCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, String code});
+  $Res call({String name, String code, String flag});
 }
 
 /// @nodoc
@@ -555,6 +561,7 @@ class __$$_LanguageCopyWithImpl<$Res>
   $Res call({
     Object? name = null,
     Object? code = null,
+    Object? flag = null,
   }) {
     return _then(_$_Language(
       name: null == name
@@ -565,6 +572,10 @@ class __$$_LanguageCopyWithImpl<$Res>
           ? _value.code
           : code // ignore: cast_nullable_to_non_nullable
               as String,
+      flag: null == flag
+          ? _value.flag
+          : flag // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -572,16 +583,19 @@ class __$$_LanguageCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Language with DiagnosticableTreeMixin implements _Language {
-  const _$_Language({required this.name, required this.code});
+  const _$_Language(
+      {required this.name, required this.code, required this.flag});
 
   @override
   final String name;
   @override
   final String code;
+  @override
+  final String flag;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Language(name: $name, code: $code)';
+    return 'Language(name: $name, code: $code, flag: $flag)';
   }
 
   @override
@@ -590,7 +604,8 @@ class _$_Language with DiagnosticableTreeMixin implements _Language {
     properties
       ..add(DiagnosticsProperty('type', 'Language'))
       ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('code', code));
+      ..add(DiagnosticsProperty('code', code))
+      ..add(DiagnosticsProperty('flag', flag));
   }
 
   @override
@@ -599,11 +614,12 @@ class _$_Language with DiagnosticableTreeMixin implements _Language {
         (other.runtimeType == runtimeType &&
             other is _$_Language &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.code, code) || other.code == code));
+            (identical(other.code, code) || other.code == code) &&
+            (identical(other.flag, flag) || other.flag == flag));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, name, code);
+  int get hashCode => Object.hash(runtimeType, name, code, flag);
 
   @JsonKey(ignore: true)
   @override
@@ -614,12 +630,16 @@ class _$_Language with DiagnosticableTreeMixin implements _Language {
 
 abstract class _Language implements Language {
   const factory _Language(
-      {required final String name, required final String code}) = _$_Language;
+      {required final String name,
+      required final String code,
+      required final String flag}) = _$_Language;
 
   @override
   String get name;
   @override
   String get code;
+  @override
+  String get flag;
   @override
   @JsonKey(ignore: true)
   _$$_LanguageCopyWith<_$_Language> get copyWith =>
