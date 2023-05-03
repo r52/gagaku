@@ -71,8 +71,10 @@ class ReaderWidget extends HookConsumerWidget {
     final refresh = useState(0);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
-    final scaleStateController = usePhotoViewScaleStateController();
-    final viewController = usePhotoViewController();
+    final scaleStateController = List<PhotoViewScaleStateController>.generate(
+        pageCount, (index) => usePhotoViewScaleStateController());
+    final viewController = List<PhotoViewController>.generate(
+        pageCount, (index) => usePhotoViewController());
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
     final currentPage = useValueNotifier(0);
@@ -269,11 +271,11 @@ class ReaderWidget extends HookConsumerWidget {
 
       switch (settings.direction) {
         case ReaderDirection.topToBottom:
-          final oldpos = viewController.position;
-          viewController.position =
-              viewController.position + Offset(0.0, offset);
+          final oldpos = viewController[currentPage.value].position;
+          viewController[currentPage.value].position =
+              viewController[currentPage.value].position + Offset(0.0, offset);
 
-          if (viewController.position == oldpos) {
+          if (viewController[currentPage.value].position == oldpos) {
             // At edge
             if (currentPage.value > 0) {
               jumpToPreviousPage();
@@ -282,8 +284,8 @@ class ReaderWidget extends HookConsumerWidget {
           break;
         case ReaderDirection.leftToRight:
         case ReaderDirection.rightToLeft:
-          viewController.position =
-              viewController.position + Offset(0.0, offset);
+          viewController[currentPage.value].position =
+              viewController[currentPage.value].position + Offset(0.0, offset);
           break;
         default:
           // Do nothing
@@ -314,11 +316,11 @@ class ReaderWidget extends HookConsumerWidget {
 
       switch (settings.direction) {
         case ReaderDirection.topToBottom:
-          final oldpos = viewController.position;
-          viewController.position =
-              viewController.position - Offset(0.0, offset);
+          final oldpos = viewController[currentPage.value].position;
+          viewController[currentPage.value].position =
+              viewController[currentPage.value].position - Offset(0.0, offset);
 
-          if (viewController.position == oldpos) {
+          if (viewController[currentPage.value].position == oldpos) {
             // At edge
             if (currentPage.value < pageCount - 1) {
               jumpToNextPage();
@@ -329,8 +331,8 @@ class ReaderWidget extends HookConsumerWidget {
           break;
         case ReaderDirection.leftToRight:
         case ReaderDirection.rightToLeft:
-          viewController.position =
-              viewController.position - Offset(0.0, offset);
+          viewController[currentPage.value].position =
+              viewController[currentPage.value].position - Offset(0.0, offset);
           break;
         default:
           // Do nothing
@@ -489,8 +491,9 @@ class ReaderWidget extends HookConsumerWidget {
                   avatar: const Icon(Icons.fit_screen),
                   label: const Text('Toggle Page Size'),
                   onPressed: () {
-                    scaleStateController.scaleState =
-                        defaultScaleStateCycle(scaleStateController.scaleState);
+                    scaleStateController[currentPage.value].scaleState =
+                        defaultScaleStateCycle(
+                            scaleStateController[currentPage.value].scaleState);
                   },
                 ),
                 const SizedBox(height: 10.0),
@@ -674,8 +677,8 @@ class ReaderWidget extends HookConsumerWidget {
                   backgroundDecoration:
                       const BoxDecoration(color: Colors.black),
                   enableRotation: false,
-                  scaleStateController: scaleStateController,
-                  controller: viewController,
+                  scaleStateController: scaleStateController[index],
+                  controller: viewController[index],
                   minScale: PhotoViewComputedScale.contained * 1.0,
                   maxScale: PhotoViewComputedScale.covered * 5.0,
                   initialScale: PhotoViewComputedScale.contained,
