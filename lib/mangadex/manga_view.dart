@@ -209,10 +209,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   color: theme.cardColor,
                   child: Row(
                     children: [
-                      MangaStatusChip(status: manga.attributes.status),
-                      const SizedBox(
-                        width: 10,
-                      ),
                       ContentRatingChip(rating: manga.attributes.contentRating),
                       ...stats.when(
                         skipLoadingOnReload: true,
@@ -279,6 +275,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           )
                         ],
                       ),
+                      const SizedBox(width: 10),
+                      MangaStatusChip(status: manga.attributes.status),
                     ],
                   ),
                 ),
@@ -438,18 +436,81 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    var e = result.chapters.elementAt(index);
+                    var lastChapIsSame = false;
+                    var nextChapIsSame = false;
+
+                    final thischap = result.chapters.elementAt(index);
+                    final chapbtn = ChapterButtonWidget(
+                      chapter: thischap,
+                      manga: manga,
+                      link: Text(
+                        manga.attributes.title.get('en'),
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                    );
+
+                    if (index > 0) {
+                      lastChapIsSame = result.chapters
+                              .elementAt(index - 1)
+                              .attributes
+                              .chapter ==
+                          thischap.attributes.chapter;
+                    }
+
+                    if (index < result.chapters.length - 1) {
+                      nextChapIsSame = result.chapters
+                              .elementAt(index + 1)
+                              .attributes
+                              .chapter ==
+                          thischap.attributes.chapter;
+                    }
+
+                    if (lastChapIsSame || nextChapIsSame) {
+                      Widget child = Row(
+                        children: [
+                          const Icon(
+                            Icons.subdirectory_arrow_right,
+                            size: 15.0,
+                          ),
+                          Flexible(
+                            child: chapbtn,
+                          ),
+                        ],
+                      );
+
+                      if (!lastChapIsSame && nextChapIsSame) {
+                        child = Wrap(
+                          children: [
+                            Text("Chapter ${thischap.attributes.chapter}"),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.subdirectory_arrow_right,
+                                  size: 15.0,
+                                ),
+                                Flexible(
+                                  child: chapbtn,
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Padding(
+                        padding: EdgeInsets.only(
+                            top:
+                                (!lastChapIsSame && nextChapIsSame) ? 6.0 : 2.0,
+                            bottom: (lastChapIsSame && !nextChapIsSame)
+                                ? 6.0
+                                : 2.0),
+                        child: child,
+                      );
+                    }
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2.0),
-                      child: ChapterButtonWidget(
-                        chapter: e,
-                        manga: manga,
-                        link: Text(
-                          manga.attributes.title.get('en'),
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                      ),
+                      child: chapbtn,
                     );
                   },
                   childCount: result.chapters.length,
