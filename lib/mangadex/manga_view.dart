@@ -405,6 +405,23 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           ),
                         ],
                       ),
+                    if (manga.attributes.lastChapter != null)
+                      ExpansionTile(
+                        title: const Text('Final Chapter'),
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            color: theme.colorScheme.background,
+                            child: Row(
+                              children: [
+                                Text(manga.attributes.lastVolume != null
+                                    ? 'Volume ${manga.attributes.lastVolume}, Chapter ${manga.attributes.lastChapter}'
+                                    : 'Chapter ${manga.attributes.lastChapter}')
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),
