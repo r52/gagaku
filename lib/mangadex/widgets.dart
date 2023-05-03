@@ -124,7 +124,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
                           const SizedBox(width: 4),
                           IconTextChip(
                             icon: const Icon(Icons.group, size: 20),
-                            text: Text(g),
+                            text: Text(g.crop()),
                           ),
                         ],
                         if (chapter.attributes.externalUrl != null) ...[

@@ -8,6 +8,14 @@ extension StringExtension on String {
 
     return "${this[0].toUpperCase()}${substring(1)}";
   }
+
+  String crop() {
+    if (length > 32) {
+      return '${substring(0, 32)}...';
+    }
+
+    return this;
+  }
 }
 
 class DeviceContext {
