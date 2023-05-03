@@ -80,12 +80,17 @@ class WebGalleryReaderWidget extends ConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       error: (err, stackTrace) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(SnackBar(
-            content: Text('$err'),
-            backgroundColor: Colors.red,
-          ));
+        Future.delayed(
+          Duration.zero,
+          () => ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('$err'),
+                backgroundColor: Colors.red,
+              ),
+            ),
+        );
 
         return Text('Error: $err');
       },

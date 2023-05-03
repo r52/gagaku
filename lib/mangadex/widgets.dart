@@ -53,7 +53,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
     return readChapters.when(
       skipLoadingOnReload: true,
       data: (result) {
-        read.value = result.contains(chapter.id);
+        read.value = result.containsKey(manga.id) &&
+            result[manga.id]!.contains(chapter.id);
 
         return Container(
           decoration: BoxDecoration(
@@ -156,12 +157,17 @@ class ChapterButtonWidget extends HookConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       error: (err, stackTrace) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(SnackBar(
-            content: Text('$err'),
-            backgroundColor: Colors.red,
-          ));
+        Future.delayed(
+          Duration.zero,
+          () => ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('$err'),
+                backgroundColor: Colors.red,
+              ),
+            ),
+        );
 
         return Text('Error: $err');
       },

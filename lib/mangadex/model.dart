@@ -582,7 +582,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
-    var response = await _client!.post(uri,
+    final response = await _client!.post(uri,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(params));
 
@@ -601,7 +601,7 @@ class MangaDexModel {
   ///
   /// Do not use directly. Prefer [readChaptersProvider] for its caching and
   /// state management.
-  Future<Set<String>> fetchReadChapters(Iterable<Manga> mangas) async {
+  Future<ReadChaptersMap> fetchReadChapters(Iterable<Manga> mangas) async {
     if (!loggedIn()) {
       throw Exception(
           "Data fetch called on invalid token/login. Shouldn't ever get here");
@@ -611,10 +611,10 @@ class MangaDexModel {
       await refreshToken();
     }
 
-    var fetch = mangas.map((e) => e.id);
+    final fetch = mangas.map((e) => e.id);
 
     if (fetch.isNotEmpty) {
-      final queryParams = {'ids[]': fetch};
+      final queryParams = {'ids[]': fetch, 'grouped': 'true'};
 
       final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.getRead, queryParameters: queryParams);
@@ -624,11 +624,12 @@ class MangaDexModel {
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = json.decode(response.body);
 
-        var clist = body['data'] as List<dynamic>;
+        final cmap = body['data'] as Map<String, dynamic>;
 
-        var strlist = clist.map((e) => e.toString());
+        final readmap = cmap.map((key, value) => MapEntry(
+            key, (value as List<dynamic>).map((e) => e.toString()).toSet()));
 
-        return strlist.toSet();
+        return readmap;
       } else {
         // Throw if failure
         throw Exception("Failed to download read chapters data");
@@ -755,9 +756,9 @@ class MangaDexModel {
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
 
-      var apidat = ChapterAPI.fromJson(body);
+      final apidat = ChapterAPI.fromJson(body);
 
-      var chapterUrl = apidat.getUrl(settings.dataSaver);
+      final chapterUrl = apidat.getUrl(settings.dataSaver);
 
       var plist = apidat.chapter.data;
 
@@ -765,7 +766,7 @@ class MangaDexModel {
         plist = apidat.chapter.dataSaver;
       }
 
-      var data = PageData(chapterUrl, plist);
+      final data = PageData(chapterUrl, plist);
 
       return data;
     }
@@ -1048,26 +1049,27 @@ class MangaChapters extends _$MangaChapters {
 @Riverpod(keepAlive: true)
 class ReadChapters extends _$ReadChapters {
   ///Fetch the latest chapters list based on offset
-  Future<Set<String>> _fetchReadChapters(Iterable<Manga> mangas) async {
+  Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
     final api = ref.watch(mangadexProvider);
-    var list = await api.fetchReadChapters(mangas);
+    final map = await api.fetchReadChapters(mangas);
 
-    return list;
+    return map;
   }
 
   @override
-  FutureOr<Set<String>> build() async {
+  FutureOr<ReadChaptersMap> build() async {
     return {};
   }
 
   /// Fetch read chapters for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
-    var oldstate =
-        state.maybeWhen(data: (data) => data, orElse: () => <String>{});
+    final oldstate = state.maybeWhen(
+        data: (data) => data, orElse: () => <String, Set<String>>{});
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      var chapters = await _fetchReadChapters(mangas);
-      return {...oldstate, ...chapters};
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+      final map = await _fetchReadChapters(mg);
+      return {...oldstate, ...map};
     });
   }
 
@@ -1077,8 +1079,8 @@ class ReadChapters extends _$ReadChapters {
     final chapIdSet = chapters.map((e) => e.id).toSet();
     final api = ref.watch(mangadexProvider);
 
-    var oldstate =
-        state.maybeWhen(data: (data) => data, orElse: () => <String>{});
+    final oldstate = state.maybeWhen(
+        data: (data) => data, orElse: () => <String, Set<String>>{});
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -1087,12 +1089,20 @@ class ReadChapters extends _$ReadChapters {
       if (result) {
         // Refresh
         if (setRead) {
-          return {...oldstate, ...chapIdSet};
+          if (oldstate.containsKey(manga.id)) {
+            oldstate[manga.id]!.addAll(chapIdSet);
+          } else {
+            oldstate[manga.id] = chapIdSet;
+          }
         } else {
-          return oldstate
-              .where((element) => !chapIdSet.contains(element))
-              .toSet();
+          if (oldstate.containsKey(manga.id)) {
+            oldstate[manga.id]!.removeAll(chapIdSet);
+          } else {
+            oldstate[manga.id] = {};
+          }
         }
+
+        return {...oldstate};
       }
 
       return oldstate;

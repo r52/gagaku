@@ -9,6 +9,7 @@ part 'types.g.dart';
 
 typedef LocalizedString = Map<String, String>;
 typedef LibraryMap = Map<String, MangaReadingStatus>;
+typedef ReadChaptersMap = Map<String, Set<String>>;
 
 extension LocalizedStringExt on LocalizedString {
   String get(String code) {

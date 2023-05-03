@@ -77,8 +77,9 @@ class CacheManager {
   }
 
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
-  void putAllAPIResolved(Iterable<dynamic> list) {
-    final resolved = list.map((e) => MapEntry(e.id as String, CacheEntry(e)));
+  void putAllAPIResolved(Iterable<dynamic> list, [int expiry = 10]) {
+    final resolved =
+        list.map((e) => MapEntry(e.id as String, CacheEntry(e, expiry)));
     _cache.addEntries(resolved);
 
     if (_cache.length > _preferredMaxEntries) {
@@ -95,7 +96,7 @@ class CacheManager {
     _cache[key] = CacheEntry(ids, expiry); // Just overwrite it
 
     if (resolve) {
-      putAllAPIResolved(list);
+      putAllAPIResolved(list, expiry);
     }
   }
 

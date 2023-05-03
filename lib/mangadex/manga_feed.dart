@@ -60,12 +60,18 @@ class MangaDexMangaFeed extends HookConsumerWidget {
           );
         },
         error: (err, stack) {
-          ScaffoldMessenger.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              content: Text('$err'),
-              backgroundColor: Colors.red,
-            ));
+          Future.delayed(
+            Duration.zero,
+            () => ScaffoldMessenger.of(context)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text('$err'),
+                  backgroundColor: Colors.red,
+                ),
+              ),
+          );
+
           return Text('Error: $err');
         },
         loading: () => const CircularProgressIndicator(),

@@ -72,7 +72,8 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       data: (result) {
         readChapters.maybeWhen(
             data: (read) {
-              if (!read.contains(chapter.id)) {
+              if (!read.containsKey(manga.id) ||
+                  !read[manga.id]!.contains(chapter.id)) {
                 Future.delayed(
                     Duration.zero,
                     () => ref
@@ -96,14 +97,17 @@ class MangaDexReaderWidget extends HookConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       error: (err, stackTrace) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text('$err'),
-              backgroundColor: Colors.red,
+        Future.delayed(
+          Duration.zero,
+          () => ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('$err'),
+                backgroundColor: Colors.red,
+              ),
             ),
-          );
+        );
 
         return Text('Error: $err');
       },
