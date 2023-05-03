@@ -624,6 +624,18 @@ class MangaDexModel {
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = json.decode(response.body);
 
+        if (body['data'] is List) {
+          // Since grouped = true, if the api returns a List, then the result
+          // is null
+          ReadChaptersMap map = {};
+
+          for (var m in mangas) {
+            map[m.id] = <String>{};
+          }
+
+          return map;
+        }
+
         final cmap = body['data'] as Map<String, dynamic>;
 
         final readmap = cmap.map((key, value) => MapEntry(
