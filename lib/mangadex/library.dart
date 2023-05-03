@@ -51,7 +51,6 @@ class MangaDexLibraryView extends HookConsumerWidget {
                 skipLoadingOnReload: true,
                 data: (result) {
                   return MangaListWidget(
-                    items: result,
                     title: Text(
                       '${ref.read(userLibraryProvider(type).notifier).total()} Mangas',
                       style: const TextStyle(fontSize: 24),
@@ -61,6 +60,9 @@ class MangaDexLibraryView extends HookConsumerWidget {
                       final lt = ref.read(libraryViewTypeProvider);
                       ref.read(userLibraryProvider(lt).notifier).getMore();
                     },
+                    children: [
+                      MangaListViewSliver(items: result),
+                    ],
                   );
                 },
                 loading: () => const Center(

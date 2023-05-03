@@ -171,16 +171,16 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
 class MangaListWidget extends HookConsumerWidget {
   const MangaListWidget({
-    Key? key,
+    super.key,
     required this.title,
-    required this.items,
+    required this.children,
     this.leading = const <Widget>[],
     this.physics,
     this.onAtEdge,
-  }) : super(key: key);
+  });
 
   final Widget title;
-  final Iterable<Manga> items;
+  final List<Widget> children;
   final List<Widget> leading;
   final ScrollPhysics? physics;
   final VoidCallback? onAtEdge;
@@ -240,46 +240,59 @@ class MangaListWidget extends HookConsumerWidget {
             ),
           ),
         ),
-        (() {
-          switch (view) {
-            case MangaListView.list:
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    var manga = items.elementAt(index);
-
-                    return _ListMangaItem(
-                      manga: manga,
-                    );
-                  },
-                  childCount: items.length,
-                ),
-              );
-            case MangaListView.detailed:
-              return SliverGrid.extent(
-                maxCrossAxisExtent: 1024,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 3,
-                children: items
-                    .map((manga) => _GridMangaDetailedItem(manga: manga))
-                    .toList(),
-              );
-
-            case MangaListView.grid:
-            default:
-              return SliverGrid.extent(
-                maxCrossAxisExtent: 256,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.7,
-                children:
-                    items.map((manga) => _GridMangaItem(manga: manga)).toList(),
-              );
-          }
-        }()),
+        ...children,
       ],
     );
+  }
+}
+
+class MangaListViewSliver extends ConsumerWidget {
+  const MangaListViewSliver({
+    super.key,
+    required this.items,
+  });
+
+  final Iterable<Manga> items;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final view = ref.watch(_mangaListViewProvider);
+
+    switch (view) {
+      case MangaListView.list:
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              var manga = items.elementAt(index);
+
+              return _ListMangaItem(
+                manga: manga,
+              );
+            },
+            childCount: items.length,
+          ),
+        );
+      case MangaListView.detailed:
+        return SliverGrid.extent(
+          maxCrossAxisExtent: 1024,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 3,
+          children: items
+              .map((manga) => _GridMangaDetailedItem(manga: manga))
+              .toList(),
+        );
+
+      case MangaListView.grid:
+      default:
+        return SliverGrid.extent(
+          maxCrossAxisExtent: 256,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 0.7,
+          children: items.map((manga) => _GridMangaItem(manga: manga)).toList(),
+        );
+    }
   }
 }
 
@@ -382,7 +395,9 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            MangaStatusChip(status: manga.attributes.status),
+                            ContentRatingChip(
+                                rating: manga.attributes.contentRating),
+                            const SizedBox(width: 4),
                             ...stats.when(
                               skipLoadingOnReload: true,
                               data: (data) {
@@ -448,6 +463,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 )
                               ],
                             ),
+                            const SizedBox(width: 4),
+                            MangaStatusChip(status: manga.attributes.status),
                           ],
                         ),
                         Wrap(
@@ -533,9 +550,8 @@ class _ListMangaItem extends ConsumerWidget {
                   ),
                   Row(
                     children: [
-                      MangaStatusChip(
-                        status: manga.attributes.status,
-                      ),
+                      ContentRatingChip(rating: manga.attributes.contentRating),
+                      const SizedBox(width: 4),
                       ...stats.when(
                         skipLoadingOnReload: true,
                         data: (data) {
@@ -601,6 +617,8 @@ class _ListMangaItem extends ConsumerWidget {
                           )
                         ],
                       ),
+                      const SizedBox(width: 4),
+                      MangaStatusChip(status: manga.attributes.status),
                     ],
                   )
                 ],

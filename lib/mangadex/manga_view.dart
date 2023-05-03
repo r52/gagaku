@@ -27,10 +27,10 @@ Future<_FetchMangaChaptersResult> _fetchMangaViewChapters(
   final reading = await ref.watch(fetchReadingStatusProvider(manga).future);
   await Future.delayed(const Duration(milliseconds: 100));
 
-  ref.watch(readChaptersProvider.notifier).get([manga]);
+  await ref.watch(readChaptersProvider.notifier).get([manga]);
   await Future.delayed(const Duration(milliseconds: 100));
 
-  ref.watch(statisticsProvider.notifier).get([manga]);
+  await ref.watch(statisticsProvider.notifier).get([manga]);
   await Future.delayed(const Duration(milliseconds: 100));
 
   final chapters = await ref.watch(mangaChaptersProvider(manga).future);

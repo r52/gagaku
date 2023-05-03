@@ -47,108 +47,122 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     }
 
     return Scaffold(
-      body: results.when(
-        skipLoadingOnReload: true,
-        data: (mangas) {
-          return MangaListWidget(
-            items: mangas,
-            title: DropdownButton<FilterOrder>(
-              value: filter.filter.order,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 24,
-              elevation: 16,
-              underline: Container(
-                height: 2,
-                color: Colors.deepOrangeAccent,
-              ),
-              onChanged: (FilterOrder? order) async {
-                if (order != null) {
-                  ref.read(_searchParamsProvider.notifier).state =
-                      filter.copyWith(
-                    query: filter.query,
-                    filter: filter.filter.copyWith(order: order),
-                  );
-                }
-              },
-              items: List<DropdownMenuItem<FilterOrder>>.generate(
-                FilterOrder.values.length,
-                (int index) => DropdownMenuItem<FilterOrder>(
-                  value: FilterOrder.values.elementAt(index),
-                  child: Text(
-                    FilterOrder.values.elementAt(index).formatted,
+        body: MangaListWidget(
+      title: DropdownButton<FilterOrder>(
+        value: filter.filter.order,
+        icon: const Icon(Icons.arrow_drop_down),
+        iconSize: 24,
+        elevation: 16,
+        underline: Container(
+          height: 2,
+          color: Colors.deepOrangeAccent,
+        ),
+        onChanged: (FilterOrder? order) async {
+          if (order != null) {
+            ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
+              query: filter.query,
+              filter: filter.filter.copyWith(order: order),
+            );
+          }
+        },
+        items: List<DropdownMenuItem<FilterOrder>>.generate(
+          FilterOrder.values.length,
+          (int index) => DropdownMenuItem<FilterOrder>(
+            value: FilterOrder.values.elementAt(index),
+            child: Text(
+              FilterOrder.values.elementAt(index).formatted,
+            ),
+          ),
+        ),
+      ),
+      onAtEdge: () {
+        final lt = ref.read(_searchParamsProvider);
+        ref.read(mangaSearchProvider(lt).notifier).getMore();
+      },
+      leading: [
+        SliverAppBar(
+          pinned: true,
+          snap: false,
+          floating: false,
+          expandedHeight: 80.0,
+          flexibleSpace: FlexibleSpaceBar(
+            title: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    autofocus: true,
+                    controller: controller,
+                    onChanged: onSearchChanged,
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.search),
+                      hintText: 'Search MangaDex...',
+                    ),
                   ),
                 ),
-              ),
-            ),
-            onAtEdge: () {
-              final lt = ref.read(_searchParamsProvider);
-              ref.read(mangaSearchProvider(lt).notifier).getMore();
-            },
-            leading: [
-              SliverAppBar(
-                pinned: true,
-                snap: false,
-                floating: false,
-                expandedHeight: 80.0,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          autofocus: true,
-                          controller: controller,
-                          onChanged: onSearchChanged,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.search),
-                            hintText: 'Search MangaDex...',
-                          ),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final result = await Navigator.push<MangaFilters>(
+                      context,
+                      Styles.buildSlideTransitionRoute(
+                        (context, animation, secondaryAnimation) =>
+                            _MangaDexFilterWidget(
+                          filter: filter.filter,
                         ),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final result = await Navigator.push<MangaFilters>(
-                            context,
-                            Styles.buildSlideTransitionRoute(
-                              (context, animation, secondaryAnimation) =>
-                                  _MangaDexFilterWidget(
-                                filter: filter.filter,
-                              ),
-                            ),
-                          );
+                    );
 
-                          if (result != null) {
-                            ref.read(_searchParamsProvider.notifier).state =
-                                filter.copyWith(
-                              query: filter.query,
-                              filter: result,
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.filter_list),
-                        label: const Text('Filters'),
-                      ),
-                    ],
-                  ),
+                    if (result != null) {
+                      ref.read(_searchParamsProvider.notifier).state =
+                          filter.copyWith(
+                        query: filter.query,
+                        filter: result,
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.filter_list),
+                  label: const Text('Filters'),
                 ),
-              ),
-            ],
-          );
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
+              ],
+            ),
+          ),
         ),
-        error: (err, stackTrace) {
-          ScaffoldMessenger.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              content: Text('$err'),
-              backgroundColor: Colors.red,
-            ));
+      ],
+      children: [
+        results.when(
+          skipLoadingOnReload: true,
+          data: (data) {
+            if (data.isNotEmpty) {
+              return MangaListViewSliver(items: data);
+            }
 
-          return Text('Error: $err');
-        },
-      ),
-    );
+            return const SliverToBoxAdapter(
+              child: Center(
+                child: Text("No results!"),
+              ),
+            );
+          },
+          loading: () => const SliverToBoxAdapter(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (err, stackTrace) {
+            ScaffoldMessenger.of(context)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(SnackBar(
+                content: Text('$err'),
+                backgroundColor: Colors.red,
+              ));
+
+            return SliverToBoxAdapter(
+              child: Center(
+                child: Text('Error: $err'),
+              ),
+            );
+          },
+        )
+      ],
+    ));
   }
 }
 

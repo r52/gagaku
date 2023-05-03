@@ -25,10 +25,10 @@ Future<List<_ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
   final mangas = await api.fetchManga(mangaIds);
   await Future.delayed(const Duration(milliseconds: 100));
 
-  ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.watch(statisticsProvider.notifier).get(mangas);
   await Future.delayed(const Duration(milliseconds: 100));
 
-  ref.watch(readChaptersProvider.notifier).get(mangas);
+  await ref.watch(readChaptersProvider.notifier).get(mangas);
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 

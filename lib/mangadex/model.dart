@@ -1122,8 +1122,12 @@ class UserLibrary extends _$UserLibrary {
 
     _total = results.length;
 
-    var range = min(results.length, _offset + MangaDexEndpoints.apiQueryLimit);
-    var mangas = await api.fetchManga(results.getRange(_offset, range));
+    final range =
+        min(results.length, _offset + MangaDexEndpoints.apiQueryLimit);
+    final mangas = await api.fetchManga(results.getRange(_offset, range));
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    await ref.read(statisticsProvider.notifier).get(mangas);
 
     return mangas;
   }
@@ -1139,7 +1143,7 @@ class UserLibrary extends _$UserLibrary {
 
   /// Fetch more chapters if more data exists
   Future<void> getMore() async {
-    var oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
     // If there is more content, get more
     if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit) {
       state = const AsyncValue.loading();
@@ -1191,7 +1195,7 @@ class MangaSearch extends _$MangaSearch {
         filter: params.filter, offset: _offset);
     await Future.delayed(const Duration(milliseconds: 100));
 
-    ref.read(statisticsProvider.notifier).get(manga);
+    await ref.read(statisticsProvider.notifier).get(manga);
 
     return manga;
   }

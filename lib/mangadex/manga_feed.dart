@@ -19,7 +19,7 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   final mangas = await api.fetchManga(mangaids);
   await Future.delayed(const Duration(milliseconds: 100));
 
-  ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.watch(statisticsProvider.notifier).get(mangas);
 
   ref.keepAlive();
 
@@ -46,7 +46,6 @@ class MangaDexMangaFeed extends HookConsumerWidget {
               ref.read(latestChaptersFeedProvider.notifier).clear();
             },
             child: MangaListWidget(
-              items: result,
               title: const Text(
                 'Latest Updates',
                 style: TextStyle(fontSize: 24),
@@ -54,6 +53,9 @@ class MangaDexMangaFeed extends HookConsumerWidget {
               physics: const AlwaysScrollableScrollPhysics(),
               onAtEdge: () =>
                   ref.read(latestChaptersFeedProvider.notifier).getMore(),
+              children: [
+                MangaListViewSliver(items: result),
+              ],
             ),
           );
         },
