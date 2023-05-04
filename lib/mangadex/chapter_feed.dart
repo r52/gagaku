@@ -93,6 +93,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
             behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
               PointerDeviceKind.touch,
               PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
             }),
             child: RefreshIndicator(
               onRefresh: () async {

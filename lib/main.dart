@@ -8,7 +8,7 @@ import 'package:gagaku/web/main.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class GHttpOverrides extends HttpOverrides {
+class _HttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)..maxConnectionsPerHost = 5;
@@ -16,7 +16,7 @@ class GHttpOverrides extends HttpOverrides {
 }
 
 void main() async {
-  HttpOverrides.global = GHttpOverrides();
+  HttpOverrides.global = _HttpOverrides();
 
   await Hive.initFlutter();
   await Hive.openBox(gagakuBox);
