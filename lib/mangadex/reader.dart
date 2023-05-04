@@ -97,9 +97,10 @@ class MangaDexReaderWidget extends HookConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       error: (err, stackTrace) {
+        final messenger = ScaffoldMessenger.of(context);
         Future.delayed(
           Duration.zero,
-          () => ScaffoldMessenger.of(context)
+          () => messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(
               SnackBar(

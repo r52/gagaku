@@ -157,9 +157,10 @@ class ChapterButtonWidget extends HookConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       error: (err, stackTrace) {
+        final messenger = ScaffoldMessenger.of(context);
         Future.delayed(
           Duration.zero,
-          () => ScaffoldMessenger.of(context)
+          () => messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
@@ -371,7 +372,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                   textStyle: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               onPressed: () async {
-                Navigator.push(context, createMangaViewRoute(manga));
+                final nav = Navigator.of(context);
+                nav.push(createMangaViewRoute(manga));
               },
               child: Text(
                 manga.attributes.title.get('en'),
@@ -387,7 +389,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      Navigator.push(context, createMangaViewRoute(manga));
+                      final nav = Navigator.of(context);
+                      nav.push(createMangaViewRoute(manga));
                     },
                     child: ExtendedImage.network(
                         manga.getCovertArtUrl(quality: CoverArtQuality.medium),
@@ -525,7 +528,8 @@ class _ListMangaItem extends ConsumerWidget {
           children: [
             TextButton(
               onPressed: () async {
-                Navigator.push(context, createMangaViewRoute(manga));
+                final nav = Navigator.of(context);
+                nav.push(createMangaViewRoute(manga));
               },
               child: ExtendedImage.network(
                 manga.getCovertArtUrl(quality: CoverArtQuality.medium),
@@ -547,7 +551,8 @@ class _ListMangaItem extends ConsumerWidget {
                       ),
                     ),
                     onPressed: () async {
-                      Navigator.push(context, createMangaViewRoute(manga));
+                      final nav = Navigator.of(context);
+                      nav.push(createMangaViewRoute(manga));
                     },
                     child: Text(manga.attributes.title.get('en')),
                   ),

@@ -60,9 +60,10 @@ class MangaDexMangaFeed extends HookConsumerWidget {
           );
         },
         error: (err, stack) {
+          final messenger = ScaffoldMessenger.of(context);
           Future.delayed(
             Duration.zero,
-            () => ScaffoldMessenger.of(context)
+            () => messenger
               ..removeCurrentSnackBar()
               ..showSnackBar(
                 SnackBar(

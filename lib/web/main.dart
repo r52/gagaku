@@ -14,13 +14,14 @@ class WebGalleryHome extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final urlFieldController = useTextEditingController();
+    final nav = Navigator.of(context);
 
     Future<void> openManga(WebManga manga) async {
-      Navigator.push(context, createMangaViewRoute(manga));
+      nav.push(createMangaViewRoute(manga));
     }
 
     Future<void> openImgur(String src) async {
-      Navigator.push(context, createWebGalleryReaderRoute(src));
+      nav.push(createWebGalleryReaderRoute(src));
     }
 
     Future<bool> parseUrl(String url) async {
@@ -85,7 +86,8 @@ class WebGalleryHome extends HookConsumerWidget {
             ),
             ElevatedButton.icon(
               onPressed: () async {
-                var result = await showDialog<String>(
+                final messenger = ScaffoldMessenger.of(context);
+                final result = await showDialog<String>(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
@@ -128,7 +130,7 @@ class WebGalleryHome extends HookConsumerWidget {
                   var parseResult = await parseUrl(result);
 
                   if (!parseResult) {
-                    ScaffoldMessenger.of(context)
+                    messenger
                       ..removeCurrentSnackBar()
                       ..showSnackBar(const SnackBar(
                         content: Text('Unsupported URL'),

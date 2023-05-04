@@ -71,7 +71,7 @@ class WebGalleryReaderWidget extends ConsumerWidget {
           pages: pages,
           pageCount: pages.length,
           title: name,
-          isLongStrip: false, // TODO figure this out
+          isLongStrip: false, // TODO longstrip
           link: link,
           onLinkPressed: onLinkPressed,
         );
@@ -80,9 +80,10 @@ class WebGalleryReaderWidget extends ConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       error: (err, stackTrace) {
+        final messenger = ScaffoldMessenger.of(context);
         Future.delayed(
           Duration.zero,
-          () => ScaffoldMessenger.of(context)
+          () => messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(
               SnackBar(

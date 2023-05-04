@@ -25,8 +25,8 @@ class MangaDexLoginWidget extends ConsumerWidget {
             body: Center(
               child: ElevatedButton.icon(
                 onPressed: () async {
-                  Navigator.push(
-                    context,
+                  final nav = Navigator.of(context);
+                  nav.push(
                     MaterialPageRoute(
                       builder: (context) => const MangaDexLoginScreen(),
                     ),
@@ -121,6 +121,9 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                 ElevatedButton(
                   child: const Text('LOGIN'),
                   onPressed: () async {
+                    final navigator = Navigator.of(context);
+                    final messenger = ScaffoldMessenger.of(context);
+
                     if (usernameController.text.isNotEmpty &&
                         passwordController.text.isNotEmpty) {
                       var loginSuccess = await ref
@@ -128,14 +131,12 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                           .login(
                               usernameController.text, passwordController.text);
 
-                      if (!context.mounted) return;
-
                       if (loginSuccess) {
-                        Navigator.of(context).pop();
+                        navigator.pop();
                         usernameController.clear();
                         passwordController.clear();
                       } else {
-                        ScaffoldMessenger.of(context)
+                        messenger
                           ..removeCurrentSnackBar()
                           ..showSnackBar(const SnackBar(
                             content: Text('Failed to login.'),
@@ -143,7 +144,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                           ));
                       }
                     } else {
-                      ScaffoldMessenger.of(context)
+                      messenger
                         ..removeCurrentSnackBar()
                         ..showSnackBar(const SnackBar(
                           content:

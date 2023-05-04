@@ -7,9 +7,7 @@ import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:openid_client/openid_client_io.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 import '../model.dart';
@@ -91,14 +89,14 @@ class MangaDexModel {
 
   final CacheManager _cache = CacheManager();
 
-  _urlLauncher(String url) async {
-    var uri = Uri.parse(url);
-    if (await canLaunchUrl(uri) || Platform.isAndroid) {
-      await launchUrl(uri);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  // void _urlLauncher(String url) async {
+  //   var uri = Uri.parse(url);
+  //   if (await canLaunchUrl(uri) || Platform.isAndroid) {
+  //     await launchUrl(uri);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 
   // bool _tokenExpired(TokenResponse token) {
   //   return token.expiresAt != null

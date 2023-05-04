@@ -134,9 +134,10 @@ class MangaDexChapterFeed extends HookConsumerWidget {
           child: CircularProgressIndicator(),
         ),
         error: (err, stackTrace) {
+          final messenger = ScaffoldMessenger.of(context);
           Future.delayed(
             Duration.zero,
-            () => ScaffoldMessenger.of(context)
+            () => messenger
               ..removeCurrentSnackBar()
               ..showSnackBar(
                 SnackBar(
@@ -194,8 +195,8 @@ class _ChapterFeedItem extends HookWidget {
           children: [
             TextButton(
               onPressed: () async {
-                Navigator.push(context, createMangaViewRoute(state.manga))
-                    .then((value) {
+                final nav = Navigator.of(context);
+                nav.push(createMangaViewRoute(state.manga)).then((value) {
                   // Refresh when the view is closed
                   refresh.value++;
                 });
@@ -214,8 +215,9 @@ class _ChapterFeedItem extends HookWidget {
                           textStyle: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       onPressed: () async {
-                        Navigator.push(
-                                context, createMangaViewRoute(state.manga))
+                        final nav = Navigator.of(context);
+                        nav
+                            .push(createMangaViewRoute(state.manga))
                             .then((value) {
                           // Refresh when the view is closed
                           refresh.value++;

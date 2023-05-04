@@ -101,8 +101,8 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                 ),
                 ElevatedButton.icon(
                   onPressed: () async {
-                    final result = await Navigator.push<MangaFilters>(
-                      context,
+                    final nav = Navigator.of(context);
+                    final result = await nav.push<MangaFilters>(
                       Styles.buildSlideTransitionRoute(
                         (context, animation, secondaryAnimation) =>
                             _MangaDexFilterWidget(
@@ -147,9 +147,10 @@ class MangaDexSearchWidget extends HookConsumerWidget {
             ),
           ),
           error: (err, stackTrace) {
+            final messenger = ScaffoldMessenger.of(context);
             Future.delayed(
               Duration.zero,
-              () => ScaffoldMessenger.of(context)
+              () => messenger
                 ..removeCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
@@ -482,9 +483,10 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
           child: CircularProgressIndicator(),
         ),
         error: (err, stackTrace) {
+          final messenger = ScaffoldMessenger.of(context);
           Future.delayed(
             Duration.zero,
-            () => ScaffoldMessenger.of(context)
+            () => messenger
               ..removeCurrentSnackBar()
               ..showSnackBar(
                 SnackBar(
