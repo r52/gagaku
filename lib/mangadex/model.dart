@@ -547,7 +547,7 @@ class MangaDexModel {
       Map<String, dynamic> body = json.decode(response.body);
 
       if (body['result'] == 'ok') {
-        MangaReadingStatus status = MangaReadingStatus.reading;
+        MangaReadingStatus? status;
 
         if (body['status'] != null) {
           status = MangaReadingStatusExt.parse(body['status']);
@@ -575,7 +575,11 @@ class MangaDexModel {
       await refreshToken();
     }
 
-    final params = {'status': (status?.name)};
+    final params = {
+      'status': (status != null && status != MangaReadingStatus.remove)
+          ? status.name
+          : null
+    };
 
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
@@ -1270,26 +1274,64 @@ class Statistics extends _$Statistics {
   }
 }
 
-@riverpod
-Future<MangaReadingStatus?> fetchReadingStatus(
-    FetchReadingStatusRef ref, Manga manga) async {
-  final api = ref.watch(mangadexProvider);
-  var status = await api.getMangaReadingStatus(manga);
+@Riverpod(keepAlive: true)
+class ReadingStatus extends _$ReadingStatus {
+  Future<MangaReadingStatus?> _fetchReadingStatus() async {
+    final api = ref.watch(mangadexProvider);
+    final status = await api.getMangaReadingStatus(manga);
 
-  ref.keepAlive();
+    return status;
+  }
 
-  return status;
+  @override
+  FutureOr<MangaReadingStatus?> build(Manga manga) async {
+    return _fetchReadingStatus();
+  }
+
+  Future<void> set(MangaReadingStatus? status) async {
+    final api = ref.watch(mangadexProvider);
+    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      MangaReadingStatus? resolved =
+          status == MangaReadingStatus.remove ? null : status;
+      bool success = await api.setMangaReadingStatus(manga, resolved);
+      if (success) {
+        return resolved;
+      }
+
+      return oldstate;
+    });
+  }
 }
 
-@riverpod
-Future<bool> fetchFollowingManga(
-    FetchFollowingMangaRef ref, Manga manga) async {
-  final api = ref.watch(mangadexProvider);
-  var status = await api.getMangaFollowing(manga);
+@Riverpod(keepAlive: true)
+class FollowingStatus extends _$FollowingStatus {
+  Future<bool> _fetchFollowingStatus() async {
+    final api = ref.watch(mangadexProvider);
+    final status = await api.getMangaFollowing(manga);
 
-  ref.keepAlive();
+    return status;
+  }
 
-  return status;
+  @override
+  FutureOr<bool> build(Manga manga) async {
+    return _fetchFollowingStatus();
+  }
+
+  Future<void> set(bool following) async {
+    final api = ref.watch(mangadexProvider);
+    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => false);
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      bool success = await api.setMangaFollowing(manga, following);
+      if (success) {
+        return following;
+      }
+
+      return oldstate;
+    });
+  }
 }
 
 @riverpod

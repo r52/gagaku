@@ -21,10 +21,10 @@ Route createMangaViewRoute(Manga manga) {
 @riverpod
 Future<_FetchMangaChaptersResult> _fetchMangaViewChapters(
     _FetchMangaViewChaptersRef ref, Manga manga) async {
-  final following = await ref.watch(fetchFollowingMangaProvider(manga).future);
+  final following = await ref.watch(followingStatusProvider(manga).future);
   await Future.delayed(const Duration(milliseconds: 100));
 
-  final reading = await ref.watch(fetchReadingStatusProvider(manga).future);
+  final reading = await ref.watch(readingStatusProvider(manga).future);
   await Future.delayed(const Duration(milliseconds: 100));
 
   await ref.watch(readChaptersProvider.notifier).get([manga]);
@@ -54,9 +54,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final api = ref.watch(mangadexProvider);
     final scrollController = useScrollController();
-    final refresh = useState(0);
     final theme = Theme.of(context);
 
     final result = ref.watch(_fetchMangaViewChaptersProvider(manga));
@@ -114,21 +112,17 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 ),
                 actions: [
                   ...(() {
-                    if (!result.following || result.reading == null) {
+                    if (!result.following && result.reading == null) {
                       return [
                         ElevatedButton(
                           onPressed: () async {
-                            bool success = await api.setMangaReadingStatus(
-                                manga, MangaReadingStatus.plan_to_read);
+                            ref
+                                .read(readingStatusProvider(manga).notifier)
+                                .set(MangaReadingStatus.plan_to_read);
 
-                            if (success) {
-                              success =
-                                  await api.setMangaFollowing(manga, true);
-                            }
-
-                            if (success) {
-                              refresh.value++;
-                            }
+                            ref
+                                .read(followingStatusProvider(manga).notifier)
+                                .set(true);
                           },
                           child: const Text('Add to Library'),
                         ),
@@ -139,22 +133,19 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     } else {
                       return [
                         Tooltip(
-                          message: 'Remove from Library',
+                          message: result.following
+                              ? 'Unfollow Manga'
+                              : 'Follow Manga',
                           child: ElevatedButton(
                             onPressed: () async {
-                              bool success =
-                                  await api.setMangaFollowing(manga, false);
-
-                              if (success) {
-                                success = await api.setMangaReadingStatus(
-                                    manga, null);
-                              }
-
-                              if (success) {
-                                refresh.value++;
-                              }
+                              bool set = !result.following;
+                              ref
+                                  .read(followingStatusProvider(manga).notifier)
+                                  .set(set);
                             },
-                            child: const Icon(Icons.favorite),
+                            child: Icon(result.following
+                                ? Icons.favorite
+                                : Icons.favorite_border),
                           ),
                         ),
                         const SizedBox(
@@ -170,16 +161,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             color: Colors.deepOrangeAccent,
                           ),
                           onChanged: (MangaReadingStatus? status) async {
-                            bool success =
-                                await api.setMangaReadingStatus(manga, status);
+                            ref
+                                .read(readingStatusProvider(manga).notifier)
+                                .set(status);
 
-                            if (success && status == null) {
-                              success =
-                                  await api.setMangaFollowing(manga, false);
-                            }
-
-                            if (success) {
-                              refresh.value++;
+                            if (status == null ||
+                                status == MangaReadingStatus.remove) {
+                              ref
+                                  .read(followingStatusProvider(manga).notifier)
+                                  .set(false);
                             }
                           },
                           items: List<

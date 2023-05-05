@@ -27,14 +27,15 @@ class MangaDexLibraryView extends HookConsumerWidget {
                 children: [
                   ToggleButtons(
                     isSelected: List<bool>.generate(
-                        MangaReadingStatus.values.length,
-                        (index) => type.index == index),
+                        MangaReadingStatus.values.skip(1).length,
+                        (index) => type.index == (index + 1)),
                     onPressed: (index) {
                       ref.read(libraryViewTypeProvider.notifier).state =
-                          MangaReadingStatus.values.elementAt(index);
+                          MangaReadingStatus.values.skip(1).elementAt(index);
                     },
                     children: [
                       ...MangaReadingStatus.values
+                          .skip(1)
                           .map((e) => Text(
                                 e.formatted,
                                 style: const TextStyle(

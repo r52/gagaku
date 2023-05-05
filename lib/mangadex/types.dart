@@ -36,6 +36,7 @@ extension MangaStatusExt on MangaStatus {
 }
 
 enum MangaReadingStatus {
+  remove,
   reading,
   on_hold,
   plan_to_read,
@@ -46,6 +47,7 @@ enum MangaReadingStatus {
 
 extension MangaReadingStatusExt on MangaReadingStatus {
   String get formatted => const [
+        'Remove',
         'Reading',
         'On Hold',
         'Plan to Read',
