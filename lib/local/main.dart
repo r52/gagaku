@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/local/archive_reader.dart';
+import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum LocalLibraryAction { open, settings }
@@ -81,24 +82,26 @@ class LocalLibraryHome extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Library is empty!'),
-            const SizedBox(
-              height: 10,
-            ),
-            ElevatedButton.icon(
-              onPressed: () async {
-                // TODO local library
-              },
-              icon: const Icon(Icons.library_add),
-              label: const Text('Set Library Directory'),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Divider(),
-            const SizedBox(
-              height: 10,
-            ),
+            if (DeviceContext.isDesktop()) ...[
+              const Text('Library is empty!'),
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  // TODO local library
+                },
+                icon: const Icon(Icons.library_add),
+                label: const Text('Set Library Directory'),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
             ElevatedButton.icon(
               onPressed: () async {
                 final nav = Navigator.of(context);
