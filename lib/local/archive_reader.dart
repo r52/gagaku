@@ -81,6 +81,12 @@ class ArchiveReaderWidget extends HookConsumerWidget {
     return pages.when(
       skipLoadingOnReload: true,
       data: (result) {
+        if (result.isEmpty) {
+          return const Center(
+            child: Text("This archive contains no images!"),
+          );
+        }
+
         return ReaderWidget(
           pages: result,
           pageCount: result.length,
