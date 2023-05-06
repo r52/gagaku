@@ -70,6 +70,7 @@ class ArchiveReaderWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pages = ref.watch(_getArchivePagesProvider(path));
+    final theme = Theme.of(context);
 
     String strtitle = path;
 
@@ -89,8 +90,25 @@ class ArchiveReaderWidget extends HookConsumerWidget {
           onLinkPressed: onLinkPressed,
         );
       },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
+      loading: () => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Extracting archive...",
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.normal,
+                fontSize: 18,
+                decoration: TextDecoration.none,
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const CircularProgressIndicator()
+          ],
+        ),
       ),
       error: (err, stackTrace) {
         final messenger = ScaffoldMessenger.of(context);

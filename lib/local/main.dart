@@ -26,7 +26,8 @@ class LocalLibraryHome extends ConsumerWidget {
     PlatformFile? result = await _pickMangaArchive();
 
     if (result != null) {
-      navigator.push(createArchiveReaderRoute(result.path!));
+      navigator
+          .push(createArchiveReaderRoute(result.path!, title: result.name));
     }
   }
 
