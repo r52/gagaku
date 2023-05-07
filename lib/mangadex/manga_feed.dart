@@ -44,6 +44,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
           return RefreshIndicator(
             onRefresh: () async {
               ref.read(latestChaptersFeedProvider.notifier).clear();
+              return await ref.refresh(_fetchMangaFeedProvider.future);
             },
             child: MangaListWidget(
               title: const Text(

@@ -287,12 +287,12 @@ class Chapter with _$Chapter {
       _$ChapterFromJson(json);
 
   Iterable<String> getGroups() {
-    var groups = relationships.where((element) => element.maybeWhen(
+    final groups = relationships.where((element) => element.maybeWhen(
         group: (id, attributes) => true, orElse: () => false));
 
-    var groupNames = <String>{};
+    final groupNames = <String>{};
     if (groups.isNotEmpty) {
-      for (var g in groups) {
+      for (final g in groups) {
         groupNames.add(g.maybeWhen(
             group: (id, attributes) => attributes.name, orElse: () => ''));
       }
@@ -304,11 +304,11 @@ class Chapter with _$Chapter {
   }
 
   String getMangaID() {
-    var mangas = relationships.where((element) =>
+    final mangas = relationships.where((element) =>
         element.maybeWhen(manga: (id) => true, orElse: () => false));
 
     if (mangas.isNotEmpty) {
-      var m = mangas.first.maybeWhen(manga: (id) => id, orElse: () => '');
+      final m = mangas.first.maybeWhen(manga: (id) => id, orElse: () => '');
       return m;
     }
 
@@ -463,11 +463,11 @@ class Manga with _$Manga {
     var coverArt =
         'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
 
-    var coverArtR = relationships.where((element) => element.maybeWhen(
+    final coverArtR = relationships.where((element) => element.maybeWhen(
         cover: (id, attributes) => true, orElse: () => false));
 
     if (coverArtR.isNotEmpty) {
-      var rel = coverArtR.first
+      final rel = coverArtR.first
           .maybeWhen(cover: (id, attributes) => attributes, orElse: () => null);
       coverArt = "https://uploads.mangadex.org/covers/$id/${rel?.fileName}";
 
@@ -487,11 +487,11 @@ class Manga with _$Manga {
   }
 
   String? getAuthor() {
-    var authorRs = relationships.where((element) => element.maybeWhen(
+    final authorRs = relationships.where((element) => element.maybeWhen(
         author: (id, attributes) => true, orElse: () => false));
 
     if (authorRs.isNotEmpty) {
-      var rel = authorRs.first.maybeWhen(
+      final rel = authorRs.first.maybeWhen(
           author: (id, attributes) => attributes, orElse: () => null);
 
       return rel?.name;
@@ -501,11 +501,11 @@ class Manga with _$Manga {
   }
 
   String? getArtist() {
-    var artistRs = relationships.where((element) => element.maybeWhen(
+    final artistRs = relationships.where((element) => element.maybeWhen(
         artist: (id, attributes) => true, orElse: () => false));
 
     if (artistRs.isNotEmpty) {
-      var rel = artistRs.first.maybeWhen(
+      final rel = artistRs.first.maybeWhen(
           artist: (id, attributes) => attributes, orElse: () => null);
 
       return rel?.name;
