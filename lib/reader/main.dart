@@ -96,25 +96,41 @@ class ReaderWidget extends HookConsumerWidget {
       return null;
     }, [settings]);
 
+    void cachePages() {
+      // Forward cache precacheCount() pages
+      if (currentPage.value + 1 < pageCount &&
+          !pages.elementAt(currentPage.value + 1).cached) {
+        while (!pages.elementAt(currentPage.value + 1).cached) {
+          pages
+              .skip(currentPage.value)
+              .take(precacheCount())
+              .forEach((element) {
+            if (!element.cached) {
+              cachePage(element);
+            }
+          });
+        }
+      }
+
+      // Try and back cache 3 pages
+      var backCache = currentPage.value - 3;
+      if (backCache < 0) {
+        backCache = 0;
+      }
+
+      pages.skip(backCache).take(3).forEach((element) {
+        if (!element.cached) {
+          cachePage(element);
+        }
+      });
+    }
+
     useEffect(() {
       void pageCallback() {
         if (pageController.page != null) {
           currentPage.value = pageController.page!.toInt();
-        }
 
-        if (pageController.page != null &&
-            pageController.page!.toInt() + 1 < pageCount &&
-            !pages.elementAt(pageController.page!.toInt() + 1).cached) {
-          while (!pages.elementAt(pageController.page!.toInt() + 1).cached) {
-            pages
-                .skipWhile((page) => page.cached)
-                .take(precacheCount())
-                .forEach((element) {
-              if (!element.cached) {
-                cachePage(element);
-              }
-            });
-          }
+          cachePages();
         }
       }
 
@@ -131,19 +147,7 @@ class ReaderWidget extends HookConsumerWidget {
         if (min != null) {
           currentPage.value = min.index;
 
-          if (min.index + 1 < pageCount &&
-              !pages.elementAt(min.index + 1).cached) {
-            while (!pages.elementAt(min.index + 1).cached) {
-              pages
-                  .skipWhile((page) => page.cached)
-                  .take(precacheCount())
-                  .forEach((element) {
-                if (!element.cached) {
-                  cachePage(element);
-                }
-              });
-            }
-          }
+          cachePages();
         }
       }
 
@@ -584,8 +588,9 @@ class ReaderWidget extends HookConsumerWidget {
                       10,
                       (int index) => DropdownMenuItem<int>(
                         value: index + 1,
-                        child: Text(
-                            (index + 1 > 9) ? 'Max' : (index + 1).toString()),
+                        child: Text((index + 1 > 9)
+                            ? 'Max (not recommended)'
+                            : (index + 1).toString()),
                       ),
                     ),
                   ),
