@@ -1,0 +1,4 @@
+enum ArchiveType {
+  zip,
+  tar,
+}

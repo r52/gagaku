@@ -1,25 +1,22 @@
 import 'dart:io';
 
-import 'package:archive/archive_io.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gagaku/local/types.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'archive_reader.g.dart';
+part 'directory_reader.g.dart';
 
-Route createArchiveReaderRoute(
+Route createDirectoryReaderRoute(
   String path, {
   String? title,
   Widget? link,
   VoidCallback? onLinkPressed,
 }) {
   return Styles.buildSlideTransitionRoute(
-    (context, animation, secondaryAnimation) => ArchiveReaderWidget(
+    (context, animation, secondaryAnimation) => DirectoryReaderWidget(
       path: path,
       title: title,
       link: link,
@@ -29,55 +26,31 @@ Route createArchiveReaderRoute(
 }
 
 @riverpod
-Future<List<ReaderPage>> _getArchivePages(
-    _GetArchivePagesRef ref, String path) async {
-  final bytes = await File(path).readAsBytes();
+Future<List<ReaderPage>> _getDirectoryPages(
+    _GetDirectoryPagesRef ref, String path) async {
+  final dir = Directory(path);
+  final entities = await dir.list().toList();
+  final files = entities.whereType<File>();
 
-  if (path.endsWith('.cbt') || path.endsWith('.tar')) {
-    return compute(_extractTar, bytes);
-  }
+  final pageFiles = files.where((element) =>
+      element.path.endsWith('.png') ||
+      element.path.endsWith('.jpg') ||
+      element.path.endsWith('.jpeg'));
 
-  return compute(_extractZip, bytes);
-}
-
-List<ReaderPage> _extractZip(Uint8List bytes) {
-  return _extractArchive(ArchiveType.zip, bytes);
-}
-
-List<ReaderPage> _extractTar(Uint8List bytes) {
-  return _extractArchive(ArchiveType.tar, bytes);
-}
-
-List<ReaderPage> _extractArchive(ArchiveType type, Uint8List bytes) {
-  Archive archive;
-
-  switch (type) {
-    case ArchiveType.tar:
-      archive = TarDecoder().decodeBytes(bytes);
-      break;
-    case ArchiveType.zip:
-    default:
-      archive = ZipDecoder().decodeBytes(bytes);
-      break;
-  }
-
-  final pages = <ReaderPage>[];
-
-  for (final file in archive) {
-    if (file.isFile &&
-        (file.name.endsWith(".jpg") ||
-            file.name.endsWith(".png") ||
-            file.name.endsWith(".jpeg"))) {
-      final data = file.content as Uint8List;
-      pages.add(ReaderPage(provider: MemoryImage(data)));
+  if (pageFiles.isNotEmpty) {
+    final pages = <ReaderPage>[];
+    for (final f in pageFiles) {
+      pages.add(ReaderPage(provider: FileImage(f)));
     }
+
+    return pages;
   }
 
-  return pages;
+  return [];
 }
 
-class ArchiveReaderWidget extends HookConsumerWidget {
-  const ArchiveReaderWidget({
+class DirectoryReaderWidget extends HookConsumerWidget {
+  const DirectoryReaderWidget({
     super.key,
     required this.path,
     this.title,
@@ -92,7 +65,7 @@ class ArchiveReaderWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pages = ref.watch(_getArchivePagesProvider(path));
+    final pages = ref.watch(_getDirectoryPagesProvider(path));
     final theme = Theme.of(context);
 
     String strtitle = path;
@@ -124,7 +97,7 @@ class ArchiveReaderWidget extends HookConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Extracting archive...",
+              "Loading directory...",
               style: TextStyle(
                 color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.normal,

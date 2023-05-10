@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'archive_reader.dart';
+part of 'directory_reader.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getArchivePagesHash() => r'90ba0b7cb5c10495145604e5aef6e6bfb34b21db';
+String _$getDirectoryPagesHash() => r'b0d54343c0f0f752fbf7c378626d8054632121c1';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,29 +29,29 @@ class _SystemHash {
   }
 }
 
-typedef _GetArchivePagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
+typedef _GetDirectoryPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
 
-/// See also [_getArchivePages].
-@ProviderFor(_getArchivePages)
-const _getArchivePagesProvider = _GetArchivePagesFamily();
+/// See also [_getDirectoryPages].
+@ProviderFor(_getDirectoryPages)
+const _getDirectoryPagesProvider = _GetDirectoryPagesFamily();
 
-/// See also [_getArchivePages].
-class _GetArchivePagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
-  /// See also [_getArchivePages].
-  const _GetArchivePagesFamily();
+/// See also [_getDirectoryPages].
+class _GetDirectoryPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
+  /// See also [_getDirectoryPages].
+  const _GetDirectoryPagesFamily();
 
-  /// See also [_getArchivePages].
-  _GetArchivePagesProvider call(
+  /// See also [_getDirectoryPages].
+  _GetDirectoryPagesProvider call(
     String path,
   ) {
-    return _GetArchivePagesProvider(
+    return _GetDirectoryPagesProvider(
       path,
     );
   }
 
   @override
-  _GetArchivePagesProvider getProviderOverride(
-    covariant _GetArchivePagesProvider provider,
+  _GetDirectoryPagesProvider getProviderOverride(
+    covariant _GetDirectoryPagesProvider provider,
   ) {
     return call(
       provider.path,
@@ -70,36 +70,36 @@ class _GetArchivePagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_getArchivePagesProvider';
+  String? get name => r'_getDirectoryPagesProvider';
 }
 
-/// See also [_getArchivePages].
-class _GetArchivePagesProvider
+/// See also [_getDirectoryPages].
+class _GetDirectoryPagesProvider
     extends AutoDisposeFutureProvider<List<ReaderPage>> {
-  /// See also [_getArchivePages].
-  _GetArchivePagesProvider(
+  /// See also [_getDirectoryPages].
+  _GetDirectoryPagesProvider(
     this.path,
   ) : super.internal(
-          (ref) => _getArchivePages(
+          (ref) => _getDirectoryPages(
             ref,
             path,
           ),
-          from: _getArchivePagesProvider,
-          name: r'_getArchivePagesProvider',
+          from: _getDirectoryPagesProvider,
+          name: r'_getDirectoryPagesProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$getArchivePagesHash,
-          dependencies: _GetArchivePagesFamily._dependencies,
+                  : _$getDirectoryPagesHash,
+          dependencies: _GetDirectoryPagesFamily._dependencies,
           allTransitiveDependencies:
-              _GetArchivePagesFamily._allTransitiveDependencies,
+              _GetDirectoryPagesFamily._allTransitiveDependencies,
         );
 
   final String path;
 
   @override
   bool operator ==(Object other) {
-    return other is _GetArchivePagesProvider && other.path == path;
+    return other is _GetDirectoryPagesProvider && other.path == path;
   }
 
   @override
