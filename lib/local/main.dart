@@ -134,9 +134,10 @@ class LocalLibraryHome extends HookConsumerWidget {
           skipLoadingOnReload: false,
           data: (top) {
             currentItem.value ??= top;
+            Widget child;
 
             if (top.children.isEmpty) {
-              return Center(
+              child = Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -155,28 +156,35 @@ class LocalLibraryHome extends HookConsumerWidget {
                   ],
                 ),
               );
+            } else {
+              child = LibraryListWidget(
+                title: Text(
+                  currentItem.value!.path,
+                  style: const TextStyle(fontSize: 24),
+                ),
+                item: currentItem.value!,
+                onTap: (item) {
+                  if (item.isReadable) {
+                    final nav = Navigator.of(context);
+                    if (item.isDirectory) {
+                      nav.push(createDirectoryReaderRoute(item.path,
+                          title: item.name ?? item.path));
+                    } else {
+                      nav.push(createArchiveReaderRoute(item.path,
+                          title: item.name ?? item.path));
+                    }
+                  } else {
+                    currentItem.value = item;
+                  }
+                },
+              );
             }
 
-            return LibraryListWidget(
-              title: Text(
-                currentItem.value!.path,
-                style: const TextStyle(fontSize: 24),
-              ),
-              item: currentItem.value!,
-              onTap: (item) {
-                if (item.isReadable) {
-                  final nav = Navigator.of(context);
-                  if (item.isDirectory) {
-                    nav.push(createDirectoryReaderRoute(item.path,
-                        title: item.name ?? item.path));
-                  } else {
-                    nav.push(createArchiveReaderRoute(item.path,
-                        title: item.name ?? item.path));
-                  }
-                } else {
-                  currentItem.value = item;
-                }
+            return RefreshIndicator(
+              onRefresh: () async {
+                return await ref.refresh(localLibraryProvider.future);
               },
+              child: child,
             );
           },
           loading: () => Center(
