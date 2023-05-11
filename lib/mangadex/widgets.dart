@@ -326,18 +326,23 @@ class _GridMangaItem extends StatelessWidget {
         Navigator.push(context, createMangaViewRoute(manga));
       },
       child: GridTile(
-        footer: Material(
-          color: Colors.transparent,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: GridTileBar(
-            backgroundColor: Colors.black45,
-            title: FittedBox(
-              fit: BoxFit.none,
-              alignment: AlignmentDirectional.centerStart,
-              child: Text(manga.attributes.title.get('en')),
+        footer: SizedBox(
+          height: 60,
+          child: Material(
+            color: Colors.transparent,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: GridTileBar(
+              backgroundColor: Colors.black45,
+              title: Text(
+                manga.attributes.title.get('en'),
+                softWrap: true,
+                style: const TextStyle(
+                  overflow: TextOverflow.fade,
+                ),
+              ),
             ),
           ),
         ),
