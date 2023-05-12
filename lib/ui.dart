@@ -237,9 +237,9 @@ Widget? extendedImageLoadStateHandler(ExtendedImageState state) {
       return null;
     case LoadState.failed:
       return GestureDetector(
-        child: Stack(
+        child: const Stack(
           fit: StackFit.expand,
-          children: const <Widget>[
+          children: <Widget>[
             Icon(Icons.error),
             Text(
               "Image load failed",

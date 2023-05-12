@@ -65,8 +65,8 @@ class MangaDexLoginScreen extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           children: <Widget>[
             const SizedBox(height: 80.0),
-            Column(
-              children: const <Widget>[
+            const Column(
+              children: <Widget>[
                 SizedBox(height: 32.0),
                 Text('Login to MangaDex'),
               ],

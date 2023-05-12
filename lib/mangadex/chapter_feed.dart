@@ -102,11 +102,11 @@ class MangaDexChapterFeed extends HookConsumerWidget {
               },
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 10.0),
+                  const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
                     child: Row(
-                      children: const [
+                      children: [
                         Text(
                           'Latest Chapters',
                           style: TextStyle(fontSize: 24),

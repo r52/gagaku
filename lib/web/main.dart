@@ -67,12 +67,12 @@ class WebGalleryHome extends HookConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Tooltip(
+            const Tooltip(
               message: 'Supported URLs:\ncubari.moe\nimgur.com',
-              padding: const EdgeInsets.all(6),
+              padding: EdgeInsets.all(6),
               triggerMode: TooltipTriggerMode.tap,
               child: Wrap(
-                children: const [
+                children: [
                   Text('Supported URLs'),
                   Icon(
                     Icons.help,
