@@ -121,9 +121,6 @@ flutter_launcher_icons:
   image_path: "assets/icon.png"
   min_sdk_android: 26
   remove_alpha_ios: true
-  web:
-    generate: true
-    image_path: "assets/icon.png"
   windows:
     generate: true
     image_path: "assets/icon.png"
