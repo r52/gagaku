@@ -421,6 +421,7 @@ class ReaderWidget extends HookConsumerWidget {
         ],
       ),
       endDrawer: Drawer(
+        width: 320,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -492,7 +493,7 @@ class ReaderWidget extends HookConsumerWidget {
               if (!isLongStrip) ...[
                 const SizedBox(height: 10.0),
                 ActionChip(
-                  avatar: const Icon(Icons.fit_screen),
+                  avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
                   label: const Text('Toggle Page Size'),
                   onPressed: () {
                     scaleStateController[currentPage.value].scaleState =
@@ -506,7 +507,10 @@ class ReaderWidget extends HookConsumerWidget {
                   children: [
                     for (final dir in ReaderDirection.values)
                       ChoiceChip(
-                        avatar: dir.icon,
+                        avatar: Icon(
+                          dir.icon,
+                          color: theme.iconTheme.color,
+                        ),
                         label: Text(dir.formatted),
                         selected: settings.direction == dir,
                         onSelected: (value) {
@@ -522,9 +526,12 @@ class ReaderWidget extends HookConsumerWidget {
               ],
               const SizedBox(height: 10.0),
               ActionChip(
-                avatar: Icon(settings.showProgressBar
-                    ? Icons.donut_small
-                    : Icons.donut_small_outlined),
+                avatar: Icon(
+                  settings.showProgressBar
+                      ? Icons.donut_small
+                      : Icons.donut_small_outlined,
+                  color: theme.iconTheme.color,
+                ),
                 label: const Text('Progress Bar'),
                 onPressed: () {
                   ref.read(readerSettingsProvider.notifier).save(settings

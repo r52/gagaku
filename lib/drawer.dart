@@ -15,16 +15,15 @@ class MainDrawer extends ConsumerWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
+              color: theme.colorScheme.primaryContainer,
             ),
-            child: Center(
+            child: const Center(
               child: Column(
                 children: [
                   CircleAvatar(
-                    foregroundImage: const AssetImage('assets/icon.png'),
-                    backgroundColor: theme.colorScheme.onBackground,
+                    foregroundImage: AssetImage('assets/icon.png'),
                   ),
-                  const Text('Gagaku')
+                  Text('Gagaku')
                 ],
               ),
             ),

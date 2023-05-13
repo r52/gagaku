@@ -33,19 +33,23 @@ class App extends StatelessWidget {
       title: 'Gagaku',
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.deepOrange,
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.brown, brightness: Brightness.light),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
         ),
+        useMaterial3: true,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.amber,
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.brown, brightness: Brightness.dark),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
         ),
+        useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
       home: const GagakuHome(),

@@ -39,6 +39,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
+    final tileColor = theme.colorScheme.primaryContainer;
 
     String title = '';
 
@@ -60,9 +61,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
           decoration: BoxDecoration(
             border: Border(
               left: BorderSide(
-                  color:
-                      read.value ? theme.colorScheme.background : Colors.blue,
-                  width: 4.0),
+                  color: read.value ? tileColor : Colors.blue, width: 4.0),
             ),
           ),
           child: ListTile(
@@ -76,7 +75,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
                 refresh.value++;
               });
             },
-            tileColor: theme.colorScheme.background,
+            tileColor: tileColor,
             dense: true,
             minVerticalPadding: 0.0,
             contentPadding: EdgeInsets.symmetric(
@@ -480,6 +479,9 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                             const SizedBox(width: 4),
                             MangaStatusChip(status: manga.attributes.status),
                           ],
+                        ),
+                        const SizedBox(
+                          height: 2,
                         ),
                         Wrap(
                             children: manga.attributes.tags

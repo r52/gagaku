@@ -31,7 +31,7 @@ class IconTextChip extends StatelessWidget {
     return UnconstrainedBox(
       child: Container(
         decoration: BoxDecoration(
-          color: color ?? theme.canvasColor,
+          color: color ?? theme.colorScheme.tertiaryContainer,
           borderRadius: BorderRadius.circular(6),
         ),
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),

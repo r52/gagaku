@@ -7,10 +7,10 @@ enum ReaderDirection {
 }
 
 extension ReaderDirectionExt on ReaderDirection {
-  Icon get icon => const [
-        Icon(Icons.arrow_forward),
-        Icon(Icons.arrow_back),
-        Icon(Icons.arrow_downward),
+  IconData get icon => const [
+        Icons.arrow_forward,
+        Icons.arrow_back,
+        Icons.arrow_downward,
       ].elementAt(index);
 
   String get formatted => const [
