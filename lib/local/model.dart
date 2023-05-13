@@ -9,6 +9,7 @@ class LocalLibraryItem {
   LocalLibraryItem({
     required this.path,
     this.name,
+    this.thumbnail,
     this.isDirectory = false,
     this.isReadable = false,
     this.parent,
@@ -16,6 +17,7 @@ class LocalLibraryItem {
 
   String path;
   String? name;
+  String? thumbnail;
   bool isDirectory;
   bool isReadable;
   LocalLibraryItem? parent;
@@ -44,6 +46,7 @@ class LocalLibrary extends _$LocalLibrary {
     res.isReadable = isReadable;
 
     if (res.isReadable) {
+      res.thumbnail = files.first.path;
       return res;
     }
 
@@ -75,6 +78,7 @@ class LocalLibrary extends _$LocalLibrary {
         file.path.endsWith('.zip') ||
         file.path.endsWith('.cbt') ||
         file.path.endsWith('.tar')) {
+      // TODO thumbnail for archives?
       return LocalLibraryItem(
           path: file.path,
           name: file.uri.pathSegments.last,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/ui.dart';
@@ -73,14 +75,18 @@ class _GridLibraryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO thumbnail
     final Widget image = Material(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       clipBehavior: Clip.antiAlias,
-      child: Icon(
-        item.isReadable ? Icons.image : Icons.folder,
-        size: 128.0,
-      ),
+      child: item.thumbnail != null
+          ? Image.file(
+              File(item.thumbnail!),
+              width: 256.0,
+            )
+          : Icon(
+              item.isReadable ? Icons.menu_book : Icons.folder,
+              size: 128.0,
+            ),
     );
 
     return Tooltip(
