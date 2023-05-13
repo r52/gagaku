@@ -241,6 +241,20 @@ Map<String, dynamic> _$$RelationshipAuthorToJson(
       'type': instance.$type,
     };
 
+_$RelationshipCreator _$$RelationshipCreatorFromJson(
+        Map<String, dynamic> json) =>
+    _$RelationshipCreator(
+      id: json['id'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$RelationshipCreatorToJson(
+        _$RelationshipCreator instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'type': instance.$type,
+    };
+
 _$RelationshipCoverArt _$$RelationshipCoverArtFromJson(
         Map<String, dynamic> json) =>
     _$RelationshipCoverArt(

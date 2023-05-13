@@ -1925,6 +1925,8 @@ Relationship _$RelationshipFromJson(Map<String, dynamic> json) {
       return RelationshipArtist.fromJson(json);
     case 'author':
       return RelationshipAuthor.fromJson(json);
+    case 'creator':
+      return RelationshipCreator.fromJson(json);
     case 'cover_art':
       return RelationshipCoverArt.fromJson(json);
     case 'scanlation_group':
@@ -1945,6 +1947,7 @@ mixin _$Relationship {
     required TResult Function(String id) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
     required TResult Function(String id, CoverArtAttributes attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
@@ -1956,6 +1959,7 @@ mixin _$Relationship {
     TResult? Function(String id)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) =>
@@ -1966,6 +1970,7 @@ mixin _$Relationship {
     TResult Function(String id)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
@@ -1977,6 +1982,7 @@ mixin _$Relationship {
     required TResult Function(RelationshipUser value) user,
     required TResult Function(RelationshipArtist value) artist,
     required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
     required TResult Function(RelationshipCoverArt value) cover,
     required TResult Function(RelationshipGroup value) group,
   }) =>
@@ -1987,6 +1993,7 @@ mixin _$Relationship {
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(RelationshipArtist value)? artist,
     TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
     TResult? Function(RelationshipCoverArt value)? cover,
     TResult? Function(RelationshipGroup value)? group,
   }) =>
@@ -1997,6 +2004,7 @@ mixin _$Relationship {
     TResult Function(RelationshipUser value)? user,
     TResult Function(RelationshipArtist value)? artist,
     TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
     TResult Function(RelationshipCoverArt value)? cover,
     TResult Function(RelationshipGroup value)? group,
     required TResult orElse(),
@@ -2129,6 +2137,7 @@ class _$RelationshipManga
     required TResult Function(String id) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
     required TResult Function(String id, CoverArtAttributes attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
@@ -2143,6 +2152,7 @@ class _$RelationshipManga
     TResult? Function(String id)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
@@ -2156,6 +2166,7 @@ class _$RelationshipManga
     TResult Function(String id)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
@@ -2173,6 +2184,7 @@ class _$RelationshipManga
     required TResult Function(RelationshipUser value) user,
     required TResult Function(RelationshipArtist value) artist,
     required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
     required TResult Function(RelationshipCoverArt value) cover,
     required TResult Function(RelationshipGroup value) group,
   }) {
@@ -2186,6 +2198,7 @@ class _$RelationshipManga
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(RelationshipArtist value)? artist,
     TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
     TResult? Function(RelationshipCoverArt value)? cover,
     TResult? Function(RelationshipGroup value)? group,
   }) {
@@ -2199,6 +2212,7 @@ class _$RelationshipManga
     TResult Function(RelationshipUser value)? user,
     TResult Function(RelationshipArtist value)? artist,
     TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
     TResult Function(RelationshipCoverArt value)? cover,
     TResult Function(RelationshipGroup value)? group,
     required TResult orElse(),
@@ -2320,6 +2334,7 @@ class _$RelationshipUser
     required TResult Function(String id) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
     required TResult Function(String id, CoverArtAttributes attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
@@ -2334,6 +2349,7 @@ class _$RelationshipUser
     TResult? Function(String id)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
@@ -2347,6 +2363,7 @@ class _$RelationshipUser
     TResult Function(String id)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
@@ -2364,6 +2381,7 @@ class _$RelationshipUser
     required TResult Function(RelationshipUser value) user,
     required TResult Function(RelationshipArtist value) artist,
     required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
     required TResult Function(RelationshipCoverArt value) cover,
     required TResult Function(RelationshipGroup value) group,
   }) {
@@ -2377,6 +2395,7 @@ class _$RelationshipUser
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(RelationshipArtist value)? artist,
     TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
     TResult? Function(RelationshipCoverArt value)? cover,
     TResult? Function(RelationshipGroup value)? group,
   }) {
@@ -2390,6 +2409,7 @@ class _$RelationshipUser
     TResult Function(RelationshipUser value)? user,
     TResult Function(RelationshipArtist value)? artist,
     TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
     TResult Function(RelationshipCoverArt value)? cover,
     TResult Function(RelationshipGroup value)? group,
     required TResult orElse(),
@@ -2533,6 +2553,7 @@ class _$RelationshipArtist
     required TResult Function(String id) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
     required TResult Function(String id, CoverArtAttributes attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
@@ -2547,6 +2568,7 @@ class _$RelationshipArtist
     TResult? Function(String id)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
@@ -2560,6 +2582,7 @@ class _$RelationshipArtist
     TResult Function(String id)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
@@ -2577,6 +2600,7 @@ class _$RelationshipArtist
     required TResult Function(RelationshipUser value) user,
     required TResult Function(RelationshipArtist value) artist,
     required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
     required TResult Function(RelationshipCoverArt value) cover,
     required TResult Function(RelationshipGroup value) group,
   }) {
@@ -2590,6 +2614,7 @@ class _$RelationshipArtist
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(RelationshipArtist value)? artist,
     TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
     TResult? Function(RelationshipCoverArt value)? cover,
     TResult? Function(RelationshipGroup value)? group,
   }) {
@@ -2603,6 +2628,7 @@ class _$RelationshipArtist
     TResult Function(RelationshipUser value)? user,
     TResult Function(RelationshipArtist value)? artist,
     TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
     TResult Function(RelationshipCoverArt value)? cover,
     TResult Function(RelationshipGroup value)? group,
     required TResult orElse(),
@@ -2748,6 +2774,7 @@ class _$RelationshipAuthor
     required TResult Function(String id) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
     required TResult Function(String id, CoverArtAttributes attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
@@ -2762,6 +2789,7 @@ class _$RelationshipAuthor
     TResult? Function(String id)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
@@ -2775,6 +2803,7 @@ class _$RelationshipAuthor
     TResult Function(String id)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
@@ -2792,6 +2821,7 @@ class _$RelationshipAuthor
     required TResult Function(RelationshipUser value) user,
     required TResult Function(RelationshipArtist value) artist,
     required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
     required TResult Function(RelationshipCoverArt value) cover,
     required TResult Function(RelationshipGroup value) group,
   }) {
@@ -2805,6 +2835,7 @@ class _$RelationshipAuthor
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(RelationshipArtist value)? artist,
     TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
     TResult? Function(RelationshipCoverArt value)? cover,
     TResult? Function(RelationshipGroup value)? group,
   }) {
@@ -2818,6 +2849,7 @@ class _$RelationshipAuthor
     TResult Function(RelationshipUser value)? user,
     TResult Function(RelationshipArtist value)? artist,
     TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
     TResult Function(RelationshipCoverArt value)? cover,
     TResult Function(RelationshipGroup value)? group,
     required TResult orElse(),
@@ -2850,6 +2882,204 @@ abstract class RelationshipAuthor implements Relationship {
   @override
   @JsonKey(ignore: true)
   _$$RelationshipAuthorCopyWith<_$RelationshipAuthor> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$RelationshipCreatorCopyWith<$Res>
+    implements $RelationshipCopyWith<$Res> {
+  factory _$$RelationshipCreatorCopyWith(_$RelationshipCreator value,
+          $Res Function(_$RelationshipCreator) then) =
+      __$$RelationshipCreatorCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id});
+}
+
+/// @nodoc
+class __$$RelationshipCreatorCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipCreator>
+    implements _$$RelationshipCreatorCopyWith<$Res> {
+  __$$RelationshipCreatorCopyWithImpl(
+      _$RelationshipCreator _value, $Res Function(_$RelationshipCreator) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+  }) {
+    return _then(_$RelationshipCreator(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RelationshipCreator
+    with DiagnosticableTreeMixin
+    implements RelationshipCreator {
+  const _$RelationshipCreator({required this.id, final String? $type})
+      : $type = $type ?? 'creator';
+
+  factory _$RelationshipCreator.fromJson(Map<String, dynamic> json) =>
+      _$$RelationshipCreatorFromJson(json);
+
+  @override
+  final String id;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'Relationship.creator(id: $id)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'Relationship.creator'))
+      ..add(DiagnosticsProperty('id', id));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RelationshipCreator &&
+            (identical(other.id, id) || other.id == id));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, id);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RelationshipCreatorCopyWith<_$RelationshipCreator> get copyWith =>
+      __$$RelationshipCreatorCopyWithImpl<_$RelationshipCreator>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id) manga,
+    required TResult Function(String id) user,
+    required TResult Function(String id, NamedAttributes attributes) artist,
+    required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
+    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, ScanlationGroupAttributes attributes)
+        group,
+  }) {
+    return creator(id);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id)? manga,
+    TResult? Function(String id)? user,
+    TResult? Function(String id, NamedAttributes attributes)? artist,
+    TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
+    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+  }) {
+    return creator?.call(id);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id)? manga,
+    TResult Function(String id)? user,
+    TResult Function(String id, NamedAttributes attributes)? artist,
+    TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
+    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    required TResult orElse(),
+  }) {
+    if (creator != null) {
+      return creator(id);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(RelationshipUser value) user,
+    required TResult Function(RelationshipArtist value) artist,
+    required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(RelationshipCoverArt value) cover,
+    required TResult Function(RelationshipGroup value) group,
+  }) {
+    return creator(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(RelationshipArtist value)? artist,
+    TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(RelationshipCoverArt value)? cover,
+    TResult? Function(RelationshipGroup value)? group,
+  }) {
+    return creator?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(RelationshipManga value)? manga,
+    TResult Function(RelationshipUser value)? user,
+    TResult Function(RelationshipArtist value)? artist,
+    TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(RelationshipCoverArt value)? cover,
+    TResult Function(RelationshipGroup value)? group,
+    required TResult orElse(),
+  }) {
+    if (creator != null) {
+      return creator(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RelationshipCreatorToJson(
+      this,
+    );
+  }
+}
+
+abstract class RelationshipCreator implements Relationship {
+  const factory RelationshipCreator({required final String id}) =
+      _$RelationshipCreator;
+
+  factory RelationshipCreator.fromJson(Map<String, dynamic> json) =
+      _$RelationshipCreator.fromJson;
+
+  @override
+  String get id;
+  @override
+  @JsonKey(ignore: true)
+  _$$RelationshipCreatorCopyWith<_$RelationshipCreator> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2963,6 +3193,7 @@ class _$RelationshipCoverArt
     required TResult Function(String id) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
     required TResult Function(String id, CoverArtAttributes attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
@@ -2977,6 +3208,7 @@ class _$RelationshipCoverArt
     TResult? Function(String id)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
@@ -2990,6 +3222,7 @@ class _$RelationshipCoverArt
     TResult Function(String id)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
@@ -3007,6 +3240,7 @@ class _$RelationshipCoverArt
     required TResult Function(RelationshipUser value) user,
     required TResult Function(RelationshipArtist value) artist,
     required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
     required TResult Function(RelationshipCoverArt value) cover,
     required TResult Function(RelationshipGroup value) group,
   }) {
@@ -3020,6 +3254,7 @@ class _$RelationshipCoverArt
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(RelationshipArtist value)? artist,
     TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
     TResult? Function(RelationshipCoverArt value)? cover,
     TResult? Function(RelationshipGroup value)? group,
   }) {
@@ -3033,6 +3268,7 @@ class _$RelationshipCoverArt
     TResult Function(RelationshipUser value)? user,
     TResult Function(RelationshipArtist value)? artist,
     TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
     TResult Function(RelationshipCoverArt value)? cover,
     TResult Function(RelationshipGroup value)? group,
     required TResult orElse(),
@@ -3177,6 +3413,7 @@ class _$RelationshipGroup
     required TResult Function(String id) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
+    required TResult Function(String id) creator,
     required TResult Function(String id, CoverArtAttributes attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
@@ -3191,6 +3428,7 @@ class _$RelationshipGroup
     TResult? Function(String id)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
+    TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
@@ -3204,6 +3442,7 @@ class _$RelationshipGroup
     TResult Function(String id)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
+    TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
@@ -3221,6 +3460,7 @@ class _$RelationshipGroup
     required TResult Function(RelationshipUser value) user,
     required TResult Function(RelationshipArtist value) artist,
     required TResult Function(RelationshipAuthor value) author,
+    required TResult Function(RelationshipCreator value) creator,
     required TResult Function(RelationshipCoverArt value) cover,
     required TResult Function(RelationshipGroup value) group,
   }) {
@@ -3234,6 +3474,7 @@ class _$RelationshipGroup
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(RelationshipArtist value)? artist,
     TResult? Function(RelationshipAuthor value)? author,
+    TResult? Function(RelationshipCreator value)? creator,
     TResult? Function(RelationshipCoverArt value)? cover,
     TResult? Function(RelationshipGroup value)? group,
   }) {
@@ -3247,6 +3488,7 @@ class _$RelationshipGroup
     TResult Function(RelationshipUser value)? user,
     TResult Function(RelationshipArtist value)? artist,
     TResult Function(RelationshipAuthor value)? author,
+    TResult Function(RelationshipCreator value)? creator,
     TResult Function(RelationshipCoverArt value)? cover,
     TResult Function(RelationshipGroup value)? group,
     required TResult orElse(),

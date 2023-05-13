@@ -388,6 +388,10 @@ class Relationship with _$Relationship {
     required NamedAttributes attributes,
   }) = RelationshipAuthor;
 
+  const factory Relationship.creator({
+    required String id,
+  }) = RelationshipCreator;
+
   @FreezedUnionValue('cover_art')
   const factory Relationship.cover({
     required String id,
