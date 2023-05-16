@@ -41,6 +41,9 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
     final iconSize = screenSizeSmall ? 15.0 : 20.0;
+    final isEndChapter = manga.attributes.lastChapter != null &&
+        manga.attributes.lastChapter!.isNotEmpty &&
+        chapter.attributes.chapter == manga.attributes.lastChapter;
 
     String title = '';
 
@@ -81,6 +84,17 @@ class ChapterButtonWidget extends HookConsumerWidget {
           icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
           text: const Text('Official Publisher'),
         ),
+      ]);
+    }
+
+    final endChip = [];
+    if (isEndChapter) {
+      endChip.addAll([
+        const IconTextChip(
+          color: Colors.blue,
+          text: Text('END'),
+        ),
+        const SizedBox(width: 4),
       ]);
     }
 
@@ -137,6 +151,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      ...endChip,
                       flagChip,
                       ...groupChips,
                       ...publisherChip,
@@ -171,6 +186,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
                   const SizedBox(
                     width: 10.0,
                   ),
+                  ...endChip,
                   flagChip,
                   ...groupChips,
                   ...publisherChip,
