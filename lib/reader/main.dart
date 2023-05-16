@@ -708,6 +708,7 @@ class ReaderWidget extends HookConsumerWidget {
       // Can't use bottomSheet anymore due to Material 3 specs
       // forcing bottom sheet width to be 640 max
       // https://github.com/flutter/flutter/pull/122445
+      extendBody: true,
       bottomNavigationBar: settings.showProgressBar
           ? ProgressIndicator(
               reverse: !isLongStrip &&
@@ -783,14 +784,14 @@ class ProgressIndicator extends AnimatedWidget {
     return Container(
         padding: EdgeInsets.zero,
         margin: EdgeInsets.zero,
-        height: _barHeight,
+        height: 30.0,
         decoration: const BoxDecoration(
             gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           stops: [0.0, 0.6],
           colors: [
-            Colors.black,
+            Color.fromARGB(255, 0, 0, 0),
             Colors.transparent,
           ],
         )),
