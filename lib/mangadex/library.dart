@@ -8,7 +8,12 @@ final libraryViewTypeProvider =
     StateProvider((ref) => MangaReadingStatus.reading);
 
 class MangaDexLibraryView extends HookConsumerWidget {
-  const MangaDexLibraryView({super.key});
+  const MangaDexLibraryView({
+    super.key,
+    this.controller,
+  });
+
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -55,6 +60,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                       style: const TextStyle(fontSize: 24),
                     ),
                     physics: const AlwaysScrollableScrollPhysics(),
+                    controller: controller,
                     onAtEdge: () {
                       final lt = ref.read(libraryViewTypeProvider);
                       ref.read(userLibraryProvider(lt).notifier).getMore();

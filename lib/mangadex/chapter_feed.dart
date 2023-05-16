@@ -61,11 +61,16 @@ Future<List<_ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
 }
 
 class MangaDexChapterFeed extends HookConsumerWidget {
-  const MangaDexChapterFeed({super.key});
+  const MangaDexChapterFeed({
+    super.key,
+    this.controller,
+  });
+
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = useScrollController();
+    final scrollController = controller ?? useScrollController();
     final results = ref.watch(_fetchChaptersProvider);
 
     useEffect(() {

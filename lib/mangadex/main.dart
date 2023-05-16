@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
 import 'package:gagaku/mangadex/library.dart';
@@ -18,7 +19,7 @@ enum MangaDexTab {
 
 final _mangadexTabProvider = StateProvider((ref) => MangaDexTab.mangaFeed);
 
-class MangaDexHome extends ConsumerWidget {
+class MangaDexHome extends HookConsumerWidget {
   const MangaDexHome({super.key});
 
   @override
@@ -41,10 +42,22 @@ class MangaDexHome extends ConsumerWidget {
       )
     ];
 
-    const tabs = <Widget>[
-      MangaDexMangaFeed(),
-      MangaDexChapterFeed(),
-      MangaDexLibraryView(),
+    final controllers = [
+      useScrollController(),
+      useScrollController(),
+      useScrollController(),
+    ];
+
+    final tabs = <Widget>[
+      MangaDexMangaFeed(
+        controller: controllers[0],
+      ),
+      MangaDexChapterFeed(
+        controller: controllers[1],
+      ),
+      MangaDexLibraryView(
+        controller: controllers[2],
+      ),
     ];
 
     return MangaDexLoginWidget(
@@ -52,6 +65,14 @@ class MangaDexHome extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(
             title: const Text("Mangadex"),
+            flexibleSpace: GestureDetector(
+              onTap: () {
+                // Tap app bar to scroll to top
+                controllers[tab.index].animateTo(0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut);
+              },
+            ),
             actions: [
               ButtonBar(
                 children: [
@@ -90,9 +111,10 @@ class MangaDexHome extends ConsumerWidget {
           body: Center(
             child: PageTransitionSwitcher(
               transitionBuilder: (child, animation, secondaryAnimation) {
-                return FadeThroughTransition(
+                return SharedAxisTransition(
                   animation: animation,
                   secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.horizontal,
                   child: child,
                 );
               },
@@ -106,8 +128,18 @@ class MangaDexHome extends ConsumerWidget {
             type: BottomNavigationBarType.fixed,
             fixedColor: Theme.of(context).colorScheme.primary,
             onTap: (index) {
-              ref.read(_mangadexTabProvider.notifier).state =
-                  MangaDexTab.values[index];
+              final currTab = ref.read(_mangadexTabProvider);
+
+              if (currTab == MangaDexTab.values[index]) {
+                // Scroll to top if on the same tab
+                controllers[index].animateTo(0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut);
+              } else {
+                // Switch tab
+                ref.read(_mangadexTabProvider.notifier).state =
+                    MangaDexTab.values[index];
+              }
             },
           ),
         );

@@ -27,7 +27,12 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
 }
 
 class MangaDexMangaFeed extends HookConsumerWidget {
-  const MangaDexMangaFeed({super.key});
+  const MangaDexMangaFeed({
+    super.key,
+    this.controller,
+  });
+
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,6 +57,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
                 style: TextStyle(fontSize: 24),
               ),
               physics: const AlwaysScrollableScrollPhysics(),
+              controller: controller,
               onAtEdge: () =>
                   ref.read(latestChaptersFeedProvider.notifier).getMore(),
               children: [

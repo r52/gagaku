@@ -241,6 +241,7 @@ class MangaListWidget extends HookConsumerWidget {
     this.leading = const <Widget>[],
     this.physics,
     this.onAtEdge,
+    this.controller,
   });
 
   final Widget title;
@@ -248,10 +249,11 @@ class MangaListWidget extends HookConsumerWidget {
   final List<Widget> leading;
   final ScrollPhysics? physics;
   final VoidCallback? onAtEdge;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = useScrollController();
+    final scrollController = controller ?? useScrollController();
     final view = ref.watch(_mangaListViewProvider);
 
     useEffect(() {
