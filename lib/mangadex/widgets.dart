@@ -263,6 +263,8 @@ class MangaListViewSliver extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final view = ref.watch(_mangaListViewProvider);
+    final onMobilePortrait =
+        DeviceContext.isPortraitMode(context) && DeviceContext.isMobile();
 
     switch (view) {
       case MangaListView.list:
@@ -283,7 +285,7 @@ class MangaListViewSliver extends ConsumerWidget {
           maxCrossAxisExtent: 1024,
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
-          childAspectRatio: 3,
+          childAspectRatio: onMobilePortrait ? 1.0 : 3.0,
           children: items
               .map((manga) => _GridMangaDetailedItem(manga: manga))
               .toList(),
@@ -406,11 +408,11 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        Wrap(
+                          runSpacing: 4.0,
                           children: [
                             ContentRatingChip(
                                 rating: manga.attributes.contentRating),
-                            const SizedBox(width: 4),
                             ...stats.when(
                               skipLoadingOnReload: true,
                               data: (data) {
@@ -566,10 +568,10 @@ class _ListMangaItem extends ConsumerWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  Row(
+                  Wrap(
+                    runSpacing: 4.0,
                     children: [
                       ContentRatingChip(rating: manga.attributes.contentRating),
-                      const SizedBox(width: 4),
                       ...stats.when(
                         skipLoadingOnReload: true,
                         data: (data) {
