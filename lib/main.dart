@@ -34,7 +34,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.brown, brightness: Brightness.light),
+            seedColor: Colors.amber, brightness: Brightness.light),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
@@ -44,7 +44,7 @@ class App extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.brown, brightness: Brightness.dark),
+            seedColor: Colors.amber, brightness: Brightness.dark),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
