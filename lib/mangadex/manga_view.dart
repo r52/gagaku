@@ -393,7 +393,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           ),
                         ],
                       ),
-                    if (manga.attributes.lastChapter != null)
+                    if (manga.attributes.lastChapter != null &&
+                        manga.attributes.lastChapter!.isNotEmpty)
                       ExpansionTile(
                         title: const Text('Final Chapter'),
                         children: [
@@ -402,7 +403,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             color: theme.colorScheme.background,
                             child: Row(
                               children: [
-                                Text(manga.attributes.lastVolume != null
+                                Text(manga.attributes.lastVolume != null &&
+                                        manga.attributes.lastVolume!.isNotEmpty
                                     ? 'Volume ${manga.attributes.lastVolume}, Chapter ${manga.attributes.lastChapter}'
                                     : 'Chapter ${manga.attributes.lastChapter}')
                               ],
