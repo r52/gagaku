@@ -151,36 +151,44 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         const SizedBox(
                           width: 10,
                         ),
-                        DropdownButton<MangaReadingStatus>(
-                          value: result.reading,
-                          icon: const Icon(Icons.arrow_drop_down),
-                          iconSize: 24,
-                          elevation: 16,
-                          underline: Container(
-                            height: 2,
-                            color: Colors.deepOrangeAccent,
-                          ),
-                          onChanged: (MangaReadingStatus? status) async {
-                            ref
-                                .read(readingStatusProvider(manga).notifier)
-                                .set(status);
-
-                            if (status == null ||
-                                status == MangaReadingStatus.remove) {
+                        Container(
+                          decoration: BoxDecoration(
+                              color:
+                                  theme.colorScheme.background.withAlpha(200)),
+                          child: DropdownButton<MangaReadingStatus>(
+                            value: result.reading,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            iconSize: 24,
+                            elevation: 16,
+                            underline: Container(
+                              height: 2,
+                              color: Colors.deepOrangeAccent,
+                            ),
+                            onChanged: (MangaReadingStatus? status) async {
                               ref
-                                  .read(followingStatusProvider(manga).notifier)
-                                  .set(false);
-                            }
-                          },
-                          items: List<
-                              DropdownMenuItem<MangaReadingStatus>>.generate(
-                            MangaReadingStatus.values.length,
-                            (int index) => DropdownMenuItem<MangaReadingStatus>(
-                              value: MangaReadingStatus.values.elementAt(index),
-                              child: Text(
-                                MangaReadingStatus.values
-                                    .elementAt(index)
-                                    .formatted,
+                                  .read(readingStatusProvider(manga).notifier)
+                                  .set(status);
+
+                              if (status == null ||
+                                  status == MangaReadingStatus.remove) {
+                                ref
+                                    .read(
+                                        followingStatusProvider(manga).notifier)
+                                    .set(false);
+                              }
+                            },
+                            items: List<
+                                DropdownMenuItem<MangaReadingStatus>>.generate(
+                              MangaReadingStatus.values.length,
+                              (int index) =>
+                                  DropdownMenuItem<MangaReadingStatus>(
+                                value:
+                                    MangaReadingStatus.values.elementAt(index),
+                                child: Text(
+                                  MangaReadingStatus.values
+                                      .elementAt(index)
+                                      .formatted,
+                                ),
                               ),
                             ),
                           ),
