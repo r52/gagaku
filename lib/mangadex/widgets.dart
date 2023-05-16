@@ -40,6 +40,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
+    final iconSize = screenSizeSmall ? 15.0 : 20.0;
 
     String title = '';
 
@@ -51,105 +52,146 @@ class ChapterButtonWidget extends HookConsumerWidget {
       title += ' - ${chapter.attributes.title!}';
     }
 
+    final flagChip = IconTextChip(
+      text: dashflag.CountryFlag(
+        country: dashflag.Country.fromCode(
+            chapter.attributes.translatedLanguage.flag),
+        height: screenSizeSmall ? 15 : 18,
+      ),
+    );
+
+    final groups = chapter.getGroups();
+    final groupChips = [];
+
+    for (var g in groups) {
+      groupChips.addAll([
+        const SizedBox(width: 4),
+        IconTextChip(
+          icon: Icon(Icons.group, size: iconSize),
+          text: Text(g.crop()),
+        ),
+      ]);
+    }
+
+    final publisherChip = [];
+    if (chapter.attributes.externalUrl != null) {
+      publisherChip.addAll([
+        const SizedBox(width: 4),
+        IconTextChip(
+          icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
+          text: const Text('Official Publisher'),
+        ),
+      ]);
+    }
+
     return readChapters.when(
       skipLoadingOnReload: true,
       data: (result) {
         read.value = result.containsKey(manga.id) &&
             result[manga.id]!.contains(chapter.id);
 
+        final tile = ListTile(
+          onTap: () {
+            Navigator.push(
+                    context,
+                    createMangaDexReaderRoute(
+                        chapter, manga, link, onLinkPressed))
+                .then((value) {
+              // Refresh this when reader view is closed to update read status
+              refresh.value++;
+            });
+          },
+          //tileColor: tileColor,
+          dense: true,
+          minVerticalPadding: 0.0,
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
+          minLeadingWidth: 0.0,
+          leading: IconButton(
+            onPressed: () async {
+              bool set = !read.value;
+              ref
+                  .read(readChaptersProvider.notifier)
+                  .set(manga, [chapter], set);
+            },
+            padding: const EdgeInsets.all(0.0),
+            splashRadius: 15,
+            iconSize: 20,
+            tooltip: read.value ? 'Unmark as read' : 'Mark as read',
+            icon: Icon(read.value ? Icons.visibility_off : Icons.visibility,
+                color: (read.value
+                    ? theme.highlightColor
+                    : theme.primaryIconTheme.color)),
+            constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
+          ),
+          title: Text(
+            title,
+            style: TextStyle(
+                color: (read.value
+                    ? theme.highlightColor
+                    : theme.colorScheme.primary)),
+          ),
+          trailing: !screenSizeSmall
+              ? FittedBox(
+                  fit: BoxFit.fill,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      flagChip,
+                      ...groupChips,
+                      ...publisherChip,
+                      const SizedBox(width: 10),
+                      const Icon(Icons.schedule, size: 20),
+                      const SizedBox(width: 5),
+                      Text(timeago.format(chapter.attributes.publishAt))
+                    ],
+                  ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.schedule, size: 15),
+                    const SizedBox(width: 5),
+                    Text(timeago.format(chapter.attributes.publishAt))
+                  ],
+                ),
+        );
+
+        Widget child = tile;
+
+        if (screenSizeSmall) {
+          child = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              tile,
+              Wrap(
+                runSpacing: 2.0,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 10.0,
+                  ),
+                  flagChip,
+                  ...groupChips,
+                  ...publisherChip,
+                ],
+              ),
+              const SizedBox(
+                height: 2.0,
+              ),
+            ],
+          );
+        }
+
         return Container(
           decoration: BoxDecoration(
+            color: tileColor,
             border: Border(
               left: BorderSide(
                   color: read.value ? tileColor : Colors.blue, width: 4.0),
             ),
           ),
-          child: ListTile(
-            onTap: () {
-              Navigator.push(
-                      context,
-                      createMangaDexReaderRoute(
-                          chapter, manga, link, onLinkPressed))
-                  .then((value) {
-                // Refresh this when reader view is closed to update read status
-                refresh.value++;
-              });
-            },
-            tileColor: tileColor,
-            dense: true,
-            minVerticalPadding: 0.0,
-            contentPadding: EdgeInsets.symmetric(
-                horizontal: (screenSizeSmall ? 4.0 : 10.0)),
-            minLeadingWidth: 0.0,
-            leading: IconButton(
-              onPressed: () async {
-                bool set = !read.value;
-                ref
-                    .read(readChaptersProvider.notifier)
-                    .set(manga, [chapter], set);
-              },
-              padding: const EdgeInsets.all(0.0),
-              splashRadius: 15,
-              iconSize: 20,
-              tooltip: read.value ? 'Unmark as read' : 'Mark as read',
-              icon: Icon(read.value ? Icons.visibility_off : Icons.visibility,
-                  color: (read.value
-                      ? theme.highlightColor
-                      : theme.primaryIconTheme.color)),
-              constraints:
-                  const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
-            ),
-            title: Text(
-              title,
-              style: TextStyle(
-                  color: (read.value
-                      ? theme.highlightColor
-                      : theme.colorScheme.primary)),
-            ),
-            trailing: !screenSizeSmall
-                ? FittedBox(
-                    fit: BoxFit.fill,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconTextChip(
-                          text: dashflag.CountryFlag(
-                            country: dashflag.Country.fromCode(
-                                chapter.attributes.translatedLanguage.flag),
-                            height: 18,
-                          ),
-                        ),
-                        for (var g in chapter.getGroups()) ...[
-                          const SizedBox(width: 4),
-                          IconTextChip(
-                            icon: const Icon(Icons.group, size: 20),
-                            text: Text(g.crop()),
-                          ),
-                        ],
-                        if (chapter.attributes.externalUrl != null) ...[
-                          const SizedBox(width: 4),
-                          const IconTextChip(
-                            icon: Icon(Icons.check,
-                                color: Colors.amber, size: 20),
-                            text: Text('Official Publisher'),
-                          ),
-                        ],
-                        const SizedBox(width: 10),
-                        const Icon(Icons.schedule, size: 20),
-                        const SizedBox(width: 5),
-                        Text(timeago.format(chapter.attributes.publishAt))
-                      ],
-                    ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.schedule, size: 15),
-                      const SizedBox(width: 5),
-                      Text(timeago.format(chapter.attributes.publishAt))
-                    ],
-                  ),
-          ),
+          child: child,
         );
       },
       loading: () => const Center(
