@@ -64,10 +64,19 @@ class MangaDexHome extends HookConsumerWidget {
       builder: (context, ref) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Mangadex"),
-            flexibleSpace: GestureDetector(
+            title: GestureDetector(
               onTap: () {
                 // Tap app bar to scroll to top
+                controllers[tab.index].animateTo(0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut);
+              },
+              child: const Text("Mangadex"),
+            ),
+            // Need to double up here to detect the entire width of
+            // the bar
+            flexibleSpace: GestureDetector(
+              onTap: () {
                 controllers[tab.index].animateTo(0.0,
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeInOut);
