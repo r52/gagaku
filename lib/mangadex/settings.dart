@@ -6,12 +6,6 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-Route createMangaDexSettingsRoute() {
-  return Styles.buildSlideTransitionRoute(
-      (context, animation, secondaryAnimation) =>
-          const MangaDexSettingsWidget());
-}
-
 class MangaDexSettingsWidget extends HookConsumerWidget {
   const MangaDexSettingsWidget({super.key});
 
@@ -25,7 +19,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.pop(context, false);
+            Navigator.of(context).pop(false);
           },
         ),
         title: const Text('MangaDex Settings'),
@@ -39,7 +33,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   label: const Text('Save Settings'),
                   onPressed: () {
                     ref.read(mdConfigProvider.notifier).save(config.value);
-                    Navigator.pop(context, true);
+                    Navigator.of(context).pop(true);
                   },
                 ),
               ),

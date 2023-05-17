@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -211,7 +212,7 @@ class Styles {
     const end = Offset.zero;
     const curve = Curves.ease;
 
-    var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
     return SlideTransition(
       position: animation.drive(tween),
@@ -223,6 +224,22 @@ class Styles {
     return PageRouteBuilder<T>(
       pageBuilder: builder,
       transitionsBuilder: slideTransitionBuilder,
+    );
+  }
+
+  static Route<T> buildSharedAxisTransitionRoute<T>(
+      RoutePageBuilder builder, SharedAxisTransitionType transitionType) {
+    return PageRouteBuilder<T>(
+      pageBuilder: builder,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return SharedAxisTransition(
+          fillColor: Theme.of(context).cardColor,
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          transitionType: transitionType,
+          child: child,
+        );
+      },
     );
   }
 }

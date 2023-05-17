@@ -76,23 +76,41 @@ class MangaDexHome extends HookConsumerWidget {
             actions: [
               ButtonBar(
                 children: [
-                  Tooltip(
-                    message: 'Search Manga',
-                    child: IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {
-                        Navigator.push(context, createMangaDexSearchRoute());
-                      },
-                    ),
+                  OpenContainer(
+                    closedColor: theme.cardColor,
+                    closedShape: const CircleBorder(),
+                    closedBuilder: (context, openContainer) {
+                      return Tooltip(
+                        message: 'Search Manga',
+                        child: IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            openContainer();
+                          },
+                        ),
+                      );
+                    },
+                    openBuilder: (context, closedContainer) {
+                      return const MangaDexSearchWidget();
+                    },
                   ),
-                  Tooltip(
-                    message: 'MangaDex Settings',
-                    child: IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        Navigator.push(context, createMangaDexSettingsRoute());
-                      },
-                    ),
+                  OpenContainer<bool>(
+                    closedColor: theme.cardColor,
+                    closedShape: const CircleBorder(),
+                    closedBuilder: (context, openContainer) {
+                      return Tooltip(
+                        message: 'MangaDex Settings',
+                        child: IconButton(
+                          icon: const Icon(Icons.settings),
+                          onPressed: () {
+                            openContainer();
+                          },
+                        ),
+                      );
+                    },
+                    openBuilder: (context, closedContainer) {
+                      return const MangaDexSettingsWidget();
+                    },
                   ),
                   Tooltip(
                     message: 'Logout',

@@ -10,12 +10,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 //part 'search.g.dart';
 
-Route createMangaDexSearchRoute() {
-  return Styles.buildSlideTransitionRoute(
-    (context, animation, secondaryAnimation) => const MangaDexSearchWidget(),
-  );
-}
-
 final _searchParamsProvider = StateProvider(
     (ref) => const MangaSearchParameters(query: '', filter: MangaFilters()));
 
@@ -210,7 +204,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.pop(context, null);
+            Navigator.of(context).pop(null);
           },
         ),
         title: const Text('Search Filters'),
@@ -237,7 +231,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 message: 'Apply Filters',
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.pop(context, fil.value);
+                    Navigator.of(context).pop(fil.value);
                   },
                   icon: const Icon(Icons.filter_list),
                   label: const Text('Apply Filters'),
