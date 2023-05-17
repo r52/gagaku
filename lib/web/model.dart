@@ -8,35 +8,44 @@ part 'model.g.dart';
 
 @riverpod
 Future<WebManga> getMangaFromGist(GetMangaFromGistRef ref, String code) async {
-  Codec<String, String> b64 = utf8.fuse(base64Url);
-  String link = b64.decode('$code==');
-  final schema = link.split('/');
-  var baseUrl = 'https://raw.githubusercontent.com/';
+  var url = '';
 
-  if (schema.isEmpty || schema.length < 3) {
-    throw Exception("Bad url/gist code $code");
-  }
+  if (code.length > 5) {
+    // Pretty bad way of determining whether its an old git.io link but w/e
+    Codec<String, String> b64 = utf8.fuse(base64Url);
+    String link = b64.decode('$code==');
+    final schema = link.split('/');
+    var baseUrl = 'https://raw.githubusercontent.com/';
 
-  if (schema[0] == 'raw') {
-    baseUrl = 'https://raw.githubusercontent.com/';
-  } else if (schema[0] == 'gist') {
-    baseUrl = 'https://gist.githubusercontent.com/';
+    if (schema.isEmpty || schema.length < 3) {
+      throw Exception("Bad url/gist code $code");
+    }
+
+    if (schema[0] == 'raw') {
+      baseUrl = 'https://raw.githubusercontent.com/';
+    } else if (schema[0] == 'gist') {
+      baseUrl = 'https://gist.githubusercontent.com/';
+    } else {
+      throw Exception("Unknown schema ${schema[0]}");
+    }
+
+    url = '$baseUrl${link.substring(link.indexOf('/'))}';
   } else {
-    throw Exception("Unknown schema ${schema[0]}");
+    url = 'https://git.io/$code';
   }
 
-  final url = '$baseUrl${link.substring(link.indexOf('/'))}';
+  if (url.isNotEmpty) {
+    final response = await http.get(Uri.parse(url));
 
-  final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      var body = json.decode(response.body);
 
-  if (response.statusCode == 200) {
-    var body = json.decode(response.body);
+      var manga = WebManga.fromJson(body);
 
-    var manga = WebManga.fromJson(body);
+      ref.keepAlive();
 
-    ref.keepAlive();
-
-    return manga;
+      return manga;
+    }
   }
 
   // Throw if failure
