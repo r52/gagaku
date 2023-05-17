@@ -105,17 +105,6 @@ class ChapterButtonWidget extends HookConsumerWidget {
             result[manga.id]!.contains(chapter.id);
 
         final tile = ListTile(
-          onTap: () {
-            Navigator.push(
-                    context,
-                    createMangaDexReaderRoute(
-                        chapter, manga, link, onLinkPressed))
-                .then((value) {
-              // Refresh this when reader view is closed to update read status
-              refresh.value++;
-            });
-          },
-          //tileColor: tileColor,
           dense: true,
           minVerticalPadding: 0.0,
           contentPadding:
@@ -199,15 +188,27 @@ class ChapterButtonWidget extends HookConsumerWidget {
           );
         }
 
-        return Container(
-          decoration: BoxDecoration(
-            color: tileColor,
-            border: Border(
-              left: BorderSide(
-                  color: read.value ? tileColor : Colors.blue, width: 4.0),
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+                    context,
+                    createMangaDexReaderRoute(
+                        chapter, manga, link, onLinkPressed))
+                .then((value) {
+              // Refresh this when reader view is closed to update read status
+              refresh.value++;
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: tileColor,
+              border: Border(
+                left: BorderSide(
+                    color: read.value ? tileColor : Colors.blue, width: 4.0),
+              ),
             ),
+            child: child,
           ),
-          child: child,
         );
       },
       loading: () => const Center(
