@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/ui.dart';
@@ -7,10 +8,11 @@ import 'package:gagaku/web/types.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 Route createMangaViewRoute(WebManga manga) {
-  return Styles.buildSlideTransitionRoute(
+  return Styles.buildSharedAxisTransitionRoute(
     (context, animation, secondaryAnimation) => WebMangaViewWidget(
       manga: manga,
     ),
+    SharedAxisTransitionType.scaled,
   );
 }
 
@@ -210,7 +212,7 @@ class ChapterButtonWidget extends StatelessWidget {
                   link: link,
                   onLinkPressed: onLinkPressed));
         },
-        tileColor: theme.colorScheme.background,
+        tileColor: theme.colorScheme.primaryContainer,
         dense: true,
         minVerticalPadding: 0.0,
         contentPadding:

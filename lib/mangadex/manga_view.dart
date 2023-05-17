@@ -155,8 +155,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                         Container(
                           decoration: BoxDecoration(
-                              color:
-                                  theme.colorScheme.background.withAlpha(200)),
+                            borderRadius: BorderRadius.circular(4),
+                            color: theme.colorScheme.background.withAlpha(200),
+                          ),
                           child: DropdownButton<MangaReadingStatus>(
                             value: result.reading,
                             icon: const Icon(Icons.arrow_drop_down),
