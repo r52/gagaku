@@ -1180,9 +1180,11 @@ class UserLibrary extends _$UserLibrary {
     final range =
         min(results.length, _offset + MangaDexEndpoints.apiQueryLimit);
     final mangas = await api.fetchManga(results.getRange(_offset, range));
-    await Future.delayed(const Duration(milliseconds: 100));
 
-    await ref.read(statisticsProvider.notifier).get(mangas);
+    if (mangas.isNotEmpty) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      await ref.read(statisticsProvider.notifier).get(mangas);
+    }
 
     return mangas;
   }
@@ -1265,11 +1267,18 @@ class MangaSearch extends _$MangaSearch {
   Future<List<Manga>> _searchManga() async {
     final api = ref.watch(mangadexProvider);
 
+    if (params.query.isEmpty) {
+      // No search term
+      return [];
+    }
+
     final manga = await api.searchManga(params.query,
         filter: params.filter, offset: _offset);
-    await Future.delayed(const Duration(milliseconds: 100));
 
-    await ref.read(statisticsProvider.notifier).get(manga);
+    if (manga.isNotEmpty) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      await ref.read(statisticsProvider.notifier).get(manga);
+    }
 
     return manga;
   }
