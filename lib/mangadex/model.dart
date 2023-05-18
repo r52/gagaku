@@ -916,7 +916,7 @@ class MangaDexModel {
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
 
-      var mlist = MangaList.fromJson(body);
+      final mlist = MangaList.fromJson(body);
 
       list.addAll(mlist.data);
 
@@ -974,6 +974,7 @@ class MangaDexModel {
 @Riverpod(keepAlive: true)
 class LatestChaptersFeed extends _$LatestChaptersFeed {
   int _offset = 0;
+  bool _atEnd = false;
 
   ///Fetch the latest chapters list based on offset
   Future<List<Chapter>> _fetchLatestChapters(int offset) async {
@@ -990,18 +991,29 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 
   /// Fetch more latest chapters if more data exists
   Future<void> getMore() async {
-    var oldstate =
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate =
         state.maybeWhen(data: (data) => data.length, orElse: () => 0);
     // If there is more content, get more
-    if (oldstate == _offset + MangaDexEndpoints.apiQueryLimit) {
+    if (oldstate == _offset + MangaDexEndpoints.apiQueryLimit && !_atEnd) {
       state = const AsyncValue.loading();
       state = await AsyncValue.guard(() async {
         _offset += MangaDexEndpoints.apiQueryLimit;
-        return _fetchLatestChapters(_offset);
+        final chapters = await _fetchLatestChapters(_offset);
+
+        if (chapters.isEmpty) {
+          _atEnd = true;
+        }
+
+        return chapters;
       });
     }
 
     // Otherwise, do nothing because there is no more content
+    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1011,6 +1023,7 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
     state = await AsyncValue.guard(() async {
       api.invalidateCacheItem(CacheLists.latestChapters);
       _offset = 0;
+      _atEnd = false;
       return _fetchLatestChapters(_offset);
     });
   }
@@ -1019,6 +1032,7 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 @Riverpod(keepAlive: true)
 class MangaChapters extends _$MangaChapters {
   int _offset = 0;
+  bool _atEnd = false;
 
   ///Fetch the manga chapters list based on offset
   Future<List<Chapter>> _fetchMangaChapters(int offset) async {
@@ -1035,18 +1049,29 @@ class MangaChapters extends _$MangaChapters {
 
   /// Fetch more chapters if more data exists
   Future<void> getMore() async {
-    var oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
     // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit) {
+    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit &&
+        !_atEnd) {
       state = const AsyncValue.loading();
       state = await AsyncValue.guard(() async {
         _offset += MangaDexEndpoints.apiQueryLimit;
-        var chapters = await _fetchMangaChapters(_offset);
+        final chapters = await _fetchMangaChapters(_offset);
+
+        if (chapters.isEmpty) {
+          _atEnd = true;
+        }
+
         return [...oldstate!, ...chapters];
       });
     }
 
     // Otherwise, do nothing because there is no more content
+    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1054,6 +1079,7 @@ class MangaChapters extends _$MangaChapters {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       _offset = 0;
+      _atEnd = false;
       return _fetchMangaChapters(_offset);
     });
   }
@@ -1127,6 +1153,7 @@ class ReadChapters extends _$ReadChapters {
 class UserLibrary extends _$UserLibrary {
   int _total = 0;
   int _offset = 0;
+  bool _atEnd = false;
 
   ///Fetch the manga chapters list based on offset
   Future<Iterable<Manga>> _fetchUserLibrary() async {
@@ -1145,6 +1172,11 @@ class UserLibrary extends _$UserLibrary {
 
     _total = results.length;
 
+    if (_offset > _total) {
+      // No more items
+      return [];
+    }
+
     final range =
         min(results.length, _offset + MangaDexEndpoints.apiQueryLimit);
     final mangas = await api.fetchManga(results.getRange(_offset, range));
@@ -1155,9 +1187,19 @@ class UserLibrary extends _$UserLibrary {
     return mangas;
   }
 
+  Future<Iterable<Manga>> _fetchAndCheck() async {
+    final mangas = await _fetchUserLibrary();
+
+    if (mangas.isEmpty) {
+      _atEnd = true;
+    }
+
+    return mangas;
+  }
+
   @override
   FutureOr<Iterable<Manga>> build(MangaReadingStatus status) async {
-    return _fetchUserLibrary();
+    return _fetchAndCheck();
   }
 
   int total() {
@@ -1166,18 +1208,25 @@ class UserLibrary extends _$UserLibrary {
 
   /// Fetch more chapters if more data exists
   Future<void> getMore() async {
+    if (_atEnd) {
+      return;
+    }
+
     final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
     // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit) {
+    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit &&
+        !_atEnd) {
       state = const AsyncValue.loading();
       state = await AsyncValue.guard(() async {
         _offset += MangaDexEndpoints.apiQueryLimit;
-        var mangas = await _fetchUserLibrary();
+        final mangas = await _fetchAndCheck();
+
         return [...oldstate!, ...mangas];
       });
     }
 
     // Otherwise, do nothing because there is no more content
+    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1185,7 +1234,8 @@ class UserLibrary extends _$UserLibrary {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       _offset = 0;
-      return _fetchUserLibrary();
+      _atEnd = false;
+      return _fetchAndCheck();
     });
   }
 }
@@ -1210,6 +1260,7 @@ class TagList extends _$TagList {
 @riverpod
 class MangaSearch extends _$MangaSearch {
   int _offset = 0;
+  bool _atEnd = false;
 
   Future<List<Manga>> _searchManga() async {
     final api = ref.watch(mangadexProvider);
@@ -1230,18 +1281,29 @@ class MangaSearch extends _$MangaSearch {
 
   /// Fetch more if more data exists
   Future<void> getMore() async {
-    var oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
     // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiSearchLimit) {
+    if (oldstate?.length == _offset + MangaDexEndpoints.apiSearchLimit &&
+        !_atEnd) {
       state = const AsyncValue.loading();
       state = await AsyncValue.guard(() async {
         _offset += MangaDexEndpoints.apiSearchLimit;
-        var list = await _searchManga();
+        final list = await _searchManga();
+
+        if (list.isEmpty) {
+          _atEnd = true;
+        }
+
         return [...oldstate!, ...list];
       });
     }
 
     // Otherwise, do nothing because there is no more content
+    _atEnd = true;
   }
 }
 
