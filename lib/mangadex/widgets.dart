@@ -105,6 +105,16 @@ class ChapterButtonWidget extends HookConsumerWidget {
             result[manga.id]!.contains(chapter.id);
 
         final tile = ListTile(
+          onTap: () {
+            Navigator.push(
+                    context,
+                    createMangaDexReaderRoute(
+                        chapter, manga, link, onLinkPressed))
+                .then((value) {
+              // Refresh this when reader view is closed to update read status
+              refresh.value++;
+            });
+          },
           dense: true,
           minVerticalPadding: 0.0,
           contentPadding:
