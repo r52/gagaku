@@ -29,7 +29,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     useEffect(() {
       controller.text = filter.query;
       return null;
-    }, [filter]);
+    }, []);
 
     void onSearchChanged(String query) {
       if (debounce.value?.isActive ?? false) debounce.value?.cancel();
