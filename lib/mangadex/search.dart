@@ -19,7 +19,6 @@ class MangaDexSearchWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(_searchParamsProvider);
-    final results = ref.watch(mangaSearchProvider(filter));
     final controller = useTextEditingController();
     final debounce = useRef<Timer?>(null);
 
@@ -122,45 +121,50 @@ class MangaDexSearchWidget extends HookConsumerWidget {
         ),
       ],
       children: [
-        results.when(
-          skipLoadingOnReload: true,
-          data: (data) {
-            if (data.isNotEmpty) {
-              return MangaListViewSliver(items: data);
-            }
+        Consumer(
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            final results = ref.watch(mangaSearchProvider(filter));
+            return results.when(
+              skipLoadingOnReload: true,
+              data: (data) {
+                if (data.isNotEmpty) {
+                  return MangaListViewSliver(items: data);
+                }
 
-            return const SliverToBoxAdapter(
-              child: Center(
-                child: Text("No results!"),
-              ),
-            );
-          },
-          loading: () => const SliverToBoxAdapter(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (err, stackTrace) {
-            final messenger = ScaffoldMessenger.of(context);
-            Future.delayed(
-              Duration.zero,
-              () => messenger
-                ..removeCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('$err'),
-                    backgroundColor: Colors.red,
+                return const SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("No results!"),
                   ),
+                );
+              },
+              loading: () => const SliverToBoxAdapter(
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
-            );
-
-            return SliverToBoxAdapter(
-              child: Center(
-                child: Text('Error: $err'),
               ),
+              error: (err, stackTrace) {
+                final messenger = ScaffoldMessenger.of(context);
+                Future.delayed(
+                  Duration.zero,
+                  () => messenger
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text('$err'),
+                        backgroundColor: Colors.red,
+                      ),
+                    ),
+                );
+
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Text('Error: $err'),
+                  ),
+                );
+              },
             );
           },
-        )
+        ),
       ],
     ));
   }

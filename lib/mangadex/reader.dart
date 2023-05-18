@@ -55,7 +55,6 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pages = ref.watch(_fetchChapterPagesProvider(chapter));
-    final readChapters = ref.watch(readChaptersProvider);
 
     String title = '';
 
@@ -70,7 +69,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
     return pages.when(
       skipLoadingOnReload: true,
       data: (result) {
-        readChapters.maybeWhen(
+        ref.read(readChaptersProvider).maybeWhen(
             data: (read) {
               if (!read.containsKey(manga.id) ||
                   !read[manga.id]!.contains(chapter.id)) {
