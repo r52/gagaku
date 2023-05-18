@@ -34,7 +34,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
 
     void onSearchChanged(String query) {
       if (debounce.value?.isActive ?? false) debounce.value?.cancel();
-      debounce.value = Timer(const Duration(milliseconds: 750), () {
+      debounce.value = Timer(const Duration(milliseconds: 1000), () {
         ref.read(_searchParamsProvider.notifier).state =
             filter.copyWith(query: query, filter: filter.filter);
       });
