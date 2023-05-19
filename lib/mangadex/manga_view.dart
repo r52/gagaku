@@ -449,6 +449,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   ref.watch(_fetchMangaViewChaptersProvider(manga));
 
               return chapters.when(
+                skipLoadingOnReload: true,
                 data: (result) {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
