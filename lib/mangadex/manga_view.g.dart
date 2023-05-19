@@ -7,7 +7,7 @@ part of 'manga_view.dart';
 // **************************************************************************
 
 String _$fetchMangaViewChaptersHash() =>
-    r'fad9c083a61306d5350214053a36f47da17e4e71';
+    r'412d6430701fd3a811e9ed09d01175fc8ce73260';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,7 +31,7 @@ class _SystemHash {
 }
 
 typedef _FetchMangaViewChaptersRef
-    = AutoDisposeFutureProviderRef<_FetchMangaChaptersResult>;
+    = AutoDisposeFutureProviderRef<Iterable<Chapter>>;
 
 /// See also [_fetchMangaViewChapters].
 @ProviderFor(_fetchMangaViewChapters)
@@ -39,7 +39,7 @@ const _fetchMangaViewChaptersProvider = _FetchMangaViewChaptersFamily();
 
 /// See also [_fetchMangaViewChapters].
 class _FetchMangaViewChaptersFamily
-    extends Family<AsyncValue<_FetchMangaChaptersResult>> {
+    extends Family<AsyncValue<Iterable<Chapter>>> {
   /// See also [_fetchMangaViewChapters].
   const _FetchMangaViewChaptersFamily();
 
@@ -78,7 +78,7 @@ class _FetchMangaViewChaptersFamily
 
 /// See also [_fetchMangaViewChapters].
 class _FetchMangaViewChaptersProvider
-    extends AutoDisposeFutureProvider<_FetchMangaChaptersResult> {
+    extends AutoDisposeFutureProvider<Iterable<Chapter>> {
   /// See also [_fetchMangaViewChapters].
   _FetchMangaViewChaptersProvider(
     this.manga,

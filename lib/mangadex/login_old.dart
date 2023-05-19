@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/drawer.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,32 +18,25 @@ class MangaDexLoginWidget extends ConsumerWidget {
           return builder(context, ref);
         }
 
-        return Scaffold(
-            appBar: AppBar(title: const Text("Mangadex")),
-            drawer: const MainDrawer(),
-            body: Center(
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  final nav = Navigator.of(context);
-                  nav.push(
-                    MaterialPageRoute(
-                      builder: (context) => const MangaDexLoginScreen(),
-                    ),
-                  );
-                },
-                label: const Text('Login to MangaDex'),
-                icon: const Icon(
-                  Icons.https,
+        return Center(
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              final nav = Navigator.of(context);
+              nav.push(
+                MaterialPageRoute(
+                  builder: (context) => const MangaDexLoginScreen(),
                 ),
-              ),
-            ));
+              );
+            },
+            label: const Text('Login to MangaDex'),
+            icon: const Icon(
+              Icons.https,
+            ),
+          ),
+        );
       },
-      loading: () => Scaffold(
-        appBar: AppBar(title: const Text("Mangadex")),
-        drawer: const MainDrawer(),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
       ),
       error: (err, stack) => Text('Error: $err'),
     );

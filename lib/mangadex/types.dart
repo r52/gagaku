@@ -641,6 +641,18 @@ class PageData {
   final List<String> pages;
 }
 
+class ChapterFeedItemData {
+  ChapterFeedItemData({required this.manga})
+      : mangaId = manga.id,
+        coverArt = manga.getCovertArtUrl(quality: CoverArtQuality.medium);
+
+  final Manga manga;
+  final String mangaId;
+  final String coverArt;
+
+  List<Chapter> chapters = [];
+}
+
 // Deprecated old style login types
 @freezed
 class OldToken with _$OldToken {

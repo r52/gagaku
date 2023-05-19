@@ -7,12 +7,15 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'chapter_feed.g.dart';
+part 'latest_feed.g.dart';
 
 @riverpod
-Future<List<ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
+Future<List<ChapterFeedItem>> _fetchGlobalChapters(
+    _FetchGlobalChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
-  final chapters = await ref.watch(latestChaptersFeedProvider.future);
+  final loggedin = await ref.watch(authControlProvider.future);
+
+  final chapters = await ref.watch(latestGlobalFeedProvider.future);
 
   final mangaIds = chapters.map((e) => e.getMangaID()).toSet();
   mangaIds.removeWhere((element) => element.isEmpty);
@@ -24,7 +27,9 @@ Future<List<ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
   await ref.watch(statisticsProvider.notifier).get(mangas);
   await Future.delayed(const Duration(milliseconds: 100));
 
-  await ref.watch(readChaptersProvider.notifier).get(mangas);
+  if (loggedin) {
+    await ref.watch(readChaptersProvider.notifier).get(mangas);
+  }
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
@@ -56,8 +61,8 @@ Future<List<ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
   return wlist;
 }
 
-class MangaDexChapterFeed extends HookConsumerWidget {
-  const MangaDexChapterFeed({
+class MangaDexGlobalFeed extends HookConsumerWidget {
+  const MangaDexGlobalFeed({
     super.key,
     this.controller,
   });
@@ -67,13 +72,13 @@ class MangaDexChapterFeed extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
-    final results = ref.watch(_fetchChaptersProvider);
+    final results = ref.watch(_fetchGlobalChaptersProvider);
 
     useEffect(() {
       void controllerAtEdge() {
         if (scrollController.position.atEdge) {
           if (scrollController.position.pixels != 0) {
-            ref.read(latestChaptersFeedProvider.notifier).getMore();
+            ref.read(latestGlobalFeedProvider.notifier).getMore();
           }
         }
       }
@@ -87,7 +92,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
         skipLoadingOnReload: true,
         data: (result) {
           if (result.isEmpty) {
-            return const Text('Find some manga to follow!');
+            return const Text('No results!');
           }
 
           return ScrollConfiguration(
@@ -98,8 +103,8 @@ class MangaDexChapterFeed extends HookConsumerWidget {
             }),
             child: RefreshIndicator(
               onRefresh: () async {
-                ref.read(latestChaptersFeedProvider.notifier).clear();
-                return await ref.refresh(_fetchChaptersProvider.future);
+                ref.read(latestGlobalFeedProvider.notifier).clear();
+                return await ref.refresh(_fetchGlobalChaptersProvider.future);
               },
               child: Column(
                 children: [
@@ -109,7 +114,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
                     child: Row(
                       children: [
                         Text(
-                          'Latest Chapters',
+                          'Latest Uploads',
                           style: TextStyle(fontSize: 24),
                         )
                       ],
@@ -119,7 +124,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
                     child: ListView.builder(
                       controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
-                      restorationId: 'chapter_list_offset',
+                      restorationId: 'global_list_offset',
                       padding: const EdgeInsets.all(6),
                       itemCount: result.length,
                       itemBuilder: (context, index) {

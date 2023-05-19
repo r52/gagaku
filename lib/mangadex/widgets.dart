@@ -16,6 +16,88 @@ enum MangaListView { grid, list, detailed }
 
 final _mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
 
+class ChapterFeedItem extends HookWidget {
+  const ChapterFeedItem({super.key, required this.state});
+
+  final ChapterFeedItemData state;
+
+  @override
+  Widget build(BuildContext context) {
+    final refresh = useState(0);
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final theme = Theme.of(context);
+
+    var chapterBtns = state.chapters.map((e) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0),
+        child: ChapterButtonWidget(
+          chapter: e,
+          manga: state.manga,
+          link: Text(
+            state.manga.attributes.title.get('en'),
+            style: const TextStyle(fontSize: 24),
+          ),
+          onLinkPressed: () {
+            Navigator.push(context, createMangaViewRoute(state.manga))
+                .then((value) {
+              // Refresh when the view is closed
+              refresh.value++;
+            });
+          },
+        ),
+      );
+    }).toList();
+
+    return Card(
+      margin: const EdgeInsets.all(6),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () async {
+                final nav = Navigator.of(context);
+                nav.push(createMangaViewRoute(state.manga)).then((value) {
+                  // Refresh when the view is closed
+                  refresh.value++;
+                });
+              },
+              child: ExtendedImage.network(state.coverArt,
+                  loadStateChanged: extendedImageLoadStateHandler,
+                  width: screenSizeSmall ? 80.0 : 128.0),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextButton(
+                      style: TextButton.styleFrom(
+                          foregroundColor: theme.colorScheme.onSurface,
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        final nav = Navigator.of(context);
+                        nav
+                            .push(createMangaViewRoute(state.manga))
+                            .then((value) {
+                          // Refresh when the view is closed
+                          refresh.value++;
+                        });
+                      },
+                      child: Text(state.manga.attributes.title.get('en'))),
+                  const Divider(),
+                  ...chapterBtns
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ChapterButtonWidget extends HookConsumerWidget {
   const ChapterButtonWidget({
     super.key,
@@ -32,10 +114,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authControlProvider);
     final refresh = useState(0);
-    final read = useRef(false);
-
-    final readChapters = ref.watch(readChaptersProvider);
 
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
@@ -98,148 +178,217 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ]);
     }
 
-    return readChapters.when(
-      skipLoadingOnReload: true,
-      data: (result) {
-        read.value = result.containsKey(manga.id) &&
-            result[manga.id]!.contains(chapter.id);
+    final tile = ListTile(
+      onTap: () {
+        Navigator.push(context,
+                createMangaDexReaderRoute(chapter, manga, link, onLinkPressed))
+            .then((value) {
+          // Refresh this when reader view is closed to update read status
+          refresh.value++;
+        });
+      },
+      dense: true,
+      minVerticalPadding: 0.0,
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
+      minLeadingWidth: 0.0,
+      leading: auth.maybeWhen(
+        data: (loggedin) {
+          if (!loggedin) {
+            return null;
+          }
 
-        final tile = ListTile(
-          onTap: () {
-            Navigator.push(
-                    context,
-                    createMangaDexReaderRoute(
-                        chapter, manga, link, onLinkPressed))
-                .then((value) {
-              // Refresh this when reader view is closed to update read status
-              refresh.value++;
-            });
-          },
-          dense: true,
-          minVerticalPadding: 0.0,
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
-          minLeadingWidth: 0.0,
-          leading: IconButton(
-            onPressed: () async {
-              bool set = !read.value;
-              ref
-                  .read(readChaptersProvider.notifier)
-                  .set(manga, [chapter], set);
+          final readChapters = ref.watch(readChaptersProvider);
+
+          return readChapters.maybeWhen(
+            skipLoadingOnReload: true,
+            data: (data) {
+              bool isRead = data.containsKey(manga.id) &&
+                  data[manga.id]!.contains(chapter.id);
+
+              return IconButton(
+                onPressed: () async {
+                  bool set = !isRead;
+                  ref
+                      .read(readChaptersProvider.notifier)
+                      .set(manga, [chapter], set);
+                },
+                padding: const EdgeInsets.all(0.0),
+                splashRadius: 15,
+                iconSize: 20,
+                tooltip: isRead ? 'Unmark as read' : 'Mark as read',
+                icon: Icon(isRead ? Icons.visibility_off : Icons.visibility,
+                    color: (isRead
+                        ? theme.highlightColor
+                        : theme.primaryIconTheme.color)),
+                constraints:
+                    const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
+              );
             },
-            padding: const EdgeInsets.all(0.0),
-            splashRadius: 15,
-            iconSize: 20,
-            tooltip: read.value ? 'Unmark as read' : 'Mark as read',
-            icon: Icon(read.value ? Icons.visibility_off : Icons.visibility,
-                color: (read.value
-                    ? theme.highlightColor
-                    : theme.primaryIconTheme.color)),
-            constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-                color: (read.value
-                    ? theme.highlightColor
-                    : theme.colorScheme.primary)),
-          ),
-          trailing: !screenSizeSmall
-              ? FittedBox(
-                  fit: BoxFit.fill,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ...endChip,
-                      flagChip,
-                      ...groupChips,
-                      ...publisherChip,
-                      const SizedBox(width: 10),
-                      const Icon(Icons.schedule, size: 20),
-                      const SizedBox(width: 5),
-                      Text(timeago.format(chapter.attributes.publishAt))
-                    ],
-                  ),
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.schedule, size: 15),
-                    const SizedBox(width: 5),
-                    Text(timeago.format(chapter.attributes.publishAt))
-                  ],
-                ),
-        );
+            orElse: () => null,
+          );
+        },
+        orElse: () => null,
+      ),
+      title: auth.maybeWhen(
+        data: (loggedin) {
+          if (!loggedin) {
+            return Text(
+              title,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+              ),
+            );
+          }
 
-        Widget child = tile;
+          final readChapters = ref.watch(readChaptersProvider);
 
-        if (screenSizeSmall) {
-          child = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              tile,
-              Wrap(
-                runSpacing: 2.0,
-                crossAxisAlignment: WrapCrossAlignment.center,
+          return readChapters.maybeWhen(
+            skipLoadingOnReload: true,
+            data: (data) {
+              bool isRead = data.containsKey(manga.id) &&
+                  data[manga.id]!.contains(chapter.id);
+
+              return Text(
+                title,
+                style: TextStyle(
+                    color: (isRead
+                        ? theme.highlightColor
+                        : theme.colorScheme.primary)),
+              );
+            },
+            orElse: () => Text(
+              title,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+              ),
+            ),
+          );
+        },
+        orElse: () => Text(
+          title,
+          style: TextStyle(
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      ),
+      trailing: !screenSizeSmall
+          ? FittedBox(
+              fit: BoxFit.fill,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(
-                    width: 10.0,
-                  ),
                   ...endChip,
                   flagChip,
                   ...groupChips,
                   ...publisherChip,
+                  const SizedBox(width: 10),
+                  const Icon(Icons.schedule, size: 20),
+                  const SizedBox(width: 5),
+                  Text(timeago.format(chapter.attributes.publishAt))
                 ],
               ),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.schedule, size: 15),
+                const SizedBox(width: 5),
+                Text(timeago.format(chapter.attributes.publishAt))
+              ],
+            ),
+    );
+
+    Widget child = tile;
+
+    if (screenSizeSmall) {
+      child = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          tile,
+          Wrap(
+            runSpacing: 2.0,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
               const SizedBox(
-                height: 2.0,
+                width: 10.0,
               ),
+              ...endChip,
+              flagChip,
+              ...groupChips,
+              ...publisherChip,
             ],
-          );
-        }
-
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-                    context,
-                    createMangaDexReaderRoute(
-                        chapter, manga, link, onLinkPressed))
-                .then((value) {
-              // Refresh this when reader view is closed to update read status
-              refresh.value++;
-            });
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: tileColor,
-              border: Border(
-                left: BorderSide(
-                    color: read.value ? tileColor : Colors.blue, width: 4.0),
-              ),
-            ),
-            child: child,
           ),
-        );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (err, stackTrace) {
-        final messenger = ScaffoldMessenger.of(context);
-        Future.delayed(
-          Duration.zero,
-          () => messenger
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text('$err'),
-                backgroundColor: Colors.red,
-              ),
-            ),
-        );
+          const SizedBox(
+            height: 2.0,
+          ),
+        ],
+      );
+    }
 
-        return Text('Error: $err');
+    return InkWell(
+      onTap: () {
+        Navigator.push(context,
+                createMangaDexReaderRoute(chapter, manga, link, onLinkPressed))
+            .then((value) {
+          // Refresh this when reader view is closed to update read status
+          refresh.value++;
+        });
       },
+      child: auth.maybeWhen(
+        data: (loggedin) {
+          if (!loggedin) {
+            return Container(
+              decoration: BoxDecoration(
+                color: tileColor,
+                border: Border(
+                  left: BorderSide(color: tileColor, width: 4.0),
+                ),
+              ),
+              child: child,
+            );
+          }
+
+          final readChapters = ref.watch(readChaptersProvider);
+
+          return readChapters.maybeWhen(
+            skipLoadingOnReload: true,
+            data: (data) {
+              bool isRead = data.containsKey(manga.id) &&
+                  data[manga.id]!.contains(chapter.id);
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: tileColor,
+                  border: Border(
+                    left: BorderSide(
+                        color: isRead ? tileColor : Colors.blue, width: 4.0),
+                  ),
+                ),
+                child: child,
+              );
+            },
+            orElse: () => Container(
+              decoration: BoxDecoration(
+                color: tileColor,
+                border: Border(
+                  left: BorderSide(color: tileColor, width: 4.0),
+                ),
+              ),
+              child: child,
+            ),
+          );
+        },
+        orElse: () => Container(
+          decoration: BoxDecoration(
+            color: tileColor,
+            border: Border(
+              left: BorderSide(color: tileColor, width: 4.0),
+            ),
+          ),
+          child: child,
+        ),
+      ),
     );
   }
 }

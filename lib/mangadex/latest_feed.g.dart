@@ -1,25 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chapter_feed.dart';
+part of 'latest_feed.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchChaptersHash() => r'b6401eb1fddf47e4f60ebe90bcfb91c0f9c604bb';
+String _$fetchGlobalChaptersHash() =>
+    r'6616fc9cee274a2d471e4a7530d557bdbd0002c2';
 
-/// See also [_fetchChapters].
-@ProviderFor(_fetchChapters)
-final _fetchChaptersProvider =
+/// See also [_fetchGlobalChapters].
+@ProviderFor(_fetchGlobalChapters)
+final _fetchGlobalChaptersProvider =
     AutoDisposeFutureProvider<List<ChapterFeedItem>>.internal(
-  _fetchChapters,
-  name: r'_fetchChaptersProvider',
+  _fetchGlobalChapters,
+  name: r'_fetchGlobalChaptersProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$fetchChaptersHash,
+      : _$fetchGlobalChaptersHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _FetchChaptersRef = AutoDisposeFutureProviderRef<List<ChapterFeedItem>>;
+typedef _FetchGlobalChaptersRef
+    = AutoDisposeFutureProviderRef<List<ChapterFeedItem>>;
 // ignore_for_file: unnecessary_raw_strings, subtype_of_sealed_class, invalid_use_of_internal_member, do_not_use_environment, prefer_const_constructors, public_member_api_docs, avoid_private_typedef_functions
