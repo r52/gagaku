@@ -19,8 +19,9 @@ abstract class MangaDexEndpoints {
   static const apiQueryLimit = 100;
   static const apiSearchLimit = 10;
 
+  // For future OAuth
   static final provider =
-      Uri.parse('https://auth.mangadex.dev/realms/mangadex');
+      Uri.parse('https://auth.mangadex.org/realms/mangadex');
   static const login = '/auth/login';
   static const logout = '/auth/logout';
   static const refresh = '/auth/refresh';
@@ -103,7 +104,11 @@ class MangaDexModel {
   //       : false;
   // }
 
-  bool _tokenExpired(OldToken token) {
+  bool _tokenExpired(OldToken? token) {
+    if (token == null) {
+      return false;
+    }
+
     return token.expired;
   }
 
@@ -181,6 +186,8 @@ class MangaDexModel {
         }
       }
     }
+
+    _client ??= http.Client();
   }
 
   // Future<void> authenticate() async {
@@ -267,7 +274,7 @@ class MangaDexModel {
 
         if (body['result'] == 'ok') {
           _token = null;
-          _client = null;
+          _client = http.Client();
 
           final storage = Hive.box(gagakuBox);
           await storage.delete('oldtoken');
@@ -307,7 +314,7 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -400,12 +407,7 @@ class MangaDexModel {
 
   /// Fetches manga data of the given manga [uuids]
   Future<Iterable<Manga>> fetchManga(Iterable<String> uuids) async {
-    if (!loggedIn()) {
-      throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
-    }
-
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -413,7 +415,7 @@ class MangaDexModel {
 
     Set<Manga> list = <Manga>{};
 
-    var fetch = uuids.where((id) => (!_cache.exists(id))).toList();
+    final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
 
     if (fetch.isNotEmpty) {
       // dev.log('Retrieving Manga info');
@@ -423,10 +425,6 @@ class MangaDexModel {
       var queryParams = {
         'limit': MangaDexEndpoints.apiQueryLimit.toString(),
         'order[latestUploadedChapter]': 'desc',
-        // 'availableTranslatedLanguage[]':
-        //     _settings.translatedLanguages.map(const LanguageConverter().toJson).toList(),
-        // 'originalLanguage[]':
-        //     _settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
         'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
         'includes[]': ['cover_art', 'author', 'artist']
       };
@@ -475,14 +473,14 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id));
 
-    var response = await _client!.get(uri);
+    final response = await _client!.get(uri);
 
     if (response.statusCode == 200) {
       // User follows the manga
@@ -503,7 +501,7 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -533,14 +531,14 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
-    var response = await _client!.get(uri);
+    final response = await _client!.get(uri);
 
     if (response.statusCode == 200) {
       Map<String, dynamic> body = json.decode(response.body);
@@ -570,7 +568,7 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -608,7 +606,7 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -664,12 +662,7 @@ class MangaDexModel {
   /// management.
   Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
       [int offset = 0]) async {
-    if (!loggedIn()) {
-      throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
-    }
-
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -725,7 +718,7 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -740,7 +733,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id));
 
-    var response = await _client!.post(uri,
+    final response = await _client!.post(uri,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(params));
 
@@ -794,7 +787,7 @@ class MangaDexModel {
           "Data fetch called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -814,9 +807,9 @@ class MangaDexModel {
         return null;
       }
 
-      var mlist = body['statuses'] as Map<String, dynamic>;
+      final mlist = body['statuses'] as Map<String, dynamic>;
 
-      var libMap = mlist.map(
+      final libMap = mlist.map(
           (key, value) => MapEntry(key, MangaReadingStatusExt.parse(value)));
 
       _cache.put(CacheLists.library, libMap, true);
@@ -830,12 +823,7 @@ class MangaDexModel {
 
   /// Retrieve all MangaDex tags
   Future<Iterable<Tag>> getTagList() async {
-    if (!loggedIn()) {
-      throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
-    }
-
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -850,7 +838,7 @@ class MangaDexModel {
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
 
-      var result = TagResponse.fromJson(body);
+      final result = TagResponse.fromJson(body);
 
       // Cache the data and list
       _cache.putSpecialList(CacheLists.tags, result.data,
@@ -874,12 +862,7 @@ class MangaDexModel {
     required MangaFilters filter,
     int offset = 0,
   }) async {
-    if (!loggedIn()) {
-      throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
-    }
-
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
@@ -936,16 +919,11 @@ class MangaDexModel {
   /// state management.
   Future<Map<String, MangaStatistics>> fetchStatistics(
       Iterable<Manga> mangas) async {
-    if (!loggedIn()) {
-      throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
-    }
-
-    if (_tokenExpired(_token!)) {
+    if (_tokenExpired(_token)) {
       await refreshToken();
     }
 
-    var fetch = mangas.map((e) => e.id);
+    final fetch = mangas.map((e) => e.id);
 
     if (fetch.isNotEmpty) {
       final queryParams = {'manga[]': fetch.toList()};
