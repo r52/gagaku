@@ -4,7 +4,7 @@
 
 ![License](https://img.shields.io/github/license/r52/gagaku)
 
-Gagaku is a minimalist, lightweight manga reader optimized for desktop OSes with touchscreen support. Current supports Windows and Android.
+Gagaku is a minimalist, lightweight manga reader optimized for desktop OSes with touchscreen support. Currently supports (and is tested on) Windows and Android.
 
 Gagaku is currently a work-in-progress and many things may not work as intended or is janky.
 
@@ -12,11 +12,15 @@ Gagaku is licensed under the MIT license.
 
 ## Features
 
-- MangaDex client (logged in only)
-  - No chapter download support. There are far better clients for this purpose.
-- CBZ/CBT support
-- Local directory scanning
-- gist/cubari.moe links (currently no URL handling)
+- MangaDex client
+- CBZ/CBT file support
+- Local directory catalog/scanning (desktop only)
+- cubari.moe links (currently supports gist/imgur proxies only)
+
+Gagaku does NOT feature:
+
+- Chapter download support. There are far better clients for this purpose.
+- File types such as CBR/CB7/PDF/EPUB etc.
 
 ## Building
 
