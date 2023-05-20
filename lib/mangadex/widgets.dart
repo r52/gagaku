@@ -31,6 +31,7 @@ class ChapterFeedItem extends HookWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: ChapterButtonWidget(
+          short: screenSizeSmall,
           chapter: e,
           manga: state.manga,
           link: Text(
@@ -105,12 +106,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
     required this.manga,
     this.link,
     this.onLinkPressed,
+    this.short = false,
   });
 
   final Chapter chapter;
   final Manga manga;
   final Widget? link;
   final VoidCallback? onLinkPressed;
+  final bool short;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -131,7 +134,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       title += 'Chapter ${chapter.attributes.chapter!}';
     }
 
-    if (chapter.attributes.title != null) {
+    if (chapter.attributes.title != null && !short) {
       title += ' - ${chapter.attributes.title!}';
     }
 
