@@ -84,6 +84,9 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           }
         });
 
+        Future.delayed(Duration.zero,
+            () => ref.read(mangaDexHistoryProvider.notifier).add(chapter));
+
         return ReaderWidget(
           pages: result,
           pageCount: result.length,

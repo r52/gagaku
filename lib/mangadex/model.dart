@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -513,6 +514,63 @@ class MangaDexModel {
 
     // Throw if failure
     throw Exception("Failed to download latest global chapters");
+  }
+
+  /// Fetches chapter data of the given chapter [uuids]
+  Future<Iterable<Chapter>> fetchChapters(Iterable<String> uuids) async {
+    if (_tokenExpired(_token)) {
+      await refreshToken();
+    }
+
+    final settings = ref.read(mdConfigProvider);
+
+    final list = <Chapter>[];
+
+    final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
+
+    if (fetch.isNotEmpty) {
+      int start = 0, end = 0;
+
+      var queryParams = {
+        'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+        'includeFutureUpdates': '0',
+        //'order[publishAt]': 'desc',
+        'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
+        'includes[]': ['scanlation_group']
+      };
+
+      while (end < fetch.length) {
+        start = end;
+        end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
+
+        queryParams['ids[]'] = fetch.getRange(start, end);
+
+        final uri = MangaDexEndpoints.api.replace(
+            path: MangaDexEndpoints.chapter, queryParameters: queryParams);
+
+        final response = await _client!.get(uri);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> body = json.decode(response.body);
+
+          final result = ChapterList.fromJson(body);
+
+          // Cache the data
+          _cache.putAllAPIResolved(result.data);
+        } else {
+          // Throw if failure
+          throw Exception("Failed to download manga data");
+        }
+      }
+    }
+
+    // Craft the list
+    for (var id in uuids) {
+      // Assume that all elements are cache satisfied at this point
+      list.add(_cache.get<Chapter>(id));
+    }
+
+    return list;
   }
 
   /// Fetches manga data of the given manga [uuids]
@@ -1544,6 +1602,53 @@ class FollowingStatus extends _$FollowingStatus {
       if (success) {
         return following;
       }
+
+      return oldstate;
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class MangaDexHistory extends _$MangaDexHistory {
+  final _numItems = 50;
+
+  Future<Queue<Chapter>> _fetch() async {
+    final box = Hive.box(gagakuBox);
+    final str = box.get('mangadex_history');
+
+    if (str == null || (str as String).isEmpty) {
+      return Queue<Chapter>();
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final content = json.decode(str) as List<dynamic>;
+    final uuids = List<String>.from(content);
+
+    final chapters = await api.fetchChapters(uuids);
+
+    return Queue<Chapter>.from(chapters);
+  }
+
+  @override
+  FutureOr<Queue<Chapter>> build() async {
+    return _fetch();
+  }
+
+  Future<void> add(Chapter chapter) async {
+    final oldstate =
+        state.maybeWhen(data: (data) => data, orElse: () => Queue<Chapter>());
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      oldstate.addFirst(chapter);
+
+      while (oldstate.length > _numItems) {
+        oldstate.removeLast();
+      }
+
+      final uuids = oldstate.map((e) => e.id).toList();
+
+      final box = Hive.box(gagakuBox);
+      box.put('mangadex_history', json.encode(uuids));
 
       return oldstate;
     });

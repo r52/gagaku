@@ -586,6 +586,22 @@ class FollowingStatusProvider
   }
 }
 
+String _$mangaDexHistoryHash() => r'71171b2d2ebd87eb156463a2ae20ef038c9655ef';
+
+/// See also [MangaDexHistory].
+@ProviderFor(MangaDexHistory)
+final mangaDexHistoryProvider =
+    AsyncNotifierProvider<MangaDexHistory, Queue<Chapter>>.internal(
+  MangaDexHistory.new,
+  name: r'mangaDexHistoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$mangaDexHistoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$MangaDexHistory = AsyncNotifier<Queue<Chapter>>;
 String _$authControlHash() => r'f8be09eda62cb7aef4301595371cdb20bc07059e';
 
 /// See also [AuthControl].

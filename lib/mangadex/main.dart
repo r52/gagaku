@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
+import 'package:gagaku/mangadex/history_feed.dart';
 import 'package:gagaku/mangadex/latest_feed.dart';
 import 'package:gagaku/mangadex/library.dart';
 import 'package:gagaku/mangadex/login_old.dart';
@@ -17,6 +18,7 @@ enum MangaDexTab {
   mangaFeed,
   chapterFeed,
   libraryView,
+  history,
 }
 
 final _mangadexTabProvider = StateProvider((ref) => MangaDexTab.latestFeed);
@@ -45,10 +47,15 @@ class MangaDexHome extends HookConsumerWidget {
       BottomNavigationBarItem(
         icon: Icon(Icons.collections),
         label: 'Library',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.history),
+        label: 'Reading History',
       )
     ];
 
     final controllers = [
+      useScrollController(),
       useScrollController(),
       useScrollController(),
       useScrollController(),
@@ -79,6 +86,9 @@ class MangaDexHome extends HookConsumerWidget {
             controller: controllers[3],
           );
         },
+      ),
+      MangaDexHistoryFeed(
+        controller: controllers[4],
       ),
     ];
 
