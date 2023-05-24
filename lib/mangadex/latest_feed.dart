@@ -1,10 +1,7 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'latest_feed.g.dart';
@@ -61,7 +58,7 @@ Future<List<ChapterFeedItem>> _fetchGlobalChapters(
   return wlist;
 }
 
-class MangaDexGlobalFeed extends HookConsumerWidget {
+class MangaDexGlobalFeed extends StatelessWidget {
   const MangaDexGlobalFeed({
     super.key,
     this.controller,
@@ -70,93 +67,12 @@ class MangaDexGlobalFeed extends HookConsumerWidget {
   final ScrollController? controller;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = controller ?? useScrollController();
-    final results = ref.watch(_fetchGlobalChaptersProvider);
-
-    useEffect(() {
-      void controllerAtEdge() {
-        if (scrollController.position.atEdge) {
-          if (scrollController.position.pixels != 0) {
-            ref.read(latestGlobalFeedProvider.notifier).getMore();
-          }
-        }
-      }
-
-      scrollController.addListener(controllerAtEdge);
-      return () => scrollController.removeListener(controllerAtEdge);
-    }, [scrollController]);
-
-    return Center(
-      child: results.when(
-        skipLoadingOnReload: true,
-        data: (result) {
-          if (result.isEmpty) {
-            return const Text('No results!');
-          }
-
-          return ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.trackpad,
-            }),
-            child: RefreshIndicator(
-              onRefresh: () async {
-                ref.read(latestGlobalFeedProvider.notifier).clear();
-                return await ref.refresh(_fetchGlobalChaptersProvider.future);
-              },
-              child: Column(
-                children: [
-                  const Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Latest Uploads',
-                          style: TextStyle(fontSize: 24),
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      restorationId: 'global_list_offset',
-                      padding: const EdgeInsets.all(6),
-                      itemCount: result.length,
-                      itemBuilder: (context, index) {
-                        return result.elementAt(index);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (err, stackTrace) {
-          final messenger = ScaffoldMessenger.of(context);
-          Future.delayed(
-            Duration.zero,
-            () => messenger
-              ..removeCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text('$err'),
-                  backgroundColor: Colors.red,
-                ),
-              ),
-          );
-
-          return Text('Error: $err');
-        },
-      ),
+  Widget build(BuildContext context) {
+    return ChapterFeedWidget(
+      provider: _fetchGlobalChaptersProvider,
+      title: 'Latest Uploads',
+      controller: controller,
+      restorationId: 'global_list_offset',
     );
   }
 }

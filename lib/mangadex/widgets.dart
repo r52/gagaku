@@ -1,4 +1,5 @@
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
@@ -15,6 +16,114 @@ import 'types.dart';
 enum MangaListView { grid, list, detailed }
 
 final _mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
+
+class ChapterFeedWidget extends HookConsumerWidget {
+  const ChapterFeedWidget({
+    super.key,
+    required this.provider,
+    required this.title,
+    this.emptyText,
+    this.controller,
+    this.restorationId,
+  });
+
+  final AutoDisposeFutureProvider<List<ChapterFeedItem>> provider;
+  final String title;
+  final String? emptyText;
+  final ScrollController? controller;
+  final String? restorationId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = controller ?? useScrollController();
+    final results = ref.watch(provider);
+
+    useEffect(() {
+      void controllerAtEdge() {
+        if (scrollController.position.atEdge) {
+          if (scrollController.position.pixels != 0) {
+            ref.read(latestGlobalFeedProvider.notifier).getMore();
+          }
+        }
+      }
+
+      scrollController.addListener(controllerAtEdge);
+      return () => scrollController.removeListener(controllerAtEdge);
+    }, [scrollController]);
+
+    return Center(
+      child: results.when(
+        skipLoadingOnReload: true,
+        data: (result) {
+          if (result.isEmpty) {
+            return Text(emptyText ?? 'No results!');
+          }
+
+          return ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+            }),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                ref.read(latestGlobalFeedProvider.notifier).clear();
+                return await ref.refresh(provider.future);
+              },
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 10.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(fontSize: 24),
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      restorationId: restorationId,
+                      padding: const EdgeInsets.all(6),
+                      itemCount: result.length,
+                      itemBuilder: (context, index) {
+                        return result.elementAt(index);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (err, stackTrace) {
+          final messenger = ScaffoldMessenger.of(context);
+          Future.delayed(
+            Duration.zero,
+            () => messenger
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text('$err'),
+                  backgroundColor: Colors.red,
+                ),
+              ),
+          );
+
+          return Text('Error: $err');
+        },
+      ),
+    );
+  }
+}
 
 class ChapterFeedItem extends HookWidget {
   const ChapterFeedItem({super.key, required this.state});
