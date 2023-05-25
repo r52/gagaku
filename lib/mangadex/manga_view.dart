@@ -53,7 +53,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     useEffect(() {
       void controllerAtEdge() {
         if (scrollController.position.atEdge) {
-          if (scrollController.position.pixels != 0) {
+          if (scrollController.position.pixels ==
+              scrollController.position.maxScrollExtent) {
             ref.read(mangaChaptersProvider(manga).notifier).getMore();
           }
         }
