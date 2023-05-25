@@ -67,7 +67,7 @@ class GagakuHome extends ConsumerWidget {
     final pages = <Widget>[
       const MangaDexHome(),
       const LocalLibraryHome(),
-      const WebGalleryHome(),
+      const WebSourcesHome(),
     ];
 
     return pages[page.index];

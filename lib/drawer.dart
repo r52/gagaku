@@ -46,7 +46,7 @@ class MainDrawer extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.language),
-            title: const Text('Web Gallery'),
+            title: const Text('Web Sources'),
             onTap: () {
               ref.read(homepageProvider.notifier).state = HomePage.web;
               //Navigator.pop(context);

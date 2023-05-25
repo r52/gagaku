@@ -8,8 +8,8 @@ import 'package:gagaku/web/reader.dart';
 import 'package:gagaku/web/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class WebGalleryHome extends HookConsumerWidget {
-  const WebGalleryHome({super.key});
+class WebSourcesHome extends HookConsumerWidget {
+  const WebSourcesHome({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -60,7 +60,7 @@ class WebGalleryHome extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Web Gallery'),
+        title: const Text('Web Sources'),
       ),
       drawer: const MainDrawer(),
       body: Center(
@@ -142,7 +142,7 @@ class WebGalleryHome extends HookConsumerWidget {
               icon: const Icon(
                 Icons.link,
               ),
-              label: const Text('Open Web Gallery'),
+              label: const Text('Open Web Source'),
             ),
           ],
         ),
