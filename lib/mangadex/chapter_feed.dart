@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'chapter_feed.g.dart';
@@ -53,7 +54,7 @@ Future<List<ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
   return wlist;
 }
 
-class MangaDexChapterFeed extends StatelessWidget {
+class MangaDexChapterFeed extends ConsumerWidget {
   const MangaDexChapterFeed({
     super.key,
     this.controller,
@@ -62,11 +63,18 @@ class MangaDexChapterFeed extends StatelessWidget {
   final ScrollController? controller;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ChapterFeedWidget(
       provider: _fetchChaptersProvider,
       title: 'Latest Chapters',
       emptyText: 'Find some manga to follow!',
+      onAtEdge: () {
+        ref.read(latestChaptersFeedProvider.notifier).getMore();
+      },
+      onRefresh: () async {
+        ref.read(latestChaptersFeedProvider.notifier).clear();
+        return await ref.refresh(_fetchChaptersProvider.future);
+      },
       controller: controller,
       restorationId: 'chapter_list_offset',
     );

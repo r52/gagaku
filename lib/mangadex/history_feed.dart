@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_feed.g.dart';
@@ -58,7 +59,7 @@ Future<List<ChapterFeedItem>> _fetchHistoryFeed(
   return wlist;
 }
 
-class MangaDexHistoryFeed extends StatelessWidget {
+class MangaDexHistoryFeed extends ConsumerWidget {
   const MangaDexHistoryFeed({
     super.key,
     this.controller,
@@ -67,11 +68,14 @@ class MangaDexHistoryFeed extends StatelessWidget {
   final ScrollController? controller;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ChapterFeedWidget(
       provider: _fetchHistoryFeedProvider,
       title: 'Reading History (local)',
       emptyText: 'No reading history!',
+      onRefresh: () async {
+        return await ref.refresh(mangaDexHistoryProvider.future);
+      },
       controller: controller,
       restorationId: 'history_list_offset',
     );

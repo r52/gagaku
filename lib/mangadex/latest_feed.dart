@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'latest_feed.g.dart';
@@ -58,7 +59,7 @@ Future<List<ChapterFeedItem>> _fetchGlobalChapters(
   return wlist;
 }
 
-class MangaDexGlobalFeed extends StatelessWidget {
+class MangaDexGlobalFeed extends ConsumerWidget {
   const MangaDexGlobalFeed({
     super.key,
     this.controller,
@@ -67,10 +68,17 @@ class MangaDexGlobalFeed extends StatelessWidget {
   final ScrollController? controller;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ChapterFeedWidget(
       provider: _fetchGlobalChaptersProvider,
       title: 'Latest Uploads',
+      onAtEdge: () {
+        ref.read(latestGlobalFeedProvider.notifier).getMore();
+      },
+      onRefresh: () async {
+        ref.read(latestGlobalFeedProvider.notifier).clear();
+        return await ref.refresh(_fetchGlobalChaptersProvider.future);
+      },
       controller: controller,
       restorationId: 'global_list_offset',
     );

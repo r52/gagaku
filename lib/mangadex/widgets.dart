@@ -23,6 +23,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
     required this.provider,
     required this.title,
     this.emptyText,
+    this.onAtEdge,
+    required this.onRefresh,
     this.controller,
     this.restorationId,
   });
@@ -30,6 +32,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
   final AutoDisposeFutureProvider<List<ChapterFeedItem>> provider;
   final String title;
   final String? emptyText;
+  final VoidCallback? onAtEdge;
+  final RefreshCallback onRefresh;
   final ScrollController? controller;
   final String? restorationId;
 
@@ -40,9 +44,9 @@ class ChapterFeedWidget extends HookConsumerWidget {
 
     useEffect(() {
       void controllerAtEdge() {
-        if (scrollController.position.atEdge) {
+        if (onAtEdge != null && scrollController.position.atEdge) {
           if (scrollController.position.pixels != 0) {
-            ref.read(latestGlobalFeedProvider.notifier).getMore();
+            onAtEdge!();
           }
         }
       }
@@ -66,10 +70,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
               PointerDeviceKind.trackpad,
             }),
             child: RefreshIndicator(
-              onRefresh: () async {
-                ref.read(latestGlobalFeedProvider.notifier).clear();
-                return await ref.refresh(provider.future);
-              },
+              onRefresh: onRefresh,
               child: Column(
                 children: [
                   Padding(
