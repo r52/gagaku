@@ -3,16 +3,41 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'types.freezed.dart';
 part 'types.g.dart';
 
-class EpochTimestampSerializer implements JsonConverter<DateTime, dynamic> {
+class ProxyInfo {
+  ProxyInfo({required this.proxy, required this.code, this.chapter});
+
+  String proxy;
+  String code;
+  String? chapter;
+}
+
+class ProxyData {
+  ProxyData({this.manga, this.code});
+
+  WebManga? manga;
+  String? code;
+}
+
+class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
   const EpochTimestampSerializer();
 
   @override
-  DateTime fromJson(dynamic timestamp) =>
-      DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
+  DateTime? fromJson(dynamic timestamp) {
+    if (timestamp == null) {
+      return null;
+    }
+
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
+  }
 
   @override
-  dynamic toJson(DateTime date) =>
-      (date.millisecondsSinceEpoch / 1000).toString();
+  dynamic toJson(DateTime? date) {
+    if (date == null) {
+      return null;
+    }
+
+    return (date.millisecondsSinceEpoch / 1000).toString();
+  }
 }
 
 @freezed
@@ -37,7 +62,7 @@ class WebChapter with _$WebChapter {
   const factory WebChapter({
     required String title,
     required String volume,
-    @EpochTimestampSerializer() required DateTime lastUpdated,
+    @EpochTimestampSerializer() DateTime? lastUpdated,
     required Map<String, String> groups,
   }) = _WebChapter;
 

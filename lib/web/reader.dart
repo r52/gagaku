@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader.g.dart';
 
-Route createWebGalleryReaderRoute(
+Route createWebSourceReaderRoute(
   String src, {
   String? title,
   WebManga? manga,
@@ -18,7 +18,7 @@ Route createWebGalleryReaderRoute(
   VoidCallback? onLinkPressed,
 }) {
   return Styles.buildSlideTransitionRoute(
-    (context, animation, secondaryAnimation) => WebGalleryReaderWidget(
+    (context, animation, secondaryAnimation) => WebSourceReaderWidget(
       source: src,
       title: title,
       manga: manga,
@@ -30,17 +30,20 @@ Route createWebGalleryReaderRoute(
 
 @riverpod
 Future<List<ReaderPage>> _getPages(_GetPagesRef ref, String code) async {
-  final pages = await ref.read(getImgurPagesProvider(code).future);
+  final api = ref.watch(proxyProvider);
+  final pages = await api.getChapter(code);
+
+  ref.keepAlive();
 
   return pages
       .map((e) => ReaderPage(
-            provider: ExtendedNetworkImageProvider(e.src),
+            provider: ExtendedNetworkImageProvider(e),
           ))
       .toList();
 }
 
-class WebGalleryReaderWidget extends ConsumerWidget {
-  const WebGalleryReaderWidget({
+class WebSourceReaderWidget extends ConsumerWidget {
+  const WebSourceReaderWidget({
     super.key,
     required this.source,
     this.title,

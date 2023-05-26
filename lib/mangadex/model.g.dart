@@ -586,7 +586,7 @@ class FollowingStatusProvider
   }
 }
 
-String _$mangaDexHistoryHash() => r'71171b2d2ebd87eb156463a2ae20ef038c9655ef';
+String _$mangaDexHistoryHash() => r'c7d43c0c7fd0b68d0b078be0c442547887223b24';
 
 /// See also [MangaDexHistory].
 @ProviderFor(MangaDexHistory)

@@ -13,6 +13,7 @@ class WebSourcesHome extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final api = ref.watch(proxyProvider);
     final urlFieldController = useTextEditingController();
     final nav = Navigator.of(context);
 
@@ -20,42 +21,35 @@ class WebSourcesHome extends HookConsumerWidget {
       nav.push(createMangaViewRoute(manga));
     }
 
-    Future<void> openImgur(String src) async {
-      nav.push(createWebGalleryReaderRoute(src));
-    }
-
     Future<bool> parseUrl(String url) async {
-      if (!url.startsWith('https://cubari.moe/read/') &&
-          !url.startsWith('https://imgur.com/a/')) {
-        return false;
-      }
-
       if (url.startsWith('https://imgur.com/a/')) {
-        var src = url.substring(20);
-        await openImgur(src);
-      } else if (url.startsWith('https://cubari.moe/read/')) {
-        var src = url.substring(24);
-        var proxy = src.split('/');
-        proxy.removeWhere((element) => element.isEmpty);
+        final src = url.substring(20);
+        final code = '/read/api/imgur/chapter/$src';
+        await nav.push(createWebSourceReaderRoute(code));
+        return true;
+      }
 
-        if (proxy.length < 2) {
+      if (url.startsWith('https://cubari.moe/read/')) {
+        final info = await api.parseUrl(url);
+
+        if (info == null) {
           return false;
         }
 
-        var type = proxy[0];
+        final proxy = await api.handleProxy(info);
 
-        if (type == 'gist') {
-          var manga = await ref.read(getMangaFromGistProvider(proxy[1]).future);
-          await openManga(manga);
-        } else if (type == 'imgur') {
-          await openImgur(proxy[1]);
-        } else {
-          // Don't support other proxies (like mangadex)
-          return false;
+        if (proxy.code != null) {
+          await nav.push(createWebSourceReaderRoute(proxy.code!));
+          return true;
+        }
+
+        if (proxy.manga != null) {
+          await openManga(proxy.manga!);
+          return true;
         }
       }
 
-      return true;
+      return false;
     }
 
     return Scaffold(

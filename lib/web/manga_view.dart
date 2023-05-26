@@ -34,7 +34,8 @@ class WebMangaViewWidget extends StatelessWidget {
     final chapterlist = manga.chapters.entries
         .map((e) => ChapterEntry(e.key, e.value))
         .toList();
-    chapterlist.sort((a, b) => int.parse(b.name).compareTo(int.parse(a.name)));
+    chapterlist
+        .sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
 
     return Scaffold(
       body: CustomScrollView(
@@ -177,13 +178,6 @@ class ChapterButtonWidget extends StatelessWidget {
   final Widget? link;
   final VoidCallback? onLinkPressed;
 
-  String getImgurSource(String proxy) {
-    var split = proxy.split('/');
-    split.removeWhere((element) => element.isEmpty);
-
-    return split.last;
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
@@ -205,8 +199,7 @@ class ChapterButtonWidget extends StatelessWidget {
         onTap: () {
           Navigator.push(
               context,
-              createWebGalleryReaderRoute(
-                  getImgurSource(chapter.groups.entries.first.value),
+              createWebSourceReaderRoute(chapter.groups.entries.first.value,
                   title: title,
                   manga: manga,
                   link: link,
@@ -235,7 +228,8 @@ class ChapterButtonWidget extends StatelessWidget {
                     const SizedBox(width: 10),
                     const Icon(Icons.schedule, size: 20),
                     const SizedBox(width: 5),
-                    Text(timeago.format(chapter.lastUpdated))
+                    if (chapter.lastUpdated != null)
+                      Text(timeago.format(chapter.lastUpdated!))
                   ],
                 ),
               )
@@ -244,7 +238,8 @@ class ChapterButtonWidget extends StatelessWidget {
                 children: [
                   const Icon(Icons.schedule, size: 15),
                   const SizedBox(width: 5),
-                  Text(timeago.format(chapter.lastUpdated))
+                  if (chapter.lastUpdated != null)
+                    Text(timeago.format(chapter.lastUpdated!))
                 ],
               ),
       ),
