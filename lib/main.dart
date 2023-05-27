@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gagaku/about.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/model.dart';
@@ -17,6 +18,7 @@ class _HttpOverrides extends HttpOverrides {
 
 void main() async {
   HttpOverrides.global = _HttpOverrides();
+  WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
   await Hive.openBox(gagakuBox);
@@ -68,6 +70,7 @@ class GagakuHome extends ConsumerWidget {
       const MangaDexHome(),
       const LocalLibraryHome(),
       const WebSourcesHome(),
+      const AboutPage(),
     ];
 
     return pages[page.index];
