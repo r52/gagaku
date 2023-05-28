@@ -64,6 +64,8 @@ jobs:
 
       - run: flutter pub get
 
+      - run: flutter pub run build_runner build
+
       - name: Build Project
         run: flutter build ${{ matrix.pkg }}
 
