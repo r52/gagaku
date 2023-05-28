@@ -52,6 +52,13 @@ class MainDrawer extends ConsumerWidget {
               //Navigator.pop(context);
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.info),
+            title: const Text('About'),
+            onTap: () {
+              ref.read(homepageProvider.notifier).state = HomePage.about;
+            },
+          ),
         ],
       ),
     );

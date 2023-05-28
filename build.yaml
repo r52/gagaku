@@ -1,0 +1,6 @@
+builders:
+  version_builder:
+    import: "package:gagaku/gen_version.dart"
+    builder_factories: ["versionBuilderFactory"]
+    build_extensions: { ".dart": [".dart_xxx"] }
+    auto_apply: all_packages
