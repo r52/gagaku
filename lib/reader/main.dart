@@ -68,6 +68,8 @@ class ReaderWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
+    final mediaContext = MediaQuery.of(context);
     final refresh = useState(0);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
@@ -113,12 +115,13 @@ class ReaderWidget extends HookConsumerWidget {
       }
 
       // Try and back cache 3 pages
-      var backCache = currentPage.value - 3;
+      const backCacheAmount = 3;
+      var backCache = currentPage.value - backCacheAmount;
       if (backCache < 0) {
         backCache = 0;
       }
 
-      pages.skip(backCache).take(3).forEach((element) {
+      pages.skip(backCache).take(backCacheAmount).forEach((element) {
         if (!element.cached) {
           cachePage(element);
         }
@@ -219,7 +222,7 @@ class ReaderWidget extends HookConsumerWidget {
           if (currentPage.value < pageCount - 1) {
             jumpToNextPage();
           } else {
-            Navigator.of(context).pop();
+            nav.pop();
           }
           break;
         case ReaderDirection.topToBottom:
@@ -239,7 +242,7 @@ class ReaderWidget extends HookConsumerWidget {
           if (currentPage.value < pageCount - 1) {
             jumpToNextPage();
           } else {
-            Navigator.of(context).pop();
+            nav.pop();
           }
           break;
         case ReaderDirection.rightToLeft:
@@ -260,7 +263,7 @@ class ReaderWidget extends HookConsumerWidget {
         final min = _getListViewFirstShownPage(positions);
 
         if (min != null) {
-          var off = offset / MediaQuery.of(context).size.height;
+          var off = offset / mediaContext.size.height;
 
           if (min.index == 0 && min.itemLeadingEdge + off > 0.0) {
             off = min.itemLeadingEdge.abs();
@@ -305,10 +308,10 @@ class ReaderWidget extends HookConsumerWidget {
         final max = _getListViewLastShownPage(positions);
 
         if (max != null) {
-          final off = offset / MediaQuery.of(context).size.height;
+          final off = offset / mediaContext.size.height;
 
           if (max.index == pageCount - 1 && max.itemTrailingEdge == 1.0) {
-            Navigator.of(context).pop();
+            nav.pop();
           } else {
             itemScrollController.jumpTo(
                 index: max.index, alignment: max.itemLeadingEdge - off);
@@ -329,7 +332,7 @@ class ReaderWidget extends HookConsumerWidget {
             if (currentPage.value < pageCount - 1) {
               jumpToNextPage();
             } else {
-              Navigator.of(context).pop();
+              nav.pop();
             }
           }
           break;
@@ -348,28 +351,34 @@ class ReaderWidget extends HookConsumerWidget {
 
     KeyEventResult handleKeyEvent(FocusNode node, KeyEvent event) {
       if (event is KeyDownEvent) {
-        if (event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
-          return onTapLeft();
-        } else if (event.physicalKey == PhysicalKeyboardKey.arrowRight) {
-          return onTapRight();
-        } else if (event.physicalKey == PhysicalKeyboardKey.arrowUp) {
-          return onTapTop(250);
-        } else if (event.physicalKey == PhysicalKeyboardKey.arrowDown) {
-          return onTapBottom(250);
-        } else if (event.physicalKey == PhysicalKeyboardKey.pageUp) {
-          return onTapTop(1000);
-        } else if (event.physicalKey == PhysicalKeyboardKey.pageDown) {
-          return onTapBottom(1000);
+        switch (event.physicalKey) {
+          case PhysicalKeyboardKey.arrowLeft:
+            return onTapLeft();
+          case PhysicalKeyboardKey.arrowRight:
+            return onTapRight();
+          case PhysicalKeyboardKey.arrowUp:
+            return onTapTop(250);
+          case PhysicalKeyboardKey.arrowDown:
+            return onTapBottom(250);
+          case PhysicalKeyboardKey.pageUp:
+            return onTapTop(1000);
+          case PhysicalKeyboardKey.pageDown:
+            return onTapBottom(1000);
+          default:
+            return KeyEventResult.ignored;
         }
       } else if (event is KeyRepeatEvent) {
-        if (event.physicalKey == PhysicalKeyboardKey.arrowUp) {
-          return onTapTop(250);
-        } else if (event.physicalKey == PhysicalKeyboardKey.arrowDown) {
-          return onTapBottom(250);
-        } else if (event.physicalKey == PhysicalKeyboardKey.pageUp) {
-          return onTapTop(1000);
-        } else if (event.physicalKey == PhysicalKeyboardKey.pageDown) {
-          return onTapBottom(1000);
+        switch (event.physicalKey) {
+          case PhysicalKeyboardKey.arrowUp:
+            return onTapTop(250);
+          case PhysicalKeyboardKey.arrowDown:
+            return onTapBottom(250);
+          case PhysicalKeyboardKey.pageUp:
+            return onTapTop(1000);
+          case PhysicalKeyboardKey.pageDown:
+            return onTapBottom(1000);
+          default:
+            return KeyEventResult.ignored;
         }
       }
 
@@ -432,7 +441,7 @@ class ReaderWidget extends HookConsumerWidget {
               (link != null
                   ? TextButton(
                       onPressed: () {
-                        Navigator.of(context)
+                        nav
                           ..pop()
                           ..pop();
 
@@ -642,7 +651,7 @@ class ReaderWidget extends HookConsumerWidget {
                 itemPositionsListener: itemPositionsListener,
                 itemCount: pageCount,
                 itemBuilder: (BuildContext context, int index) {
-                  var page = pages.elementAt(index);
+                  final page = pages.elementAt(index);
 
                   return PhotoView(
                     imageProvider: page.provider,
@@ -650,7 +659,7 @@ class ReaderWidget extends HookConsumerWidget {
                         const BoxDecoration(color: Colors.black),
                     enableRotation: false,
                     disableGestures: true,
-                    customSize: MediaQuery.of(context).size,
+                    customSize: mediaContext.size,
                     minScale: PhotoViewComputedScale.contained * 1.0,
                     maxScale: PhotoViewComputedScale.covered * 5.0,
                     initialScale: DeviceContext.isPortraitMode(context)
@@ -682,7 +691,7 @@ class ReaderWidget extends HookConsumerWidget {
                 focusNode.requestFocus();
               },
               itemBuilder: (BuildContext context, int index) {
-                var page = pages.elementAt(index);
+                final page = pages.elementAt(index);
 
                 return PhotoView(
                   imageProvider: page.provider,

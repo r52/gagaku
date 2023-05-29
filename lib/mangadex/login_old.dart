@@ -10,6 +10,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final auth = ref.watch(authControlProvider);
 
     return auth.when(
@@ -21,7 +22,6 @@ class MangaDexLoginWidget extends ConsumerWidget {
         return Center(
           child: ElevatedButton.icon(
             onPressed: () async {
-              final nav = Navigator.of(context);
               nav.push(
                 MaterialPageRoute(
                   builder: (context) => const MangaDexLoginScreen(),
@@ -48,6 +48,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final usernameController = useTextEditingController();
     final passwordController = useTextEditingController();
 
@@ -107,13 +108,12 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                   onPressed: () {
                     usernameController.clear();
                     passwordController.clear();
-                    Navigator.pop(context);
+                    nav.pop();
                   },
                 ),
                 ElevatedButton(
                   child: const Text('LOGIN'),
                   onPressed: () async {
-                    final navigator = Navigator.of(context);
                     final messenger = ScaffoldMessenger.of(context);
 
                     if (usernameController.text.isNotEmpty &&
@@ -124,7 +124,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                               usernameController.text, passwordController.text);
 
                       if (loginSuccess) {
-                        navigator.pop();
+                        nav.pop();
                         usernameController.clear();
                         passwordController.clear();
                       } else {

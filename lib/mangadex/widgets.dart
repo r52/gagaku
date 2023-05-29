@@ -29,7 +29,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
     this.restorationId,
   });
 
-  final AutoDisposeFutureProvider<List<ChapterFeedItem>> provider;
+  final AutoDisposeFutureProvider<List<ChapterFeedItemData>> provider;
   final String title;
   final String? emptyText;
   final VoidCallback? onAtEdge;
@@ -44,11 +44,11 @@ class ChapterFeedWidget extends HookConsumerWidget {
 
     useEffect(() {
       void controllerAtEdge() {
-        if (onAtEdge != null && scrollController.position.atEdge) {
-          if (scrollController.position.pixels ==
-              scrollController.position.maxScrollExtent) {
-            onAtEdge!();
-          }
+        if (onAtEdge != null &&
+            scrollController.position.atEdge &&
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
+          onAtEdge!();
         }
       }
 
@@ -94,7 +94,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
                       padding: const EdgeInsets.all(6),
                       itemCount: result.length,
                       itemBuilder: (context, index) {
-                        return result.elementAt(index);
+                        return ChapterFeedItem(state: result.elementAt(index));
                       },
                     ),
                   ),
@@ -134,11 +134,12 @@ class ChapterFeedItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final nav = Navigator.of(context);
     final refresh = useState(0);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
-    var chapterBtns = state.chapters.map((e) {
+    final chapterBtns = state.chapters.map((e) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: ChapterButtonWidget(
@@ -150,8 +151,7 @@ class ChapterFeedItem extends HookWidget {
             style: const TextStyle(fontSize: 24),
           ),
           onLinkPressed: () {
-            Navigator.push(context, createMangaViewRoute(state.manga))
-                .then((value) {
+            nav.push(createMangaViewRoute(state.manga)).then((value) {
               // Refresh when the view is closed
               refresh.value++;
             });
@@ -169,7 +169,6 @@ class ChapterFeedItem extends HookWidget {
           children: [
             TextButton(
               onPressed: () async {
-                final nav = Navigator.of(context);
                 nav.push(createMangaViewRoute(state.manga)).then((value) {
                   // Refresh when the view is closed
                   refresh.value++;
@@ -189,7 +188,6 @@ class ChapterFeedItem extends HookWidget {
                           textStyle: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       onPressed: () async {
-                        final nav = Navigator.of(context);
                         nav
                             .push(createMangaViewRoute(state.manga))
                             .then((value) {
@@ -228,6 +226,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final auth = ref.watch(authControlProvider);
     final refresh = useState(0);
 
@@ -258,43 +257,120 @@ class ChapterButtonWidget extends HookConsumerWidget {
     );
 
     final groups = chapter.getGroups();
-    final groupChips = [];
+    final groupChips = <Widget>[];
 
     for (var g in groups) {
-      groupChips.addAll([
-        const SizedBox(width: 4),
-        IconTextChip(
-          icon: Icon(Icons.group, size: iconSize),
-          text: Text(g.crop()),
-        ),
-      ]);
+      groupChips.add(const SizedBox(width: 4));
+      groupChips.add(IconTextChip(
+        icon: Icon(Icons.group, size: iconSize),
+        text: Text(g.crop()),
+      ));
     }
 
-    final publisherChip = [];
+    final publisherChip = <Widget>[];
     if (chapter.attributes.externalUrl != null) {
-      publisherChip.addAll([
-        const SizedBox(width: 4),
-        IconTextChip(
-          icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
-          text: const Text('Official Publisher'),
-        ),
-      ]);
+      publisherChip.add(const SizedBox(width: 4));
+      publisherChip.add(IconTextChip(
+        icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
+        text: const Text('Official Publisher'),
+      ));
     }
 
-    final endChip = [];
+    final endChip = <Widget>[];
     if (isEndChapter) {
-      endChip.addAll([
-        const IconTextChip(
-          color: Colors.blue,
-          text: Text('END'),
-        ),
-        const SizedBox(width: 4),
-      ]);
+      endChip.add(const IconTextChip(
+        color: Colors.blue,
+        text: Text('END'),
+      ));
+      endChip.add(const SizedBox(width: 4));
     }
+
+    // Logged in components
+    IconButton? markReadBtn;
+    Border? border;
+    TextStyle? textstyle;
+
+    auth.maybeWhen(
+      data: (loggedin) {
+        if (!loggedin) {
+          border = Border(
+            left: BorderSide(color: tileColor, width: 4.0),
+          );
+
+          textstyle = TextStyle(
+            color: theme.colorScheme.primary,
+          );
+
+          return;
+        }
+
+        final readChapters = ref.watch(readChaptersProvider);
+
+        return readChapters.maybeWhen(
+          skipLoadingOnReload: true,
+          data: (data) {
+            bool isRead = data.containsKey(manga.id) &&
+                data[manga.id]!.contains(chapter.id);
+
+            border = Border(
+              left: BorderSide(
+                  color: isRead ? tileColor : Colors.blue, width: 4.0),
+            );
+
+            textstyle = TextStyle(
+                color: (isRead
+                    ? theme.highlightColor
+                    : theme.colorScheme.primary));
+
+            markReadBtn = IconButton(
+              onPressed: () async {
+                bool set = !isRead;
+                ref
+                    .read(readChaptersProvider.notifier)
+                    .set(manga, [chapter], set);
+              },
+              padding: const EdgeInsets.all(0.0),
+              splashRadius: 15,
+              iconSize: 20,
+              tooltip: isRead ? 'Unmark as read' : 'Mark as read',
+              icon: Icon(isRead ? Icons.visibility_off : Icons.visibility,
+                  color: (isRead
+                      ? theme.highlightColor
+                      : theme.primaryIconTheme.color)),
+              constraints:
+                  const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
+            );
+
+            return;
+          },
+          orElse: () {
+            border = Border(
+              left: BorderSide(color: tileColor, width: 4.0),
+            );
+
+            textstyle = TextStyle(
+              color: theme.colorScheme.primary,
+            );
+            return;
+          },
+        );
+      },
+      orElse: () {
+        border = Border(
+          left: BorderSide(color: tileColor, width: 4.0),
+        );
+
+        textstyle = TextStyle(
+          color: theme.colorScheme.primary,
+        );
+        return;
+      },
+    );
 
     final tile = ListTile(
       onTap: () {
-        Navigator.push(context,
+        nav
+            .push(
                 createMangaDexReaderRoute(chapter, manga, link, onLinkPressed))
             .then((value) {
           // Refresh this when reader view is closed to update read status
@@ -306,85 +382,10 @@ class ChapterButtonWidget extends HookConsumerWidget {
       contentPadding:
           EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
       minLeadingWidth: 0.0,
-      leading: auth.maybeWhen(
-        data: (loggedin) {
-          if (!loggedin) {
-            return null;
-          }
-
-          final readChapters = ref.watch(readChaptersProvider);
-
-          return readChapters.maybeWhen(
-            skipLoadingOnReload: true,
-            data: (data) {
-              bool isRead = data.containsKey(manga.id) &&
-                  data[manga.id]!.contains(chapter.id);
-
-              return IconButton(
-                onPressed: () async {
-                  bool set = !isRead;
-                  ref
-                      .read(readChaptersProvider.notifier)
-                      .set(manga, [chapter], set);
-                },
-                padding: const EdgeInsets.all(0.0),
-                splashRadius: 15,
-                iconSize: 20,
-                tooltip: isRead ? 'Unmark as read' : 'Mark as read',
-                icon: Icon(isRead ? Icons.visibility_off : Icons.visibility,
-                    color: (isRead
-                        ? theme.highlightColor
-                        : theme.primaryIconTheme.color)),
-                constraints:
-                    const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
-              );
-            },
-            orElse: () => null,
-          );
-        },
-        orElse: () => null,
-      ),
-      title: auth.maybeWhen(
-        data: (loggedin) {
-          if (!loggedin) {
-            return Text(
-              title,
-              style: TextStyle(
-                color: theme.colorScheme.primary,
-              ),
-            );
-          }
-
-          final readChapters = ref.watch(readChaptersProvider);
-
-          return readChapters.maybeWhen(
-            skipLoadingOnReload: true,
-            data: (data) {
-              bool isRead = data.containsKey(manga.id) &&
-                  data[manga.id]!.contains(chapter.id);
-
-              return Text(
-                title,
-                style: TextStyle(
-                    color: (isRead
-                        ? theme.highlightColor
-                        : theme.colorScheme.primary)),
-              );
-            },
-            orElse: () => Text(
-              title,
-              style: TextStyle(
-                color: theme.colorScheme.primary,
-              ),
-            ),
-          );
-        },
-        orElse: () => Text(
-          title,
-          style: TextStyle(
-            color: theme.colorScheme.primary,
-          ),
-        ),
+      leading: markReadBtn,
+      title: Text(
+        title,
+        style: textstyle,
       ),
       trailing: !screenSizeSmall
           ? FittedBox(
@@ -442,66 +443,20 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.push(context,
+        nav
+            .push(
                 createMangaDexReaderRoute(chapter, manga, link, onLinkPressed))
             .then((value) {
           // Refresh this when reader view is closed to update read status
           refresh.value++;
         });
       },
-      child: auth.maybeWhen(
-        data: (loggedin) {
-          if (!loggedin) {
-            return Container(
-              decoration: BoxDecoration(
-                color: tileColor,
-                border: Border(
-                  left: BorderSide(color: tileColor, width: 4.0),
-                ),
-              ),
-              child: child,
-            );
-          }
-
-          final readChapters = ref.watch(readChaptersProvider);
-
-          return readChapters.maybeWhen(
-            skipLoadingOnReload: true,
-            data: (data) {
-              bool isRead = data.containsKey(manga.id) &&
-                  data[manga.id]!.contains(chapter.id);
-
-              return Container(
-                decoration: BoxDecoration(
-                  color: tileColor,
-                  border: Border(
-                    left: BorderSide(
-                        color: isRead ? tileColor : Colors.blue, width: 4.0),
-                  ),
-                ),
-                child: child,
-              );
-            },
-            orElse: () => Container(
-              decoration: BoxDecoration(
-                color: tileColor,
-                border: Border(
-                  left: BorderSide(color: tileColor, width: 4.0),
-                ),
-              ),
-              child: child,
-            ),
-          );
-        },
-        orElse: () => Container(
-          decoration: BoxDecoration(
-            color: tileColor,
-            border: Border(
-              left: BorderSide(color: tileColor, width: 4.0),
-            ),
-          ),
-          child: child,
+      child: Container(
+        decoration: BoxDecoration(
+          color: tileColor,
+          border: border,
         ),
+        child: child,
       ),
     );
   }
@@ -646,6 +601,7 @@ class _GridMangaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final nav = Navigator.of(context);
     final Widget image = Material(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       clipBehavior: Clip.antiAlias,
@@ -659,7 +615,7 @@ class _GridMangaItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.push(context, createMangaViewRoute(manga));
+        nav.push(createMangaViewRoute(manga));
       },
       child: GridTile(
         footer: SizedBox(
@@ -696,6 +652,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final stats = ref.watch(statisticsProvider);
@@ -713,7 +670,6 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                   textStyle: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               onPressed: () async {
-                final nav = Navigator.of(context);
                 nav.push(createMangaViewRoute(manga));
               },
               child: Text(
@@ -730,7 +686,6 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      final nav = Navigator.of(context);
                       nav.push(createMangaViewRoute(manga));
                     },
                     child: ExtendedImage.network(
@@ -860,6 +815,7 @@ class _ListMangaItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final stats = ref.watch(statisticsProvider);
 
@@ -872,7 +828,6 @@ class _ListMangaItem extends ConsumerWidget {
           children: [
             TextButton(
               onPressed: () async {
-                final nav = Navigator.of(context);
                 nav.push(createMangaViewRoute(manga));
               },
               child: ExtendedImage.network(
@@ -895,7 +850,6 @@ class _ListMangaItem extends ConsumerWidget {
                       ),
                     ),
                     onPressed: () async {
-                      final nav = Navigator.of(context);
                       nav.push(createMangaViewRoute(manga));
                     },
                     child: Text(manga.attributes.title.get('en')),

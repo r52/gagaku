@@ -180,6 +180,7 @@ class ChapterButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
@@ -197,13 +198,12 @@ class ChapterButtonWidget extends StatelessWidget {
       ),
       child: ListTile(
         onTap: () {
-          Navigator.push(
-              context,
-              createWebSourceReaderRoute(chapter.groups.entries.first.value,
-                  title: title,
-                  manga: manga,
-                  link: link,
-                  onLinkPressed: onLinkPressed));
+          nav.push(createWebSourceReaderRoute(
+              chapter.groups.entries.first.value,
+              title: title,
+              manga: manga,
+              link: link,
+              onLinkPressed: onLinkPressed));
         },
         tileColor: theme.colorScheme.primaryContainer,
         dense: true,

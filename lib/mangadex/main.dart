@@ -28,6 +28,7 @@ class MangaDexHome extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final tab = ref.watch(_mangadexTabProvider);
 
@@ -176,7 +177,6 @@ class MangaDexHome extends HookConsumerWidget {
                           color: theme.colorScheme.primary,
                           icon: const Icon(Icons.login),
                           onPressed: () {
-                            final nav = Navigator.of(context);
                             nav.push(
                               MaterialPageRoute(
                                 builder: (context) =>
