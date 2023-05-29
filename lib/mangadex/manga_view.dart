@@ -47,16 +47,24 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authControlProvider);
+    final loggedin =
+        auth.maybeWhen(data: (loggedin) => loggedin, orElse: () => false);
     final scrollController = useScrollController();
     final theme = Theme.of(context);
 
+    Map<String, Set<String>> readData = {};
+
+    if (loggedin) {
+      readData = ref.watch(readChaptersProvider).maybeWhen(
+          skipLoadingOnReload: true, data: (data) => data, orElse: () => {});
+    }
+
     useEffect(() {
       void controllerAtEdge() {
-        if (scrollController.position.atEdge) {
-          if (scrollController.position.pixels ==
-              scrollController.position.maxScrollExtent) {
-            ref.read(mangaChaptersProvider(manga).notifier).getMore();
-          }
+        if (scrollController.position.atEdge &&
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
+          ref.read(mangaChaptersProvider(manga).notifier).getMore();
         }
       }
 
@@ -98,114 +106,104 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 loadStateChanged: extendedImageLoadStateHandler,
               ),
             ),
-            actions: [
-              ...auth.maybeWhen(
-                data: (loggedin) {
-                  if (loggedin) {
-                    final following =
-                        ref.watch(followingStatusProvider(manga)).maybeWhen(
-                              data: (following) => following,
-                              orElse: () => false,
-                            );
-                    final reading =
-                        ref.watch(readingStatusProvider(manga)).maybeWhen(
-                              data: (reading) => reading,
-                              orElse: () => null,
-                            );
+            actions: () {
+              if (loggedin) {
+                final following =
+                    ref.watch(followingStatusProvider(manga)).maybeWhen(
+                          data: (following) => following,
+                          orElse: () => false,
+                        );
+                final reading =
+                    ref.watch(readingStatusProvider(manga)).maybeWhen(
+                          data: (reading) => reading,
+                          orElse: () => null,
+                        );
 
-                    if (!following && reading == null) {
-                      return [
-                        ElevatedButton(
-                          onPressed: () async {
-                            ref
-                                .read(readingStatusProvider(manga).notifier)
-                                .set(MangaReadingStatus.plan_to_read);
+                if (!following && reading == null) {
+                  return [
+                    ElevatedButton(
+                      onPressed: () async {
+                        ref
+                            .read(readingStatusProvider(manga).notifier)
+                            .set(MangaReadingStatus.plan_to_read);
 
+                        ref
+                            .read(followingStatusProvider(manga).notifier)
+                            .set(true);
+                      },
+                      child: const Text('Add to Library'),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                  ];
+                } else {
+                  return [
+                    Tooltip(
+                      message: following ? 'Unfollow Manga' : 'Follow Manga',
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          bool set = !following;
+                          ref
+                              .read(followingStatusProvider(manga).notifier)
+                              .set(set);
+                        },
+                        child: Icon(
+                            following ? Icons.favorite : Icons.favorite_border),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: theme.colorScheme.background.withAlpha(200),
+                      ),
+                      child: DropdownButton<MangaReadingStatus>(
+                        value: reading,
+                        icon: const Icon(Icons.arrow_drop_down),
+                        iconSize: 24,
+                        elevation: 16,
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepOrangeAccent,
+                        ),
+                        onChanged: (MangaReadingStatus? status) async {
+                          ref
+                              .read(readingStatusProvider(manga).notifier)
+                              .set(status);
+
+                          if (status == null ||
+                              status == MangaReadingStatus.remove) {
                             ref
                                 .read(followingStatusProvider(manga).notifier)
-                                .set(true);
-                          },
-                          child: const Text('Add to Library'),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                      ];
-                    } else {
-                      return [
-                        Tooltip(
-                          message:
-                              following ? 'Unfollow Manga' : 'Follow Manga',
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              bool set = !following;
-                              ref
-                                  .read(followingStatusProvider(manga).notifier)
-                                  .set(set);
-                            },
-                            child: Icon(following
-                                ? Icons.favorite
-                                : Icons.favorite_border),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: theme.colorScheme.background.withAlpha(200),
-                          ),
-                          child: DropdownButton<MangaReadingStatus>(
-                            value: reading,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            iconSize: 24,
-                            elevation: 16,
-                            underline: Container(
-                              height: 2,
-                              color: Colors.deepOrangeAccent,
-                            ),
-                            onChanged: (MangaReadingStatus? status) async {
-                              ref
-                                  .read(readingStatusProvider(manga).notifier)
-                                  .set(status);
-
-                              if (status == null ||
-                                  status == MangaReadingStatus.remove) {
-                                ref
-                                    .read(
-                                        followingStatusProvider(manga).notifier)
-                                    .set(false);
-                              }
-                            },
-                            items: List<
-                                DropdownMenuItem<MangaReadingStatus>>.generate(
-                              MangaReadingStatus.values.length,
-                              (int index) =>
-                                  DropdownMenuItem<MangaReadingStatus>(
-                                value:
-                                    MangaReadingStatus.values.elementAt(index),
-                                child: Text(
-                                  MangaReadingStatus.values
-                                      .elementAt(index)
-                                      .formatted,
-                                ),
-                              ),
+                                .set(false);
+                          }
+                        },
+                        items:
+                            List<DropdownMenuItem<MangaReadingStatus>>.generate(
+                          MangaReadingStatus.values.length,
+                          (int index) => DropdownMenuItem<MangaReadingStatus>(
+                            value: MangaReadingStatus.values.elementAt(index),
+                            child: Text(
+                              MangaReadingStatus.values
+                                  .elementAt(index)
+                                  .formatted,
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                      ];
-                    }
-                  }
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                  ];
+                }
+              }
 
-                  return [];
-                },
-                orElse: () => [],
-              ),
-            ],
+              return <Widget>[];
+            }(),
           ),
           SliverToBoxAdapter(
             child: Container(
@@ -462,6 +460,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         final chapbtn = ChapterButtonWidget(
                           chapter: thischap,
                           manga: manga,
+                          loggedin: loggedin,
+                          isRead: readData.containsKey(manga.id) &&
+                              readData[manga.id]!.contains(thischap.id),
                           link: Text(
                             manga.attributes.title.get('en'),
                             style: const TextStyle(fontSize: 24),

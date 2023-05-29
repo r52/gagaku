@@ -217,7 +217,7 @@ class MangaDexHome extends HookConsumerWidget {
         items: bottomNavigationBarItems,
         currentIndex: tab.index,
         type: BottomNavigationBarType.fixed,
-        fixedColor: Theme.of(context).colorScheme.primary,
+        selectedItemColor: theme.colorScheme.primary,
         onTap: (index) {
           final currTab = ref.read(_mangadexTabProvider);
 
