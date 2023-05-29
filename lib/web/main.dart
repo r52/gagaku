@@ -105,14 +105,14 @@ class WebSourcesHome extends HookConsumerWidget {
                           TextButton(
                             child: const Text('CANCEL'),
                             onPressed: () {
-                              Navigator.pop(context);
+                              nav.pop();
                               urlFieldController.clear();
                             },
                           ),
                           ElevatedButton(
                             child: const Text('OK'),
                             onPressed: () {
-                              Navigator.pop(context, urlFieldController.text);
+                              nav.pop(urlFieldController.text);
                               urlFieldController.clear();
                             },
                           ),

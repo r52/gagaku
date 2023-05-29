@@ -16,6 +16,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final cfg = ref.read(localConfigProvider);
     final config = useState(cfg);
 
@@ -23,7 +24,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.pop(context, false);
+            nav.pop(false);
           },
         ),
         title: const Text('Library Settings'),
@@ -37,7 +38,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                   label: const Text('Save Settings'),
                   onPressed: () {
                     ref.read(localConfigProvider.notifier).save(config.value);
-                    Navigator.pop(context, true);
+                    nav.pop(true);
                   },
                 ),
               ),

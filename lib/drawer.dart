@@ -33,7 +33,6 @@ class MainDrawer extends ConsumerWidget {
             title: const Text('MangaDex'),
             onTap: () {
               ref.read(homepageProvider.notifier).state = HomePage.mangadex;
-              //Navigator.pop(context);
             },
           ),
           ListTile(
@@ -41,7 +40,6 @@ class MainDrawer extends ConsumerWidget {
             title: const Text('Local Library'),
             onTap: () {
               ref.read(homepageProvider.notifier).state = HomePage.local;
-              //Navigator.pop(context);
             },
           ),
           ListTile(
@@ -49,7 +47,6 @@ class MainDrawer extends ConsumerWidget {
             title: const Text('Web Sources'),
             onTap: () {
               ref.read(homepageProvider.notifier).state = HomePage.web;
-              //Navigator.pop(context);
             },
           ),
           ListTile(

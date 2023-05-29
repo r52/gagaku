@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'history_feed.g.dart';
 
 @riverpod
-Future<List<ChapterFeedItem>> _fetchHistoryFeed(
+Future<List<ChapterFeedItemData>> _fetchHistoryFeed(
     _FetchHistoryFeedRef ref) async {
   final api = ref.watch(mangadexProvider);
   final loggedin = await ref.watch(authControlProvider.future);
@@ -47,16 +47,9 @@ Future<List<ChapterFeedItem>> _fetchHistoryFeed(
     item.chapters.add(chapter);
   }
 
-  // Craft widgets
-  final wlist = dlist
-      .map((e) => ChapterFeedItem(
-            state: e,
-          ))
-      .toList();
-
   ref.keepAlive();
 
-  return wlist;
+  return dlist;
 }
 
 class MangaDexHistoryFeed extends ConsumerWidget {

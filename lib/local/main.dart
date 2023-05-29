@@ -40,6 +40,7 @@ class LocalLibraryHome extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final settings = ref.watch(localConfigProvider);
     final result = ref.watch(localLibraryProvider);
     final theme = Theme.of(context);
@@ -56,12 +57,10 @@ class LocalLibraryHome extends HookConsumerWidget {
                 onSelected: (LocalLibraryAction result) async {
                   switch (result) {
                     case LocalLibraryAction.open:
-                      final nav = Navigator.of(context);
                       await _readArchive(nav);
                       break;
                     case LocalLibraryAction.settings:
-                      Navigator.push(
-                          context, createLocalLibrarySettingsRoute());
+                      nav.push(createLocalLibrarySettingsRoute());
                       break;
                     default:
                       break;
@@ -103,8 +102,7 @@ class LocalLibraryHome extends HookConsumerWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                          context, createLocalLibrarySettingsRoute());
+                      nav.push(createLocalLibrarySettingsRoute());
                     },
                     icon: const Icon(Icons.library_add),
                     label: const Text('Set Library Directory'),
@@ -119,7 +117,6 @@ class LocalLibraryHome extends HookConsumerWidget {
                 ],
                 ElevatedButton.icon(
                   onPressed: () async {
-                    final nav = Navigator.of(context);
                     await _readArchive(nav);
                   },
                   icon: const Icon(Icons.folder_open),
@@ -147,7 +144,6 @@ class LocalLibraryHome extends HookConsumerWidget {
                     ),
                     ElevatedButton.icon(
                       onPressed: () async {
-                        final nav = Navigator.of(context);
                         await _readArchive(nav);
                       },
                       icon: const Icon(Icons.folder_open),
@@ -165,7 +161,6 @@ class LocalLibraryHome extends HookConsumerWidget {
                 item: currentItem.value!,
                 onTap: (item) {
                   if (item.isReadable) {
-                    final nav = Navigator.of(context);
                     if (item.isDirectory) {
                       nav.push(createDirectoryReaderRoute(item.path,
                           title: item.name ?? item.path));

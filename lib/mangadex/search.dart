@@ -18,6 +18,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final filter = ref.watch(_searchParamsProvider);
     final controller = useTextEditingController();
     final debounce = useRef<Timer?>(null);
@@ -94,7 +95,6 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                 ),
                 ElevatedButton.icon(
                   onPressed: () async {
-                    final nav = Navigator.of(context);
                     final result = await nav.push<MangaFilters>(
                       Styles.buildSlideTransitionRoute(
                         (context, animation, secondaryAnimation) =>
@@ -195,6 +195,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final fil = useState(filter);
     final tags = ref.watch(tagListProvider);
@@ -208,7 +209,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.of(context).pop(null);
+            nav.pop(null);
           },
         ),
         title: const Text('Search Filters'),
@@ -235,7 +236,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 message: 'Apply Filters',
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.of(context).pop(fil.value);
+                    nav.pop(fil.value);
                   },
                   icon: const Icon(Icons.filter_list),
                   label: const Text('Apply Filters'),

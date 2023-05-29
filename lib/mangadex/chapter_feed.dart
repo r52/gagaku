@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'chapter_feed.g.dart';
 
 @riverpod
-Future<List<ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
+Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
   final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
@@ -42,16 +42,9 @@ Future<List<ChapterFeedItem>> _fetchChapters(_FetchChaptersRef ref) async {
     item.chapters.add(chapter);
   }
 
-  // Craft widgets
-  final wlist = dlist
-      .map((e) => ChapterFeedItem(
-            state: e,
-          ))
-      .toList();
-
   ref.keepAlive();
 
-  return wlist;
+  return dlist;
 }
 
 class MangaDexChapterFeed extends ConsumerWidget {

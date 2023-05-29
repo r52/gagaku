@@ -11,6 +11,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final cfg = ref.read(mdConfigProvider);
     final config = useState(cfg);
@@ -19,7 +20,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.of(context).pop(false);
+            nav.pop(false);
           },
         ),
         title: const Text('MangaDex Settings'),
@@ -33,7 +34,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   label: const Text('Save Settings'),
                   onPressed: () {
                     ref.read(mdConfigProvider.notifier).save(config.value);
-                    Navigator.of(context).pop(true);
+                    nav.pop(true);
                   },
                 ),
               ),

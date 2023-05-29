@@ -32,16 +32,20 @@ class ProxyHandler {
   Future<ProxyData> handleProxy(ProxyInfo info) async {
     ProxyData p = ProxyData();
 
-    if (info.proxy == 'gist') {
-      final manga = await _getMangaFromGist(info.code);
-      p.manga = manga;
-    } else if (info.proxy == 'imgur') {
-      final code = '/read/api/imgur/chapter/${info.code}';
-      p.code = code;
-    } else {
-      // Generic proxy
-      final manga = await _getMangaFromProxy(info);
-      p.manga = manga;
+    switch (info.proxy) {
+      case 'gist':
+        final manga = await _getMangaFromGist(info.code);
+        p.manga = manga;
+        break;
+      case 'imgur':
+        final code = '/read/api/imgur/chapter/${info.code}';
+        p.code = code;
+        break;
+      default:
+        // Generic proxy
+        final manga = await _getMangaFromProxy(info);
+        p.manga = manga;
+        break;
     }
 
     return p;
@@ -77,12 +81,15 @@ class ProxyHandler {
         throw Exception("Bad url/gist code $code");
       }
 
-      if (schema[0] == 'raw') {
-        baseUrl = 'https://raw.githubusercontent.com/';
-      } else if (schema[0] == 'gist') {
-        baseUrl = 'https://gist.githubusercontent.com/';
-      } else {
-        throw Exception("Unknown schema ${schema[0]}");
+      switch (schema[0]) {
+        case 'raw':
+          baseUrl = 'https://raw.githubusercontent.com/';
+          break;
+        case 'gist':
+          baseUrl = 'https://gist.githubusercontent.com/';
+          break;
+        default:
+          throw Exception("Unknown schema ${schema[0]}");
       }
 
       url = '$baseUrl${link.substring(link.indexOf('/') + 1)}';
