@@ -249,6 +249,11 @@ class ChapterButtonWidget extends ConsumerWidget {
       title += ' - ${chapter.attributes.title!}';
     }
 
+    if (title.isEmpty) {
+      // Probably a oneshot?
+      title = 'Oneshot';
+    }
+
     final pubtime = timeago.format(chapter.attributes.publishAt);
 
     final flagChip = IconTextChip(
