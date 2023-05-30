@@ -1143,10 +1143,10 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 
         return chapters;
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1201,10 +1201,10 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
 
         return chapters;
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1259,10 +1259,10 @@ class MangaChapters extends _$MangaChapters {
 
         return [...oldstate!, ...chapters];
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1416,10 +1416,10 @@ class UserLibrary extends _$UserLibrary {
 
         return [...oldstate!, ...mangas];
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1500,10 +1500,10 @@ class MangaSearch extends _$MangaSearch {
 
         return [...oldstate!, ...list];
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 }
 

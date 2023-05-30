@@ -46,7 +46,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
       void controllerAtEdge() {
         if (onAtEdge != null &&
             scrollController.position.atEdge &&
-            scrollController.position.pixels != 0) {
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
           onAtEdge!();
         }
       }
@@ -440,11 +441,11 @@ class MangaListWidget extends HookConsumerWidget {
 
     useEffect(() {
       void controllerAtEdge() {
-        if (onAtEdge != null && scrollController.position.atEdge) {
-          if (scrollController.position.pixels ==
-              scrollController.position.maxScrollExtent) {
-            onAtEdge!();
-          }
+        if (onAtEdge != null &&
+            scrollController.position.atEdge &&
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
+          onAtEdge!();
         }
       }
 
