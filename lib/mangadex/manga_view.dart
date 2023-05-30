@@ -59,6 +59,26 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
           skipLoadingOnReload: true, data: (data) => data, orElse: () => {});
     }
 
+    String? lastvolchap;
+
+    if ((manga.attributes.lastVolume != null &&
+            manga.attributes.lastVolume!.isNotEmpty) ||
+        (manga.attributes.lastChapter != null &&
+            manga.attributes.lastChapter!.isNotEmpty)) {
+      lastvolchap = '';
+
+      if (manga.attributes.lastVolume != null &&
+          manga.attributes.lastVolume!.isNotEmpty) {
+        lastvolchap += 'Volume ${manga.attributes.lastVolume}';
+      }
+
+      if (manga.attributes.lastChapter != null &&
+          manga.attributes.lastChapter!.isNotEmpty) {
+        lastvolchap +=
+            '${lastvolchap.isEmpty ? '' : ', '}Chapter ${manga.attributes.lastChapter!}';
+      }
+    }
+
     useEffect(() {
       void controllerAtEdge() {
         if (scrollController.position.atEdge &&
@@ -410,20 +430,16 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       ),
                     ],
                   ),
-                if (manga.attributes.lastChapter != null &&
-                    manga.attributes.lastChapter!.isNotEmpty)
+                if (lastvolchap != null)
                   ExpansionTile(
-                    title: const Text('Final Chapter'),
+                    title: const Text('Final Volume/Chapter'),
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         color: theme.colorScheme.background,
                         child: Row(
                           children: [
-                            Text(manga.attributes.lastVolume != null &&
-                                    manga.attributes.lastVolume!.isNotEmpty
-                                ? 'Volume ${manga.attributes.lastVolume}, Chapter ${manga.attributes.lastChapter}'
-                                : 'Chapter ${manga.attributes.lastChapter}')
+                            Text(lastvolchap),
                           ],
                         ),
                       ),
