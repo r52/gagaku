@@ -1626,6 +1626,10 @@ class MangaDexHistory extends _$MangaDexHistory {
         state.maybeWhen(data: (data) => data, orElse: () => Queue<Chapter>());
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      while (oldstate.contains(chapter)) {
+        oldstate.remove(chapter);
+      }
+
       oldstate.addFirst(chapter);
 
       while (oldstate.length > _numItems) {
