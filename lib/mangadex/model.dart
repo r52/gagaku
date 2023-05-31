@@ -327,7 +327,6 @@ class MangaDexModel {
 
     // Grab it from the cache if it exists
     if (_cache.exists(CacheLists.latestChapters)) {
-      // dev.log('Getting latest chapters from cache');
       var cached =
           _cache.getSpecialList<Chapter>(CacheLists.latestChapters).toList();
 
@@ -361,7 +360,6 @@ class MangaDexModel {
     final settings = ref.read(mdConfigProvider);
 
     // Download missing data
-    // dev.log('Downloading latest chapters');
     final queryParams = {
       'limit': MangaDexEndpoints.apiQueryLimit.toString(),
       'offset': offset.toString(),
@@ -379,12 +377,9 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
 
-    // dev.log('query', error: uri.toString());
-
     final response = await _client!.get(uri);
 
     if (response.statusCode == 200) {
-      // dev.log('response', error: response.body);
       final Map<String, dynamic> body = json.decode(response.body);
 
       final result = ChapterList.fromJson(body);
@@ -489,7 +484,6 @@ class MangaDexModel {
     final response = await _client!.get(uri);
 
     if (response.statusCode == 200) {
-      // dev.log('response', error: response.body);
       final Map<String, dynamic> body = json.decode(response.body);
 
       final result = ChapterList.fromJson(body);
@@ -586,8 +580,6 @@ class MangaDexModel {
     final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
 
     if (fetch.isNotEmpty) {
-      // dev.log('Retrieving Manga info');
-
       int start = 0, end = 0;
 
       var queryParams = {
@@ -606,12 +598,9 @@ class MangaDexModel {
         final uri = MangaDexEndpoints.api.replace(
             path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
-        // dev.log('query', error: uri.toString());
-
         final response = await _client!.get(uri);
 
         if (response.statusCode == 200) {
-          // dev.log('response', error: response.body);
           final Map<String, dynamic> body = json.decode(response.body);
 
           final mangalist = MangaList.fromJson(body);
@@ -839,7 +828,6 @@ class MangaDexModel {
     final settings = ref.read(mdConfigProvider);
 
     // Download missing data
-    // dev.log('Downloading latest chapters');
     final queryParams = {
       'limit': MangaDexEndpoints.apiQueryLimit.toString(),
       'offset': offset.toString(),
@@ -860,7 +848,6 @@ class MangaDexModel {
     final response = await _client!.get(uri);
 
     if (response.statusCode == 200) {
-      // dev.log('response', error: response.body);
       final Map<String, dynamic> body = json.decode(response.body);
 
       final result = ChapterList.fromJson(body);
@@ -1156,10 +1143,10 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 
         return chapters;
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1214,10 +1201,10 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
 
         return chapters;
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1272,10 +1259,10 @@ class MangaChapters extends _$MangaChapters {
 
         return [...oldstate!, ...chapters];
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1429,10 +1416,10 @@ class UserLibrary extends _$UserLibrary {
 
         return [...oldstate!, ...mangas];
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 
   /// Clears the list and refetch from the beginning
@@ -1513,10 +1500,10 @@ class MangaSearch extends _$MangaSearch {
 
         return [...oldstate!, ...list];
       });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
     }
-
-    // Otherwise, do nothing because there is no more content
-    _atEnd = true;
   }
 }
 
@@ -1639,6 +1626,10 @@ class MangaDexHistory extends _$MangaDexHistory {
         state.maybeWhen(data: (data) => data, orElse: () => Queue<Chapter>());
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      while (oldstate.contains(chapter)) {
+        oldstate.remove(chapter);
+      }
+
       oldstate.addFirst(chapter);
 
       while (oldstate.length > _numItems) {

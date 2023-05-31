@@ -70,7 +70,6 @@ class ReaderWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
     final mediaContext = MediaQuery.of(context);
-    final refresh = useState(0);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
     final scaleStateController = List<PhotoViewScaleStateController>.generate(
@@ -158,15 +157,6 @@ class ReaderWidget extends HookConsumerWidget {
       return () =>
           itemPositionsListener.itemPositions.removeListener(listPosCb);
     }, [settings]);
-
-    useEffect(() {
-      void pageCb() {
-        refresh.value++;
-      }
-
-      currentPage.addListener(pageCb);
-      return () => currentPage.removeListener(pageCb);
-    }, []);
 
     void jumpToPage(int page) {
       assert(page >= 0 && page < pageCount);
@@ -414,6 +404,11 @@ class ReaderWidget extends HookConsumerWidget {
       }
     }
 
+    final pageDropdownItems = List<DropdownMenuItem<int>>.generate(
+        pageCount,
+        (int index) => DropdownMenuItem<int>(
+            value: index, child: Text((index + 1).toString())));
+
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: AppBar(
@@ -454,43 +449,54 @@ class ReaderWidget extends HookConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  OutlinedButton(
-                    onPressed: (currentPage.value > 0)
-                        ? () => jumpToPreviousPage()
-                        : null,
-                    child: const Text('Previous Page'),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  DropdownButton<int>(
-                    value: currentPage.value,
-                    icon: const Icon(Icons.arrow_downward),
-                    iconSize: 24,
-                    elevation: 16,
-                    style: TextStyle(color: theme.colorScheme.primary),
-                    underline: Container(
-                      height: 2,
-                      color: Colors.deepPurpleAccent,
-                    ),
-                    onChanged: (int? index) {
-                      if (index != null) {
-                        jumpToPage(index);
-                      }
+                  ValueListenableBuilder<int>(
+                    builder: (BuildContext context, int value, Widget? child) {
+                      return OutlinedButton(
+                        onPressed:
+                            (value > 0) ? () => jumpToPreviousPage() : null,
+                        child: const Text('Previous Page'),
+                      );
                     },
-                    items: List<DropdownMenuItem<int>>.generate(
-                        pageCount,
-                        (int index) => DropdownMenuItem<int>(
-                            value: index, child: Text((index + 1).toString()))),
+                    valueListenable: currentPage,
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  OutlinedButton(
-                    onPressed: (currentPage.value < pageCount - 1)
-                        ? () => jumpToNextPage()
-                        : null,
-                    child: const Text('Next Page'),
+                  ValueListenableBuilder<int>(
+                    builder: (BuildContext context, int value, Widget? child) {
+                      return DropdownButton<int>(
+                        value: value,
+                        icon: const Icon(Icons.arrow_downward),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: TextStyle(color: theme.colorScheme.primary),
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        onChanged: (int? index) {
+                          if (index != null) {
+                            jumpToPage(index);
+                          }
+                        },
+                        items: pageDropdownItems,
+                      );
+                    },
+                    valueListenable: currentPage,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ValueListenableBuilder<int>(
+                    builder: (BuildContext context, int value, Widget? child) {
+                      return OutlinedButton(
+                        onPressed: (value < pageCount - 1)
+                            ? () => jumpToNextPage()
+                            : null,
+                        child: const Text('Next Page'),
+                      );
+                    },
+                    valueListenable: currentPage,
                   ),
                 ],
               ),
