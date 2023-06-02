@@ -250,10 +250,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   size: 18,
                                 ),
                                 text: Text(
-                                  data[manga.id]!
-                                      .rating
-                                      .bayesian
-                                      .toStringAsFixed(2),
+                                  data[manga.id]
+                                          ?.rating
+                                          .bayesian
+                                          .toStringAsFixed(2) ??
+                                      statsError,
                                   style: const TextStyle(
                                     color: Colors.amber,
                                   ),
@@ -268,7 +269,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   size: 18,
                                 ),
                                 text: Text(
-                                  data[manga.id]!.follows.toString(),
+                                  data[manga.id]?.follows.toString() ??
+                                      statsError,
                                 ),
                               ),
                             ];
@@ -279,7 +281,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               width: 10,
                             ),
                             const IconTextChip(
-                              text: Text('Error Retrieving Stats'),
+                              text: Text(statsError),
                             )
                           ];
                         },
@@ -288,7 +290,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             width: 10,
                           ),
                           const IconTextChip(
-                            text: Text('Error Retrieving Stats'),
+                            text: Text(statsError),
                           )
                         ],
                         loading: () => [
@@ -478,7 +480,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           manga: manga,
                           loggedin: loggedin,
                           isRead: readData.containsKey(manga.id) &&
-                              readData[manga.id]!.contains(thischap.id),
+                              readData[manga.id]?.contains(thischap.id) == true,
                           link: Text(
                             manga.attributes.title.get('en'),
                             style: const TextStyle(fontSize: 24),
@@ -571,7 +573,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                   return SliverToBoxAdapter(
                     child: Center(
-                      child: Text('Error: $err'),
+                      child: Column(
+                        children: [
+                          Text('Error: $err'),
+                          Text(stackTrace.toString()),
+                        ],
+                      ),
                     ),
                   );
                 },

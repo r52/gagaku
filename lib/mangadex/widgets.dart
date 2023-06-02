@@ -13,6 +13,8 @@ import 'package:dash_flags/dash_flags.dart' as dashflag;
 
 import 'types.dart';
 
+const statsError = 'Error Retrieving Stats';
+
 enum MangaListView { grid, list, detailed }
 
 final _mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
@@ -156,7 +158,7 @@ class ChapterFeedItem extends ConsumerWidget {
           manga: state.manga,
           loggedin: loggedin,
           isRead: readData.containsKey(state.manga.id) &&
-              readData[state.manga.id]!.contains(e.id),
+              readData[state.manga.id]?.contains(e.id) == true,
           link: Text(
             state.manga.attributes.title.get('en'),
             style: const TextStyle(fontSize: 24),
@@ -237,17 +239,17 @@ class ChapterButtonWidget extends ConsumerWidget {
     final tileColor = theme.colorScheme.primaryContainer;
     final iconSize = screenSizeSmall ? 15.0 : 20.0;
     final isEndChapter = manga.attributes.lastChapter != null &&
-        manga.attributes.lastChapter!.isNotEmpty &&
+        manga.attributes.lastChapter?.isNotEmpty == true &&
         chapter.attributes.chapter == manga.attributes.lastChapter;
 
     String title = '';
 
     if (chapter.attributes.chapter != null) {
-      title += 'Chapter ${chapter.attributes.chapter!}';
+      title += 'Chapter ${chapter.attributes.chapter}';
     }
 
     if (chapter.attributes.title != null && !short) {
-      title += ' - ${chapter.attributes.title!}';
+      title += ' - ${chapter.attributes.title}';
     }
 
     if (title.isEmpty) {
@@ -672,10 +674,11 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                         size: 18,
                                       ),
                                       text: Text(
-                                        data[manga.id]!
-                                            .rating
-                                            .bayesian
-                                            .toStringAsFixed(2),
+                                        data[manga.id]
+                                                ?.rating
+                                                .bayesian
+                                                .toStringAsFixed(2) ??
+                                            statsError,
                                         style: const TextStyle(
                                           color: Colors.amber,
                                         ),
@@ -690,7 +693,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                         size: 18,
                                       ),
                                       text: Text(
-                                        data[manga.id]!.follows.toString(),
+                                        data[manga.id]?.follows.toString() ??
+                                            statsError,
                                       ),
                                     ),
                                   ];
@@ -701,7 +705,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                     width: 4,
                                   ),
                                   const IconTextChip(
-                                    text: Text('Error Retrieving Stats'),
+                                    text: Text(statsError),
                                   )
                                 ];
                               },
@@ -710,7 +714,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                   width: 4,
                                 ),
                                 const IconTextChip(
-                                  text: Text('Error Retrieving Stats'),
+                                  text: Text(statsError),
                                 )
                               ],
                               loading: () => [
@@ -830,10 +834,11 @@ class _ListMangaItem extends ConsumerWidget {
                                   size: 18,
                                 ),
                                 text: Text(
-                                  data[manga.id]!
-                                      .rating
-                                      .bayesian
-                                      .toStringAsFixed(2),
+                                  data[manga.id]
+                                          ?.rating
+                                          .bayesian
+                                          .toStringAsFixed(2) ??
+                                      statsError,
                                   style: const TextStyle(
                                     color: Colors.amber,
                                   ),
@@ -848,7 +853,8 @@ class _ListMangaItem extends ConsumerWidget {
                                   size: 18,
                                 ),
                                 text: Text(
-                                  data[manga.id]!.follows.toString(),
+                                  data[manga.id]?.follows.toString() ??
+                                      statsError,
                                 ),
                               ),
                             ];
@@ -859,7 +865,7 @@ class _ListMangaItem extends ConsumerWidget {
                               width: 4,
                             ),
                             const IconTextChip(
-                              text: Text('Error Retrieving Stats'),
+                              text: Text(statsError),
                             )
                           ];
                         },
@@ -868,7 +874,7 @@ class _ListMangaItem extends ConsumerWidget {
                             width: 4,
                           ),
                           const IconTextChip(
-                            text: Text('Error Retrieving Stats'),
+                            text: Text(statsError),
                           )
                         ],
                         loading: () => [
