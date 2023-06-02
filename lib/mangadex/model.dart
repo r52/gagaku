@@ -88,7 +88,7 @@ class MangaDexModel {
   final Ref ref;
   //TokenResponse? _token;
   OldToken? _token;
-  http.Client? _client;
+  http.Client _client = http.Client();
   late Future _initFuture;
   Future get initialized => _initFuture;
 
@@ -117,7 +117,7 @@ class MangaDexModel {
     return token.expired;
   }
 
-  bool loggedIn() => (_token != null && _client != null);
+  bool loggedIn() => (_token != null && _client is AuthenticatedClient);
 
   Future _init() async {
     await refreshToken();
@@ -159,13 +159,12 @@ class MangaDexModel {
   Future<void> refreshToken() async {
     // Clear old data
     _token = null;
-    _client = null;
 
     final storage = Hive.box(gagakuBox);
     String? strken = await storage.get('oldtoken') as String?;
 
     if (strken != null) {
-      var jstr = json.decode(strken);
+      final jstr = json.decode(strken);
       OldToken token = OldToken.fromJson(jstr);
 
       if (token.isValid) {
@@ -186,13 +185,15 @@ class MangaDexModel {
               await _saveToken(t);
               _token = t;
               _client = AuthenticatedClient(http.Client(), t);
+              return;
             }
           }
         }
       }
     }
 
-    _client ??= http.Client();
+    // If any steps fail, assign a default client
+    _client = http.Client();
   }
 
   // Future<void> authenticate() async {
@@ -238,6 +239,7 @@ class MangaDexModel {
           await _saveToken(t);
           _token = t;
           _client = AuthenticatedClient(http.Client(), t);
+          return;
         }
       }
     }
@@ -271,7 +273,7 @@ class MangaDexModel {
 
   Future<void> logout() async {
     if (loggedIn()) {
-      final response = await _client!
+      final response = await _client
           .post(MangaDexEndpoints.api.replace(path: MangaDexEndpoints.logout));
 
       if (response.statusCode == 200) {
@@ -377,7 +379,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
@@ -481,7 +483,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.chapter, queryParameters: queryParams);
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
@@ -542,7 +544,7 @@ class MangaDexModel {
         final uri = MangaDexEndpoints.api.replace(
             path: MangaDexEndpoints.chapter, queryParameters: queryParams);
 
-        final response = await _client!.get(uri);
+        final response = await _client.get(uri);
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
@@ -598,7 +600,7 @@ class MangaDexModel {
         final uri = MangaDexEndpoints.api.replace(
             path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
-        final response = await _client!.get(uri);
+        final response = await _client.get(uri);
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
@@ -637,7 +639,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id));
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       // User follows the manga
@@ -668,9 +670,9 @@ class MangaDexModel {
     http.Response response;
 
     if (setFollow) {
-      response = await _client!.post(uri);
+      response = await _client.post(uri);
     } else {
-      response = await _client!.delete(uri);
+      response = await _client.delete(uri);
     }
 
     if (response.statusCode == 200) {
@@ -695,7 +697,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       Map<String, dynamic> body = json.decode(response.body);
@@ -738,7 +740,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
-    final response = await _client!.post(uri,
+    final response = await _client.post(uri,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(params));
 
@@ -775,7 +777,7 @@ class MangaDexModel {
       final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.getRead, queryParameters: queryParams);
 
-      final response = await _client!.get(uri);
+      final response = await _client.get(uri);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = json.decode(response.body);
@@ -845,7 +847,7 @@ class MangaDexModel {
         path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
         queryParameters: queryParams);
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
@@ -888,7 +890,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id));
 
-    final response = await _client!.post(uri,
+    final response = await _client.post(uri,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(params));
 
@@ -912,7 +914,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id));
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
@@ -952,7 +954,7 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = jsonDecode(response.body);
@@ -988,7 +990,7 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
@@ -1049,7 +1051,7 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
-    final response = await _client!.get(uri);
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
@@ -1086,7 +1088,7 @@ class MangaDexModel {
       final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.statistics, queryParameters: queryParams);
 
-      final response = await _client!.get(uri);
+      final response = await _client.get(uri);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = json.decode(response.body);
@@ -1228,7 +1230,7 @@ class MangaChapters extends _$MangaChapters {
   ///Fetch the manga chapters list based on offset
   Future<List<Chapter>> _fetchMangaChapters(int offset) async {
     final api = ref.watch(mangadexProvider);
-    var chapters = await api.fetchMangaChapters(manga, offset);
+    final chapters = await api.fetchMangaChapters(manga, offset);
 
     return chapters.toList();
   }

@@ -39,7 +39,7 @@ final latestGlobalFeedProvider =
 );
 
 typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
-String _$mangaChaptersHash() => r'242aedcf868eaad20fa54866003c64f2818b0b09';
+String _$mangaChaptersHash() => r'd8c317766deb89459478f5e1d51b29803db0f3c5';
 
 /// Copied from Dart SDK
 class _SystemHash {
