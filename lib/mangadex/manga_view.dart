@@ -143,13 +143,101 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   return [
                     ElevatedButton(
                       onPressed: () async {
-                        ref
-                            .read(readingStatusProvider(manga).notifier)
-                            .set(MangaReadingStatus.plan_to_read);
+                        final result = await showDialog<
+                                (MangaReadingStatus, bool)>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return HookBuilder(
+                                builder: (context) {
+                                  final nav = Navigator.of(context);
+                                  final nreading =
+                                      useState(MangaReadingStatus.plan_to_read);
+                                  final nfollowing = useState(true);
 
-                        ref
-                            .read(followingStatusProvider(manga).notifier)
-                            .set(true);
+                                  return AlertDialog(
+                                    title: const Text('Add to Library'),
+                                    content: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        DropdownButton<MangaReadingStatus>(
+                                          value: nreading.value,
+                                          icon:
+                                              const Icon(Icons.arrow_drop_down),
+                                          iconSize: 24,
+                                          elevation: 16,
+                                          underline: Container(
+                                            height: 2,
+                                            color: Colors.deepOrangeAccent,
+                                          ),
+                                          onChanged: (MangaReadingStatus?
+                                              status) async {
+                                            if (status != null) {
+                                              nreading.value = status;
+                                            }
+                                          },
+                                          items: List<
+                                              DropdownMenuItem<
+                                                  MangaReadingStatus>>.generate(
+                                            MangaReadingStatus.values.length -
+                                                1,
+                                            (int index) => DropdownMenuItem<
+                                                MangaReadingStatus>(
+                                              value: MangaReadingStatus.values
+                                                  .elementAt(index + 1),
+                                              child: Text(
+                                                MangaReadingStatus.values
+                                                    .elementAt(index + 1)
+                                                    .formatted,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            nfollowing.value =
+                                                !nfollowing.value;
+                                          },
+                                          child: Icon(nfollowing.value
+                                              ? Icons.favorite
+                                              : Icons.favorite_border),
+                                        ),
+                                      ],
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('Cancel'),
+                                        onPressed: () {
+                                          nav.pop(null);
+                                        },
+                                      ),
+                                      ElevatedButton(
+                                        child: const Text('Add'),
+                                        onPressed: () {
+                                          nav.pop((
+                                            nreading.value,
+                                            nfollowing.value
+                                          ));
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            });
+
+                        if (result != null) {
+                          ref
+                              .read(readingStatusProvider(manga).notifier)
+                              .set(result.$1);
+
+                          ref
+                              .read(followingStatusProvider(manga).notifier)
+                              .set(result.$2);
+                        }
                       },
                       child: const Text('Add to Library'),
                     ),
