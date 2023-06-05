@@ -36,15 +36,17 @@ Future<List<ChapterFeedItemData>> _fetchHistoryFeed(
 
   for (final chapter in chapters) {
     final cid = chapter.getMangaID();
-    ChapterFeedItemData? item;
-    if (dlist.isNotEmpty && dlist.last.mangaId == cid) {
-      item = dlist.last;
-    } else {
-      item = ChapterFeedItemData(manga: mangaMap[cid]!);
-      dlist.add(item);
-    }
+    if (cid.isNotEmpty && mangaMap.containsKey(cid)) {
+      ChapterFeedItemData? item;
+      if (dlist.isNotEmpty && dlist.last.mangaId == cid) {
+        item = dlist.last;
+      } else {
+        item = ChapterFeedItemData(manga: mangaMap[cid]!);
+        dlist.add(item);
+      }
 
-    item.chapters.add(chapter);
+      item.chapters.add(chapter);
+    }
   }
 
   ref.keepAlive();

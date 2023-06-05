@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:gagaku/about.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/model.dart';
@@ -70,7 +69,6 @@ class GagakuHome extends ConsumerWidget {
       const MangaDexHome(),
       const LocalLibraryHome(),
       const WebSourcesHome(),
-      const AboutPage(),
     ];
 
     return pages[page.index];
