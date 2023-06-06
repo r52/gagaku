@@ -51,20 +51,25 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final usernameController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final usernameIsEmpty = useListenableSelector(
+        usernameController, () => usernameController.text.isEmpty);
+    final passwordIsEmpty = useListenableSelector(
+        passwordController, () => passwordController.text.isEmpty);
 
     return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            nav.pop(false);
+          },
+        ),
+        title: const Text('Login to MangaDex'),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           children: <Widget>[
-            const SizedBox(height: 80.0),
-            const Column(
-              children: <Widget>[
-                SizedBox(height: 32.0),
-                Text('Login to MangaDex'),
-              ],
-            ),
-            const SizedBox(height: 120.0),
+            const SizedBox(height: 200.0),
             AutofillGroup(
               child: Column(
                 children: [
@@ -112,39 +117,45 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                   },
                 ),
                 ElevatedButton(
+                  onPressed: (usernameIsEmpty || passwordIsEmpty)
+                      ? null
+                      : () async {
+                          final messenger = ScaffoldMessenger.of(context);
+
+                          if (usernameController.text.isNotEmpty &&
+                              passwordController.text.isNotEmpty) {
+                            var loginSuccess = await ref
+                                .read(authControlProvider.notifier)
+                                .login(usernameController.text,
+                                    passwordController.text);
+
+                            if (loginSuccess) {
+                              nav.pop();
+                              usernameController.clear();
+                              passwordController.clear();
+                            } else {
+                              messenger
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Failed to login.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                            }
+                          } else {
+                            messenger
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Username and Password cannot be empty.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                          }
+                        },
                   child: const Text('LOGIN'),
-                  onPressed: () async {
-                    final messenger = ScaffoldMessenger.of(context);
-
-                    if (usernameController.text.isNotEmpty &&
-                        passwordController.text.isNotEmpty) {
-                      var loginSuccess = await ref
-                          .read(authControlProvider.notifier)
-                          .login(
-                              usernameController.text, passwordController.text);
-
-                      if (loginSuccess) {
-                        nav.pop();
-                        usernameController.clear();
-                        passwordController.clear();
-                      } else {
-                        messenger
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(const SnackBar(
-                            content: Text('Failed to login.'),
-                            backgroundColor: Colors.red,
-                          ));
-                      }
-                    } else {
-                      messenger
-                        ..removeCurrentSnackBar()
-                        ..showSnackBar(const SnackBar(
-                          content:
-                              Text('Username and Password cannot be empty.'),
-                          backgroundColor: Colors.red,
-                        ));
-                    }
-                  },
                 ),
               ],
             ),
