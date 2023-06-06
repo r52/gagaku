@@ -2,6 +2,100 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+ItemScrollController useItemScrollController({
+  List<Object?>? keys,
+}) {
+  return use(
+    _ItemScrollControllerHook(
+      keys: keys,
+    ),
+  );
+}
+
+class _ItemScrollControllerHook extends Hook<ItemScrollController> {
+  const _ItemScrollControllerHook({
+    List<Object?>? keys,
+  }) : super(keys: keys);
+
+  @override
+  HookState<ItemScrollController, Hook<ItemScrollController>> createState() =>
+      _ItemScrollControllerHookState();
+}
+
+class _ItemScrollControllerHookState
+    extends HookState<ItemScrollController, _ItemScrollControllerHook> {
+  late final controller = ItemScrollController();
+
+  @override
+  ItemScrollController build(BuildContext context) => controller;
+
+  @override
+  String get debugLabel => 'useItemScrollController';
+}
+
+ScrollOffsetController useScrollOffsetController({
+  List<Object?>? keys,
+}) {
+  return use(
+    _ScrollOffsetControllerHook(
+      keys: keys,
+    ),
+  );
+}
+
+class _ScrollOffsetControllerHook extends Hook<ScrollOffsetController> {
+  const _ScrollOffsetControllerHook({
+    List<Object?>? keys,
+  }) : super(keys: keys);
+
+  @override
+  HookState<ScrollOffsetController, Hook<ScrollOffsetController>>
+      createState() => _ScrollOffsetControllerHookState();
+}
+
+class _ScrollOffsetControllerHookState
+    extends HookState<ScrollOffsetController, _ScrollOffsetControllerHook> {
+  late final controller = ScrollOffsetController();
+
+  @override
+  ScrollOffsetController build(BuildContext context) => controller;
+
+  @override
+  String get debugLabel => 'useScrollOffsetController';
+}
+
+ItemPositionsListener useItemPositionsListener({
+  List<Object?>? keys,
+}) {
+  return use(
+    _ItemPositionsListenerHook(
+      keys: keys,
+    ),
+  );
+}
+
+class _ItemPositionsListenerHook extends Hook<ItemPositionsListener> {
+  const _ItemPositionsListenerHook({
+    List<Object?>? keys,
+  }) : super(keys: keys);
+
+  @override
+  HookState<ItemPositionsListener, Hook<ItemPositionsListener>> createState() =>
+      _ItemPositionsListenerHookState();
+}
+
+class _ItemPositionsListenerHookState
+    extends HookState<ItemPositionsListener, _ItemPositionsListenerHook> {
+  late final listener = ItemPositionsListener.create();
+
+  @override
+  ItemPositionsListener build(BuildContext context) => listener;
+
+  @override
+  String get debugLabel => 'useItemPositionsListener';
+}
 
 ExtendedPageController useExtendedPageController({
   int initialPage = 0,
