@@ -514,37 +514,44 @@ class MangaListViewSliver extends ConsumerWidget {
 
     switch (view) {
       case MangaListView.list:
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              var manga = items.elementAt(index);
-
-              return _ListMangaItem(
-                manga: manga,
-              );
-            },
-            childCount: items.length,
-          ),
+        return SliverList.builder(
+          itemBuilder: (BuildContext context, int index) {
+            final manga = items.elementAt(index);
+            return _ListMangaItem(
+              manga: manga,
+            );
+          },
+          itemCount: items.length,
         );
       case MangaListView.detailed:
-        return SliverGrid.extent(
-          maxCrossAxisExtent: 1024,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: onMobilePortrait ? 1.0 : 3.0,
-          children: items
-              .map((manga) => _GridMangaDetailedItem(manga: manga))
-              .toList(),
+        return SliverGrid.builder(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 1024,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: onMobilePortrait ? 1.0 : 3.0,
+          ),
+          itemBuilder: (context, index) {
+            final manga = items.elementAt(index);
+            return _GridMangaDetailedItem(manga: manga);
+          },
+          itemCount: items.length,
         );
 
       case MangaListView.grid:
       default:
-        return SliverGrid.extent(
-          maxCrossAxisExtent: 256,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 0.7,
-          children: items.map((manga) => _GridMangaItem(manga: manga)).toList(),
+        return SliverGrid.builder(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 256,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (context, index) {
+            final manga = items.elementAt(index);
+            return _GridMangaItem(manga: manga);
+          },
+          itemCount: items.length,
         );
     }
   }
