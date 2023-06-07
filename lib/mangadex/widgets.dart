@@ -43,6 +43,10 @@ class ChapterFeedWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
     final results = ref.watch(provider);
+    final isLoading = results.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
 
     useEffect(() {
       void controllerAtEdge() {
@@ -59,71 +63,76 @@ class ChapterFeedWidget extends HookConsumerWidget {
     }, [scrollController]);
 
     return Center(
-      child: results.when(
-        skipLoadingOnReload: true,
-        data: (result) {
-          if (result.isEmpty) {
-            return Text(emptyText ?? 'No results!');
-          }
+      child: Stack(
+        children: [
+          results.when(
+            skipLoadingOnReload: true,
+            data: (result) {
+              if (result.isEmpty) {
+                return Text(emptyText ?? 'No results!');
+              }
 
-          return ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.trackpad,
-            }),
-            child: RefreshIndicator(
-              onRefresh: onRefresh,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 10.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(fontSize: 24),
-                        )
-                      ],
-                    ),
+              return ScrollConfiguration(
+                behavior:
+                    ScrollConfiguration.of(context).copyWith(dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                }),
+                child: RefreshIndicator(
+                  onRefresh: onRefresh,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 10.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(fontSize: 24),
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          controller: scrollController,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          restorationId: restorationId,
+                          padding: const EdgeInsets.all(6),
+                          itemCount: result.length,
+                          itemBuilder: (context, index) {
+                            return ChapterFeedItem(
+                                state: result.elementAt(index));
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      restorationId: restorationId,
-                      padding: const EdgeInsets.all(6),
-                      itemCount: result.length,
-                      itemBuilder: (context, index) {
-                        return ChapterFeedItem(state: result.elementAt(index));
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (err, stackTrace) {
-          final messenger = ScaffoldMessenger.of(context);
-          Future.delayed(
-            Duration.zero,
-            () => messenger
-              ..removeCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text('$err'),
-                  backgroundColor: Colors.red,
                 ),
-              ),
-          );
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (err, stackTrace) {
+              final messenger = ScaffoldMessenger.of(context);
+              Future.delayed(
+                Duration.zero,
+                () => messenger
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('$err'),
+                      backgroundColor: Colors.red,
+                    ),
+                  ),
+              );
 
-          return Text('Error: $err');
-        },
+              return Text('Error: $err');
+            },
+          ),
+          if (isLoading) ...Styles.loadingOverlay,
+        ],
       ),
     );
   }

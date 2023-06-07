@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -37,52 +38,61 @@ class MangaDexMangaFeed extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final results = ref.watch(_fetchMangaFeedProvider);
+    final isLoading = results.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
 
     return Center(
-      child: results.when(
-        skipLoadingOnReload: true,
-        data: (result) {
-          if (result.isEmpty) {
-            return const Text('Find some manga to follow!');
-          }
+      child: Stack(
+        children: [
+          results.when(
+            skipLoadingOnReload: true,
+            data: (result) {
+              if (result.isEmpty) {
+                return const Text('Find some manga to follow!');
+              }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.read(latestChaptersFeedProvider.notifier).clear();
-              return await ref.refresh(_fetchMangaFeedProvider.future);
-            },
-            child: MangaListWidget(
-              title: const Text(
-                'Latest Updates',
-                style: TextStyle(fontSize: 24),
-              ),
-              physics: const AlwaysScrollableScrollPhysics(),
-              controller: controller,
-              onAtEdge: () =>
-                  ref.read(latestChaptersFeedProvider.notifier).getMore(),
-              children: [
-                MangaListViewSliver(items: result),
-              ],
-            ),
-          );
-        },
-        error: (err, stack) {
-          final messenger = ScaffoldMessenger.of(context);
-          Future.delayed(
-            Duration.zero,
-            () => messenger
-              ..removeCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text('$err'),
-                  backgroundColor: Colors.red,
+              return RefreshIndicator(
+                onRefresh: () async {
+                  ref.read(latestChaptersFeedProvider.notifier).clear();
+                  return await ref.refresh(_fetchMangaFeedProvider.future);
+                },
+                child: MangaListWidget(
+                  title: const Text(
+                    'Latest Updates',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: controller,
+                  onAtEdge: () =>
+                      ref.read(latestChaptersFeedProvider.notifier).getMore(),
+                  children: [
+                    MangaListViewSliver(items: result),
+                  ],
                 ),
-              ),
-          );
+              );
+            },
+            error: (err, stack) {
+              final messenger = ScaffoldMessenger.of(context);
+              Future.delayed(
+                Duration.zero,
+                () => messenger
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('$err'),
+                      backgroundColor: Colors.red,
+                    ),
+                  ),
+              );
 
-          return Text('Error: $err');
-        },
-        loading: () => const CircularProgressIndicator(),
+              return Text('Error: $err');
+            },
+            loading: () => const SizedBox.shrink(),
+          ),
+          if (isLoading) ...Styles.loadingOverlay,
+        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final libraryViewTypeProvider =
@@ -19,6 +20,10 @@ class MangaDexLibraryView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final type = ref.watch(libraryViewTypeProvider);
     final results = ref.watch(userLibraryProvider(type));
+    final isLoading = results.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
 
     return Scaffold(
       body: Center(
@@ -51,44 +56,47 @@ class MangaDexLibraryView extends HookConsumerWidget {
               ),
             ),
             Expanded(
-              child: results.when(
-                skipLoadingOnReload: true,
-                data: (result) {
-                  return MangaListWidget(
-                    title: Text(
-                      '${ref.read(userLibraryProvider(type).notifier).total()} Mangas',
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: controller,
-                    onAtEdge: () {
-                      final lt = ref.read(libraryViewTypeProvider);
-                      ref.read(userLibraryProvider(lt).notifier).getMore();
-                    },
-                    children: [
-                      MangaListViewSliver(items: result),
-                    ],
-                  );
-                },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                error: (err, stackTrace) {
-                  final messenger = ScaffoldMessenger.of(context);
-                  Future.delayed(
-                    Duration.zero,
-                    () => messenger
-                      ..removeCurrentSnackBar()
-                      ..showSnackBar(
-                        SnackBar(
-                          content: Text('$err'),
-                          backgroundColor: Colors.red,
+              child: Stack(
+                children: [
+                  results.when(
+                    skipLoadingOnReload: true,
+                    data: (result) {
+                      return MangaListWidget(
+                        title: Text(
+                          '${ref.read(userLibraryProvider(type).notifier).total()} Mangas',
+                          style: const TextStyle(fontSize: 24),
                         ),
-                      ),
-                  );
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: controller,
+                        onAtEdge: () {
+                          final lt = ref.read(libraryViewTypeProvider);
+                          ref.read(userLibraryProvider(lt).notifier).getMore();
+                        },
+                        children: [
+                          MangaListViewSliver(items: result),
+                        ],
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (err, stackTrace) {
+                      final messenger = ScaffoldMessenger.of(context);
+                      Future.delayed(
+                        Duration.zero,
+                        () => messenger
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: Text('$err'),
+                              backgroundColor: Colors.red,
+                            ),
+                          ),
+                      );
 
-                  return Text('Error: $err');
-                },
+                      return Text('Error: $err');
+                    },
+                  ),
+                  if (isLoading) ...Styles.loadingOverlay,
+                ],
               ),
             ),
           ],
