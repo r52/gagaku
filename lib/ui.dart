@@ -213,6 +213,13 @@ class Styles {
     ),
   ];
 
+  static const listSpinner = Padding(
+    padding: EdgeInsets.symmetric(vertical: 5.0),
+    child: Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
   static Widget slideTransitionBuilder(
       BuildContext context,
       Animation<double> animation,

@@ -63,76 +63,72 @@ class ChapterFeedWidget extends HookConsumerWidget {
     }, [scrollController]);
 
     return Center(
-      child: Stack(
-        children: [
-          results.when(
-            skipLoadingOnReload: true,
-            data: (result) {
-              if (result.isEmpty) {
-                return Text(emptyText ?? 'No results!');
-              }
+      child: results.when(
+        skipLoadingOnReload: true,
+        data: (result) {
+          if (result.isEmpty) {
+            return Text(emptyText ?? 'No results!');
+          }
 
-              return ScrollConfiguration(
-                behavior:
-                    ScrollConfiguration.of(context).copyWith(dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                  PointerDeviceKind.trackpad,
-                }),
-                child: RefreshIndicator(
-                  onRefresh: onRefresh,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 10.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              title,
-                              style: const TextStyle(fontSize: 24),
-                            )
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          controller: scrollController,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          restorationId: restorationId,
-                          padding: const EdgeInsets.all(6),
-                          itemCount: result.length,
-                          itemBuilder: (context, index) {
-                            return ChapterFeedItem(
-                                state: result.elementAt(index));
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (err, stackTrace) {
-              final messenger = ScaffoldMessenger.of(context);
-              Future.delayed(
-                Duration.zero,
-                () => messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('$err'),
-                      backgroundColor: Colors.red,
+          return ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+            }),
+            child: RefreshIndicator(
+              onRefresh: onRefresh,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 10.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(fontSize: 24),
+                        )
+                      ],
                     ),
                   ),
-              );
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      restorationId: restorationId,
+                      padding: const EdgeInsets.all(6),
+                      itemCount: result.length,
+                      itemBuilder: (context, index) {
+                        return ChapterFeedItem(state: result.elementAt(index));
+                      },
+                    ),
+                  ),
+                  if (isLoading) Styles.listSpinner,
+                ],
+              ),
+            ),
+          );
+        },
+        loading: () => const Stack(
+          children: Styles.loadingOverlay,
+        ),
+        error: (err, stackTrace) {
+          final messenger = ScaffoldMessenger.of(context);
+          Future.delayed(
+            Duration.zero,
+            () => messenger
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text('$err'),
+                  backgroundColor: Colors.red,
+                ),
+              ),
+          );
 
-              return Text('Error: $err');
-            },
-          ),
-          if (isLoading) ...Styles.loadingOverlay,
-        ],
+          return Text('Error: $err');
+        },
       ),
     );
   }
