@@ -91,7 +91,7 @@ class MangaDexModel {
   final Ref ref;
   //TokenResponse? _token;
   OldToken? _token;
-  http.Client _client = http.Client();
+  http.Client _client = RateLimitedClient();
   late Future _initFuture;
   Future get initialized => _initFuture;
 
@@ -187,7 +187,7 @@ class MangaDexModel {
             if (t.isValid) {
               await _saveToken(t);
               _token = t;
-              _client = AuthenticatedClient(http.Client(), t);
+              _client = AuthenticatedClient(RateLimitedClient(), t);
               return;
             }
           }
@@ -196,7 +196,7 @@ class MangaDexModel {
     }
 
     // If any steps fail, assign a default client
-    _client = http.Client();
+    _client = RateLimitedClient();
   }
 
   // Future<void> authenticate() async {
@@ -241,7 +241,7 @@ class MangaDexModel {
         if (t.isValid) {
           await _saveToken(t);
           _token = t;
-          _client = AuthenticatedClient(http.Client(), t);
+          _client = AuthenticatedClient(RateLimitedClient(), t);
           return;
         }
       }
@@ -284,7 +284,7 @@ class MangaDexModel {
 
         if (body['result'] == 'ok') {
           _token = null;
-          _client = http.Client();
+          _client = RateLimitedClient();
 
           final storage = Hive.box(gagakuBox);
           await storage.delete('oldtoken');
@@ -1388,7 +1388,6 @@ class ReadChapters extends _$ReadChapters {
   /// Sets a list of chapters for a manga read or unread
   Future<void> set(
       Manga manga, Iterable<Chapter> chapters, bool setRead) async {
-    final chapIdSet = chapters.map((e) => e.id).toSet();
     final api = ref.watch(mangadexProvider);
 
     final oldstate = state.maybeWhen(
@@ -1396,6 +1395,7 @@ class ReadChapters extends _$ReadChapters {
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      final chapIdSet = chapters.map((e) => e.id).toSet();
       bool result = await api.setChaptersRead(manga, chapters, setRead);
 
       if (result) {
@@ -1415,6 +1415,8 @@ class ReadChapters extends _$ReadChapters {
             oldstate[manga.id] = {};
           }
         }
+
+        return {...oldstate};
       }
 
       return oldstate;
@@ -1455,7 +1457,6 @@ class UserLibrary extends _$UserLibrary {
     final mangas = await api.fetchManga(results.getRange(_offset, range));
 
     if (mangas.isNotEmpty) {
-      await Future.delayed(const Duration(milliseconds: 100));
       await ref.read(statisticsProvider.notifier).get(mangas);
     }
 
@@ -1549,7 +1550,6 @@ class MangaSearch extends _$MangaSearch {
         filter: params.filter, offset: _offset);
 
     if (manga.isNotEmpty) {
-      await Future.delayed(const Duration(milliseconds: 100));
       await ref.read(statisticsProvider.notifier).get(manga);
     }
 
@@ -1755,6 +1755,18 @@ class AuthControl extends _$AuthControl {
       await api.logout();
       return api.loggedIn();
     });
+  }
+}
+
+class RateLimitedClient extends http.BaseClient {
+  final http.Client baseClient = http.Client();
+
+  RateLimitedClient();
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    return baseClient.send(request);
   }
 }
 

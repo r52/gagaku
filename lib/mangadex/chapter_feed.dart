@@ -14,14 +14,10 @@ Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
 
   final mangaIds = chapters.map((e) => e.getMangaID()).toSet();
   mangaIds.removeWhere((element) => element.isEmpty);
-  await Future.delayed(const Duration(milliseconds: 100));
 
   final mangas = await api.fetchManga(mangaIds);
-  await Future.delayed(const Duration(milliseconds: 100));
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
-  await Future.delayed(const Duration(milliseconds: 100));
-
   await ref.watch(readChaptersProvider.notifier).get(mangas);
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);

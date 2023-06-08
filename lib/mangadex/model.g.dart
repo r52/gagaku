@@ -252,7 +252,7 @@ class MangaCoversProvider
   }
 }
 
-String _$readChaptersHash() => r'4602e9d65d6c185c76b3179fcb49272a32a8acd4';
+String _$readChaptersHash() => r'8e8f740e537a3b4b8ef0f61246bb2c72098b5839';
 
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)
@@ -267,7 +267,7 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<Map<String, Set<String>>>;
-String _$userLibraryHash() => r'0a3d2b6cb11b307c05ed2b17b1aba7cdf87b28b3';
+String _$userLibraryHash() => r'55c367b59e5f7a1a5591bbf90de2ce3509a060bc';
 
 abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
   late final MangaReadingStatus status;
@@ -377,7 +377,7 @@ final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
 );
 
 typedef _$TagList = AsyncNotifier<Iterable<Tag>>;
-String _$mangaSearchHash() => r'dbcaceb01c6084d617495b39921bac7118a79004';
+String _$mangaSearchHash() => r'de270cf7400b1955aa07fe9f414ad5a78122005e';
 
 abstract class _$MangaSearch
     extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
