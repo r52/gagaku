@@ -31,8 +31,12 @@ Future<void> _fetchReadChaptersRedun(
   if (loggedin) {
     // Redundant retrieve read chapters when opening the manga
     // from places where it hasn't been retrieved yet
+    await Future.delayed(const Duration(milliseconds: 100));
     await ref.read(readChaptersProvider.notifier).get([manga]);
   }
+
+  await Future.delayed(const Duration(milliseconds: 100));
+  await ref.read(statisticsProvider.notifier).get([manga]);
 }
 
 class MangaDexMangaViewWidget extends HookConsumerWidget {
@@ -674,6 +678,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 child: SizedBox.shrink(),
               ),
               error: (err, stackTrace) {
+                // Invalidate the provider results on error
+                ref.invalidate(mangaChaptersProvider(manga));
+
                 final messenger = ScaffoldMessenger.of(context);
                 Future.delayed(
                   Duration.zero,
