@@ -69,6 +69,9 @@ abstract class MangaDexEndpoints {
 
   /// Gets statistics for given manga
   static const statistics = '/statistics/manga';
+
+  /// Gets cover art
+  static const cover = '/cover';
 }
 
 abstract class CacheLists {
@@ -1104,6 +1107,36 @@ class MangaDexModel {
 
     return {};
   }
+
+  /// Retrieve cover art for a specific manga
+  Future<List<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
+    if (_tokenExpired(_token)) {
+      await refreshToken();
+    }
+
+    // Download missing data
+    final queryParams = {
+      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
+      'offset': offset.toString(),
+      'order[volume]': 'asc',
+      'manga[]': manga.id,
+    };
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.cover, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      final result = CoverList.fromJson(body);
+
+      return result.data;
+    }
+
+    // Throw if failure
+    throw Exception("Failed to download covers");
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -1279,12 +1312,59 @@ class MangaChapters extends _$MangaChapters {
 }
 
 @Riverpod(keepAlive: true)
+class MangaCovers extends _$MangaCovers {
+  int _offset = 0;
+  bool _atEnd = false;
+
+  ///Fetch the manga chapters list based on offset
+  Future<List<Cover>> _fetchCovers(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    final covers = await api.getCoverList(manga, offset);
+
+    return covers.toList();
+  }
+
+  @override
+  FutureOr<List<Cover>> build(Manga manga) async {
+    return _fetchCovers(0);
+  }
+
+  /// Fetch more chapters if more data exists
+  Future<void> getMore() async {
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate =
+        state.maybeWhen(data: (data) => data, orElse: () => <Cover>[]);
+    // If there is more content, get more
+    if (oldstate.length == _offset + MangaDexEndpoints.apiSearchLimit &&
+        !_atEnd) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        _offset += MangaDexEndpoints.apiSearchLimit;
+        final covers = await _fetchCovers(_offset);
+
+        if (covers.isEmpty) {
+          _atEnd = true;
+        }
+
+        return [...oldstate, ...covers];
+      });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
+    }
+  }
+}
+
+@Riverpod(keepAlive: true)
 class ReadChapters extends _$ReadChapters {
   ///Fetch the latest chapters list based on offset
   Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
     final api = ref.watch(mangadexProvider);
-    final map = await api.fetchReadChapters(mangas);
 
+    final map = await api.fetchReadChapters(mangas);
     return map;
   }
 

@@ -1625,6 +1625,7 @@ CoverArtAttributes _$CoverArtAttributesFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CoverArtAttributes {
+  String? get volume => throw _privateConstructorUsedError;
   String get fileName => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1639,7 +1640,7 @@ abstract class $CoverArtAttributesCopyWith<$Res> {
           CoverArtAttributes value, $Res Function(CoverArtAttributes) then) =
       _$CoverArtAttributesCopyWithImpl<$Res, CoverArtAttributes>;
   @useResult
-  $Res call({String fileName});
+  $Res call({String? volume, String fileName});
 }
 
 /// @nodoc
@@ -1655,9 +1656,14 @@ class _$CoverArtAttributesCopyWithImpl<$Res, $Val extends CoverArtAttributes>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? volume = freezed,
     Object? fileName = null,
   }) {
     return _then(_value.copyWith(
+      volume: freezed == volume
+          ? _value.volume
+          : volume // ignore: cast_nullable_to_non_nullable
+              as String?,
       fileName: null == fileName
           ? _value.fileName
           : fileName // ignore: cast_nullable_to_non_nullable
@@ -1674,7 +1680,7 @@ abstract class _$$_CoverArtAttributesCopyWith<$Res>
       __$$_CoverArtAttributesCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String fileName});
+  $Res call({String? volume, String fileName});
 }
 
 /// @nodoc
@@ -1688,9 +1694,14 @@ class __$$_CoverArtAttributesCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? volume = freezed,
     Object? fileName = null,
   }) {
     return _then(_$_CoverArtAttributes(
+      volume: freezed == volume
+          ? _value.volume
+          : volume // ignore: cast_nullable_to_non_nullable
+              as String?,
       fileName: null == fileName
           ? _value.fileName
           : fileName // ignore: cast_nullable_to_non_nullable
@@ -1704,17 +1715,19 @@ class __$$_CoverArtAttributesCopyWithImpl<$Res>
 class _$_CoverArtAttributes
     with DiagnosticableTreeMixin
     implements _CoverArtAttributes {
-  const _$_CoverArtAttributes({required this.fileName});
+  const _$_CoverArtAttributes({this.volume, required this.fileName});
 
   factory _$_CoverArtAttributes.fromJson(Map<String, dynamic> json) =>
       _$$_CoverArtAttributesFromJson(json);
 
   @override
+  final String? volume;
+  @override
   final String fileName;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CoverArtAttributes(fileName: $fileName)';
+    return 'CoverArtAttributes(volume: $volume, fileName: $fileName)';
   }
 
   @override
@@ -1722,6 +1735,7 @@ class _$_CoverArtAttributes
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'CoverArtAttributes'))
+      ..add(DiagnosticsProperty('volume', volume))
       ..add(DiagnosticsProperty('fileName', fileName));
   }
 
@@ -1730,13 +1744,14 @@ class _$_CoverArtAttributes
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_CoverArtAttributes &&
+            (identical(other.volume, volume) || other.volume == volume) &&
             (identical(other.fileName, fileName) ||
                 other.fileName == fileName));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, fileName);
+  int get hashCode => Object.hash(runtimeType, volume, fileName);
 
   @JsonKey(ignore: true)
   @override
@@ -1754,12 +1769,15 @@ class _$_CoverArtAttributes
 }
 
 abstract class _CoverArtAttributes implements CoverArtAttributes {
-  const factory _CoverArtAttributes({required final String fileName}) =
-      _$_CoverArtAttributes;
+  const factory _CoverArtAttributes(
+      {final String? volume,
+      required final String fileName}) = _$_CoverArtAttributes;
 
   factory _CoverArtAttributes.fromJson(Map<String, dynamic> json) =
       _$_CoverArtAttributes.fromJson;
 
+  @override
+  String? get volume;
   @override
   String get fileName;
   @override
@@ -3904,6 +3922,343 @@ abstract class _ChapterAPI extends ChapterAPI {
   @override
   @JsonKey(ignore: true)
   _$$_ChapterAPICopyWith<_$_ChapterAPI> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+Cover _$CoverFromJson(Map<String, dynamic> json) {
+  return _Cover.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Cover {
+  String get id => throw _privateConstructorUsedError;
+  CoverArtAttributes get attributes => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CoverCopyWith<Cover> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CoverCopyWith<$Res> {
+  factory $CoverCopyWith(Cover value, $Res Function(Cover) then) =
+      _$CoverCopyWithImpl<$Res, Cover>;
+  @useResult
+  $Res call({String id, CoverArtAttributes attributes});
+
+  $CoverArtAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class _$CoverCopyWithImpl<$Res, $Val extends Cover>
+    implements $CoverCopyWith<$Res> {
+  _$CoverCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as CoverArtAttributes,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $CoverArtAttributesCopyWith<$Res> get attributes {
+    return $CoverArtAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$_CoverCopyWith<$Res> implements $CoverCopyWith<$Res> {
+  factory _$$_CoverCopyWith(_$_Cover value, $Res Function(_$_Cover) then) =
+      __$$_CoverCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, CoverArtAttributes attributes});
+
+  @override
+  $CoverArtAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class __$$_CoverCopyWithImpl<$Res> extends _$CoverCopyWithImpl<$Res, _$_Cover>
+    implements _$$_CoverCopyWith<$Res> {
+  __$$_CoverCopyWithImpl(_$_Cover _value, $Res Function(_$_Cover) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+  }) {
+    return _then(_$_Cover(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as CoverArtAttributes,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_Cover with DiagnosticableTreeMixin implements _Cover {
+  const _$_Cover({required this.id, required this.attributes});
+
+  factory _$_Cover.fromJson(Map<String, dynamic> json) =>
+      _$$_CoverFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final CoverArtAttributes attributes;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'Cover(id: $id, attributes: $attributes)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'Cover'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('attributes', attributes));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_Cover &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.attributes, attributes) ||
+                other.attributes == attributes));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, attributes);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_CoverCopyWith<_$_Cover> get copyWith =>
+      __$$_CoverCopyWithImpl<_$_Cover>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_CoverToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Cover implements Cover {
+  const factory _Cover(
+      {required final String id,
+      required final CoverArtAttributes attributes}) = _$_Cover;
+
+  factory _Cover.fromJson(Map<String, dynamic> json) = _$_Cover.fromJson;
+
+  @override
+  String get id;
+  @override
+  CoverArtAttributes get attributes;
+  @override
+  @JsonKey(ignore: true)
+  _$$_CoverCopyWith<_$_Cover> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+CoverList _$CoverListFromJson(Map<String, dynamic> json) {
+  return _CoverList.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CoverList {
+  List<Cover> get data => throw _privateConstructorUsedError;
+  int get total => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CoverListCopyWith<CoverList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CoverListCopyWith<$Res> {
+  factory $CoverListCopyWith(CoverList value, $Res Function(CoverList) then) =
+      _$CoverListCopyWithImpl<$Res, CoverList>;
+  @useResult
+  $Res call({List<Cover> data, int total});
+}
+
+/// @nodoc
+class _$CoverListCopyWithImpl<$Res, $Val extends CoverList>
+    implements $CoverListCopyWith<$Res> {
+  _$CoverListCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Cover>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_CoverListCopyWith<$Res> implements $CoverListCopyWith<$Res> {
+  factory _$$_CoverListCopyWith(
+          _$_CoverList value, $Res Function(_$_CoverList) then) =
+      __$$_CoverListCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<Cover> data, int total});
+}
+
+/// @nodoc
+class __$$_CoverListCopyWithImpl<$Res>
+    extends _$CoverListCopyWithImpl<$Res, _$_CoverList>
+    implements _$$_CoverListCopyWith<$Res> {
+  __$$_CoverListCopyWithImpl(
+      _$_CoverList _value, $Res Function(_$_CoverList) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_$_CoverList(
+      null == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Cover>,
+      null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_CoverList with DiagnosticableTreeMixin implements _CoverList {
+  const _$_CoverList(final List<Cover> data, this.total) : _data = data;
+
+  factory _$_CoverList.fromJson(Map<String, dynamic> json) =>
+      _$$_CoverListFromJson(json);
+
+  final List<Cover> _data;
+  @override
+  List<Cover> get data {
+    if (_data is EqualUnmodifiableListView) return _data;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_data);
+  }
+
+  @override
+  final int total;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'CoverList(data: $data, total: $total)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CoverList'))
+      ..add(DiagnosticsProperty('data', data))
+      ..add(DiagnosticsProperty('total', total));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_CoverList &&
+            const DeepCollectionEquality().equals(other._data, _data) &&
+            (identical(other.total, total) || other.total == total));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_data), total);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_CoverListCopyWith<_$_CoverList> get copyWith =>
+      __$$_CoverListCopyWithImpl<_$_CoverList>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_CoverListToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CoverList implements CoverList {
+  const factory _CoverList(final List<Cover> data, final int total) =
+      _$_CoverList;
+
+  factory _CoverList.fromJson(Map<String, dynamic> json) =
+      _$_CoverList.fromJson;
+
+  @override
+  List<Cover> get data;
+  @override
+  int get total;
+  @override
+  @JsonKey(ignore: true)
+  _$$_CoverListCopyWith<_$_CoverList> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

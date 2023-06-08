@@ -13,7 +13,7 @@ typedef ReadChaptersMap = Map<String, Set<String>>;
 typedef CoverArtUrl = String;
 
 extension CoverArtUrlExt on CoverArtUrl {
-  String get({CoverArtQuality quality = CoverArtQuality.best}) {
+  String quality({CoverArtQuality quality = CoverArtQuality.best}) {
     var cv = this;
 
     switch (quality) {
@@ -371,6 +371,7 @@ class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
 @freezed
 class CoverArtAttributes with _$CoverArtAttributes {
   const factory CoverArtAttributes({
+    String? volume,
     required String fileName,
   }) = _CoverArtAttributes;
 
@@ -457,6 +458,27 @@ class ChapterAPI with _$ChapterAPI {
 }
 
 @freezed
+class Cover with _$Cover {
+  const factory Cover({
+    required String id,
+    required CoverArtAttributes attributes,
+  }) = _Cover;
+
+  factory Cover.fromJson(Map<String, dynamic> json) => _$CoverFromJson(json);
+}
+
+@freezed
+class CoverList with _$CoverList {
+  const factory CoverList(
+    List<Cover> data,
+    int total,
+  ) = _CoverList;
+
+  factory CoverList.fromJson(Map<String, dynamic> json) =>
+      _$CoverListFromJson(json);
+}
+
+@freezed
 class MangaList with _$MangaList {
   const factory MangaList(
     List<Manga> data,
@@ -513,7 +535,15 @@ class Manga with _$Manga {
       return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
     }
 
-    return covers.first.get(quality: quality);
+    return covers.first.quality(quality: quality);
+  }
+
+  CoverArtUrl getUrlFromCover(Cover cover,
+      {CoverArtQuality quality = CoverArtQuality.best}) {
+    final filename = cover.attributes.fileName;
+
+    return 'https://uploads.mangadex.org/covers/$id/$filename'
+        .quality(quality: quality);
   }
 
   String? getAuthor() {

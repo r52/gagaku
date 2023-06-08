@@ -127,7 +127,12 @@ class ChapterFeedWidget extends HookConsumerWidget {
               ),
           );
 
-          return Text('Error: $err');
+          return Column(
+            children: [
+              Text('Error: $err'),
+              Text(stackTrace.toString()),
+            ],
+          );
         },
       ),
     );

@@ -156,7 +156,103 @@ class MangaChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'a574c728485bf17dd64340f02e64edbdad218bb7';
+String _$mangaCoversHash() => r'98691974619e0d01ebfa226d6e9bc96c4105b286';
+
+abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<Cover>> {
+  late final Manga manga;
+
+  FutureOr<List<Cover>> build(
+    Manga manga,
+  );
+}
+
+/// See also [MangaCovers].
+@ProviderFor(MangaCovers)
+const mangaCoversProvider = MangaCoversFamily();
+
+/// See also [MangaCovers].
+class MangaCoversFamily extends Family<AsyncValue<List<Cover>>> {
+  /// See also [MangaCovers].
+  const MangaCoversFamily();
+
+  /// See also [MangaCovers].
+  MangaCoversProvider call(
+    Manga manga,
+  ) {
+    return MangaCoversProvider(
+      manga,
+    );
+  }
+
+  @override
+  MangaCoversProvider getProviderOverride(
+    covariant MangaCoversProvider provider,
+  ) {
+    return call(
+      provider.manga,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mangaCoversProvider';
+}
+
+/// See also [MangaCovers].
+class MangaCoversProvider
+    extends AsyncNotifierProviderImpl<MangaCovers, List<Cover>> {
+  /// See also [MangaCovers].
+  MangaCoversProvider(
+    this.manga,
+  ) : super.internal(
+          () => MangaCovers()..manga = manga,
+          from: mangaCoversProvider,
+          name: r'mangaCoversProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$mangaCoversHash,
+          dependencies: MangaCoversFamily._dependencies,
+          allTransitiveDependencies:
+              MangaCoversFamily._allTransitiveDependencies,
+        );
+
+  final Manga manga;
+
+  @override
+  bool operator ==(Object other) {
+    return other is MangaCoversProvider && other.manga == manga;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, manga.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+
+  @override
+  FutureOr<List<Cover>> runNotifierBuild(
+    covariant MangaCovers notifier,
+  ) {
+    return notifier.build(
+      manga,
+    );
+  }
+}
+
+String _$readChaptersHash() => r'4602e9d65d6c185c76b3179fcb49272a32a8acd4';
 
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)
@@ -586,7 +682,7 @@ class FollowingStatusProvider
   }
 }
 
-String _$mangaDexHistoryHash() => r'582bae05a00f04054b8f4fe0e5a0db6db55d7574';
+String _$mangaDexHistoryHash() => r'b536fbc0d5a0ba2367a3d5685f175af2441171eb';
 
 /// See also [MangaDexHistory].
 @ProviderFor(MangaDexHistory)
