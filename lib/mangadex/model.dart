@@ -1319,22 +1319,22 @@ class ReadChapters extends _$ReadChapters {
       bool result = await api.setChaptersRead(manga, chapters, setRead);
 
       if (result) {
+        final keyExists = oldstate.containsKey(manga.id);
+
         // Refresh
         if (setRead) {
-          if (oldstate.containsKey(manga.id)) {
-            oldstate[manga.id]!.addAll(chapIdSet);
+          if (keyExists) {
+            oldstate[manga.id]?.addAll(chapIdSet);
           } else {
             oldstate[manga.id] = chapIdSet;
           }
         } else {
-          if (oldstate.containsKey(manga.id)) {
-            oldstate[manga.id]!.removeAll(chapIdSet);
+          if (keyExists) {
+            oldstate[manga.id]?.removeAll(chapIdSet);
           } else {
             oldstate[manga.id] = {};
           }
         }
-
-        return {...oldstate};
       }
 
       return oldstate;
@@ -1641,7 +1641,7 @@ class MangaDexHistory extends _$MangaDexHistory {
       final uuids = oldstate.map((e) => e.id).toList();
 
       final box = Hive.box(gagakuBox);
-      box.put('mangadex_history', json.encode(uuids));
+      await box.put('mangadex_history', json.encode(uuids));
 
       return oldstate;
     });

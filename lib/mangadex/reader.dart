@@ -73,9 +73,9 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           if (loggedin) {
             ref.read(readChaptersProvider).whenData((read) {
               if (!read.containsKey(manga.id) ||
-                  !read[manga.id]!.contains(chapter.id)) {
+                  read[manga.id]?.contains(chapter.id) == false) {
                 Future.delayed(
-                    Duration.zero,
+                    const Duration(seconds: 3),
                     () => ref
                         .read(readChaptersProvider.notifier)
                         .set(manga, [chapter], true));
@@ -84,7 +84,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           }
         });
 
-        Future.delayed(Duration.zero,
+        Future.delayed(const Duration(seconds: 1),
             () => ref.read(mangaDexHistoryProvider.notifier).add(chapter));
 
         return ReaderWidget(
