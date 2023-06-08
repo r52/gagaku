@@ -103,7 +103,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 ),
               ),
               background: ExtendedImage.network(
-                manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                 cache: true,
                 colorBlendMode: BlendMode.modulate,
                 color: Colors.grey,

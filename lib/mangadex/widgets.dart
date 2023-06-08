@@ -574,7 +574,7 @@ class _GridMangaItem extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       clipBehavior: Clip.antiAlias,
       child: ExtendedImage.network(
-        manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+        manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
         cache: true,
         loadStateChanged: extendedImageLoadStateHandler,
         width: 256.0,
@@ -657,7 +657,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                       nav.push(createMangaViewRoute(manga));
                     },
                     child: ExtendedImage.network(
-                        manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                        manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                         cache: true,
                         loadStateChanged: extendedImageLoadStateHandler,
                         width: screenSizeSmall ? 80.0 : 128.0),
@@ -801,7 +801,7 @@ class _ListMangaItem extends ConsumerWidget {
                 nav.push(createMangaViewRoute(manga));
               },
               child: ExtendedImage.network(
-                manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                 cache: true,
                 loadStateChanged: extendedImageLoadStateHandler,
                 width: 80.0,
