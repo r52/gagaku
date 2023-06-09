@@ -128,7 +128,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             pinned: true,
             snap: false,
             floating: false,
-            expandedHeight: 180.0,
+            expandedHeight: 200.0,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 manga.attributes.title.get('en'),
@@ -344,20 +344,44 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               color: theme.cardColor,
+              child: Row(
+                children: [
+                  ContentRatingChip(rating: manga.attributes.contentRating),
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  if (manga.attributes.tags.isNotEmpty)
+                    ...manga.attributes.tags
+                        .where((tag) =>
+                            (tag.attributes.group == TagGroup.genre ||
+                                tag.attributes.group == TagGroup.theme))
+                        .map((e) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
+                              child: IconTextChip(
+                                  text: Text(e.attributes.name.get('en'))),
+                            ))
+                        .toList(),
+                  const SizedBox(width: 10),
+                  MangaStatusChip(status: manga.attributes.status),
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              color: theme.cardColor,
               child: Consumer(
                 builder: (context, ref, child) {
                   final stats = ref.watch(statisticsProvider);
                   return Row(
                     children: [
-                      ContentRatingChip(rating: manga.attributes.contentRating),
                       ...stats.when(
                         skipLoadingOnReload: true,
                         data: (data) {
                           if (data.containsKey(manga.id)) {
                             return [
-                              const SizedBox(
-                                width: 10,
-                              ),
                               IconTextChip(
                                 icon: const Icon(
                                   Icons.star_border,
@@ -376,7 +400,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 ),
                               ),
                               const SizedBox(
-                                width: 10,
+                                width: 5,
                               ),
                               IconTextChip(
                                 icon: const Icon(
@@ -417,8 +441,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           )
                         ],
                       ),
-                      const SizedBox(width: 10),
-                      MangaStatusChip(status: manga.attributes.status),
                     ],
                   );
                 },

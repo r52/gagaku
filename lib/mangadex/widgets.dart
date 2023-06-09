@@ -674,16 +674,11 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                         Wrap(
                           runSpacing: 4.0,
                           children: [
-                            ContentRatingChip(
-                                rating: manga.attributes.contentRating),
                             ...stats.when(
                               skipLoadingOnReload: true,
                               data: (data) {
                                 if (data.containsKey(manga.id)) {
                                   return [
-                                    const SizedBox(
-                                      width: 4,
-                                    ),
                                     IconTextChip(
                                       icon: const Icon(
                                         Icons.star_border,
@@ -718,48 +713,46 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 }
 
                                 return [
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
                                   const IconTextChip(
                                     text: Text(statsError),
                                   )
                                 ];
                               },
                               error: (obj, stack) => [
-                                const SizedBox(
-                                  width: 4,
-                                ),
                                 const IconTextChip(
                                   text: Text(statsError),
                                 )
                               ],
                               loading: () => [
-                                const SizedBox(
-                                  width: 4,
-                                ),
                                 const IconTextChip(
                                   text: CircularProgressIndicator(),
                                 )
                               ],
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 10),
                             MangaStatusChip(status: manga.attributes.status),
                           ],
                         ),
                         const SizedBox(
-                          height: 2,
+                          height: 4.0,
                         ),
                         Wrap(
-                            children: manga.attributes.tags
+                          runSpacing: 4.0,
+                          children: [
+                            ContentRatingChip(
+                                rating: manga.attributes.contentRating),
+                            const SizedBox(width: 2.0),
+                            ...manga.attributes.tags
                                 .map((e) => Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 2.0, horizontal: 2.0),
+                                          horizontal: 2.0),
                                       child: IconTextChip(
                                           text: Text(
                                               e.attributes.name.get('en'))),
                                     ))
-                                .toList()),
+                                .toList(),
+                          ],
+                        ),
                         if (manga.attributes.description.isNotEmpty)
                           Expanded(
                             child: Padding(
@@ -836,77 +829,84 @@ class _ListMangaItem extends ConsumerWidget {
                     runSpacing: 4.0,
                     children: [
                       ContentRatingChip(rating: manga.attributes.contentRating),
-                      ...stats.when(
-                        skipLoadingOnReload: true,
-                        data: (data) {
-                          if (data.containsKey(manga.id)) {
-                            return [
-                              const SizedBox(
-                                width: 4,
-                              ),
-                              IconTextChip(
-                                icon: const Icon(
-                                  Icons.star_border,
-                                  color: Colors.amber,
-                                  size: 18,
-                                ),
-                                text: Text(
-                                  data[manga.id]
-                                          ?.rating
-                                          .bayesian
-                                          .toStringAsFixed(2) ??
-                                      statsError,
-                                  style: const TextStyle(
-                                    color: Colors.amber,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 4,
-                              ),
-                              IconTextChip(
-                                icon: const Icon(
-                                  Icons.bookmark_outline,
-                                  size: 18,
-                                ),
-                                text: Text(
-                                  data[manga.id]?.follows.toString() ??
-                                      statsError,
-                                ),
-                              ),
-                            ];
-                          }
-
+                      const SizedBox(width: 2),
+                      if (manga.attributes.tags.isNotEmpty)
+                        ...manga.attributes.tags
+                            .where((tag) =>
+                                (tag.attributes.group == TagGroup.genre ||
+                                    tag.attributes.group == TagGroup.theme))
+                            .map((e) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  child: IconTextChip(
+                                      text: Text(e.attributes.name.get('en'))),
+                                ))
+                            .toList(),
+                      const SizedBox(width: 10),
+                      MangaStatusChip(status: manga.attributes.status),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Wrap(
+                    runSpacing: 4.0,
+                    children: stats.when(
+                      skipLoadingOnReload: true,
+                      data: (data) {
+                        if (data.containsKey(manga.id)) {
                           return [
-                            const SizedBox(
-                              width: 4,
+                            IconTextChip(
+                              icon: const Icon(
+                                Icons.star_border,
+                                color: Colors.amber,
+                                size: 18,
+                              ),
+                              text: Text(
+                                data[manga.id]
+                                        ?.rating
+                                        .bayesian
+                                        .toStringAsFixed(2) ??
+                                    statsError,
+                                style: const TextStyle(
+                                  color: Colors.amber,
+                                ),
+                              ),
                             ),
-                            const IconTextChip(
-                              text: Text(statsError),
-                            )
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            IconTextChip(
+                              icon: const Icon(
+                                Icons.bookmark_outline,
+                                size: 18,
+                              ),
+                              text: Text(
+                                data[manga.id]?.follows.toString() ??
+                                    statsError,
+                              ),
+                            ),
                           ];
-                        },
-                        error: (obj, stack) => [
-                          const SizedBox(
-                            width: 4,
-                          ),
+                        }
+
+                        return [
                           const IconTextChip(
                             text: Text(statsError),
                           )
-                        ],
-                        loading: () => [
-                          const SizedBox(
-                            width: 4,
-                          ),
-                          const IconTextChip(
-                            text: CircularProgressIndicator(),
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 4),
-                      MangaStatusChip(status: manga.attributes.status),
-                    ],
-                  )
+                        ];
+                      },
+                      error: (obj, stack) => [
+                        const IconTextChip(
+                          text: Text(statsError),
+                        )
+                      ],
+                      loading: () => [
+                        const IconTextChip(
+                          text: CircularProgressIndicator(),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             )
