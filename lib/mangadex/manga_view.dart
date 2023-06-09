@@ -344,7 +344,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               color: theme.cardColor,
-              child: Row(
+              child: Wrap(
+                runSpacing: 4.0,
                 children: [
                   ContentRatingChip(rating: manga.attributes.contentRating),
                   const SizedBox(
@@ -362,8 +363,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   text: Text(e.attributes.name.get('en'))),
                             ))
                         .toList(),
-                  const SizedBox(width: 10),
-                  MangaStatusChip(status: manga.attributes.status),
                 ],
               ),
             ),
@@ -375,7 +374,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               child: Consumer(
                 builder: (context, ref, child) {
                   final stats = ref.watch(statisticsProvider);
-                  return Row(
+                  return Wrap(
+                    runSpacing: 4.0,
                     children: [
                       ...stats.when(
                         skipLoadingOnReload: true,
@@ -441,6 +441,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           )
                         ],
                       ),
+                      const SizedBox(width: 10),
+                      MangaStatusChip(status: manga.attributes.status),
                     ],
                   );
                 },
@@ -525,12 +527,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   ),
                 if (manga.attributes.tags.isNotEmpty)
                   ExpansionTile(
+                    expandedAlignment: Alignment.centerLeft,
                     title: const Text('Genres'),
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         color: theme.colorScheme.background,
-                        child: Row(
+                        child: Wrap(
+                          runSpacing: 4.0,
                           children: manga.attributes.tags
                               .where((tag) =>
                                   tag.attributes.group == TagGroup.genre)
@@ -548,12 +552,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   ),
                 if (manga.attributes.tags.isNotEmpty)
                   ExpansionTile(
+                    expandedAlignment: Alignment.centerLeft,
                     title: const Text('Themes'),
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         color: theme.colorScheme.background,
-                        child: Row(
+                        child: Wrap(
+                          runSpacing: 4.0,
                           children: manga.attributes.tags
                               .where((tag) =>
                                   tag.attributes.group == TagGroup.theme)
