@@ -166,12 +166,14 @@ Map<String, dynamic> _$$_ScanlationGroupAttributesToJson(
 _$_CoverArtAttributes _$$_CoverArtAttributesFromJson(
         Map<String, dynamic> json) =>
     _$_CoverArtAttributes(
+      volume: json['volume'] as String?,
       fileName: json['fileName'] as String,
     );
 
 Map<String, dynamic> _$$_CoverArtAttributesToJson(
         _$_CoverArtAttributes instance) =>
     <String, dynamic>{
+      'volume': instance.volume,
       'fileName': instance.fileName,
     };
 
@@ -312,6 +314,30 @@ Map<String, dynamic> _$$_ChapterAPIToJson(_$_ChapterAPI instance) =>
     <String, dynamic>{
       'baseUrl': instance.baseUrl,
       'chapter': instance.chapter,
+    };
+
+_$_Cover _$$_CoverFromJson(Map<String, dynamic> json) => _$_Cover(
+      id: json['id'] as String,
+      attributes: CoverArtAttributes.fromJson(
+          json['attributes'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$_CoverToJson(_$_Cover instance) => <String, dynamic>{
+      'id': instance.id,
+      'attributes': instance.attributes,
+    };
+
+_$_CoverList _$$_CoverListFromJson(Map<String, dynamic> json) => _$_CoverList(
+      (json['data'] as List<dynamic>)
+          .map((e) => Cover.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      json['total'] as int,
+    );
+
+Map<String, dynamic> _$$_CoverListToJson(_$_CoverList instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'total': instance.total,
     };
 
 _$_MangaList _$$_MangaListFromJson(Map<String, dynamic> json) => _$_MangaList(

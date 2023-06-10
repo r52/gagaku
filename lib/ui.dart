@@ -203,6 +203,23 @@ class SettingCardWidget extends StatelessWidget {
 }
 
 class Styles {
+  static const List<Widget> loadingOverlay = [
+    Opacity(
+      opacity: 0.75,
+      child: ModalBarrier(dismissible: false, color: Colors.black),
+    ),
+    Center(
+      child: CircularProgressIndicator(),
+    ),
+  ];
+
+  static const listSpinner = Padding(
+    padding: EdgeInsets.symmetric(vertical: 5.0),
+    child: Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
   static Widget slideTransitionBuilder(
       BuildContext context,
       Animation<double> animation,

@@ -50,17 +50,21 @@ class LibraryListWidget extends HookConsumerWidget {
             ),
           ),
         ),
-        SliverGrid.extent(
-          maxCrossAxisExtent: 256,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 0.7,
-          children: item.children
-              .map((item) => _GridLibraryItem(
-                    item: item,
-                    onTap: onTap,
-                  ))
-              .toList(),
+        SliverGrid.builder(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 256,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (context, index) {
+            final i = item.children.elementAt(index);
+            return _GridLibraryItem(
+              item: i,
+              onTap: onTap,
+            );
+          },
+          itemCount: item.children.length,
         ),
       ],
     );

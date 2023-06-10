@@ -13,7 +13,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ReaderWidget extends HookConsumerWidget {
-  ReaderWidget({
+  const ReaderWidget({
     super.key,
     required this.pages,
     required this.pageCount,
@@ -31,10 +31,6 @@ class ReaderWidget extends HookConsumerWidget {
   final Widget? link;
   final VoidCallback? onLinkPressed;
   final String? externalUrl;
-
-  final ItemPositionsListener itemPositionsListener =
-      ItemPositionsListener.create();
-  final ItemScrollController itemScrollController = ItemScrollController();
 
   ItemPosition? _getListViewFirstShownPage(Iterable<ItemPosition> positions) {
     if (positions.isNotEmpty) {
@@ -79,6 +75,9 @@ class ReaderWidget extends HookConsumerWidget {
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
     final currentPage = useValueNotifier(0);
+    final itemPositionsListener = useItemPositionsListener();
+    final itemScrollController = useItemScrollController();
+    final scrollOffsetController = useScrollOffsetController();
 
     void cachePage(ReaderPage page) {
       precacheImage(page.provider, context);
@@ -87,14 +86,6 @@ class ReaderWidget extends HookConsumerWidget {
 
     final precacheCount = useCallback(() {
       return settings.precacheCount > 9 ? pageCount : settings.precacheCount;
-    }, [settings]);
-
-    final runOnce = useCallback(() {
-      pages.take(precacheCount()).forEach((element) {
-        cachePage(element);
-      });
-
-      return null;
     }, [settings]);
 
     void cachePages() {
@@ -249,19 +240,8 @@ class ReaderWidget extends HookConsumerWidget {
 
     KeyEventResult onTapTop(double offset) {
       if (isLongStrip) {
-        final positions = itemPositionsListener.itemPositions.value;
-        final min = _getListViewFirstShownPage(positions);
-
-        if (min != null) {
-          var off = offset / mediaContext.size.height;
-
-          if (min.index == 0 && min.itemLeadingEdge + off > 0.0) {
-            off = min.itemLeadingEdge.abs();
-          }
-
-          itemScrollController.jumpTo(
-              index: min.index, alignment: min.itemLeadingEdge + off);
-        }
+        scrollOffsetController.animateScroll(
+            offset: -offset, duration: const Duration(milliseconds: 50));
 
         return KeyEventResult.handled;
       }
@@ -298,13 +278,11 @@ class ReaderWidget extends HookConsumerWidget {
         final max = _getListViewLastShownPage(positions);
 
         if (max != null) {
-          final off = offset / mediaContext.size.height;
-
           if (max.index == pageCount - 1 && max.itemTrailingEdge == 1.0) {
             nav.pop();
           } else {
-            itemScrollController.jumpTo(
-                index: max.index, alignment: max.itemLeadingEdge - off);
+            scrollOffsetController.animateScroll(
+                offset: offset, duration: const Duration(milliseconds: 50));
           }
         }
 
@@ -655,6 +633,7 @@ class ReaderWidget extends HookConsumerWidget {
               return ScrollablePositionedList.builder(
                 itemScrollController: itemScrollController,
                 itemPositionsListener: itemPositionsListener,
+                scrollOffsetController: scrollOffsetController,
                 itemCount: pageCount,
                 itemBuilder: (BuildContext context, int index) {
                   final page = pages.elementAt(index);

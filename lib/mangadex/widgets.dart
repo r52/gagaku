@@ -43,6 +43,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
     final results = ref.watch(provider);
+    final isLoading = results.isLoading;
 
     useEffect(() {
       void controllerAtEdge() {
@@ -100,13 +101,14 @@ class ChapterFeedWidget extends HookConsumerWidget {
                       },
                     ),
                   ),
+                  if (isLoading) Styles.listSpinner,
                 ],
               ),
             ),
           );
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
+        loading: () => const Stack(
+          children: Styles.loadingOverlay,
         ),
         error: (err, stackTrace) {
           final messenger = ScaffoldMessenger.of(context);
@@ -122,7 +124,12 @@ class ChapterFeedWidget extends HookConsumerWidget {
               ),
           );
 
-          return Text('Error: $err');
+          return Column(
+            children: [
+              Text('Error: $err'),
+              Text(stackTrace.toString()),
+            ],
+          );
         },
       ),
     );
@@ -139,14 +146,11 @@ class ChapterFeedItem extends ConsumerWidget {
     final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final loggedin = ref
-        .watch(authControlProvider)
-        .maybeWhen(data: (loggedin) => loggedin, orElse: () => false);
+    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     Map<String, Set<String>> readData = {};
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).maybeWhen(
-          skipLoadingOnReload: true, data: (data) => data, orElse: () => {});
+      readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
     }
 
     final chapterBtns = state.chapters.map((e) {
@@ -157,8 +161,7 @@ class ChapterFeedItem extends ConsumerWidget {
           chapter: e,
           manga: state.manga,
           loggedin: loggedin,
-          isRead: readData.containsKey(state.manga.id) &&
-              readData[state.manga.id]?.contains(e.id) == true,
+          isRead: readData[state.manga.id]?.contains(e.id) ?? false,
           link: Text(
             state.manga.attributes.title.get('en'),
             style: const TextStyle(fontSize: 24),
@@ -514,37 +517,44 @@ class MangaListViewSliver extends ConsumerWidget {
 
     switch (view) {
       case MangaListView.list:
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              var manga = items.elementAt(index);
-
-              return _ListMangaItem(
-                manga: manga,
-              );
-            },
-            childCount: items.length,
-          ),
+        return SliverList.builder(
+          itemBuilder: (BuildContext context, int index) {
+            final manga = items.elementAt(index);
+            return _ListMangaItem(
+              manga: manga,
+            );
+          },
+          itemCount: items.length,
         );
       case MangaListView.detailed:
-        return SliverGrid.extent(
-          maxCrossAxisExtent: 1024,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: onMobilePortrait ? 1.0 : 3.0,
-          children: items
-              .map((manga) => _GridMangaDetailedItem(manga: manga))
-              .toList(),
+        return SliverGrid.builder(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 1024,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: onMobilePortrait ? 1.0 : 3.0,
+          ),
+          itemBuilder: (context, index) {
+            final manga = items.elementAt(index);
+            return _GridMangaDetailedItem(manga: manga);
+          },
+          itemCount: items.length,
         );
 
       case MangaListView.grid:
       default:
-        return SliverGrid.extent(
-          maxCrossAxisExtent: 256,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 0.7,
-          children: items.map((manga) => _GridMangaItem(manga: manga)).toList(),
+        return SliverGrid.builder(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 256,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (context, index) {
+            final manga = items.elementAt(index);
+            return _GridMangaItem(manga: manga);
+          },
+          itemCount: items.length,
         );
     }
   }
@@ -562,7 +572,7 @@ class _GridMangaItem extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       clipBehavior: Clip.antiAlias,
       child: ExtendedImage.network(
-        manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+        manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
         cache: true,
         loadStateChanged: extendedImageLoadStateHandler,
         width: 256.0,
@@ -645,7 +655,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                       nav.push(createMangaViewRoute(manga));
                     },
                     child: ExtendedImage.network(
-                        manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                        manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                         cache: true,
                         loadStateChanged: extendedImageLoadStateHandler,
                         width: screenSizeSmall ? 80.0 : 128.0),
@@ -657,16 +667,11 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                         Wrap(
                           runSpacing: 4.0,
                           children: [
-                            ContentRatingChip(
-                                rating: manga.attributes.contentRating),
                             ...stats.when(
                               skipLoadingOnReload: true,
                               data: (data) {
                                 if (data.containsKey(manga.id)) {
                                   return [
-                                    const SizedBox(
-                                      width: 4,
-                                    ),
                                     IconTextChip(
                                       icon: const Icon(
                                         Icons.star_border,
@@ -701,48 +706,46 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 }
 
                                 return [
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
                                   const IconTextChip(
                                     text: Text(statsError),
                                   )
                                 ];
                               },
                               error: (obj, stack) => [
-                                const SizedBox(
-                                  width: 4,
-                                ),
                                 const IconTextChip(
                                   text: Text(statsError),
                                 )
                               ],
                               loading: () => [
-                                const SizedBox(
-                                  width: 4,
-                                ),
                                 const IconTextChip(
                                   text: CircularProgressIndicator(),
                                 )
                               ],
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 10),
                             MangaStatusChip(status: manga.attributes.status),
                           ],
                         ),
                         const SizedBox(
-                          height: 2,
+                          height: 4.0,
                         ),
                         Wrap(
-                            children: manga.attributes.tags
+                          runSpacing: 4.0,
+                          children: [
+                            ContentRatingChip(
+                                rating: manga.attributes.contentRating),
+                            const SizedBox(width: 2.0),
+                            ...manga.attributes.tags
                                 .map((e) => Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 2.0, horizontal: 2.0),
+                                          horizontal: 2.0),
                                       child: IconTextChip(
                                           text: Text(
                                               e.attributes.name.get('en'))),
                                     ))
-                                .toList()),
+                                .toList(),
+                          ],
+                        ),
                         if (manga.attributes.description.isNotEmpty)
                           Expanded(
                             child: Padding(
@@ -789,7 +792,7 @@ class _ListMangaItem extends ConsumerWidget {
                 nav.push(createMangaViewRoute(manga));
               },
               child: ExtendedImage.network(
-                manga.getCovertArtUrl(quality: CoverArtQuality.medium),
+                manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                 cache: true,
                 loadStateChanged: extendedImageLoadStateHandler,
                 width: 80.0,
@@ -819,14 +822,32 @@ class _ListMangaItem extends ConsumerWidget {
                     runSpacing: 4.0,
                     children: [
                       ContentRatingChip(rating: manga.attributes.contentRating),
+                      const SizedBox(width: 2),
+                      if (manga.attributes.tags.isNotEmpty)
+                        ...manga.attributes.tags
+                            .where((tag) =>
+                                (tag.attributes.group == TagGroup.genre ||
+                                    tag.attributes.group == TagGroup.theme))
+                            .map((e) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  child: IconTextChip(
+                                      text: Text(e.attributes.name.get('en'))),
+                                ))
+                            .toList(),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Wrap(
+                    runSpacing: 4.0,
+                    children: [
                       ...stats.when(
                         skipLoadingOnReload: true,
                         data: (data) {
                           if (data.containsKey(manga.id)) {
                             return [
-                              const SizedBox(
-                                width: 4,
-                              ),
                               IconTextChip(
                                 icon: const Icon(
                                   Icons.star_border,
@@ -845,7 +866,7 @@ class _ListMangaItem extends ConsumerWidget {
                                 ),
                               ),
                               const SizedBox(
-                                width: 4,
+                                width: 5,
                               ),
                               IconTextChip(
                                 icon: const Icon(
@@ -861,35 +882,26 @@ class _ListMangaItem extends ConsumerWidget {
                           }
 
                           return [
-                            const SizedBox(
-                              width: 4,
-                            ),
                             const IconTextChip(
                               text: Text(statsError),
                             )
                           ];
                         },
                         error: (obj, stack) => [
-                          const SizedBox(
-                            width: 4,
-                          ),
                           const IconTextChip(
                             text: Text(statsError),
                           )
                         ],
                         loading: () => [
-                          const SizedBox(
-                            width: 4,
-                          ),
                           const IconTextChip(
                             text: CircularProgressIndicator(),
                           )
                         ],
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 10),
                       MangaStatusChip(status: manga.attributes.status),
                     ],
-                  )
+                  ),
                 ],
               ),
             )

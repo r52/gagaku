@@ -10,6 +10,26 @@ part 'types.g.dart';
 typedef LocalizedString = Map<String, String>;
 typedef LibraryMap = Map<String, MangaReadingStatus>;
 typedef ReadChaptersMap = Map<String, Set<String>>;
+typedef CoverArtUrl = String;
+
+extension CoverArtUrlExt on CoverArtUrl {
+  String quality({CoverArtQuality quality = CoverArtQuality.best}) {
+    var cv = this;
+
+    switch (quality) {
+      case CoverArtQuality.best:
+        break;
+      case CoverArtQuality.medium:
+        cv += '.512.jpg';
+        break;
+      case CoverArtQuality.small:
+        cv += '.256.jpg';
+        break;
+    }
+
+    return cv;
+  }
+}
 
 extension LocalizedStringExt on LocalizedString {
   String get(String code) {
@@ -351,6 +371,7 @@ class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
 @freezed
 class CoverArtAttributes with _$CoverArtAttributes {
   const factory CoverArtAttributes({
+    String? volume,
     required String fileName,
   }) = _CoverArtAttributes;
 
@@ -437,6 +458,27 @@ class ChapterAPI with _$ChapterAPI {
 }
 
 @freezed
+class Cover with _$Cover {
+  const factory Cover({
+    required String id,
+    required CoverArtAttributes attributes,
+  }) = _Cover;
+
+  factory Cover.fromJson(Map<String, dynamic> json) => _$CoverFromJson(json);
+}
+
+@freezed
+class CoverList with _$CoverList {
+  const factory CoverList(
+    List<Cover> data,
+    int total,
+  ) = _CoverList;
+
+  factory CoverList.fromJson(Map<String, dynamic> json) =>
+      _$CoverListFromJson(json);
+}
+
+@freezed
 class MangaList with _$MangaList {
   const factory MangaList(
     List<Manga> data,
@@ -462,32 +504,46 @@ class Manga with _$Manga {
   late final String? author = getAuthor();
   late final String? artist = getArtist();
   late final longStrip = isLongStrip();
+  late final covers = getAllCoverArt();
 
-  String getCovertArtUrl({CoverArtQuality quality = CoverArtQuality.best}) {
-    var coverArt =
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
+  List<CoverArtUrl> getAllCoverArt() {
+    final coverRelations = <CoverArtAttributes>[];
 
-    final coverArtR = relationships.where((element) => element.maybeWhen(
-        cover: (id, attributes) => true, orElse: () => false));
-
-    if (coverArtR.isNotEmpty) {
-      final rel = coverArtR.first
-          .maybeWhen(cover: (id, attributes) => attributes, orElse: () => null);
-      coverArt = "https://uploads.mangadex.org/covers/$id/${rel?.fileName}";
-
-      switch (quality) {
-        case CoverArtQuality.best:
-          break;
-        case CoverArtQuality.medium:
-          coverArt += '.512.jpg';
-          break;
-        case CoverArtQuality.small:
-          coverArt += '.256.jpg';
-          break;
+    for (final r in relationships) {
+      final cr = r.maybeWhen(
+          cover: (id, attributes) => attributes, orElse: () => null);
+      if (cr != null) {
+        coverRelations.add(cr);
       }
     }
 
-    return coverArt;
+    if (coverRelations.isNotEmpty) {
+      final covers = <CoverArtUrl>[];
+
+      for (final rel in coverRelations) {
+        covers.add('https://uploads.mangadex.org/covers/$id/${rel.fileName}');
+      }
+
+      return covers;
+    }
+
+    return [];
+  }
+
+  String getFirstCoverUrl({CoverArtQuality quality = CoverArtQuality.best}) {
+    if (covers.isEmpty) {
+      return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
+    }
+
+    return covers.first.quality(quality: quality);
+  }
+
+  CoverArtUrl getUrlFromCover(Cover cover,
+      {CoverArtQuality quality = CoverArtQuality.best}) {
+    final filename = cover.attributes.fileName;
+
+    return 'https://uploads.mangadex.org/covers/$id/$filename'
+        .quality(quality: quality);
   }
 
   String? getAuthor() {
@@ -644,7 +700,7 @@ class PageData {
 class ChapterFeedItemData {
   ChapterFeedItemData({required this.manga})
       : mangaId = manga.id,
-        coverArt = manga.getCovertArtUrl(quality: CoverArtQuality.medium);
+        coverArt = manga.getFirstCoverUrl(quality: CoverArtQuality.medium);
 
   final Manga manga;
   final String mangaId;
