@@ -1146,6 +1146,11 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 
   ///Fetch the latest chapters list based on offset
   Future<List<Chapter>> _fetchLatestChapters(int offset) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return [];
+    }
+
     final api = ref.watch(mangadexProvider);
     var chapters = await api.fetchChapterFeed(offset, true);
 
@@ -1359,6 +1364,11 @@ class MangaCovers extends _$MangaCovers {
 class ReadChapters extends _$ReadChapters {
   ///Fetch the latest chapters list based on offset
   Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return {};
+    }
+
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchReadChapters(mangas);
     return map;
@@ -1383,6 +1393,11 @@ class ReadChapters extends _$ReadChapters {
   /// Sets a list of chapters for a manga read or unread
   Future<void> set(
       Manga manga, Iterable<Chapter> chapters, bool setRead) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
     final api = ref.watch(mangadexProvider);
     final oldstate = state.valueOrNull ?? {};
 
@@ -1429,6 +1444,11 @@ class UserLibrary extends _$UserLibrary {
 
   ///Fetch the manga chapters list based on offset
   Future<Iterable<Manga>> _fetchUserLibrary() async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return [];
+    }
+
     final api = ref.watch(mangadexProvider);
     final library = await api.fetchUserLibrary();
 
@@ -1615,6 +1635,11 @@ class Statistics extends _$Statistics {
 @Riverpod(keepAlive: true)
 class ReadingStatus extends _$ReadingStatus {
   Future<MangaReadingStatus?> _fetchReadingStatus() async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return null;
+    }
+
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaReadingStatus(manga);
 
@@ -1627,6 +1652,11 @@ class ReadingStatus extends _$ReadingStatus {
   }
 
   Future<void> set(MangaReadingStatus? status) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
     final api = ref.watch(mangadexProvider);
     final oldstate = state.valueOrNull;
     state = const AsyncValue.loading();
@@ -1646,6 +1676,11 @@ class ReadingStatus extends _$ReadingStatus {
 @Riverpod(keepAlive: true)
 class FollowingStatus extends _$FollowingStatus {
   Future<bool> _fetchFollowingStatus() async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return false;
+    }
+
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaFollowing(manga);
 
@@ -1658,6 +1693,11 @@ class FollowingStatus extends _$FollowingStatus {
   }
 
   Future<void> set(bool following) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
     final api = ref.watch(mangadexProvider);
     final oldstate = state.valueOrNull ?? false;
     state = const AsyncValue.loading();
