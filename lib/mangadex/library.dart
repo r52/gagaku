@@ -20,10 +20,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final type = ref.watch(libraryViewTypeProvider);
     final results = ref.watch(userLibraryProvider(type));
-    final isLoading = results.maybeWhen(
-      loading: () => true,
-      orElse: () => false,
-    );
+    final isLoading = results.isLoading;
 
     return Scaffold(
       body: Center(

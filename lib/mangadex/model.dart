@@ -799,8 +799,8 @@ class MangaDexModel {
 
         final cmap = body['data'] as Map<String, dynamic>;
 
-        final readmap = cmap.map((key, value) => MapEntry(
-            key, (value as List<dynamic>).map((e) => e.toString()).toSet()));
+        final readmap = cmap.map((key, value) =>
+            MapEntry(key, List<String>.from(value as List<dynamic>).toSet()));
 
         return readmap;
       } else {
@@ -1163,8 +1163,7 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
       return;
     }
 
-    final oldstate =
-        state.maybeWhen(data: (data) => data.length, orElse: () => 0);
+    final oldstate = state.valueOrNull?.length ?? 0;
     // If there is more content, get more
     if (oldstate == _offset + MangaDexEndpoints.apiQueryLimit && !_atEnd) {
       state = const AsyncValue.loading();
@@ -1221,8 +1220,7 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
       return;
     }
 
-    final oldstate =
-        state.maybeWhen(data: (data) => data.length, orElse: () => 0);
+    final oldstate = state.valueOrNull?.length ?? 0;
     // If there is more content, get more
     if (oldstate == _offset + MangaDexEndpoints.apiQueryLimit && !_atEnd) {
       state = const AsyncValue.loading();
@@ -1279,7 +1277,7 @@ class MangaChapters extends _$MangaChapters {
       return;
     }
 
-    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    final oldstate = state.valueOrNull;
     // If there is more content, get more
     if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -1335,8 +1333,7 @@ class MangaCovers extends _$MangaCovers {
       return;
     }
 
-    final oldstate =
-        state.maybeWhen(data: (data) => data, orElse: () => <Cover>[]);
+    final oldstate = state.valueOrNull ?? [];
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiSearchLimit &&
         !_atEnd) {
@@ -1363,7 +1360,6 @@ class ReadChapters extends _$ReadChapters {
   ///Fetch the latest chapters list based on offset
   Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
     final api = ref.watch(mangadexProvider);
-
     final map = await api.fetchReadChapters(mangas);
     return map;
   }
@@ -1375,8 +1371,7 @@ class ReadChapters extends _$ReadChapters {
 
   /// Fetch read chapters for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
-    final oldstate = state.maybeWhen(
-        data: (data) => data, orElse: () => <String, Set<String>>{});
+    final oldstate = state.valueOrNull ?? {};
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
@@ -1389,9 +1384,7 @@ class ReadChapters extends _$ReadChapters {
   Future<void> set(
       Manga manga, Iterable<Chapter> chapters, bool setRead) async {
     final api = ref.watch(mangadexProvider);
-
-    final oldstate = state.maybeWhen(
-        data: (data) => data, orElse: () => <String, Set<String>>{});
+    final oldstate = state.valueOrNull ?? {};
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -1402,24 +1395,28 @@ class ReadChapters extends _$ReadChapters {
         final keyExists = oldstate.containsKey(manga.id);
 
         // Refresh
-        if (setRead) {
-          if (keyExists) {
-            oldstate[manga.id]?.addAll(chapIdSet);
-          } else {
-            oldstate[manga.id] = chapIdSet;
+        if (keyExists) {
+          switch (setRead) {
+            case true:
+              oldstate[manga.id]?.addAll(chapIdSet);
+              break;
+            case false:
+              oldstate[manga.id]?.removeAll(chapIdSet);
+              break;
           }
         } else {
-          if (keyExists) {
-            oldstate[manga.id]?.removeAll(chapIdSet);
-          } else {
-            oldstate[manga.id] = {};
+          switch (setRead) {
+            case true:
+              oldstate[manga.id] = chapIdSet;
+              break;
+            case false:
+              oldstate[manga.id] = {};
+              break;
           }
         }
-
-        return {...oldstate};
       }
 
-      return oldstate;
+      return {...oldstate};
     });
   }
 }
@@ -1433,7 +1430,6 @@ class UserLibrary extends _$UserLibrary {
   ///Fetch the manga chapters list based on offset
   Future<Iterable<Manga>> _fetchUserLibrary() async {
     final api = ref.watch(mangadexProvider);
-
     final library = await api.fetchUserLibrary();
 
     if (library == null) {
@@ -1488,7 +1484,7 @@ class UserLibrary extends _$UserLibrary {
       return;
     }
 
-    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    final oldstate = state.valueOrNull;
     // If there is more content, get more
     if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -1567,7 +1563,7 @@ class MangaSearch extends _$MangaSearch {
       return;
     }
 
-    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    final oldstate = state.valueOrNull;
     // If there is more content, get more
     if (oldstate?.length == _offset + MangaDexEndpoints.apiSearchLimit &&
         !_atEnd) {
@@ -1606,8 +1602,7 @@ class Statistics extends _$Statistics {
 
   /// Fetch statistics for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
-    final oldstate = state.maybeWhen(
-        data: (data) => data, orElse: () => <String, MangaStatistics>{});
+    final oldstate = state.valueOrNull ?? {};
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
@@ -1633,7 +1628,7 @@ class ReadingStatus extends _$ReadingStatus {
 
   Future<void> set(MangaReadingStatus? status) async {
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => null);
+    final oldstate = state.valueOrNull;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       MangaReadingStatus? resolved =
@@ -1664,7 +1659,7 @@ class FollowingStatus extends _$FollowingStatus {
 
   Future<void> set(bool following) async {
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.maybeWhen(data: (data) => data, orElse: () => false);
+    final oldstate = state.valueOrNull ?? false;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       bool success = await api.setMangaFollowing(manga, following);
@@ -1695,7 +1690,7 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final chapters = await api.fetchChapters(uuids);
 
-    return Queue<Chapter>.from(chapters);
+    return Queue.of(chapters);
   }
 
   @override
@@ -1704,26 +1699,27 @@ class MangaDexHistory extends _$MangaDexHistory {
   }
 
   Future<void> add(Chapter chapter) async {
-    final oldstate =
-        state.maybeWhen(data: (data) => data, orElse: () => Queue<Chapter>());
+    final oldstate = state.valueOrNull ?? Queue<Chapter>();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      while (oldstate.contains(chapter)) {
-        oldstate.remove(chapter);
+      final cpy = Queue.of(oldstate);
+
+      while (cpy.contains(chapter)) {
+        cpy.remove(chapter);
       }
 
-      oldstate.addFirst(chapter);
+      cpy.addFirst(chapter);
 
-      while (oldstate.length > _numItems) {
-        oldstate.removeLast();
+      while (cpy.length > _numItems) {
+        cpy.removeLast();
       }
 
-      final uuids = oldstate.map((e) => e.id).toList();
+      final uuids = cpy.map((e) => e.id).toList();
 
       final box = Hive.box(gagakuBox);
       await box.put('mangadex_history', json.encode(uuids));
 
-      return oldstate;
+      return cpy;
     });
   }
 }

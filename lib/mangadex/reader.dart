@@ -55,6 +55,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pages = ref.watch(_fetchChapterPagesProvider(chapter));
+    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
 
     String title = '';
 
@@ -66,23 +67,24 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       title += ' - ${chapter.attributes.title!}';
     }
 
+    Map<String, Set<String>> readData = {};
+
+    if (loggedin) {
+      readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
+    }
+
     return pages.when(
       skipLoadingOnReload: true,
       data: (result) {
-        ref.read(authControlProvider).whenData((loggedin) {
-          if (loggedin) {
-            ref.read(readChaptersProvider).whenData((read) {
-              if (!read.containsKey(manga.id) ||
-                  read[manga.id]?.contains(chapter.id) == false) {
-                Future.delayed(
-                    const Duration(seconds: 3),
-                    () => ref
-                        .read(readChaptersProvider.notifier)
-                        .set(manga, [chapter], true));
-              }
-            });
+        if (loggedin) {
+          if (readData[manga.id]?.contains(chapter.id) != true) {
+            Future.delayed(
+                const Duration(seconds: 3),
+                () => ref
+                    .read(readChaptersProvider.notifier)
+                    .set(manga, [chapter], true));
           }
-        });
+        }
 
         Future.delayed(const Duration(seconds: 1),
             () => ref.read(mangaDexHistoryProvider.notifier).add(chapter));

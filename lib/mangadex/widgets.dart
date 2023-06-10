@@ -43,10 +43,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
     final results = ref.watch(provider);
-    final isLoading = results.maybeWhen(
-      loading: () => true,
-      orElse: () => false,
-    );
+    final isLoading = results.isLoading;
 
     useEffect(() {
       void controllerAtEdge() {
@@ -149,14 +146,11 @@ class ChapterFeedItem extends ConsumerWidget {
     final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final loggedin = ref
-        .watch(authControlProvider)
-        .maybeWhen(data: (loggedin) => loggedin, orElse: () => false);
+    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     Map<String, Set<String>> readData = {};
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).maybeWhen(
-          skipLoadingOnReload: true, data: (data) => data, orElse: () => {});
+      readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
     }
 
     final chapterBtns = state.chapters.map((e) {
@@ -167,8 +161,7 @@ class ChapterFeedItem extends ConsumerWidget {
           chapter: e,
           manga: state.manga,
           loggedin: loggedin,
-          isRead: readData.containsKey(state.manga.id) &&
-              readData[state.manga.id]?.contains(e.id) == true,
+          isRead: readData[state.manga.id]?.contains(e.id) ?? false,
           link: Text(
             state.manga.attributes.title.get('en'),
             style: const TextStyle(fontSize: 24),

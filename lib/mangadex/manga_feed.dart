@@ -36,10 +36,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final results = ref.watch(_fetchMangaFeedProvider);
-    final isLoading = results.maybeWhen(
-      loading: () => true,
-      orElse: () => false,
-    );
+    final isLoading = results.isLoading;
 
     return Center(
       child: Stack(

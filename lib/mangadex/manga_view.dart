@@ -45,9 +45,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authControlProvider);
-    final loggedin =
-        auth.maybeWhen(data: (loggedin) => loggedin, orElse: () => false);
+    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     final scrollController = useScrollController();
     final theme = Theme.of(context);
     final view = useState(_ViewType.chapters);
@@ -57,26 +55,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     Map<String, Set<String>> readData = {};
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).maybeWhen(
-          skipLoadingOnReload: true, data: (data) => data, orElse: () => {});
+      readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
     }
 
     final chapters = ref.watch(mangaChaptersProvider(manga));
     final covers = ref.watch(mangaCoversProvider(manga));
 
-    final isLoading = chapters.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        ) ||
-        covers.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        );
-
-    final coverList = covers.maybeWhen(
-        skipLoadingOnReload: true,
-        data: (data) => data,
-        orElse: () => <Cover>[]);
+    final isLoading = chapters.isLoading || covers.isLoading;
 
     String? lastvolchap;
 
@@ -156,15 +141,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             actions: () {
               if (loggedin) {
                 final following =
-                    ref.watch(followingStatusProvider(manga)).maybeWhen(
-                          data: (following) => following,
-                          orElse: () => false,
-                        );
+                    ref.watch(followingStatusProvider(manga)).valueOrNull ??
+                        false;
                 final reading =
-                    ref.watch(readingStatusProvider(manga)).maybeWhen(
-                          data: (reading) => reading,
-                          orElse: () => null,
-                        );
+                    ref.watch(readingStatusProvider(manga)).valueOrNull;
 
                 if (!following && reading == null) {
                   return [
@@ -629,8 +609,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       chapter: thischap,
                       manga: manga,
                       loggedin: loggedin,
-                      isRead: readData.containsKey(manga.id) &&
-                          readData[manga.id]?.contains(thischap.id) == true,
+                      isRead:
+                          readData[manga.id]?.contains(thischap.id) ?? false,
                       link: Text(
                         manga.attributes.title.get('en'),
                         style: const TextStyle(fontSize: 24),
@@ -733,66 +713,102 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               },
             ),
           if (view.value == _ViewType.art)
-            SliverGrid.builder(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 256,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.7,
-              ),
-              itemBuilder: (context, index) {
-                final cover = coverList.elementAt(index);
-                return _CoverArtItem(
-                  cover: cover,
-                  manga: manga,
-                  page: index,
-                  onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute<void>(builder: (context) {
-                      return Scaffold(
-                        body: ExtendedImageGesturePageView.builder(
-                          itemBuilder: (BuildContext context, int id) {
-                            final item = coverList.elementAt(id);
-                            final url = manga.getUrlFromCover(item);
-                            Widget image = ExtendedImage.network(
-                              url,
-                              fit: BoxFit.contain,
-                              mode: ExtendedImageMode.gesture,
-                              enableSlideOutPage: true,
-                              loadStateChanged: extendedImageLoadStateHandler,
-                            );
+            covers.when(
+              data: (coverList) {
+                return SliverGrid.builder(
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 256,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemBuilder: (context, index) {
+                    final cover = coverList.elementAt(index);
+                    return _CoverArtItem(
+                      cover: cover,
+                      manga: manga,
+                      page: index,
+                      onTap: () {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute<void>(builder: (context) {
+                          return Scaffold(
+                            body: ExtendedImageGesturePageView.builder(
+                              itemBuilder: (BuildContext context, int id) {
+                                final item = coverList.elementAt(id);
+                                final url = manga.getUrlFromCover(item);
+                                Widget image = ExtendedImage.network(
+                                  url,
+                                  fit: BoxFit.contain,
+                                  mode: ExtendedImageMode.gesture,
+                                  enableSlideOutPage: true,
+                                  loadStateChanged:
+                                      extendedImageLoadStateHandler,
+                                );
 
-                            image = Container(
-                              padding: const EdgeInsets.all(5.0),
-                              child: GestureDetector(
-                                child: image,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
+                                image = Container(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: GestureDetector(
+                                    child: image,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                );
+
+                                if (id == index) {
+                                  return Hero(
+                                    tag: url,
+                                    child: image,
+                                  );
+                                } else {
+                                  return image;
+                                }
+                              },
+                              itemCount: coverList.length,
+                              controller: ExtendedPageController(
+                                initialPage: index,
                               ),
-                            );
-
-                            if (id == index) {
-                              return Hero(
-                                tag: url,
-                                child: image,
-                              );
-                            } else {
-                              return image;
-                            }
-                          },
-                          itemCount: coverList.length,
-                          controller: ExtendedPageController(
-                            initialPage: index,
-                          ),
-                          scrollDirection: Axis.horizontal,
-                        ),
-                      );
-                    }));
+                              scrollDirection: Axis.horizontal,
+                            ),
+                          );
+                        }));
+                      },
+                    );
                   },
+                  itemCount: coverList.length,
                 );
               },
-              itemCount: coverList.length,
+              loading: () => const SliverToBoxAdapter(
+                child: SizedBox.shrink(),
+              ),
+              error: (err, stackTrace) {
+                // Invalidate the provider results on error
+                ref.invalidate(mangaCoversProvider(manga));
+
+                final messenger = ScaffoldMessenger.of(context);
+                Future.delayed(
+                  Duration.zero,
+                  () => messenger
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text('$err'),
+                        backgroundColor: Colors.red,
+                      ),
+                    ),
+                );
+
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text('Error: $err'),
+                        Text(stackTrace.toString()),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           if (isLoading)
             const SliverToBoxAdapter(
