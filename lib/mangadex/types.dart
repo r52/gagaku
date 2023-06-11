@@ -282,6 +282,21 @@ class Languages {
   }
 }
 
+mixin MangaDexUUID {
+  String get id;
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MangaDexUUID &&
+            (identical(other.id, id) || other.id == id));
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+}
+
 @freezed
 class ChapterList with _$ChapterList {
   const factory ChapterList(
@@ -294,7 +309,7 @@ class ChapterList with _$ChapterList {
 }
 
 @freezed
-class Chapter with _$Chapter {
+class Chapter with _$Chapter, MangaDexUUID {
   const Chapter._();
 
   const factory Chapter({
@@ -307,14 +322,18 @@ class Chapter with _$Chapter {
       _$ChapterFromJson(json);
 
   Iterable<String> getGroups() {
-    final groups = relationships.where((element) => element.maybeWhen(
-        group: (id, attributes) => true, orElse: () => false));
+    final groups = relationships.where((element) => switch (element) {
+          RelationshipGroup() => true,
+          _ => false,
+        });
 
     final groupNames = <String>{};
     if (groups.isNotEmpty) {
       for (final g in groups) {
-        groupNames.add(g.maybeWhen(
-            group: (id, attributes) => attributes.name, orElse: () => ''));
+        groupNames.add(switch (g) {
+          RelationshipGroup(:final attributes) => attributes.name,
+          _ => '',
+        });
       }
 
       return groupNames;
@@ -324,11 +343,16 @@ class Chapter with _$Chapter {
   }
 
   String getMangaID() {
-    final mangas = relationships.where((element) =>
-        element.maybeWhen(manga: (id) => true, orElse: () => false));
+    final mangas = relationships.where((element) => switch (element) {
+          RelationshipManga() => true,
+          _ => false,
+        });
 
     if (mangas.isNotEmpty) {
-      final m = mangas.first.maybeWhen(manga: (id) => id, orElse: () => '');
+      final m = switch (mangas.first) {
+        RelationshipManga(:final id) => id,
+        _ => '',
+      };
       return m;
     }
 
@@ -390,7 +414,7 @@ class NamedAttributes with _$NamedAttributes {
 }
 
 @Freezed(unionKey: 'type')
-class Relationship with _$Relationship {
+class Relationship with _$Relationship, MangaDexUUID {
   const factory Relationship.manga({
     required String id,
   }) = RelationshipManga;
@@ -458,7 +482,7 @@ class ChapterAPI with _$ChapterAPI {
 }
 
 @freezed
-class Cover with _$Cover {
+class Cover with _$Cover, MangaDexUUID {
   const factory Cover({
     required String id,
     required CoverArtAttributes attributes,
@@ -490,7 +514,7 @@ class MangaList with _$MangaList {
 }
 
 @freezed
-class Manga with _$Manga {
+class Manga with _$Manga, MangaDexUUID {
   Manga._();
 
   factory Manga({
@@ -510,8 +534,11 @@ class Manga with _$Manga {
     final coverRelations = <CoverArtAttributes>[];
 
     for (final r in relationships) {
-      final cr = r.maybeWhen(
-          cover: (id, attributes) => attributes, orElse: () => null);
+      final cr = switch (r) {
+        RelationshipCoverArt(:final attributes) => attributes,
+        _ => null,
+      };
+
       if (cr != null) {
         coverRelations.add(cr);
       }
@@ -547,12 +574,16 @@ class Manga with _$Manga {
   }
 
   String? getAuthor() {
-    final authorRs = relationships.where((element) => element.maybeWhen(
-        author: (id, attributes) => true, orElse: () => false));
+    final authorRs = relationships.where((element) => switch (element) {
+          RelationshipAuthor() => true,
+          _ => false,
+        });
 
     if (authorRs.isNotEmpty) {
-      final rel = authorRs.first.maybeWhen(
-          author: (id, attributes) => attributes, orElse: () => null);
+      final rel = switch (authorRs.first) {
+        RelationshipAuthor(:final attributes) => attributes,
+        _ => null,
+      };
 
       return rel?.name;
     }
@@ -561,12 +592,16 @@ class Manga with _$Manga {
   }
 
   String? getArtist() {
-    final artistRs = relationships.where((element) => element.maybeWhen(
-        artist: (id, attributes) => true, orElse: () => false));
+    final artistRs = relationships.where((element) => switch (element) {
+          RelationshipArtist() => true,
+          _ => false,
+        });
 
     if (artistRs.isNotEmpty) {
-      final rel = artistRs.first.maybeWhen(
-          artist: (id, attributes) => attributes, orElse: () => null);
+      final rel = switch (artistRs.first) {
+        RelationshipArtist(:final attributes) => attributes,
+        _ => null,
+      };
 
       return rel?.name;
     }
@@ -614,7 +649,7 @@ class MangaAttributes with _$MangaAttributes {
 }
 
 @freezed
-class Tag with _$Tag {
+class Tag with _$Tag, MangaDexUUID {
   const factory Tag({
     required String id,
     required TagAttributes attributes,

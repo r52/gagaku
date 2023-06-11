@@ -1,3 +1,5 @@
+import 'package:gagaku/mangadex/types.dart';
+
 /// A simple in-memory cache for temporarily storing MangaDex data.
 /// Mainly to stop gagaku from querying the API for the same stuff
 /// too often.
@@ -77,9 +79,8 @@ class CacheManager {
   }
 
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
-  void putAllAPIResolved(Iterable<dynamic> list, [int expiry = 10]) {
-    final resolved =
-        list.map((e) => MapEntry(e.id as String, CacheEntry(e, expiry)));
+  void putAllAPIResolved(Iterable<MangaDexUUID> list, [int expiry = 10]) {
+    final resolved = list.map((e) => MapEntry(e.id, CacheEntry(e, expiry)));
     _cache.addEntries(resolved);
 
     if (_cache.length > _preferredMaxEntries) {
@@ -89,10 +90,10 @@ class CacheManager {
 
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
   /// if requested, as a part of a special query given by [key]
-  void putSpecialList(String key, Iterable<dynamic> list,
+  void putSpecialList(String key, Iterable<MangaDexUUID> list,
       {bool resolve = true, int expiry = 10}) {
     // Transform data list to a list of uuids
-    final ids = list.map((e) => e.id as String).toList();
+    final ids = list.map((e) => e.id).toList();
     _cache[key] = CacheEntry(ids, expiry); // Just overwrite it
 
     if (resolve) {
