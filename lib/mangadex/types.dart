@@ -294,7 +294,7 @@ mixin MangaDexUUID {
   }
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => Object.hash(runtimeType, id);
 }
 
 @freezed
