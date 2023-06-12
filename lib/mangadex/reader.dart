@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/reader/main.dart';
@@ -56,6 +59,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pages = ref.watch(_fetchChapterPagesProvider(chapter));
     final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
+    final timer = useRef<Timer?>(null);
 
     String title = '';
 
@@ -73,22 +77,23 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
     }
 
+    useEffect(() {
+      if (timer.value?.isActive ?? false) timer.value?.cancel();
+
+      timer.value = Timer(const Duration(milliseconds: 2000), () {
+        if (readData[manga.id]?.contains(chapter.id) != true) {
+          ref.read(readChaptersProvider.notifier).set(manga, [chapter], true);
+        }
+
+        ref.read(mangaDexHistoryProvider.notifier).add(chapter);
+      });
+
+      return () => timer.value?.cancel();
+    }, [chapter]);
+
     return pages.when(
       skipLoadingOnReload: true,
       data: (result) {
-        if (loggedin) {
-          if (readData[manga.id]?.contains(chapter.id) != true) {
-            Future.delayed(
-                const Duration(seconds: 3),
-                () => ref
-                    .read(readChaptersProvider.notifier)
-                    .set(manga, [chapter], true));
-          }
-        }
-
-        Future.delayed(const Duration(seconds: 1),
-            () => ref.read(mangaDexHistoryProvider.notifier).add(chapter));
-
         return ReaderWidget(
           pages: result,
           pageCount: result.length,

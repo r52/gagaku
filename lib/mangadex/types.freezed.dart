@@ -972,23 +972,6 @@ class _$_Chapter extends _Chapter with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('relationships', relationships));
   }
 
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_Chapter &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes) &&
-            const DeepCollectionEquality()
-                .equals(other._relationships, _relationships));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes,
-      const DeepCollectionEquality().hash(_relationships));
-
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
@@ -2130,18 +2113,6 @@ class _$RelationshipManga
       ..add(DiagnosticsProperty('id', id));
   }
 
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$RelationshipManga &&
-            (identical(other.id, id) || other.id == id));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id);
-
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
@@ -2326,18 +2297,6 @@ class _$RelationshipUser
       ..add(DiagnosticsProperty('type', 'Relationship.user'))
       ..add(DiagnosticsProperty('id', id));
   }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$RelationshipUser &&
-            (identical(other.id, id) || other.id == id));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id);
 
   @JsonKey(ignore: true)
   @override
@@ -2542,20 +2501,6 @@ class _$RelationshipArtist
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$RelationshipArtist &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes);
 
   @JsonKey(ignore: true)
   @override
@@ -2764,20 +2709,6 @@ class _$RelationshipAuthor
       ..add(DiagnosticsProperty('attributes', attributes));
   }
 
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$RelationshipAuthor &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes);
-
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
@@ -2965,18 +2896,6 @@ class _$RelationshipCreator
       ..add(DiagnosticsProperty('type', 'Relationship.creator'))
       ..add(DiagnosticsProperty('id', id));
   }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$RelationshipCreator &&
-            (identical(other.id, id) || other.id == id));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id);
 
   @JsonKey(ignore: true)
   @override
@@ -3182,20 +3101,6 @@ class _$RelationshipCoverArt
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$RelationshipCoverArt &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes);
 
   @JsonKey(ignore: true)
   @override
@@ -3403,20 +3308,6 @@ class _$RelationshipGroup
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$RelationshipGroup &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes);
 
   @JsonKey(ignore: true)
   @override
@@ -4050,20 +3941,6 @@ class _$_Cover with DiagnosticableTreeMixin implements _Cover {
       ..add(DiagnosticsProperty('attributes', attributes));
   }
 
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_Cover &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes);
-
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
@@ -4583,23 +4460,6 @@ class _$_Manga extends _Manga with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('attributes', attributes))
       ..add(DiagnosticsProperty('relationships', relationships));
   }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_Manga &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes) &&
-            const DeepCollectionEquality()
-                .equals(other._relationships, _relationships));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes,
-      const DeepCollectionEquality().hash(_relationships));
 
   @JsonKey(ignore: true)
   @override
@@ -5289,20 +5149,6 @@ class _$_Tag with DiagnosticableTreeMixin implements _Tag {
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_Tag &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes));
-  }
-
-  @JsonKey(ignore: true)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes);
 
   @JsonKey(ignore: true)
   @override

@@ -1164,6 +1164,10 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 
   /// Fetch more latest chapters if more data exists
   Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
     if (_atEnd) {
       return;
     }
@@ -1221,6 +1225,10 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
 
   /// Fetch more latest chapters if more data exists
   Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
     if (_atEnd) {
       return;
     }
@@ -1278,6 +1286,10 @@ class MangaChapters extends _$MangaChapters {
 
   /// Fetch more chapters if more data exists
   Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
     if (_atEnd) {
       return;
     }
@@ -1334,6 +1346,10 @@ class MangaCovers extends _$MangaCovers {
 
   /// Fetch more chapters if more data exists
   Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
     if (_atEnd) {
       return;
     }
@@ -1381,6 +1397,11 @@ class ReadChapters extends _$ReadChapters {
 
   /// Fetch read chapters for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
     final oldstate = state.valueOrNull ?? {};
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -1396,6 +1417,11 @@ class ReadChapters extends _$ReadChapters {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return;
+    }
+
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
     }
 
     final api = ref.watch(mangadexProvider);
@@ -1500,6 +1526,10 @@ class UserLibrary extends _$UserLibrary {
 
   /// Fetch more chapters if more data exists
   Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
     if (_atEnd) {
       return;
     }
@@ -1579,6 +1609,10 @@ class MangaSearch extends _$MangaSearch {
 
   /// Fetch more if more data exists
   Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
     if (_atEnd) {
       return;
     }
@@ -1622,6 +1656,11 @@ class Statistics extends _$Statistics {
 
   /// Fetch statistics for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
     final oldstate = state.valueOrNull ?? {};
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -1655,6 +1694,11 @@ class ReadingStatus extends _$ReadingStatus {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return;
+    }
+
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
     }
 
     final api = ref.watch(mangadexProvider);
@@ -1698,6 +1742,11 @@ class FollowingStatus extends _$FollowingStatus {
       return;
     }
 
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
     final api = ref.watch(mangadexProvider);
     final oldstate = state.valueOrNull ?? false;
     state = const AsyncValue.loading();
@@ -1739,6 +1788,11 @@ class MangaDexHistory extends _$MangaDexHistory {
   }
 
   Future<void> add(Chapter chapter) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
     final oldstate = state.valueOrNull ?? Queue<Chapter>();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {

@@ -714,6 +714,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             ),
           if (view.value == _ViewType.art)
             covers.when(
+              skipLoadingOnReload: true,
               data: (coverList) {
                 return SliverGrid.builder(
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -822,7 +823,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
 class _CoverArtItem extends StatelessWidget {
   const _CoverArtItem({
-    super.key,
     required this.cover,
     required this.manga,
     required this.page,
