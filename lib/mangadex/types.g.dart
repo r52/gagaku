@@ -368,6 +368,20 @@ Map<String, dynamic> _$$_MangaToJson(_$_Manga instance) => <String, dynamic>{
       'relationships': instance.relationships,
     };
 
+_$_MangaLinks _$$_MangaLinksFromJson(Map<String, dynamic> json) =>
+    _$_MangaLinks(
+      al: json['al'] as String?,
+      mu: json['mu'] as String?,
+      mal: json['mal'] as String?,
+    );
+
+Map<String, dynamic> _$$_MangaLinksToJson(_$_MangaLinks instance) =>
+    <String, dynamic>{
+      'al': instance.al,
+      'mu': instance.mu,
+      'mal': instance.mal,
+    };
+
 _$_MangaAttributes _$$_MangaAttributesFromJson(Map<String, dynamic> json) =>
     _$_MangaAttributes(
       title: Map<String, String>.from(json['title'] as Map),
@@ -375,9 +389,9 @@ _$_MangaAttributes _$$_MangaAttributesFromJson(Map<String, dynamic> json) =>
           .map((e) => Map<String, String>.from(e as Map))
           .toList(),
       description: Map<String, String>.from(json['description'] as Map),
-      links: (json['links'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e as String),
-      ),
+      links: json['links'] == null
+          ? null
+          : MangaLinks.fromJson(json['links'] as Map<String, dynamic>),
       originalLanguage:
           const LanguageConverter().fromJson(json['originalLanguage']),
       lastVolume: json['lastVolume'] as String?,

@@ -13,13 +13,54 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
-class IconTextChip extends StatelessWidget {
-  const IconTextChip({
-    Key? key,
+class ButtonChip extends StatelessWidget {
+  const ButtonChip({
+    super.key,
     this.icon,
     required this.text,
     this.color,
-  }) : super(key: key);
+    this.onPressed,
+  });
+
+  final Widget? icon;
+  final Widget text;
+  final Color? color;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final style = ElevatedButton.styleFrom(
+      backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
+      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+    );
+
+    return icon != null
+        ? ElevatedButton.icon(
+            style: style,
+            onPressed: onPressed,
+            icon: icon!,
+            label: text,
+          )
+        : ElevatedButton(
+            style: style,
+            onPressed: onPressed,
+            child: text,
+          );
+  }
+}
+
+class IconTextChip extends StatelessWidget {
+  const IconTextChip({
+    super.key,
+    this.icon,
+    required this.text,
+    this.color,
+  });
 
   final Widget? icon;
   final Widget text;
@@ -51,7 +92,7 @@ class IconTextChip extends StatelessWidget {
 
 class TriStateChip extends StatelessWidget {
   const TriStateChip(
-      {Key? key,
+      {super.key,
       required this.label,
       this.labelStyle,
       this.labelPadding,
@@ -71,8 +112,7 @@ class TriStateChip extends StatelessWidget {
       this.selectedColor,
       this.unselectedColor})
       : assert(onChanged != null),
-        assert(elevation == null || elevation >= 0.0),
-        super(key: key);
+        assert(elevation == null || elevation >= 0.0);
 
   final Widget label;
   final TextStyle? labelStyle;

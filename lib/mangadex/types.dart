@@ -625,12 +625,24 @@ class Manga with _$Manga, MangaDexUUID {
 }
 
 @freezed
+class MangaLinks with _$MangaLinks {
+  const factory MangaLinks({
+    String? al,
+    String? mu,
+    String? mal,
+  }) = _MangaLinks;
+
+  factory MangaLinks.fromJson(Map<String, dynamic> json) =>
+      _$MangaLinksFromJson(json);
+}
+
+@freezed
 class MangaAttributes with _$MangaAttributes {
   const factory MangaAttributes({
     required LocalizedString title,
     required List<LocalizedString> altTitles,
     required LocalizedString description,
-    Map<String, String>? links,
+    MangaLinks? links,
     @LanguageConverter() required Language originalLanguage,
     String? lastVolume,
     String? lastChapter,

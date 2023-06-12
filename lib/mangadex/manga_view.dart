@@ -9,6 +9,7 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 part 'manga_view.g.dart';
 
@@ -514,17 +515,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         padding: const EdgeInsets.all(8),
                         color: theme.colorScheme.background,
                         child: Wrap(
+                          spacing: 4.0,
                           runSpacing: 4.0,
                           children: manga.attributes.tags
                               .where((tag) =>
                                   tag.attributes.group == TagGroup.genre)
-                              .map((e) => Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 2),
-                                    child: IconTextChip(
-                                        text:
-                                            Text(e.attributes.name.get('en'))),
-                                  ))
+                              .map((e) => IconTextChip(
+                                  text: Text(e.attributes.name.get('en'))))
                               .toList(),
                         ),
                       ),
@@ -539,18 +536,64 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         padding: const EdgeInsets.all(8),
                         color: theme.colorScheme.background,
                         child: Wrap(
+                          spacing: 4.0,
                           runSpacing: 4.0,
                           children: manga.attributes.tags
                               .where((tag) =>
                                   tag.attributes.group == TagGroup.theme)
-                              .map((e) => Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 2),
-                                    child: IconTextChip(
-                                        text:
-                                            Text(e.attributes.name.get('en'))),
-                                  ))
+                              .map((e) => IconTextChip(
+                                  text: Text(e.attributes.name.get('en'))))
                               .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (manga.attributes.links != null)
+                  ExpansionTile(
+                    expandedAlignment: Alignment.centerLeft,
+                    title: const Text('Track'),
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        color: theme.colorScheme.background,
+                        child: Wrap(
+                          spacing: 4.0,
+                          runSpacing: 4.0,
+                          children: [
+                            if (manga.attributes.links?.mu != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final url =
+                                      'https://www.mangaupdates.com/series.html?id=${manga.attributes.links!.mu!}';
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('MangaUpdates'),
+                              ),
+                            if (manga.attributes.links?.al != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final url =
+                                      'https://anilist.co/manga/${manga.attributes.links!.al!}';
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('AniList'),
+                              ),
+                            if (manga.attributes.links?.mal != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final url =
+                                      'https://myanimelist.net/manga/${manga.attributes.links!.mal!}';
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('MyAnimeList'),
+                              ),
+                          ],
                         ),
                       ),
                     ],
