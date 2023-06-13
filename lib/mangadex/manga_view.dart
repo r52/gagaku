@@ -39,8 +39,7 @@ Future<void> _fetchReadChaptersRedun(
 }
 
 class MangaDexMangaViewWidget extends HookConsumerWidget {
-  const MangaDexMangaViewWidget({Key? key, required this.manga})
-      : super(key: key);
+  const MangaDexMangaViewWidget({super.key, required this.manga});
 
   final Manga manga;
 

@@ -3816,6 +3816,163 @@ abstract class _ChapterAPI extends ChapterAPI {
       throw _privateConstructorUsedError;
 }
 
+Group _$GroupFromJson(Map<String, dynamic> json) {
+  return _Group.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Group {
+  String get id => throw _privateConstructorUsedError;
+  ScanlationGroupAttributes get attributes =>
+      throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $GroupCopyWith<Group> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GroupCopyWith<$Res> {
+  factory $GroupCopyWith(Group value, $Res Function(Group) then) =
+      _$GroupCopyWithImpl<$Res, Group>;
+  @useResult
+  $Res call({String id, ScanlationGroupAttributes attributes});
+
+  $ScanlationGroupAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class _$GroupCopyWithImpl<$Res, $Val extends Group>
+    implements $GroupCopyWith<$Res> {
+  _$GroupCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as ScanlationGroupAttributes,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ScanlationGroupAttributesCopyWith<$Res> get attributes {
+    return $ScanlationGroupAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$_GroupCopyWith<$Res> implements $GroupCopyWith<$Res> {
+  factory _$$_GroupCopyWith(_$_Group value, $Res Function(_$_Group) then) =
+      __$$_GroupCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, ScanlationGroupAttributes attributes});
+
+  @override
+  $ScanlationGroupAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class __$$_GroupCopyWithImpl<$Res> extends _$GroupCopyWithImpl<$Res, _$_Group>
+    implements _$$_GroupCopyWith<$Res> {
+  __$$_GroupCopyWithImpl(_$_Group _value, $Res Function(_$_Group) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+  }) {
+    return _then(_$_Group(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as ScanlationGroupAttributes,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_Group with DiagnosticableTreeMixin implements _Group {
+  const _$_Group({required this.id, required this.attributes});
+
+  factory _$_Group.fromJson(Map<String, dynamic> json) =>
+      _$$_GroupFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final ScanlationGroupAttributes attributes;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'Group(id: $id, attributes: $attributes)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'Group'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('attributes', attributes));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_GroupCopyWith<_$_Group> get copyWith =>
+      __$$_GroupCopyWithImpl<_$_Group>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_GroupToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Group implements Group {
+  const factory _Group(
+      {required final String id,
+      required final ScanlationGroupAttributes attributes}) = _$_Group;
+
+  factory _Group.fromJson(Map<String, dynamic> json) = _$_Group.fromJson;
+
+  @override
+  String get id;
+  @override
+  ScanlationGroupAttributes get attributes;
+  @override
+  @JsonKey(ignore: true)
+  _$$_GroupCopyWith<_$_Group> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Cover _$CoverFromJson(Map<String, dynamic> json) {
   return _Cover.fromJson(json);
 }

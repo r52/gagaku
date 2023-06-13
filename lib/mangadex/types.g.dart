@@ -316,6 +316,17 @@ Map<String, dynamic> _$$_ChapterAPIToJson(_$_ChapterAPI instance) =>
       'chapter': instance.chapter,
     };
 
+_$_Group _$$_GroupFromJson(Map<String, dynamic> json) => _$_Group(
+      id: json['id'] as String,
+      attributes: ScanlationGroupAttributes.fromJson(
+          json['attributes'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$_GroupToJson(_$_Group instance) => <String, dynamic>{
+      'id': instance.id,
+      'attributes': instance.attributes,
+    };
+
 _$_Cover _$$_CoverFromJson(Map<String, dynamic> json) => _$_Cover(
       id: json['id'] as String,
       attributes: CoverArtAttributes.fromJson(

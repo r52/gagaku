@@ -2,6 +2,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
@@ -111,6 +112,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
           children: Styles.loadingOverlay,
         ),
         error: (err, stackTrace) {
+          ref.invalidate(provider);
+
           final messenger = ScaffoldMessenger.of(context);
           Future.delayed(
             Duration.zero,
@@ -273,11 +276,22 @@ class ChapterButtonWidget extends ConsumerWidget {
     final groups = chapter.getGroups();
     final groupChips = <Widget>[];
 
-    for (var g in groups) {
+    for (final g in groups) {
       groupChips.add(const SizedBox(width: 4));
       groupChips.add(IconTextChip(
         icon: Icon(Icons.group, size: iconSize),
-        text: Text(g.crop()),
+        text: Text(g.attributes.name.crop()),
+        onPressed: () {
+          nav.push(createGroupViewRoute(g));
+        },
+      ));
+    }
+
+    if (groupChips.isEmpty) {
+      groupChips.add(const SizedBox(width: 4));
+      groupChips.add(IconTextChip(
+        icon: Icon(Icons.group, size: iconSize),
+        text: const Text('No Group'),
       ));
     }
 

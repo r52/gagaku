@@ -60,17 +60,19 @@ class IconTextChip extends StatelessWidget {
     this.icon,
     required this.text,
     this.color,
+    this.onPressed,
   });
 
   final Widget? icon;
   final Widget text;
   final Color? color;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return UnconstrainedBox(
+    Widget chip = UnconstrainedBox(
       child: Container(
         decoration: BoxDecoration(
           color: color ?? theme.colorScheme.tertiaryContainer,
@@ -87,6 +89,15 @@ class IconTextChip extends StatelessWidget {
         ),
       ),
     );
+
+    if (onPressed != null) {
+      chip = InkWell(
+        onTap: onPressed,
+        child: chip,
+      );
+    }
+
+    return chip;
   }
 }
 
