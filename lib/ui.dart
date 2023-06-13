@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -33,13 +34,15 @@ class ButtonChip extends StatelessWidget {
 
     final style = ElevatedButton.styleFrom(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
+      textStyle:
+          theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6.0),
       ),
     );
 
-    return icon != null
+    final btn = icon != null
         ? ElevatedButton.icon(
             style: style,
             onPressed: onPressed,
@@ -51,10 +54,12 @@ class ButtonChip extends StatelessWidget {
             onPressed: onPressed,
             child: text,
           );
+
+    return SizedBox(height: 24, child: btn);
   }
 }
 
-class IconTextChip extends StatelessWidget {
+class IconTextChip extends HookWidget {
   const IconTextChip({
     super.key,
     this.icon,
@@ -71,13 +76,18 @@ class IconTextChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bgColor = color ?? theme.colorScheme.tertiaryContainer;
+    final hoverColor = theme.colorScheme.primary.withOpacity(0.08);
+    final hover = useState(false);
 
     Widget chip = UnconstrainedBox(
       child: Container(
         decoration: BoxDecoration(
-          color: color ?? theme.colorScheme.tertiaryContainer,
+          color: bgColor,
           borderRadius: BorderRadius.circular(6),
         ),
+        foregroundDecoration:
+            hover.value ? BoxDecoration(color: hoverColor) : null,
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
         alignment: Alignment.center,
         child: Row(
@@ -93,6 +103,7 @@ class IconTextChip extends StatelessWidget {
     if (onPressed != null) {
       chip = InkWell(
         onTap: onPressed,
+        onHover: (value) => hover.value = value,
         child: chip,
       );
     }
