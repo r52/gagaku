@@ -282,6 +282,32 @@ class Styles {
     ),
   );
 
+  static Widget titleFlexBar({
+    required BuildContext context,
+    required String title,
+  }) =>
+      FlexibleSpaceBar(
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            shadows: <Shadow>[
+              Shadow(
+                offset: Offset(2.0, 2.0),
+                blurRadius: 1.0,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+            ],
+          ),
+        ),
+        background: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+          ),
+        ),
+      );
+
   static Widget slideTransitionBuilder(
       BuildContext context,
       Animation<double> animation,

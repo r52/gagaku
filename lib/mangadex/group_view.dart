@@ -84,7 +84,6 @@ class MangaDexGroupViewWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scrollController = useScrollController();
     final theme = Theme.of(context);
     final view = useState(_ViewType.info);
 
@@ -111,7 +110,7 @@ class MangaDexGroupViewWidget extends HookWidget {
 
     final tabs = <Widget>[
       CustomScrollView(
-        controller: scrollController,
+        controller: controllers[0],
         scrollBehavior: MouseTouchScrollBehavior(),
         slivers: <Widget>[
           if (group.attributes.description != null)
@@ -186,7 +185,7 @@ class MangaDexGroupViewWidget extends HookWidget {
               ref.read(groupFeedProvider(group).notifier).clear();
               return await ref.refresh(_fetchGroupFeedProvider(group).future);
             },
-            controller: scrollController,
+            controller: controllers[1],
             restorationId: 'group_feed_offset',
           );
         },
@@ -217,7 +216,7 @@ class MangaDexGroupViewWidget extends HookWidget {
                         style: TextStyle(fontSize: 24),
                       ),
                       physics: const AlwaysScrollableScrollPhysics(),
-                      controller: scrollController,
+                      controller: controllers[2],
                       onAtEdge: () => ref
                           .read(groupTitlesProvider(group).notifier)
                           .getMore(),
@@ -257,26 +256,14 @@ class MangaDexGroupViewWidget extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: FlexibleSpaceBar(
-          title: Text(
-            group.attributes.name,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              shadows: <Shadow>[
-                Shadow(
-                  offset: Offset(2.0, 2.0),
-                  blurRadius: 1.0,
-                  color: Color.fromARGB(255, 0, 0, 0),
-                ),
-              ],
-            ),
-          ),
-          background: Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
-            ),
-          ),
+        flexibleSpace: GestureDetector(
+          onTap: () {
+            controllers[view.value.index].animateTo(0.0,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut);
+          },
+          child: Styles.titleFlexBar(
+              context: context, title: group.attributes.name),
         ),
       ),
       body: Center(
