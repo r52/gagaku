@@ -129,54 +129,48 @@ class MangaDexGroupViewWidget extends HookWidget {
                 ],
               ),
             ),
-          SliverToBoxAdapter(
-            child: ExpansionTile(
-              initiallyExpanded: true,
-              title: const Text('Info'),
-              children: [
-                if (group.attributes.website != null ||
-                    group.attributes.discord != null)
-                  ExpansionTile(
-                    initiallyExpanded: true,
-                    expandedAlignment: Alignment.centerLeft,
-                    title: const Text('Links'),
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        color: theme.colorScheme.background,
-                        child: Wrap(
-                          spacing: 4.0,
-                          runSpacing: 4.0,
-                          children: [
-                            if (group.attributes.website != null)
-                              ButtonChip(
-                                onPressed: () async {
-                                  if (!await launchUrl(
-                                      Uri.parse(group.attributes.website!))) {
-                                    throw 'Could not launch ${group.attributes.website!}';
-                                  }
-                                },
-                                text: const Text('Website'),
-                              ),
-                            if (group.attributes.discord != null)
-                              ButtonChip(
-                                onPressed: () async {
-                                  final url =
-                                      'https://discord.gg/${group.attributes.discord!}';
-                                  if (!await launchUrl(Uri.parse(url))) {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                text: const Text('Discord'),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
+          if (group.attributes.website != null ||
+              group.attributes.discord != null)
+            SliverToBoxAdapter(
+              child: ExpansionTile(
+                initiallyExpanded: true,
+                expandedAlignment: Alignment.centerLeft,
+                title: const Text('Links'),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: theme.colorScheme.background,
+                    child: Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
+                      children: [
+                        if (group.attributes.website != null)
+                          ButtonChip(
+                            onPressed: () async {
+                              if (!await launchUrl(
+                                  Uri.parse(group.attributes.website!))) {
+                                throw 'Could not launch ${group.attributes.website!}';
+                              }
+                            },
+                            text: const Text('Website'),
+                          ),
+                        if (group.attributes.discord != null)
+                          ButtonChip(
+                            onPressed: () async {
+                              final url =
+                                  'https://discord.gg/${group.attributes.discord!}';
+                              if (!await launchUrl(Uri.parse(url))) {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            text: const Text('Discord'),
+                          ),
+                      ],
+                    ),
                   ),
-              ],
+                ],
+              ),
             ),
-          ),
         ],
       ),
       Consumer(
