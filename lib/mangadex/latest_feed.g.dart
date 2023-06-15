@@ -7,7 +7,7 @@ part of 'latest_feed.dart';
 // **************************************************************************
 
 String _$fetchGlobalChaptersHash() =>
-    r'411d19c3a6e7485ee5b6de87215fd315efe9db3e';
+    r'2b701980c89260727f80ee9be563725a55f23ad1';
 
 /// See also [_fetchGlobalChapters].
 @ProviderFor(_fetchGlobalChapters)

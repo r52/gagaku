@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -13,28 +14,80 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
-class IconTextChip extends StatelessWidget {
-  const IconTextChip({
-    Key? key,
+class ButtonChip extends StatelessWidget {
+  const ButtonChip({
+    super.key,
     this.icon,
     required this.text,
     this.color,
-  }) : super(key: key);
+    this.onPressed,
+  });
 
   final Widget? icon;
   final Widget text;
   final Color? color;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return UnconstrainedBox(
+    final style = ElevatedButton.styleFrom(
+      backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
+      textStyle:
+          theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
+      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+    );
+
+    final btn = icon != null
+        ? ElevatedButton.icon(
+            style: style,
+            onPressed: onPressed,
+            icon: icon!,
+            label: text,
+          )
+        : ElevatedButton(
+            style: style,
+            onPressed: onPressed,
+            child: text,
+          );
+
+    return SizedBox(height: 24, child: btn);
+  }
+}
+
+class IconTextChip extends HookWidget {
+  const IconTextChip({
+    super.key,
+    this.icon,
+    required this.text,
+    this.color,
+    this.onPressed,
+  });
+
+  final Widget? icon;
+  final Widget text;
+  final Color? color;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bgColor = color ?? theme.colorScheme.tertiaryContainer;
+    final hoverColor = theme.colorScheme.primary.withOpacity(0.08);
+    final hover = useState(false);
+
+    Widget chip = UnconstrainedBox(
       child: Container(
         decoration: BoxDecoration(
-          color: color ?? theme.colorScheme.tertiaryContainer,
+          color: bgColor,
           borderRadius: BorderRadius.circular(6),
         ),
+        foregroundDecoration:
+            hover.value ? BoxDecoration(color: hoverColor) : null,
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
         alignment: Alignment.center,
         child: Row(
@@ -46,12 +99,22 @@ class IconTextChip extends StatelessWidget {
         ),
       ),
     );
+
+    if (onPressed != null) {
+      chip = InkWell(
+        onTap: onPressed,
+        onHover: (value) => hover.value = value,
+        child: chip,
+      );
+    }
+
+    return chip;
   }
 }
 
 class TriStateChip extends StatelessWidget {
   const TriStateChip(
-      {Key? key,
+      {super.key,
       required this.label,
       this.labelStyle,
       this.labelPadding,
@@ -71,8 +134,7 @@ class TriStateChip extends StatelessWidget {
       this.selectedColor,
       this.unselectedColor})
       : assert(onChanged != null),
-        assert(elevation == null || elevation >= 0.0),
-        super(key: key);
+        assert(elevation == null || elevation >= 0.0);
 
   final Widget label;
   final TextStyle? labelStyle;
@@ -219,6 +281,32 @@ class Styles {
       child: CircularProgressIndicator(),
     ),
   );
+
+  static Widget titleFlexBar({
+    required BuildContext context,
+    required String title,
+  }) =>
+      FlexibleSpaceBar(
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            shadows: <Shadow>[
+              Shadow(
+                offset: Offset(2.0, 2.0),
+                blurRadius: 1.0,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+            ],
+          ),
+        ),
+        background: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+          ),
+        ),
+      );
 
   static Widget slideTransitionBuilder(
       BuildContext context,

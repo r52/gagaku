@@ -316,6 +316,17 @@ Map<String, dynamic> _$$_ChapterAPIToJson(_$_ChapterAPI instance) =>
       'chapter': instance.chapter,
     };
 
+_$_Group _$$_GroupFromJson(Map<String, dynamic> json) => _$_Group(
+      id: json['id'] as String,
+      attributes: ScanlationGroupAttributes.fromJson(
+          json['attributes'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$_GroupToJson(_$_Group instance) => <String, dynamic>{
+      'id': instance.id,
+      'attributes': instance.attributes,
+    };
+
 _$_Cover _$$_CoverFromJson(Map<String, dynamic> json) => _$_Cover(
       id: json['id'] as String,
       attributes: CoverArtAttributes.fromJson(
@@ -368,6 +379,22 @@ Map<String, dynamic> _$$_MangaToJson(_$_Manga instance) => <String, dynamic>{
       'relationships': instance.relationships,
     };
 
+_$_MangaLinks _$$_MangaLinksFromJson(Map<String, dynamic> json) =>
+    _$_MangaLinks(
+      raw: json['raw'] as String?,
+      al: json['al'] as String?,
+      mu: json['mu'] as String?,
+      mal: json['mal'] as String?,
+    );
+
+Map<String, dynamic> _$$_MangaLinksToJson(_$_MangaLinks instance) =>
+    <String, dynamic>{
+      'raw': instance.raw,
+      'al': instance.al,
+      'mu': instance.mu,
+      'mal': instance.mal,
+    };
+
 _$_MangaAttributes _$$_MangaAttributesFromJson(Map<String, dynamic> json) =>
     _$_MangaAttributes(
       title: Map<String, String>.from(json['title'] as Map),
@@ -375,9 +402,9 @@ _$_MangaAttributes _$$_MangaAttributesFromJson(Map<String, dynamic> json) =>
           .map((e) => Map<String, String>.from(e as Map))
           .toList(),
       description: Map<String, String>.from(json['description'] as Map),
-      links: (json['links'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e as String),
-      ),
+      links: json['links'] == null
+          ? null
+          : MangaLinks.fromJson(json['links'] as Map<String, dynamic>),
       originalLanguage:
           const LanguageConverter().fromJson(json['originalLanguage']),
       lastVolume: json['lastVolume'] as String?,

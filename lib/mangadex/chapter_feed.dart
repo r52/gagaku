@@ -15,7 +15,7 @@ Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
   final mangaIds = chapters.map((e) => e.getMangaID()).toSet();
   mangaIds.removeWhere((element) => element.isEmpty);
 
-  final mangas = await api.fetchManga(mangaIds);
+  final mangas = await api.fetchManga(ids: mangaIds);
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
   await ref.watch(readChaptersProvider.notifier).get(mangas);

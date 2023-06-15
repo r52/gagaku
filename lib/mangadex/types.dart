@@ -238,7 +238,7 @@ class Languages {
     'pl': Language(name: 'Polish', code: 'pl', flag: 'pl'),
     'tr': Language(name: 'Turkish', code: 'tr', flag: 'tr'),
     'it': Language(name: 'Italian', code: 'it', flag: 'it'),
-    'id': Language(name: 'Indoneasian', code: 'id', flag: 'id'),
+    'id': Language(name: 'Indonesian', code: 'id', flag: 'id'),
     'vi': Language(name: 'Vietnam', code: 'vi', flag: 'vn'),
     'hu': Language(name: 'Hungarian', code: 'hu', flag: 'hu'),
     'zh': Language(name: 'Chinese (Simp.)', code: 'zh', flag: 'cn'),
@@ -271,11 +271,20 @@ class Languages {
     'NULL': Language(name: 'Other', code: 'NULL', flag: 'Other'),
   };
 
+  // Non-standard entries
+  static const Map<String, Language> _extraLanguages = {
+    'ja-ro': Language(name: 'Japanese (Romanized)', code: 'ja-ro', flag: 'jp'),
+  };
+
   static Map<String, Language> get languages => _languages;
 
   static Language get(String code) {
-    if (!_languages.containsKey(code)) {
+    if (!_languages.containsKey(code) && !_extraLanguages.containsKey(code)) {
       return _languages['NULL']!;
+    }
+
+    if (_extraLanguages.containsKey(code)) {
+      return _extraLanguages[code]!;
     }
 
     return _languages[code]!;
@@ -294,7 +303,7 @@ mixin MangaDexUUID {
   }
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => Object.hash(runtimeType, id);
 }
 
 @freezed
@@ -321,25 +330,20 @@ class Chapter with _$Chapter, MangaDexUUID {
   factory Chapter.fromJson(Map<String, dynamic> json) =>
       _$ChapterFromJson(json);
 
-  Iterable<String> getGroups() {
-    final groups = relationships.where((element) => switch (element) {
-          RelationshipGroup() => true,
-          _ => false,
-        });
+  Iterable<Group> getGroups() {
+    final groups = <Group>{};
 
-    final groupNames = <String>{};
-    if (groups.isNotEmpty) {
-      for (final g in groups) {
-        groupNames.add(switch (g) {
-          RelationshipGroup(:final attributes) => attributes.name,
-          _ => '',
-        });
+    for (final g in relationships) {
+      switch (g) {
+        case RelationshipGroup():
+          groups.add(Group.fromRelationship(g));
+          break;
+        default:
+          break;
       }
-
-      return groupNames;
     }
 
-    return ["No Group"];
+    return groups;
   }
 
   String getMangaID() {
@@ -479,6 +483,18 @@ class ChapterAPI with _$ChapterAPI {
 
   String getUrl(bool datasaver) =>
       '$baseUrl/${datasaver ? 'data-saver' : 'data'}/${chapter.hash}/';
+}
+
+@freezed
+class Group with _$Group, MangaDexUUID {
+  const factory Group({
+    required String id,
+    required ScanlationGroupAttributes attributes,
+  }) = _Group;
+
+  factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
+  factory Group.fromRelationship(RelationshipGroup group) =>
+      Group(id: group.id, attributes: group.attributes);
 }
 
 @freezed
@@ -625,12 +641,25 @@ class Manga with _$Manga, MangaDexUUID {
 }
 
 @freezed
+class MangaLinks with _$MangaLinks {
+  const factory MangaLinks({
+    String? raw,
+    String? al,
+    String? mu,
+    String? mal,
+  }) = _MangaLinks;
+
+  factory MangaLinks.fromJson(Map<String, dynamic> json) =>
+      _$MangaLinksFromJson(json);
+}
+
+@freezed
 class MangaAttributes with _$MangaAttributes {
   const factory MangaAttributes({
     required LocalizedString title,
     required List<LocalizedString> altTitles,
     required LocalizedString description,
-    Map<String, String>? links,
+    MangaLinks? links,
     @LanguageConverter() required Language originalLanguage,
     String? lastVolume,
     String? lastChapter,

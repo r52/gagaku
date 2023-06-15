@@ -8,6 +8,7 @@ import 'package:gagaku/local/directory_reader.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
+import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -48,7 +49,8 @@ class LocalLibraryHome extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Local Library"),
+        flexibleSpace:
+            Styles.titleFlexBar(context: context, title: 'Local Library'),
         actions: [
           ButtonBar(
             children: [

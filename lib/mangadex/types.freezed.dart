@@ -3816,6 +3816,163 @@ abstract class _ChapterAPI extends ChapterAPI {
       throw _privateConstructorUsedError;
 }
 
+Group _$GroupFromJson(Map<String, dynamic> json) {
+  return _Group.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Group {
+  String get id => throw _privateConstructorUsedError;
+  ScanlationGroupAttributes get attributes =>
+      throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $GroupCopyWith<Group> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GroupCopyWith<$Res> {
+  factory $GroupCopyWith(Group value, $Res Function(Group) then) =
+      _$GroupCopyWithImpl<$Res, Group>;
+  @useResult
+  $Res call({String id, ScanlationGroupAttributes attributes});
+
+  $ScanlationGroupAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class _$GroupCopyWithImpl<$Res, $Val extends Group>
+    implements $GroupCopyWith<$Res> {
+  _$GroupCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as ScanlationGroupAttributes,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ScanlationGroupAttributesCopyWith<$Res> get attributes {
+    return $ScanlationGroupAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$_GroupCopyWith<$Res> implements $GroupCopyWith<$Res> {
+  factory _$$_GroupCopyWith(_$_Group value, $Res Function(_$_Group) then) =
+      __$$_GroupCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, ScanlationGroupAttributes attributes});
+
+  @override
+  $ScanlationGroupAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class __$$_GroupCopyWithImpl<$Res> extends _$GroupCopyWithImpl<$Res, _$_Group>
+    implements _$$_GroupCopyWith<$Res> {
+  __$$_GroupCopyWithImpl(_$_Group _value, $Res Function(_$_Group) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+  }) {
+    return _then(_$_Group(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as ScanlationGroupAttributes,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_Group with DiagnosticableTreeMixin implements _Group {
+  const _$_Group({required this.id, required this.attributes});
+
+  factory _$_Group.fromJson(Map<String, dynamic> json) =>
+      _$$_GroupFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final ScanlationGroupAttributes attributes;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'Group(id: $id, attributes: $attributes)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'Group'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('attributes', attributes));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_GroupCopyWith<_$_Group> get copyWith =>
+      __$$_GroupCopyWithImpl<_$_Group>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_GroupToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Group implements Group {
+  const factory _Group(
+      {required final String id,
+      required final ScanlationGroupAttributes attributes}) = _$_Group;
+
+  factory _Group.fromJson(Map<String, dynamic> json) = _$_Group.fromJson;
+
+  @override
+  String get id;
+  @override
+  ScanlationGroupAttributes get attributes;
+  @override
+  @JsonKey(ignore: true)
+  _$$_GroupCopyWith<_$_Group> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Cover _$CoverFromJson(Map<String, dynamic> json) {
   return _Cover.fromJson(json);
 }
@@ -4496,6 +4653,205 @@ abstract class _Manga extends Manga {
       throw _privateConstructorUsedError;
 }
 
+MangaLinks _$MangaLinksFromJson(Map<String, dynamic> json) {
+  return _MangaLinks.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MangaLinks {
+  String? get raw => throw _privateConstructorUsedError;
+  String? get al => throw _privateConstructorUsedError;
+  String? get mu => throw _privateConstructorUsedError;
+  String? get mal => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MangaLinksCopyWith<MangaLinks> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MangaLinksCopyWith<$Res> {
+  factory $MangaLinksCopyWith(
+          MangaLinks value, $Res Function(MangaLinks) then) =
+      _$MangaLinksCopyWithImpl<$Res, MangaLinks>;
+  @useResult
+  $Res call({String? raw, String? al, String? mu, String? mal});
+}
+
+/// @nodoc
+class _$MangaLinksCopyWithImpl<$Res, $Val extends MangaLinks>
+    implements $MangaLinksCopyWith<$Res> {
+  _$MangaLinksCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? raw = freezed,
+    Object? al = freezed,
+    Object? mu = freezed,
+    Object? mal = freezed,
+  }) {
+    return _then(_value.copyWith(
+      raw: freezed == raw
+          ? _value.raw
+          : raw // ignore: cast_nullable_to_non_nullable
+              as String?,
+      al: freezed == al
+          ? _value.al
+          : al // ignore: cast_nullable_to_non_nullable
+              as String?,
+      mu: freezed == mu
+          ? _value.mu
+          : mu // ignore: cast_nullable_to_non_nullable
+              as String?,
+      mal: freezed == mal
+          ? _value.mal
+          : mal // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_MangaLinksCopyWith<$Res>
+    implements $MangaLinksCopyWith<$Res> {
+  factory _$$_MangaLinksCopyWith(
+          _$_MangaLinks value, $Res Function(_$_MangaLinks) then) =
+      __$$_MangaLinksCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String? raw, String? al, String? mu, String? mal});
+}
+
+/// @nodoc
+class __$$_MangaLinksCopyWithImpl<$Res>
+    extends _$MangaLinksCopyWithImpl<$Res, _$_MangaLinks>
+    implements _$$_MangaLinksCopyWith<$Res> {
+  __$$_MangaLinksCopyWithImpl(
+      _$_MangaLinks _value, $Res Function(_$_MangaLinks) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? raw = freezed,
+    Object? al = freezed,
+    Object? mu = freezed,
+    Object? mal = freezed,
+  }) {
+    return _then(_$_MangaLinks(
+      raw: freezed == raw
+          ? _value.raw
+          : raw // ignore: cast_nullable_to_non_nullable
+              as String?,
+      al: freezed == al
+          ? _value.al
+          : al // ignore: cast_nullable_to_non_nullable
+              as String?,
+      mu: freezed == mu
+          ? _value.mu
+          : mu // ignore: cast_nullable_to_non_nullable
+              as String?,
+      mal: freezed == mal
+          ? _value.mal
+          : mal // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
+  const _$_MangaLinks({this.raw, this.al, this.mu, this.mal});
+
+  factory _$_MangaLinks.fromJson(Map<String, dynamic> json) =>
+      _$$_MangaLinksFromJson(json);
+
+  @override
+  final String? raw;
+  @override
+  final String? al;
+  @override
+  final String? mu;
+  @override
+  final String? mal;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaLinks(raw: $raw, al: $al, mu: $mu, mal: $mal)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaLinks'))
+      ..add(DiagnosticsProperty('raw', raw))
+      ..add(DiagnosticsProperty('al', al))
+      ..add(DiagnosticsProperty('mu', mu))
+      ..add(DiagnosticsProperty('mal', mal));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_MangaLinks &&
+            (identical(other.raw, raw) || other.raw == raw) &&
+            (identical(other.al, al) || other.al == al) &&
+            (identical(other.mu, mu) || other.mu == mu) &&
+            (identical(other.mal, mal) || other.mal == mal));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, raw, al, mu, mal);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_MangaLinksCopyWith<_$_MangaLinks> get copyWith =>
+      __$$_MangaLinksCopyWithImpl<_$_MangaLinks>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_MangaLinksToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MangaLinks implements MangaLinks {
+  const factory _MangaLinks(
+      {final String? raw,
+      final String? al,
+      final String? mu,
+      final String? mal}) = _$_MangaLinks;
+
+  factory _MangaLinks.fromJson(Map<String, dynamic> json) =
+      _$_MangaLinks.fromJson;
+
+  @override
+  String? get raw;
+  @override
+  String? get al;
+  @override
+  String? get mu;
+  @override
+  String? get mal;
+  @override
+  @JsonKey(ignore: true)
+  _$$_MangaLinksCopyWith<_$_MangaLinks> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 MangaAttributes _$MangaAttributesFromJson(Map<String, dynamic> json) {
   return _MangaAttributes.fromJson(json);
 }
@@ -4505,7 +4861,7 @@ mixin _$MangaAttributes {
   Map<String, String> get title => throw _privateConstructorUsedError;
   List<Map<String, String>> get altTitles => throw _privateConstructorUsedError;
   Map<String, String> get description => throw _privateConstructorUsedError;
-  Map<String, String>? get links => throw _privateConstructorUsedError;
+  MangaLinks? get links => throw _privateConstructorUsedError;
   @LanguageConverter()
   Language get originalLanguage => throw _privateConstructorUsedError;
   String? get lastVolume => throw _privateConstructorUsedError;
@@ -4538,7 +4894,7 @@ abstract class $MangaAttributesCopyWith<$Res> {
       {Map<String, String> title,
       List<Map<String, String>> altTitles,
       Map<String, String> description,
-      Map<String, String>? links,
+      MangaLinks? links,
       @LanguageConverter() Language originalLanguage,
       String? lastVolume,
       String? lastChapter,
@@ -4551,6 +4907,7 @@ abstract class $MangaAttributesCopyWith<$Res> {
       @TimestampSerializer() DateTime createdAt,
       @TimestampSerializer() DateTime updatedAt});
 
+  $MangaLinksCopyWith<$Res>? get links;
   $LanguageCopyWith<$Res> get originalLanguage;
 }
 
@@ -4599,7 +4956,7 @@ class _$MangaAttributesCopyWithImpl<$Res, $Val extends MangaAttributes>
       links: freezed == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>?,
+              as MangaLinks?,
       originalLanguage: null == originalLanguage
           ? _value.originalLanguage
           : originalLanguage // ignore: cast_nullable_to_non_nullable
@@ -4649,6 +5006,18 @@ class _$MangaAttributesCopyWithImpl<$Res, $Val extends MangaAttributes>
 
   @override
   @pragma('vm:prefer-inline')
+  $MangaLinksCopyWith<$Res>? get links {
+    if (_value.links == null) {
+      return null;
+    }
+
+    return $MangaLinksCopyWith<$Res>(_value.links!, (value) {
+      return _then(_value.copyWith(links: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
   $LanguageCopyWith<$Res> get originalLanguage {
     return $LanguageCopyWith<$Res>(_value.originalLanguage, (value) {
       return _then(_value.copyWith(originalLanguage: value) as $Val);
@@ -4668,7 +5037,7 @@ abstract class _$$_MangaAttributesCopyWith<$Res>
       {Map<String, String> title,
       List<Map<String, String>> altTitles,
       Map<String, String> description,
-      Map<String, String>? links,
+      MangaLinks? links,
       @LanguageConverter() Language originalLanguage,
       String? lastVolume,
       String? lastChapter,
@@ -4681,6 +5050,8 @@ abstract class _$$_MangaAttributesCopyWith<$Res>
       @TimestampSerializer() DateTime createdAt,
       @TimestampSerializer() DateTime updatedAt});
 
+  @override
+  $MangaLinksCopyWith<$Res>? get links;
   @override
   $LanguageCopyWith<$Res> get originalLanguage;
 }
@@ -4726,9 +5097,9 @@ class __$$_MangaAttributesCopyWithImpl<$Res>
           : description // ignore: cast_nullable_to_non_nullable
               as Map<String, String>,
       links: freezed == links
-          ? _value._links
+          ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>?,
+              as MangaLinks?,
       originalLanguage: null == originalLanguage
           ? _value.originalLanguage
           : originalLanguage // ignore: cast_nullable_to_non_nullable
@@ -4786,7 +5157,7 @@ class _$_MangaAttributes
       {required final Map<String, String> title,
       required final List<Map<String, String>> altTitles,
       required final Map<String, String> description,
-      final Map<String, String>? links,
+      this.links,
       @LanguageConverter() required this.originalLanguage,
       this.lastVolume,
       this.lastChapter,
@@ -4801,7 +5172,6 @@ class _$_MangaAttributes
       : _title = title,
         _altTitles = altTitles,
         _description = description,
-        _links = links,
         _tags = tags;
 
   factory _$_MangaAttributes.fromJson(Map<String, dynamic> json) =>
@@ -4831,16 +5201,8 @@ class _$_MangaAttributes
     return EqualUnmodifiableMapView(_description);
   }
 
-  final Map<String, String>? _links;
   @override
-  Map<String, String>? get links {
-    final value = _links;
-    if (value == null) return null;
-    if (_links is EqualUnmodifiableMapView) return _links;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
-
+  final MangaLinks? links;
   @override
   @LanguageConverter()
   final Language originalLanguage;
@@ -4911,7 +5273,7 @@ class _$_MangaAttributes
                 .equals(other._altTitles, _altTitles) &&
             const DeepCollectionEquality()
                 .equals(other._description, _description) &&
-            const DeepCollectionEquality().equals(other._links, _links) &&
+            (identical(other.links, links) || other.links == links) &&
             (identical(other.originalLanguage, originalLanguage) ||
                 other.originalLanguage == originalLanguage) &&
             (identical(other.lastVolume, lastVolume) ||
@@ -4939,7 +5301,7 @@ class _$_MangaAttributes
       const DeepCollectionEquality().hash(_title),
       const DeepCollectionEquality().hash(_altTitles),
       const DeepCollectionEquality().hash(_description),
-      const DeepCollectionEquality().hash(_links),
+      links,
       originalLanguage,
       lastVolume,
       lastChapter,
@@ -4971,7 +5333,7 @@ abstract class _MangaAttributes implements MangaAttributes {
           {required final Map<String, String> title,
           required final List<Map<String, String>> altTitles,
           required final Map<String, String> description,
-          final Map<String, String>? links,
+          final MangaLinks? links,
           @LanguageConverter() required final Language originalLanguage,
           final String? lastVolume,
           final String? lastChapter,
@@ -4995,7 +5357,7 @@ abstract class _MangaAttributes implements MangaAttributes {
   @override
   Map<String, String> get description;
   @override
-  Map<String, String>? get links;
+  MangaLinks? get links;
   @override
   @LanguageConverter()
   Language get originalLanguage;

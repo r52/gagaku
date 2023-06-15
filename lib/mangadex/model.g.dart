@@ -7,7 +7,7 @@ part of 'model.dart';
 // **************************************************************************
 
 String _$latestChaptersFeedHash() =>
-    r'b9086dddbf2eed4d2d22e11a477e81e826384b67';
+    r'6305d0ceae44098c2b4c64e6cba41ae5f9a74602';
 
 /// See also [LatestChaptersFeed].
 @ProviderFor(LatestChaptersFeed)
@@ -23,7 +23,7 @@ final latestChaptersFeedProvider =
 );
 
 typedef _$LatestChaptersFeed = AsyncNotifier<List<Chapter>>;
-String _$latestGlobalFeedHash() => r'12953ab7e934dd3d544635437851b2d57821826c';
+String _$latestGlobalFeedHash() => r'3e7976dff8938bf4e274492203a5572b897065a3';
 
 /// See also [LatestGlobalFeed].
 @ProviderFor(LatestGlobalFeed)
@@ -39,7 +39,7 @@ final latestGlobalFeedProvider =
 );
 
 typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
-String _$mangaChaptersHash() => r'bd0ba2d4a8f5701053f023f06fd75a6603cd70cc';
+String _$groupFeedHash() => r'e3614f98336e802a96b08a4fef737b28a4228547';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -61,6 +61,197 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+abstract class _$GroupFeed extends BuildlessAsyncNotifier<List<Chapter>> {
+  late final Group group;
+
+  FutureOr<List<Chapter>> build(
+    Group group,
+  );
+}
+
+/// See also [GroupFeed].
+@ProviderFor(GroupFeed)
+const groupFeedProvider = GroupFeedFamily();
+
+/// See also [GroupFeed].
+class GroupFeedFamily extends Family<AsyncValue<List<Chapter>>> {
+  /// See also [GroupFeed].
+  const GroupFeedFamily();
+
+  /// See also [GroupFeed].
+  GroupFeedProvider call(
+    Group group,
+  ) {
+    return GroupFeedProvider(
+      group,
+    );
+  }
+
+  @override
+  GroupFeedProvider getProviderOverride(
+    covariant GroupFeedProvider provider,
+  ) {
+    return call(
+      provider.group,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupFeedProvider';
+}
+
+/// See also [GroupFeed].
+class GroupFeedProvider
+    extends AsyncNotifierProviderImpl<GroupFeed, List<Chapter>> {
+  /// See also [GroupFeed].
+  GroupFeedProvider(
+    this.group,
+  ) : super.internal(
+          () => GroupFeed()..group = group,
+          from: groupFeedProvider,
+          name: r'groupFeedProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupFeedHash,
+          dependencies: GroupFeedFamily._dependencies,
+          allTransitiveDependencies: GroupFeedFamily._allTransitiveDependencies,
+        );
+
+  final Group group;
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupFeedProvider && other.group == group;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, group.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+
+  @override
+  FutureOr<List<Chapter>> runNotifierBuild(
+    covariant GroupFeed notifier,
+  ) {
+    return notifier.build(
+      group,
+    );
+  }
+}
+
+String _$groupTitlesHash() => r'1e3913db6b0da08fc4f358d831a297fbb61f00a0';
+
+abstract class _$GroupTitles extends BuildlessAsyncNotifier<List<Manga>> {
+  late final Group group;
+
+  FutureOr<List<Manga>> build(
+    Group group,
+  );
+}
+
+/// See also [GroupTitles].
+@ProviderFor(GroupTitles)
+const groupTitlesProvider = GroupTitlesFamily();
+
+/// See also [GroupTitles].
+class GroupTitlesFamily extends Family<AsyncValue<List<Manga>>> {
+  /// See also [GroupTitles].
+  const GroupTitlesFamily();
+
+  /// See also [GroupTitles].
+  GroupTitlesProvider call(
+    Group group,
+  ) {
+    return GroupTitlesProvider(
+      group,
+    );
+  }
+
+  @override
+  GroupTitlesProvider getProviderOverride(
+    covariant GroupTitlesProvider provider,
+  ) {
+    return call(
+      provider.group,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupTitlesProvider';
+}
+
+/// See also [GroupTitles].
+class GroupTitlesProvider
+    extends AsyncNotifierProviderImpl<GroupTitles, List<Manga>> {
+  /// See also [GroupTitles].
+  GroupTitlesProvider(
+    this.group,
+  ) : super.internal(
+          () => GroupTitles()..group = group,
+          from: groupTitlesProvider,
+          name: r'groupTitlesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupTitlesHash,
+          dependencies: GroupTitlesFamily._dependencies,
+          allTransitiveDependencies:
+              GroupTitlesFamily._allTransitiveDependencies,
+        );
+
+  final Group group;
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupTitlesProvider && other.group == group;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, group.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+
+  @override
+  FutureOr<List<Manga>> runNotifierBuild(
+    covariant GroupTitles notifier,
+  ) {
+    return notifier.build(
+      group,
+    );
+  }
+}
+
+String _$mangaChaptersHash() => r'eef92125eaf26472423ff81cd42d29e549bfccdd';
 
 abstract class _$MangaChapters extends BuildlessAsyncNotifier<List<Chapter>> {
   late final Manga manga;
@@ -156,7 +347,7 @@ class MangaChaptersProvider
   }
 }
 
-String _$mangaCoversHash() => r'67c1b40c14efa17104e948c45a7e8a18040bf9d6';
+String _$mangaCoversHash() => r'95729bda618963c0109cdac05d33be8c23761e0c';
 
 abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<Cover>> {
   late final Manga manga;
@@ -267,7 +458,7 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<Map<String, Set<String>>>;
-String _$userLibraryHash() => r'f009f50479297398f7ed26dbcd9052d2630492d5';
+String _$userLibraryHash() => r'b057b553aa3ffd5b01d113266a518d7f55dad8ac';
 
 abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
   late final MangaReadingStatus status;

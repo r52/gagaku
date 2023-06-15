@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
+import 'package:gagaku/ui.dart';
 import 'package:gagaku/web/manga_view.dart';
 import 'package:gagaku/web/model.dart';
 import 'package:gagaku/web/reader.dart';
@@ -54,7 +55,8 @@ class WebSourcesHome extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Web Sources'),
+        flexibleSpace:
+            Styles.titleFlexBar(context: context, title: 'Web Sources'),
       ),
       drawer: const MainDrawer(),
       body: Center(

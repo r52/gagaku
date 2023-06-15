@@ -11,6 +11,7 @@ import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
+import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum MangaDexTab {
@@ -95,23 +96,13 @@ class MangaDexHome extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: () {
-            // Tap app bar to scroll to top
-            controllers[tab.index].animateTo(0.0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut);
-          },
-          child: const Text("Mangadex"),
-        ),
-        // Need to double up here to detect the entire width of
-        // the bar
         flexibleSpace: GestureDetector(
           onTap: () {
             controllers[tab.index].animateTo(0.0,
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut);
           },
+          child: Styles.titleFlexBar(context: context, title: 'MangaDex'),
         ),
         actions: [
           ButtonBar(
@@ -158,20 +149,8 @@ class MangaDexHome extends HookConsumerWidget {
 
                   return auth.when(
                     data: (loggedIn) {
-                      if (loggedIn) {
-                        return Tooltip(
-                          message: 'Logout',
-                          child: IconButton(
-                            color: theme.colorScheme.primary,
-                            icon: const Icon(Icons.logout),
-                            onPressed: () =>
-                                ref.read(authControlProvider.notifier).logout(),
-                          ),
-                        );
-                      }
-
                       // XXX: This changes when OAuth is released
-                      return Tooltip(
+                      Widget logbtn = Tooltip(
                         message: 'Login',
                         child: IconButton(
                           color: theme.colorScheme.primary,
@@ -185,6 +164,26 @@ class MangaDexHome extends HookConsumerWidget {
                             );
                           },
                         ),
+                      );
+
+                      if (loggedIn) {
+                        logbtn = Tooltip(
+                          message: 'Logout',
+                          child: IconButton(
+                            color: theme.colorScheme.primary,
+                            icon: const Icon(Icons.logout),
+                            onPressed: () =>
+                                ref.read(authControlProvider.notifier).logout(),
+                          ),
+                        );
+                      }
+
+                      return Ink(
+                        decoration: ShapeDecoration(
+                          color: theme.cardColor,
+                          shape: const CircleBorder(),
+                        ),
+                        child: logbtn,
                       );
                     },
                     loading: () => const Center(
