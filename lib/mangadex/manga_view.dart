@@ -580,6 +580,16 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           spacing: 4.0,
                           runSpacing: 4.0,
                           children: [
+                            if (manga.attributes.links?.raw != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final url = manga.attributes.links!.raw!;
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('Official Raw'),
+                              ),
                             if (manga.attributes.links?.mu != null)
                               ButtonChip(
                                 onPressed: () async {

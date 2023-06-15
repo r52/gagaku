@@ -4659,6 +4659,7 @@ MangaLinks _$MangaLinksFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$MangaLinks {
+  String? get raw => throw _privateConstructorUsedError;
   String? get al => throw _privateConstructorUsedError;
   String? get mu => throw _privateConstructorUsedError;
   String? get mal => throw _privateConstructorUsedError;
@@ -4675,7 +4676,7 @@ abstract class $MangaLinksCopyWith<$Res> {
           MangaLinks value, $Res Function(MangaLinks) then) =
       _$MangaLinksCopyWithImpl<$Res, MangaLinks>;
   @useResult
-  $Res call({String? al, String? mu, String? mal});
+  $Res call({String? raw, String? al, String? mu, String? mal});
 }
 
 /// @nodoc
@@ -4691,11 +4692,16 @@ class _$MangaLinksCopyWithImpl<$Res, $Val extends MangaLinks>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? raw = freezed,
     Object? al = freezed,
     Object? mu = freezed,
     Object? mal = freezed,
   }) {
     return _then(_value.copyWith(
+      raw: freezed == raw
+          ? _value.raw
+          : raw // ignore: cast_nullable_to_non_nullable
+              as String?,
       al: freezed == al
           ? _value.al
           : al // ignore: cast_nullable_to_non_nullable
@@ -4720,7 +4726,7 @@ abstract class _$$_MangaLinksCopyWith<$Res>
       __$$_MangaLinksCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? al, String? mu, String? mal});
+  $Res call({String? raw, String? al, String? mu, String? mal});
 }
 
 /// @nodoc
@@ -4734,11 +4740,16 @@ class __$$_MangaLinksCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? raw = freezed,
     Object? al = freezed,
     Object? mu = freezed,
     Object? mal = freezed,
   }) {
     return _then(_$_MangaLinks(
+      raw: freezed == raw
+          ? _value.raw
+          : raw // ignore: cast_nullable_to_non_nullable
+              as String?,
       al: freezed == al
           ? _value.al
           : al // ignore: cast_nullable_to_non_nullable
@@ -4758,11 +4769,13 @@ class __$$_MangaLinksCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
-  const _$_MangaLinks({this.al, this.mu, this.mal});
+  const _$_MangaLinks({this.raw, this.al, this.mu, this.mal});
 
   factory _$_MangaLinks.fromJson(Map<String, dynamic> json) =>
       _$$_MangaLinksFromJson(json);
 
+  @override
+  final String? raw;
   @override
   final String? al;
   @override
@@ -4772,7 +4785,7 @@ class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'MangaLinks(al: $al, mu: $mu, mal: $mal)';
+    return 'MangaLinks(raw: $raw, al: $al, mu: $mu, mal: $mal)';
   }
 
   @override
@@ -4780,6 +4793,7 @@ class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'MangaLinks'))
+      ..add(DiagnosticsProperty('raw', raw))
       ..add(DiagnosticsProperty('al', al))
       ..add(DiagnosticsProperty('mu', mu))
       ..add(DiagnosticsProperty('mal', mal));
@@ -4790,6 +4804,7 @@ class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_MangaLinks &&
+            (identical(other.raw, raw) || other.raw == raw) &&
             (identical(other.al, al) || other.al == al) &&
             (identical(other.mu, mu) || other.mu == mu) &&
             (identical(other.mal, mal) || other.mal == mal));
@@ -4797,7 +4812,7 @@ class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, al, mu, mal);
+  int get hashCode => Object.hash(runtimeType, raw, al, mu, mal);
 
   @JsonKey(ignore: true)
   @override
@@ -4815,11 +4830,16 @@ class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
 
 abstract class _MangaLinks implements MangaLinks {
   const factory _MangaLinks(
-      {final String? al, final String? mu, final String? mal}) = _$_MangaLinks;
+      {final String? raw,
+      final String? al,
+      final String? mu,
+      final String? mal}) = _$_MangaLinks;
 
   factory _MangaLinks.fromJson(Map<String, dynamic> json) =
       _$_MangaLinks.fromJson;
 
+  @override
+  String? get raw;
   @override
   String? get al;
   @override

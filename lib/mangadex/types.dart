@@ -643,6 +643,7 @@ class Manga with _$Manga, MangaDexUUID {
 @freezed
 class MangaLinks with _$MangaLinks {
   const factory MangaLinks({
+    String? raw,
     String? al,
     String? mu,
     String? mal,

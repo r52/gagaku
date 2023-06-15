@@ -381,6 +381,7 @@ Map<String, dynamic> _$$_MangaToJson(_$_Manga instance) => <String, dynamic>{
 
 _$_MangaLinks _$$_MangaLinksFromJson(Map<String, dynamic> json) =>
     _$_MangaLinks(
+      raw: json['raw'] as String?,
       al: json['al'] as String?,
       mu: json['mu'] as String?,
       mal: json['mal'] as String?,
@@ -388,6 +389,7 @@ _$_MangaLinks _$$_MangaLinksFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$_MangaLinksToJson(_$_MangaLinks instance) =>
     <String, dynamic>{
+      'raw': instance.raw,
       'al': instance.al,
       'mu': instance.mu,
       'mal': instance.mal,
