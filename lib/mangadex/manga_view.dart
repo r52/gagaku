@@ -563,7 +563,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               ButtonChip(
                                 onPressed: () async {
                                   final url =
-                                      'https://www.mangaupdates.com/series.html?id=${manga.attributes.links!.mu!}';
+                                      'https://www.mangaupdates.com/series/${manga.attributes.links!.mu!}';
                                   if (!await launchUrl(Uri.parse(url))) {
                                     throw 'Could not launch $url';
                                   }
