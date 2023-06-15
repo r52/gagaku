@@ -238,7 +238,7 @@ class Languages {
     'pl': Language(name: 'Polish', code: 'pl', flag: 'pl'),
     'tr': Language(name: 'Turkish', code: 'tr', flag: 'tr'),
     'it': Language(name: 'Italian', code: 'it', flag: 'it'),
-    'id': Language(name: 'Indoneasian', code: 'id', flag: 'id'),
+    'id': Language(name: 'Indonesian', code: 'id', flag: 'id'),
     'vi': Language(name: 'Vietnam', code: 'vi', flag: 'vn'),
     'hu': Language(name: 'Hungarian', code: 'hu', flag: 'hu'),
     'zh': Language(name: 'Chinese (Simp.)', code: 'zh', flag: 'cn'),
