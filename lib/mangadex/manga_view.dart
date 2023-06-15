@@ -429,20 +429,41 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               ),
             ),
           ),
+          if (manga.attributes.altTitles.isNotEmpty)
+            SliverToBoxAdapter(
+              child: ExpansionTile(
+                title: const Text('Alt. Titles'),
+                children: [
+                  for (final Map(entries: entry) in manga.attributes.altTitles)
+                    ExpansionTile(
+                      title: Text(Languages.get(entry.first.key).name),
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(8),
+                          color: theme.colorScheme.surfaceVariant,
+                          child: Text(entry.first.value),
+                        ),
+                      ],
+                    )
+                ],
+              ),
+            ),
           if (manga.attributes.description.isNotEmpty)
             SliverToBoxAdapter(
               child: ExpansionTile(
                 title: const Text('Synopsis'),
                 children: [
-                  for (final entry in manga.attributes.description.entries)
+                  for (final MapEntry(key: lang, value: desc)
+                      in manga.attributes.description.entries)
                     ExpansionTile(
-                      title: Text(Languages.get(entry.key).name),
+                      title: Text(Languages.get(lang).name),
                       children: [
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(8),
-                          color: theme.colorScheme.background,
-                          child: Text(entry.value),
+                          color: theme.colorScheme.surfaceVariant,
+                          child: Text(desc),
                         ),
                       ],
                     )

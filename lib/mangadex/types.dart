@@ -271,11 +271,20 @@ class Languages {
     'NULL': Language(name: 'Other', code: 'NULL', flag: 'Other'),
   };
 
+  // Non-standard entries
+  static const Map<String, Language> _extraLanguages = {
+    'ja-ro': Language(name: 'Japanese (Romanized)', code: 'ja-ro', flag: 'jp'),
+  };
+
   static Map<String, Language> get languages => _languages;
 
   static Language get(String code) {
-    if (!_languages.containsKey(code)) {
+    if (!_languages.containsKey(code) && !_extraLanguages.containsKey(code)) {
       return _languages['NULL']!;
+    }
+
+    if (_extraLanguages.containsKey(code)) {
+      return _extraLanguages[code]!;
     }
 
     return _languages[code]!;
