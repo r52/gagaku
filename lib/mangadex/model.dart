@@ -9,6 +9,7 @@ import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
@@ -2003,11 +2004,16 @@ class AuthControl extends _$AuthControl {
 
 class RateLimitedClient extends http.BaseClient {
   final http.Client baseClient = http.Client();
+  late final String userAgent;
 
-  RateLimitedClient();
+  RateLimitedClient() {
+    PackageInfo.fromPlatform()
+        .then((info) => userAgent = '${info.appName}/${info.version}');
+  }
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    request.headers[HttpHeaders.userAgentHeader] = userAgent;
     await Future.delayed(const Duration(milliseconds: 200));
     return baseClient.send(request);
   }
