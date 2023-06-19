@@ -52,10 +52,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
     ref.watch(_fetchReadChaptersRedunProvider(manga));
 
-    Map<String, Set<String>> readData = {};
+    ReadChaptersMap? readData;
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
+      readData = ref.watch(readChaptersProvider).maybeWhen(
+          skipLoadingOnReload: true, data: (data) => data, orElse: () => null);
     }
 
     final chapters = ref.watch(mangaChaptersProvider(manga));
@@ -682,8 +683,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       chapter: thischap,
                       manga: manga,
                       loggedin: loggedin,
-                      isRead:
-                          readData[manga.id]?.contains(thischap.id) ?? false,
+                      isRead: switch (readData) {
+                        null => null,
+                        _ => readData[manga.id]?.contains(thischap.id) == true,
+                      },
                       link: Text(
                         manga.attributes.title.get('en'),
                         style: const TextStyle(fontSize: 24),
