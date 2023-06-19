@@ -594,8 +594,16 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             if (manga.attributes.links?.mu != null)
                               ButtonChip(
                                 onPressed: () async {
-                                  final url =
+                                  final seriesnum =
+                                      int.tryParse(manga.attributes.links!.mu!);
+                                  var url =
                                       'https://www.mangaupdates.com/series/${manga.attributes.links!.mu!}';
+
+                                  if (seriesnum != null) {
+                                    url =
+                                        'https://www.mangaupdates.com/series.html?id=${manga.attributes.links!.mu!}';
+                                  }
+
                                   if (!await launchUrl(Uri.parse(url))) {
                                     throw 'Could not launch $url';
                                   }
