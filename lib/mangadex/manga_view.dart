@@ -55,8 +55,27 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     ReadChaptersMap? readData;
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).maybeWhen(
-          skipLoadingOnReload: true, data: (data) => data, orElse: () => null);
+      readData = ref.watch(readChaptersProvider).when(
+            skipLoadingOnReload: true,
+            data: (data) => data,
+            loading: () => null,
+            error: (err, stackTrace) {
+              final messenger = ScaffoldMessenger.of(context);
+              Future.delayed(
+                Duration.zero,
+                () => messenger
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('$err'),
+                      backgroundColor: Colors.red,
+                    ),
+                  ),
+              );
+
+              return null;
+            },
+          );
     }
 
     final chapters = ref.watch(mangaChaptersProvider(manga));
