@@ -443,7 +443,7 @@ class MangaCoversProvider
   }
 }
 
-String _$readChaptersHash() => r'b34804255a89e3c7fd2d21a865cfcad46bd95d63';
+String _$readChaptersHash() => r'a98afd37a00836974a53b24ce85f68a96fddf96b';
 
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)

@@ -1554,6 +1554,11 @@ class ReadChapters extends _$ReadChapters {
 
   /// Fetch read chapters for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
     // If state is loading, wait for it first
     if (state.isLoading || state.isReloading) {
       await future;
@@ -2004,16 +2009,14 @@ class AuthControl extends _$AuthControl {
 
 class RateLimitedClient extends http.BaseClient {
   final http.Client baseClient = http.Client();
-  late final String userAgent;
+  final userAgent = PackageInfo.fromPlatform()
+      .then((info) => '${info.appName}/${info.version}');
 
-  RateLimitedClient() {
-    PackageInfo.fromPlatform()
-        .then((info) => userAgent = '${info.appName}/${info.version}');
-  }
+  RateLimitedClient();
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    request.headers[HttpHeaders.userAgentHeader] = userAgent;
+    request.headers[HttpHeaders.userAgentHeader] = await userAgent;
     await Future.delayed(const Duration(milliseconds: 200));
     return baseClient.send(request);
   }
