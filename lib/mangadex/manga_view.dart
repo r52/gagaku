@@ -813,50 +813,60 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       cover: cover,
                       manga: manga,
                       page: index,
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute<void>(builder: (context) {
-                          return Scaffold(
-                            body: ExtendedImageGesturePageView.builder(
-                              itemBuilder: (BuildContext context, int id) {
-                                final item = coverList.elementAt(id);
-                                final url = manga.getUrlFromCover(item);
-                                Widget image = ExtendedImage.network(
-                                  url,
-                                  fit: BoxFit.contain,
-                                  mode: ExtendedImageMode.gesture,
-                                  enableSlideOutPage: true,
-                                  loadStateChanged:
-                                      extendedImageLoadStateHandler,
-                                );
-
-                                image = Container(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: GestureDetector(
-                                    child: image,
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                );
-
-                                if (id == index) {
-                                  return Hero(
-                                    tag: url,
-                                    child: image,
-                                  );
-                                } else {
-                                  return image;
-                                }
-                              },
-                              itemCount: coverList.length,
-                              controller: ExtendedPageController(
-                                initialPage: index,
+                      onTap: () async {
+                        await showModal(
+                          context: context,
+                          builder: (context) {
+                            return Scaffold(
+                              appBar: AppBar(
+                                backgroundColor: Colors.transparent,
                               ),
-                              scrollDirection: Axis.horizontal,
-                            ),
-                          );
-                        }));
+                              backgroundColor: Colors.transparent,
+                              extendBody: true,
+                              extendBodyBehindAppBar: true,
+                              body: PageView.builder(
+                                scrollBehavior: MouseTouchScrollBehavior(),
+                                itemBuilder: (BuildContext context, int id) {
+                                  final item = coverList.elementAt(id);
+                                  final url = manga.getUrlFromCover(item);
+                                  Widget image = ExtendedImage.network(
+                                    url,
+                                    fit: BoxFit.contain,
+                                    mode: ExtendedImageMode.gesture,
+                                    enableSlideOutPage: true,
+                                    loadStateChanged:
+                                        extendedImageLoadStateHandler,
+                                  );
+
+                                  image = Container(
+                                    padding: const EdgeInsets.all(5.0),
+                                    color: Colors.transparent,
+                                    child: GestureDetector(
+                                      child: image,
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  );
+
+                                  if (id == index) {
+                                    return Hero(
+                                      tag: url,
+                                      child: image,
+                                    );
+                                  } else {
+                                    return image;
+                                  }
+                                },
+                                itemCount: coverList.length,
+                                controller: PageController(
+                                  initialPage: index,
+                                ),
+                                scrollDirection: Axis.horizontal,
+                              ),
+                            );
+                          },
+                        );
                       },
                     );
                   },
