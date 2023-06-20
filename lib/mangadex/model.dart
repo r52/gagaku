@@ -322,7 +322,7 @@ class MangaDexModel {
       [int offset = 0, bool wholeList = false]) async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "fetchUserFeed() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
@@ -669,7 +669,7 @@ class MangaDexModel {
   Future<bool> getMangaFollowing(Manga manga) async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "getMangaFollowing() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
@@ -697,7 +697,7 @@ class MangaDexModel {
   Future<bool> setMangaFollowing(Manga manga, bool setFollow) async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "setMangaFollowing() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
@@ -727,7 +727,7 @@ class MangaDexModel {
   Future<MangaReadingStatus?> getMangaReadingStatus(Manga manga) async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "getMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
@@ -764,7 +764,7 @@ class MangaDexModel {
       Manga manga, MangaReadingStatus? status) async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "setMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
@@ -802,7 +802,7 @@ class MangaDexModel {
   Future<ReadChaptersMap> fetchReadChapters(Iterable<Manga> mangas) async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "fetchReadChapters() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
@@ -912,7 +912,7 @@ class MangaDexModel {
       Manga manga, Iterable<Chapter> chapters, bool setRead) async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "setChaptersRead() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
@@ -981,7 +981,7 @@ class MangaDexModel {
   Future<LibraryMap?> fetchUserLibrary() async {
     if (!loggedIn()) {
       throw Exception(
-          "Data fetch called on invalid token/login. Shouldn't ever get here");
+          "fetchUserLibrary() called on invalid token/login. Shouldn't ever get here");
     }
 
     if (_tokenExpired(_token)) {
