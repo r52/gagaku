@@ -70,17 +70,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
             },
             error: (err, stack) {
               final messenger = ScaffoldMessenger.of(context);
-              Future.delayed(
-                Duration.zero,
-                () => messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('$err'),
-                      backgroundColor: Colors.red,
-                    ),
-                  ),
-              );
+              Styles.showErrorSnackBar(messenger, '$err');
 
               return Text('Error: $err');
             },

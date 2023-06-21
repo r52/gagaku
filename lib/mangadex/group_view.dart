@@ -229,17 +229,7 @@ class MangaDexGroupViewWidget extends HookWidget {
                 error: (err, stack) {
                   ref.invalidate(groupTitlesProvider(group));
                   final messenger = ScaffoldMessenger.of(context);
-                  Future.delayed(
-                    Duration.zero,
-                    () => messenger
-                      ..removeCurrentSnackBar()
-                      ..showSnackBar(
-                        SnackBar(
-                          content: Text('$err'),
-                          backgroundColor: Colors.red,
-                        ),
-                      ),
-                  );
+                  Styles.showErrorSnackBar(messenger, '$err');
 
                   return Text('Error: $err');
                 },

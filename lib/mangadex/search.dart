@@ -144,17 +144,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
               ),
               error: (err, stackTrace) {
                 final messenger = ScaffoldMessenger.of(context);
-                Future.delayed(
-                  Duration.zero,
-                  () => messenger
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text('$err'),
-                        backgroundColor: Colors.red,
-                      ),
-                    ),
-                );
+                Styles.showErrorSnackBar(messenger, '$err');
 
                 return SliverToBoxAdapter(
                   child: Center(
@@ -483,17 +473,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
         ),
         error: (err, stackTrace) {
           final messenger = ScaffoldMessenger.of(context);
-          Future.delayed(
-            Duration.zero,
-            () => messenger
-              ..removeCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text('$err'),
-                  backgroundColor: Colors.red,
-                ),
-              ),
-          );
+          Styles.showErrorSnackBar(messenger, '$err');
 
           return Text('Error: $err');
         },

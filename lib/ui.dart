@@ -308,6 +308,20 @@ class Styles {
         ),
       );
 
+  static void showErrorSnackBar(ScaffoldMessengerState state, String content) {
+    Future.delayed(
+      Duration.zero,
+      () => state
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(content),
+            backgroundColor: Colors.red,
+          ),
+        ),
+    );
+  }
+
   static Widget slideTransitionBuilder(
       BuildContext context,
       Animation<double> animation,

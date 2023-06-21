@@ -61,17 +61,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             loading: () => null,
             error: (err, stackTrace) {
               final messenger = ScaffoldMessenger.of(context);
-              Future.delayed(
-                Duration.zero,
-                () => messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('$err'),
-                      backgroundColor: Colors.red,
-                    ),
-                  ),
-              );
+              Styles.showErrorSnackBar(messenger, '$err');
 
               return null;
             },
@@ -791,17 +781,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 ref.invalidate(mangaChaptersProvider(manga));
 
                 final messenger = ScaffoldMessenger.of(context);
-                Future.delayed(
-                  Duration.zero,
-                  () => messenger
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text('$err'),
-                        backgroundColor: Colors.red,
-                      ),
-                    ),
-                );
+                Styles.showErrorSnackBar(messenger, '$err');
 
                 return SliverToBoxAdapter(
                   child: Center(
@@ -900,17 +880,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 ref.invalidate(mangaCoversProvider(manga));
 
                 final messenger = ScaffoldMessenger.of(context);
-                Future.delayed(
-                  Duration.zero,
-                  () => messenger
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text('$err'),
-                        backgroundColor: Colors.red,
-                      ),
-                    ),
-                );
+                Styles.showErrorSnackBar(messenger, '$err');
 
                 return SliverToBoxAdapter(
                   child: Center(

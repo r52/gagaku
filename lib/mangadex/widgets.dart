@@ -115,17 +115,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
           ref.invalidate(provider);
 
           final messenger = ScaffoldMessenger.of(context);
-          Future.delayed(
-            Duration.zero,
-            () => messenger
-              ..removeCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text('$err'),
-                  backgroundColor: Colors.red,
-                ),
-              ),
-          );
+          Styles.showErrorSnackBar(messenger, '$err');
 
           return Column(
             children: [
@@ -159,17 +149,7 @@ class ChapterFeedItem extends ConsumerWidget {
             loading: () => null,
             error: (err, stackTrace) {
               final messenger = ScaffoldMessenger.of(context);
-              Future.delayed(
-                Duration.zero,
-                () => messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('$err'),
-                      backgroundColor: Colors.red,
-                    ),
-                  ),
-              );
+              Styles.showErrorSnackBar(messenger, '$err');
 
               return null;
             },
