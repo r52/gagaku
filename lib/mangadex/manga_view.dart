@@ -819,6 +819,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             return Scaffold(
                               appBar: AppBar(
                                 backgroundColor: Colors.transparent,
+                                leading: const CloseButton(),
                               ),
                               backgroundColor: Colors.transparent,
                               extendBody: true,

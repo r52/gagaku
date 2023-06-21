@@ -58,11 +58,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            nav.pop(false);
-          },
-        ),
+        leading: const BackButton(),
         title: const Text('Login to MangaDex'),
       ),
       body: SafeArea(
