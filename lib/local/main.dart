@@ -208,7 +208,12 @@ class LocalLibraryHome extends HookConsumerWidget {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$err');
 
-            return Styles.errorColumn(err, stackTrace);
+            return RefreshIndicator(
+              onRefresh: () async {
+                return await ref.refresh(localLibraryProvider.future);
+              },
+              child: Styles.errorColumn(err, stackTrace),
+            );
           },
         );
       }(),
