@@ -9,6 +9,7 @@ import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:mutex/mutex.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
@@ -86,15 +87,16 @@ final mangadexProvider = Provider(MangaDexModel.new);
 
 class MangaDexModel {
   MangaDexModel(this.ref) {
-    _initFuture = _init();
+    _future = refreshToken();
   }
 
   final Ref ref;
   //TokenResponse? _token;
   OldToken? _token;
+  final _tokenMutex = ReadWriteMutex();
   http.Client _client = RateLimitedClient();
-  late Future _initFuture;
-  Future get initialized => _initFuture;
+  late Future _future;
+  Future get future => _future;
 
   final CacheManager _cache = CacheManager();
 
@@ -113,18 +115,20 @@ class MangaDexModel {
   //       : false;
   // }
 
-  bool _tokenExpired(OldToken? token) {
-    if (token == null) {
-      return false;
-    }
+  Future<bool> _tokenExpired() async {
+    return await _tokenMutex.protectRead(() async {
+      if (_token == null) {
+        return false;
+      }
 
-    return token.expired;
+      return _token!.expired;
+    });
   }
 
-  bool loggedIn() => (_token != null && _client is AuthenticatedClient);
-
-  Future _init() async {
-    await refreshToken();
+  Future<bool> loggedIn() async {
+    return await _tokenMutex.protectRead(() async {
+      return (_token != null && _client is AuthenticatedClient);
+    });
   }
 
   // Future<void> refreshToken() async {
@@ -161,43 +165,45 @@ class MangaDexModel {
   // }
 
   Future<void> refreshToken() async {
-    // Clear old data
-    _token = null;
+    await _tokenMutex.protectWrite(() async {
+      // Clear old data
+      _token = null;
 
-    final storage = Hive.box(gagakuBox);
-    String? strken = await storage.get('oldtoken') as String?;
+      final storage = Hive.box(gagakuBox);
+      String? strken = await storage.get('oldtoken') as String?;
 
-    if (strken != null) {
-      final jstr = json.decode(strken);
-      OldToken token = OldToken.fromJson(jstr);
+      if (strken != null) {
+        final jstr = json.decode(strken);
+        OldToken token = OldToken.fromJson(jstr);
 
-      if (token.isValid) {
-        Map<String, String> payload = {'token': token.refresh};
+        if (token.isValid) {
+          Map<String, String> payload = {'token': token.refresh};
 
-        final response = await http.post(
-            MangaDexEndpoints.api.replace(path: MangaDexEndpoints.refresh),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode(payload));
+          final response = await http.post(
+              MangaDexEndpoints.api.replace(path: MangaDexEndpoints.refresh),
+              headers: {'Content-Type': 'application/json'},
+              body: json.encode(payload));
 
-        if (response.statusCode == 200) {
-          Map<String, dynamic> body = json.decode(response.body);
+          if (response.statusCode == 200) {
+            Map<String, dynamic> body = json.decode(response.body);
 
-          if (body['result'] == 'ok') {
-            OldToken t = OldToken.fromJson(body['token']);
+            if (body['result'] == 'ok') {
+              OldToken t = OldToken.fromJson(body['token']);
 
-            if (t.isValid) {
-              await _saveToken(t);
-              _token = t;
-              _client = AuthenticatedClient(RateLimitedClient(), t);
-              return;
+              if (t.isValid) {
+                await _saveToken(t);
+                _token = t;
+                _client = AuthenticatedClient(RateLimitedClient(), t);
+                return;
+              }
             }
           }
         }
       }
-    }
 
-    // If any steps fail, assign a default client
-    _client = RateLimitedClient();
+      // If any steps fail, assign a default client
+      _client = RateLimitedClient();
+    });
   }
 
   // Future<void> authenticate() async {
@@ -240,10 +246,11 @@ class MangaDexModel {
         OldToken t = OldToken.fromJson(body['token']);
 
         if (t.isValid) {
-          await _saveToken(t);
-          _token = t;
-          _client = AuthenticatedClient(RateLimitedClient(), t);
-          return;
+          return await _tokenMutex.protectWrite(() async {
+            await _saveToken(t);
+            _token = t;
+            _client = AuthenticatedClient(RateLimitedClient(), t);
+          });
         }
       }
     }
@@ -276,7 +283,7 @@ class MangaDexModel {
   // }
 
   Future<void> logout() async {
-    if (loggedIn()) {
+    if (await loggedIn()) {
       final response = await _client
           .post(MangaDexEndpoints.api.replace(path: MangaDexEndpoints.logout));
 
@@ -284,11 +291,13 @@ class MangaDexModel {
         Map<String, dynamic> body = jsonDecode(response.body);
 
         if (body['result'] == 'ok') {
-          _token = null;
-          _client = RateLimitedClient();
+          return await _tokenMutex.protectWrite(() async {
+            _token = null;
+            _client = RateLimitedClient();
 
-          final storage = Hive.box(gagakuBox);
-          await storage.delete('oldtoken');
+            final storage = Hive.box(gagakuBox);
+            await storage.delete('oldtoken');
+          });
         }
       }
     }
@@ -313,11 +322,11 @@ class MangaDexModel {
   /// Do not use directly. The provider [latestChaptersFeedProvider] should be
   /// used instead as it provides auto state management.
   Future<Iterable<Chapter>> fetchUserFeed([int offset = 0]) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "fetchUserFeed() called on invalid token/login. Shouldn't ever get here");
     }
@@ -373,7 +382,7 @@ class MangaDexModel {
   /// used instead as it provides auto state management.
   Future<Iterable<Chapter>> fetchChapterFeed(
       {int offset = 0, Group? group}) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -421,7 +430,7 @@ class MangaDexModel {
 
   /// Fetches chapter data of the given chapter [uuids]
   Future<Iterable<Chapter>> fetchChapters(Iterable<String> uuids) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -479,7 +488,7 @@ class MangaDexModel {
   /// Fetches a list of manga data given the query parameters
   Future<Iterable<Manga>> fetchManga(
       {Iterable<String>? ids, Group? group, int offset = 0}) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -559,11 +568,11 @@ class MangaDexModel {
 
   /// Gets whether or not the user is following [manga]
   Future<bool> getMangaFollowing(Manga manga) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "getMangaFollowing() called on invalid token/login. Shouldn't ever get here");
     }
@@ -587,11 +596,11 @@ class MangaDexModel {
 
   /// Sets the manga's following status [setFollow] of the [manga]
   Future<bool> setMangaFollowing(Manga manga, bool setFollow) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "setMangaFollowing() called on invalid token/login. Shouldn't ever get here");
     }
@@ -617,11 +626,11 @@ class MangaDexModel {
 
   /// Gets the user's reading status for [manga]
   Future<MangaReadingStatus?> getMangaReadingStatus(Manga manga) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "getMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
     }
@@ -654,11 +663,11 @@ class MangaDexModel {
   /// Sets the manga's reading status [status] of the [manga]
   Future<bool> setMangaReadingStatus(
       Manga manga, MangaReadingStatus? status) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "setMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
     }
@@ -692,11 +701,11 @@ class MangaDexModel {
   /// Do not use directly. Prefer [readChaptersProvider] for its caching and
   /// state management.
   Future<ReadChaptersMap> fetchReadChapters(Iterable<Manga> mangas) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "fetchReadChapters() called on invalid token/login. Shouldn't ever get here");
     }
@@ -753,7 +762,7 @@ class MangaDexModel {
   /// management.
   Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
       [int offset = 0]) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -802,11 +811,11 @@ class MangaDexModel {
   /// Sets the chapter read status [setRead] of the [chapters]
   Future<bool> setChaptersRead(
       Manga manga, Iterable<Chapter> chapters, bool setRead) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "setChaptersRead() called on invalid token/login. Shouldn't ever get here");
     }
@@ -871,11 +880,11 @@ class MangaDexModel {
 
   /// Fetches the user's manga library
   Future<LibraryMap?> fetchUserLibrary() async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
-    if (!loggedIn()) {
+    if (!await loggedIn()) {
       throw Exception(
           "fetchUserLibrary() called on invalid token/login. Shouldn't ever get here");
     }
@@ -912,7 +921,7 @@ class MangaDexModel {
 
   /// Retrieve all MangaDex tags
   Future<Iterable<Tag>> getTagList() async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -951,7 +960,7 @@ class MangaDexModel {
     required MangaFilters filter,
     int offset = 0,
   }) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -1008,7 +1017,7 @@ class MangaDexModel {
   /// state management.
   Future<Map<String, MangaStatistics>> fetchStatistics(
       Iterable<Manga> mangas) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -1039,7 +1048,7 @@ class MangaDexModel {
 
   /// Retrieve cover art for a specific manga
   Future<List<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
-    if (_tokenExpired(_token)) {
+    if (await _tokenExpired()) {
       await refreshToken();
     }
 
@@ -1869,8 +1878,8 @@ class AuthControl extends _$AuthControl {
   @override
   FutureOr<bool> build() async {
     final api = ref.watch(mangadexProvider);
-    await api.initialized;
-    return api.loggedIn();
+    await api.future;
+    return await api.loggedIn();
   }
 
   Future<bool> login(String user, String pass) async {
@@ -1878,10 +1887,10 @@ class AuthControl extends _$AuthControl {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await api.authenticate(user, pass);
-      return api.loggedIn();
+      return await api.loggedIn();
     });
 
-    return api.loggedIn();
+    return await api.loggedIn();
   }
 
   Future<void> logout() async {
@@ -1889,7 +1898,7 @@ class AuthControl extends _$AuthControl {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await api.logout();
-      return api.loggedIn();
+      return await api.loggedIn();
     });
   }
 }
