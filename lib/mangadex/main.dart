@@ -189,7 +189,11 @@ class MangaDexHome extends HookConsumerWidget {
                     loading: () => const Center(
                       child: CircularProgressIndicator(),
                     ),
-                    error: (err, stack) => const Icon(Icons.error),
+                    error: (err, stack) {
+                      final messenger = ScaffoldMessenger.of(context);
+                      Styles.showErrorSnackBar(messenger, '$err');
+                      return const Icon(Icons.error);
+                    },
                   );
                 },
               ),

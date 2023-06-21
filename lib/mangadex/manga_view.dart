@@ -784,14 +784,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 Styles.showErrorSnackBar(messenger, '$err');
 
                 return SliverToBoxAdapter(
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text('Error: $err'),
-                        Text(stackTrace.toString()),
-                      ],
-                    ),
-                  ),
+                  child: Styles.errorColumn(err, stackTrace),
                 );
               },
             ),
@@ -884,14 +877,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 Styles.showErrorSnackBar(messenger, '$err');
 
                 return SliverToBoxAdapter(
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text('Error: $err'),
-                        Text(stackTrace.toString()),
-                      ],
-                    ),
-                  ),
+                  child: Styles.errorColumn(err, stackTrace),
                 );
               },
             ),

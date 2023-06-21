@@ -282,6 +282,15 @@ class Styles {
     ),
   );
 
+  static Widget errorColumn(Object err, StackTrace stack) => Center(
+        child: Column(
+          children: [
+            Text('Error: $err'),
+            Text(stack.toString()),
+          ],
+        ),
+      );
+
   static Widget titleFlexBar({
     required BuildContext context,
     required String title,

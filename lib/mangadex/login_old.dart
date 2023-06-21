@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
+import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MangaDexLoginWidget extends ConsumerWidget {
@@ -38,7 +39,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
       loading: () => const Center(
         child: CircularProgressIndicator(),
       ),
-      error: (err, stack) => Text('Error: $err'),
+      error: (err, stack) => Styles.errorColumn(err, stack),
     );
   }
 }

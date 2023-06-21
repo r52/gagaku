@@ -231,7 +231,7 @@ class MangaDexGroupViewWidget extends HookWidget {
                   final messenger = ScaffoldMessenger.of(context);
                   Styles.showErrorSnackBar(messenger, '$err');
 
-                  return Text('Error: $err');
+                  return Styles.errorColumn(err, stack);
                 },
                 loading: () => const Stack(
                   children: Styles.loadingOverlay,

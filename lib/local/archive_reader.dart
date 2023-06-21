@@ -143,7 +143,12 @@ class ArchiveReaderWidget extends HookConsumerWidget {
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$err');
 
-        return Text('Error: $err');
+        return Scaffold(
+          appBar: AppBar(
+            leading: const BackButton(),
+          ),
+          body: Styles.errorColumn(err, stackTrace),
+        );
       },
     );
   }

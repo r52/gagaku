@@ -147,9 +147,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                 Styles.showErrorSnackBar(messenger, '$err');
 
                 return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text('Error: $err'),
-                  ),
+                  child: Styles.errorColumn(err, stackTrace),
                 );
               },
             );
@@ -475,7 +473,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
           final messenger = ScaffoldMessenger.of(context);
           Styles.showErrorSnackBar(messenger, '$err');
 
-          return Text('Error: $err');
+          return Styles.errorColumn(err, stackTrace);
         },
       ),
     );

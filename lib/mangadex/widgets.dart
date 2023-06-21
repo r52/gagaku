@@ -117,12 +117,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
           final messenger = ScaffoldMessenger.of(context);
           Styles.showErrorSnackBar(messenger, '$err');
 
-          return Column(
-            children: [
-              Text('Error: $err'),
-              Text(stackTrace.toString()),
-            ],
-          );
+          return Styles.errorColumn(err, stackTrace);
         },
       ),
     );

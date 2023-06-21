@@ -79,7 +79,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                       final messenger = ScaffoldMessenger.of(context);
                       Styles.showErrorSnackBar(messenger, '$err');
 
-                      return Text('Error: $err');
+                      return Styles.errorColumn(err, stackTrace);
                     },
                   ),
                   if (isLoading) ...Styles.loadingOverlay,
