@@ -115,7 +115,7 @@ class MangaDexModel {
   //       : false;
   // }
 
-  Future<bool> _tokenExpired() async {
+  Future<bool> tokenExpired() async {
     return await _tokenMutex.protectRead(() async {
       if (_token == null) {
         return false;
@@ -322,10 +322,6 @@ class MangaDexModel {
   /// Do not use directly. The provider [latestChaptersFeedProvider] should be
   /// used instead as it provides auto state management.
   Future<Iterable<Chapter>> fetchUserFeed([int offset = 0]) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "fetchUserFeed() called on invalid token/login. Shouldn't ever get here");
@@ -382,10 +378,6 @@ class MangaDexModel {
   /// used instead as it provides auto state management.
   Future<Iterable<Chapter>> fetchChapterFeed(
       {int offset = 0, Group? group}) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     final settings = ref.read(mdConfigProvider);
 
     // Download missing data
@@ -430,10 +422,6 @@ class MangaDexModel {
 
   /// Fetches chapter data of the given chapter [uuids]
   Future<Iterable<Chapter>> fetchChapters(Iterable<String> uuids) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     final settings = ref.read(mdConfigProvider);
 
     final list = <Chapter>[];
@@ -488,10 +476,6 @@ class MangaDexModel {
   /// Fetches a list of manga data given the query parameters
   Future<Iterable<Manga>> fetchManga(
       {Iterable<String>? ids, Group? group, int offset = 0}) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     final settings = ref.read(mdConfigProvider);
 
     final queryParams = {
@@ -568,10 +552,6 @@ class MangaDexModel {
 
   /// Gets whether or not the user is following [manga]
   Future<bool> getMangaFollowing(Manga manga) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "getMangaFollowing() called on invalid token/login. Shouldn't ever get here");
@@ -596,10 +576,6 @@ class MangaDexModel {
 
   /// Sets the manga's following status [setFollow] of the [manga]
   Future<bool> setMangaFollowing(Manga manga, bool setFollow) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "setMangaFollowing() called on invalid token/login. Shouldn't ever get here");
@@ -626,10 +602,6 @@ class MangaDexModel {
 
   /// Gets the user's reading status for [manga]
   Future<MangaReadingStatus?> getMangaReadingStatus(Manga manga) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "getMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
@@ -663,10 +635,6 @@ class MangaDexModel {
   /// Sets the manga's reading status [status] of the [manga]
   Future<bool> setMangaReadingStatus(
       Manga manga, MangaReadingStatus? status) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "setMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
@@ -701,10 +669,6 @@ class MangaDexModel {
   /// Do not use directly. Prefer [readChaptersProvider] for its caching and
   /// state management.
   Future<ReadChaptersMap> fetchReadChapters(Iterable<Manga> mangas) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "fetchReadChapters() called on invalid token/login. Shouldn't ever get here");
@@ -762,12 +726,6 @@ class MangaDexModel {
   /// management.
   Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
       [int offset = 0]) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
-    var list = <Chapter>[];
-
     final settings = ref.read(mdConfigProvider);
 
     // Download missing data
@@ -798,10 +756,7 @@ class MangaDexModel {
       // Cache the data
       _cache.putAllAPIResolved(result.data);
 
-      // Add data to the list
-      list.addAll(result.data);
-
-      return list;
+      return result.data;
     }
 
     // Throw if failure
@@ -811,10 +766,6 @@ class MangaDexModel {
   /// Sets the chapter read status [setRead] of the [chapters]
   Future<bool> setChaptersRead(
       Manga manga, Iterable<Chapter> chapters, bool setRead) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "setChaptersRead() called on invalid token/login. Shouldn't ever get here");
@@ -880,10 +831,6 @@ class MangaDexModel {
 
   /// Fetches the user's manga library
   Future<LibraryMap?> fetchUserLibrary() async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (!await loggedIn()) {
       throw Exception(
           "fetchUserLibrary() called on invalid token/login. Shouldn't ever get here");
@@ -921,10 +868,6 @@ class MangaDexModel {
 
   /// Retrieve all MangaDex tags
   Future<Iterable<Tag>> getTagList() async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     if (_cache.exists(CacheLists.tags)) {
       return _cache.getSpecialList<Tag>(CacheLists.tags);
     }
@@ -960,18 +903,12 @@ class MangaDexModel {
     required MangaFilters filter,
     int offset = 0,
   }) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     // Return nothing if empty search term
     if (searchTerm.isEmpty) {
       return [];
     }
 
     final settings = ref.read(mdConfigProvider);
-
-    List<Manga> list = [];
 
     Map<String, dynamic> queryParams = {
       'limit': MangaDexEndpoints.apiSearchLimit.toString(),
@@ -999,16 +936,13 @@ class MangaDexModel {
 
       final mlist = MangaList.fromJson(body);
 
-      list.addAll(mlist.data);
-
       // Cache the data
       _cache.putAllAPIResolved(mlist.data);
-    } else {
-      // Throw if failure
-      throw Exception("Failed to search manga");
-    }
 
-    return list;
+      return mlist.data;
+    }
+    // Throw if failure
+    throw Exception("Failed to search manga");
   }
 
   /// Fetches statistics of given [mangas]
@@ -1017,10 +951,6 @@ class MangaDexModel {
   /// state management.
   Future<Map<String, MangaStatistics>> fetchStatistics(
       Iterable<Manga> mangas) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     final fetch = mangas.map((e) => e.id);
 
     if (fetch.isNotEmpty) {
@@ -1048,10 +978,6 @@ class MangaDexModel {
 
   /// Retrieve cover art for a specific manga
   Future<List<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
-    if (await _tokenExpired()) {
-      await refreshToken();
-    }
-
     // Download missing data
     final queryParams = {
       'limit': MangaDexEndpoints.apiSearchLimit.toString(),
@@ -1879,6 +1805,11 @@ class AuthControl extends _$AuthControl {
   FutureOr<bool> build() async {
     final api = ref.watch(mangadexProvider);
     await api.future;
+
+    if (await api.tokenExpired()) {
+      await api.refreshToken();
+    }
+
     return await api.loggedIn();
   }
 
