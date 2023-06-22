@@ -361,7 +361,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to download latest chapters");
+    throw Exception(
+        "fetchUserFeed() failed. Response code: ${response.statusCode}");
   }
 
   /// Fetches the chapter feed based on the given parameters
@@ -417,7 +418,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to download latest global chapters");
+    throw Exception(
+        "fetchChapterFeed() failed. Response code: ${response.statusCode}");
   }
 
   /// Fetches chapter data of the given chapter [uuids]
@@ -459,7 +461,8 @@ class MangaDexModel {
           _cache.putAllAPIResolved(result.data);
         } else {
           // Throw if failure
-          throw Exception("Failed to download manga data");
+          throw Exception(
+              "fetchChapters() failed. Response code: ${response.statusCode}");
         }
       }
     }
@@ -513,7 +516,8 @@ class MangaDexModel {
             _cache.putAllAPIResolved(mangalist.data);
           } else {
             // Throw if failure
-            throw Exception("Failed to download manga data");
+            throw Exception(
+                "fetchManga(ids) failed. Response code: ${response.statusCode}");
           }
         }
       }
@@ -543,7 +547,8 @@ class MangaDexModel {
         list.addAll(mangalist.data);
       } else {
         // Throw if failure
-        throw Exception("Failed to download manga data");
+        throw Exception(
+            "fetchManga(group) failed. Response code: ${response.statusCode}");
       }
     }
 
@@ -571,7 +576,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to retrieve manga following status");
+    throw Exception(
+        "getMangaFollowing() failed. Response code: ${response.statusCode}");
   }
 
   /// Sets the manga's following status [setFollow] of the [manga]
@@ -629,7 +635,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to retrieve manga reading status");
+    throw Exception(
+        "getMangaReadingStatus() failed. Response code: ${response.statusCode}");
   }
 
   /// Sets the manga's reading status [status] of the [manga]
@@ -707,7 +714,8 @@ class MangaDexModel {
         return readmap;
       } else {
         // Throw if failure
-        throw Exception("Failed to download read chapters data");
+        throw Exception(
+            "fetchReadChapters() failed. Response code: ${response.statusCode}");
       }
     }
 
@@ -760,7 +768,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to download manga chapters");
+    throw Exception(
+        "fetchMangaChapters() failed. Response code: ${response.statusCode}");
   }
 
   /// Sets the chapter read status [setRead] of the [chapters]
@@ -826,7 +835,8 @@ class MangaDexModel {
       return data;
     }
 
-    throw Exception("Failed to get relay server");
+    throw Exception(
+        "getChapterServer() failed. Response code: ${response.statusCode}");
   }
 
   /// Fetches the user's manga library
@@ -863,7 +873,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to download user library data");
+    throw Exception(
+        "fetchUserLibrary() failed. Response code: ${response.statusCode}");
   }
 
   /// Retrieve all MangaDex tags
@@ -889,7 +900,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to download tag list");
+    throw Exception(
+        "getTagList() failed. Response code: ${response.statusCode}");
   }
 
   /// Searches for manga using the MangaDex API with the search term [searchTerm].
@@ -942,7 +954,8 @@ class MangaDexModel {
       return mlist.data;
     }
     // Throw if failure
-    throw Exception("Failed to search manga");
+    throw Exception(
+        "searchManga() failed. Response code: ${response.statusCode}");
   }
 
   /// Fetches statistics of given [mangas]
@@ -969,7 +982,8 @@ class MangaDexModel {
         return resp.statistics;
       } else {
         // Throw if failure
-        throw Exception("Failed to download manga statistics");
+        throw Exception(
+            "fetchStatistics() failed. Response code: ${response.statusCode}");
       }
     }
 
@@ -999,7 +1013,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    throw Exception("Failed to download covers");
+    throw Exception(
+        "getCoverList() failed. Response code: ${response.statusCode}");
   }
 }
 
