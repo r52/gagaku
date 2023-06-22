@@ -1838,14 +1838,17 @@ class RateLimitedClient extends http.BaseClient {
   final http.Client baseClient = http.Client();
   final userAgent = PackageInfo.fromPlatform()
       .then((info) => '${info.appName}/${info.version}');
+  final _mutex = Mutex();
 
   RateLimitedClient();
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    request.headers[HttpHeaders.userAgentHeader] = await userAgent;
-    await Future.delayed(const Duration(milliseconds: 200));
-    return baseClient.send(request);
+    return await _mutex.protect(() async {
+      request.headers[HttpHeaders.userAgentHeader] = await userAgent;
+      await Future.delayed(const Duration(milliseconds: 200));
+      return baseClient.send(request);
+    });
   }
 }
 
