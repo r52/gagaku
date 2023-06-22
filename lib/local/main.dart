@@ -212,7 +212,7 @@ class LocalLibraryHome extends HookConsumerWidget {
               onRefresh: () async {
                 return await ref.refresh(localLibraryProvider.future);
               },
-              child: Styles.errorColumn(err, stackTrace),
+              child: Styles.errorList(err, stackTrace),
             );
           },
         );

@@ -227,16 +227,16 @@ class MangaDexGroupViewWidget extends HookWidget {
                   );
                 },
                 error: (err, stack) {
-                  ref.invalidate(groupTitlesProvider(group));
                   final messenger = ScaffoldMessenger.of(context);
                   Styles.showErrorSnackBar(messenger, '$err');
 
                   return RefreshIndicator(
                     onRefresh: () async {
+                      ref.invalidate(groupTitlesProvider(group));
                       return await ref
                           .refresh(_fetchGroupTitlesProvider(group).future);
                     },
-                    child: Styles.errorColumn(err, stack),
+                    child: Styles.errorList(err, stack),
                   );
                 },
                 loading: () => const Stack(

@@ -778,7 +778,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               ),
               error: (err, stackTrace) {
                 // Invalidate the provider results on error
-                ref.invalidate(mangaChaptersProvider(manga));
+                // ref.invalidate(mangaChaptersProvider(manga));
 
                 final messenger = ScaffoldMessenger.of(context);
                 Styles.showErrorSnackBar(messenger, '$err');
@@ -871,7 +871,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               ),
               error: (err, stackTrace) {
                 // Invalidate the provider results on error
-                ref.invalidate(mangaCoversProvider(manga));
+                // ref.invalidate(mangaCoversProvider(manga));
 
                 final messenger = ScaffoldMessenger.of(context);
                 Styles.showErrorSnackBar(messenger, '$err');

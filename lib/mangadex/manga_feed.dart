@@ -69,15 +69,15 @@ class MangaDexMangaFeed extends HookConsumerWidget {
               );
             },
             error: (err, stack) {
-              ref.invalidate(latestChaptersFeedProvider);
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$err');
 
               return RefreshIndicator(
                 onRefresh: () async {
+                  ref.invalidate(latestChaptersFeedProvider);
                   return await ref.refresh(_fetchMangaFeedProvider.future);
                 },
-                child: Styles.errorColumn(err, stack),
+                child: Styles.errorList(err, stack),
               );
             },
             loading: () => const SizedBox.shrink(),

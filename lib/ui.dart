@@ -291,6 +291,16 @@ class Styles {
         ),
       );
 
+  static Widget errorList(Object err, StackTrace stack) => Center(
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Text('Error: $err'),
+            Text(stack.toString()),
+          ],
+        ),
+      );
+
   static Widget titleFlexBar({
     required BuildContext context,
     required String title,

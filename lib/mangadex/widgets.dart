@@ -112,14 +112,12 @@ class ChapterFeedWidget extends HookConsumerWidget {
           children: Styles.loadingOverlay,
         ),
         error: (err, stackTrace) {
-          ref.invalidate(provider);
-
           final messenger = ScaffoldMessenger.of(context);
           Styles.showErrorSnackBar(messenger, '$err');
 
           return RefreshIndicator(
             onRefresh: onRefresh,
-            child: Styles.errorColumn(err, stackTrace),
+            child: Styles.errorList(err, stackTrace),
           );
         },
       ),
