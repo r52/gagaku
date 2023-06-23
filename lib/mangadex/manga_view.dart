@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -62,6 +63,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             error: (err, stackTrace) {
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$err');
+              logger.e("readChaptersProvider failed", err, stackTrace);
 
               return null;
             },
@@ -782,6 +784,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                 final messenger = ScaffoldMessenger.of(context);
                 Styles.showErrorSnackBar(messenger, '$err');
+                logger.e("mangaChaptersProvider(${manga.id}) failed", err,
+                    stackTrace);
 
                 return SliverToBoxAdapter(
                   child: Styles.errorColumn(err, stackTrace),
@@ -875,6 +879,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                 final messenger = ScaffoldMessenger.of(context);
                 Styles.showErrorSnackBar(messenger, '$err');
+                logger.e(
+                    "mangaCoversProvider(${manga.id}) failed", err, stackTrace);
 
                 return SliverToBoxAdapter(
                   child: Styles.errorColumn(err, stackTrace),

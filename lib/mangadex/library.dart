@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -78,6 +79,8 @@ class MangaDexLibraryView extends HookConsumerWidget {
                     error: (err, stackTrace) {
                       final messenger = ScaffoldMessenger.of(context);
                       Styles.showErrorSnackBar(messenger, '$err');
+                      logger.e(
+                          "userLibraryProvider($type) failed", err, stackTrace);
 
                       return Styles.errorColumn(err, stackTrace);
                     },

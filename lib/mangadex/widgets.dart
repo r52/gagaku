@@ -2,6 +2,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -114,6 +115,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
         error: (err, stackTrace) {
           final messenger = ScaffoldMessenger.of(context);
           Styles.showErrorSnackBar(messenger, '$err');
+          logger.e("${provider.toString()} failed", err, stackTrace);
 
           return RefreshIndicator(
             onRefresh: onRefresh,
@@ -146,6 +148,7 @@ class ChapterFeedItem extends ConsumerWidget {
             error: (err, stackTrace) {
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$err');
+              logger.e("readChaptersProvider failed", err, stackTrace);
 
               return null;
             },

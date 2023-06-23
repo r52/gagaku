@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
 import 'package:gagaku/mangadex/history_feed.dart';
 import 'package:gagaku/mangadex/latest_feed.dart';
@@ -192,6 +193,7 @@ class MangaDexHome extends HookConsumerWidget {
                     error: (err, stack) {
                       final messenger = ScaffoldMessenger.of(context);
                       Styles.showErrorSnackBar(messenger, '$err');
+                      logger.e("authControlProvider failed", err, stack);
                       return const Icon(Icons.error);
                     },
                   );

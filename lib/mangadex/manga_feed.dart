@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -71,6 +72,7 @@ class MangaDexMangaFeed extends HookConsumerWidget {
             error: (err, stack) {
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$err');
+              logger.e("_fetchMangaFeedProvider failed", err, stack);
 
               return RefreshIndicator(
                 onRefresh: () async {

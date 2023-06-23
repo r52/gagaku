@@ -89,7 +89,6 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "r52" "\0"
             VALUE "FileDescription", "gagaku" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "gagaku" "\0"

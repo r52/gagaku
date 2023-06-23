@@ -4,6 +4,7 @@ import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/types.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
@@ -142,6 +143,7 @@ class ArchiveReaderWidget extends HookConsumerWidget {
       error: (err, stackTrace) {
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$err');
+        logger.e("_getArchivePagesProvider($path) failed", err, stackTrace);
 
         return Scaffold(
           appBar: AppBar(
