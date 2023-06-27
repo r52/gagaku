@@ -309,7 +309,7 @@ class ChapterButtonWidget extends ConsumerWidget {
     final endChip = <Widget>[];
     if (isEndChapter) {
       endChip.add(const IconTextChip(
-        color: Colors.blue,
+        color: Colors.deepOrange,
         text: Text('END'),
       ));
       endChip.add(const SizedBox(width: 4));
