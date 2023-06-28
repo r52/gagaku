@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
@@ -8,7 +9,6 @@ import 'package:gagaku/mangadex/cache.dart';
 import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mutex/mutex.dart';
@@ -206,6 +206,7 @@ class MangaDexModel {
                 await _saveToken(t);
                 _token = t;
                 _client = AuthenticatedClient(RateLimitedClient(), t);
+                logger.i("refreshToken(): MangaDex token refreshed");
                 return;
               }
             }
@@ -265,6 +266,8 @@ class MangaDexModel {
             await _saveToken(t);
             _token = t;
             _client = AuthenticatedClient(RateLimitedClient(), t);
+
+            logger.i("authenticate(): MangaDex user logged in");
           });
         }
       }
@@ -315,6 +318,8 @@ class MangaDexModel {
 
             final storage = Hive.box(gagakuBox);
             await storage.delete('oldtoken');
+
+            logger.i("logout(): MangaDex user logged out");
           });
         }
       }
@@ -1879,22 +1884,40 @@ class MangaDexHistory extends _$MangaDexHistory {
 
 @riverpod
 class AuthControl extends _$AuthControl {
+  Timer? _staleTime;
+
+  Future<void> _setStaleTime() async {
+    final api = ref.watch(mangadexProvider);
+
+    _staleTime?.cancel();
+
+    final expireTime = await api.timeUntilTokenExpiry();
+
+    if (expireTime != null) {
+      logger.d("AuthControl: setting stale time");
+      _staleTime = Timer(Duration(minutes: expireTime), () {
+        logger.i("AuthControl: stale time expiry");
+        ref.invalidateSelf();
+      });
+    }
+
+    ref.onDispose(() {
+      logger.d("AuthControl: dispose");
+      _staleTime?.cancel();
+    });
+  }
+
   @override
   FutureOr<bool> build() async {
     final api = ref.watch(mangadexProvider);
     await api.future;
 
     if (await api.tokenExpired()) {
+      logger.i("MangaDex token has expired. Refreshing...");
       await api.refreshToken();
     }
 
-    final expireTime = await api.timeUntilTokenExpiry();
-
-    if (expireTime != null) {
-      ref.staleTime(Duration(minutes: expireTime));
-    } else {
-      ref.staleTime(const Duration(minutes: OldToken.expiryTime));
-    }
+    await _setStaleTime();
 
     return await api.loggedIn();
   }
@@ -1904,6 +1927,7 @@ class AuthControl extends _$AuthControl {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await api.authenticate(user, pass);
+      await _setStaleTime();
       return await api.loggedIn();
     });
 
@@ -1915,6 +1939,7 @@ class AuthControl extends _$AuthControl {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await api.logout();
+      await _setStaleTime();
       return await api.loggedIn();
     });
   }
