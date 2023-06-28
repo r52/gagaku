@@ -8,6 +8,7 @@ import 'package:gagaku/mangadex/cache.dart';
 import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mutex/mutex.dart';
@@ -115,6 +116,16 @@ class MangaDexModel {
   //       ? (DateTime.now().difference(token.expiresAt!).inMinutes > -5)
   //       : false;
   // }
+
+  Future<int?> timeUntilTokenExpiry() async {
+    return await _tokenMutex.protectRead(() async {
+      if (_token == null) {
+        return null;
+      }
+
+      return _token!.timeUntilExpiry;
+    });
+  }
 
   Future<bool> tokenExpired() async {
     return await _tokenMutex.protectRead(() async {
@@ -1867,6 +1878,14 @@ class AuthControl extends _$AuthControl {
 
     if (await api.tokenExpired()) {
       await api.refreshToken();
+    }
+
+    final expireTime = await api.timeUntilTokenExpiry();
+
+    if (expireTime != null) {
+      ref.staleTime(Duration(minutes: expireTime));
+    } else {
+      ref.staleTime(const Duration(minutes: OldToken.expiryTime));
     }
 
     return await api.loggedIn();
