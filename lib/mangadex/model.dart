@@ -1894,9 +1894,10 @@ class AuthControl extends _$AuthControl {
     final expireTime = await api.timeUntilTokenExpiry();
 
     if (expireTime != null) {
-      logger.d("AuthControl: setting stale time");
-      _staleTime = Timer(Duration(minutes: expireTime), () {
-        logger.i("AuthControl: stale time expiry");
+      final delay = expireTime + 10;
+      logger.d("AuthControl: setting stale time to $delay seconds");
+      _staleTime = Timer(Duration(seconds: delay), () {
+        logger.d("AuthControl: stale time expiry");
         ref.invalidateSelf();
       });
     }

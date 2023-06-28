@@ -889,7 +889,7 @@ final mangaDexHistoryProvider =
 );
 
 typedef _$MangaDexHistory = AsyncNotifier<Queue<Chapter>>;
-String _$authControlHash() => r'0852564617576e4dfbf9b4325a34551d19437985';
+String _$authControlHash() => r'2e618c435c8d93320dcf40ce6dff48db361cf84e';
 
 /// See also [AuthControl].
 @ProviderFor(AuthControl)
