@@ -21,7 +21,7 @@ part 'model.g.dart';
 abstract class MangaDexEndpoints {
   static final api = Uri.https('api.mangadex.org', '');
 
-  static const apiQueryLimit = 100;
+  static const apiQueryLimit = 50;
   static const apiSearchLimit = 10;
 
   // For future OAuth
