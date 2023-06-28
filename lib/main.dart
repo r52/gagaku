@@ -31,11 +31,20 @@ void main() async {
   final appdir = await getApplicationSupportDirectory();
 
   if (kReleaseMode) {
-    Logger.level = Level.warning;
+    Logger.level = Level.info;
   }
 
   logger = Logger(
     filter: kReleaseMode ? ProductionFilter() : null,
+    printer: PrettyPrinter(
+      colors: false,
+      printTime: true,
+      excludeBox: {
+        Level.verbose: true,
+        Level.debug: true,
+        Level.info: true,
+      },
+    ),
     output: DeviceContext.isDesktop()
         ? (kReleaseMode
             ? FileOutput(file: File(p.join(appdir.path, 'gagaku.log')))

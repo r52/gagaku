@@ -210,6 +210,9 @@ class MangaDexModel {
               }
             }
           }
+
+          logger.w("refreshToken() returned code ${response.statusCode}",
+              response.body);
         }
       }
 
@@ -266,6 +269,9 @@ class MangaDexModel {
         }
       }
     }
+
+    logger.w(
+        "authenticate() returned code ${response.statusCode}", response.body);
   }
 
   // Future<void> _saveToken(TokenResponse token) async {
@@ -312,6 +318,8 @@ class MangaDexModel {
           });
         }
       }
+
+      logger.w("logout() returned code ${response.statusCode}", response.body);
     }
   }
 
