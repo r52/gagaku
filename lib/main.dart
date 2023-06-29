@@ -31,7 +31,7 @@ void main() async {
   final appdir = await getApplicationSupportDirectory();
 
   if (kReleaseMode) {
-    Logger.level = Level.info;
+    Logger.level = Level.warning;
   }
 
   logger = Logger(
