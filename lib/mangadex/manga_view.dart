@@ -164,10 +164,22 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               actions: () {
                 if (loggedin) {
                   final following =
-                      ref.watch(followingStatusProvider(manga)).valueOrNull ??
-                          false;
+                      ref.watch(followingStatusProvider(manga)).valueOrNull;
                   final reading =
                       ref.watch(readingStatusProvider(manga)).valueOrNull;
+
+                  if (following == null) {
+                    return [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    ];
+                  }
 
                   if (!following && reading == null) {
                     return [
