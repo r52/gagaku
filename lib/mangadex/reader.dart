@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/reader/main.dart';
@@ -58,7 +59,6 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pages = ref.watch(_fetchChapterPagesProvider(chapter));
-    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     final timer = useRef<Timer?>(null);
 
     String title = '';
@@ -71,18 +71,18 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       title += ' - ${chapter.attributes.title!}';
     }
 
-    Map<String, Set<String>> readData = {};
-
-    if (loggedin) {
-      readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
-    }
-
     useEffect(() {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
 
-      timer.value = Timer(const Duration(milliseconds: 2000), () {
-        if (readData[manga.id]?.contains(chapter.id) != true) {
-          ref.read(readChaptersProvider.notifier).set(manga, [chapter], true);
+      timer.value = Timer(const Duration(milliseconds: 2000), () async {
+        final loggedin = await ref.read(authControlProvider.future);
+
+        if (loggedin) {
+          final readData = await ref.read(readChaptersProvider.future);
+
+          if (readData[manga.id]?.contains(chapter.id) != true) {
+            ref.read(readChaptersProvider.notifier).set(manga, [chapter], true);
+          }
         }
 
         ref.read(mangaDexHistoryProvider.notifier).add(chapter);
@@ -109,19 +109,16 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       ),
       error: (err, stackTrace) {
         final messenger = ScaffoldMessenger.of(context);
-        Future.delayed(
-          Duration.zero,
-          () => messenger
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text('$err'),
-                backgroundColor: Colors.red,
-              ),
-            ),
-        );
+        Styles.showErrorSnackBar(messenger, '$err');
+        logger.e("_fetchChapterPagesProvider(${chapter.id}) failed", err,
+            stackTrace);
 
-        return Text('Error: $err');
+        return Scaffold(
+          appBar: AppBar(
+            leading: const BackButton(),
+          ),
+          body: Styles.errorColumn(err, stackTrace),
+        );
       },
     );
   }

@@ -778,6 +778,8 @@ class ChapterFeedItemData {
 class OldToken with _$OldToken {
   OldToken._();
 
+  static const int expiryTime = 600; // seconds (10 minutes)
+
   factory OldToken({
     required String session,
     required String refresh,
@@ -788,6 +790,8 @@ class OldToken with _$OldToken {
 
   final DateTime createdAt = DateTime.now();
 
-  bool get expired => (DateTime.now().difference(createdAt).inMinutes > 10);
+  int get age => DateTime.now().difference(createdAt).inSeconds;
+  int get timeUntilExpiry => expiryTime - age;
+  bool get expired => (age > expiryTime);
   bool get isValid => (session.isNotEmpty && refresh.isNotEmpty);
 }

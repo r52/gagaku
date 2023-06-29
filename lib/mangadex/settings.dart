@@ -18,11 +18,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            nav.pop(false);
-          },
-        ),
+        leading: const BackButton(),
         title: const Text('MangaDex Settings'),
         actions: [
           ButtonBar(
@@ -34,7 +30,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   label: const Text('Save Settings'),
                   onPressed: () {
                     ref.read(mdConfigProvider.notifier).save(config.value);
-                    nav.pop(true);
+                    nav.pop();
                   },
                 ),
               ),

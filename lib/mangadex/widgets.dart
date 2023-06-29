@@ -2,6 +2,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -112,26 +113,13 @@ class ChapterFeedWidget extends HookConsumerWidget {
           children: Styles.loadingOverlay,
         ),
         error: (err, stackTrace) {
-          ref.invalidate(provider);
-
           final messenger = ScaffoldMessenger.of(context);
-          Future.delayed(
-            Duration.zero,
-            () => messenger
-              ..removeCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text('$err'),
-                  backgroundColor: Colors.red,
-                ),
-              ),
-          );
+          Styles.showErrorSnackBar(messenger, '$err');
+          logger.e("${provider.toString()} failed", err, stackTrace);
 
-          return Column(
-            children: [
-              Text('Error: $err'),
-              Text(stackTrace.toString()),
-            ],
+          return RefreshIndicator(
+            onRefresh: onRefresh,
+            child: Styles.errorList(err, stackTrace),
           );
         },
       ),
@@ -150,10 +138,21 @@ class ChapterFeedItem extends ConsumerWidget {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
-    Map<String, Set<String>> readData = {};
+    ReadChaptersMap? readData;
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).valueOrNull ?? {};
+      readData = ref.watch(readChaptersProvider).when(
+            skipLoadingOnReload: true,
+            data: (data) => data,
+            loading: () => null,
+            error: (err, stackTrace) {
+              final messenger = ScaffoldMessenger.of(context);
+              Styles.showErrorSnackBar(messenger, '$err');
+              logger.e("readChaptersProvider failed", err, stackTrace);
+
+              return null;
+            },
+          );
     }
 
     final chapterBtns = state.chapters.map((e) {
@@ -164,7 +163,10 @@ class ChapterFeedItem extends ConsumerWidget {
           chapter: e,
           manga: state.manga,
           loggedin: loggedin,
-          isRead: readData[state.manga.id]?.contains(e.id) ?? false,
+          isRead: switch (readData) {
+            null => null,
+            _ => readData[state.manga.id]?.contains(e.id) == true,
+          },
           link: Text(
             state.manga.attributes.title.get('en'),
             style: const TextStyle(fontSize: 24),
@@ -222,7 +224,7 @@ class ChapterButtonWidget extends ConsumerWidget {
     required this.chapter,
     required this.manga,
     required this.loggedin,
-    this.isRead = false,
+    this.isRead,
     this.link,
     this.onLinkPressed,
     this.short = false,
@@ -231,7 +233,7 @@ class ChapterButtonWidget extends ConsumerWidget {
   final Chapter chapter;
   final Manga manga;
   final bool loggedin;
-  final bool isRead;
+  final bool? isRead;
   final Widget? link;
   final VoidCallback? onLinkPressed;
   final bool short;
@@ -307,14 +309,14 @@ class ChapterButtonWidget extends ConsumerWidget {
     final endChip = <Widget>[];
     if (isEndChapter) {
       endChip.add(const IconTextChip(
-        color: Colors.blue,
+        color: Colors.deepOrange,
         text: Text('END'),
       ));
       endChip.add(const SizedBox(width: 4));
     }
 
     // Logged in components
-    IconButton? markReadBtn;
+    Widget? markReadBtn;
     Border? border;
     TextStyle? textstyle;
 
@@ -328,26 +330,39 @@ class ChapterButtonWidget extends ConsumerWidget {
       );
     } else {
       border = Border(
-        left: BorderSide(color: isRead ? tileColor : Colors.blue, width: 4.0),
+        left: BorderSide(
+            color: isRead == true ? tileColor : Colors.blue, width: 4.0),
       );
 
       textstyle = TextStyle(
-          color: (isRead ? theme.highlightColor : theme.colorScheme.primary));
+          color: (isRead == true
+              ? theme.highlightColor
+              : theme.colorScheme.primary));
 
-      markReadBtn = IconButton(
-        onPressed: () async {
-          bool set = !isRead;
-          ref.read(readChaptersProvider.notifier).set(manga, [chapter], set);
-        },
-        padding: const EdgeInsets.all(0.0),
-        splashRadius: 15,
-        iconSize: 20,
-        tooltip: isRead ? 'Unmark as read' : 'Mark as read',
-        icon: Icon(isRead ? Icons.visibility_off : Icons.visibility,
-            color:
-                (isRead ? theme.highlightColor : theme.primaryIconTheme.color)),
-        constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
-      );
+      markReadBtn = switch (isRead) {
+        null => const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(),
+          ),
+        true || false => IconButton(
+            onPressed: () async {
+              bool set = !isRead!;
+              ref
+                  .read(readChaptersProvider.notifier)
+                  .set(manga, [chapter], set);
+            },
+            padding: const EdgeInsets.all(0.0),
+            splashRadius: 15,
+            iconSize: 20,
+            tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
+            icon: Icon(isRead == true ? Icons.visibility_off : Icons.visibility,
+                color: (isRead == true
+                    ? theme.highlightColor
+                    : theme.primaryIconTheme.color)),
+            constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
+          ),
+      };
     }
 
     final tile = ListTile(

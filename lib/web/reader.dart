@@ -1,5 +1,6 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
@@ -84,19 +85,15 @@ class WebSourceReaderWidget extends ConsumerWidget {
       ),
       error: (err, stackTrace) {
         final messenger = ScaffoldMessenger.of(context);
-        Future.delayed(
-          Duration.zero,
-          () => messenger
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text('$err'),
-                backgroundColor: Colors.red,
-              ),
-            ),
-        );
+        Styles.showErrorSnackBar(messenger, '$err');
+        logger.e("_getPagesProvider($source) failed", err, stackTrace);
 
-        return Text('Error: $err');
+        return Scaffold(
+          appBar: AppBar(
+            leading: const BackButton(),
+          ),
+          body: Styles.errorColumn(err, stackTrace),
+        );
       },
     );
   }

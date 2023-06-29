@@ -282,6 +282,25 @@ class Styles {
     ),
   );
 
+  static Widget errorColumn(Object err, StackTrace stack) => Center(
+        child: Column(
+          children: [
+            Text('Error: $err'),
+            Text(stack.toString()),
+          ],
+        ),
+      );
+
+  static Widget errorList(Object err, StackTrace stack) => Center(
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Text('Error: $err'),
+            Text(stack.toString()),
+          ],
+        ),
+      );
+
   static Widget titleFlexBar({
     required BuildContext context,
     required String title,
@@ -307,6 +326,20 @@ class Styles {
           ),
         ),
       );
+
+  static void showErrorSnackBar(ScaffoldMessengerState state, String content) {
+    Future.delayed(
+      Duration.zero,
+      () => state
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(content),
+            backgroundColor: Colors.red,
+          ),
+        ),
+    );
+  }
 
   static Widget slideTransitionBuilder(
       BuildContext context,

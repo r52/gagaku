@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -35,5 +37,15 @@ class DeviceContext {
   static bool isPortraitMode(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.height > size.width;
+  }
+}
+
+extension AutoDisposeRefExt on AutoDisposeRef {
+  void staleTime(Duration duration) {
+    var timer = Timer(duration, invalidateSelf);
+
+    onDispose(() {
+      timer.cancel();
+    });
   }
 }

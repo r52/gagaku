@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -144,22 +145,11 @@ class MangaDexSearchWidget extends HookConsumerWidget {
               ),
               error: (err, stackTrace) {
                 final messenger = ScaffoldMessenger.of(context);
-                Future.delayed(
-                  Duration.zero,
-                  () => messenger
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text('$err'),
-                        backgroundColor: Colors.red,
-                      ),
-                    ),
-                );
+                Styles.showErrorSnackBar(messenger, '$err');
+                logger.e("mangaSearchProvider(filter) failed", err, stackTrace);
 
                 return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text('Error: $err'),
-                  ),
+                  child: Styles.errorColumn(err, stackTrace),
                 );
               },
             );
@@ -483,19 +473,10 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
         ),
         error: (err, stackTrace) {
           final messenger = ScaffoldMessenger.of(context);
-          Future.delayed(
-            Duration.zero,
-            () => messenger
-              ..removeCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text('$err'),
-                  backgroundColor: Colors.red,
-                ),
-              ),
-          );
+          Styles.showErrorSnackBar(messenger, '$err');
+          logger.e("tagListProvider failed", err, stackTrace);
 
-          return Text('Error: $err');
+          return Styles.errorColumn(err, stackTrace);
         },
       ),
     );

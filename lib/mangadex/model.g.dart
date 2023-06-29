@@ -7,7 +7,7 @@ part of 'model.dart';
 // **************************************************************************
 
 String _$latestChaptersFeedHash() =>
-    r'6305d0ceae44098c2b4c64e6cba41ae5f9a74602';
+    r'ea75ba36369bdde3c5c2eb72f6c98bd779ded249';
 
 /// See also [LatestChaptersFeed].
 @ProviderFor(LatestChaptersFeed)
@@ -23,7 +23,7 @@ final latestChaptersFeedProvider =
 );
 
 typedef _$LatestChaptersFeed = AsyncNotifier<List<Chapter>>;
-String _$latestGlobalFeedHash() => r'3e7976dff8938bf4e274492203a5572b897065a3';
+String _$latestGlobalFeedHash() => r'9288dcf6c19e330f5af2651f1ed0c8e89c396ebe';
 
 /// See also [LatestGlobalFeed].
 @ProviderFor(LatestGlobalFeed)
@@ -39,7 +39,7 @@ final latestGlobalFeedProvider =
 );
 
 typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
-String _$groupFeedHash() => r'e3614f98336e802a96b08a4fef737b28a4228547';
+String _$groupFeedHash() => r'a63a0998fe40860c6833e550fb67459de7ce9fbb';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -443,7 +443,7 @@ class MangaCoversProvider
   }
 }
 
-String _$readChaptersHash() => r'b34804255a89e3c7fd2d21a865cfcad46bd95d63';
+String _$readChaptersHash() => r'a98afd37a00836974a53b24ce85f68a96fddf96b';
 
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)
@@ -889,7 +889,7 @@ final mangaDexHistoryProvider =
 );
 
 typedef _$MangaDexHistory = AsyncNotifier<Queue<Chapter>>;
-String _$authControlHash() => r'f8be09eda62cb7aef4301595371cdb20bc07059e';
+String _$authControlHash() => r'2e618c435c8d93320dcf40ce6dff48db361cf84e';
 
 /// See also [AuthControl].
 @ProviderFor(AuthControl)

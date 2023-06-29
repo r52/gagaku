@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -70,19 +71,16 @@ class MangaDexMangaFeed extends HookConsumerWidget {
             },
             error: (err, stack) {
               final messenger = ScaffoldMessenger.of(context);
-              Future.delayed(
-                Duration.zero,
-                () => messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('$err'),
-                      backgroundColor: Colors.red,
-                    ),
-                  ),
-              );
+              Styles.showErrorSnackBar(messenger, '$err');
+              logger.e("_fetchMangaFeedProvider failed", err, stack);
 
-              return Text('Error: $err');
+              return RefreshIndicator(
+                onRefresh: () async {
+                  ref.invalidate(latestChaptersFeedProvider);
+                  return await ref.refresh(_fetchMangaFeedProvider.future);
+                },
+                child: Styles.errorList(err, stack),
+              );
             },
             loading: () => const SizedBox.shrink(),
           ),

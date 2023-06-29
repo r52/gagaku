@@ -8,6 +8,7 @@ import 'package:gagaku/local/directory_reader.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -206,19 +207,15 @@ class LocalLibraryHome extends HookConsumerWidget {
           ),
           error: (err, stackTrace) {
             final messenger = ScaffoldMessenger.of(context);
-            Future.delayed(
-              Duration.zero,
-              () => messenger
-                ..removeCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('$err'),
-                    backgroundColor: Colors.red,
-                  ),
-                ),
-            );
+            Styles.showErrorSnackBar(messenger, '$err');
+            logger.e("localLibraryProvider failed", err, stackTrace);
 
-            return Text('Error: $err');
+            return RefreshIndicator(
+              onRefresh: () async {
+                return await ref.refresh(localLibraryProvider.future);
+              },
+              child: Styles.errorList(err, stackTrace),
+            );
           },
         );
       }(),

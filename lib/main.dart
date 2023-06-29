@@ -1,12 +1,18 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/main.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util.dart';
 import 'package:gagaku/web/main.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -21,6 +27,34 @@ void main() async {
 
   await Hive.initFlutter();
   await Hive.openBox(gagakuBox);
+
+  final appdir = await getApplicationSupportDirectory();
+
+  if (kReleaseMode) {
+    Logger.level = Level.warning;
+  }
+
+  logger = Logger(
+    filter: kReleaseMode ? ProductionFilter() : null,
+    printer: PrettyPrinter(
+      colors: false,
+      printTime: true,
+      excludeBox: {
+        Level.verbose: true,
+        Level.debug: true,
+        Level.info: true,
+      },
+    ),
+    output: DeviceContext.isDesktop()
+        ? (kReleaseMode
+            ? FileOutput(file: File(p.join(appdir.path, 'gagaku.log')))
+            : MultiOutput([
+                FileOutput(file: File(p.join(appdir.path, 'gagaku.log'))),
+                ConsoleOutput(),
+              ]))
+        : null,
+  );
+
   runApp(const ProviderScope(child: App()));
 }
 

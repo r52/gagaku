@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -227,21 +228,19 @@ class MangaDexGroupViewWidget extends HookWidget {
                   );
                 },
                 error: (err, stack) {
-                  ref.invalidate(groupTitlesProvider(group));
                   final messenger = ScaffoldMessenger.of(context);
-                  Future.delayed(
-                    Duration.zero,
-                    () => messenger
-                      ..removeCurrentSnackBar()
-                      ..showSnackBar(
-                        SnackBar(
-                          content: Text('$err'),
-                          backgroundColor: Colors.red,
-                        ),
-                      ),
-                  );
+                  Styles.showErrorSnackBar(messenger, '$err');
+                  logger.e(
+                      "_fetchGroupTitlesProvider(group) failed", err, stack);
 
-                  return Text('Error: $err');
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      ref.invalidate(groupTitlesProvider(group));
+                      return await ref
+                          .refresh(_fetchGroupTitlesProvider(group).future);
+                    },
+                    child: Styles.errorList(err, stack),
+                  );
                 },
                 loading: () => const Stack(
                   children: Styles.loadingOverlay,
