@@ -117,7 +117,7 @@ class MangaDexModel {
   //       : false;
   // }
 
-  Future<int?> timeUntilTokenExpiry() async {
+  Future<Duration?> timeUntilTokenExpiry() async {
     return await _tokenMutex.protectRead(() async {
       if (_token == null) {
         return null;
@@ -1894,9 +1894,9 @@ class AuthControl extends _$AuthControl {
     final expireTime = await api.timeUntilTokenExpiry();
 
     if (expireTime != null) {
-      final delay = expireTime + 10;
-      logger.d("AuthControl: setting stale time to $delay seconds");
-      _staleTime = Timer(Duration(seconds: delay), () {
+      final delay = expireTime + const Duration(seconds: 10);
+      logger.d("AuthControl: setting stale time to ${delay.inSeconds} seconds");
+      _staleTime = Timer(delay, () {
         logger.d("AuthControl: stale time expiry");
         ref.invalidateSelf();
       });
