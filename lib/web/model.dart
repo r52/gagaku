@@ -1,8 +1,14 @@
+import 'dart:collection';
 import 'dart:convert';
 
+import 'package:gagaku/model.dart';
 import 'package:gagaku/web/types.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'model.g.dart';
 
 final proxyProvider = Provider(ProxyHandler.new);
 
@@ -134,5 +140,105 @@ class ProxyHandler {
     }
 
     throw Exception("Failed to chapter data");
+  }
+}
+
+@Riverpod(keepAlive: true)
+class WebSourceHistory extends _$WebSourceHistory {
+  final _numItems = 50;
+
+  Future<Queue<HistoryLink>> _fetch() async {
+    final box = Hive.box(gagakuBox);
+    final str = box.get('web_history');
+
+    if (str == null || (str as String).isEmpty) {
+      return Queue<HistoryLink>();
+    }
+
+    final content = json.decode(str) as List<dynamic>;
+    final links = content.map((e) => HistoryLink.fromJson(e));
+
+    return Queue.of(links);
+  }
+
+  @override
+  FutureOr<Queue<HistoryLink>> build() async {
+    return _fetch();
+  }
+
+  Future<void> clear() async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final empty = Queue<HistoryLink>();
+      final links = empty.toList();
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_history', json.encode(links));
+
+      return empty;
+    });
+  }
+
+  Future<void> add(HistoryLink link) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.valueOrNull ?? Queue<HistoryLink>();
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final cpy = Queue.of(oldstate);
+
+      while (cpy.contains(link)) {
+        cpy.remove(link);
+      }
+
+      cpy.addFirst(link);
+
+      while (cpy.length > _numItems) {
+        cpy.removeLast();
+      }
+
+      final links = cpy.map((e) => e.toJson()).toList();
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_history', json.encode(links));
+
+      return cpy;
+    });
+  }
+
+  Future<void> remove(HistoryLink link) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.valueOrNull ?? Queue<HistoryLink>();
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final cpy = Queue.of(oldstate);
+
+      while (cpy.contains(link)) {
+        cpy.remove(link);
+      }
+
+      while (cpy.length > _numItems) {
+        cpy.removeLast();
+      }
+
+      final links = cpy.map((e) => e.toJson()).toList();
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_history', json.encode(links));
+
+      return cpy;
+    });
   }
 }

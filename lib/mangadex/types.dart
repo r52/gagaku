@@ -788,10 +788,10 @@ class OldToken with _$OldToken {
   factory OldToken.fromJson(Map<String, dynamic> json) =>
       _$OldTokenFromJson(json);
 
-  final DateTime createdAt = DateTime.now();
+  final DateTime expiresAt =
+      DateTime.now().add(const Duration(seconds: expiryTime));
 
-  int get age => DateTime.now().difference(createdAt).inSeconds;
-  int get timeUntilExpiry => expiryTime - age;
-  bool get expired => (age > expiryTime);
+  Duration get timeUntilExpiry => expiresAt.difference(DateTime.now());
+  bool get expired => (DateTime.now().compareTo(expiresAt) >= 0);
   bool get isValid => (session.isNotEmpty && refresh.isNotEmpty);
 }

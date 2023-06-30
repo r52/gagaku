@@ -14,6 +14,148 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
+HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) {
+  return _HistoryLink.fromJson(json);
+}
+
+/// @nodoc
+mixin _$HistoryLink {
+  String get title => throw _privateConstructorUsedError;
+  String get url => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $HistoryLinkCopyWith<HistoryLink> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $HistoryLinkCopyWith<$Res> {
+  factory $HistoryLinkCopyWith(
+          HistoryLink value, $Res Function(HistoryLink) then) =
+      _$HistoryLinkCopyWithImpl<$Res, HistoryLink>;
+  @useResult
+  $Res call({String title, String url});
+}
+
+/// @nodoc
+class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
+    implements $HistoryLinkCopyWith<$Res> {
+  _$HistoryLinkCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? title = null,
+    Object? url = null,
+  }) {
+    return _then(_value.copyWith(
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_HistoryLinkCopyWith<$Res>
+    implements $HistoryLinkCopyWith<$Res> {
+  factory _$$_HistoryLinkCopyWith(
+          _$_HistoryLink value, $Res Function(_$_HistoryLink) then) =
+      __$$_HistoryLinkCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String title, String url});
+}
+
+/// @nodoc
+class __$$_HistoryLinkCopyWithImpl<$Res>
+    extends _$HistoryLinkCopyWithImpl<$Res, _$_HistoryLink>
+    implements _$$_HistoryLinkCopyWith<$Res> {
+  __$$_HistoryLinkCopyWithImpl(
+      _$_HistoryLink _value, $Res Function(_$_HistoryLink) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? title = null,
+    Object? url = null,
+  }) {
+    return _then(_$_HistoryLink(
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_HistoryLink extends _HistoryLink {
+  const _$_HistoryLink({required this.title, required this.url}) : super._();
+
+  factory _$_HistoryLink.fromJson(Map<String, dynamic> json) =>
+      _$$_HistoryLinkFromJson(json);
+
+  @override
+  final String title;
+  @override
+  final String url;
+
+  @override
+  String toString() {
+    return 'HistoryLink(title: $title, url: $url)';
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_HistoryLinkCopyWith<_$_HistoryLink> get copyWith =>
+      __$$_HistoryLinkCopyWithImpl<_$_HistoryLink>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_HistoryLinkToJson(
+      this,
+    );
+  }
+}
+
+abstract class _HistoryLink extends HistoryLink {
+  const factory _HistoryLink(
+      {required final String title,
+      required final String url}) = _$_HistoryLink;
+  const _HistoryLink._() : super._();
+
+  factory _HistoryLink.fromJson(Map<String, dynamic> json) =
+      _$_HistoryLink.fromJson;
+
+  @override
+  String get title;
+  @override
+  String get url;
+  @override
+  @JsonKey(ignore: true)
+  _$$_HistoryLinkCopyWith<_$_HistoryLink> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 WebManga _$WebMangaFromJson(Map<String, dynamic> json) {
   return _WebManga.fromJson(json);
 }
