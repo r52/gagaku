@@ -41,6 +41,28 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
 }
 
 @freezed
+class HistoryLink with _$HistoryLink {
+  const HistoryLink._();
+
+  const factory HistoryLink({required String title, required String url}) =
+      _HistoryLink;
+
+  factory HistoryLink.fromJson(Map<String, dynamic> json) =>
+      _$HistoryLinkFromJson(json);
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_HistoryLink &&
+            (identical(other.url, url) || other.url == url));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, url);
+}
+
+@freezed
 class WebManga with _$WebManga {
   const factory WebManga({
     required String title,

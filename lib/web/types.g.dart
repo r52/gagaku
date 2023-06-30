@@ -6,6 +6,18 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$_HistoryLink _$$_HistoryLinkFromJson(Map<String, dynamic> json) =>
+    _$_HistoryLink(
+      title: json['title'] as String,
+      url: json['url'] as String,
+    );
+
+Map<String, dynamic> _$$_HistoryLinkToJson(_$_HistoryLink instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'url': instance.url,
+    };
+
 _$_WebManga _$$_WebMangaFromJson(Map<String, dynamic> json) => _$_WebManga(
       title: json['title'] as String,
       description: json['description'] as String,
