@@ -159,7 +159,6 @@ class ChapterFeedItem extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: ChapterButtonWidget(
-          short: screenSizeSmall,
           chapter: e,
           manga: state.manga,
           loggedin: loggedin,
@@ -227,7 +226,6 @@ class ChapterButtonWidget extends ConsumerWidget {
     this.isRead,
     this.link,
     this.onLinkPressed,
-    this.short = false,
   });
 
   final Chapter chapter;
@@ -236,7 +234,6 @@ class ChapterButtonWidget extends ConsumerWidget {
   final bool? isRead;
   final Widget? link;
   final VoidCallback? onLinkPressed;
-  final bool short;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -256,7 +253,7 @@ class ChapterButtonWidget extends ConsumerWidget {
       title += 'Chapter ${chapter.attributes.chapter}';
     }
 
-    if (chapter.attributes.title != null && !short) {
+    if (chapter.attributes.title != null) {
       title += ' - ${chapter.attributes.title}';
     }
 
@@ -265,21 +262,22 @@ class ChapterButtonWidget extends ConsumerWidget {
       title = 'Oneshot';
     }
 
+    const rowPadding = SizedBox(
+      width: 6.0,
+    );
+
     final pubtime = timeago.format(chapter.attributes.publishAt);
 
-    final flagChip = IconTextChip(
-      text: dashflag.CountryFlag(
-        country: dashflag.Country.fromCode(
-            chapter.attributes.translatedLanguage.flag),
-        height: screenSizeSmall ? 15 : 18,
-      ),
+    final flagChip = dashflag.CountryFlag(
+      country:
+          dashflag.Country.fromCode(chapter.attributes.translatedLanguage.flag),
+      height: screenSizeSmall ? 15 : 18,
     );
 
     final groups = chapter.getGroups();
     final groupChips = <Widget>[];
 
     for (final g in groups) {
-      groupChips.add(const SizedBox(width: 4));
       groupChips.add(IconTextChip(
         icon: Icon(Icons.group, size: iconSize),
         text: Text(g.attributes.name.crop()),
@@ -287,32 +285,37 @@ class ChapterButtonWidget extends ConsumerWidget {
           nav.push(createGroupViewRoute(g));
         },
       ));
+      groupChips.add(rowPadding);
     }
 
     if (groupChips.isEmpty) {
-      groupChips.add(const SizedBox(width: 4));
       groupChips.add(IconTextChip(
         icon: Icon(Icons.group, size: iconSize),
         text: const Text('No Group'),
       ));
+      groupChips.add(rowPadding);
     }
 
     final publisherChip = <Widget>[];
     if (chapter.attributes.externalUrl != null) {
-      publisherChip.add(const SizedBox(width: 4));
       publisherChip.add(IconTextChip(
         icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
         text: const Text('Official Publisher'),
       ));
+      publisherChip.add(rowPadding);
     }
 
-    final endChip = <Widget>[];
+    final userChip = IconTextChip(
+      icon: Icon(Icons.person, size: iconSize),
+      text: Text(chapter.getUploadUser()),
+    );
+
+    Widget? endChip;
     if (isEndChapter) {
-      endChip.add(const IconTextChip(
+      endChip = const IconTextChip(
         color: Colors.deepOrange,
         text: Text('END'),
-      ));
-      endChip.add(const SizedBox(width: 4));
+      );
     }
 
     // Logged in components
@@ -360,79 +363,95 @@ class ChapterButtonWidget extends ConsumerWidget {
                 color: (isRead == true
                     ? theme.highlightColor
                     : theme.primaryIconTheme.color)),
-            constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0),
+            constraints: const BoxConstraints(
+                minWidth: 20.0,
+                minHeight: 20.0,
+                maxWidth: 30.0,
+                maxHeight: 30.0),
+            visualDensity:
+                const VisualDensity(horizontal: -4.0, vertical: -4.0),
           ),
       };
     }
 
-    final tile = ListTile(
-      onTap: () {
-        nav.push(
-            createMangaDexReaderRoute(chapter, manga, link, onLinkPressed));
-      },
-      dense: true,
-      minVerticalPadding: 0.0,
-      contentPadding:
-          EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
-      minLeadingWidth: 0.0,
-      leading: markReadBtn,
-      title: Text(
-        title,
-        style: textstyle,
-      ),
-      trailing: !screenSizeSmall
-          ? FittedBox(
-              fit: BoxFit.fill,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ...endChip,
-                  flagChip,
-                  ...groupChips,
-                  ...publisherChip,
-                  const SizedBox(width: 10),
-                  const Icon(Icons.schedule, size: 20),
-                  const SizedBox(width: 5),
-                  Text(pubtime)
-                ],
-              ),
-            )
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.schedule, size: 15),
-                const SizedBox(width: 5),
-                Text(pubtime)
-              ],
-            ),
-    );
+    final vPadding =
+        EdgeInsets.symmetric(vertical: (screenSizeSmall ? 2.0 : 4.0));
 
-    Widget child = tile;
-
-    if (screenSizeSmall) {
-      child = Column(
+    final tile = Padding(
+      padding: EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 6.0 : 10.0)),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          tile,
-          Wrap(
-            runSpacing: 2.0,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              const SizedBox(
-                width: 10.0,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              children: [
+                if (markReadBtn != null) ...[
+                  markReadBtn,
+                  const SizedBox(
+                    width: 10,
+                  )
+                ],
+                flagChip,
+                rowPadding,
+                Flexible(
+                  fit: FlexFit.tight,
+                  child: Text(
+                    title,
+                    overflow: TextOverflow.ellipsis,
+                    style: textstyle,
+                  ),
+                ),
+                rowPadding,
+                if (endChip != null) endChip,
+                if (!screenSizeSmall) ...[
+                  const Spacer(),
+                  const Icon(Icons.schedule, size: 20),
+                  rowPadding,
+                  Text(pubtime)
+                ]
+              ],
+            ),
+          ),
+          Padding(
+            padding: vPadding,
+            child: screenSizeSmall
+                ? Wrap(
+                    runSpacing: 2.0,
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    children: [...groupChips, ...publisherChip],
+                  )
+                : Row(
+                    children: [
+                      ...groupChips,
+                      ...publisherChip,
+                      const Spacer(),
+                      userChip,
+                    ],
+                  ),
+          ),
+          if (screenSizeSmall)
+            Padding(
+              padding: vPadding,
+              child: Row(
+                children: [
+                  userChip,
+                  const Spacer(),
+                  const Icon(Icons.schedule, size: 15),
+                  rowPadding,
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: Text(
+                      pubtime,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              ...endChip,
-              flagChip,
-              ...groupChips,
-              ...publisherChip,
-            ],
-          ),
-          const SizedBox(
-            height: 2.0,
-          ),
+            ),
         ],
-      );
-    }
+      ),
+    );
 
     return InkWell(
       onTap: () {
@@ -444,7 +463,7 @@ class ChapterButtonWidget extends ConsumerWidget {
           color: tileColor,
           border: border,
         ),
-        child: child,
+        child: tile,
       ),
     );
   }
