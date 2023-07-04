@@ -362,6 +362,23 @@ class Chapter with _$Chapter, MangaDexUUID {
 
     return '';
   }
+
+  String getUploadUser() {
+    final user = relationships.where((element) => switch (element) {
+          RelationshipUser() => true,
+          _ => false,
+        });
+
+    if (user.isNotEmpty) {
+      final u = switch (user.first) {
+        RelationshipUser(:final attributes) => attributes.username,
+        _ => '',
+      };
+      return u;
+    }
+
+    return '';
+  }
 }
 
 @freezed
@@ -417,6 +434,16 @@ class NamedAttributes with _$NamedAttributes {
       _$NamedAttributesFromJson(json);
 }
 
+@freezed
+class UserAttributes with _$UserAttributes {
+  const factory UserAttributes({
+    required String username,
+  }) = _UserAttributes;
+
+  factory UserAttributes.fromJson(Map<String, dynamic> json) =>
+      _$UserAttributesFromJson(json);
+}
+
 @Freezed(unionKey: 'type')
 class Relationship with _$Relationship, MangaDexUUID {
   const factory Relationship.manga({
@@ -425,6 +452,7 @@ class Relationship with _$Relationship, MangaDexUUID {
 
   const factory Relationship.user({
     required String id,
+    required UserAttributes attributes,
   }) = RelationshipUser;
 
   const factory Relationship.artist({

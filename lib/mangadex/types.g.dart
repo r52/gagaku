@@ -187,6 +187,16 @@ Map<String, dynamic> _$$_NamedAttributesToJson(_$_NamedAttributes instance) =>
       'name': instance.name,
     };
 
+_$_UserAttributes _$$_UserAttributesFromJson(Map<String, dynamic> json) =>
+    _$_UserAttributes(
+      username: json['username'] as String,
+    );
+
+Map<String, dynamic> _$$_UserAttributesToJson(_$_UserAttributes instance) =>
+    <String, dynamic>{
+      'username': instance.username,
+    };
+
 _$RelationshipManga _$$RelationshipMangaFromJson(Map<String, dynamic> json) =>
     _$RelationshipManga(
       id: json['id'] as String,
@@ -202,12 +212,15 @@ Map<String, dynamic> _$$RelationshipMangaToJson(_$RelationshipManga instance) =>
 _$RelationshipUser _$$RelationshipUserFromJson(Map<String, dynamic> json) =>
     _$RelationshipUser(
       id: json['id'] as String,
+      attributes:
+          UserAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 
 Map<String, dynamic> _$$RelationshipUserToJson(_$RelationshipUser instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'attributes': instance.attributes,
       'type': instance.$type,
     };
 

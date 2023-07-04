@@ -367,7 +367,7 @@ class MangaDexModel {
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[publishAt]': 'desc',
-      'includes[]': 'scanlation_group'
+      'includes[]': ['scanlation_group', 'user']
     };
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
@@ -420,7 +420,7 @@ class MangaDexModel {
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[publishAt]': 'desc',
-      'includes[]': 'scanlation_group'
+      'includes[]': ['scanlation_group', 'user']
     };
 
     if (group != null) {
@@ -466,7 +466,7 @@ class MangaDexModel {
         'includeFutureUpdates': '0',
         //'order[publishAt]': 'desc',
         'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-        'includes[]': ['scanlation_group']
+        'includes[]': ['scanlation_group', 'user']
       };
 
       while (end < fetch.length) {
@@ -798,7 +798,7 @@ class MangaDexModel {
           .toList(),
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[chapter]': 'desc',
-      'includes[]': 'scanlation_group'
+      'includes[]': ['scanlation_group', 'user']
     };
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),

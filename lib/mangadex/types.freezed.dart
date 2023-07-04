@@ -1916,6 +1916,154 @@ abstract class _NamedAttributes implements NamedAttributes {
       throw _privateConstructorUsedError;
 }
 
+UserAttributes _$UserAttributesFromJson(Map<String, dynamic> json) {
+  return _UserAttributes.fromJson(json);
+}
+
+/// @nodoc
+mixin _$UserAttributes {
+  String get username => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $UserAttributesCopyWith<UserAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserAttributesCopyWith<$Res> {
+  factory $UserAttributesCopyWith(
+          UserAttributes value, $Res Function(UserAttributes) then) =
+      _$UserAttributesCopyWithImpl<$Res, UserAttributes>;
+  @useResult
+  $Res call({String username});
+}
+
+/// @nodoc
+class _$UserAttributesCopyWithImpl<$Res, $Val extends UserAttributes>
+    implements $UserAttributesCopyWith<$Res> {
+  _$UserAttributesCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? username = null,
+  }) {
+    return _then(_value.copyWith(
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_UserAttributesCopyWith<$Res>
+    implements $UserAttributesCopyWith<$Res> {
+  factory _$$_UserAttributesCopyWith(
+          _$_UserAttributes value, $Res Function(_$_UserAttributes) then) =
+      __$$_UserAttributesCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String username});
+}
+
+/// @nodoc
+class __$$_UserAttributesCopyWithImpl<$Res>
+    extends _$UserAttributesCopyWithImpl<$Res, _$_UserAttributes>
+    implements _$$_UserAttributesCopyWith<$Res> {
+  __$$_UserAttributesCopyWithImpl(
+      _$_UserAttributes _value, $Res Function(_$_UserAttributes) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? username = null,
+  }) {
+    return _then(_$_UserAttributes(
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_UserAttributes
+    with DiagnosticableTreeMixin
+    implements _UserAttributes {
+  const _$_UserAttributes({required this.username});
+
+  factory _$_UserAttributes.fromJson(Map<String, dynamic> json) =>
+      _$$_UserAttributesFromJson(json);
+
+  @override
+  final String username;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'UserAttributes(username: $username)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserAttributes'))
+      ..add(DiagnosticsProperty('username', username));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_UserAttributes &&
+            (identical(other.username, username) ||
+                other.username == username));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, username);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_UserAttributesCopyWith<_$_UserAttributes> get copyWith =>
+      __$$_UserAttributesCopyWithImpl<_$_UserAttributes>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_UserAttributesToJson(
+      this,
+    );
+  }
+}
+
+abstract class _UserAttributes implements UserAttributes {
+  const factory _UserAttributes({required final String username}) =
+      _$_UserAttributes;
+
+  factory _UserAttributes.fromJson(Map<String, dynamic> json) =
+      _$_UserAttributes.fromJson;
+
+  @override
+  String get username;
+  @override
+  @JsonKey(ignore: true)
+  _$$_UserAttributesCopyWith<_$_UserAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Relationship _$RelationshipFromJson(Map<String, dynamic> json) {
   switch (json['type']) {
     case 'manga':
@@ -1945,7 +2093,7 @@ mixin _$Relationship {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -1957,7 +2105,7 @@ mixin _$Relationship {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -1968,7 +2116,7 @@ mixin _$Relationship {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2123,7 +2271,7 @@ class _$RelationshipManga
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2138,7 +2286,7 @@ class _$RelationshipManga
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2152,7 +2300,7 @@ class _$RelationshipManga
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2243,7 +2391,9 @@ abstract class _$$RelationshipUserCopyWith<$Res>
       __$$RelationshipUserCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id});
+  $Res call({String id, UserAttributes attributes});
+
+  $UserAttributesCopyWith<$Res> get attributes;
 }
 
 /// @nodoc
@@ -2258,13 +2408,26 @@ class __$$RelationshipUserCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
+    Object? attributes = null,
   }) {
     return _then(_$RelationshipUser(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as UserAttributes,
     ));
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $UserAttributesCopyWith<$Res> get attributes {
+    return $UserAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value));
+    });
   }
 }
 
@@ -2273,7 +2436,8 @@ class __$$RelationshipUserCopyWithImpl<$Res>
 class _$RelationshipUser
     with DiagnosticableTreeMixin
     implements RelationshipUser {
-  const _$RelationshipUser({required this.id, final String? $type})
+  const _$RelationshipUser(
+      {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'user';
 
   factory _$RelationshipUser.fromJson(Map<String, dynamic> json) =>
@@ -2281,13 +2445,15 @@ class _$RelationshipUser
 
   @override
   final String id;
+  @override
+  final UserAttributes attributes;
 
   @JsonKey(name: 'type')
   final String $type;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.user(id: $id)';
+    return 'Relationship.user(id: $id, attributes: $attributes)';
   }
 
   @override
@@ -2295,7 +2461,8 @@ class _$RelationshipUser
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'Relationship.user'))
-      ..add(DiagnosticsProperty('id', id));
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('attributes', attributes));
   }
 
   @JsonKey(ignore: true)
@@ -2308,7 +2475,7 @@ class _$RelationshipUser
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2316,28 +2483,28 @@ class _$RelationshipUser
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
-    return user(id);
+    return user(id, attributes);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
-    return user?.call(id);
+    return user?.call(id, attributes);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2346,7 +2513,7 @@ class _$RelationshipUser
     required TResult orElse(),
   }) {
     if (user != null) {
-      return user(id);
+      return user(id, attributes);
     }
     return orElse();
   }
@@ -2406,14 +2573,16 @@ class _$RelationshipUser
 }
 
 abstract class RelationshipUser implements Relationship {
-  const factory RelationshipUser({required final String id}) =
-      _$RelationshipUser;
+  const factory RelationshipUser(
+      {required final String id,
+      required final UserAttributes attributes}) = _$RelationshipUser;
 
   factory RelationshipUser.fromJson(Map<String, dynamic> json) =
       _$RelationshipUser.fromJson;
 
   @override
   String get id;
+  UserAttributes get attributes;
   @override
   @JsonKey(ignore: true)
   _$$RelationshipUserCopyWith<_$RelationshipUser> get copyWith =>
@@ -2513,7 +2682,7 @@ class _$RelationshipArtist
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2528,7 +2697,7 @@ class _$RelationshipArtist
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2542,7 +2711,7 @@ class _$RelationshipArtist
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2720,7 +2889,7 @@ class _$RelationshipAuthor
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2735,7 +2904,7 @@ class _$RelationshipAuthor
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2749,7 +2918,7 @@ class _$RelationshipAuthor
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2908,7 +3077,7 @@ class _$RelationshipCreator
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2923,7 +3092,7 @@ class _$RelationshipCreator
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2937,7 +3106,7 @@ class _$RelationshipCreator
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -3113,7 +3282,7 @@ class _$RelationshipCoverArt
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -3128,7 +3297,7 @@ class _$RelationshipCoverArt
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -3142,7 +3311,7 @@ class _$RelationshipCoverArt
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -3319,7 +3488,7 @@ class _$RelationshipGroup
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id) user,
+    required TResult Function(String id, UserAttributes attributes) user,
     required TResult Function(String id, NamedAttributes attributes) artist,
     required TResult Function(String id, NamedAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -3334,7 +3503,7 @@ class _$RelationshipGroup
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id)? user,
+    TResult? Function(String id, UserAttributes attributes)? user,
     TResult? Function(String id, NamedAttributes attributes)? artist,
     TResult? Function(String id, NamedAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -3348,7 +3517,7 @@ class _$RelationshipGroup
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id)? user,
+    TResult Function(String id, UserAttributes attributes)? user,
     TResult Function(String id, NamedAttributes attributes)? artist,
     TResult Function(String id, NamedAttributes attributes)? author,
     TResult Function(String id)? creator,
