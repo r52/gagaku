@@ -292,12 +292,15 @@ class Styles {
       );
 
   static Widget errorList(Object err, StackTrace stack) => Center(
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            Text('Error: $err'),
-            Text(stack.toString()),
-          ],
+        child: ScrollConfiguration(
+          behavior: MouseTouchScrollBehavior(),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              Text('Error: $err'),
+              Text(stack.toString()),
+            ],
+          ),
         ),
       );
 
