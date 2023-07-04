@@ -177,41 +177,80 @@ class ChapterFeedItem extends ConsumerWidget {
       );
     }).toList();
 
+    final titleBtn = TextButton(
+      style: TextButton.styleFrom(
+        minimumSize: const Size(0.0, 20.0),
+        shape: const RoundedRectangleBorder(),
+        foregroundColor: theme.colorScheme.onSurface,
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      onPressed: () async {
+        nav.push(createMangaViewRoute(state.manga));
+      },
+      child: Text(
+        state.manga.attributes.title.get('en'),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+
+    final coverBtn = TextButton(
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
+        shape: const RoundedRectangleBorder(),
+      ),
+      onPressed: () async {
+        nav.push(createMangaViewRoute(state.manga));
+      },
+      child: ExtendedImage.network(state.coverArt,
+          loadStateChanged: extendedImageLoadStateHandler,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(4.0),
+          width: screenSizeSmall ? 64.0 : 128.0),
+    );
+
     return Card(
       margin: const EdgeInsets.all(6),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextButton(
-              onPressed: () async {
-                nav.push(createMangaViewRoute(state.manga));
-              },
-              child: ExtendedImage.network(state.coverArt,
-                  loadStateChanged: extendedImageLoadStateHandler,
-                  width: screenSizeSmall ? 80.0 : 128.0),
-            ),
-            Expanded(
-              child: Column(
+        child: screenSizeSmall
+            ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextButton(
-                      style: TextButton.styleFrom(
-                          foregroundColor: theme.colorScheme.onSurface,
-                          textStyle: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                      onPressed: () async {
-                        nav.push(createMangaViewRoute(state.manga));
-                      },
-                      child: Text(state.manga.attributes.title.get('en'))),
-                  const Divider(),
-                  ...chapterBtns
+                  titleBtn,
+                  const Divider(
+                    height: 4.0,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      coverBtn,
+                      Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: chapterBtns,
+                      )),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  coverBtn,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        titleBtn,
+                        const Divider(
+                          height: 10.0,
+                        ),
+                        ...chapterBtns,
+                      ],
+                    ),
+                  )
                 ],
               ),
-            )
-          ],
-        ),
       ),
     );
   }
@@ -439,12 +478,9 @@ class ChapterButtonWidget extends ConsumerWidget {
                   const Spacer(),
                   const Icon(Icons.schedule, size: 15),
                   rowPadding,
-                  Flexible(
-                    fit: FlexFit.tight,
-                    child: Text(
-                      pubtime,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  Text(
+                    pubtime,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
