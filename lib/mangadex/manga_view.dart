@@ -165,10 +165,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 if (loggedin) {
                   final following =
                       ref.watch(followingStatusProvider(manga)).valueOrNull;
-                  final reading =
-                      ref.watch(readingStatusProvider(manga)).valueOrNull;
+                  final readProvider = ref.watch(readingStatusProvider(manga));
+                  final reading = readProvider.valueOrNull;
 
-                  if (following == null) {
+                  if (following == null || readProvider.isLoading) {
                     return [
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -353,7 +353,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   }
                 }
 
-                return <Widget>[];
+                return null;
               }(),
             ),
             SliverToBoxAdapter(
