@@ -680,6 +680,21 @@ final statisticsProvider =
 );
 
 typedef _$Statistics = AsyncNotifier<Map<String, MangaStatistics>>;
+String _$ratingsHash() => r'f507d7d7f9d27c0ff7f572a6a24d281b80794fef';
+
+/// See also [Ratings].
+@ProviderFor(Ratings)
+final ratingsProvider =
+    AsyncNotifierProvider<Ratings, Map<String, SelfRating>>.internal(
+  Ratings.new,
+  name: r'ratingsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$ratingsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
 String _$readingStatusHash() => r'5281cee334576d80177ad0c9b441badde919ffd6';
 
 abstract class _$ReadingStatus

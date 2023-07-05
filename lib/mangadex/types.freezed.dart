@@ -6816,6 +6816,330 @@ abstract class _StatisticsDetailsRating implements StatisticsDetailsRating {
       get copyWith => throw _privateConstructorUsedError;
 }
 
+SelfRatingResponse _$SelfRatingResponseFromJson(Map<String, dynamic> json) {
+  return _SelfRatingResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SelfRatingResponse {
+  Map<String, SelfRating> get ratings => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $SelfRatingResponseCopyWith<SelfRatingResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SelfRatingResponseCopyWith<$Res> {
+  factory $SelfRatingResponseCopyWith(
+          SelfRatingResponse value, $Res Function(SelfRatingResponse) then) =
+      _$SelfRatingResponseCopyWithImpl<$Res, SelfRatingResponse>;
+  @useResult
+  $Res call({Map<String, SelfRating> ratings});
+}
+
+/// @nodoc
+class _$SelfRatingResponseCopyWithImpl<$Res, $Val extends SelfRatingResponse>
+    implements $SelfRatingResponseCopyWith<$Res> {
+  _$SelfRatingResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? ratings = null,
+  }) {
+    return _then(_value.copyWith(
+      ratings: null == ratings
+          ? _value.ratings
+          : ratings // ignore: cast_nullable_to_non_nullable
+              as Map<String, SelfRating>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_SelfRatingResponseCopyWith<$Res>
+    implements $SelfRatingResponseCopyWith<$Res> {
+  factory _$$_SelfRatingResponseCopyWith(_$_SelfRatingResponse value,
+          $Res Function(_$_SelfRatingResponse) then) =
+      __$$_SelfRatingResponseCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({Map<String, SelfRating> ratings});
+}
+
+/// @nodoc
+class __$$_SelfRatingResponseCopyWithImpl<$Res>
+    extends _$SelfRatingResponseCopyWithImpl<$Res, _$_SelfRatingResponse>
+    implements _$$_SelfRatingResponseCopyWith<$Res> {
+  __$$_SelfRatingResponseCopyWithImpl(
+      _$_SelfRatingResponse _value, $Res Function(_$_SelfRatingResponse) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? ratings = null,
+  }) {
+    return _then(_$_SelfRatingResponse(
+      null == ratings
+          ? _value._ratings
+          : ratings // ignore: cast_nullable_to_non_nullable
+              as Map<String, SelfRating>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_SelfRatingResponse
+    with DiagnosticableTreeMixin
+    implements _SelfRatingResponse {
+  const _$_SelfRatingResponse(final Map<String, SelfRating> ratings)
+      : _ratings = ratings;
+
+  factory _$_SelfRatingResponse.fromJson(Map<String, dynamic> json) =>
+      _$$_SelfRatingResponseFromJson(json);
+
+  final Map<String, SelfRating> _ratings;
+  @override
+  Map<String, SelfRating> get ratings {
+    if (_ratings is EqualUnmodifiableMapView) return _ratings;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_ratings);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SelfRatingResponse(ratings: $ratings)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'SelfRatingResponse'))
+      ..add(DiagnosticsProperty('ratings', ratings));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_SelfRatingResponse &&
+            const DeepCollectionEquality().equals(other._ratings, _ratings));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_ratings));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_SelfRatingResponseCopyWith<_$_SelfRatingResponse> get copyWith =>
+      __$$_SelfRatingResponseCopyWithImpl<_$_SelfRatingResponse>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_SelfRatingResponseToJson(
+      this,
+    );
+  }
+}
+
+abstract class _SelfRatingResponse implements SelfRatingResponse {
+  const factory _SelfRatingResponse(final Map<String, SelfRating> ratings) =
+      _$_SelfRatingResponse;
+
+  factory _SelfRatingResponse.fromJson(Map<String, dynamic> json) =
+      _$_SelfRatingResponse.fromJson;
+
+  @override
+  Map<String, SelfRating> get ratings;
+  @override
+  @JsonKey(ignore: true)
+  _$$_SelfRatingResponseCopyWith<_$_SelfRatingResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+SelfRating _$SelfRatingFromJson(Map<String, dynamic> json) {
+  return _SelfRating.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SelfRating {
+  int get rating => throw _privateConstructorUsedError;
+  @TimestampSerializer()
+  DateTime get createdAt => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $SelfRatingCopyWith<SelfRating> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SelfRatingCopyWith<$Res> {
+  factory $SelfRatingCopyWith(
+          SelfRating value, $Res Function(SelfRating) then) =
+      _$SelfRatingCopyWithImpl<$Res, SelfRating>;
+  @useResult
+  $Res call({int rating, @TimestampSerializer() DateTime createdAt});
+}
+
+/// @nodoc
+class _$SelfRatingCopyWithImpl<$Res, $Val extends SelfRating>
+    implements $SelfRatingCopyWith<$Res> {
+  _$SelfRatingCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? rating = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_value.copyWith(
+      rating: null == rating
+          ? _value.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_SelfRatingCopyWith<$Res>
+    implements $SelfRatingCopyWith<$Res> {
+  factory _$$_SelfRatingCopyWith(
+          _$_SelfRating value, $Res Function(_$_SelfRating) then) =
+      __$$_SelfRatingCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int rating, @TimestampSerializer() DateTime createdAt});
+}
+
+/// @nodoc
+class __$$_SelfRatingCopyWithImpl<$Res>
+    extends _$SelfRatingCopyWithImpl<$Res, _$_SelfRating>
+    implements _$$_SelfRatingCopyWith<$Res> {
+  __$$_SelfRatingCopyWithImpl(
+      _$_SelfRating _value, $Res Function(_$_SelfRating) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? rating = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_$_SelfRating(
+      rating: null == rating
+          ? _value.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_SelfRating with DiagnosticableTreeMixin implements _SelfRating {
+  _$_SelfRating(
+      {required this.rating, @TimestampSerializer() required this.createdAt});
+
+  factory _$_SelfRating.fromJson(Map<String, dynamic> json) =>
+      _$$_SelfRatingFromJson(json);
+
+  @override
+  final int rating;
+  @override
+  @TimestampSerializer()
+  final DateTime createdAt;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SelfRating(rating: $rating, createdAt: $createdAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'SelfRating'))
+      ..add(DiagnosticsProperty('rating', rating))
+      ..add(DiagnosticsProperty('createdAt', createdAt));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_SelfRating &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, rating, createdAt);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_SelfRatingCopyWith<_$_SelfRating> get copyWith =>
+      __$$_SelfRatingCopyWithImpl<_$_SelfRating>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_SelfRatingToJson(
+      this,
+    );
+  }
+}
+
+abstract class _SelfRating implements SelfRating {
+  factory _SelfRating(
+          {required final int rating,
+          @TimestampSerializer() required final DateTime createdAt}) =
+      _$_SelfRating;
+
+  factory _SelfRating.fromJson(Map<String, dynamic> json) =
+      _$_SelfRating.fromJson;
+
+  @override
+  int get rating;
+  @override
+  @TimestampSerializer()
+  DateTime get createdAt;
+  @override
+  @JsonKey(ignore: true)
+  _$$_SelfRatingCopyWith<_$_SelfRating> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 OldToken _$OldTokenFromJson(Map<String, dynamic> json) {
   return _OldToken.fromJson(json);
 }

@@ -34,6 +34,8 @@ Future<void> _fetchReadChaptersRedun(
     // Redundant retrieve read chapters when opening the manga
     // from places where it hasn't been retrieved yet
     await ref.read(readChaptersProvider.notifier).get([manga]);
+
+    await ref.read(ratingsProvider.notifier).get([manga]);
   }
 
   await ref.read(statisticsProvider.notifier).get([manga]);
@@ -162,198 +164,263 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 ),
               ),
               actions: () {
-                if (loggedin) {
-                  final following =
-                      ref.watch(followingStatusProvider(manga)).valueOrNull;
-                  final readProvider = ref.watch(readingStatusProvider(manga));
-                  final reading = readProvider.valueOrNull;
+                if (!loggedin) {
+                  return null;
+                }
 
-                  if (following == null || readProvider.isLoading) {
-                    return [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ];
-                  }
+                final actions = <Widget>[];
 
-                  if (!following && reading == null) {
-                    return [
-                      ElevatedButton(
-                        onPressed: () async {
-                          final result = await showDialog<
-                                  (MangaReadingStatus, bool)>(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return HookBuilder(
-                                  builder: (context) {
-                                    final nav = Navigator.of(context);
-                                    final nreading = useState(
-                                        MangaReadingStatus.plan_to_read);
-                                    final nfollowing = useState(true);
+                final following =
+                    ref.watch(followingStatusProvider(manga)).valueOrNull;
+                final readProvider = ref.watch(readingStatusProvider(manga));
+                final ratingProv = ref.watch(ratingsProvider);
+                final reading = readProvider.valueOrNull;
+                final ratings = ratingProv.valueOrNull;
 
-                                    return AlertDialog(
-                                      title: const Text('Add to Library'),
-                                      content: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          DropdownButton<MangaReadingStatus>(
-                                            value: nreading.value,
-                                            icon: const Icon(
-                                                Icons.arrow_drop_down),
-                                            iconSize: 24,
-                                            elevation: 16,
-                                            underline: Container(
-                                              height: 2,
-                                              color: Colors.deepOrangeAccent,
-                                            ),
-                                            onChanged: (MangaReadingStatus?
-                                                status) async {
-                                              if (status != null) {
-                                                nreading.value = status;
-                                              }
-                                            },
-                                            items: List<
-                                                DropdownMenuItem<
-                                                    MangaReadingStatus>>.generate(
-                                              MangaReadingStatus.values.length -
-                                                  1,
-                                              (int index) => DropdownMenuItem<
-                                                  MangaReadingStatus>(
-                                                value: MangaReadingStatus.values
-                                                    .elementAt(index + 1),
-                                                child: Text(
-                                                  MangaReadingStatus.values
-                                                      .elementAt(index + 1)
-                                                      .formatted,
-                                                ),
+                if (following == null || readProvider.isLoading) {
+                  actions.add(const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ));
+                } else if (!following && reading == null) {
+                  actions.addAll([
+                    ElevatedButton(
+                      onPressed: () async {
+                        final result = await showDialog<
+                                (MangaReadingStatus, bool)>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return HookBuilder(
+                                builder: (context) {
+                                  final nav = Navigator.of(context);
+                                  final nreading =
+                                      useState(MangaReadingStatus.plan_to_read);
+                                  final nfollowing = useState(true);
+
+                                  return AlertDialog(
+                                    title: const Text('Add to Library'),
+                                    content: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        DropdownButton<MangaReadingStatus>(
+                                          value: nreading.value,
+                                          icon:
+                                              const Icon(Icons.arrow_drop_down),
+                                          iconSize: 24,
+                                          elevation: 16,
+                                          underline: Container(
+                                            height: 2,
+                                            color: Colors.deepOrangeAccent,
+                                          ),
+                                          onChanged: (MangaReadingStatus?
+                                              status) async {
+                                            if (status != null) {
+                                              nreading.value = status;
+                                            }
+                                          },
+                                          items: List<
+                                              DropdownMenuItem<
+                                                  MangaReadingStatus>>.generate(
+                                            MangaReadingStatus.values.length -
+                                                1,
+                                            (int index) => DropdownMenuItem<
+                                                MangaReadingStatus>(
+                                              value: MangaReadingStatus.values
+                                                  .elementAt(index + 1),
+                                              child: Text(
+                                                MangaReadingStatus.values
+                                                    .elementAt(index + 1)
+                                                    .formatted,
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () async {
-                                              nfollowing.value =
-                                                  !nfollowing.value;
-                                            },
-                                            child: Icon(nfollowing.value
-                                                ? Icons.favorite
-                                                : Icons.favorite_border),
-                                          ),
-                                        ],
-                                      ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text('Cancel'),
-                                          onPressed: () {
-                                            nav.pop(null);
-                                          },
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
                                         ),
                                         ElevatedButton(
-                                          child: const Text('Add'),
-                                          onPressed: () {
-                                            nav.pop((
-                                              nreading.value,
-                                              nfollowing.value
-                                            ));
+                                          onPressed: () async {
+                                            nfollowing.value =
+                                                !nfollowing.value;
                                           },
+                                          child: Icon(nfollowing.value
+                                              ? Icons.favorite
+                                              : Icons.favorite_border),
                                         ),
                                       ],
-                                    );
-                                  },
-                                );
-                              });
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('Cancel'),
+                                        onPressed: () {
+                                          nav.pop(null);
+                                        },
+                                      ),
+                                      ElevatedButton(
+                                        child: const Text('Add'),
+                                        onPressed: () {
+                                          nav.pop((
+                                            nreading.value,
+                                            nfollowing.value
+                                          ));
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            });
 
-                          if (result != null) {
-                            ref
-                                .read(readingStatusProvider(manga).notifier)
-                                .set(result.$1);
+                        if (result != null) {
+                          ref
+                              .read(readingStatusProvider(manga).notifier)
+                              .set(result.$1);
 
+                          ref
+                              .read(followingStatusProvider(manga).notifier)
+                              .set(result.$2);
+                        }
+                      },
+                      child: const Text('Add to Library'),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                  ]);
+                } else {
+                  actions.addAll([
+                    Tooltip(
+                      message: following ? 'Unfollow Manga' : 'Follow Manga',
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                          ),
+                        ),
+                        onPressed: () async {
+                          bool set = !following;
+                          ref
+                              .read(followingStatusProvider(manga).notifier)
+                              .set(set);
+                        },
+                        child: Icon(
+                            following ? Icons.favorite : Icons.favorite_border),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: theme.colorScheme.background.withAlpha(200),
+                      ),
+                      child: DropdownButton<MangaReadingStatus>(
+                        value: reading,
+                        icon: const Icon(Icons.arrow_drop_down),
+                        iconSize: 24,
+                        elevation: 16,
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepOrangeAccent,
+                        ),
+                        onChanged: (MangaReadingStatus? status) async {
+                          ref
+                              .read(readingStatusProvider(manga).notifier)
+                              .set(status);
+
+                          if (status == null ||
+                              status == MangaReadingStatus.remove) {
                             ref
                                 .read(followingStatusProvider(manga).notifier)
-                                .set(result.$2);
+                                .set(false);
                           }
                         },
-                        child: const Text('Add to Library'),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                    ];
-                  } else {
-                    return [
-                      Tooltip(
-                        message: following ? 'Unfollow Manga' : 'Follow Manga',
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            bool set = !following;
-                            ref
-                                .read(followingStatusProvider(manga).notifier)
-                                .set(set);
-                          },
-                          child: Icon(following
-                              ? Icons.favorite
-                              : Icons.favorite_border),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: theme.colorScheme.background.withAlpha(200),
-                        ),
-                        child: DropdownButton<MangaReadingStatus>(
-                          value: reading,
-                          icon: const Icon(Icons.arrow_drop_down),
-                          iconSize: 24,
-                          elevation: 16,
-                          underline: Container(
-                            height: 2,
-                            color: Colors.deepOrangeAccent,
-                          ),
-                          onChanged: (MangaReadingStatus? status) async {
-                            ref
-                                .read(readingStatusProvider(manga).notifier)
-                                .set(status);
-
-                            if (status == null ||
-                                status == MangaReadingStatus.remove) {
-                              ref
-                                  .read(followingStatusProvider(manga).notifier)
-                                  .set(false);
-                            }
-                          },
-                          items: List<
-                              DropdownMenuItem<MangaReadingStatus>>.generate(
-                            MangaReadingStatus.values.length,
-                            (int index) => DropdownMenuItem<MangaReadingStatus>(
-                              value: MangaReadingStatus.values.elementAt(index),
-                              child: Text(
-                                MangaReadingStatus.values
-                                    .elementAt(index)
-                                    .formatted,
-                              ),
+                        items:
+                            List<DropdownMenuItem<MangaReadingStatus>>.generate(
+                          MangaReadingStatus.values.length,
+                          (int index) => DropdownMenuItem<MangaReadingStatus>(
+                            value: MangaReadingStatus.values.elementAt(index),
+                            child: Text(
+                              MangaReadingStatus.values
+                                  .elementAt(index)
+                                  .formatted,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                    ];
-                  }
+                    ),
+                  ]);
                 }
 
-                return null;
+                if (ratingProv.isLoading || ratings == null) {
+                  actions.add(const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ));
+                } else {
+                  actions.addAll([
+                    PopupMenuButton<int>(
+                      shape: const RoundedRectangleBorder(),
+                      tooltip: 'Rating',
+                      icon: Container(
+                        padding: const EdgeInsets.all(6.0),
+                        decoration: BoxDecoration(
+                          color: ratings.containsKey(manga.id)
+                              ? Colors.deepOrange
+                              : Colors.grey.shade600,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.star_border),
+                            if (ratings.containsKey(manga.id)) ...[
+                              const SizedBox(
+                                width: 4.0,
+                              ),
+                              Text('${ratings[manga.id]!.rating}')
+                            ]
+                          ],
+                        ),
+                      ),
+                      onSelected: (value) {
+                        ref
+                            .read(ratingsProvider.notifier)
+                            .set(manga, value > 0 ? value : null);
+                      },
+                      itemBuilder: (context) {
+                        final items = List.generate(
+                          10,
+                          (index) => PopupMenuItem<int>(
+                            value: index + 1,
+                            child: Text('${index + 1}'),
+                          ),
+                        ).reversed.toList();
+
+                        items.add(const PopupMenuItem<int>(
+                          value: 0,
+                          child: Text('Remove'),
+                        ));
+
+                        return items;
+                      },
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                  ]);
+                }
+
+                return actions;
               }(),
             ),
             SliverToBoxAdapter(

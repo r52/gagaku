@@ -782,6 +782,27 @@ class StatisticsDetailsRating with _$StatisticsDetailsRating {
       _$StatisticsDetailsRatingFromJson(json);
 }
 
+@freezed
+class SelfRatingResponse with _$SelfRatingResponse {
+  const factory SelfRatingResponse(
+    Map<String, SelfRating> ratings,
+  ) = _SelfRatingResponse;
+
+  factory SelfRatingResponse.fromJson(Map<String, dynamic> json) =>
+      _$SelfRatingResponseFromJson(json);
+}
+
+@freezed
+class SelfRating with _$SelfRating {
+  factory SelfRating({
+    required int rating,
+    @TimestampSerializer() required DateTime createdAt,
+  }) = _SelfRating;
+
+  factory SelfRating.fromJson(Map<String, dynamic> json) =>
+      _$SelfRatingFromJson(json);
+}
+
 class PageData {
   const PageData(this.baseUrl, this.pages);
 

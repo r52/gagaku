@@ -563,6 +563,32 @@ Map<String, dynamic> _$$_StatisticsDetailsRatingToJson(
       'bayesian': instance.bayesian,
     };
 
+_$_SelfRatingResponse _$$_SelfRatingResponseFromJson(
+        Map<String, dynamic> json) =>
+    _$_SelfRatingResponse(
+      (json['ratings'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k, SelfRating.fromJson(e as Map<String, dynamic>)),
+      ),
+    );
+
+Map<String, dynamic> _$$_SelfRatingResponseToJson(
+        _$_SelfRatingResponse instance) =>
+    <String, dynamic>{
+      'ratings': instance.ratings,
+    };
+
+_$_SelfRating _$$_SelfRatingFromJson(Map<String, dynamic> json) =>
+    _$_SelfRating(
+      rating: json['rating'] as int,
+      createdAt: const TimestampSerializer().fromJson(json['createdAt']),
+    );
+
+Map<String, dynamic> _$$_SelfRatingToJson(_$_SelfRating instance) =>
+    <String, dynamic>{
+      'rating': instance.rating,
+      'createdAt': const TimestampSerializer().toJson(instance.createdAt),
+    };
+
 _$_OldToken _$$_OldTokenFromJson(Map<String, dynamic> json) => _$_OldToken(
       session: json['session'] as String,
       refresh: json['refresh'] as String,

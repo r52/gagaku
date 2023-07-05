@@ -74,6 +74,12 @@ abstract class MangaDexEndpoints {
   /// Gets statistics for given manga
   static const statistics = '/statistics/manga';
 
+  /// Gets self-ratings for given mangas
+  static const getRating = '/rating';
+
+  /// Sets self-ratings for given manga
+  static const setRating = '/rating/{id}';
+
   /// Gets cover art
   static const cover = '/cover';
 }
@@ -1084,6 +1090,79 @@ class MangaDexModel {
     logger.e(msg, response.body);
     throw Exception(msg);
   }
+
+  /// Fetches the user's self-rating of given [mangas]
+  ///
+  /// Do not use directly. Prefer [ratingsProvider] for its caching and
+  /// state management.
+  Future<Map<String, SelfRating>> fetchRatings(Iterable<Manga> mangas) async {
+    final fetch = mangas.map((e) => e.id);
+
+    if (fetch.isNotEmpty) {
+      final queryParams = {'manga[]': fetch.toList()};
+
+      final uri = MangaDexEndpoints.api.replace(
+          path: MangaDexEndpoints.getRating, queryParameters: queryParams);
+
+      final response = await _client.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+
+        final resp = SelfRatingResponse.fromJson(body);
+
+        return resp.ratings;
+      } else {
+        // Throw if failure
+        final msg =
+            "fetchRating() failed. Response code: ${response.statusCode}";
+        logger.e(msg, response.body);
+        throw Exception(msg);
+      }
+    }
+
+    return {};
+  }
+
+  /// Sets the [manga]'s self-rating
+  Future<bool> setMangaRating(Manga manga, int? rating) async {
+    if (!await loggedIn()) {
+      throw Exception(
+          "setMangaRating() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.setRating.replaceFirst('{id}', manga.id));
+
+    http.Response? response;
+
+    if (rating != null) {
+      final params = {
+        'rating': rating,
+      };
+
+      response = await _client.post(uri,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(params));
+    } else {
+      response = await _client.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        return true;
+      }
+    }
+
+    // Log the failure
+    logger.w(
+        "setMangaRating(${manga.id}, $rating) returned code ${response.statusCode}",
+        response.body);
+
+    return false;
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -1731,6 +1810,81 @@ class Statistics extends _$Statistics {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
       final map = await _fetchStatistics(mg);
       return {...oldstate, ...map};
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class Ratings extends _$Ratings {
+  Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return {};
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchRatings(mangas);
+    return map;
+  }
+
+  @override
+  FutureOr<Map<String, SelfRating>> build() async {
+    return {};
+  }
+
+  /// Fetch user's self-ratings for the provided list of mangas
+  Future<void> get(Iterable<Manga> mangas) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.valueOrNull ?? {};
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+      final map = await _fetchRatings(mg);
+      return {...oldstate, ...map};
+    });
+  }
+
+  /// Sets a self-rating for a manga
+  Future<void> set(Manga manga, int? rating) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final oldstate = state.valueOrNull ?? {};
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      bool result = await api.setMangaRating(manga, rating);
+
+      if (result) {
+        switch (rating) {
+          case null:
+            oldstate.remove(manga.id);
+            break;
+          case _:
+            oldstate[manga.id] =
+                SelfRating(rating: rating, createdAt: DateTime.now());
+            break;
+        }
+      }
+
+      return {...oldstate};
     });
   }
 }
