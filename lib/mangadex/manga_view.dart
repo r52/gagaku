@@ -592,7 +592,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           color: theme.colorScheme.background,
                           child: Row(
                             children: [
-                              IconTextChip(
+                              ButtonChip(
                                 text: Text(manga.author!.attributes.name),
                                 onPressed: () {
                                   nav.push(
@@ -613,7 +613,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           color: theme.colorScheme.background,
                           child: Row(
                             children: [
-                              IconTextChip(
+                              ButtonChip(
                                 text: Text(manga.artist!.attributes.name),
                                 onPressed: () {
                                   nav.push(
