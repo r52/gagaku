@@ -179,10 +179,11 @@ class ChapterFeedItem extends ConsumerWidget {
 
     final titleBtn = TextButton(
       style: TextButton.styleFrom(
-        minimumSize: const Size(0.0, 20.0),
+        minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
         foregroundColor: theme.colorScheme.onSurface,
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
         nav.push(createMangaViewRoute(state.manga));
@@ -195,7 +196,7 @@ class ChapterFeedItem extends ConsumerWidget {
 
     final coverBtn = TextButton(
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
         shape: const RoundedRectangleBorder(),
       ),
       onPressed: () async {
@@ -352,7 +353,7 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     final userChip = IconTextChip(
       icon: Icon(Icons.person, size: iconSize),
-      text: Text(chapter.getUploadUser()),
+      text: Text(chapter.getUploadUser().crop()),
     );
 
     Widget? endChip;
@@ -481,6 +482,14 @@ class ChapterButtonWidget extends ConsumerWidget {
               child: Row(
                 children: [
                   userChip,
+                ],
+              ),
+            ),
+          if (screenSizeSmall)
+            Padding(
+              padding: vPadding,
+              child: Row(
+                children: [
                   const Spacer(),
                   const Icon(Icons.schedule, size: 15),
                   rowPadding,
