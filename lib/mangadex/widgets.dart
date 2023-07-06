@@ -288,12 +288,18 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     String title = '';
 
-    if (chapter.attributes.chapter != null) {
+    if (chapter.attributes.chapter != null &&
+        chapter.attributes.chapter!.isNotEmpty) {
       title += 'Chapter ${chapter.attributes.chapter}';
     }
 
-    if (chapter.attributes.title != null) {
-      title += ' - ${chapter.attributes.title}';
+    if (chapter.attributes.title != null &&
+        chapter.attributes.title!.isNotEmpty) {
+      if (title.isNotEmpty) {
+        title += ' - ';
+      }
+
+      title += '${chapter.attributes.title}';
     }
 
     if (title.isEmpty) {
