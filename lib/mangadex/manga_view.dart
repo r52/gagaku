@@ -252,8 +252,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                 !nfollowing.value;
                                           },
                                           child: Icon(nfollowing.value
-                                              ? Icons.favorite
-                                              : Icons.favorite_border),
+                                              ? Icons.notification_add
+                                              : Icons
+                                                  .notifications_off_outlined),
                                         ),
                                       ],
                                     ),
@@ -311,8 +312,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               .read(followingStatusProvider(manga).notifier)
                               .set(set);
                         },
-                        child: Icon(
-                            following ? Icons.favorite : Icons.favorite_border),
+                        child: Icon(following
+                            ? Icons.notifications_active
+                            : Icons.notifications_off_outlined),
                       ),
                     ),
                     const SizedBox(
