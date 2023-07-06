@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/mangadex/creator_view.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -49,6 +50,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     final scrollController = useScrollController();
     final theme = Theme.of(context);
@@ -592,7 +594,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             children: [
                               IconTextChip(
                                 text: Text(manga.author!.attributes.name),
-                              )
+                                onPressed: () {
+                                  nav.push(
+                                      createCreatorViewRoute(manga.author!));
+                                },
+                              ),
                             ],
                           ),
                         ),
@@ -609,6 +615,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             children: [
                               IconTextChip(
                                 text: Text(manga.artist!.attributes.name),
+                                onPressed: () {
+                                  nav.push(
+                                      createCreatorViewRoute(manga.artist!));
+                                },
                               )
                             ],
                           ),

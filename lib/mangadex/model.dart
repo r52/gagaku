@@ -514,7 +514,7 @@ class MangaDexModel {
 
   /// Fetches a list of manga data given the query parameters
   Future<Iterable<Manga>> fetchManga(
-      {Iterable<String>? ids, Group? group, int offset = 0}) async {
+      {Iterable<String>? ids, MangaDexUUID? filterId, int offset = 0}) async {
     final settings = ref.read(mdConfigProvider);
 
     final queryParams = {
@@ -565,9 +565,21 @@ class MangaDexModel {
         // Assume that all elements are cache satisfied at this point
         list.add(_cache.get<Manga>(id));
       }
-    } else if (group != null) {
+    } else if (filterId != null) {
       queryParams['offset'] = offset.toString();
-      queryParams['group'] = group.id;
+
+      switch (filterId) {
+        case Author(:final id) || Artist(:final id):
+          queryParams['authorOrArtist'] = id;
+          break;
+        case Group(:final id):
+          queryParams['group'] = id;
+          break;
+        default:
+          const msg = "fetchManga(filterId) failed. Invalid filter type.";
+          logger.e(msg);
+          throw Exception(msg);
+      }
 
       final uri = MangaDexEndpoints.api
           .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
@@ -586,7 +598,7 @@ class MangaDexModel {
       } else {
         // Throw if failure
         final msg =
-            "fetchManga(group) failed. Response code: ${response.statusCode}";
+            "fetchManga(filterId) failed. Response code: ${response.statusCode}";
         logger.e(msg, response.body);
         throw Exception(msg);
       }
@@ -1358,13 +1370,72 @@ class GroupTitles extends _$GroupTitles {
 
   Future<List<Manga>> _fetchManga(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final manga = await api.fetchManga(offset: offset, group: group);
+    final manga = await api.fetchManga(offset: offset, filterId: group);
 
     return manga.toList();
   }
 
   @override
   FutureOr<List<Manga>> build(Group group) async {
+    return _fetchManga(0);
+  }
+
+  Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate = state.valueOrNull ?? [];
+    // If there is more content, get more
+    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
+        !_atEnd) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final manga =
+            await _fetchManga(_offset + MangaDexEndpoints.apiQueryLimit);
+        _offset += MangaDexEndpoints.apiQueryLimit;
+
+        if (manga.isEmpty) {
+          _atEnd = true;
+        }
+
+        return [...oldstate, ...manga];
+      });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
+    }
+  }
+
+  /// Clears the list and refetch from the beginning
+  Future<void> clear() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      _offset = 0;
+      _atEnd = false;
+      return _fetchManga(_offset);
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class CreatorTitles extends _$CreatorTitles {
+  int _offset = 0;
+  bool _atEnd = false;
+
+  Future<List<Manga>> _fetchManga(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    final manga = await api.fetchManga(offset: offset, filterId: creator);
+
+    return manga.toList();
+  }
+
+  @override
+  FutureOr<List<Manga>> build(CreatorType creator) async {
     return _fetchManga(0);
   }
 

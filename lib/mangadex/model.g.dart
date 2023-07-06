@@ -155,7 +155,7 @@ class GroupFeedProvider
   }
 }
 
-String _$groupTitlesHash() => r'1e3913db6b0da08fc4f358d831a297fbb61f00a0';
+String _$groupTitlesHash() => r'bb3138a274c1973f59fa2aa7c0a8b3c80b99a3ad';
 
 abstract class _$GroupTitles extends BuildlessAsyncNotifier<List<Manga>> {
   late final Group group;
@@ -247,6 +247,102 @@ class GroupTitlesProvider
   ) {
     return notifier.build(
       group,
+    );
+  }
+}
+
+String _$creatorTitlesHash() => r'873b599622ede2fbd363a8fe527bc111397538ae';
+
+abstract class _$CreatorTitles extends BuildlessAsyncNotifier<List<Manga>> {
+  late final CreatorType creator;
+
+  FutureOr<List<Manga>> build(
+    CreatorType creator,
+  );
+}
+
+/// See also [CreatorTitles].
+@ProviderFor(CreatorTitles)
+const creatorTitlesProvider = CreatorTitlesFamily();
+
+/// See also [CreatorTitles].
+class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
+  /// See also [CreatorTitles].
+  const CreatorTitlesFamily();
+
+  /// See also [CreatorTitles].
+  CreatorTitlesProvider call(
+    CreatorType creator,
+  ) {
+    return CreatorTitlesProvider(
+      creator,
+    );
+  }
+
+  @override
+  CreatorTitlesProvider getProviderOverride(
+    covariant CreatorTitlesProvider provider,
+  ) {
+    return call(
+      provider.creator,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'creatorTitlesProvider';
+}
+
+/// See also [CreatorTitles].
+class CreatorTitlesProvider
+    extends AsyncNotifierProviderImpl<CreatorTitles, List<Manga>> {
+  /// See also [CreatorTitles].
+  CreatorTitlesProvider(
+    this.creator,
+  ) : super.internal(
+          () => CreatorTitles()..creator = creator,
+          from: creatorTitlesProvider,
+          name: r'creatorTitlesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$creatorTitlesHash,
+          dependencies: CreatorTitlesFamily._dependencies,
+          allTransitiveDependencies:
+              CreatorTitlesFamily._allTransitiveDependencies,
+        );
+
+  final CreatorType creator;
+
+  @override
+  bool operator ==(Object other) {
+    return other is CreatorTitlesProvider && other.creator == creator;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, creator.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+
+  @override
+  FutureOr<List<Manga>> runNotifierBuild(
+    covariant CreatorTitles notifier,
+  ) {
+    return notifier.build(
+      creator,
     );
   }
 }
