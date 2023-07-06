@@ -595,6 +595,62 @@ class MangaDexModel {
     return list;
   }
 
+  /// Searches for manga using the MangaDex API with the search term [searchTerm].
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiSearchLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  Future<List<Manga>> searchManga(
+    String searchTerm, {
+    required MangaFilters filter,
+    int offset = 0,
+  }) async {
+    // Return nothing if empty search term
+    if (searchTerm.isEmpty) {
+      return [];
+    }
+
+    final settings = ref.read(mdConfigProvider);
+
+    Map<String, dynamic> queryParams = {
+      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
+      'offset': offset.toString(),
+      'availableTranslatedLanguage[]': settings.translatedLanguages
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'originalLanguage[]': settings.originalLanguage
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
+      'includes[]': ['cover_art', 'author', 'artist'],
+      'title': searchTerm
+    };
+
+    queryParams.addAll(filter.getMap());
+
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      final mlist = MangaList.fromJson(body);
+
+      // Cache the data
+      _cache.putAllAPIResolved(mlist.data);
+
+      return mlist.data;
+    }
+
+    // Throw if failure
+    final msg = "searchManga() failed. Response code: ${response.statusCode}";
+    logger.e(msg, response.body);
+    throw Exception(msg);
+  }
+
   /// Gets whether or not the user is following [manga]
   Future<bool> getMangaFollowing(Manga manga) async {
     if (!await loggedIn()) {
@@ -969,62 +1025,6 @@ class MangaDexModel {
 
     // Throw if failure
     final msg = "getTagList() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
-    throw Exception(msg);
-  }
-
-  /// Searches for manga using the MangaDex API with the search term [searchTerm].
-  ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiSearchLimit] number of items.
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  Future<List<Manga>> searchManga(
-    String searchTerm, {
-    required MangaFilters filter,
-    int offset = 0,
-  }) async {
-    // Return nothing if empty search term
-    if (searchTerm.isEmpty) {
-      return [];
-    }
-
-    final settings = ref.read(mdConfigProvider);
-
-    Map<String, dynamic> queryParams = {
-      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
-      'offset': offset.toString(),
-      'availableTranslatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'includes[]': ['cover_art', 'author', 'artist'],
-      'title': searchTerm
-    };
-
-    queryParams.addAll(filter.getMap());
-
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-
-      final mlist = MangaList.fromJson(body);
-
-      // Cache the data
-      _cache.putAllAPIResolved(mlist.data);
-
-      return mlist.data;
-    }
-
-    // Throw if failure
-    final msg = "searchManga() failed. Response code: ${response.statusCode}";
     logger.e(msg, response.body);
     throw Exception(msg);
   }

@@ -591,7 +591,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           child: Row(
                             children: [
                               IconTextChip(
-                                text: Text(manga.author!),
+                                text: Text(manga.author!.attributes.name),
                               )
                             ],
                           ),
@@ -608,7 +608,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           child: Row(
                             children: [
                               IconTextChip(
-                                text: Text(manga.artist!),
+                                text: Text(manga.artist!.attributes.name),
                               )
                             ],
                           ),

@@ -177,16 +177,6 @@ Map<String, dynamic> _$$_CoverArtAttributesToJson(
       'fileName': instance.fileName,
     };
 
-_$_NamedAttributes _$$_NamedAttributesFromJson(Map<String, dynamic> json) =>
-    _$_NamedAttributes(
-      name: json['name'] as String,
-    );
-
-Map<String, dynamic> _$$_NamedAttributesToJson(_$_NamedAttributes instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-    };
-
 _$_UserAttributes _$$_UserAttributesFromJson(Map<String, dynamic> json) =>
     _$_UserAttributes(
       username: json['username'] as String,
@@ -195,6 +185,32 @@ _$_UserAttributes _$$_UserAttributesFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$_UserAttributesToJson(_$_UserAttributes instance) =>
     <String, dynamic>{
       'username': instance.username,
+    };
+
+_$_AuthorAttributes _$$_AuthorAttributesFromJson(Map<String, dynamic> json) =>
+    _$_AuthorAttributes(
+      name: json['name'] as String,
+      imageUrl: json['imageUrl'] as String?,
+      biography: Map<String, String>.from(json['biography'] as Map),
+      twitter: json['twitter'] as String?,
+      pixiv: json['pixiv'] as String?,
+      youtube: json['youtube'] as String?,
+      website: json['website'] as String?,
+      createdAt: const TimestampSerializer().fromJson(json['createdAt']),
+      updatedAt: const TimestampSerializer().fromJson(json['updatedAt']),
+    );
+
+Map<String, dynamic> _$$_AuthorAttributesToJson(_$_AuthorAttributes instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'imageUrl': instance.imageUrl,
+      'biography': instance.biography,
+      'twitter': instance.twitter,
+      'pixiv': instance.pixiv,
+      'youtube': instance.youtube,
+      'website': instance.website,
+      'createdAt': const TimestampSerializer().toJson(instance.createdAt),
+      'updatedAt': const TimestampSerializer().toJson(instance.updatedAt),
     };
 
 _$RelationshipManga _$$RelationshipMangaFromJson(Map<String, dynamic> json) =>
@@ -224,33 +240,27 @@ Map<String, dynamic> _$$RelationshipUserToJson(_$RelationshipUser instance) =>
       'type': instance.$type,
     };
 
-_$RelationshipArtist _$$RelationshipArtistFromJson(Map<String, dynamic> json) =>
-    _$RelationshipArtist(
+_$Artist _$$ArtistFromJson(Map<String, dynamic> json) => _$Artist(
       id: json['id'] as String,
       attributes:
-          NamedAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
+          AuthorAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$RelationshipArtistToJson(
-        _$RelationshipArtist instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$$ArtistToJson(_$Artist instance) => <String, dynamic>{
       'id': instance.id,
       'attributes': instance.attributes,
       'type': instance.$type,
     };
 
-_$RelationshipAuthor _$$RelationshipAuthorFromJson(Map<String, dynamic> json) =>
-    _$RelationshipAuthor(
+_$Author _$$AuthorFromJson(Map<String, dynamic> json) => _$Author(
       id: json['id'] as String,
       attributes:
-          NamedAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
+          AuthorAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$RelationshipAuthorToJson(
-        _$RelationshipAuthor instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$$AuthorToJson(_$Author instance) => <String, dynamic>{
       'id': instance.id,
       'attributes': instance.attributes,
       'type': instance.$type,
@@ -270,32 +280,29 @@ Map<String, dynamic> _$$RelationshipCreatorToJson(
       'type': instance.$type,
     };
 
-_$RelationshipCoverArt _$$RelationshipCoverArtFromJson(
-        Map<String, dynamic> json) =>
-    _$RelationshipCoverArt(
+_$CoverArt _$$CoverArtFromJson(Map<String, dynamic> json) => _$CoverArt(
       id: json['id'] as String,
       attributes: CoverArtAttributes.fromJson(
           json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$RelationshipCoverArtToJson(
-        _$RelationshipCoverArt instance) =>
+Map<String, dynamic> _$$CoverArtToJson(_$CoverArt instance) =>
     <String, dynamic>{
       'id': instance.id,
       'attributes': instance.attributes,
       'type': instance.$type,
     };
 
-_$RelationshipGroup _$$RelationshipGroupFromJson(Map<String, dynamic> json) =>
-    _$RelationshipGroup(
+_$ScanlationGroup _$$ScanlationGroupFromJson(Map<String, dynamic> json) =>
+    _$ScanlationGroup(
       id: json['id'] as String,
       attributes: ScanlationGroupAttributes.fromJson(
           json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$RelationshipGroupToJson(_$RelationshipGroup instance) =>
+Map<String, dynamic> _$$ScanlationGroupToJson(_$ScanlationGroup instance) =>
     <String, dynamic>{
       'id': instance.id,
       'attributes': instance.attributes,
@@ -329,31 +336,9 @@ Map<String, dynamic> _$$_ChapterAPIToJson(_$_ChapterAPI instance) =>
       'chapter': instance.chapter,
     };
 
-_$_Group _$$_GroupFromJson(Map<String, dynamic> json) => _$_Group(
-      id: json['id'] as String,
-      attributes: ScanlationGroupAttributes.fromJson(
-          json['attributes'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$$_GroupToJson(_$_Group instance) => <String, dynamic>{
-      'id': instance.id,
-      'attributes': instance.attributes,
-    };
-
-_$_Cover _$$_CoverFromJson(Map<String, dynamic> json) => _$_Cover(
-      id: json['id'] as String,
-      attributes: CoverArtAttributes.fromJson(
-          json['attributes'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$$_CoverToJson(_$_Cover instance) => <String, dynamic>{
-      'id': instance.id,
-      'attributes': instance.attributes,
-    };
-
 _$_CoverList _$$_CoverListFromJson(Map<String, dynamic> json) => _$_CoverList(
       (json['data'] as List<dynamic>)
-          .map((e) => Cover.fromJson(e as Map<String, dynamic>))
+          .map((e) => CoverArt.fromJson(e as Map<String, dynamic>))
           .toList(),
       json['total'] as int,
     );

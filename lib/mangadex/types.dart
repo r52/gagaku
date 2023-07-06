@@ -335,8 +335,8 @@ class Chapter with _$Chapter, MangaDexUUID {
 
     for (final g in relationships) {
       switch (g) {
-        case RelationshipGroup():
-          groups.add(Group.fromRelationship(g));
+        case ScanlationGroup():
+          groups.add(g);
           break;
         default:
           break;
@@ -425,16 +425,6 @@ class CoverArtAttributes with _$CoverArtAttributes {
 }
 
 @freezed
-class NamedAttributes with _$NamedAttributes {
-  const factory NamedAttributes({
-    required String name,
-  }) = _NamedAttributes;
-
-  factory NamedAttributes.fromJson(Map<String, dynamic> json) =>
-      _$NamedAttributesFromJson(json);
-}
-
-@freezed
 class UserAttributes with _$UserAttributes {
   const factory UserAttributes({
     required String username,
@@ -443,6 +433,41 @@ class UserAttributes with _$UserAttributes {
   factory UserAttributes.fromJson(Map<String, dynamic> json) =>
       _$UserAttributesFromJson(json);
 }
+
+@freezed
+class AuthorAttributes with _$AuthorAttributes {
+  const factory AuthorAttributes({
+    required String name,
+    String? imageUrl,
+    required LocalizedString biography,
+    String? twitter,
+    String? pixiv,
+    String? youtube,
+    String? website,
+    @TimestampSerializer() required DateTime createdAt,
+    @TimestampSerializer() required DateTime updatedAt,
+  }) = _AuthorAttributes;
+
+  factory AuthorAttributes.fromJson(Map<String, dynamic> json) =>
+      _$AuthorAttributesFromJson(json);
+}
+
+/// These classes are sued to expose the corresponding relationship union types
+/// for riverpod/other generators, so that the union type being generated
+/// doesn't need do be known during generation time.
+abstract class Group with MangaDexUUID {
+  ScanlationGroupAttributes get attributes;
+}
+
+abstract class Cover with MangaDexUUID {
+  CoverArtAttributes get attributes;
+}
+
+abstract class CreatorType with MangaDexUUID {
+  AuthorAttributes get attributes;
+}
+
+/// END
 
 @Freezed(unionKey: 'type')
 class Relationship with _$Relationship, MangaDexUUID {
@@ -455,31 +480,35 @@ class Relationship with _$Relationship, MangaDexUUID {
     required UserAttributes attributes,
   }) = RelationshipUser;
 
+  @Implements<CreatorType>()
   const factory Relationship.artist({
     required String id,
-    required NamedAttributes attributes,
-  }) = RelationshipArtist;
+    required AuthorAttributes attributes,
+  }) = Artist;
 
+  @Implements<CreatorType>()
   const factory Relationship.author({
     required String id,
-    required NamedAttributes attributes,
-  }) = RelationshipAuthor;
+    required AuthorAttributes attributes,
+  }) = Author;
 
   const factory Relationship.creator({
     required String id,
   }) = RelationshipCreator;
 
   @FreezedUnionValue('cover_art')
+  @Implements<Cover>()
   const factory Relationship.cover({
     required String id,
     required CoverArtAttributes attributes,
-  }) = RelationshipCoverArt;
+  }) = CoverArt;
 
   @FreezedUnionValue('scanlation_group')
+  @Implements<Group>()
   const factory Relationship.group({
     required String id,
     required ScanlationGroupAttributes attributes,
-  }) = RelationshipGroup;
+  }) = ScanlationGroup;
 
   factory Relationship.fromJson(Map<String, dynamic> json) =>
       _$RelationshipFromJson(json);
@@ -514,31 +543,9 @@ class ChapterAPI with _$ChapterAPI {
 }
 
 @freezed
-class Group with _$Group, MangaDexUUID {
-  const factory Group({
-    required String id,
-    required ScanlationGroupAttributes attributes,
-  }) = _Group;
-
-  factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
-  factory Group.fromRelationship(RelationshipGroup group) =>
-      Group(id: group.id, attributes: group.attributes);
-}
-
-@freezed
-class Cover with _$Cover, MangaDexUUID {
-  const factory Cover({
-    required String id,
-    required CoverArtAttributes attributes,
-  }) = _Cover;
-
-  factory Cover.fromJson(Map<String, dynamic> json) => _$CoverFromJson(json);
-}
-
-@freezed
 class CoverList with _$CoverList {
   const factory CoverList(
-    List<Cover> data,
+    List<CoverArt> data,
     int total,
   ) = _CoverList;
 
@@ -569,8 +576,8 @@ class Manga with _$Manga, MangaDexUUID {
 
   factory Manga.fromJson(Map<String, dynamic> json) => _$MangaFromJson(json);
 
-  late final String? author = getAuthor();
-  late final String? artist = getArtist();
+  late final CreatorType? author = getAuthor();
+  late final CreatorType? artist = getArtist();
   late final longStrip = isLongStrip();
   late final covers = getAllCoverArt();
 
@@ -579,7 +586,7 @@ class Manga with _$Manga, MangaDexUUID {
 
     for (final r in relationships) {
       final cr = switch (r) {
-        RelationshipCoverArt(:final attributes) => attributes,
+        CoverArt(:final attributes) => attributes,
         _ => null,
       };
 
@@ -617,37 +624,27 @@ class Manga with _$Manga, MangaDexUUID {
         .quality(quality: quality);
   }
 
-  String? getAuthor() {
+  CreatorType? getAuthor() {
     final authorRs = relationships.where((element) => switch (element) {
-          RelationshipAuthor() => true,
+          Author() => true,
           _ => false,
         });
 
     if (authorRs.isNotEmpty) {
-      final rel = switch (authorRs.first) {
-        RelationshipAuthor(:final attributes) => attributes,
-        _ => null,
-      };
-
-      return rel?.name;
+      return authorRs.first as Author;
     }
 
     return null;
   }
 
-  String? getArtist() {
+  CreatorType? getArtist() {
     final artistRs = relationships.where((element) => switch (element) {
-          RelationshipArtist() => true,
+          Artist() => true,
           _ => false,
         });
 
     if (artistRs.isNotEmpty) {
-      final rel = switch (artistRs.first) {
-        RelationshipArtist(:final attributes) => attributes,
-        _ => null,
-      };
-
-      return rel?.name;
+      return artistRs.first as Artist;
     }
 
     return null;
