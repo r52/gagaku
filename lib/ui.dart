@@ -55,7 +55,7 @@ class ButtonChip extends StatelessWidget {
             child: text,
           );
 
-    return SizedBox(height: 24, child: btn);
+    return btn;
   }
 }
 
