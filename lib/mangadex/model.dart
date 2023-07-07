@@ -618,11 +618,6 @@ class MangaDexModel {
     required MangaFilters filter,
     int offset = 0,
   }) async {
-    // Return nothing if empty search term
-    if (searchTerm.isEmpty) {
-      return [];
-    }
-
     final settings = ref.read(mdConfigProvider);
 
     Map<String, dynamic> queryParams = {
@@ -636,8 +631,11 @@ class MangaDexModel {
           .toList(),
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'includes[]': ['cover_art', 'author', 'artist'],
-      'title': searchTerm
     };
+
+    if (searchTerm.isNotEmpty) {
+      queryParams['title'] = searchTerm;
+    }
 
     queryParams.addAll(filter.getMap());
 
@@ -1801,11 +1799,6 @@ class MangaSearch extends _$MangaSearch {
 
   Future<List<Manga>> _searchManga() async {
     final api = ref.watch(mangadexProvider);
-
-    if (params.query.isEmpty) {
-      // No search term
-      return [];
-    }
 
     final manga = await api.searchManga(params.query,
         filter: params.filter, offset: _offset);

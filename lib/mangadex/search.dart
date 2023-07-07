@@ -24,6 +24,9 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     final controller = useTextEditingController();
     final debounce = useRef<Timer?>(null);
 
+    final results = ref.watch(mangaSearchProvider(filter));
+    final isLoading = results.isLoading && results.isReloading;
+
     useEffect(() {
       return () => debounce.value?.cancel();
     }, [debounce]);
@@ -42,90 +45,90 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     }
 
     return Scaffold(
-        body: MangaListWidget(
-      title: DropdownButton<FilterOrder>(
-        value: filter.filter.order,
-        icon: const Icon(Icons.arrow_drop_down),
-        iconSize: 24,
-        elevation: 16,
-        underline: Container(
-          height: 2,
-          color: Colors.deepOrangeAccent,
-        ),
-        onChanged: (FilterOrder? order) async {
-          if (order != null) {
-            ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
-              query: filter.query,
-              filter: filter.filter.copyWith(order: order),
-            );
-          }
-        },
-        items: List<DropdownMenuItem<FilterOrder>>.generate(
-          FilterOrder.values.length,
-          (int index) => DropdownMenuItem<FilterOrder>(
-            value: FilterOrder.values.elementAt(index),
-            child: Text(
-              FilterOrder.values.elementAt(index).formatted,
+        body: Stack(
+      children: [
+        MangaListWidget(
+          title: DropdownButton<FilterOrder>(
+            value: filter.filter.order,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 24,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+              color: Colors.deepOrangeAccent,
+            ),
+            onChanged: (FilterOrder? order) async {
+              if (order != null) {
+                ref.read(_searchParamsProvider.notifier).state =
+                    filter.copyWith(
+                  query: filter.query,
+                  filter: filter.filter.copyWith(order: order),
+                );
+              }
+            },
+            items: List<DropdownMenuItem<FilterOrder>>.generate(
+              FilterOrder.values.length,
+              (int index) => DropdownMenuItem<FilterOrder>(
+                value: FilterOrder.values.elementAt(index),
+                child: Text(
+                  FilterOrder.values.elementAt(index).formatted,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      onAtEdge: () {
-        final lt = ref.read(_searchParamsProvider);
-        ref.read(mangaSearchProvider(lt).notifier).getMore();
-      },
-      leading: [
-        SliverAppBar(
-          pinned: true,
-          snap: false,
-          floating: false,
-          expandedHeight: 80.0,
-          flexibleSpace: FlexibleSpaceBar(
-            title: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    autofocus: true,
-                    controller: controller,
-                    onChanged: onSearchChanged,
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.search),
-                      hintText: 'Search MangaDex...',
-                    ),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final result = await nav.push<MangaFilters>(
-                      Styles.buildSlideTransitionRoute(
-                        (context, animation, secondaryAnimation) =>
-                            _MangaDexFilterWidget(
-                          filter: filter.filter,
+          onAtEdge: () {
+            final lt = ref.read(_searchParamsProvider);
+            ref.read(mangaSearchProvider(lt).notifier).getMore();
+          },
+          leading: [
+            SliverAppBar(
+              pinned: true,
+              snap: false,
+              floating: false,
+              expandedHeight: 80.0,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        autofocus: true,
+                        controller: controller,
+                        onChanged: onSearchChanged,
+                        decoration: const InputDecoration(
+                          icon: Icon(Icons.search),
+                          hintText: 'Search MangaDex...',
                         ),
                       ),
-                    );
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final result = await nav.push<MangaFilters>(
+                          Styles.buildSlideTransitionRoute(
+                            (context, animation, secondaryAnimation) =>
+                                _MangaDexFilterWidget(
+                              filter: filter.filter,
+                            ),
+                          ),
+                        );
 
-                    if (result != null) {
-                      ref.read(_searchParamsProvider.notifier).state =
-                          filter.copyWith(
-                        query: filter.query,
-                        filter: result,
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.filter_list),
-                  label: const Text('Filters'),
+                        if (result != null) {
+                          ref.read(_searchParamsProvider.notifier).state =
+                              filter.copyWith(
+                            query: filter.query,
+                            filter: result,
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.filter_list),
+                      label: const Text('Filters'),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ],
-      children: [
-        Consumer(
-          builder: (BuildContext context, WidgetRef ref, Widget? child) {
-            final results = ref.watch(mangaSearchProvider(filter));
-            return results.when(
+          ],
+          children: [
+            results.when(
               skipLoadingOnReload: true,
               data: (data) {
                 if (data.isNotEmpty) {
@@ -152,9 +155,10 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                   child: Styles.errorColumn(err, stackTrace),
                 );
               },
-            );
-          },
+            )
+          ],
         ),
+        if (isLoading) ...Styles.loadingOverlay,
       ],
     ));
   }
