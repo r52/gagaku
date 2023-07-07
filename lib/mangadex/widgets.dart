@@ -168,7 +168,7 @@ class ChapterFeedItem extends ConsumerWidget {
           },
           link: Text(
             state.manga.attributes.title.get('en'),
-            style: const TextStyle(fontSize: 24),
+            style: const TextStyle(fontSize: 18),
           ),
           onLinkPressed: () {
             nav.push(createMangaViewRoute(state.manga));
