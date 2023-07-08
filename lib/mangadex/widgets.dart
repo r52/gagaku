@@ -506,8 +506,8 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        nav.push(
-            createMangaDexReaderRoute(chapter, manga, link, onLinkPressed));
+        nav.push(createMangaDexReaderRoute(
+            title, chapter, manga, link, onLinkPressed));
       },
       child: Container(
         decoration: BoxDecoration(
