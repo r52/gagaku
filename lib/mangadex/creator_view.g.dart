@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'manga_view.dart';
+part of 'creator_view.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchReadChaptersRedunHash() =>
-    r'279890046cc51b6f2dc6fa8a3f94a5bd58f0e011';
+String _$fetchCreatorTitlesHash() =>
+    r'ffcf1c482c4d5245f8d9fb305a62edbe1dca5b32';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,32 +30,32 @@ class _SystemHash {
   }
 }
 
-typedef _FetchReadChaptersRedunRef = AutoDisposeFutureProviderRef<void>;
+typedef _FetchCreatorTitlesRef = AutoDisposeFutureProviderRef<Iterable<Manga>>;
 
-/// See also [_fetchReadChaptersRedun].
-@ProviderFor(_fetchReadChaptersRedun)
-const _fetchReadChaptersRedunProvider = _FetchReadChaptersRedunFamily();
+/// See also [_fetchCreatorTitles].
+@ProviderFor(_fetchCreatorTitles)
+const _fetchCreatorTitlesProvider = _FetchCreatorTitlesFamily();
 
-/// See also [_fetchReadChaptersRedun].
-class _FetchReadChaptersRedunFamily extends Family<AsyncValue<void>> {
-  /// See also [_fetchReadChaptersRedun].
-  const _FetchReadChaptersRedunFamily();
+/// See also [_fetchCreatorTitles].
+class _FetchCreatorTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
+  /// See also [_fetchCreatorTitles].
+  const _FetchCreatorTitlesFamily();
 
-  /// See also [_fetchReadChaptersRedun].
-  _FetchReadChaptersRedunProvider call(
-    Manga manga,
+  /// See also [_fetchCreatorTitles].
+  _FetchCreatorTitlesProvider call(
+    CreatorType creator,
   ) {
-    return _FetchReadChaptersRedunProvider(
-      manga,
+    return _FetchCreatorTitlesProvider(
+      creator,
     );
   }
 
   @override
-  _FetchReadChaptersRedunProvider getProviderOverride(
-    covariant _FetchReadChaptersRedunProvider provider,
+  _FetchCreatorTitlesProvider getProviderOverride(
+    covariant _FetchCreatorTitlesProvider provider,
   ) {
     return call(
-      provider.manga,
+      provider.creator,
     );
   }
 
@@ -71,41 +71,42 @@ class _FetchReadChaptersRedunFamily extends Family<AsyncValue<void>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_fetchReadChaptersRedunProvider';
+  String? get name => r'_fetchCreatorTitlesProvider';
 }
 
-/// See also [_fetchReadChaptersRedun].
-class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
-  /// See also [_fetchReadChaptersRedun].
-  _FetchReadChaptersRedunProvider(
-    this.manga,
+/// See also [_fetchCreatorTitles].
+class _FetchCreatorTitlesProvider
+    extends AutoDisposeFutureProvider<Iterable<Manga>> {
+  /// See also [_fetchCreatorTitles].
+  _FetchCreatorTitlesProvider(
+    this.creator,
   ) : super.internal(
-          (ref) => _fetchReadChaptersRedun(
+          (ref) => _fetchCreatorTitles(
             ref,
-            manga,
+            creator,
           ),
-          from: _fetchReadChaptersRedunProvider,
-          name: r'_fetchReadChaptersRedunProvider',
+          from: _fetchCreatorTitlesProvider,
+          name: r'_fetchCreatorTitlesProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$fetchReadChaptersRedunHash,
-          dependencies: _FetchReadChaptersRedunFamily._dependencies,
+                  : _$fetchCreatorTitlesHash,
+          dependencies: _FetchCreatorTitlesFamily._dependencies,
           allTransitiveDependencies:
-              _FetchReadChaptersRedunFamily._allTransitiveDependencies,
+              _FetchCreatorTitlesFamily._allTransitiveDependencies,
         );
 
-  final Manga manga;
+  final CreatorType creator;
 
   @override
   bool operator ==(Object other) {
-    return other is _FetchReadChaptersRedunProvider && other.manga == manga;
+    return other is _FetchCreatorTitlesProvider && other.creator == creator;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, manga.hashCode);
+    hash = _SystemHash.combine(hash, creator.hashCode);
 
     return _SystemHash.finish(hash);
   }

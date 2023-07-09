@@ -74,6 +74,12 @@ abstract class MangaDexEndpoints {
   /// Gets statistics for given manga
   static const statistics = '/statistics/manga';
 
+  /// Gets self-ratings for given mangas
+  static const getRating = '/rating';
+
+  /// Sets self-ratings for given manga
+  static const setRating = '/rating/{id}';
+
   /// Gets cover art
   static const cover = '/cover';
 }
@@ -367,7 +373,7 @@ class MangaDexModel {
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[publishAt]': 'desc',
-      'includes[]': 'scanlation_group'
+      'includes[]': ['scanlation_group', 'user']
     };
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
@@ -420,7 +426,7 @@ class MangaDexModel {
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[publishAt]': 'desc',
-      'includes[]': 'scanlation_group'
+      'includes[]': ['scanlation_group', 'user']
     };
 
     if (group != null) {
@@ -466,7 +472,7 @@ class MangaDexModel {
         'includeFutureUpdates': '0',
         //'order[publishAt]': 'desc',
         'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-        'includes[]': ['scanlation_group']
+        'includes[]': ['scanlation_group', 'user']
       };
 
       while (end < fetch.length) {
@@ -508,7 +514,7 @@ class MangaDexModel {
 
   /// Fetches a list of manga data given the query parameters
   Future<Iterable<Manga>> fetchManga(
-      {Iterable<String>? ids, Group? group, int offset = 0}) async {
+      {Iterable<String>? ids, MangaDexUUID? filterId, int offset = 0}) async {
     final settings = ref.read(mdConfigProvider);
 
     final queryParams = {
@@ -559,9 +565,21 @@ class MangaDexModel {
         // Assume that all elements are cache satisfied at this point
         list.add(_cache.get<Manga>(id));
       }
-    } else if (group != null) {
+    } else if (filterId != null) {
       queryParams['offset'] = offset.toString();
-      queryParams['group'] = group.id;
+
+      switch (filterId) {
+        case Author(:final id) || Artist(:final id):
+          queryParams['authorOrArtist'] = id;
+          break;
+        case Group(:final id):
+          queryParams['group'] = id;
+          break;
+        default:
+          const msg = "fetchManga(filterId) failed. Invalid filter type.";
+          logger.e(msg);
+          throw Exception(msg);
+      }
 
       final uri = MangaDexEndpoints.api
           .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
@@ -580,13 +598,67 @@ class MangaDexModel {
       } else {
         // Throw if failure
         final msg =
-            "fetchManga(group) failed. Response code: ${response.statusCode}";
+            "fetchManga(filterId) failed. Response code: ${response.statusCode}";
         logger.e(msg, response.body);
         throw Exception(msg);
       }
     }
 
     return list;
+  }
+
+  /// Searches for manga using the MangaDex API with the search term [searchTerm].
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiSearchLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  Future<List<Manga>> searchManga(
+    String searchTerm, {
+    required MangaFilters filter,
+    int offset = 0,
+  }) async {
+    final settings = ref.read(mdConfigProvider);
+
+    Map<String, dynamic> queryParams = {
+      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
+      'offset': offset.toString(),
+      'availableTranslatedLanguage[]': settings.translatedLanguages
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'originalLanguage[]': settings.originalLanguage
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
+      'includes[]': ['cover_art', 'author', 'artist'],
+    };
+
+    if (searchTerm.isNotEmpty) {
+      queryParams['title'] = searchTerm;
+    }
+
+    queryParams.addAll(filter.getMap());
+
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      final mlist = MangaList.fromJson(body);
+
+      // Cache the data
+      _cache.putAllAPIResolved(mlist.data);
+
+      return mlist.data;
+    }
+
+    // Throw if failure
+    final msg = "searchManga() failed. Response code: ${response.statusCode}";
+    logger.e(msg, response.body);
+    throw Exception(msg);
   }
 
   /// Gets whether or not the user is following [manga]
@@ -798,7 +870,7 @@ class MangaDexModel {
           .toList(),
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[chapter]': 'desc',
-      'includes[]': 'scanlation_group'
+      'includes[]': ['scanlation_group', 'user']
     };
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
@@ -967,62 +1039,6 @@ class MangaDexModel {
     throw Exception(msg);
   }
 
-  /// Searches for manga using the MangaDex API with the search term [searchTerm].
-  ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiSearchLimit] number of items.
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  Future<List<Manga>> searchManga(
-    String searchTerm, {
-    required MangaFilters filter,
-    int offset = 0,
-  }) async {
-    // Return nothing if empty search term
-    if (searchTerm.isEmpty) {
-      return [];
-    }
-
-    final settings = ref.read(mdConfigProvider);
-
-    Map<String, dynamic> queryParams = {
-      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
-      'offset': offset.toString(),
-      'availableTranslatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'includes[]': ['cover_art', 'author', 'artist'],
-      'title': searchTerm
-    };
-
-    queryParams.addAll(filter.getMap());
-
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-
-      final mlist = MangaList.fromJson(body);
-
-      // Cache the data
-      _cache.putAllAPIResolved(mlist.data);
-
-      return mlist.data;
-    }
-
-    // Throw if failure
-    final msg = "searchManga() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
-    throw Exception(msg);
-  }
-
   /// Fetches statistics of given [mangas]
   ///
   /// Do not use directly. Prefer [statisticsProvider] for its caching and
@@ -1083,6 +1099,79 @@ class MangaDexModel {
     final msg = "getCoverList() failed. Response code: ${response.statusCode}";
     logger.e(msg, response.body);
     throw Exception(msg);
+  }
+
+  /// Fetches the user's self-rating of given [mangas]
+  ///
+  /// Do not use directly. Prefer [ratingsProvider] for its caching and
+  /// state management.
+  Future<Map<String, SelfRating>> fetchRatings(Iterable<Manga> mangas) async {
+    final fetch = mangas.map((e) => e.id);
+
+    if (fetch.isNotEmpty) {
+      final queryParams = {'manga[]': fetch.toList()};
+
+      final uri = MangaDexEndpoints.api.replace(
+          path: MangaDexEndpoints.getRating, queryParameters: queryParams);
+
+      final response = await _client.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+
+        final resp = SelfRatingResponse.fromJson(body);
+
+        return resp.ratings;
+      } else {
+        // Throw if failure
+        final msg =
+            "fetchRating() failed. Response code: ${response.statusCode}";
+        logger.e(msg, response.body);
+        throw Exception(msg);
+      }
+    }
+
+    return {};
+  }
+
+  /// Sets the [manga]'s self-rating
+  Future<bool> setMangaRating(Manga manga, int? rating) async {
+    if (!await loggedIn()) {
+      throw Exception(
+          "setMangaRating() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.setRating.replaceFirst('{id}', manga.id));
+
+    http.Response? response;
+
+    if (rating != null) {
+      final params = {
+        'rating': rating,
+      };
+
+      response = await _client.post(uri,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(params));
+    } else {
+      response = await _client.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        return true;
+      }
+    }
+
+    // Log the failure
+    logger.w(
+        "setMangaRating(${manga.id}, $rating) returned code ${response.statusCode}",
+        response.body);
+
+    return false;
   }
 }
 
@@ -1279,13 +1368,72 @@ class GroupTitles extends _$GroupTitles {
 
   Future<List<Manga>> _fetchManga(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final manga = await api.fetchManga(offset: offset, group: group);
+    final manga = await api.fetchManga(offset: offset, filterId: group);
 
     return manga.toList();
   }
 
   @override
   FutureOr<List<Manga>> build(Group group) async {
+    return _fetchManga(0);
+  }
+
+  Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate = state.valueOrNull ?? [];
+    // If there is more content, get more
+    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
+        !_atEnd) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final manga =
+            await _fetchManga(_offset + MangaDexEndpoints.apiQueryLimit);
+        _offset += MangaDexEndpoints.apiQueryLimit;
+
+        if (manga.isEmpty) {
+          _atEnd = true;
+        }
+
+        return [...oldstate, ...manga];
+      });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
+    }
+  }
+
+  /// Clears the list and refetch from the beginning
+  Future<void> clear() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      _offset = 0;
+      _atEnd = false;
+      return _fetchManga(_offset);
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class CreatorTitles extends _$CreatorTitles {
+  int _offset = 0;
+  bool _atEnd = false;
+
+  Future<List<Manga>> _fetchManga(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    final manga = await api.fetchManga(offset: offset, filterId: creator);
+
+    return manga.toList();
+  }
+
+  @override
+  FutureOr<List<Manga>> build(CreatorType creator) async {
     return _fetchManga(0);
   }
 
@@ -1652,11 +1800,6 @@ class MangaSearch extends _$MangaSearch {
   Future<List<Manga>> _searchManga() async {
     final api = ref.watch(mangadexProvider);
 
-    if (params.query.isEmpty) {
-      // No search term
-      return [];
-    }
-
     final manga = await api.searchManga(params.query,
         filter: params.filter, offset: _offset);
 
@@ -1731,6 +1874,81 @@ class Statistics extends _$Statistics {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
       final map = await _fetchStatistics(mg);
       return {...oldstate, ...map};
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class Ratings extends _$Ratings {
+  Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return {};
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchRatings(mangas);
+    return map;
+  }
+
+  @override
+  FutureOr<Map<String, SelfRating>> build() async {
+    return {};
+  }
+
+  /// Fetch user's self-ratings for the provided list of mangas
+  Future<void> get(Iterable<Manga> mangas) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.valueOrNull ?? {};
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+      final map = await _fetchRatings(mg);
+      return {...oldstate, ...map};
+    });
+  }
+
+  /// Sets a self-rating for a manga
+  Future<void> set(Manga manga, int? rating) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return;
+    }
+
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final oldstate = state.valueOrNull ?? {};
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      bool result = await api.setMangaRating(manga, rating);
+
+      if (result) {
+        switch (rating) {
+          case null:
+            oldstate.remove(manga.id);
+            break;
+          case _:
+            oldstate[manga.id] =
+                SelfRating(rating: rating, createdAt: DateTime.now());
+            break;
+        }
+      }
+
+      return {...oldstate};
     });
   }
 }

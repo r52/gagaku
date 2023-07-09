@@ -155,7 +155,7 @@ class GroupFeedProvider
   }
 }
 
-String _$groupTitlesHash() => r'1e3913db6b0da08fc4f358d831a297fbb61f00a0';
+String _$groupTitlesHash() => r'bb3138a274c1973f59fa2aa7c0a8b3c80b99a3ad';
 
 abstract class _$GroupTitles extends BuildlessAsyncNotifier<List<Manga>> {
   late final Group group;
@@ -247,6 +247,102 @@ class GroupTitlesProvider
   ) {
     return notifier.build(
       group,
+    );
+  }
+}
+
+String _$creatorTitlesHash() => r'873b599622ede2fbd363a8fe527bc111397538ae';
+
+abstract class _$CreatorTitles extends BuildlessAsyncNotifier<List<Manga>> {
+  late final CreatorType creator;
+
+  FutureOr<List<Manga>> build(
+    CreatorType creator,
+  );
+}
+
+/// See also [CreatorTitles].
+@ProviderFor(CreatorTitles)
+const creatorTitlesProvider = CreatorTitlesFamily();
+
+/// See also [CreatorTitles].
+class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
+  /// See also [CreatorTitles].
+  const CreatorTitlesFamily();
+
+  /// See also [CreatorTitles].
+  CreatorTitlesProvider call(
+    CreatorType creator,
+  ) {
+    return CreatorTitlesProvider(
+      creator,
+    );
+  }
+
+  @override
+  CreatorTitlesProvider getProviderOverride(
+    covariant CreatorTitlesProvider provider,
+  ) {
+    return call(
+      provider.creator,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'creatorTitlesProvider';
+}
+
+/// See also [CreatorTitles].
+class CreatorTitlesProvider
+    extends AsyncNotifierProviderImpl<CreatorTitles, List<Manga>> {
+  /// See also [CreatorTitles].
+  CreatorTitlesProvider(
+    this.creator,
+  ) : super.internal(
+          () => CreatorTitles()..creator = creator,
+          from: creatorTitlesProvider,
+          name: r'creatorTitlesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$creatorTitlesHash,
+          dependencies: CreatorTitlesFamily._dependencies,
+          allTransitiveDependencies:
+              CreatorTitlesFamily._allTransitiveDependencies,
+        );
+
+  final CreatorType creator;
+
+  @override
+  bool operator ==(Object other) {
+    return other is CreatorTitlesProvider && other.creator == creator;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, creator.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+
+  @override
+  FutureOr<List<Manga>> runNotifierBuild(
+    covariant CreatorTitles notifier,
+  ) {
+    return notifier.build(
+      creator,
     );
   }
 }
@@ -568,7 +664,7 @@ final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
 );
 
 typedef _$TagList = AsyncNotifier<Iterable<Tag>>;
-String _$mangaSearchHash() => r'09e2eb0e5fbeeaf46154d20e9b4baf21bad678c1';
+String _$mangaSearchHash() => r'9ad84a7796c50b38279997f42733c6c0b82806f1';
 
 abstract class _$MangaSearch
     extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
@@ -680,6 +776,21 @@ final statisticsProvider =
 );
 
 typedef _$Statistics = AsyncNotifier<Map<String, MangaStatistics>>;
+String _$ratingsHash() => r'f507d7d7f9d27c0ff7f572a6a24d281b80794fef';
+
+/// See also [Ratings].
+@ProviderFor(Ratings)
+final ratingsProvider =
+    AsyncNotifierProvider<Ratings, Map<String, SelfRating>>.internal(
+  Ratings.new,
+  name: r'ratingsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$ratingsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
 String _$readingStatusHash() => r'5281cee334576d80177ad0c9b441badde919ffd6';
 
 abstract class _$ReadingStatus

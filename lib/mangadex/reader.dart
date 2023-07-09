@@ -14,10 +14,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader.g.dart';
 
-Route createMangaDexReaderRoute(
-    Chapter chapter, Manga manga, Widget? link, VoidCallback? onLinkPressed) {
+Route createMangaDexReaderRoute(String title, Chapter chapter, Manga manga,
+    Widget? link, VoidCallback? onLinkPressed) {
   return Styles.buildSlideTransitionRoute(
     (context, animation, secondaryAnimation) => MangaDexReaderWidget(
+      title: title,
       chapter: chapter,
       manga: manga,
       link: link,
@@ -45,12 +46,14 @@ Future<List<ReaderPage>> _fetchChapterPages(
 class MangaDexReaderWidget extends HookConsumerWidget {
   const MangaDexReaderWidget({
     super.key,
+    required this.title,
     required this.chapter,
     required this.manga,
     this.link,
     this.onLinkPressed,
   });
 
+  final String title;
   final Chapter chapter;
   final Manga manga;
   final Widget? link;
@@ -60,16 +63,6 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pages = ref.watch(_fetchChapterPagesProvider(chapter));
     final timer = useRef<Timer?>(null);
-
-    String title = '';
-
-    if (chapter.attributes.chapter != null) {
-      title += 'Chapter ${chapter.attributes.chapter!}';
-    }
-
-    if (chapter.attributes.title != null) {
-      title += ' - ${chapter.attributes.title!}';
-    }
 
     useEffect(() {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
@@ -97,7 +90,8 @@ class MangaDexReaderWidget extends HookConsumerWidget {
         return ReaderWidget(
           pages: result,
           pageCount: result.length,
-          title: '${manga.attributes.title.get('en')} - $title',
+          title: title,
+          subtitle: manga.attributes.title.get('en'),
           isLongStrip: manga.longStrip,
           link: link,
           onLinkPressed: onLinkPressed,

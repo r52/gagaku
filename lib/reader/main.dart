@@ -18,6 +18,7 @@ class ReaderWidget extends HookConsumerWidget {
     required this.pages,
     required this.pageCount,
     required this.title,
+    this.subtitle,
     required this.isLongStrip,
     this.link,
     this.onLinkPressed,
@@ -27,6 +28,7 @@ class ReaderWidget extends HookConsumerWidget {
   final Iterable<ReaderPage> pages;
   final int pageCount;
   final String title;
+  final String? subtitle;
   final bool isLongStrip;
   final Widget? link;
   final VoidCallback? onLinkPressed;
@@ -391,7 +393,13 @@ class ReaderWidget extends HookConsumerWidget {
       extendBodyBehindAppBar: false,
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text(title),
+        title: ListTile(
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: subtitle != null ? Text(subtitle!) : null,
+        ),
         actions: [
           Builder(
             builder: (context) => IconButton(
