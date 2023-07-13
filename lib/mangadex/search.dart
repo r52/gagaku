@@ -48,6 +48,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
         body: Stack(
       children: [
         MangaListWidget(
+          physics: const AlwaysScrollableScrollPhysics(),
           title: DropdownButton<FilterOrder>(
             value: filter.filter.order,
             icon: const Icon(Icons.arrow_drop_down),
@@ -155,7 +156,23 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                   child: Styles.errorColumn(err, stackTrace),
                 );
               },
-            )
+            ),
+            if (!results.isLoading &&
+                !ref.read(mangaSearchProvider(filter).notifier).isAtEnd())
+              SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final lt = ref.read(_searchParamsProvider);
+                        ref.read(mangaSearchProvider(lt).notifier).getMore();
+                      },
+                      child: const Text('Load More'),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
         if (isLoading) ...Styles.loadingOverlay,

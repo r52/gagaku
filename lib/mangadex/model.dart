@@ -1815,6 +1815,10 @@ class MangaSearch extends _$MangaSearch {
     return _searchManga();
   }
 
+  bool isAtEnd() {
+    return _atEnd;
+  }
+
   Future<void> getMore() async {
     if (state.isLoading || state.isReloading) {
       return;

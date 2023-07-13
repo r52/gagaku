@@ -664,7 +664,7 @@ final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
 );
 
 typedef _$TagList = AsyncNotifier<Iterable<Tag>>;
-String _$mangaSearchHash() => r'9ad84a7796c50b38279997f42733c6c0b82806f1';
+String _$mangaSearchHash() => r'e5e3db3c56b9a668163093c117e6d49a1fb81269';
 
 abstract class _$MangaSearch
     extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
