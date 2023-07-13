@@ -359,7 +359,7 @@ class ChapterButtonWidget extends ConsumerWidget {
     Widget? endChip;
     if (isEndChapter) {
       endChip = const IconTextChip(
-        color: Colors.deepOrange,
+        color: Colors.blue,
         text: Text('END'),
       );
     }
@@ -450,12 +450,17 @@ class ChapterButtonWidget extends ConsumerWidget {
                 ),
                 rowPadding,
                 if (endChip != null) endChip,
-                if (!screenSizeSmall) ...[
-                  const Spacer(),
-                  const Icon(Icons.schedule, size: 20),
-                  rowPadding,
-                  Text(pubtime)
-                ]
+                if (!screenSizeSmall)
+                  Flexible(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(Icons.schedule, size: 20),
+                        rowPadding,
+                        Text(pubtime)
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -509,12 +514,16 @@ class ChapterButtonWidget extends ConsumerWidget {
         nav.push(createMangaDexReaderRoute(
             title, chapter, manga, link, onLinkPressed));
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: tileColor,
-          border: border,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        clipBehavior: Clip.hardEdge,
+        child: Container(
+          decoration: BoxDecoration(
+            color: tileColor,
+            border: border,
+          ),
+          child: tile,
         ),
-        child: tile,
       ),
     );
   }
