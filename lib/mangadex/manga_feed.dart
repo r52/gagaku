@@ -26,7 +26,7 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   return mangas;
 }
 
-class MangaDexMangaFeed extends HookConsumerWidget {
+class MangaDexMangaFeed extends ConsumerWidget {
   const MangaDexMangaFeed({
     super.key,
     this.controller,

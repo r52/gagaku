@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/ui.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef LibraryItemTapCallback = void Function(LocalLibraryItem);
 
-class LibraryListWidget extends HookConsumerWidget {
+class LibraryListWidget extends StatelessWidget {
   const LibraryListWidget({
     super.key,
     required this.title,
@@ -24,7 +23,7 @@ class LibraryListWidget extends HookConsumerWidget {
   final LibraryItemTapCallback? onTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return CustomScrollView(
       scrollBehavior: MouseTouchScrollBehavior(),
       physics: physics,

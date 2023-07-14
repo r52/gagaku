@@ -50,7 +50,7 @@ Future<List<ReaderPage>> _getDirectoryPages(
   return [];
 }
 
-class DirectoryReaderWidget extends HookConsumerWidget {
+class DirectoryReaderWidget extends ConsumerWidget {
   const DirectoryReaderWidget({
     super.key,
     required this.path,

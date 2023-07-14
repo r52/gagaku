@@ -77,7 +77,7 @@ List<ReaderPage> _extractArchive(ArchiveType type, Uint8List bytes) {
   return pages;
 }
 
-class ArchiveReaderWidget extends HookConsumerWidget {
+class ArchiveReaderWidget extends ConsumerWidget {
   const ArchiveReaderWidget({
     super.key,
     required this.path,

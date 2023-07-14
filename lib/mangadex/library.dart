@@ -9,7 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final libraryViewTypeProvider =
     StateProvider((ref) => MangaReadingStatus.reading);
 
-class MangaDexLibraryView extends HookConsumerWidget {
+class MangaDexLibraryView extends ConsumerWidget {
   const MangaDexLibraryView({
     super.key,
     this.controller,
