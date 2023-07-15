@@ -504,9 +504,10 @@ class MangaDexModel {
     }
 
     // Craft the list
-    for (var id in uuids) {
-      // Assume that all elements are cache satisfied at this point
-      list.add(_cache.get<Chapter>(id));
+    for (final id in uuids) {
+      if (_cache.exists(id)) {
+        list.add(_cache.get<Chapter>(id));
+      }
     }
 
     return list;
@@ -562,8 +563,9 @@ class MangaDexModel {
 
       // Craft the list
       for (final id in ids) {
-        // Assume that all elements are cache satisfied at this point
-        list.add(_cache.get<Manga>(id));
+        if (_cache.exists(id)) {
+          list.add(_cache.get<Manga>(id));
+        }
       }
     } else if (filterId != null) {
       queryParams['offset'] = offset.toString();
