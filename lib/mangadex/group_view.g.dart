@@ -6,7 +6,7 @@ part of 'group_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchGroupFeedHash() => r'3e2ddcba46b13c004631281af07b55e428c7dd82';
+String _$fetchGroupFeedHash() => r'2accd66c235ba80d1b919b2fe8e0299eb984ae5d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -113,7 +113,7 @@ class _FetchGroupFeedProvider
   }
 }
 
-String _$fetchGroupTitlesHash() => r'c1c7cdbdb1101c72ce678f2762e1909bddc8dd24';
+String _$fetchGroupTitlesHash() => r'7807d9d1023b067036001ef4fe0045d8b256766a';
 typedef _FetchGroupTitlesRef = AutoDisposeFutureProviderRef<Iterable<Manga>>;
 
 /// See also [_fetchGroupTitles].

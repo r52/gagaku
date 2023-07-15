@@ -13,7 +13,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final cfg = ref.read(mdConfigProvider);
+    final cfg = ref.watch(mdConfigProvider);
     final config = useState(cfg);
 
     return Scaffold(

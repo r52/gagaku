@@ -61,7 +61,7 @@ class MangaDexLibraryView extends ConsumerWidget {
                     data: (result) {
                       return MangaListWidget(
                         title: Text(
-                          '${ref.read(userLibraryProvider(type).notifier).total()} Mangas',
+                          '${ref.watch(userLibraryProvider(type).notifier).total()} Mangas',
                           style: const TextStyle(fontSize: 24),
                         ),
                         physics: const AlwaysScrollableScrollPhysics(),

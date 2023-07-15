@@ -26,7 +26,7 @@ Route createCreatorViewRoute(CreatorType creator) {
 Future<Iterable<Manga>> _fetchCreatorTitles(
     _FetchCreatorTitlesRef ref, CreatorType creator) async {
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
-  await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.watch(statisticsProvider.notifier).get(mangas);
 
   ref.keepAlive();
 

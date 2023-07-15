@@ -158,7 +158,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
               },
             ),
             if (!results.isLoading &&
-                !ref.read(mangaSearchProvider(filter).notifier).isAtEnd())
+                !ref.watch(mangaSearchProvider(filter).notifier).isAtEnd())
               SliverToBoxAdapter(
                 child: Center(
                   child: Padding(

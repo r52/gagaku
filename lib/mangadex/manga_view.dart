@@ -35,12 +35,12 @@ Future<void> _fetchReadChaptersRedun(
   if (loggedin) {
     // Redundant retrieve read chapters when opening the manga
     // from places where it hasn't been retrieved yet
-    await ref.read(readChaptersProvider.notifier).get([manga]);
+    await ref.watch(readChaptersProvider.notifier).get([manga]);
 
-    await ref.read(ratingsProvider.notifier).get([manga]);
+    await ref.watch(ratingsProvider.notifier).get([manga]);
   }
 
-  await ref.read(statisticsProvider.notifier).get([manga]);
+  await ref.watch(statisticsProvider.notifier).get([manga]);
 }
 
 class MangaDexMangaViewWidget extends HookConsumerWidget {
