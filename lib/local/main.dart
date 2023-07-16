@@ -130,13 +130,12 @@ class LocalLibraryHome extends HookConsumerWidget {
           );
         }
 
-        return result.when(
-          skipLoadingOnReload: false,
-          data: (top) {
-            currentItem.value ??= top;
+        switch (result) {
+          case AsyncData(:final value):
+            currentItem.value ??= value;
             Widget child;
 
-            if (top.children.isEmpty) {
+            if (value.children.isEmpty) {
               child = Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -184,40 +183,39 @@ class LocalLibraryHome extends HookConsumerWidget {
               },
               child: child,
             );
-          },
-          loading: () => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Scanning library...",
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontWeight: FontWeight.normal,
-                    fontSize: 18,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const CircularProgressIndicator()
-              ],
-            ),
-          ),
-          error: (err, stackTrace) {
+          case AsyncError(:final error, :final stackTrace):
             final messenger = ScaffoldMessenger.of(context);
-            Styles.showErrorSnackBar(messenger, '$err');
-            logger.e("localLibraryProvider failed", err, stackTrace);
+            Styles.showErrorSnackBar(messenger, '$error');
+            logger.e("localLibraryProvider failed", error, stackTrace);
 
             return RefreshIndicator(
               onRefresh: () async {
                 return await ref.refresh(localLibraryProvider.future);
               },
-              child: Styles.errorList(err, stackTrace),
+              child: Styles.errorList(error, stackTrace),
             );
-          },
-        );
+          case _:
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Scanning library...",
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.normal,
+                      fontSize: 18,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const CircularProgressIndicator()
+                ],
+              ),
+            );
+        }
       }(),
     );
   }

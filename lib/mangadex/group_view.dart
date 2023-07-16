@@ -198,54 +198,53 @@ class MangaDexGroupViewWidget extends HookWidget {
 
           return Stack(
             children: [
-              mangas.when(
-                skipLoadingOnReload: true,
-                data: (result) {
-                  if (result.isEmpty) {
-                    return const Text('No manga!');
-                  }
+              switch (mangas) {
+                AsyncValue(:final error?, :final stackTrace?) => () {
+                    final messenger = ScaffoldMessenger.of(context);
+                    Styles.showErrorSnackBar(messenger, '$error');
+                    logger.e("_fetchGroupTitlesProvider(group) failed", error,
+                        stackTrace);
 
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      ref.read(groupTitlesProvider(group).notifier).clear();
-                      return await ref
-                          .refresh(_fetchGroupTitlesProvider(group).future);
-                    },
-                    child: MangaListWidget(
-                      title: const Text(
-                        'Group Titles',
-                        style: TextStyle(fontSize: 24),
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        ref.invalidate(groupTitlesProvider(group));
+                        return await ref
+                            .refresh(_fetchGroupTitlesProvider(group).future);
+                      },
+                      child: Styles.errorList(error, stackTrace),
+                    );
+                  }(),
+                AsyncValue(:final value?) => () {
+                    if (value.isEmpty) {
+                      return const Text('No manga!');
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        ref.read(groupTitlesProvider(group).notifier).clear();
+                        return await ref
+                            .refresh(_fetchGroupTitlesProvider(group).future);
+                      },
+                      child: MangaListWidget(
+                        title: const Text(
+                          'Group Titles',
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: controllers[2],
+                        onAtEdge: () => ref
+                            .read(groupTitlesProvider(group).notifier)
+                            .getMore(),
+                        children: [
+                          MangaListViewSliver(items: value),
+                        ],
                       ),
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: controllers[2],
-                      onAtEdge: () => ref
-                          .read(groupTitlesProvider(group).notifier)
-                          .getMore(),
-                      children: [
-                        MangaListViewSliver(items: result),
-                      ],
-                    ),
-                  );
-                },
-                error: (err, stack) {
-                  final messenger = ScaffoldMessenger.of(context);
-                  Styles.showErrorSnackBar(messenger, '$err');
-                  logger.e(
-                      "_fetchGroupTitlesProvider(group) failed", err, stack);
-
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      ref.invalidate(groupTitlesProvider(group));
-                      return await ref
-                          .refresh(_fetchGroupTitlesProvider(group).future);
-                    },
-                    child: Styles.errorList(err, stack),
-                  );
-                },
-                loading: () => const Stack(
-                  children: Styles.loadingOverlay,
-                ),
-              ),
+                    );
+                  }(),
+                _ => const Stack(
+                    children: Styles.loadingOverlay,
+                  ),
+              },
               if (isLoading) ...Styles.loadingOverlay,
             ],
           );

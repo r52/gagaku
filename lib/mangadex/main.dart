@@ -148,8 +148,8 @@ class MangaDexHome extends HookConsumerWidget {
                 builder: (context, ref, child) {
                   final auth = ref.watch(authControlProvider);
 
-                  return auth.when(
-                    data: (loggedIn) {
+                  switch (auth) {
+                    case AsyncData(value: final loggedin):
                       // XXX: This changes when OAuth is released
                       Widget logbtn = Tooltip(
                         message: 'Login',
@@ -167,7 +167,7 @@ class MangaDexHome extends HookConsumerWidget {
                         ),
                       );
 
-                      if (loggedIn) {
+                      if (loggedin) {
                         logbtn = Tooltip(
                           message: 'Logout',
                           child: IconButton(
@@ -186,17 +186,16 @@ class MangaDexHome extends HookConsumerWidget {
                         ),
                         child: logbtn,
                       );
-                    },
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    error: (err, stack) {
+                    case AsyncError(:final error, :final stackTrace):
                       final messenger = ScaffoldMessenger.of(context);
-                      Styles.showErrorSnackBar(messenger, '$err');
-                      logger.e("authControlProvider failed", err, stack);
+                      Styles.showErrorSnackBar(messenger, '$error');
+                      logger.e("authControlProvider failed", error, stackTrace);
                       return const Icon(Icons.error);
-                    },
-                  );
+                    case _:
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                  }
                 },
               ),
             ],

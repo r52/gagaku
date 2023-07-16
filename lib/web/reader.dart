@@ -67,34 +67,33 @@ class WebSourceReaderWidget extends ConsumerWidget {
       name = title!;
     }
 
-    final results = ref.watch(_getPagesProvider(source));
+    final pages = ref.watch(_getPagesProvider(source));
 
-    return results.when(
-      data: (pages) {
-        return ReaderWidget(
-          pages: pages,
-          pageCount: pages.length,
-          title: name,
-          isLongStrip: false, // TODO longstrip
-          link: link,
-          onLinkPressed: onLinkPressed,
-        );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (err, stackTrace) {
+    switch (pages) {
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$err');
-        logger.e("_getPagesProvider($source) failed", err, stackTrace);
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e("_getPagesProvider($source) failed", error, stackTrace);
 
         return Scaffold(
           appBar: AppBar(
             leading: const BackButton(),
           ),
-          body: Styles.errorColumn(err, stackTrace),
+          body: Styles.errorColumn(error, stackTrace),
         );
-      },
-    );
+      case AsyncValue(:final value?):
+        return ReaderWidget(
+          pages: value,
+          pageCount: value.length,
+          title: name,
+          isLongStrip: false, // TODO longstrip
+          link: link,
+          onLinkPressed: onLinkPressed,
+        );
+      case _:
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+    }
   }
 }

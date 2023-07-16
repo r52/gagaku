@@ -56,10 +56,16 @@ class MangaDexLibraryView extends ConsumerWidget {
             Expanded(
               child: Stack(
                 children: [
-                  results.when(
-                    skipLoadingOnReload: true,
-                    data: (result) {
-                      return MangaListWidget(
+                  switch (results) {
+                    AsyncValue(:final error?, :final stackTrace?) => () {
+                        final messenger = ScaffoldMessenger.of(context);
+                        Styles.showErrorSnackBar(messenger, '$error');
+                        logger.e("userLibraryProvider($type) failed", error,
+                            stackTrace);
+
+                        return Styles.errorColumn(error, stackTrace);
+                      }(),
+                    AsyncValue(:final value?) => MangaListWidget(
                         title: Text(
                           '${ref.watch(userLibraryProvider(type).notifier).total()} Mangas',
                           style: const TextStyle(fontSize: 24),
@@ -71,20 +77,11 @@ class MangaDexLibraryView extends ConsumerWidget {
                           ref.read(userLibraryProvider(lt).notifier).getMore();
                         },
                         children: [
-                          MangaListViewSliver(items: result),
+                          MangaListViewSliver(items: value),
                         ],
-                      );
-                    },
-                    loading: () => const SizedBox.shrink(),
-                    error: (err, stackTrace) {
-                      final messenger = ScaffoldMessenger.of(context);
-                      Styles.showErrorSnackBar(messenger, '$err');
-                      logger.e(
-                          "userLibraryProvider($type) failed", err, stackTrace);
-
-                      return Styles.errorColumn(err, stackTrace);
-                    },
-                  ),
+                      ),
+                    _ => const SizedBox.shrink(),
+                  },
                   if (isLoading) ...Styles.loadingOverlay,
                 ],
               ),
