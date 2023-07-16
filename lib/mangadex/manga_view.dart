@@ -588,42 +588,46 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 children: [
                   if (manga.author != null)
                     ExpansionTile(
+                      expandedAlignment: Alignment.centerLeft,
                       title: const Text('Author'),
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           color: theme.colorScheme.background,
-                          child: Row(
-                            children: [
-                              ButtonChip(
-                                text: Text(manga.author!.attributes.name),
-                                onPressed: () {
-                                  nav.push(
-                                      createCreatorViewRoute(manga.author!));
-                                },
-                              ),
-                            ],
+                          child: Wrap(
+                            spacing: 4.0,
+                            runSpacing: 4.0,
+                            children: manga.author!
+                                .map((e) => ButtonChip(
+                                      text: Text(e.attributes.name),
+                                      onPressed: () {
+                                        nav.push(createCreatorViewRoute(e));
+                                      },
+                                    ))
+                                .toList(),
                           ),
                         ),
                       ],
                     ),
                   if (manga.artist != null)
                     ExpansionTile(
+                      expandedAlignment: Alignment.centerLeft,
                       title: const Text('Artist'),
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           color: theme.colorScheme.background,
-                          child: Row(
-                            children: [
-                              ButtonChip(
-                                text: Text(manga.artist!.attributes.name),
-                                onPressed: () {
-                                  nav.push(
-                                      createCreatorViewRoute(manga.artist!));
-                                },
-                              )
-                            ],
+                          child: Wrap(
+                            spacing: 4.0,
+                            runSpacing: 4.0,
+                            children: manga.artist!
+                                .map((e) => ButtonChip(
+                                      text: Text(e.attributes.name),
+                                      onPressed: () {
+                                        nav.push(createCreatorViewRoute(e));
+                                      },
+                                    ))
+                                .toList(),
                           ),
                         ),
                       ],
