@@ -62,67 +62,66 @@ class ChapterFeedWidget extends HookConsumerWidget {
     }, [scrollController]);
 
     return Center(
-      child: results.when(
-        skipLoadingOnReload: true,
-        data: (result) {
-          if (result.isEmpty) {
-            return Text(emptyText ?? 'No results!');
-          }
+      child: switch (results) {
+        AsyncValue(:final error?, :final stackTrace?) => () {
+            final messenger = ScaffoldMessenger.of(context);
+            Styles.showErrorSnackBar(messenger, '$error');
+            logger.e("${provider.toString()} failed", error, stackTrace);
 
-          return ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.trackpad,
-            }),
-            child: RefreshIndicator(
+            return RefreshIndicator(
               onRefresh: onRefresh,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 10.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(fontSize: 24),
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      restorationId: restorationId,
-                      padding: const EdgeInsets.all(6),
-                      itemCount: result.length,
-                      itemBuilder: (context, index) {
-                        return ChapterFeedItem(state: result.elementAt(index));
-                      },
-                    ),
-                  ),
-                  if (isLoading) Styles.listSpinner,
-                ],
-              ),
-            ),
-          );
-        },
-        loading: () => const Stack(
-          children: Styles.loadingOverlay,
-        ),
-        error: (err, stackTrace) {
-          final messenger = ScaffoldMessenger.of(context);
-          Styles.showErrorSnackBar(messenger, '$err');
-          logger.e("${provider.toString()} failed", err, stackTrace);
+              child: Styles.errorList(error, stackTrace),
+            );
+          }(),
+        AsyncValue(:final value?) => () {
+            if (value.isEmpty) {
+              return Text(emptyText ?? 'No results!');
+            }
 
-          return RefreshIndicator(
-            onRefresh: onRefresh,
-            child: Styles.errorList(err, stackTrace),
-          );
-        },
-      ),
+            return ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.trackpad,
+              }),
+              child: RefreshIndicator(
+                onRefresh: onRefresh,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 10.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(fontSize: 24),
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        restorationId: restorationId,
+                        padding: const EdgeInsets.all(6),
+                        itemCount: value.length,
+                        itemBuilder: (context, index) {
+                          return ChapterFeedItem(state: value.elementAt(index));
+                        },
+                      ),
+                    ),
+                    if (isLoading) Styles.listSpinner,
+                  ],
+                ),
+              ),
+            );
+          }(),
+        _ => const Stack(
+            children: Styles.loadingOverlay,
+          ),
+      },
     );
   }
 }
@@ -141,18 +140,19 @@ class ChapterFeedItem extends ConsumerWidget {
     ReadChaptersMap? readData;
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).when(
-            skipLoadingOnReload: true,
-            data: (data) => data,
-            loading: () => null,
-            error: (err, stackTrace) {
-              final messenger = ScaffoldMessenger.of(context);
-              Styles.showErrorSnackBar(messenger, '$err');
-              logger.e("readChaptersProvider failed", err, stackTrace);
+      readData = switch (ref.watch(readChaptersProvider)) {
+        AsyncValue(:final error?, :final stackTrace?) => () {
+            final messenger = ScaffoldMessenger.of(context);
+            Styles.showErrorSnackBar(messenger, '$error');
+            logger.e("readChaptersProvider failed", error, stackTrace);
 
-              return null;
-            },
-          );
+            return null;
+          }(),
+        AsyncValue(:final value?) => () {
+            return value;
+          }(),
+        _ => null,
+      };
     }
 
     final chapterBtns = state.chapters.map((e) {
@@ -359,7 +359,7 @@ class ChapterButtonWidget extends ConsumerWidget {
     Widget? endChip;
     if (isEndChapter) {
       endChip = const IconTextChip(
-        color: Colors.deepOrange,
+        color: Colors.blue,
         text: Text('END'),
       );
     }
@@ -450,12 +450,17 @@ class ChapterButtonWidget extends ConsumerWidget {
                 ),
                 rowPadding,
                 if (endChip != null) endChip,
-                if (!screenSizeSmall) ...[
-                  const Spacer(),
-                  const Icon(Icons.schedule, size: 20),
-                  rowPadding,
-                  Text(pubtime)
-                ]
+                if (!screenSizeSmall)
+                  Flexible(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(Icons.schedule, size: 20),
+                        rowPadding,
+                        Text(pubtime)
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -509,12 +514,16 @@ class ChapterButtonWidget extends ConsumerWidget {
         nav.push(createMangaDexReaderRoute(
             title, chapter, manga, link, onLinkPressed));
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: tileColor,
-          border: border,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        clipBehavior: Clip.hardEdge,
+        child: Container(
+          decoration: BoxDecoration(
+            color: tileColor,
+            border: border,
+          ),
+          child: tile,
         ),
-        child: tile,
       ),
     );
   }
@@ -766,61 +775,61 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                         Wrap(
                           runSpacing: 4.0,
                           children: [
-                            ...stats.when(
-                              skipLoadingOnReload: true,
-                              data: (data) {
-                                if (data.containsKey(manga.id)) {
-                                  return [
-                                    IconTextChip(
-                                      icon: const Icon(
-                                        Icons.star_border,
-                                        color: Colors.amber,
-                                        size: 18,
-                                      ),
-                                      text: Text(
-                                        data[manga.id]
-                                                ?.rating
-                                                .bayesian
-                                                .toStringAsFixed(2) ??
-                                            statsError,
-                                        style: const TextStyle(
-                                          color: Colors.amber,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 4,
-                                    ),
-                                    IconTextChip(
-                                      icon: const Icon(
-                                        Icons.bookmark_outline,
-                                        size: 18,
-                                      ),
-                                      text: Text(
-                                        data[manga.id]?.follows.toString() ??
-                                            statsError,
-                                      ),
-                                    ),
-                                  ];
-                                }
-
-                                return [
+                            ...switch (stats) {
+                              // ignore: unused_local_variable
+                              AsyncValue(:final error?, :final stackTrace?) => [
                                   const IconTextChip(
                                     text: Text(statsError),
                                   )
-                                ];
-                              },
-                              error: (obj, stack) => [
-                                const IconTextChip(
-                                  text: Text(statsError),
-                                )
-                              ],
-                              loading: () => [
-                                const IconTextChip(
-                                  text: CircularProgressIndicator(),
-                                )
-                              ],
-                            ),
+                                ],
+                              AsyncValue(:final value?) => () {
+                                  if (value.containsKey(manga.id)) {
+                                    return [
+                                      IconTextChip(
+                                        icon: const Icon(
+                                          Icons.star_border,
+                                          color: Colors.amber,
+                                          size: 18,
+                                        ),
+                                        text: Text(
+                                          value[manga.id]
+                                                  ?.rating
+                                                  .bayesian
+                                                  .toStringAsFixed(2) ??
+                                              statsError,
+                                          style: const TextStyle(
+                                            color: Colors.amber,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      IconTextChip(
+                                        icon: const Icon(
+                                          Icons.bookmark_outline,
+                                          size: 18,
+                                        ),
+                                        text: Text(
+                                          value[manga.id]?.follows.toString() ??
+                                              statsError,
+                                        ),
+                                      ),
+                                    ];
+                                  }
+
+                                  return [
+                                    const IconTextChip(
+                                      text: Text(statsError),
+                                    )
+                                  ];
+                                }(),
+                              _ => [
+                                  const IconTextChip(
+                                    text: CircularProgressIndicator(),
+                                  )
+                                ],
+                            },
                             const SizedBox(width: 10),
                             MangaStatusChip(status: manga.attributes.status),
                           ],
@@ -942,61 +951,61 @@ class _ListMangaItem extends ConsumerWidget {
                   Wrap(
                     runSpacing: 4.0,
                     children: [
-                      ...stats.when(
-                        skipLoadingOnReload: true,
-                        data: (data) {
-                          if (data.containsKey(manga.id)) {
-                            return [
-                              IconTextChip(
-                                icon: const Icon(
-                                  Icons.star_border,
-                                  color: Colors.amber,
-                                  size: 18,
-                                ),
-                                text: Text(
-                                  data[manga.id]
-                                          ?.rating
-                                          .bayesian
-                                          .toStringAsFixed(2) ??
-                                      statsError,
-                                  style: const TextStyle(
-                                    color: Colors.amber,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              IconTextChip(
-                                icon: const Icon(
-                                  Icons.bookmark_outline,
-                                  size: 18,
-                                ),
-                                text: Text(
-                                  data[manga.id]?.follows.toString() ??
-                                      statsError,
-                                ),
-                              ),
-                            ];
-                          }
-
-                          return [
+                      ...switch (stats) {
+                        // ignore: unused_local_variable
+                        AsyncValue(:final error?, :final stackTrace?) => [
                             const IconTextChip(
                               text: Text(statsError),
                             )
-                          ];
-                        },
-                        error: (obj, stack) => [
-                          const IconTextChip(
-                            text: Text(statsError),
-                          )
-                        ],
-                        loading: () => [
-                          const IconTextChip(
-                            text: CircularProgressIndicator(),
-                          )
-                        ],
-                      ),
+                          ],
+                        AsyncValue(:final value?) => () {
+                            if (value.containsKey(manga.id)) {
+                              return [
+                                IconTextChip(
+                                  icon: const Icon(
+                                    Icons.star_border,
+                                    color: Colors.amber,
+                                    size: 18,
+                                  ),
+                                  text: Text(
+                                    value[manga.id]
+                                            ?.rating
+                                            .bayesian
+                                            .toStringAsFixed(2) ??
+                                        statsError,
+                                    style: const TextStyle(
+                                      color: Colors.amber,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                IconTextChip(
+                                  icon: const Icon(
+                                    Icons.bookmark_outline,
+                                    size: 18,
+                                  ),
+                                  text: Text(
+                                    value[manga.id]?.follows.toString() ??
+                                        statsError,
+                                  ),
+                                ),
+                              ];
+                            }
+
+                            return [
+                              const IconTextChip(
+                                text: Text(statsError),
+                              )
+                            ];
+                          }(),
+                        _ => [
+                            const IconTextChip(
+                              text: CircularProgressIndicator(),
+                            )
+                          ],
+                      },
                       const SizedBox(width: 10),
                       MangaStatusChip(status: manga.attributes.status),
                     ],

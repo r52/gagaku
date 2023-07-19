@@ -50,7 +50,7 @@ Future<List<ReaderPage>> _getDirectoryPages(
   return [];
 }
 
-class DirectoryReaderWidget extends HookConsumerWidget {
+class DirectoryReaderWidget extends ConsumerWidget {
   const DirectoryReaderWidget({
     super.key,
     required this.path,
@@ -75,56 +75,54 @@ class DirectoryReaderWidget extends HookConsumerWidget {
       strtitle = title!;
     }
 
-    return pages.when(
-      skipLoadingOnReload: true,
-      data: (result) {
-        if (result.isEmpty) {
+    switch (pages) {
+      case AsyncValue(:final error?, :final stackTrace?):
+        final messenger = ScaffoldMessenger.of(context);
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e("_getDirectoryPagesProvider($path) failed", error, stackTrace);
+
+        return Scaffold(
+          appBar: AppBar(
+            leading: const BackButton(),
+          ),
+          body: Styles.errorColumn(error, stackTrace),
+        );
+      case AsyncValue(:final value?):
+        if (value.isEmpty) {
           return const Center(
             child: Text("This archive contains no images!"),
           );
         }
 
         return ReaderWidget(
-          pages: result,
-          pageCount: result.length,
+          pages: value,
+          pageCount: value.length,
           title: strtitle,
           isLongStrip: false, // TODO longstrip
           link: link,
           onLinkPressed: onLinkPressed,
         );
-      },
-      loading: () => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Loading directory...",
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontWeight: FontWeight.normal,
-                fontSize: 18,
-                decoration: TextDecoration.none,
+      case _:
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Loading directory...",
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 18,
+                  decoration: TextDecoration.none,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const CircularProgressIndicator()
-          ],
-        ),
-      ),
-      error: (err, stackTrace) {
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$err');
-        logger.e("_getDirectoryPagesProvider($path) failed", err, stackTrace);
-
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
+              const SizedBox(
+                height: 20,
+              ),
+              const CircularProgressIndicator()
+            ],
           ),
-          body: Styles.errorColumn(err, stackTrace),
         );
-      },
-    );
+    }
   }
 }

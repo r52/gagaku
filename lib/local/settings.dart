@@ -17,7 +17,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
-    final cfg = ref.read(localConfigProvider);
+    final cfg = ref.watch(localConfigProvider);
     final config = useState(cfg);
 
     return Scaffold(

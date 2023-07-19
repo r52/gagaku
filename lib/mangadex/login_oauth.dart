@@ -13,9 +13,9 @@ class MangaDexLoginWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authControlProvider);
 
-    return auth.when(
-      data: (loggedIn) {
-        if (loggedIn) {
+    switch (auth) {
+      case AsyncData(value: final loggedin):
+        if (loggedin) {
           return builder(context, ref);
         }
 
@@ -29,14 +29,13 @@ class MangaDexLoginWidget extends ConsumerWidget {
             ),
           ),
         );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (err, stack) {
-        logger.e("authControlProvider failed", err, stack);
-        return Styles.errorColumn(err, stack);
-      },
-    );
+      case AsyncError(:final error, :final stackTrace):
+        logger.e("authControlProvider failed", error, stackTrace);
+        return Styles.errorColumn(error, stackTrace);
+      case _:
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+    }
   }
 }

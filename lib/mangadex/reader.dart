@@ -84,12 +84,23 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       return () => timer.value?.cancel();
     }, [chapter]);
 
-    return pages.when(
-      skipLoadingOnReload: true,
-      data: (result) {
+    switch (pages) {
+      case AsyncValue(:final error?, :final stackTrace?):
+        final messenger = ScaffoldMessenger.of(context);
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e("_fetchChapterPagesProvider(${chapter.id}) failed", error,
+            stackTrace);
+
+        return Scaffold(
+          appBar: AppBar(
+            leading: const BackButton(),
+          ),
+          body: Styles.errorColumn(error, stackTrace),
+        );
+      case AsyncValue(:final value?):
         return ReaderWidget(
-          pages: result,
-          pageCount: result.length,
+          pages: value,
+          pageCount: value.length,
           title: title,
           subtitle: manga.attributes.title.get('en'),
           isLongStrip: manga.longStrip,
@@ -97,23 +108,10 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           onLinkPressed: onLinkPressed,
           externalUrl: chapter.attributes.externalUrl,
         );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (err, stackTrace) {
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$err');
-        logger.e("_fetchChapterPagesProvider(${chapter.id}) failed", err,
-            stackTrace);
-
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
-          ),
-          body: Styles.errorColumn(err, stackTrace),
+      case _:
+        return const Center(
+          child: CircularProgressIndicator(),
         );
-      },
-    );
+    }
   }
 }

@@ -35,12 +35,12 @@ Future<void> _fetchReadChaptersRedun(
   if (loggedin) {
     // Redundant retrieve read chapters when opening the manga
     // from places where it hasn't been retrieved yet
-    await ref.read(readChaptersProvider.notifier).get([manga]);
+    await ref.watch(readChaptersProvider.notifier).get([manga]);
 
-    await ref.read(ratingsProvider.notifier).get([manga]);
+    await ref.watch(ratingsProvider.notifier).get([manga]);
   }
 
-  await ref.read(statisticsProvider.notifier).get([manga]);
+  await ref.watch(statisticsProvider.notifier).get([manga]);
 }
 
 class MangaDexMangaViewWidget extends HookConsumerWidget {
@@ -61,18 +61,19 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     ReadChaptersMap? readData;
 
     if (loggedin) {
-      readData = ref.watch(readChaptersProvider).when(
-            skipLoadingOnReload: true,
-            data: (data) => data,
-            loading: () => null,
-            error: (err, stackTrace) {
-              final messenger = ScaffoldMessenger.of(context);
-              Styles.showErrorSnackBar(messenger, '$err');
-              logger.e("readChaptersProvider failed", err, stackTrace);
+      readData = switch (ref.watch(readChaptersProvider)) {
+        AsyncValue(:final error?, :final stackTrace?) => () {
+            final messenger = ScaffoldMessenger.of(context);
+            Styles.showErrorSnackBar(messenger, '$error');
+            logger.e("readChaptersProvider failed", error, stackTrace);
 
-              return null;
-            },
-          );
+            return null;
+          }(),
+        AsyncValue(:final value?) => () {
+            return value;
+          }(),
+        _ => null,
+      };
     }
 
     final chapters = ref.watch(mangaChaptersProvider(manga));
@@ -465,70 +466,70 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     return Wrap(
                       runSpacing: 4.0,
                       children: [
-                        ...stats.when(
-                          skipLoadingOnReload: true,
-                          data: (data) {
-                            if (data.containsKey(manga.id)) {
-                              return [
-                                IconTextChip(
-                                  icon: const Icon(
-                                    Icons.star_border,
-                                    color: Colors.amber,
-                                    size: 18,
-                                  ),
-                                  text: Text(
-                                    data[manga.id]
-                                            ?.rating
-                                            .bayesian
-                                            .toStringAsFixed(2) ??
-                                        statsError,
-                                    style: const TextStyle(
-                                      color: Colors.amber,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                IconTextChip(
-                                  icon: const Icon(
-                                    Icons.bookmark_outline,
-                                    size: 18,
-                                  ),
-                                  text: Text(
-                                    data[manga.id]?.follows.toString() ??
-                                        statsError,
-                                  ),
-                                ),
-                              ];
-                            }
-
-                            return [
+                        ...switch (stats) {
+                          // ignore: unused_local_variable
+                          AsyncValue(:final error?, :final stackTrace?) => [
                               const SizedBox(
                                 width: 10,
                               ),
                               const IconTextChip(
                                 text: Text(statsError),
                               )
-                            ];
-                          },
-                          error: (obj, stack) => [
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            const IconTextChip(
-                              text: Text(statsError),
-                            )
-                          ],
-                          loading: () => [
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            const IconTextChip(
-                              text: CircularProgressIndicator(),
-                            )
-                          ],
-                        ),
+                            ],
+                          AsyncValue(:final value?) => () {
+                              if (value.containsKey(manga.id)) {
+                                return [
+                                  IconTextChip(
+                                    icon: const Icon(
+                                      Icons.star_border,
+                                      color: Colors.amber,
+                                      size: 18,
+                                    ),
+                                    text: Text(
+                                      value[manga.id]
+                                              ?.rating
+                                              .bayesian
+                                              .toStringAsFixed(2) ??
+                                          statsError,
+                                      style: const TextStyle(
+                                        color: Colors.amber,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  IconTextChip(
+                                    icon: const Icon(
+                                      Icons.bookmark_outline,
+                                      size: 18,
+                                    ),
+                                    text: Text(
+                                      value[manga.id]?.follows.toString() ??
+                                          statsError,
+                                    ),
+                                  ),
+                                ];
+                              }
+
+                              return [
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                const IconTextChip(
+                                  text: Text(statsError),
+                                )
+                              ];
+                            }(),
+                          _ => [
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              const IconTextChip(
+                                text: CircularProgressIndicator(),
+                              )
+                            ],
+                        },
                         const SizedBox(width: 10),
                         MangaStatusChip(status: manga.attributes.status),
                       ],
@@ -587,42 +588,46 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 children: [
                   if (manga.author != null)
                     ExpansionTile(
+                      expandedAlignment: Alignment.centerLeft,
                       title: const Text('Author'),
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           color: theme.colorScheme.background,
-                          child: Row(
-                            children: [
-                              ButtonChip(
-                                text: Text(manga.author!.attributes.name),
-                                onPressed: () {
-                                  nav.push(
-                                      createCreatorViewRoute(manga.author!));
-                                },
-                              ),
-                            ],
+                          child: Wrap(
+                            spacing: 4.0,
+                            runSpacing: 4.0,
+                            children: manga.author!
+                                .map((e) => ButtonChip(
+                                      text: Text(e.attributes.name),
+                                      onPressed: () {
+                                        nav.push(createCreatorViewRoute(e));
+                                      },
+                                    ))
+                                .toList(),
                           ),
                         ),
                       ],
                     ),
                   if (manga.artist != null)
                     ExpansionTile(
+                      expandedAlignment: Alignment.centerLeft,
                       title: const Text('Artist'),
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           color: theme.colorScheme.background,
-                          child: Row(
-                            children: [
-                              ButtonChip(
-                                text: Text(manga.artist!.attributes.name),
-                                onPressed: () {
-                                  nav.push(
-                                      createCreatorViewRoute(manga.artist!));
-                                },
-                              )
-                            ],
+                          child: Wrap(
+                            spacing: 4.0,
+                            runSpacing: 4.0,
+                            children: manga.artist!
+                                .map((e) => ButtonChip(
+                                      text: Text(e.attributes.name),
+                                      onPressed: () {
+                                        nav.push(createCreatorViewRoute(e));
+                                      },
+                                    ))
+                                .toList(),
                           ),
                         ),
                       ],
@@ -797,15 +802,23 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               ),
             ),
             if (view.value == _ViewType.chapters)
-              chapters.when(
-                skipLoadingOnReload: true,
-                data: (result) {
-                  return SliverList.builder(
+              switch (chapters) {
+                AsyncValue(:final error?, :final stackTrace?) => () {
+                    final messenger = ScaffoldMessenger.of(context);
+                    Styles.showErrorSnackBar(messenger, '$error');
+                    logger.e("mangaChaptersProvider(${manga.id}) failed", error,
+                        stackTrace);
+
+                    return SliverToBoxAdapter(
+                      child: Styles.errorColumn(error, stackTrace),
+                    );
+                  }(),
+                AsyncValue(:final value?) => SliverList.builder(
                     itemBuilder: (BuildContext context, int index) {
                       var lastChapIsSame = false;
                       var nextChapIsSame = false;
 
-                      final thischap = result.elementAt(index);
+                      final thischap = value.elementAt(index);
                       final chapbtn = ChapterButtonWidget(
                         chapter: thischap,
                         manga: manga,
@@ -823,13 +836,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                       if (index > 0) {
                         lastChapIsSame =
-                            result.elementAt(index - 1).attributes.chapter ==
+                            value.elementAt(index - 1).attributes.chapter ==
                                 thischap.attributes.chapter;
                       }
 
-                      if (index < result.length - 1) {
+                      if (index < value.length - 1) {
                         nextChapIsSame =
-                            result.elementAt(index + 1).attributes.chapter ==
+                            value.elementAt(index + 1).attributes.chapter ==
                                 thischap.attributes.chapter;
                       }
 
@@ -882,31 +895,25 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         child: chapbtn,
                       );
                     },
-                    itemCount: result.length,
-                  );
-                },
-                loading: () => const SliverToBoxAdapter(
-                  child: SizedBox.shrink(),
-                ),
-                error: (err, stackTrace) {
-                  // Invalidate the provider results on error
-                  // ref.invalidate(mangaChaptersProvider(manga));
-
-                  final messenger = ScaffoldMessenger.of(context);
-                  Styles.showErrorSnackBar(messenger, '$err');
-                  logger.e("mangaChaptersProvider(${manga.id}) failed", err,
-                      stackTrace);
-
-                  return SliverToBoxAdapter(
-                    child: Styles.errorColumn(err, stackTrace),
-                  );
-                },
-              ),
+                    itemCount: value.length,
+                  ),
+                _ => const SliverToBoxAdapter(
+                    child: SizedBox.shrink(),
+                  ),
+              },
             if (view.value == _ViewType.art)
-              covers.when(
-                skipLoadingOnReload: true,
-                data: (coverList) {
-                  return SliverGrid.builder(
+              switch (covers) {
+                AsyncValue(:final error?, :final stackTrace?) => () {
+                    final messenger = ScaffoldMessenger.of(context);
+                    Styles.showErrorSnackBar(messenger, '$error');
+                    logger.e("mangaCoversProvider(${manga.id}) failed", error,
+                        stackTrace);
+
+                    return SliverToBoxAdapter(
+                      child: Styles.errorColumn(error, stackTrace),
+                    );
+                  }(),
+                AsyncValue(:final value?) => SliverGrid.builder(
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 256,
@@ -915,7 +922,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       childAspectRatio: 0.7,
                     ),
                     itemBuilder: (context, index) {
-                      final cover = coverList.elementAt(index);
+                      final cover = value.elementAt(index);
                       return _CoverArtItem(
                         cover: cover,
                         manga: manga,
@@ -935,7 +942,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 body: PageView.builder(
                                   scrollBehavior: MouseTouchScrollBehavior(),
                                   itemBuilder: (BuildContext context, int id) {
-                                    final item = coverList.elementAt(id);
+                                    final item = value.elementAt(id);
                                     final url = manga.getUrlFromCover(item);
                                     Widget image = ExtendedImage.network(
                                       url,
@@ -966,7 +973,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                       return image;
                                     }
                                   },
-                                  itemCount: coverList.length,
+                                  itemCount: value.length,
                                   controller: PageController(
                                     initialPage: index,
                                   ),
@@ -978,26 +985,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         },
                       );
                     },
-                    itemCount: coverList.length,
-                  );
-                },
-                loading: () => const SliverToBoxAdapter(
-                  child: SizedBox.shrink(),
-                ),
-                error: (err, stackTrace) {
-                  // Invalidate the provider results on error
-                  // ref.invalidate(mangaCoversProvider(manga));
-
-                  final messenger = ScaffoldMessenger.of(context);
-                  Styles.showErrorSnackBar(messenger, '$err');
-                  logger.e("mangaCoversProvider(${manga.id}) failed", err,
-                      stackTrace);
-
-                  return SliverToBoxAdapter(
-                    child: Styles.errorColumn(err, stackTrace),
-                  );
-                },
-              ),
+                    itemCount: value.length,
+                  ),
+                _ => const SliverToBoxAdapter(
+                    child: SizedBox.shrink(),
+                  ),
+              },
             if (isLoading)
               const SliverToBoxAdapter(
                 child: Styles.listSpinner,

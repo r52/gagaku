@@ -26,7 +26,7 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   return mangas;
 }
 
-class MangaDexMangaFeed extends HookConsumerWidget {
+class MangaDexMangaFeed extends ConsumerWidget {
   const MangaDexMangaFeed({
     super.key,
     this.controller,
@@ -42,48 +42,47 @@ class MangaDexMangaFeed extends HookConsumerWidget {
     return Center(
       child: Stack(
         children: [
-          results.when(
-            skipLoadingOnReload: true,
-            data: (result) {
-              if (result.isEmpty) {
-                return const Text('Find some manga to follow!');
-              }
+          switch (results) {
+            AsyncValue(:final error?, :final stackTrace?) => () {
+                final messenger = ScaffoldMessenger.of(context);
+                Styles.showErrorSnackBar(messenger, '$error');
+                logger.e("_fetchMangaFeedProvider failed", error, stackTrace);
 
-              return RefreshIndicator(
-                onRefresh: () async {
-                  ref.read(latestChaptersFeedProvider.notifier).clear();
-                  return await ref.refresh(_fetchMangaFeedProvider.future);
-                },
-                child: MangaListWidget(
-                  title: const Text(
-                    'Latest Updates',
-                    style: TextStyle(fontSize: 24),
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(latestChaptersFeedProvider);
+                    return await ref.refresh(_fetchMangaFeedProvider.future);
+                  },
+                  child: Styles.errorList(error, stackTrace),
+                );
+              }(),
+            AsyncValue(:final value?) => () {
+                if (value.isEmpty) {
+                  return const Text('Find some manga to follow!');
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    ref.read(latestChaptersFeedProvider.notifier).clear();
+                    return await ref.refresh(_fetchMangaFeedProvider.future);
+                  },
+                  child: MangaListWidget(
+                    title: const Text(
+                      'Latest Updates',
+                      style: TextStyle(fontSize: 24),
+                    ),
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: controller,
+                    onAtEdge: () =>
+                        ref.read(latestChaptersFeedProvider.notifier).getMore(),
+                    children: [
+                      MangaListViewSliver(items: value),
+                    ],
                   ),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: controller,
-                  onAtEdge: () =>
-                      ref.read(latestChaptersFeedProvider.notifier).getMore(),
-                  children: [
-                    MangaListViewSliver(items: result),
-                  ],
-                ),
-              );
-            },
-            error: (err, stack) {
-              final messenger = ScaffoldMessenger.of(context);
-              Styles.showErrorSnackBar(messenger, '$err');
-              logger.e("_fetchMangaFeedProvider failed", err, stack);
-
-              return RefreshIndicator(
-                onRefresh: () async {
-                  ref.invalidate(latestChaptersFeedProvider);
-                  return await ref.refresh(_fetchMangaFeedProvider.future);
-                },
-                child: Styles.errorList(err, stack),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-          ),
+                );
+              }(),
+            _ => const SizedBox.shrink(),
+          },
           if (isLoading) ...Styles.loadingOverlay,
         ],
       ),

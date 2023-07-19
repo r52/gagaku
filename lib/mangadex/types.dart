@@ -576,8 +576,8 @@ class Manga with _$Manga, MangaDexUUID {
 
   factory Manga.fromJson(Map<String, dynamic> json) => _$MangaFromJson(json);
 
-  late final CreatorType? author = getAuthor();
-  late final CreatorType? artist = getArtist();
+  late final List<CreatorType>? author = getAuthor();
+  late final List<CreatorType>? artist = getArtist();
   late final longStrip = isLongStrip();
   late final covers = getAllCoverArt();
 
@@ -624,27 +624,27 @@ class Manga with _$Manga, MangaDexUUID {
         .quality(quality: quality);
   }
 
-  CreatorType? getAuthor() {
+  List<CreatorType>? getAuthor() {
     final authorRs = relationships.where((element) => switch (element) {
           Author() => true,
           _ => false,
         });
 
     if (authorRs.isNotEmpty) {
-      return authorRs.first as Author;
+      return authorRs.map((e) => e as Author).toList();
     }
 
     return null;
   }
 
-  CreatorType? getArtist() {
+  List<CreatorType>? getArtist() {
     final artistRs = relationships.where((element) => switch (element) {
           Artist() => true,
           _ => false,
         });
 
     if (artistRs.isNotEmpty) {
-      return artistRs.first as Artist;
+      return artistRs.map((e) => e as Artist).toList();
     }
 
     return null;
