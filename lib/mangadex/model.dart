@@ -91,7 +91,10 @@ abstract class CacheLists {
   static const tags = 'tags';
 }
 
-final mangadexProvider = Provider(MangaDexModel.new);
+@Riverpod(keepAlive: true)
+MangaDexModel mangadex(MangadexRef ref) {
+  return MangaDexModel(ref);
+}
 
 class MangaDexModel {
   MangaDexModel(this.ref) {

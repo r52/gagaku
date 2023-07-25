@@ -6,6 +6,20 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$mangadexHash() => r'a292b576f657f3f4f75a624bdf14e965c33f39fe';
+
+/// See also [mangadex].
+@ProviderFor(mangadex)
+final mangadexProvider = Provider<MangaDexModel>.internal(
+  mangadex,
+  name: r'mangadexProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$mangadexHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$latestChaptersFeedHash() =>
     r'ea75ba36369bdde3c5c2eb72f6c98bd779ded249';
 
