@@ -460,7 +460,7 @@ abstract class Group with MangaDexUUID {
 }
 
 abstract class Cover with MangaDexUUID {
-  CoverArtAttributes get attributes;
+  CoverArtAttributes? get attributes;
 }
 
 abstract class CreatorType with MangaDexUUID {
@@ -500,7 +500,7 @@ class Relationship with _$Relationship, MangaDexUUID {
   @Implements<Cover>()
   const factory Relationship.cover({
     required String id,
-    required CoverArtAttributes attributes,
+    required CoverArtAttributes? attributes,
   }) = CoverArt;
 
   @FreezedUnionValue('scanlation_group')
@@ -610,7 +610,7 @@ class Manga with _$Manga, MangaDexUUID {
 
   String getFirstCoverUrl({CoverArtQuality quality = CoverArtQuality.best}) {
     if (covers.isEmpty) {
-      return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
+      return 'https://mangadex.org/img/cover-placeholder.jpg';
     }
 
     return covers.first.quality(quality: quality);
@@ -618,7 +618,11 @@ class Manga with _$Manga, MangaDexUUID {
 
   CoverArtUrl getUrlFromCover(Cover cover,
       {CoverArtQuality quality = CoverArtQuality.best}) {
-    final filename = cover.attributes.fileName;
+    final filename = cover.attributes?.fileName;
+
+    if (filename == null) {
+      return 'https://mangadex.org/img/cover-placeholder.jpg';
+    }
 
     return 'https://uploads.mangadex.org/covers/$id/$filename'
         .quality(quality: quality);

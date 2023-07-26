@@ -2296,7 +2296,7 @@ mixin _$Relationship {
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) =>
@@ -2308,7 +2308,7 @@ mixin _$Relationship {
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) =>
       throw _privateConstructorUsedError;
@@ -2319,7 +2319,7 @@ mixin _$Relationship {
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) =>
@@ -2474,7 +2474,7 @@ class _$RelationshipManga
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
@@ -2489,7 +2489,7 @@ class _$RelationshipManga
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
     return manga?.call(id);
@@ -2503,7 +2503,7 @@ class _$RelationshipManga
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) {
@@ -2678,7 +2678,7 @@ class _$RelationshipUser
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
@@ -2693,7 +2693,7 @@ class _$RelationshipUser
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
     return user?.call(id, attributes);
@@ -2707,7 +2707,7 @@ class _$RelationshipUser
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) {
@@ -2879,7 +2879,7 @@ class _$Artist with DiagnosticableTreeMixin implements Artist {
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
@@ -2894,7 +2894,7 @@ class _$Artist with DiagnosticableTreeMixin implements Artist {
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
     return artist?.call(id, attributes);
@@ -2908,7 +2908,7 @@ class _$Artist with DiagnosticableTreeMixin implements Artist {
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) {
@@ -3079,7 +3079,7 @@ class _$Author with DiagnosticableTreeMixin implements Author {
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
@@ -3094,7 +3094,7 @@ class _$Author with DiagnosticableTreeMixin implements Author {
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
     return author?.call(id, attributes);
@@ -3108,7 +3108,7 @@ class _$Author with DiagnosticableTreeMixin implements Author {
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) {
@@ -3266,7 +3266,7 @@ class _$RelationshipCreator
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
@@ -3281,7 +3281,7 @@ class _$RelationshipCreator
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
     return creator?.call(id);
@@ -3295,7 +3295,7 @@ class _$RelationshipCreator
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) {
@@ -3382,9 +3382,9 @@ abstract class _$$CoverArtCopyWith<$Res>
       __$$CoverArtCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, CoverArtAttributes attributes});
+  $Res call({String id, CoverArtAttributes? attributes});
 
-  $CoverArtAttributesCopyWith<$Res> get attributes;
+  $CoverArtAttributesCopyWith<$Res>? get attributes;
 }
 
 /// @nodoc
@@ -3398,24 +3398,28 @@ class __$$CoverArtCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? attributes = null,
+    Object? attributes = freezed,
   }) {
     return _then(_$CoverArt(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      attributes: null == attributes
+      attributes: freezed == attributes
           ? _value.attributes
           : attributes // ignore: cast_nullable_to_non_nullable
-              as CoverArtAttributes,
+              as CoverArtAttributes?,
     ));
   }
 
   @override
   @pragma('vm:prefer-inline')
-  $CoverArtAttributesCopyWith<$Res> get attributes {
-    return $CoverArtAttributesCopyWith<$Res>(_value.attributes, (value) {
+  $CoverArtAttributesCopyWith<$Res>? get attributes {
+    if (_value.attributes == null) {
+      return null;
+    }
+
+    return $CoverArtAttributesCopyWith<$Res>(_value.attributes!, (value) {
       return _then(_value.copyWith(attributes: value));
     });
   }
@@ -3434,7 +3438,7 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
   @override
   final String id;
   @override
-  final CoverArtAttributes attributes;
+  final CoverArtAttributes? attributes;
 
   @JsonKey(name: 'type')
   final String $type;
@@ -3467,7 +3471,7 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
@@ -3482,7 +3486,7 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
     return cover?.call(id, attributes);
@@ -3496,7 +3500,7 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) {
@@ -3563,13 +3567,13 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
 abstract class CoverArt implements Relationship, Cover {
   const factory CoverArt(
       {required final String id,
-      required final CoverArtAttributes attributes}) = _$CoverArt;
+      required final CoverArtAttributes? attributes}) = _$CoverArt;
 
   factory CoverArt.fromJson(Map<String, dynamic> json) = _$CoverArt.fromJson;
 
   @override
   String get id;
-  CoverArtAttributes get attributes;
+  CoverArtAttributes? get attributes;
   @override
   @JsonKey(ignore: true)
   _$$CoverArtCopyWith<_$CoverArt> get copyWith =>
@@ -3672,7 +3676,7 @@ class _$ScanlationGroup
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes attributes) cover,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
   }) {
@@ -3687,7 +3691,7 @@ class _$ScanlationGroup
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes attributes)? cover,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
   }) {
     return group?.call(id, attributes);
@@ -3701,7 +3705,7 @@ class _$ScanlationGroup
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes attributes)? cover,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
     required TResult orElse(),
   }) {

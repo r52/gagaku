@@ -1037,7 +1037,7 @@ class _CoverArtItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: GridTile(
-            footer: cover.attributes.volume != null
+            footer: cover.attributes?.volume != null
                 ? SizedBox(
                     height: 40,
                     child: Material(
@@ -1050,7 +1050,7 @@ class _CoverArtItem extends StatelessWidget {
                       child: GridTileBar(
                         backgroundColor: Colors.black45,
                         title: Text(
-                          'Volume ${cover.attributes.volume!}',
+                          'Volume ${cover.attributes!.volume!}',
                           softWrap: true,
                           style: const TextStyle(
                             overflow: TextOverflow.fade,
