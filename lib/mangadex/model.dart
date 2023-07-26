@@ -1687,6 +1687,7 @@ class ReadChapters extends _$ReadChapters {
 class UserLibrary extends _$UserLibrary {
   int _total = 0;
   int _offset = 0;
+  int _currentPage = 0;
   bool _atEnd = false;
 
   Future<Iterable<Manga>> _fetchUserLibrary() async {
@@ -1714,9 +1715,10 @@ class UserLibrary extends _$UserLibrary {
       return [];
     }
 
-    final range =
-        min(results.length, _offset + MangaDexEndpoints.apiQueryLimit);
+    final range = min(_total, _offset + MangaDexEndpoints.apiQueryLimit);
     final mangas = await api.fetchManga(ids: results.getRange(_offset, range));
+
+    _currentPage += (range - _offset);
 
     if (mangas.isNotEmpty) {
       await ref.read(statisticsProvider.notifier).get(mangas);
@@ -1755,8 +1757,7 @@ class UserLibrary extends _$UserLibrary {
 
     final oldstate = state.valueOrNull;
     // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit &&
-        !_atEnd) {
+    if (_currentPage == _offset + MangaDexEndpoints.apiQueryLimit && !_atEnd) {
       state = const AsyncValue.loading();
       state = await AsyncValue.guard(() async {
         _offset += MangaDexEndpoints.apiQueryLimit;
@@ -1776,6 +1777,7 @@ class UserLibrary extends _$UserLibrary {
     state = await AsyncValue.guard(() async {
       _offset = 0;
       _atEnd = false;
+      _currentPage = 0;
       return _fetchAndCheck();
     });
   }
