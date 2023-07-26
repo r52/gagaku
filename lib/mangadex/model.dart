@@ -2116,6 +2116,12 @@ class MangaDexHistory extends _$MangaDexHistory {
 class AuthControl extends _$AuthControl {
   Timer? _staleTime;
 
+  Future<void> invalidate() async {
+    state = await AsyncValue.guard(() async {
+      return await _build();
+    });
+  }
+
   Future<void> _setStaleTime() async {
     final api = ref.watch(mangadexProvider);
 
@@ -2138,8 +2144,7 @@ class AuthControl extends _$AuthControl {
     });
   }
 
-  @override
-  FutureOr<bool> build() async {
+  Future<bool> _build() async {
     final api = ref.watch(mangadexProvider);
     await api.future;
 
@@ -2151,6 +2156,11 @@ class AuthControl extends _$AuthControl {
     await _setStaleTime();
 
     return await api.loggedIn();
+  }
+
+  @override
+  FutureOr<bool> build() async {
+    return await _build();
   }
 
   Future<bool> login(String user, String pass) async {

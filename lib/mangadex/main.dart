@@ -33,6 +33,14 @@ class MangaDexHome extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final tab = ref.watch(_mangadexTabProvider);
+    final lifecycle = useAppLifecycleState();
+
+    useEffect(() {
+      if (lifecycle == AppLifecycleState.resumed) {
+        ref.read(authControlProvider.notifier).invalidate();
+      }
+      return null;
+    }, [lifecycle]);
 
     const bottomNavigationBarItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
