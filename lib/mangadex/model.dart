@@ -222,7 +222,7 @@ class MangaDexModel {
           }
 
           logger.w("refreshToken() returned code ${response.statusCode}",
-              response.body);
+              error: response.body);
         }
       }
 
@@ -282,8 +282,8 @@ class MangaDexModel {
       }
     }
 
-    logger.w(
-        "authenticate() returned code ${response.statusCode}", response.body);
+    logger.w("authenticate() returned code ${response.statusCode}",
+        error: response.body);
   }
 
   // Future<void> _saveToken(TokenResponse token) async {
@@ -333,7 +333,8 @@ class MangaDexModel {
         }
       }
 
-      logger.w("logout() returned code ${response.statusCode}", response.body);
+      logger.w("logout() returned code ${response.statusCode}",
+          error: response.body);
     }
   }
 
@@ -396,7 +397,7 @@ class MangaDexModel {
 
     // Throw if failure
     final msg = "fetchUserFeed() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -455,7 +456,7 @@ class MangaDexModel {
     // Throw if failure
     final msg =
         "fetchChapterFeed() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -500,7 +501,7 @@ class MangaDexModel {
           // Throw if failure
           final msg =
               "fetchChapters() failed. Response code: ${response.statusCode}";
-          logger.e(msg, response.body);
+          logger.e(msg, error: response.body);
           throw Exception(msg);
         }
       }
@@ -558,7 +559,7 @@ class MangaDexModel {
             // Throw if failure
             final msg =
                 "fetchManga(ids) failed. Response code: ${response.statusCode}";
-            logger.e(msg, response.body);
+            logger.e(msg, error: response.body);
             throw Exception(msg);
           }
         }
@@ -604,7 +605,7 @@ class MangaDexModel {
         // Throw if failure
         final msg =
             "fetchManga(filterId) failed. Response code: ${response.statusCode}";
-        logger.e(msg, response.body);
+        logger.e(msg, error: response.body);
         throw Exception(msg);
       }
     }
@@ -662,7 +663,7 @@ class MangaDexModel {
 
     // Throw if failure
     final msg = "searchManga() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -689,7 +690,7 @@ class MangaDexModel {
     // Throw if failure
     final msg =
         "getMangaFollowing() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -719,7 +720,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
         "setMangaFollowing(${manga.id}, $setFollow) returned code ${response.statusCode}",
-        response.body);
+        error: response.body);
 
     return false;
   }
@@ -755,7 +756,7 @@ class MangaDexModel {
     // Throw if failure
     final msg =
         "getMangaReadingStatus() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -791,7 +792,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
         "setMangaReadingStatus(${manga.id}, $status) returned code ${response.statusCode}",
-        response.body);
+        error: response.body);
 
     return false;
   }
@@ -841,7 +842,7 @@ class MangaDexModel {
         // Throw if failure
         final msg =
             "fetchReadChapters() failed. Response code: ${response.statusCode}";
-        logger.e(msg, response.body);
+        logger.e(msg, error: response.body);
         throw Exception(msg);
       }
     }
@@ -897,7 +898,7 @@ class MangaDexModel {
     // Throw if failure
     final msg =
         "fetchMangaChapters() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -932,7 +933,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
         "setChaptersRead(${manga.id}, ${chapters.toString()}, $setRead) returned code ${response.statusCode}",
-        response.body);
+        error: response.body);
 
     return false;
   }
@@ -972,7 +973,7 @@ class MangaDexModel {
     // Throw if failure
     final msg =
         "getChapterServer() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -1012,7 +1013,7 @@ class MangaDexModel {
     // Throw if failure
     final msg =
         "fetchUserLibrary() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -1040,7 +1041,7 @@ class MangaDexModel {
 
     // Throw if failure
     final msg = "getTagList() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -1070,7 +1071,7 @@ class MangaDexModel {
         // Throw if failure
         final msg =
             "fetchStatistics() failed. Response code: ${response.statusCode}";
-        logger.e(msg, response.body);
+        logger.e(msg, error: response.body);
         throw Exception(msg);
       }
     }
@@ -1102,7 +1103,7 @@ class MangaDexModel {
 
     // Throw if failure
     final msg = "getCoverList() failed. Response code: ${response.statusCode}";
-    logger.e(msg, response.body);
+    logger.e(msg, error: response.body);
     throw Exception(msg);
   }
 
@@ -1131,7 +1132,7 @@ class MangaDexModel {
         // Throw if failure
         final msg =
             "fetchRating() failed. Response code: ${response.statusCode}";
-        logger.e(msg, response.body);
+        logger.e(msg, error: response.body);
         throw Exception(msg);
       }
     }
@@ -1174,7 +1175,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
         "setMangaRating(${manga.id}, $rating) returned code ${response.statusCode}",
-        response.body);
+        error: response.body);
 
     return false;
   }

@@ -189,7 +189,8 @@ class MangaDexHome extends HookConsumerWidget {
                     case AsyncError(:final error, :final stackTrace):
                       final messenger = ScaffoldMessenger.of(context);
                       Styles.showErrorSnackBar(messenger, '$error');
-                      logger.e("authControlProvider failed", error, stackTrace);
+                      logger.e("authControlProvider failed",
+                          error: error, stackTrace: stackTrace);
                       return const Icon(Icons.error);
                     case _:
                       return const Center(

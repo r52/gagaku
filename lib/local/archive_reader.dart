@@ -106,7 +106,8 @@ class ArchiveReaderWidget extends ConsumerWidget {
       case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_getArchivePagesProvider($path) failed", error, stackTrace);
+        logger.e("_getArchivePagesProvider($path) failed",
+            error: error, stackTrace: stackTrace);
 
         return Scaffold(
           appBar: AppBar(

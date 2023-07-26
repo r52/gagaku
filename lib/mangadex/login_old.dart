@@ -37,7 +37,8 @@ class MangaDexLoginWidget extends ConsumerWidget {
           ),
         );
       case AsyncError(:final error, :final stackTrace):
-        logger.e("authControlProvider failed", error, stackTrace);
+        logger.e("authControlProvider failed",
+            error: error, stackTrace: stackTrace);
         return Styles.errorColumn(error, stackTrace);
       case _:
         return const Center(

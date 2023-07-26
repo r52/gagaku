@@ -133,8 +133,8 @@ class MangaDexSearchWidget extends HookConsumerWidget {
               AsyncValue(:final error?, :final stackTrace?) => () {
                   final messenger = ScaffoldMessenger.of(context);
                   Styles.showErrorSnackBar(messenger, '$error');
-                  logger.e(
-                      "mangaSearchProvider(filter) failed", error, stackTrace);
+                  logger.e("mangaSearchProvider(filter) failed",
+                      error: error, stackTrace: stackTrace);
 
                   return SliverToBoxAdapter(
                     child: Styles.errorColumn(error, stackTrace),
@@ -492,7 +492,8 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
         AsyncError(:final error, :final stackTrace) => () {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("tagListProvider failed", error, stackTrace);
+            logger.e("tagListProvider failed",
+                error: error, stackTrace: stackTrace);
 
             return Styles.errorColumn(error, stackTrace);
           }(),

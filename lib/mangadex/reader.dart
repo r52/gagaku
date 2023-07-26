@@ -88,8 +88,8 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchChapterPagesProvider(${chapter.id}) failed", error,
-            stackTrace);
+        logger.e("_fetchChapterPagesProvider(${chapter.id}) failed",
+            error: error, stackTrace: stackTrace);
 
         return Scaffold(
           appBar: AppBar(
