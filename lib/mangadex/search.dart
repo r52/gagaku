@@ -92,6 +92,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                   children: [
                     Expanded(
                       child: TextField(
+                        textInputAction: TextInputAction.search,
                         autofocus: true,
                         controller: controller,
                         onChanged: onSearchChanged,
