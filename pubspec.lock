@@ -556,10 +556,10 @@ packages:
     dependency: "direct main"
     description:
       name: logger
-      sha256: "496066067d1990c654cdf8cbbb35936e39105d90e8579495cd1daa506cded2e7"
+      sha256: "66cb048220ca51cf9011da69fa581e4ee2bed4be6e82870d9e9baae75739da49"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.1"
   logging:
     dependency: transitive
     description:
