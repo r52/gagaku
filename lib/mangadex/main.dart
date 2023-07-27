@@ -42,24 +42,24 @@ class MangaDexHome extends HookConsumerWidget {
       return null;
     }, [lifecycle]);
 
-    const bottomNavigationBarItems = <BottomNavigationBarItem>[
-      BottomNavigationBarItem(
+    const bottomNavigationBarItems = <Widget>[
+      NavigationDestination(
         icon: Icon(Icons.home),
         label: 'Latest Feed',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.menu_book),
         label: 'Manga Feed',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.feed),
         label: 'Chapter Feed',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.collections),
         label: 'Library',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.history),
         label: 'Reading History',
       )
@@ -78,6 +78,7 @@ class MangaDexHome extends HookConsumerWidget {
         controller: controllers[0],
       ),
       MangaDexLoginWidget(
+        key: const Key('mangafeed'),
         builder: (context, ref) {
           return MangaDexMangaFeed(
             controller: controllers[1],
@@ -85,6 +86,7 @@ class MangaDexHome extends HookConsumerWidget {
         },
       ),
       MangaDexLoginWidget(
+        key: const Key('chapterfeed'),
         builder: (context, ref) {
           return MangaDexChapterFeed(
             controller: controllers[2],
@@ -92,6 +94,7 @@ class MangaDexHome extends HookConsumerWidget {
         },
       ),
       MangaDexLoginWidget(
+        key: const Key('userlibrary'),
         builder: (context, ref) {
           return MangaDexLibraryView(
             controller: controllers[3],
@@ -225,13 +228,12 @@ class MangaDexHome extends HookConsumerWidget {
           child: tabs[tab.index],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showUnselectedLabels: false,
-        items: bottomNavigationBarItems,
-        currentIndex: tab.index,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: theme.colorScheme.primary,
-        onTap: (index) {
+      bottomNavigationBar: NavigationBar(
+        height: 60,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        destinations: bottomNavigationBarItems,
+        selectedIndex: tab.index,
+        onDestinationSelected: (index) {
           final currTab = ref.read(_mangadexTabProvider);
 
           if (currTab == MangaDexTab.values[index]) {
