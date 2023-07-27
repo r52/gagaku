@@ -21,13 +21,10 @@ extension StringExtension on String {
 }
 
 class DeviceContext {
-  static bool isMobile() {
-    return (Platform.isIOS || Platform.isAndroid);
-  }
+  static bool isMobile() => (Platform.isIOS || Platform.isAndroid);
 
-  static bool isDesktop() {
-    return (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
-  }
+  static bool isDesktop() =>
+      (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
   static bool screenWidthSmall(BuildContext context) {
     // Somewhat arbitrary measurement but w/e
