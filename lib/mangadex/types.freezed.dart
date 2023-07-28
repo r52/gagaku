@@ -6935,9 +6935,10 @@ class __$$_SelfRatingCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_SelfRating with DiagnosticableTreeMixin implements _SelfRating {
+class _$_SelfRating extends _SelfRating with DiagnosticableTreeMixin {
   _$_SelfRating(
-      {required this.rating, @TimestampSerializer() required this.createdAt});
+      {required this.rating, @TimestampSerializer() required this.createdAt})
+      : super._();
 
   factory _$_SelfRating.fromJson(Map<String, dynamic> json) =>
       _$$_SelfRatingFromJson(json);
@@ -6990,11 +6991,12 @@ class _$_SelfRating with DiagnosticableTreeMixin implements _SelfRating {
   }
 }
 
-abstract class _SelfRating implements SelfRating {
+abstract class _SelfRating extends SelfRating {
   factory _SelfRating(
           {required final int rating,
           @TimestampSerializer() required final DateTime createdAt}) =
       _$_SelfRating;
+  _SelfRating._() : super._();
 
   factory _SelfRating.fromJson(Map<String, dynamic> json) =
       _$_SelfRating.fromJson;

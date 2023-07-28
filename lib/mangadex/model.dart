@@ -9,6 +9,7 @@ import 'package:gagaku/mangadex/cache.dart';
 import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mutex/mutex.dart';
@@ -826,7 +827,7 @@ class MangaDexModel {
           ReadChaptersMap map = {};
 
           for (var m in mangas) {
-            map[m.id] = <String>{};
+            map[m.id] = ReadChapterSet(m.id, {});
           }
 
           return map;
@@ -834,8 +835,10 @@ class MangaDexModel {
 
         final cmap = body['data'] as Map<String, dynamic>;
 
-        final readmap = cmap.map((key, value) =>
-            MapEntry(key, List<String>.from(value as List<dynamic>).toSet()));
+        final readmap = cmap.map((key, value) => MapEntry(
+            key,
+            ReadChapterSet(
+                key, List<String>.from(value as List<dynamic>).toSet())));
 
         return readmap;
       } else {
@@ -1626,7 +1629,8 @@ class ReadChapters extends _$ReadChapters {
     final oldstate = state.valueOrNull ?? {};
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+      final mg = mangas.where((m) =>
+          !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
       final map = await _fetchReadChapters(mg);
       return {...oldstate, ...map};
     });
@@ -1669,10 +1673,10 @@ class ReadChapters extends _$ReadChapters {
         } else {
           switch (setRead) {
             case true:
-              oldstate[manga.id] = chapIdSet;
+              oldstate[manga.id] = ReadChapterSet(manga.id, chapIdSet);
               break;
             case false:
-              oldstate[manga.id] = {};
+              oldstate[manga.id] = ReadChapterSet(manga.id, {});
               break;
           }
         }
@@ -1923,7 +1927,8 @@ class Ratings extends _$Ratings {
     final oldstate = state.valueOrNull ?? {};
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+      final mg = mangas.where((m) =>
+          !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
       final map = await _fetchRatings(mg);
       return {...oldstate, ...map};
     });
@@ -1966,7 +1971,7 @@ class Ratings extends _$Ratings {
 }
 
 @Riverpod(keepAlive: true)
-class ReadingStatus extends _$ReadingStatus {
+class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
   Future<MangaReadingStatus?> _fetchReadingStatus() async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
@@ -1975,6 +1980,8 @@ class ReadingStatus extends _$ReadingStatus {
 
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaReadingStatus(manga);
+
+    staleTime(const Duration(minutes: 10));
 
     return status;
   }
@@ -2003,6 +2010,9 @@ class ReadingStatus extends _$ReadingStatus {
           status == MangaReadingStatus.remove ? null : status;
       bool success = await api.setMangaReadingStatus(manga, resolved);
       if (success) {
+        api.invalidateCacheItem(CacheLists.library);
+        ref.invalidate(userLibraryProvider);
+
         return resolved;
       }
 
@@ -2012,7 +2022,7 @@ class ReadingStatus extends _$ReadingStatus {
 }
 
 @Riverpod(keepAlive: true)
-class FollowingStatus extends _$FollowingStatus {
+class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
   Future<bool> _fetchFollowingStatus() async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
@@ -2021,6 +2031,8 @@ class FollowingStatus extends _$FollowingStatus {
 
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaFollowing(manga);
+
+    staleTime(const Duration(minutes: 10));
 
     return status;
   }
@@ -2113,9 +2125,7 @@ class MangaDexHistory extends _$MangaDexHistory {
 }
 
 @riverpod
-class AuthControl extends _$AuthControl {
-  Timer? _staleTime;
-
+class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
   Future<void> invalidate() async {
     state = await AsyncValue.guard(() async {
       return await _build();
@@ -2125,23 +2135,15 @@ class AuthControl extends _$AuthControl {
   Future<void> _setStaleTime() async {
     final api = ref.watch(mangadexProvider);
 
-    _staleTime?.cancel();
+    cancelStaleTime();
 
     final expireTime = await api.timeUntilTokenExpiry();
 
     if (expireTime != null) {
       final delay = expireTime + const Duration(seconds: 10);
       logger.d("AuthControl: setting stale time to ${delay.inSeconds} seconds");
-      _staleTime = Timer(delay, () {
-        logger.d("AuthControl: stale time expiry");
-        ref.invalidateSelf();
-      });
+      staleTime(delay);
     }
-
-    ref.onDispose(() {
-      logger.d("AuthControl: dispose");
-      _staleTime?.cancel();
-    });
   }
 
   Future<bool> _build() async {
