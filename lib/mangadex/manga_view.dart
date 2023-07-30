@@ -65,7 +65,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
         AsyncValue(:final error?, :final stackTrace?) => () {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("readChaptersProvider failed", error, stackTrace);
+            logger.e("readChaptersProvider failed",
+                error: error, stackTrace: stackTrace);
 
             return null;
           }(),
@@ -806,8 +807,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 AsyncValue(:final error?, :final stackTrace?) => () {
                     final messenger = ScaffoldMessenger.of(context);
                     Styles.showErrorSnackBar(messenger, '$error');
-                    logger.e("mangaChaptersProvider(${manga.id}) failed", error,
-                        stackTrace);
+                    logger.e("mangaChaptersProvider(${manga.id}) failed",
+                        error: error, stackTrace: stackTrace);
 
                     return SliverToBoxAdapter(
                       child: Styles.errorColumn(error, stackTrace),
@@ -906,8 +907,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 AsyncValue(:final error?, :final stackTrace?) => () {
                     final messenger = ScaffoldMessenger.of(context);
                     Styles.showErrorSnackBar(messenger, '$error');
-                    logger.e("mangaCoversProvider(${manga.id}) failed", error,
-                        stackTrace);
+                    logger.e("mangaCoversProvider(${manga.id}) failed",
+                        error: error, stackTrace: stackTrace);
 
                     return SliverToBoxAdapter(
                       child: Styles.errorColumn(error, stackTrace),
@@ -1037,7 +1038,7 @@ class _CoverArtItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: GridTile(
-            footer: cover.attributes.volume != null
+            footer: cover.attributes?.volume != null
                 ? SizedBox(
                     height: 40,
                     child: Material(
@@ -1050,7 +1051,7 @@ class _CoverArtItem extends StatelessWidget {
                       child: GridTileBar(
                         backgroundColor: Colors.black45,
                         title: Text(
-                          'Volume ${cover.attributes.volume!}',
+                          'Volume ${cover.attributes!.volume!}',
                           softWrap: true,
                           style: const TextStyle(
                             overflow: TextOverflow.fade,

@@ -63,8 +63,8 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
           AsyncValue(:final error?, :final stackTrace?) => () {
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$error');
-              logger.e("_fetchCreatorTitlesProvider(creator) failed", error,
-                  stackTrace);
+              logger.e("_fetchCreatorTitlesProvider(creator) failed",
+                  error: error, stackTrace: stackTrace);
 
               return RefreshIndicator(
                 onRefresh: () async {

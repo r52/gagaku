@@ -66,7 +66,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
         AsyncValue(:final error?, :final stackTrace?) => () {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("${provider.toString()} failed", error, stackTrace);
+            logger.e("${provider.toString()} failed",
+                error: error, stackTrace: stackTrace);
 
             return RefreshIndicator(
               onRefresh: onRefresh,
@@ -144,7 +145,8 @@ class ChapterFeedItem extends ConsumerWidget {
         AsyncValue(:final error?, :final stackTrace?) => () {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("readChaptersProvider failed", error, stackTrace);
+            logger.e("readChaptersProvider failed",
+                error: error, stackTrace: stackTrace);
 
             return null;
           }(),

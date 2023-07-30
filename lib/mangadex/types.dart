@@ -9,7 +9,7 @@ part 'types.g.dart';
 
 typedef LocalizedString = Map<String, String>;
 typedef LibraryMap = Map<String, MangaReadingStatus>;
-typedef ReadChaptersMap = Map<String, Set<String>>;
+typedef ReadChaptersMap = Map<String, ReadChapterSet>;
 typedef CoverArtUrl = String;
 
 extension CoverArtUrlExt on CoverArtUrl {
@@ -306,6 +306,12 @@ mixin MangaDexUUID {
   int get hashCode => Object.hash(runtimeType, id);
 }
 
+mixin ShortLivedData {
+  DateTime get expiry;
+
+  bool isExpired() => DateTime.now().compareTo(expiry) >= 0;
+}
+
 @freezed
 class ChapterList with _$ChapterList {
   const factory ChapterList(
@@ -460,7 +466,7 @@ abstract class Group with MangaDexUUID {
 }
 
 abstract class Cover with MangaDexUUID {
-  CoverArtAttributes get attributes;
+  CoverArtAttributes? get attributes;
 }
 
 abstract class CreatorType with MangaDexUUID {
@@ -500,7 +506,7 @@ class Relationship with _$Relationship, MangaDexUUID {
   @Implements<Cover>()
   const factory Relationship.cover({
     required String id,
-    required CoverArtAttributes attributes,
+    required CoverArtAttributes? attributes,
   }) = CoverArt;
 
   @FreezedUnionValue('scanlation_group')
@@ -610,7 +616,7 @@ class Manga with _$Manga, MangaDexUUID {
 
   String getFirstCoverUrl({CoverArtQuality quality = CoverArtQuality.best}) {
     if (covers.isEmpty) {
-      return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png';
+      return 'https://mangadex.org/img/cover-placeholder.jpg';
     }
 
     return covers.first.quality(quality: quality);
@@ -618,7 +624,11 @@ class Manga with _$Manga, MangaDexUUID {
 
   CoverArtUrl getUrlFromCover(Cover cover,
       {CoverArtQuality quality = CoverArtQuality.best}) {
-    final filename = cover.attributes.fileName;
+    final filename = cover.attributes?.fileName;
+
+    if (filename == null) {
+      return 'https://mangadex.org/img/cover-placeholder.jpg';
+    }
 
     return 'https://uploads.mangadex.org/covers/$id/$filename'
         .quality(quality: quality);
@@ -790,11 +800,16 @@ class SelfRatingResponse with _$SelfRatingResponse {
 }
 
 @freezed
-class SelfRating with _$SelfRating {
+class SelfRating with _$SelfRating, ShortLivedData {
+  SelfRating._();
+
   factory SelfRating({
     required int rating,
     @TimestampSerializer() required DateTime createdAt,
   }) = _SelfRating;
+
+  @override
+  final expiry = DateTime.now().add(const Duration(minutes: 10));
 
   factory SelfRating.fromJson(Map<String, dynamic> json) =>
       _$SelfRatingFromJson(json);
@@ -817,6 +832,46 @@ class ChapterFeedItemData {
   final String coverArt;
 
   List<Chapter> chapters = [];
+}
+
+class ReadChapterSet with ShortLivedData {
+  ReadChapterSet(this.mangaId, this._chapters);
+
+  final String mangaId;
+  final Set<String> _chapters;
+
+  static const _expiryDuration = Duration(minutes: 10);
+
+  @override
+  DateTime expiry = DateTime.now().add(_expiryDuration);
+
+  DateTime updateExpiry() => expiry = DateTime.now().add(_expiryDuration);
+
+  bool contains(String entry) => _chapters.contains(entry);
+  bool get isEmpty => _chapters.isEmpty;
+  bool get isNotEmpty => _chapters.isNotEmpty;
+
+  bool add(String entry) {
+    bool result = _chapters.add(entry);
+    updateExpiry();
+    return result;
+  }
+
+  void addAll(Iterable<String> entry) {
+    _chapters.addAll(entry);
+    updateExpiry();
+  }
+
+  bool remove(String entry) {
+    bool result = _chapters.remove(entry);
+    updateExpiry();
+    return result;
+  }
+
+  void removeAll(Iterable<String> entry) {
+    _chapters.removeAll(entry);
+    updateExpiry();
+  }
 }
 
 // Deprecated old style login types

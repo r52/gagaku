@@ -6,6 +6,20 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$mangadexHash() => r'a292b576f657f3f4f75a624bdf14e965c33f39fe';
+
+/// See also [mangadex].
+@ProviderFor(mangadex)
+final mangadexProvider = Provider<MangaDexModel>.internal(
+  mangadex,
+  name: r'mangadexProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$mangadexHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$latestChaptersFeedHash() =>
     r'ea75ba36369bdde3c5c2eb72f6c98bd779ded249';
 
@@ -539,12 +553,12 @@ class MangaCoversProvider
   }
 }
 
-String _$readChaptersHash() => r'a98afd37a00836974a53b24ce85f68a96fddf96b';
+String _$readChaptersHash() => r'429f19ab4f255aee8b5e414fd754ac8621091dc2';
 
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)
 final readChaptersProvider =
-    AsyncNotifierProvider<ReadChapters, Map<String, Set<String>>>.internal(
+    AsyncNotifierProvider<ReadChapters, Map<String, ReadChapterSet>>.internal(
   ReadChapters.new,
   name: r'readChaptersProvider',
   debugGetCreateSourceHash:
@@ -553,8 +567,8 @@ final readChaptersProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$ReadChapters = AsyncNotifier<Map<String, Set<String>>>;
-String _$userLibraryHash() => r'b057b553aa3ffd5b01d113266a518d7f55dad8ac';
+typedef _$ReadChapters = AsyncNotifier<Map<String, ReadChapterSet>>;
+String _$userLibraryHash() => r'db728effebe55f58d3dd147c3727b6fdf3db8f09';
 
 abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
   late final MangaReadingStatus status;
@@ -776,7 +790,7 @@ final statisticsProvider =
 );
 
 typedef _$Statistics = AsyncNotifier<Map<String, MangaStatistics>>;
-String _$ratingsHash() => r'f507d7d7f9d27c0ff7f572a6a24d281b80794fef';
+String _$ratingsHash() => r'd5689480a48de244cd7961f14e225e23811e08b9';
 
 /// See also [Ratings].
 @ProviderFor(Ratings)
@@ -791,7 +805,7 @@ final ratingsProvider =
 );
 
 typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
-String _$readingStatusHash() => r'5281cee334576d80177ad0c9b441badde919ffd6';
+String _$readingStatusHash() => r'c6928956665b33e7a7559ae2ba0d669ab8a2a577';
 
 abstract class _$ReadingStatus
     extends BuildlessAsyncNotifier<MangaReadingStatus?> {
@@ -888,7 +902,7 @@ class ReadingStatusProvider
   }
 }
 
-String _$followingStatusHash() => r'd4a6e4ee1ab4525be4dd02a3fd77277c084bc941';
+String _$followingStatusHash() => r'fb96192a8468fb7dacb102b3b253c4235cd4c1cc';
 
 abstract class _$FollowingStatus extends BuildlessAsyncNotifier<bool> {
   late final Manga manga;
@@ -1000,7 +1014,7 @@ final mangaDexHistoryProvider =
 );
 
 typedef _$MangaDexHistory = AsyncNotifier<Queue<Chapter>>;
-String _$authControlHash() => r'2a64d9dd0973ac8902ec2e89438b2834f825327f';
+String _$authControlHash() => r'f25650165fcc9db88651cdc07f10b82d4d315cce';
 
 /// See also [AuthControl].
 @ProviderFor(AuthControl)
@@ -1015,4 +1029,5 @@ final authControlProvider =
 );
 
 typedef _$AuthControl = AutoDisposeAsyncNotifier<bool>;
-// ignore_for_file: unnecessary_raw_strings, subtype_of_sealed_class, invalid_use_of_internal_member, do_not_use_environment, prefer_const_constructors, public_member_api_docs, avoid_private_typedef_functions
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member

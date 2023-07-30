@@ -60,8 +60,8 @@ class MangaDexLibraryView extends ConsumerWidget {
                     AsyncValue(:final error?, :final stackTrace?) => () {
                         final messenger = ScaffoldMessenger.of(context);
                         Styles.showErrorSnackBar(messenger, '$error');
-                        logger.e("userLibraryProvider($type) failed", error,
-                            stackTrace);
+                        logger.e("userLibraryProvider($type) failed",
+                            error: error, stackTrace: stackTrace);
 
                         return Styles.errorColumn(error, stackTrace);
                       }(),

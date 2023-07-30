@@ -79,7 +79,8 @@ class DirectoryReaderWidget extends ConsumerWidget {
       case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_getDirectoryPagesProvider($path) failed", error, stackTrace);
+        logger.e("_getDirectoryPagesProvider($path) failed",
+            error: error, stackTrace: stackTrace);
 
         return Scaffold(
           appBar: AppBar(

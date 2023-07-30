@@ -186,7 +186,8 @@ class LocalLibraryHome extends HookConsumerWidget {
           case AsyncError(:final error, :final stackTrace):
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("localLibraryProvider failed", error, stackTrace);
+            logger.e("localLibraryProvider failed",
+                error: error, stackTrace: stackTrace);
 
             return RefreshIndicator(
               onRefresh: () async {

@@ -10,7 +10,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
-final proxyProvider = Provider(ProxyHandler.new);
+@Riverpod(keepAlive: true)
+ProxyHandler proxy(ProxyRef ref) {
+  return ProxyHandler(ref);
+}
 
 class ProxyHandler {
   ProxyHandler(this.ref);

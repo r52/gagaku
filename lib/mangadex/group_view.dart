@@ -202,8 +202,8 @@ class MangaDexGroupViewWidget extends HookWidget {
                 AsyncValue(:final error?, :final stackTrace?) => () {
                     final messenger = ScaffoldMessenger.of(context);
                     Styles.showErrorSnackBar(messenger, '$error');
-                    logger.e("_fetchGroupTitlesProvider(group) failed", error,
-                        stackTrace);
+                    logger.e("_fetchGroupTitlesProvider(group) failed",
+                        error: error, stackTrace: stackTrace);
 
                     return RefreshIndicator(
                       onRefresh: () async {

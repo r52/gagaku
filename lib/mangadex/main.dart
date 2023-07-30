@@ -33,25 +33,33 @@ class MangaDexHome extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final tab = ref.watch(_mangadexTabProvider);
+    final lifecycle = useAppLifecycleState();
 
-    const bottomNavigationBarItems = <BottomNavigationBarItem>[
-      BottomNavigationBarItem(
+    useEffect(() {
+      if (lifecycle == AppLifecycleState.resumed) {
+        ref.read(authControlProvider.notifier).invalidate();
+      }
+      return null;
+    }, [lifecycle]);
+
+    const bottomNavigationBarItems = <Widget>[
+      NavigationDestination(
         icon: Icon(Icons.home),
         label: 'Latest Feed',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.menu_book),
         label: 'Manga Feed',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.feed),
         label: 'Chapter Feed',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.collections),
         label: 'Library',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.history),
         label: 'Reading History',
       )
@@ -70,6 +78,7 @@ class MangaDexHome extends HookConsumerWidget {
         controller: controllers[0],
       ),
       MangaDexLoginWidget(
+        key: const Key('mangafeed'),
         builder: (context, ref) {
           return MangaDexMangaFeed(
             controller: controllers[1],
@@ -77,6 +86,7 @@ class MangaDexHome extends HookConsumerWidget {
         },
       ),
       MangaDexLoginWidget(
+        key: const Key('chapterfeed'),
         builder: (context, ref) {
           return MangaDexChapterFeed(
             controller: controllers[2],
@@ -84,6 +94,7 @@ class MangaDexHome extends HookConsumerWidget {
         },
       ),
       MangaDexLoginWidget(
+        key: const Key('userlibrary'),
         builder: (context, ref) {
           return MangaDexLibraryView(
             controller: controllers[3],
@@ -189,7 +200,8 @@ class MangaDexHome extends HookConsumerWidget {
                     case AsyncError(:final error, :final stackTrace):
                       final messenger = ScaffoldMessenger.of(context);
                       Styles.showErrorSnackBar(messenger, '$error');
-                      logger.e("authControlProvider failed", error, stackTrace);
+                      logger.e("authControlProvider failed",
+                          error: error, stackTrace: stackTrace);
                       return const Icon(Icons.error);
                     case _:
                       return const Center(
@@ -216,13 +228,12 @@ class MangaDexHome extends HookConsumerWidget {
           child: tabs[tab.index],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showUnselectedLabels: false,
-        items: bottomNavigationBarItems,
-        currentIndex: tab.index,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: theme.colorScheme.primary,
-        onTap: (index) {
+      bottomNavigationBar: NavigationBar(
+        height: 60,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        destinations: bottomNavigationBarItems,
+        selectedIndex: tab.index,
+        onDestinationSelected: (index) {
           final currTab = ref.read(_mangadexTabProvider);
 
           if (currTab == MangaDexTab.values[index]) {

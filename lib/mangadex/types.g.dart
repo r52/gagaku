@@ -282,8 +282,10 @@ Map<String, dynamic> _$$RelationshipCreatorToJson(
 
 _$CoverArt _$$CoverArtFromJson(Map<String, dynamic> json) => _$CoverArt(
       id: json['id'] as String,
-      attributes: CoverArtAttributes.fromJson(
-          json['attributes'] as Map<String, dynamic>),
+      attributes: json['attributes'] == null
+          ? null
+          : CoverArtAttributes.fromJson(
+              json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 

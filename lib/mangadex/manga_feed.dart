@@ -46,7 +46,8 @@ class MangaDexMangaFeed extends ConsumerWidget {
             AsyncValue(:final error?, :final stackTrace?) => () {
                 final messenger = ScaffoldMessenger.of(context);
                 Styles.showErrorSnackBar(messenger, '$error');
-                logger.e("_fetchMangaFeedProvider failed", error, stackTrace);
+                logger.e("_fetchMangaFeedProvider failed",
+                    error: error, stackTrace: stackTrace);
 
                 return RefreshIndicator(
                   onRefresh: () async {
