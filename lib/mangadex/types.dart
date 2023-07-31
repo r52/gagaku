@@ -571,6 +571,17 @@ class MangaList with _$MangaList {
 }
 
 @freezed
+class GroupList with _$GroupList {
+  const factory GroupList(
+    List<ScanlationGroup> data,
+    int total,
+  ) = _GroupList;
+
+  factory GroupList.fromJson(Map<String, dynamic> json) =>
+      _$GroupListFromJson(json);
+}
+
+@freezed
 class Manga with _$Manga, MangaDexUUID {
   Manga._();
 

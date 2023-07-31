@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -78,15 +79,19 @@ Future<Iterable<Manga>> _fetchGroupTitles(
   return mangas;
 }
 
-class MangaDexGroupViewWidget extends HookWidget {
+class MangaDexGroupViewWidget extends HookConsumerWidget {
   const MangaDexGroupViewWidget({super.key, required this.group});
 
   final Group group;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final view = useState(_ViewType.info);
+
+    final settings = ref.watch(mdConfigProvider);
+    final isBlacklisted = settings.groupBlacklist.contains(group.id);
+    final cfg = useRef(settings);
 
     const bottomNavigationBarItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
@@ -263,6 +268,32 @@ class MangaDexGroupViewWidget extends HookWidget {
           child: Styles.titleFlexBar(
               context: context, title: group.attributes.name),
         ),
+        actions: [
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  isBlacklisted ? Colors.green.shade900 : Colors.red.shade900,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(6.0)),
+              ),
+            ),
+            onPressed: () {
+              if (isBlacklisted) {
+                cfg.value = settings.copyWith(
+                    groupBlacklist: settings.groupBlacklist
+                        .where((element) => element != group.id)
+                        .toSet());
+              } else {
+                cfg.value = settings.copyWith(
+                    groupBlacklist: {...settings.groupBlacklist, group.id});
+              }
+
+              ref.read(mdConfigProvider.notifier).save(cfg.value);
+            },
+            icon: const Icon(Icons.block),
+            label: Text(isBlacklisted ? 'Unblock' : 'Block'),
+          ),
+        ],
       ),
       body: Center(
         child: PageTransitionSwitcher(
