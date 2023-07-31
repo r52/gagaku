@@ -93,16 +93,16 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
     final isBlacklisted = settings.groupBlacklist.contains(group.id);
     final cfg = useRef(settings);
 
-    const bottomNavigationBarItems = <BottomNavigationBarItem>[
-      BottomNavigationBarItem(
+    const bottomNavigationBarItems = <Widget>[
+      NavigationDestination(
         icon: Icon(Icons.info),
         label: 'Info',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.feed),
         label: 'Group Feed',
       ),
-      BottomNavigationBarItem(
+      NavigationDestination(
         icon: Icon(Icons.menu_book),
         label: 'Group Titles',
       ),
@@ -308,13 +308,12 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
           child: tabs[view.value.index],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showUnselectedLabels: false,
-        items: bottomNavigationBarItems,
-        currentIndex: view.value.index,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: theme.colorScheme.primary,
-        onTap: (index) {
+      bottomNavigationBar: NavigationBar(
+        height: 60,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        destinations: bottomNavigationBarItems,
+        selectedIndex: view.value.index,
+        onDestinationSelected: (index) {
           final currTab = view.value;
 
           if (currTab == _ViewType.values[index]) {
