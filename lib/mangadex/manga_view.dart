@@ -194,6 +194,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 } else if (!following && reading == null) {
                   actions.addAll([
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                        ),
+                      ),
                       onPressed: () async {
                         final result = await showDialog<
                                 (MangaReadingStatus, bool)>(
@@ -293,9 +298,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         }
                       },
                       child: const Text('Add to Library'),
-                    ),
-                    const SizedBox(
-                      width: 10,
                     ),
                   ]);
                 } else {
