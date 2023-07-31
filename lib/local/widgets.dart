@@ -79,7 +79,8 @@ class _GridLibraryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget image = Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
       child: item.thumbnail != null
           ? Image.file(

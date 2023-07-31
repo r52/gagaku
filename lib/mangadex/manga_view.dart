@@ -304,8 +304,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       message: following ? 'Unfollow Manga' : 'Follow Manga',
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6.0),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(6.0)),
                           ),
                         ),
                         onPressed: () async {
@@ -324,7 +325,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(4.0)),
                         color: theme.colorScheme.background.withAlpha(200),
                       ),
                       child: DropdownButton<MangaReadingStatus>(
@@ -385,7 +387,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           color: ratings.containsKey(manga.id)
                               ? Colors.deepOrange
                               : Colors.grey.shade600,
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(6.0)),
                         ),
                         child: Row(
                           children: [
@@ -789,7 +792,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     view.value = _ViewType.values.elementAt(index);
                   },
                   textStyle: const TextStyle(fontSize: 24),
-                  borderRadius: BorderRadius.circular(2.0),
+                  borderRadius: const BorderRadius.all(Radius.circular(2.0)),
                   children: [
                     ..._ViewType.values
                         .map((e) => Padding(
@@ -1020,7 +1023,8 @@ class _CoverArtItem extends StatelessWidget {
     final url = manga.getUrlFromCover(cover);
 
     final Widget image = Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
       child: ExtendedImage.network(
         url.quality(quality: CoverArtQuality.medium),

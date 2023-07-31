@@ -207,7 +207,7 @@ class ChapterFeedItem extends ConsumerWidget {
       child: ExtendedImage.network(state.coverArt,
           loadStateChanged: extendedImageLoadStateHandler,
           shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
           width: screenSizeSmall ? 64.0 : 128.0),
     );
 
@@ -679,7 +679,8 @@ class _GridMangaItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = Navigator.of(context);
     final Widget image = Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
       child: ExtendedImage.network(
         manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
