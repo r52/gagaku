@@ -435,6 +435,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 padding: const EdgeInsets.all(8),
                 color: theme.cardColor,
                 child: Wrap(
+                  spacing: 4.0,
                   runSpacing: 4.0,
                   children: [
                     ContentRatingChip(rating: manga.attributes.contentRating),
@@ -446,12 +447,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           .where((tag) =>
                               (tag.attributes.group == TagGroup.genre ||
                                   tag.attributes.group == TagGroup.theme))
-                          .map((e) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 2),
-                                child: IconTextChip(
-                                    text: Text(e.attributes.name.get('en'))),
-                              ))
+                          .map(
+                            (e) => IconTextChip(
+                                text: Text(e.attributes.name.get('en'))),
+                          )
                           .toList(),
                   ],
                 ),

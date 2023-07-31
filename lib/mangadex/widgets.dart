@@ -840,19 +840,16 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                           height: 4.0,
                         ),
                         Wrap(
+                          spacing: 4.0,
                           runSpacing: 4.0,
                           children: [
                             ContentRatingChip(
                                 rating: manga.attributes.contentRating),
-                            const SizedBox(width: 2.0),
                             ...manga.attributes.tags
-                                .map((e) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 2.0),
-                                      child: IconTextChip(
-                                          text: Text(
-                                              e.attributes.name.get('en'))),
-                                    ))
+                                .map(
+                                  (e) => IconTextChip(
+                                      text: Text(e.attributes.name.get('en'))),
+                                )
                                 .toList(),
                           ],
                         ),
@@ -929,21 +926,19 @@ class _ListMangaItem extends ConsumerWidget {
                     height: 10,
                   ),
                   Wrap(
+                    spacing: 4.0,
                     runSpacing: 4.0,
                     children: [
                       ContentRatingChip(rating: manga.attributes.contentRating),
-                      const SizedBox(width: 2),
                       if (manga.attributes.tags.isNotEmpty)
                         ...manga.attributes.tags
                             .where((tag) =>
                                 (tag.attributes.group == TagGroup.genre ||
                                     tag.attributes.group == TagGroup.theme))
-                            .map((e) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 2),
-                                  child: IconTextChip(
-                                      text: Text(e.attributes.name.get('en'))),
-                                ))
+                            .map(
+                              (e) => IconTextChip(
+                                  text: Text(e.attributes.name.get('en'))),
+                            )
                             .toList(),
                     ],
                   ),
