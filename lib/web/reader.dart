@@ -34,8 +34,6 @@ Future<List<ReaderPage>> _getPages(_GetPagesRef ref, String code) async {
   final api = ref.watch(proxyProvider);
   final pages = await api.getChapter(code);
 
-  ref.keepAlive();
-
   return pages
       .map((e) => ReaderPage(
             provider: ExtendedNetworkImageProvider(e),
