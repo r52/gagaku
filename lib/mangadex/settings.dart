@@ -6,6 +6,17 @@ import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'settings.g.dart';
+
+@riverpod
+Future<Set<Group>> _fetchGroupData(
+    _FetchGroupDataRef ref, Iterable<String> uuids) async {
+  final api = ref.watch(mangadexProvider);
+  final groups = await api.fetchGroups(uuids);
+  return groups.toSet();
+}
 
 class MangaDexSettingsWidget extends HookConsumerWidget {
   const MangaDexSettingsWidget({super.key});
@@ -15,7 +26,8 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final cfg = ref.watch(mdConfigProvider);
     final config = useState(cfg);
-    final api = ref.watch(mangadexProvider);
+    final groups =
+        ref.watch(_fetchGroupDataProvider(config.value.groupBlacklist));
 
     const spacing = 4.0;
 
@@ -203,77 +215,68 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                 ),
               ),
               builder: (context) {
-                return Center(
-                  child: config.value.groupBlacklist.isEmpty
-                      ? const Wrap(
-                          children: [
-                            InputChip(
-                              label: Text('None'),
-                            ),
-                          ],
-                        )
-                      : FutureBuilder(
-                          future: api.fetchGroups(config.value.groupBlacklist),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              final groupData = snapshot.data!.toSet();
-                              final children = <Widget>[];
-
-                              for (final group in config.value.groupBlacklist) {
-                                final groupInfo = groupData.firstWhere(
-                                    (element) => element.id == group);
-                                children.add(InputChip(
-                                  label: Text(groupInfo.attributes.name),
-                                  onDeleted: () {
-                                    config.value = config.value.copyWith(
-                                      groupBlacklist: config
-                                          .value.groupBlacklist
-                                          .where((element) => element != group)
-                                          .toSet(),
-                                    );
-                                  },
-                                ));
-                              }
-
-                              return Wrap(
-                                spacing: spacing,
-                                runSpacing: spacing,
-                                children: children,
-                              );
-                            } else if (snapshot.hasError) {
-                              final messenger = ScaffoldMessenger.of(context);
-                              Styles.showErrorSnackBar(
-                                  messenger, '${snapshot.error}');
-                              logger.e("mangaSearchProvider(filter) failed",
-                                  error: snapshot.error,
-                                  stackTrace: snapshot.stackTrace);
-
-                              final children = <Widget>[];
-
-                              for (final group in config.value.groupBlacklist) {
-                                children.add(InputChip(
-                                  label: Text(group),
-                                  onDeleted: () {
-                                    config.value = config.value.copyWith(
-                                      groupBlacklist: config
-                                          .value.groupBlacklist
-                                          .where((element) => element != group)
-                                          .toSet(),
-                                    );
-                                  },
-                                ));
-                              }
-
-                              return Wrap(
-                                spacing: spacing,
-                                runSpacing: spacing,
-                                children: children,
-                              );
-                            } else {
-                              return Styles.listSpinner;
-                            }
-                          },
+                if (config.value.groupBlacklist.isEmpty) {
+                  return const Center(
+                    child: Wrap(
+                      children: [
+                        InputChip(
+                          label: Text('None'),
                         ),
+                      ],
+                    ),
+                  );
+                }
+
+                final children = <Widget>[];
+
+                switch (groups) {
+                  case AsyncData(:final value):
+                    for (final group in config.value.groupBlacklist) {
+                      final groupInfo =
+                          value.firstWhere((element) => element.id == group);
+                      children.add(InputChip(
+                        label: Text(groupInfo.attributes.name),
+                        onDeleted: () {
+                          config.value = config.value.copyWith(
+                            groupBlacklist: config.value.groupBlacklist
+                                .where((element) => element != group)
+                                .toSet(),
+                          );
+                        },
+                      ));
+                    }
+                    break;
+                  case AsyncError(:final error, :final stackTrace):
+                    final messenger = ScaffoldMessenger.of(context);
+                    Styles.showErrorSnackBar(messenger, '$error');
+                    logger.e("_fetchGroupDataProvider failed",
+                        error: error, stackTrace: stackTrace);
+
+                    final children = <Widget>[];
+
+                    for (final group in config.value.groupBlacklist) {
+                      children.add(InputChip(
+                        label: Text(group),
+                        onDeleted: () {
+                          config.value = config.value.copyWith(
+                            groupBlacklist: config.value.groupBlacklist
+                                .where((element) => element != group)
+                                .toSet(),
+                          );
+                        },
+                      ));
+                    }
+                    break;
+                  case _:
+                    return Styles.listSpinner;
+                }
+
+                return Center(
+                  child: Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: children,
+                  ),
                 );
               },
             ),
