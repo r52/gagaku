@@ -2266,7 +2266,6 @@ class RateLimitedClient extends http.BaseClient {
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     return await _mutex.protect(() async {
       request.headers[HttpHeaders.userAgentHeader] = await userAgent;
-      await Future.delayed(const Duration(milliseconds: 200));
       return baseClient.send(request);
     });
   }
