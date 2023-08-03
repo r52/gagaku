@@ -35,6 +35,8 @@ mixin _$MangaDexConfig {
       throw _privateConstructorUsedError;
   bool get dataSaver => throw _privateConstructorUsedError;
   set dataSaver(bool value) => throw _privateConstructorUsedError;
+  Set<String> get groupBlacklist => throw _privateConstructorUsedError;
+  set groupBlacklist(Set<String> value) => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -52,7 +54,8 @@ abstract class $MangaDexConfigCopyWith<$Res> {
       {@LanguageConverter() Set<Language> translatedLanguages,
       @LanguageConverter() Set<Language> originalLanguage,
       Set<ContentRating> contentRating,
-      bool dataSaver});
+      bool dataSaver,
+      Set<String> groupBlacklist});
 }
 
 /// @nodoc
@@ -72,6 +75,7 @@ class _$MangaDexConfigCopyWithImpl<$Res, $Val extends MangaDexConfig>
     Object? originalLanguage = null,
     Object? contentRating = null,
     Object? dataSaver = null,
+    Object? groupBlacklist = null,
   }) {
     return _then(_value.copyWith(
       translatedLanguages: null == translatedLanguages
@@ -90,6 +94,10 @@ class _$MangaDexConfigCopyWithImpl<$Res, $Val extends MangaDexConfig>
           ? _value.dataSaver
           : dataSaver // ignore: cast_nullable_to_non_nullable
               as bool,
+      groupBlacklist: null == groupBlacklist
+          ? _value.groupBlacklist
+          : groupBlacklist // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
     ) as $Val);
   }
 }
@@ -106,7 +114,8 @@ abstract class _$$_MangaDexConfigCopyWith<$Res>
       {@LanguageConverter() Set<Language> translatedLanguages,
       @LanguageConverter() Set<Language> originalLanguage,
       Set<ContentRating> contentRating,
-      bool dataSaver});
+      bool dataSaver,
+      Set<String> groupBlacklist});
 }
 
 /// @nodoc
@@ -124,6 +133,7 @@ class __$$_MangaDexConfigCopyWithImpl<$Res>
     Object? originalLanguage = null,
     Object? contentRating = null,
     Object? dataSaver = null,
+    Object? groupBlacklist = null,
   }) {
     return _then(_$_MangaDexConfig(
       translatedLanguages: null == translatedLanguages
@@ -142,6 +152,10 @@ class __$$_MangaDexConfigCopyWithImpl<$Res>
           ? _value.dataSaver
           : dataSaver // ignore: cast_nullable_to_non_nullable
               as bool,
+      groupBlacklist: null == groupBlacklist
+          ? _value.groupBlacklist
+          : groupBlacklist // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
     ));
   }
 }
@@ -157,7 +171,8 @@ class _$_MangaDexConfig implements _MangaDexConfig {
         ContentRating.suggestive,
         ContentRating.erotica
       },
-      this.dataSaver = false});
+      this.dataSaver = false,
+      this.groupBlacklist = const {}});
 
   factory _$_MangaDexConfig.fromJson(Map<String, dynamic> json) =>
       _$$_MangaDexConfigFromJson(json);
@@ -176,10 +191,13 @@ class _$_MangaDexConfig implements _MangaDexConfig {
   @override
   @JsonKey()
   bool dataSaver;
+  @override
+  @JsonKey()
+  Set<String> groupBlacklist;
 
   @override
   String toString() {
-    return 'MangaDexConfig(translatedLanguages: $translatedLanguages, originalLanguage: $originalLanguage, contentRating: $contentRating, dataSaver: $dataSaver)';
+    return 'MangaDexConfig(translatedLanguages: $translatedLanguages, originalLanguage: $originalLanguage, contentRating: $contentRating, dataSaver: $dataSaver, groupBlacklist: $groupBlacklist)';
   }
 
   @JsonKey(ignore: true)
@@ -201,7 +219,8 @@ abstract class _MangaDexConfig implements MangaDexConfig {
       {@LanguageConverter() Set<Language> translatedLanguages,
       @LanguageConverter() Set<Language> originalLanguage,
       Set<ContentRating> contentRating,
-      bool dataSaver}) = _$_MangaDexConfig;
+      bool dataSaver,
+      Set<String> groupBlacklist}) = _$_MangaDexConfig;
 
   factory _MangaDexConfig.fromJson(Map<String, dynamic> json) =
       _$_MangaDexConfig.fromJson;
@@ -222,6 +241,9 @@ abstract class _MangaDexConfig implements MangaDexConfig {
   @override
   bool get dataSaver;
   set dataSaver(bool value);
+  @override
+  Set<String> get groupBlacklist;
+  set groupBlacklist(Set<String> value);
   @override
   @JsonKey(ignore: true)
   _$$_MangaDexConfigCopyWith<_$_MangaDexConfig> get copyWith =>

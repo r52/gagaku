@@ -364,6 +364,19 @@ Map<String, dynamic> _$$_MangaListToJson(_$_MangaList instance) =>
       'total': instance.total,
     };
 
+_$_GroupList _$$_GroupListFromJson(Map<String, dynamic> json) => _$_GroupList(
+      (json['data'] as List<dynamic>)
+          .map((e) => ScanlationGroup.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      json['total'] as int,
+    );
+
+Map<String, dynamic> _$$_GroupListToJson(_$_GroupList instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'total': instance.total,
+    };
+
 _$_Manga _$$_MangaFromJson(Map<String, dynamic> json) => _$_Manga(
       id: json['id'] as String,
       attributes:

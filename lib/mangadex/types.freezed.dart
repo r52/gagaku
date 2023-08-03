@@ -4502,6 +4502,174 @@ abstract class _MangaList implements MangaList {
       throw _privateConstructorUsedError;
 }
 
+GroupList _$GroupListFromJson(Map<String, dynamic> json) {
+  return _GroupList.fromJson(json);
+}
+
+/// @nodoc
+mixin _$GroupList {
+  List<ScanlationGroup> get data => throw _privateConstructorUsedError;
+  int get total => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $GroupListCopyWith<GroupList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GroupListCopyWith<$Res> {
+  factory $GroupListCopyWith(GroupList value, $Res Function(GroupList) then) =
+      _$GroupListCopyWithImpl<$Res, GroupList>;
+  @useResult
+  $Res call({List<ScanlationGroup> data, int total});
+}
+
+/// @nodoc
+class _$GroupListCopyWithImpl<$Res, $Val extends GroupList>
+    implements $GroupListCopyWith<$Res> {
+  _$GroupListCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<ScanlationGroup>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_GroupListCopyWith<$Res> implements $GroupListCopyWith<$Res> {
+  factory _$$_GroupListCopyWith(
+          _$_GroupList value, $Res Function(_$_GroupList) then) =
+      __$$_GroupListCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<ScanlationGroup> data, int total});
+}
+
+/// @nodoc
+class __$$_GroupListCopyWithImpl<$Res>
+    extends _$GroupListCopyWithImpl<$Res, _$_GroupList>
+    implements _$$_GroupListCopyWith<$Res> {
+  __$$_GroupListCopyWithImpl(
+      _$_GroupList _value, $Res Function(_$_GroupList) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_$_GroupList(
+      null == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<ScanlationGroup>,
+      null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_GroupList with DiagnosticableTreeMixin implements _GroupList {
+  const _$_GroupList(final List<ScanlationGroup> data, this.total)
+      : _data = data;
+
+  factory _$_GroupList.fromJson(Map<String, dynamic> json) =>
+      _$$_GroupListFromJson(json);
+
+  final List<ScanlationGroup> _data;
+  @override
+  List<ScanlationGroup> get data {
+    if (_data is EqualUnmodifiableListView) return _data;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_data);
+  }
+
+  @override
+  final int total;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'GroupList(data: $data, total: $total)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'GroupList'))
+      ..add(DiagnosticsProperty('data', data))
+      ..add(DiagnosticsProperty('total', total));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_GroupList &&
+            const DeepCollectionEquality().equals(other._data, _data) &&
+            (identical(other.total, total) || other.total == total));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_data), total);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_GroupListCopyWith<_$_GroupList> get copyWith =>
+      __$$_GroupListCopyWithImpl<_$_GroupList>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_GroupListToJson(
+      this,
+    );
+  }
+}
+
+abstract class _GroupList implements GroupList {
+  const factory _GroupList(final List<ScanlationGroup> data, final int total) =
+      _$_GroupList;
+
+  factory _GroupList.fromJson(Map<String, dynamic> json) =
+      _$_GroupList.fromJson;
+
+  @override
+  List<ScanlationGroup> get data;
+  @override
+  int get total;
+  @override
+  @JsonKey(ignore: true)
+  _$$_GroupListCopyWith<_$_GroupList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Manga _$MangaFromJson(Map<String, dynamic> json) {
   return _Manga.fromJson(json);
 }

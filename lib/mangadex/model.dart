@@ -83,6 +83,9 @@ abstract class MangaDexEndpoints {
 
   /// Gets cover art
   static const cover = '/cover';
+
+  /// Gets scanlation group info
+  static const group = '/group';
 }
 
 abstract class CacheLists {
@@ -380,6 +383,11 @@ class MangaDexModel {
       'order[publishAt]': 'desc',
       'includes[]': ['scanlation_group', 'user']
     };
+
+    if (settings.groupBlacklist.isNotEmpty) {
+      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
+    }
+
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
 
@@ -436,6 +444,8 @@ class MangaDexModel {
 
     if (group != null) {
       queryParams['groups[]'] = group.id;
+    } else if (settings.groupBlacklist.isNotEmpty) {
+      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
     }
 
     final uri = MangaDexEndpoints.api
@@ -881,6 +891,11 @@ class MangaDexModel {
       'order[chapter]': 'desc',
       'includes[]': ['scanlation_group', 'user']
     };
+
+    if (settings.groupBlacklist.isNotEmpty) {
+      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
+    }
+
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
         queryParameters: queryParams);
@@ -1181,6 +1196,57 @@ class MangaDexModel {
         error: response.body);
 
     return false;
+  }
+
+  /// Fetches group info of the given group [uuids]
+  Future<List<Group>> fetchGroups(Iterable<String> uuids) async {
+    final list = <Group>[];
+
+    final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
+
+    if (fetch.isNotEmpty) {
+      int start = 0, end = 0;
+
+      var queryParams = <String, dynamic>{
+        'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+      };
+
+      while (end < fetch.length) {
+        start = end;
+        end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
+
+        queryParams['ids[]'] = fetch.getRange(start, end);
+
+        final uri = MangaDexEndpoints.api.replace(
+            path: MangaDexEndpoints.group, queryParameters: queryParams);
+
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> body = json.decode(response.body);
+
+          final result = GroupList.fromJson(body);
+
+          // Cache the data
+          _cache.putAllAPIResolved(result.data);
+        } else {
+          // Throw if failure
+          final msg =
+              "fetchGroups() failed. Response code: ${response.statusCode}";
+          logger.e(msg, error: response.body);
+          throw Exception(msg);
+        }
+      }
+    }
+
+    // Craft the list
+    for (final id in uuids) {
+      if (_cache.exists(id)) {
+        list.add(_cache.get<Group>(id));
+      }
+    }
+
+    return list;
   }
 }
 
@@ -2200,7 +2266,6 @@ class RateLimitedClient extends http.BaseClient {
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     return await _mutex.protect(() async {
       request.headers[HttpHeaders.userAgentHeader] = await userAgent;
-      await Future.delayed(const Duration(milliseconds: 200));
       return baseClient.send(request);
     });
   }

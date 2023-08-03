@@ -37,8 +37,8 @@ class ButtonChip extends StatelessWidget {
       textStyle:
           theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6.0),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(6.0)),
       ),
     );
 
@@ -84,7 +84,7 @@ class IconTextChip extends HookWidget {
       child: Container(
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
         ),
         foregroundDecoration:
             hover.value ? BoxDecoration(color: hoverColor) : null,

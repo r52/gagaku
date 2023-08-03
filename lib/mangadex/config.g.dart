@@ -25,6 +25,10 @@ _$_MangaDexConfig _$$_MangaDexConfigFromJson(Map<String, dynamic> json) =>
             ContentRating.erotica
           },
       dataSaver: json['dataSaver'] as bool? ?? false,
+      groupBlacklist: (json['groupBlacklist'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toSet() ??
+          const {},
     );
 
 Map<String, dynamic> _$$_MangaDexConfigToJson(_$_MangaDexConfig instance) =>
@@ -39,6 +43,7 @@ Map<String, dynamic> _$$_MangaDexConfigToJson(_$_MangaDexConfig instance) =>
           .map((e) => _$ContentRatingEnumMap[e]!)
           .toList(),
       'dataSaver': instance.dataSaver,
+      'groupBlacklist': instance.groupBlacklist.toList(),
     };
 
 const _$ContentRatingEnumMap = {

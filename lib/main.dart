@@ -40,7 +40,7 @@ void main() async {
       colors: false,
       printTime: true,
       excludeBox: {
-        Level.verbose: true,
+        Level.trace: true,
         Level.debug: true,
         Level.info: true,
       },

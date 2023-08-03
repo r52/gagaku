@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'reader.dart';
+part of 'settings.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getPagesHash() => r'dd2d588d01548fc382730f7c547fd2bfbe4e87ce';
+String _$fetchGroupDataHash() => r'c9009d905ce312badc17d76d527a3c084ce2dee4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,32 +29,32 @@ class _SystemHash {
   }
 }
 
-typedef _GetPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
+typedef _FetchGroupDataRef = AutoDisposeFutureProviderRef<Set<Group>>;
 
-/// See also [_getPages].
-@ProviderFor(_getPages)
-const _getPagesProvider = _GetPagesFamily();
+/// See also [_fetchGroupData].
+@ProviderFor(_fetchGroupData)
+const _fetchGroupDataProvider = _FetchGroupDataFamily();
 
-/// See also [_getPages].
-class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
-  /// See also [_getPages].
-  const _GetPagesFamily();
+/// See also [_fetchGroupData].
+class _FetchGroupDataFamily extends Family<AsyncValue<Set<Group>>> {
+  /// See also [_fetchGroupData].
+  const _FetchGroupDataFamily();
 
-  /// See also [_getPages].
-  _GetPagesProvider call(
-    String code,
+  /// See also [_fetchGroupData].
+  _FetchGroupDataProvider call(
+    Iterable<String> uuids,
   ) {
-    return _GetPagesProvider(
-      code,
+    return _FetchGroupDataProvider(
+      uuids,
     );
   }
 
   @override
-  _GetPagesProvider getProviderOverride(
-    covariant _GetPagesProvider provider,
+  _FetchGroupDataProvider getProviderOverride(
+    covariant _FetchGroupDataProvider provider,
   ) {
     return call(
-      provider.code,
+      provider.uuids,
     );
   }
 
@@ -70,40 +70,41 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_getPagesProvider';
+  String? get name => r'_fetchGroupDataProvider';
 }
 
-/// See also [_getPages].
-class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
-  /// See also [_getPages].
-  _GetPagesProvider(
-    this.code,
+/// See also [_fetchGroupData].
+class _FetchGroupDataProvider extends AutoDisposeFutureProvider<Set<Group>> {
+  /// See also [_fetchGroupData].
+  _FetchGroupDataProvider(
+    this.uuids,
   ) : super.internal(
-          (ref) => _getPages(
+          (ref) => _fetchGroupData(
             ref,
-            code,
+            uuids,
           ),
-          from: _getPagesProvider,
-          name: r'_getPagesProvider',
+          from: _fetchGroupDataProvider,
+          name: r'_fetchGroupDataProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$getPagesHash,
-          dependencies: _GetPagesFamily._dependencies,
-          allTransitiveDependencies: _GetPagesFamily._allTransitiveDependencies,
+                  : _$fetchGroupDataHash,
+          dependencies: _FetchGroupDataFamily._dependencies,
+          allTransitiveDependencies:
+              _FetchGroupDataFamily._allTransitiveDependencies,
         );
 
-  final String code;
+  final Iterable<String> uuids;
 
   @override
   bool operator ==(Object other) {
-    return other is _GetPagesProvider && other.code == code;
+    return other is _FetchGroupDataProvider && other.uuids == uuids;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, code.hashCode);
+    hash = _SystemHash.combine(hash, uuids.hashCode);
 
     return _SystemHash.finish(hash);
   }

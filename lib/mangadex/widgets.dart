@@ -207,7 +207,7 @@ class ChapterFeedItem extends ConsumerWidget {
       child: ExtendedImage.network(state.coverArt,
           loadStateChanged: extendedImageLoadStateHandler,
           shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
           width: screenSizeSmall ? 64.0 : 128.0),
     );
 
@@ -679,7 +679,8 @@ class _GridMangaItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = Navigator.of(context);
     final Widget image = Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
       child: ExtendedImage.network(
         manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
@@ -840,19 +841,16 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                           height: 4.0,
                         ),
                         Wrap(
+                          spacing: 4.0,
                           runSpacing: 4.0,
                           children: [
                             ContentRatingChip(
                                 rating: manga.attributes.contentRating),
-                            const SizedBox(width: 2.0),
                             ...manga.attributes.tags
-                                .map((e) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 2.0),
-                                      child: IconTextChip(
-                                          text: Text(
-                                              e.attributes.name.get('en'))),
-                                    ))
+                                .map(
+                                  (e) => IconTextChip(
+                                      text: Text(e.attributes.name.get('en'))),
+                                )
                                 .toList(),
                           ],
                         ),
@@ -929,21 +927,19 @@ class _ListMangaItem extends ConsumerWidget {
                     height: 10,
                   ),
                   Wrap(
+                    spacing: 4.0,
                     runSpacing: 4.0,
                     children: [
                       ContentRatingChip(rating: manga.attributes.contentRating),
-                      const SizedBox(width: 2),
                       if (manga.attributes.tags.isNotEmpty)
                         ...manga.attributes.tags
                             .where((tag) =>
                                 (tag.attributes.group == TagGroup.genre ||
                                     tag.attributes.group == TagGroup.theme))
-                            .map((e) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 2),
-                                  child: IconTextChip(
-                                      text: Text(e.attributes.name.get('en'))),
-                                ))
+                            .map(
+                              (e) => IconTextChip(
+                                  text: Text(e.attributes.name.get('en'))),
+                            )
                             .toList(),
                     ],
                   ),

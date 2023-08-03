@@ -199,6 +199,8 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Wrap(
+          spacing: 4.0,
+          runSpacing: 4.0,
           children: children,
         ),
       ),
@@ -262,38 +264,36 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
         AsyncData(:final value) => () {
             final selectedFilters = [
               ...fil.value.includedTags
-                  .map((e) => Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: InputChip(
-                          label: Text(e.attributes.name.get('en')),
-                          avatar: const Icon(Icons.add),
-                          onDeleted: () {
-                            fil.value = fil.value.copyWith(
-                              includedTags: fil.value.includedTags
-                                  .where((element) => element != e)
-                                  .toSet(),
-                            );
-                          },
-                          backgroundColor: Colors.deepOrangeAccent,
-                        ),
-                      ))
+                  .map(
+                    (e) => InputChip(
+                      label: Text(e.attributes.name.get('en')),
+                      avatar: const Icon(Icons.add),
+                      onDeleted: () {
+                        fil.value = fil.value.copyWith(
+                          includedTags: fil.value.includedTags
+                              .where((element) => element != e)
+                              .toSet(),
+                        );
+                      },
+                      backgroundColor: Colors.deepOrangeAccent,
+                    ),
+                  )
                   .toList(),
               ...fil.value.excludedTags
-                  .map((e) => Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: InputChip(
-                          label: Text(e.attributes.name.get('en')),
-                          avatar: const Icon(Icons.remove),
-                          onDeleted: () {
-                            fil.value = fil.value.copyWith(
-                              excludedTags: fil.value.excludedTags
-                                  .where((element) => element != e)
-                                  .toSet(),
-                            );
-                          },
-                          backgroundColor: theme.primaryColor,
-                        ),
-                      ))
+                  .map(
+                    (e) => InputChip(
+                      label: Text(e.attributes.name.get('en')),
+                      avatar: const Icon(Icons.remove),
+                      onDeleted: () {
+                        fil.value = fil.value.copyWith(
+                          excludedTags: fil.value.excludedTags
+                              .where((element) => element != e)
+                              .toSet(),
+                        );
+                      },
+                      backgroundColor: theme.disabledColor,
+                    ),
+                  )
                   .toList()
             ];
 
@@ -311,6 +311,8 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
                       children: selectedFilters.isNotEmpty
                           ? selectedFilters
                           : [const InputChip(label: Text('None'))],
@@ -325,30 +327,29 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                       style: headingStyle,
                     ),
                     children: ContentRating.values
-                        .map((e) => Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: FilterChip(
-                                label: Text(e.formatted),
-                                selectedColor: Colors.deepOrangeAccent,
-                                selected: fil.value.contentRating.contains(e),
-                                onSelected: (bool value) {
-                                  if (value) {
-                                    fil.value = fil.value.copyWith(
-                                      contentRating: {
-                                        ...fil.value.contentRating,
-                                        e
-                                      },
-                                    );
-                                  } else {
-                                    fil.value = fil.value.copyWith(
-                                      contentRating: fil.value.contentRating
-                                          .where((element) => element != e)
-                                          .toSet(),
-                                    );
-                                  }
-                                },
-                              ),
-                            ))
+                        .map(
+                          (e) => FilterChip(
+                            label: Text(e.formatted),
+                            selectedColor: Colors.deepOrangeAccent,
+                            selected: fil.value.contentRating.contains(e),
+                            onSelected: (bool value) {
+                              if (value) {
+                                fil.value = fil.value.copyWith(
+                                  contentRating: {
+                                    ...fil.value.contentRating,
+                                    e
+                                  },
+                                );
+                              } else {
+                                fil.value = fil.value.copyWith(
+                                  contentRating: fil.value.contentRating
+                                      .where((element) => element != e)
+                                      .toSet(),
+                                );
+                              }
+                            },
+                          ),
+                        )
                         .toList(),
                   ),
 
@@ -359,9 +360,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                       style: headingStyle,
                     ),
                     children: MangaDemographic.values
-                        .map((e) => Padding(
-                            padding: const EdgeInsets.all(2),
-                            child: FilterChip(
+                        .map((e) => FilterChip(
                               label: Text(e.formatted),
                               selectedColor: Colors.deepOrangeAccent,
                               selected:
@@ -383,7 +382,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                                   );
                                 }
                               },
-                            )))
+                            ))
                         .toList(),
                   ),
 
@@ -395,27 +394,26 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                     ),
                     children: MangaStatus.values
                         .skip(1)
-                        .map((e) => Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: FilterChip(
-                                label: Text(e.formatted),
-                                selectedColor: Colors.deepOrangeAccent,
-                                selected: fil.value.status.contains(e),
-                                onSelected: (bool value) {
-                                  if (value) {
-                                    fil.value = fil.value.copyWith(
-                                      status: {...fil.value.status, e},
-                                    );
-                                  } else {
-                                    fil.value = fil.value.copyWith(
-                                      status: fil.value.status
-                                          .where((element) => element != e)
-                                          .toSet(),
-                                    );
-                                  }
-                                },
-                              ),
-                            ))
+                        .map(
+                          (e) => FilterChip(
+                            label: Text(e.formatted),
+                            selectedColor: Colors.deepOrangeAccent,
+                            selected: fil.value.status.contains(e),
+                            onSelected: (bool value) {
+                              if (value) {
+                                fil.value = fil.value.copyWith(
+                                  status: {...fil.value.status, e},
+                                );
+                              } else {
+                                fil.value = fil.value.copyWith(
+                                  status: fil.value.status
+                                      .where((element) => element != e)
+                                      .toSet(),
+                                );
+                              }
+                            },
+                          ),
+                        )
                         .toList(),
                   ),
 
@@ -428,61 +426,60 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                       ),
                       children: value
                           .where((element) => element.attributes.group == group)
-                          .map((e) => Padding(
-                                padding: const EdgeInsets.all(2),
-                                child: TriStateChip(
-                                  label: Text(e.attributes.name.get('en')),
-                                  selectedColor: Colors.deepOrangeAccent,
-                                  unselectedColor: theme.primaryColor,
-                                  onChanged: (bool? value) {
-                                    switch (value) {
-                                      case null:
-                                        fil.value = fil.value.copyWith(
-                                          includedTags: fil.value.includedTags
-                                              .where((element) => element != e)
-                                              .toSet(),
-                                          excludedTags: fil.value.excludedTags
-                                              .where((element) => element != e)
-                                              .toSet(),
-                                        );
-                                        break;
-                                      case true:
-                                        fil.value = fil.value.copyWith(
-                                          includedTags: {
-                                            ...fil.value.includedTags,
-                                            e
-                                          },
-                                          excludedTags: fil.value.excludedTags
-                                              .where((element) => element != e)
-                                              .toSet(),
-                                        );
-                                        break;
-                                      case false:
-                                        fil.value = fil.value.copyWith(
-                                          includedTags: fil.value.includedTags
-                                              .where((element) => element != e)
-                                              .toSet(),
-                                          excludedTags: {
-                                            ...fil.value.excludedTags,
-                                            e
-                                          },
-                                        );
-                                        break;
-                                    }
-                                  },
-                                  value: () {
-                                    if (fil.value.includedTags.contains(e)) {
-                                      return true;
-                                    }
+                          .map(
+                            (e) => TriStateChip(
+                              label: Text(e.attributes.name.get('en')),
+                              selectedColor: Colors.deepOrangeAccent,
+                              unselectedColor: theme.disabledColor,
+                              onChanged: (bool? value) {
+                                switch (value) {
+                                  case null:
+                                    fil.value = fil.value.copyWith(
+                                      includedTags: fil.value.includedTags
+                                          .where((element) => element != e)
+                                          .toSet(),
+                                      excludedTags: fil.value.excludedTags
+                                          .where((element) => element != e)
+                                          .toSet(),
+                                    );
+                                    break;
+                                  case true:
+                                    fil.value = fil.value.copyWith(
+                                      includedTags: {
+                                        ...fil.value.includedTags,
+                                        e
+                                      },
+                                      excludedTags: fil.value.excludedTags
+                                          .where((element) => element != e)
+                                          .toSet(),
+                                    );
+                                    break;
+                                  case false:
+                                    fil.value = fil.value.copyWith(
+                                      includedTags: fil.value.includedTags
+                                          .where((element) => element != e)
+                                          .toSet(),
+                                      excludedTags: {
+                                        ...fil.value.excludedTags,
+                                        e
+                                      },
+                                    );
+                                    break;
+                                }
+                              },
+                              value: () {
+                                if (fil.value.includedTags.contains(e)) {
+                                  return true;
+                                }
 
-                                    if (fil.value.excludedTags.contains(e)) {
-                                      return false;
-                                    }
+                                if (fil.value.excludedTags.contains(e)) {
+                                  return false;
+                                }
 
-                                    return null;
-                                  }(),
-                                ),
-                              ))
+                                return null;
+                              }(),
+                            ),
+                          )
                           .toList(),
                     ),
                   ]
