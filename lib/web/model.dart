@@ -21,7 +21,7 @@ class ProxyHandler {
   final Ref ref;
   final http.Client _client = http.Client();
 
-  Future<ProxyInfo?> parseUrl(String url) async {
+  ProxyInfo? parseUrl(String url) {
     var src = url.substring(24);
     var proxy = src.split('/');
     proxy.removeWhere((element) => element.isEmpty);
@@ -30,12 +30,11 @@ class ProxyHandler {
       return null;
     }
 
-    final p = ProxyInfo(proxy: proxy[0], code: proxy[1]);
     if (proxy.length >= 3) {
-      p.chapter = proxy[2];
+      return ProxyInfo(proxy: proxy[0], code: proxy[1], chapter: proxy[2]);
     }
 
-    return p;
+    return ProxyInfo(proxy: proxy[0], code: proxy[1]);
   }
 
   Future<ProxyData> handleProxy(ProxyInfo info) async {

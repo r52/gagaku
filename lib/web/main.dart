@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/web/manga_view.dart';
 import 'package:gagaku/web/model.dart';
 import 'package:gagaku/web/reader.dart';
 import 'package:gagaku/web/types.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebSourcesHome extends HookConsumerWidget {
@@ -17,23 +17,28 @@ class WebSourcesHome extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final urlFieldController = useTextEditingController();
     final scrollController = useScrollController();
-    final nav = Navigator.of(context);
     final history = ref.watch(webSourceHistoryProvider);
 
-    Future<void> openManga(WebManga manga) async {
-      nav.push(createMangaViewRoute(manga));
+    void openManga(ProxyInfo info, WebManga manga) {
+      context.push('/read/${info.proxy}/${info.code}', extra: manga);
+    }
+
+    void openChapter(ProxyInfo info, {WebReaderData? data}) {
+      context.push('/read/${info.proxy}/${info.code}/${info.chapter}/1/',
+          extra: data);
     }
 
     Future<HistoryLink?> parseUrl(String url) async {
       if (url.startsWith('https://imgur.com/a/')) {
         final src = url.substring(20);
         final code = '/read/api/imgur/chapter/$src';
-        await nav.push(createWebSourceReaderRoute(code));
+        context.push('/read/imgur/$src/1/1/',
+            extra: WebReaderData(source: code));
         return HistoryLink(title: url, url: url);
       }
 
       if (url.startsWith('https://cubari.moe/read/')) {
-        final info = await api.parseUrl(url);
+        final info = api.parseUrl(url);
 
         if (info == null) {
           return null;
@@ -42,14 +47,19 @@ class WebSourcesHome extends HookConsumerWidget {
         final proxy = await api.handleProxy(info);
 
         if (proxy.code != null) {
-          await nav.push(createWebSourceReaderRoute(proxy.code!));
+          openChapter(info, data: WebReaderData(source: proxy.code!));
           return HistoryLink(title: '${info.proxy}: ${proxy.code}', url: url);
         }
 
         if (proxy.manga != null) {
-          await openManga(proxy.manga!);
+          if (info.chapter != null) {
+            openChapter(info);
+          } else {
+            openManga(info, proxy.manga!);
+          }
           return HistoryLink(
-              title: '${info.proxy}: ${proxy.manga?.title}', url: url);
+              title: '${info.proxy}: ${proxy.manga?.title}',
+              url: info.getURL());
         }
       }
 

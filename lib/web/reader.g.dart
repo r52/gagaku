@@ -6,7 +6,8 @@ part of 'reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getPagesHash() => r'dd2d588d01548fc382730f7c547fd2bfbe4e87ce';
+String _$fetchWebChapterInfoHash() =>
+    r'cf87975439b58e5f8cd01a876f22fea085e1e723';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,6 +30,89 @@ class _SystemHash {
   }
 }
 
+typedef _FetchWebChapterInfoRef = AutoDisposeFutureProviderRef<WebReaderData>;
+
+/// See also [_fetchWebChapterInfo].
+@ProviderFor(_fetchWebChapterInfo)
+const _fetchWebChapterInfoProvider = _FetchWebChapterInfoFamily();
+
+/// See also [_fetchWebChapterInfo].
+class _FetchWebChapterInfoFamily extends Family<AsyncValue<WebReaderData>> {
+  /// See also [_fetchWebChapterInfo].
+  const _FetchWebChapterInfoFamily();
+
+  /// See also [_fetchWebChapterInfo].
+  _FetchWebChapterInfoProvider call(
+    ProxyInfo info,
+  ) {
+    return _FetchWebChapterInfoProvider(
+      info,
+    );
+  }
+
+  @override
+  _FetchWebChapterInfoProvider getProviderOverride(
+    covariant _FetchWebChapterInfoProvider provider,
+  ) {
+    return call(
+      provider.info,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchWebChapterInfoProvider';
+}
+
+/// See also [_fetchWebChapterInfo].
+class _FetchWebChapterInfoProvider
+    extends AutoDisposeFutureProvider<WebReaderData> {
+  /// See also [_fetchWebChapterInfo].
+  _FetchWebChapterInfoProvider(
+    this.info,
+  ) : super.internal(
+          (ref) => _fetchWebChapterInfo(
+            ref,
+            info,
+          ),
+          from: _fetchWebChapterInfoProvider,
+          name: r'_fetchWebChapterInfoProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchWebChapterInfoHash,
+          dependencies: _FetchWebChapterInfoFamily._dependencies,
+          allTransitiveDependencies:
+              _FetchWebChapterInfoFamily._allTransitiveDependencies,
+        );
+
+  final ProxyInfo info;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchWebChapterInfoProvider && other.info == info;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, info.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$getPagesHash() => r'dd2d588d01548fc382730f7c547fd2bfbe4e87ce';
 typedef _GetPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
 
 /// See also [_getPages].

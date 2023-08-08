@@ -18,6 +18,8 @@ import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
 import 'package:gagaku/web/main.dart';
+import 'package:gagaku/web/manga_view.dart';
+import 'package:gagaku/web/reader.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -212,7 +214,16 @@ class _AppState extends State<App> {
           return const WebSourcesHome();
         },
         routes: <RouteBase>[
-          // TODO
+          GoRoute(
+            path: GagakuRoute.webManga,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: buildWebMangaViewPage,
+          ),
+          GoRoute(
+            path: GagakuRoute.webMangaFull,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: buildWebReaderPage,
+          ),
         ],
       ),
     ],
