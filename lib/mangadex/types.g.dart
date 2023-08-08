@@ -377,6 +377,20 @@ Map<String, dynamic> _$$_GroupListToJson(_$_GroupList instance) =>
       'total': instance.total,
     };
 
+_$_CreatorListList _$$_CreatorListListFromJson(Map<String, dynamic> json) =>
+    _$_CreatorListList(
+      (json['data'] as List<dynamic>)
+          .map((e) => Author.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      json['total'] as int,
+    );
+
+Map<String, dynamic> _$$_CreatorListListToJson(_$_CreatorListList instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'total': instance.total,
+    };
+
 _$_Manga _$$_MangaFromJson(Map<String, dynamic> json) => _$_Manga(
       id: json['id'] as String,
       attributes:

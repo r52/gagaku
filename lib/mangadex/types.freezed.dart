@@ -4670,6 +4670,177 @@ abstract class _GroupList implements GroupList {
       throw _privateConstructorUsedError;
 }
 
+CreatorList _$CreatorListFromJson(Map<String, dynamic> json) {
+  return _CreatorListList.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CreatorList {
+  List<Author> get data => throw _privateConstructorUsedError;
+  int get total => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CreatorListCopyWith<CreatorList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CreatorListCopyWith<$Res> {
+  factory $CreatorListCopyWith(
+          CreatorList value, $Res Function(CreatorList) then) =
+      _$CreatorListCopyWithImpl<$Res, CreatorList>;
+  @useResult
+  $Res call({List<Author> data, int total});
+}
+
+/// @nodoc
+class _$CreatorListCopyWithImpl<$Res, $Val extends CreatorList>
+    implements $CreatorListCopyWith<$Res> {
+  _$CreatorListCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Author>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_CreatorListListCopyWith<$Res>
+    implements $CreatorListCopyWith<$Res> {
+  factory _$$_CreatorListListCopyWith(
+          _$_CreatorListList value, $Res Function(_$_CreatorListList) then) =
+      __$$_CreatorListListCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<Author> data, int total});
+}
+
+/// @nodoc
+class __$$_CreatorListListCopyWithImpl<$Res>
+    extends _$CreatorListCopyWithImpl<$Res, _$_CreatorListList>
+    implements _$$_CreatorListListCopyWith<$Res> {
+  __$$_CreatorListListCopyWithImpl(
+      _$_CreatorListList _value, $Res Function(_$_CreatorListList) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_$_CreatorListList(
+      null == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Author>,
+      null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$_CreatorListList
+    with DiagnosticableTreeMixin
+    implements _CreatorListList {
+  const _$_CreatorListList(final List<Author> data, this.total) : _data = data;
+
+  factory _$_CreatorListList.fromJson(Map<String, dynamic> json) =>
+      _$$_CreatorListListFromJson(json);
+
+  final List<Author> _data;
+  @override
+  List<Author> get data {
+    if (_data is EqualUnmodifiableListView) return _data;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_data);
+  }
+
+  @override
+  final int total;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'CreatorList(data: $data, total: $total)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CreatorList'))
+      ..add(DiagnosticsProperty('data', data))
+      ..add(DiagnosticsProperty('total', total));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_CreatorListList &&
+            const DeepCollectionEquality().equals(other._data, _data) &&
+            (identical(other.total, total) || other.total == total));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_data), total);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_CreatorListListCopyWith<_$_CreatorListList> get copyWith =>
+      __$$_CreatorListListCopyWithImpl<_$_CreatorListList>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_CreatorListListToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CreatorListList implements CreatorList {
+  const factory _CreatorListList(final List<Author> data, final int total) =
+      _$_CreatorListList;
+
+  factory _CreatorListList.fromJson(Map<String, dynamic> json) =
+      _$_CreatorListList.fromJson;
+
+  @override
+  List<Author> get data;
+  @override
+  int get total;
+  @override
+  @JsonKey(ignore: true)
+  _$$_CreatorListListCopyWith<_$_CreatorListList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Manga _$MangaFromJson(Map<String, dynamic> json) {
   return _Manga.fromJson(json);
 }

@@ -6,6 +6,7 @@ import 'package:gagaku/reader/controller_hooks.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -66,7 +67,6 @@ class ReaderWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final mediaContext = MediaQuery.of(context);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
@@ -205,7 +205,9 @@ class ReaderWidget extends HookConsumerWidget {
           if (currentPage.value < pageCount - 1) {
             jumpToNextPage();
           } else {
-            nav.pop();
+            if (context.canPop()) {
+              context.pop();
+            }
           }
           break;
         case ReaderDirection.topToBottom:
@@ -225,7 +227,9 @@ class ReaderWidget extends HookConsumerWidget {
           if (currentPage.value < pageCount - 1) {
             jumpToNextPage();
           } else {
-            nav.pop();
+            if (context.canPop()) {
+              context.pop();
+            }
           }
           break;
         case ReaderDirection.rightToLeft:
@@ -281,7 +285,9 @@ class ReaderWidget extends HookConsumerWidget {
 
         if (max != null) {
           if (max.index == pageCount - 1 && max.itemTrailingEdge == 1.0) {
-            nav.pop();
+            if (context.canPop()) {
+              context.pop();
+            }
           } else {
             scrollOffsetController.animateScroll(
                 offset: offset, duration: const Duration(milliseconds: 50));
@@ -302,7 +308,9 @@ class ReaderWidget extends HookConsumerWidget {
             if (currentPage.value < pageCount - 1) {
               jumpToNextPage();
             } else {
-              nav.pop();
+              if (context.canPop()) {
+                context.pop();
+              }
             }
           }
           break;
@@ -392,7 +400,15 @@ class ReaderWidget extends HookConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: AppBar(
-        leading: const BackButton(),
+        leading: context.canPop()
+            ? BackButton(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  }
+                },
+              )
+            : null,
         title: ListTile(
           title: Text(
             title,
@@ -422,9 +438,15 @@ class ReaderWidget extends HookConsumerWidget {
               (link != null
                   ? TextButton(
                       onPressed: () {
-                        nav
-                          ..pop()
-                          ..pop();
+                        // First one pops the drawer
+                        if (context.canPop()) {
+                          context.pop();
+                        }
+
+                        // Second one pops the reader
+                        if (context.canPop()) {
+                          context.pop();
+                        }
 
                         if (onLinkPressed != null) {
                           onLinkPressed!();

@@ -86,6 +86,9 @@ abstract class MangaDexEndpoints {
 
   /// Gets scanlation group info
   static const group = '/group';
+
+  /// Gets author/creator info
+  static const creator = '/author';
 }
 
 abstract class CacheLists {
@@ -1243,6 +1246,57 @@ class MangaDexModel {
     for (final id in uuids) {
       if (_cache.exists(id)) {
         list.add(_cache.get<Group>(id));
+      }
+    }
+
+    return list;
+  }
+
+  /// Fetches group info of the given group [uuids]
+  Future<List<CreatorType>> fetchCreators(Iterable<String> uuids) async {
+    final list = <CreatorType>[];
+
+    final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
+
+    if (fetch.isNotEmpty) {
+      int start = 0, end = 0;
+
+      var queryParams = <String, dynamic>{
+        'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+      };
+
+      while (end < fetch.length) {
+        start = end;
+        end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
+
+        queryParams['ids[]'] = fetch.getRange(start, end);
+
+        final uri = MangaDexEndpoints.api.replace(
+            path: MangaDexEndpoints.creator, queryParameters: queryParams);
+
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> body = json.decode(response.body);
+
+          final result = CreatorList.fromJson(body);
+
+          // Cache the data
+          _cache.putAllAPIResolved(result.data);
+        } else {
+          // Throw if failure
+          final msg =
+              "fetchGroups() failed. Response code: ${response.statusCode}";
+          logger.e(msg, error: response.body);
+          throw Exception(msg);
+        }
+      }
+    }
+
+    // Craft the list
+    for (final id in uuids) {
+      if (_cache.exists(id)) {
+        list.add(_cache.get<CreatorType>(id));
       }
     }
 

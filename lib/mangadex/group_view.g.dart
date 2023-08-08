@@ -6,7 +6,7 @@ part of 'group_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchGroupFeedHash() => r'2accd66c235ba80d1b919b2fe8e0299eb984ae5d';
+String _$fetchGroupFromIdHash() => r'e3d4cc80e72975244b843d666e4bc7876ba2132c';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,6 +29,88 @@ class _SystemHash {
   }
 }
 
+typedef _FetchGroupFromIdRef = AutoDisposeFutureProviderRef<Group>;
+
+/// See also [_fetchGroupFromId].
+@ProviderFor(_fetchGroupFromId)
+const _fetchGroupFromIdProvider = _FetchGroupFromIdFamily();
+
+/// See also [_fetchGroupFromId].
+class _FetchGroupFromIdFamily extends Family<AsyncValue<Group>> {
+  /// See also [_fetchGroupFromId].
+  const _FetchGroupFromIdFamily();
+
+  /// See also [_fetchGroupFromId].
+  _FetchGroupFromIdProvider call(
+    String groupId,
+  ) {
+    return _FetchGroupFromIdProvider(
+      groupId,
+    );
+  }
+
+  @override
+  _FetchGroupFromIdProvider getProviderOverride(
+    covariant _FetchGroupFromIdProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchGroupFromIdProvider';
+}
+
+/// See also [_fetchGroupFromId].
+class _FetchGroupFromIdProvider extends AutoDisposeFutureProvider<Group> {
+  /// See also [_fetchGroupFromId].
+  _FetchGroupFromIdProvider(
+    this.groupId,
+  ) : super.internal(
+          (ref) => _fetchGroupFromId(
+            ref,
+            groupId,
+          ),
+          from: _fetchGroupFromIdProvider,
+          name: r'_fetchGroupFromIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchGroupFromIdHash,
+          dependencies: _FetchGroupFromIdFamily._dependencies,
+          allTransitiveDependencies:
+              _FetchGroupFromIdFamily._allTransitiveDependencies,
+        );
+
+  final String groupId;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchGroupFromIdProvider && other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$fetchGroupFeedHash() => r'2accd66c235ba80d1b919b2fe8e0299eb984ae5d';
 typedef _FetchGroupFeedRef
     = AutoDisposeFutureProviderRef<List<ChapterFeedItemData>>;
 

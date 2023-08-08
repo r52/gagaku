@@ -6,8 +6,8 @@ part of 'creator_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchCreatorTitlesHash() =>
-    r'efd02209a7239c89af2fdf44b2e5db30b1626f4f';
+String _$fetchCreatorFromIdHash() =>
+    r'de996798e5488880f40df3da59b157931b1d0e6d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,6 +30,90 @@ class _SystemHash {
   }
 }
 
+typedef _FetchCreatorFromIdRef = AutoDisposeFutureProviderRef<CreatorType>;
+
+/// See also [_fetchCreatorFromId].
+@ProviderFor(_fetchCreatorFromId)
+const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily();
+
+/// See also [_fetchCreatorFromId].
+class _FetchCreatorFromIdFamily extends Family<AsyncValue<CreatorType>> {
+  /// See also [_fetchCreatorFromId].
+  const _FetchCreatorFromIdFamily();
+
+  /// See also [_fetchCreatorFromId].
+  _FetchCreatorFromIdProvider call(
+    String creatorId,
+  ) {
+    return _FetchCreatorFromIdProvider(
+      creatorId,
+    );
+  }
+
+  @override
+  _FetchCreatorFromIdProvider getProviderOverride(
+    covariant _FetchCreatorFromIdProvider provider,
+  ) {
+    return call(
+      provider.creatorId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchCreatorFromIdProvider';
+}
+
+/// See also [_fetchCreatorFromId].
+class _FetchCreatorFromIdProvider
+    extends AutoDisposeFutureProvider<CreatorType> {
+  /// See also [_fetchCreatorFromId].
+  _FetchCreatorFromIdProvider(
+    this.creatorId,
+  ) : super.internal(
+          (ref) => _fetchCreatorFromId(
+            ref,
+            creatorId,
+          ),
+          from: _fetchCreatorFromIdProvider,
+          name: r'_fetchCreatorFromIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchCreatorFromIdHash,
+          dependencies: _FetchCreatorFromIdFamily._dependencies,
+          allTransitiveDependencies:
+              _FetchCreatorFromIdFamily._allTransitiveDependencies,
+        );
+
+  final String creatorId;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchCreatorFromIdProvider && other.creatorId == creatorId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, creatorId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$fetchCreatorTitlesHash() =>
+    r'efd02209a7239c89af2fdf44b2e5db30b1626f4f';
 typedef _FetchCreatorTitlesRef = AutoDisposeFutureProviderRef<Iterable<Manga>>;
 
 /// See also [_fetchCreatorTitles].
