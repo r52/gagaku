@@ -166,6 +166,9 @@ class MangaDexReaderWidget extends HookConsumerWidget {
         final loggedin = await ref.read(authControlProvider.future);
 
         if (loggedin) {
+          // One more redundant read here for direct-linked chapters
+          await ref.read(readChaptersProvider.notifier).get([manga]);
+
           final readData = await ref.read(readChaptersProvider.future);
 
           if (readData[manga.id]?.contains(chapter.id) != true) {
