@@ -19,7 +19,7 @@ class WebSourcesHome extends HookConsumerWidget {
     final scrollController = useScrollController();
     final history = ref.watch(webSourceHistoryProvider);
 
-    Future<bool> parseUrl(String url) async {
+    bool parseUrl(String url) {
       if (url.startsWith('https://imgur.com/a/')) {
         final src = url.substring(20);
         final code = '/read/api/imgur/chapter/$src';
@@ -92,7 +92,7 @@ class WebSourcesHome extends HookConsumerWidget {
           });
 
       if (result != null) {
-        final parseResult = await parseUrl(result);
+        final parseResult = parseUrl(result);
 
         if (!parseResult) {
           messenger
@@ -223,9 +223,9 @@ class WebSourcesHome extends HookConsumerWidget {
                         ),
                         title: Text(item.title),
                         textColor: Colors.blue,
-                        onTap: () async {
+                        onTap: () {
                           final messenger = ScaffoldMessenger.of(context);
-                          final parseResult = await parseUrl(item.url);
+                          final parseResult = parseUrl(item.url);
 
                           if (!parseResult) {
                             messenger
