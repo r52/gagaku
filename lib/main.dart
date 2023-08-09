@@ -89,7 +89,7 @@ class _AppState extends State<App> {
   late final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: !kReleaseMode,
     routes: <RouteBase>[
       // MD endpoints
       GoRoute(
@@ -126,6 +126,13 @@ class _AppState extends State<App> {
         path: GagakuRoute.creatorAlt,
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: buildCreatorViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.login,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (BuildContext context, GoRouterState state) {
+          return const MangaDexLoginScreen();
+        },
       ),
       // Main mangadex page
       ShellRoute(
@@ -190,12 +197,6 @@ class _AppState extends State<App> {
               return MangaDexHistoryFeed(
                 controller: _controllers[4],
               );
-            },
-          ),
-          GoRoute(
-            path: GagakuRoute.login,
-            builder: (BuildContext context, GoRouterState state) {
-              return const MangaDexLoginScreen();
             },
           ),
         ],

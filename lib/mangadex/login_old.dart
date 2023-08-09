@@ -50,7 +50,6 @@ class MangaDexLoginScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final usernameController = useTextEditingController();
     final passwordController = useTextEditingController();
     final usernameIsEmpty = useListenableSelector(
@@ -111,13 +110,14 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                   onPressed: () {
                     usernameController.clear();
                     passwordController.clear();
-                    nav.pop();
+                    context.pop();
                   },
                 ),
                 ElevatedButton(
                   onPressed: (usernameIsEmpty || passwordIsEmpty)
                       ? null
                       : () async {
+                          final router = GoRouter.of(context);
                           final messenger = ScaffoldMessenger.of(context);
 
                           if (usernameController.text.isNotEmpty &&
@@ -128,7 +128,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                     passwordController.text);
 
                             if (loginSuccess) {
-                              nav.pop();
+                              router.pop();
                               usernameController.clear();
                               passwordController.clear();
                             } else {
