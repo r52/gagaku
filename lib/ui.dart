@@ -361,6 +361,32 @@ class Styles {
     );
   }
 
+  static Widget scaledSharedAxisTransitionBuilder(
+          BuildContext context,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+          Widget child) =>
+      SharedAxisTransition(
+        fillColor: Theme.of(context).cardColor,
+        animation: animation,
+        secondaryAnimation: secondaryAnimation,
+        transitionType: SharedAxisTransitionType.scaled,
+        child: child,
+      );
+
+  static Widget horizontalSharedAxisTransitionBuilder(
+          BuildContext context,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+          Widget child) =>
+      SharedAxisTransition(
+        fillColor: Theme.of(context).cardColor,
+        animation: animation,
+        secondaryAnimation: secondaryAnimation,
+        transitionType: SharedAxisTransitionType.horizontal,
+        child: child,
+      );
+
   static Route<T> buildSlideTransitionRoute<T>(RoutePageBuilder builder) {
     return PageRouteBuilder<T>(
       pageBuilder: builder,

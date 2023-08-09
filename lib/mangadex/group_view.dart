@@ -7,6 +7,8 @@ import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,13 +17,33 @@ part 'group_view.g.dart';
 
 enum _ViewType { info, feed, titles }
 
-Route createGroupViewRoute(Group group) {
-  return Styles.buildSharedAxisTransitionRoute(
-    (context, animation, secondaryAnimation) => MangaDexGroupViewWidget(
+Page<dynamic> buildGroupViewPage(BuildContext context, GoRouterState state) {
+  final group = state.extra.asOrNull<Group>();
+
+  Widget child;
+
+  if (group != null) {
+    child = MangaDexGroupViewWidget(
       group: group,
-    ),
-    SharedAxisTransitionType.scaled,
+    );
+  } else {
+    child = QueriedMangaDexGroupViewWidget(
+        groupId: state.pathParameters['groupId']!);
+  }
+
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
+}
+
+@riverpod
+Future<Group> _fetchGroupFromId(
+    _FetchGroupFromIdRef ref, String groupId) async {
+  final api = ref.watch(mangadexProvider);
+  final group = await api.fetchGroups([groupId]);
+  return group.first;
 }
 
 @riverpod
@@ -77,6 +99,41 @@ Future<Iterable<Manga>> _fetchGroupTitles(
   ref.keepAlive();
 
   return mangas;
+}
+
+class QueriedMangaDexGroupViewWidget extends ConsumerWidget {
+  const QueriedMangaDexGroupViewWidget({super.key, required this.groupId});
+
+  final String groupId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final group = ref.watch(_fetchGroupFromIdProvider(groupId));
+
+    Widget child;
+
+    switch (group) {
+      case AsyncData(:final value):
+        return MangaDexGroupViewWidget(
+          group: value,
+        );
+      case AsyncError(:final error, :final stackTrace):
+        final messenger = ScaffoldMessenger.of(context);
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e("_fetchGroupFromIdProvider($groupId) failed",
+            error: error, stackTrace: stackTrace);
+
+        child = Styles.errorColumn(error, stackTrace);
+        break;
+      case _:
+        child = Styles.listSpinner;
+        break;
+    }
+
+    return Scaffold(
+      body: child,
+    );
+  }
 }
 
 class MangaDexGroupViewWidget extends HookConsumerWidget {
@@ -179,6 +236,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         ],
       ),
       Consumer(
+        key: const Key('/group?tab=feed'),
         builder: (context, ref, child) {
           return ChapterFeedWidget(
             provider: _fetchGroupFeedProvider(group),
@@ -197,6 +255,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         },
       ),
       Consumer(
+        key: const Key('/group?tab=titles'),
         builder: (context, ref, child) {
           final mangas = ref.watch(_fetchGroupTitlesProvider(group));
           final isLoading = ref.watch(groupTitlesProvider(group)).isLoading;
@@ -259,6 +318,15 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
         flexibleSpace: GestureDetector(
           onTap: () {
             controllers[view.value.index].animateTo(0.0,

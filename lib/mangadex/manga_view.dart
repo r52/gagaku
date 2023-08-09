@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/mangadex/creator_view.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,13 +18,33 @@ part 'manga_view.g.dart';
 
 enum _ViewType { chapters, art }
 
-Route createMangaViewRoute(Manga manga) {
-  return Styles.buildSharedAxisTransitionRoute(
-    (context, animation, secondaryAnimation) => MangaDexMangaViewWidget(
+Page<dynamic> buildMangaViewPage(BuildContext context, GoRouterState state) {
+  final manga = state.extra.asOrNull<Manga>();
+
+  Widget child;
+
+  if (manga != null) {
+    child = MangaDexMangaViewWidget(
       manga: manga,
-    ),
-    SharedAxisTransitionType.scaled,
+    );
+  } else {
+    child = QueriedMangaDexMangaViewWidget(
+        mangaId: state.pathParameters['mangaId']!);
+  }
+
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
+}
+
+@riverpod
+Future<Manga> _fetchMangaFromId(
+    _FetchMangaFromIdRef ref, String mangaId) async {
+  final api = ref.watch(mangadexProvider);
+  final manga = await api.fetchManga(ids: [mangaId]);
+  return manga.first;
 }
 
 @riverpod
@@ -43,6 +63,41 @@ Future<void> _fetchReadChaptersRedun(
   await ref.watch(statisticsProvider.notifier).get([manga]);
 }
 
+class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
+  const QueriedMangaDexMangaViewWidget({super.key, required this.mangaId});
+
+  final String mangaId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final manga = ref.watch(_fetchMangaFromIdProvider(mangaId));
+
+    Widget child;
+
+    switch (manga) {
+      case AsyncData(:final value):
+        return MangaDexMangaViewWidget(
+          manga: value,
+        );
+      case AsyncError(:final error, :final stackTrace):
+        final messenger = ScaffoldMessenger.of(context);
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e("_fetchMangaFromIdProvider($mangaId) failed",
+            error: error, stackTrace: stackTrace);
+
+        child = Styles.errorColumn(error, stackTrace);
+        break;
+      case _:
+        child = Styles.listSpinner;
+        break;
+    }
+
+    return Scaffold(
+      body: child,
+    );
+  }
+}
+
 class MangaDexMangaViewWidget extends HookConsumerWidget {
   const MangaDexMangaViewWidget({super.key, required this.manga});
 
@@ -50,7 +105,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     final scrollController = useScrollController();
     final theme = Theme.of(context);
@@ -144,6 +198,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               snap: false,
               floating: false,
               expandedHeight: 200.0,
+              leading: BackButton(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/');
+                  }
+                },
+              ),
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   manga.attributes.title.get('en'),
@@ -606,7 +669,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 .map((e) => ButtonChip(
                                       text: Text(e.attributes.name),
                                       onPressed: () {
-                                        nav.push(createCreatorViewRoute(e));
+                                        context.push('/author/${e.id}',
+                                            extra: e);
                                       },
                                     ))
                                 .toList(),
@@ -629,7 +693,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 .map((e) => ButtonChip(
                                       text: Text(e.attributes.name),
                                       onPressed: () {
-                                        nav.push(createCreatorViewRoute(e));
+                                        context.push('/author/${e.id}',
+                                            extra: e);
                                       },
                                     ))
                                 .toList(),

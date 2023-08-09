@@ -1,19 +1,56 @@
-import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
+import 'package:gagaku/web/model.dart';
 import 'package:gagaku/web/reader.dart';
 import 'package:gagaku/web/types.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-Route createMangaViewRoute(WebManga manga) {
-  return Styles.buildSharedAxisTransitionRoute(
-    (context, animation, secondaryAnimation) => WebMangaViewWidget(
+part 'manga_view.g.dart';
+
+Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
+  final manga = state.extra.asOrNull<WebManga>();
+
+  Widget child;
+
+  if (manga != null) {
+    child = WebMangaViewWidget(
       manga: manga,
-    ),
-    SharedAxisTransitionType.scaled,
+      info: ProxyInfo(
+          proxy: state.pathParameters['proxy']!,
+          code: state.pathParameters['code']!),
+    );
+  } else {
+    child = QueriedWebMangaViewWidget(
+        proxy: state.pathParameters['proxy']!,
+        code: state.pathParameters['code']!);
+  }
+
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
+}
+
+@riverpod
+Future<WebManga> _fetchWebMangaInfo(
+    _FetchWebMangaInfoRef ref, ProxyInfo info) async {
+  final api = ref.watch(proxyProvider);
+  final proxy = await api.handleProxy(info);
+
+  if (proxy.manga != null) {
+    ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(
+        title: '${info.proxy}: ${proxy.manga?.title}', url: info.getURL()));
+    return proxy.manga!;
+  }
+
+  throw Exception('Invalid WebManga link. Data not found.');
 }
 
 class ChapterEntry {
@@ -23,10 +60,48 @@ class ChapterEntry {
   final WebChapter chapter;
 }
 
+class QueriedWebMangaViewWidget extends ConsumerWidget {
+  const QueriedWebMangaViewWidget(
+      {super.key, required this.proxy, required this.code});
+
+  final String proxy;
+  final String code;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final info = ProxyInfo(proxy: proxy, code: code);
+    final manga = ref.watch(_fetchWebMangaInfoProvider(info));
+
+    Widget child;
+
+    switch (manga) {
+      case AsyncData(:final value):
+        return WebMangaViewWidget(manga: value, info: info);
+      case AsyncError(:final error, :final stackTrace):
+        final messenger = ScaffoldMessenger.of(context);
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e("_fetchWebMangaInfoProvider($proxy/$code) failed",
+            error: error, stackTrace: stackTrace);
+
+        child = Styles.errorColumn(error, stackTrace);
+        break;
+      case _:
+        child = Styles.listSpinner;
+        break;
+    }
+
+    return Scaffold(
+      body: child,
+    );
+  }
+}
+
 class WebMangaViewWidget extends StatelessWidget {
-  const WebMangaViewWidget({super.key, required this.manga});
+  const WebMangaViewWidget(
+      {super.key, required this.manga, required this.info});
 
   final WebManga manga;
+  final ProxyInfo info;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +120,12 @@ class WebMangaViewWidget extends StatelessWidget {
             pinned: true,
             snap: false,
             floating: false,
-            expandedHeight: 180.0,
+            expandedHeight: 200.0,
+            leading: context.canPop()
+                ? BackButton(
+                    onPressed: () => context.pop(),
+                  )
+                : null,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 manga.title,
@@ -145,6 +225,7 @@ class WebMangaViewWidget extends StatelessWidget {
                   name: e.name,
                   chapter: e.chapter,
                   manga: manga,
+                  info: info,
                   link: Text(
                     manga.title,
                     style: const TextStyle(fontSize: 24),
@@ -166,6 +247,7 @@ class ChapterButtonWidget extends StatelessWidget {
     required this.name,
     required this.chapter,
     required this.manga,
+    required this.info,
     this.link,
     this.onLinkPressed,
   });
@@ -173,20 +255,16 @@ class ChapterButtonWidget extends StatelessWidget {
   final String name;
   final WebChapter chapter;
   final WebManga manga;
+  final ProxyInfo info;
   final Widget? link;
   final VoidCallback? onLinkPressed;
 
   @override
   Widget build(BuildContext context) {
-    final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
-    String title = 'Chapter $name';
-
-    if (chapter.title.isNotEmpty) {
-      title += ' - ${chapter.title}';
-    }
+    String title = chapter.getTitle(name);
 
     return Container(
       decoration: BoxDecoration(
@@ -196,12 +274,14 @@ class ChapterButtonWidget extends StatelessWidget {
       ),
       child: ListTile(
         onTap: () {
-          nav.push(createWebSourceReaderRoute(
-              chapter.groups.entries.first.value,
-              title: title,
-              manga: manga,
-              link: link,
-              onLinkPressed: onLinkPressed));
+          context.push('/read/${info.proxy}/${info.code}/$name/1/',
+              extra: WebReaderData(
+                source: chapter.groups.entries.first.value,
+                title: title,
+                manga: manga,
+                link: link,
+                onLinkPressed: onLinkPressed,
+              ));
         },
         tileColor: theme.colorScheme.primaryContainer,
         dense: true,

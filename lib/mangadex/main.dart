@@ -3,36 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/mangadex/chapter_feed.dart';
-import 'package:gagaku/mangadex/history_feed.dart';
-import 'package:gagaku/mangadex/latest_feed.dart';
-import 'package:gagaku/mangadex/library.dart';
-import 'package:gagaku/mangadex/login_old.dart';
-import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
+import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-enum MangaDexTab {
-  latestFeed,
-  mangaFeed,
-  chapterFeed,
-  libraryView,
-  history,
-}
-
-final _mangadexTabProvider = StateProvider((ref) => MangaDexTab.latestFeed);
-
 class MangaDexHome extends HookConsumerWidget {
-  const MangaDexHome({super.key});
+  const MangaDexHome({this.controllers, required this.child, super.key});
+
+  final List<ScrollController>? controllers;
+  final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final theme = Theme.of(context);
-    final tab = ref.watch(_mangadexTabProvider);
     final lifecycle = useAppLifecycleState();
 
     useEffect(() {
@@ -65,52 +52,13 @@ class MangaDexHome extends HookConsumerWidget {
       )
     ];
 
-    final controllers = [
-      useScrollController(),
-      useScrollController(),
-      useScrollController(),
-      useScrollController(),
-      useScrollController(),
-    ];
-
-    final tabs = <Widget>[
-      MangaDexGlobalFeed(
-        controller: controllers[0],
-      ),
-      MangaDexLoginWidget(
-        key: const Key('mangafeed'),
-        builder: (context, ref) {
-          return MangaDexMangaFeed(
-            controller: controllers[1],
-          );
-        },
-      ),
-      MangaDexLoginWidget(
-        key: const Key('chapterfeed'),
-        builder: (context, ref) {
-          return MangaDexChapterFeed(
-            controller: controllers[2],
-          );
-        },
-      ),
-      MangaDexLoginWidget(
-        key: const Key('userlibrary'),
-        builder: (context, ref) {
-          return MangaDexLibraryView(
-            controller: controllers[3],
-          );
-        },
-      ),
-      MangaDexHistoryFeed(
-        controller: controllers[4],
-      ),
-    ];
+    final index = _calculateSelectedIndex(context);
 
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controllers[tab.index].animateTo(0.0,
+            controllers?[index].animateTo(0.0,
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut);
           },
@@ -168,12 +116,7 @@ class MangaDexHome extends HookConsumerWidget {
                           color: theme.colorScheme.primary,
                           icon: const Icon(Icons.login),
                           onPressed: () {
-                            nav.push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const MangaDexLoginScreen(),
-                              ),
-                            );
+                            context.push(GagakuRoute.login);
                           },
                         ),
                       );
@@ -216,38 +159,64 @@ class MangaDexHome extends HookConsumerWidget {
       ),
       drawer: const MainDrawer(),
       body: Center(
-        child: PageTransitionSwitcher(
-          transitionBuilder: (child, animation, secondaryAnimation) {
-            return SharedAxisTransition(
-              animation: animation,
-              secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.horizontal,
-              child: child,
-            );
-          },
-          child: tabs[tab.index],
-        ),
+        child: child,
       ),
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         destinations: bottomNavigationBarItems,
-        selectedIndex: tab.index,
+        selectedIndex: index,
         onDestinationSelected: (index) {
-          final currTab = ref.read(_mangadexTabProvider);
+          final currTab = _calculateSelectedIndex(context);
 
-          if (currTab == MangaDexTab.values[index]) {
+          if (currTab == index) {
             // Scroll to top if on the same tab
-            controllers[index].animateTo(0.0,
+            controllers?[index].animateTo(0.0,
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut);
           } else {
             // Switch tab
-            ref.read(_mangadexTabProvider.notifier).state =
-                MangaDexTab.values[index];
+            _onItemTapped(index, context);
           }
         },
       ),
     );
+  }
+
+  void _onItemTapped(int index, BuildContext context) {
+    switch (index) {
+      case 0:
+        GoRouter.of(context).go('/');
+        break;
+      case 1:
+        GoRouter.of(context).go(GagakuRoute.mangafeed);
+        break;
+      case 2:
+        GoRouter.of(context).go(GagakuRoute.chapterfeed);
+        break;
+      case 3:
+        GoRouter.of(context).go(GagakuRoute.library);
+        break;
+      case 4:
+        GoRouter.of(context).go(GagakuRoute.history);
+        break;
+    }
+  }
+
+  static int _calculateSelectedIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.toString();
+
+    switch (location) {
+      case GagakuRoute.mangafeed:
+        return 1;
+      case GagakuRoute.chapterfeed:
+        return 2;
+      case GagakuRoute.library:
+        return 3;
+      case GagakuRoute.history:
+        return 4;
+      default:
+        return 0;
+    }
   }
 }

@@ -4,15 +4,34 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/mangadex/chapter_feed.dart';
+import 'package:gagaku/mangadex/creator_view.dart';
+import 'package:gagaku/mangadex/group_view.dart';
+import 'package:gagaku/mangadex/history_feed.dart';
+import 'package:gagaku/mangadex/latest_feed.dart';
+import 'package:gagaku/mangadex/library.dart';
+import 'package:gagaku/mangadex/login_old.dart';
 import 'package:gagaku/mangadex/main.dart';
+import 'package:gagaku/mangadex/manga_feed.dart';
+import 'package:gagaku/mangadex/manga_view.dart';
+import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:gagaku/web/main.dart';
+import 'package:gagaku/web/manga_view.dart';
+import 'package:gagaku/web/reader.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:go_router/go_router.dart';
+
+final GlobalKey<NavigatorState> _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -58,13 +77,206 @@ void main() async {
   runApp(const ProviderScope(child: App()));
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  final List<ScrollController> _controllers = [];
+
+  late final GoRouter _router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: '/',
+    debugLogDiagnostics: !kReleaseMode,
+    onException: (_, GoRouterState state, GoRouter router) {
+      router.go('/404', extra: state.uri.toString());
+    },
+    routes: <RouteBase>[
+      // MD endpoints
+      GoRoute(
+        path: GagakuRoute.manga,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildMangaViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.mangaAlt,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildMangaViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.chapter,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildMDReaderPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.group,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildGroupViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.groupAlt,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildGroupViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.creator,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildCreatorViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.creatorAlt,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildCreatorViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.login,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (BuildContext context, GoRouterState state) {
+          return const MangaDexLoginScreen();
+        },
+      ),
+      // Main mangadex page
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (BuildContext context, GoRouterState state, Widget child) {
+          return MangaDexHome(
+            controllers: _controllers,
+            child: child,
+          );
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: '/',
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexGlobalFeed(
+                controller: _controllers[0],
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
+          ),
+          GoRoute(
+            path: GagakuRoute.mangafeed,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.mangafeed),
+                builder: (context, ref) {
+                  return MangaDexMangaFeed(
+                    controller: _controllers[1],
+                  );
+                },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
+          ),
+          GoRoute(
+            path: GagakuRoute.chapterfeed,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.chapterfeed),
+                builder: (context, ref) {
+                  return MangaDexChapterFeed(
+                    controller: _controllers[2],
+                  );
+                },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
+          ),
+          GoRoute(
+            path: GagakuRoute.library,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.library),
+                builder: (context, ref) {
+                  return MangaDexLibraryView(
+                    controller: _controllers[3],
+                  );
+                },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
+          ),
+          GoRoute(
+            path: GagakuRoute.history,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexHistoryFeed(
+                controller: _controllers[4],
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
+          ),
+        ],
+      ),
+      // Local
+      GoRoute(
+        path: GagakuRoute.local,
+        builder: (BuildContext context, GoRouterState state) {
+          return const LocalLibraryHome();
+        },
+      ),
+      // Web
+      GoRoute(
+        path: GagakuRoute.web,
+        builder: (BuildContext context, GoRouterState state) {
+          return const WebSourcesHome();
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: GagakuRoute.webManga,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: buildWebMangaViewPage,
+          ),
+          GoRoute(
+            path: GagakuRoute.webMangaFull,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: buildWebReaderPage,
+          ),
+        ],
+      ),
+      // Error route
+      GoRoute(
+        path: '/404',
+        builder: (BuildContext context, GoRouterState state) {
+          return NotFoundScreen(uri: state.extra as String? ?? '');
+        },
+      ),
+    ],
+  );
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controllers.addAll([
+      ScrollController(),
+      ScrollController(),
+      ScrollController(),
+      ScrollController(),
+      ScrollController(),
+    ]);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    for (var element in _controllers) {
+      element.dispose();
+    }
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Gagaku',
       theme: ThemeData(
         brightness: Brightness.light,
@@ -87,24 +299,34 @@ class App extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const GagakuHome(),
+      routerConfig: _router,
     );
   }
 }
 
-class GagakuHome extends ConsumerWidget {
-  const GagakuHome({super.key});
+class NotFoundScreen extends StatelessWidget {
+  const NotFoundScreen({super.key, required this.uri});
+
+  final String uri;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final page = ref.watch(homepageProvider);
-
-    final pages = <Widget>[
-      const MangaDexHome(),
-      const LocalLibraryHome(),
-      const WebSourcesHome(),
-    ];
-
-    return pages[page.index];
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Page Not Found'),
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
+      ),
+      body: Center(
+        child: Text("Can't find a page for: $uri"),
+      ),
+    );
   }
 }

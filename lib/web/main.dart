@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/web/manga_view.dart';
 import 'package:gagaku/web/model.dart';
 import 'package:gagaku/web/reader.dart';
 import 'package:gagaku/web/types.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebSourcesHome extends HookConsumerWidget {
@@ -17,43 +17,38 @@ class WebSourcesHome extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final urlFieldController = useTextEditingController();
     final scrollController = useScrollController();
-    final nav = Navigator.of(context);
     final history = ref.watch(webSourceHistoryProvider);
 
-    Future<void> openManga(WebManga manga) async {
-      nav.push(createMangaViewRoute(manga));
-    }
-
-    Future<HistoryLink?> parseUrl(String url) async {
+    bool parseUrl(String url) {
       if (url.startsWith('https://imgur.com/a/')) {
         final src = url.substring(20);
         final code = '/read/api/imgur/chapter/$src';
-        await nav.push(createWebSourceReaderRoute(code));
-        return HistoryLink(title: url, url: url);
+        GoRouter.of(context)
+            .push('/read/imgur/$src/1/1/', extra: WebReaderData(source: code));
+        ref
+            .read(webSourceHistoryProvider.notifier)
+            .add(HistoryLink(title: url, url: url));
+        return true;
       }
 
       if (url.startsWith('https://cubari.moe/read/')) {
-        final info = await api.parseUrl(url);
+        final info = api.parseUrl(url);
 
         if (info == null) {
-          return null;
+          return false;
         }
 
-        final proxy = await api.handleProxy(info);
-
-        if (proxy.code != null) {
-          await nav.push(createWebSourceReaderRoute(proxy.code!));
-          return HistoryLink(title: '${info.proxy}: ${proxy.code}', url: url);
+        if (info.chapter != null) {
+          GoRouter.of(context)
+              .push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
+        } else {
+          GoRouter.of(context).push('/read/${info.proxy}/${info.code}');
         }
 
-        if (proxy.manga != null) {
-          await openManga(proxy.manga!);
-          return HistoryLink(
-              title: '${info.proxy}: ${proxy.manga?.title}', url: url);
-        }
+        return true;
       }
 
-      return null;
+      return false;
     }
 
     Future<void> openLinkDialog() async {
@@ -97,11 +92,9 @@ class WebSourcesHome extends HookConsumerWidget {
           });
 
       if (result != null) {
-        final parseResult = await parseUrl(result);
+        final parseResult = parseUrl(result);
 
-        if (parseResult != null) {
-          ref.read(webSourceHistoryProvider.notifier).add(parseResult);
-        } else {
+        if (!parseResult) {
           messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(const SnackBar(
@@ -230,15 +223,11 @@ class WebSourcesHome extends HookConsumerWidget {
                         ),
                         title: Text(item.title),
                         textColor: Colors.blue,
-                        onTap: () async {
+                        onTap: () {
                           final messenger = ScaffoldMessenger.of(context);
-                          final parseResult = await parseUrl(item.url);
+                          final parseResult = parseUrl(item.url);
 
-                          if (parseResult != null) {
-                            ref
-                                .read(webSourceHistoryProvider.notifier)
-                                .add(parseResult);
-                          } else {
+                          if (!parseResult) {
                             messenger
                               ..removeCurrentSnackBar()
                               ..showSnackBar(const SnackBar(

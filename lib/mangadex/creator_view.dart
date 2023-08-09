@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -7,19 +6,41 @@ import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'creator_view.g.dart';
 
-Route createCreatorViewRoute(CreatorType creator) {
-  return Styles.buildSharedAxisTransitionRoute(
-    (context, animation, secondaryAnimation) => MangaDexCreatorViewWidget(
+Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
+  final creator = state.extra.asOrNull<CreatorType>();
+
+  Widget child;
+
+  if (creator != null) {
+    child = MangaDexCreatorViewWidget(
       creator: creator,
-    ),
-    SharedAxisTransitionType.scaled,
+    );
+  } else {
+    child = QueriedMangaDexCreatorViewWidget(
+        creatorId: state.pathParameters['creatorId']!);
+  }
+
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
+}
+
+@riverpod
+Future<CreatorType> _fetchCreatorFromId(
+    _FetchCreatorFromIdRef ref, String creatorId) async {
+  final api = ref.watch(mangadexProvider);
+  final creator = await api.fetchCreators([creatorId]);
+  return creator.first;
 }
 
 @riverpod
@@ -31,6 +52,41 @@ Future<Iterable<Manga>> _fetchCreatorTitles(
   ref.keepAlive();
 
   return mangas;
+}
+
+class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
+  const QueriedMangaDexCreatorViewWidget({super.key, required this.creatorId});
+
+  final String creatorId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final group = ref.watch(_fetchCreatorFromIdProvider(creatorId));
+
+    Widget child;
+
+    switch (group) {
+      case AsyncData(:final value):
+        return MangaDexCreatorViewWidget(
+          creator: value,
+        );
+      case AsyncError(:final error, :final stackTrace):
+        final messenger = ScaffoldMessenger.of(context);
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e("_fetchCreatorFromIdProvider($creatorId) failed",
+            error: error, stackTrace: stackTrace);
+
+        child = Styles.errorColumn(error, stackTrace);
+        break;
+      case _:
+        child = Styles.listSpinner;
+        break;
+    }
+
+    return Scaffold(
+      body: child,
+    );
+  }
 }
 
 class MangaDexCreatorViewWidget extends HookConsumerWidget {
@@ -92,6 +148,15 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                       pinned: true,
                       snap: false,
                       floating: false,
+                      leading: BackButton(
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/');
+                          }
+                        },
+                      ),
                       flexibleSpace: GestureDetector(
                         onTap: () {
                           scrollController.animateTo(0.0,

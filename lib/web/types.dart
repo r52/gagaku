@@ -3,12 +3,17 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'types.freezed.dart';
 part 'types.g.dart';
 
-class ProxyInfo {
-  ProxyInfo({required this.proxy, required this.code, this.chapter});
+@freezed
+class ProxyInfo with _$ProxyInfo {
+  const ProxyInfo._();
 
-  String proxy;
-  String code;
-  String? chapter;
+  const factory ProxyInfo({
+    required String proxy,
+    required String code,
+    String? chapter,
+  }) = _ProxyInfo;
+
+  String getURL() => 'https://cubari.moe/read/$proxy/$code/';
 }
 
 class ProxyData {
@@ -64,6 +69,8 @@ class HistoryLink with _$HistoryLink {
 
 @freezed
 class WebManga with _$WebManga {
+  const WebManga._();
+
   const factory WebManga({
     required String title,
     required String description,
@@ -75,10 +82,19 @@ class WebManga with _$WebManga {
 
   factory WebManga.fromJson(Map<String, dynamic> json) =>
       _$WebMangaFromJson(json);
+
+  WebChapter? getChapter(String chapter) {
+    if (chapters.containsKey(chapter)) {
+      return chapters[chapter];
+    }
+    return null;
+  }
 }
 
 @freezed
 class WebChapter with _$WebChapter {
+  const WebChapter._();
+
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory WebChapter({
@@ -90,6 +106,16 @@ class WebChapter with _$WebChapter {
 
   factory WebChapter.fromJson(Map<String, dynamic> json) =>
       _$WebChapterFromJson(json);
+
+  String getTitle(String index) {
+    String title = 'Chapter $index';
+
+    if (title.isNotEmpty) {
+      title += ' - $title';
+    }
+
+    return title;
+  }
 }
 
 @freezed

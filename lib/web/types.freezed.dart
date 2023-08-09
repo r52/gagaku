@@ -14,6 +14,158 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
+/// @nodoc
+mixin _$ProxyInfo {
+  String get proxy => throw _privateConstructorUsedError;
+  String get code => throw _privateConstructorUsedError;
+  String? get chapter => throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $ProxyInfoCopyWith<ProxyInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ProxyInfoCopyWith<$Res> {
+  factory $ProxyInfoCopyWith(ProxyInfo value, $Res Function(ProxyInfo) then) =
+      _$ProxyInfoCopyWithImpl<$Res, ProxyInfo>;
+  @useResult
+  $Res call({String proxy, String code, String? chapter});
+}
+
+/// @nodoc
+class _$ProxyInfoCopyWithImpl<$Res, $Val extends ProxyInfo>
+    implements $ProxyInfoCopyWith<$Res> {
+  _$ProxyInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? proxy = null,
+    Object? code = null,
+    Object? chapter = freezed,
+  }) {
+    return _then(_value.copyWith(
+      proxy: null == proxy
+          ? _value.proxy
+          : proxy // ignore: cast_nullable_to_non_nullable
+              as String,
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      chapter: freezed == chapter
+          ? _value.chapter
+          : chapter // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$_ProxyInfoCopyWith<$Res> implements $ProxyInfoCopyWith<$Res> {
+  factory _$$_ProxyInfoCopyWith(
+          _$_ProxyInfo value, $Res Function(_$_ProxyInfo) then) =
+      __$$_ProxyInfoCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String proxy, String code, String? chapter});
+}
+
+/// @nodoc
+class __$$_ProxyInfoCopyWithImpl<$Res>
+    extends _$ProxyInfoCopyWithImpl<$Res, _$_ProxyInfo>
+    implements _$$_ProxyInfoCopyWith<$Res> {
+  __$$_ProxyInfoCopyWithImpl(
+      _$_ProxyInfo _value, $Res Function(_$_ProxyInfo) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? proxy = null,
+    Object? code = null,
+    Object? chapter = freezed,
+  }) {
+    return _then(_$_ProxyInfo(
+      proxy: null == proxy
+          ? _value.proxy
+          : proxy // ignore: cast_nullable_to_non_nullable
+              as String,
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      chapter: freezed == chapter
+          ? _value.chapter
+          : chapter // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_ProxyInfo extends _ProxyInfo {
+  const _$_ProxyInfo({required this.proxy, required this.code, this.chapter})
+      : super._();
+
+  @override
+  final String proxy;
+  @override
+  final String code;
+  @override
+  final String? chapter;
+
+  @override
+  String toString() {
+    return 'ProxyInfo(proxy: $proxy, code: $code, chapter: $chapter)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_ProxyInfo &&
+            (identical(other.proxy, proxy) || other.proxy == proxy) &&
+            (identical(other.code, code) || other.code == code) &&
+            (identical(other.chapter, chapter) || other.chapter == chapter));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, proxy, code, chapter);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_ProxyInfoCopyWith<_$_ProxyInfo> get copyWith =>
+      __$$_ProxyInfoCopyWithImpl<_$_ProxyInfo>(this, _$identity);
+}
+
+abstract class _ProxyInfo extends ProxyInfo {
+  const factory _ProxyInfo(
+      {required final String proxy,
+      required final String code,
+      final String? chapter}) = _$_ProxyInfo;
+  const _ProxyInfo._() : super._();
+
+  @override
+  String get proxy;
+  @override
+  String get code;
+  @override
+  String? get chapter;
+  @override
+  @JsonKey(ignore: true)
+  _$$_ProxyInfoCopyWith<_$_ProxyInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) {
   return _HistoryLink.fromJson(json);
 }
@@ -303,7 +455,7 @@ class __$$_WebMangaCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_WebManga implements _WebManga {
+class _$_WebManga extends _WebManga {
   const _$_WebManga(
       {required this.title,
       required this.description,
@@ -311,7 +463,8 @@ class _$_WebManga implements _WebManga {
       required this.author,
       required this.cover,
       required final Map<String, WebChapter> chapters})
-      : _chapters = chapters;
+      : _chapters = chapters,
+        super._();
 
   factory _$_WebManga.fromJson(Map<String, dynamic> json) =>
       _$$_WebMangaFromJson(json);
@@ -372,7 +525,7 @@ class _$_WebManga implements _WebManga {
   }
 }
 
-abstract class _WebManga implements WebManga {
+abstract class _WebManga extends WebManga {
   const factory _WebManga(
       {required final String title,
       required final String description,
@@ -380,6 +533,7 @@ abstract class _WebManga implements WebManga {
       required final String author,
       required final String cover,
       required final Map<String, WebChapter> chapters}) = _$_WebManga;
+  const _WebManga._() : super._();
 
   factory _WebManga.fromJson(Map<String, dynamic> json) = _$_WebManga.fromJson;
 
@@ -526,13 +680,14 @@ class __$$_WebChapterCopyWithImpl<$Res>
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class _$_WebChapter implements _WebChapter {
+class _$_WebChapter extends _WebChapter {
   const _$_WebChapter(
       {required this.title,
       required this.volume,
       @EpochTimestampSerializer() this.lastUpdated,
       required final Map<String, String> groups})
-      : _groups = groups;
+      : _groups = groups,
+        super._();
 
   factory _$_WebChapter.fromJson(Map<String, dynamic> json) =>
       _$$_WebChapterFromJson(json);
@@ -588,12 +743,13 @@ class _$_WebChapter implements _WebChapter {
   }
 }
 
-abstract class _WebChapter implements WebChapter {
+abstract class _WebChapter extends WebChapter {
   const factory _WebChapter(
       {required final String title,
       required final String volume,
       @EpochTimestampSerializer() final DateTime? lastUpdated,
       required final Map<String, String> groups}) = _$_WebChapter;
+  const _WebChapter._() : super._();
 
   factory _WebChapter.fromJson(Map<String, dynamic> json) =
       _$_WebChapter.fromJson;

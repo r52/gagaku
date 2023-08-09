@@ -336,6 +336,29 @@ class Chapter with _$Chapter, MangaDexUUID {
   factory Chapter.fromJson(Map<String, dynamic> json) =>
       _$ChapterFromJson(json);
 
+  String getTitle() {
+    String title = '';
+
+    if (attributes.chapter != null && attributes.chapter!.isNotEmpty) {
+      title += 'Chapter ${attributes.chapter}';
+    }
+
+    if (attributes.title != null && attributes.title!.isNotEmpty) {
+      if (title.isNotEmpty) {
+        title += ' - ';
+      }
+
+      title += '${attributes.title}';
+    }
+
+    if (title.isEmpty) {
+      // Probably a oneshot?
+      title = 'Oneshot';
+    }
+
+    return title;
+  }
+
   Iterable<Group> getGroups() {
     final groups = <Group>{};
 
@@ -579,6 +602,17 @@ class GroupList with _$GroupList {
 
   factory GroupList.fromJson(Map<String, dynamic> json) =>
       _$GroupListFromJson(json);
+}
+
+@freezed
+class CreatorList with _$CreatorList {
+  const factory CreatorList(
+    List<Author> data,
+    int total,
+  ) = _CreatorListList;
+
+  factory CreatorList.fromJson(Map<String, dynamic> json) =>
+      _$CreatorListFromJson(json);
 }
 
 @freezed

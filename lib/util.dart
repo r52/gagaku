@@ -7,6 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+extension AsExtension on Object? {
+  X as<X>() => this as X;
+  X? asOrNull<X>() {
+    var self = this;
+    return self is X ? self : null;
+  }
+}
+
+extension AsSubtypeExtension<X> on X {
+  Y asSubtype<Y extends X>() => this as Y;
+}
+
+extension AsNotNullExtension<X> on X? {
+  X asNotNull() => this as X;
+}
+
 extension StringExtension on String {
   String capitalize() {
     if (isEmpty) return '';

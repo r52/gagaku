@@ -3,12 +3,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/mangadex/group_view.dart';
-import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:dash_flags/dash_flags.dart' as dashflag;
@@ -134,7 +133,6 @@ class ChapterFeedItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
@@ -173,7 +171,7 @@ class ChapterFeedItem extends ConsumerWidget {
             style: const TextStyle(fontSize: 18),
           ),
           onLinkPressed: () {
-            nav.push(createMangaViewRoute(state.manga));
+            context.push('/title/${state.manga.id}', extra: state.manga);
           },
         ),
       );
@@ -188,7 +186,7 @@ class ChapterFeedItem extends ConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
-        nav.push(createMangaViewRoute(state.manga));
+        context.push('/title/${state.manga.id}', extra: state.manga);
       },
       child: Text(
         state.manga.attributes.title.get('en'),
@@ -202,7 +200,7 @@ class ChapterFeedItem extends ConsumerWidget {
         shape: const RoundedRectangleBorder(),
       ),
       onPressed: () async {
-        nav.push(createMangaViewRoute(state.manga));
+        context.push('/title/${state.manga.id}', extra: state.manga);
       },
       child: ExtendedImage.network(state.coverArt,
           loadStateChanged: extendedImageLoadStateHandler,
@@ -279,8 +277,6 @@ class ChapterButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
-
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
@@ -289,26 +285,7 @@ class ChapterButtonWidget extends ConsumerWidget {
         manga.attributes.lastChapter?.isNotEmpty == true &&
         chapter.attributes.chapter == manga.attributes.lastChapter;
 
-    String title = '';
-
-    if (chapter.attributes.chapter != null &&
-        chapter.attributes.chapter!.isNotEmpty) {
-      title += 'Chapter ${chapter.attributes.chapter}';
-    }
-
-    if (chapter.attributes.title != null &&
-        chapter.attributes.title!.isNotEmpty) {
-      if (title.isNotEmpty) {
-        title += ' - ';
-      }
-
-      title += '${chapter.attributes.title}';
-    }
-
-    if (title.isEmpty) {
-      // Probably a oneshot?
-      title = 'Oneshot';
-    }
+    String title = chapter.getTitle();
 
     const rowPadding = SizedBox(
       width: 6.0,
@@ -330,7 +307,7 @@ class ChapterButtonWidget extends ConsumerWidget {
         icon: Icon(Icons.group, size: iconSize),
         text: Text(g.attributes.name.crop()),
         onPressed: () {
-          nav.push(createGroupViewRoute(g));
+          context.push('/group/${g.id}', extra: g);
         },
       ));
       groupChips.add(rowPadding);
@@ -513,8 +490,13 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        nav.push(createMangaDexReaderRoute(
-            title, chapter, manga, link, onLinkPressed));
+        context.push('/chapter/${chapter.id}',
+            extra: ReaderData(
+                title: title,
+                chapter: chapter,
+                manga: manga,
+                link: link,
+                onLinkPressed: onLinkPressed));
       },
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -677,7 +659,6 @@ class _GridMangaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Navigator.of(context);
     final Widget image = Material(
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(4.0))),
@@ -692,7 +673,7 @@ class _GridMangaItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        nav.push(createMangaViewRoute(manga));
+        context.push('/title/${manga.id}', extra: manga);
       },
       child: GridTile(
         footer: SizedBox(
@@ -729,7 +710,6 @@ class _GridMangaDetailedItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final stats = ref.watch(statisticsProvider);
@@ -747,7 +727,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                   textStyle: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               onPressed: () async {
-                nav.push(createMangaViewRoute(manga));
+                context.push('/title/${manga.id}', extra: manga);
               },
               child: Text(
                 manga.attributes.title.get('en'),
@@ -763,7 +743,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      nav.push(createMangaViewRoute(manga));
+                      context.push('/title/${manga.id}', extra: manga);
                     },
                     child: ExtendedImage.network(
                         manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
@@ -884,7 +864,6 @@ class _ListMangaItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final stats = ref.watch(statisticsProvider);
 
@@ -897,7 +876,7 @@ class _ListMangaItem extends ConsumerWidget {
           children: [
             TextButton(
               onPressed: () async {
-                nav.push(createMangaViewRoute(manga));
+                context.push('/title/${manga.id}', extra: manga);
               },
               child: ExtendedImage.network(
                 manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
@@ -919,7 +898,7 @@ class _ListMangaItem extends ConsumerWidget {
                       ),
                     ),
                     onPressed: () async {
-                      nav.push(createMangaViewRoute(manga));
+                      context.push('/title/${manga.id}', extra: manga);
                     },
                     child: Text(manga.attributes.title.get('en')),
                   ),

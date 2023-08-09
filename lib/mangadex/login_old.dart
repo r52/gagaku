@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
+import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MangaDexLoginWidget extends ConsumerWidget {
@@ -12,7 +14,6 @@ class MangaDexLoginWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final auth = ref.watch(authControlProvider);
 
     switch (auth) {
@@ -24,11 +25,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
         return Center(
           child: ElevatedButton.icon(
             onPressed: () async {
-              nav.push(
-                MaterialPageRoute(
-                  builder: (context) => const MangaDexLoginScreen(),
-                ),
-              );
+              context.push(GagakuRoute.login);
             },
             label: const Text('Login to MangaDex'),
             icon: const Icon(
@@ -53,7 +50,6 @@ class MangaDexLoginScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final usernameController = useTextEditingController();
     final passwordController = useTextEditingController();
     final usernameIsEmpty = useListenableSelector(
@@ -114,13 +110,14 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                   onPressed: () {
                     usernameController.clear();
                     passwordController.clear();
-                    nav.pop();
+                    context.pop();
                   },
                 ),
                 ElevatedButton(
                   onPressed: (usernameIsEmpty || passwordIsEmpty)
                       ? null
                       : () async {
+                          final router = GoRouter.of(context);
                           final messenger = ScaffoldMessenger.of(context);
 
                           if (usernameController.text.isNotEmpty &&
@@ -131,7 +128,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                     passwordController.text);
 
                             if (loginSuccess) {
-                              nav.pop();
+                              router.pop();
                               usernameController.clear();
                               passwordController.clear();
                             } else {

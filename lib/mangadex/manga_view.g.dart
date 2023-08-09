@@ -6,8 +6,7 @@ part of 'manga_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchReadChaptersRedunHash() =>
-    r'ee6e26ca0ad2a94741b4f9afe8e5e7ec62fe52ef';
+String _$fetchMangaFromIdHash() => r'a0ad364f40eb3ded19c3a8012e0238c43a8f1d73';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,6 +29,89 @@ class _SystemHash {
   }
 }
 
+typedef _FetchMangaFromIdRef = AutoDisposeFutureProviderRef<Manga>;
+
+/// See also [_fetchMangaFromId].
+@ProviderFor(_fetchMangaFromId)
+const _fetchMangaFromIdProvider = _FetchMangaFromIdFamily();
+
+/// See also [_fetchMangaFromId].
+class _FetchMangaFromIdFamily extends Family<AsyncValue<Manga>> {
+  /// See also [_fetchMangaFromId].
+  const _FetchMangaFromIdFamily();
+
+  /// See also [_fetchMangaFromId].
+  _FetchMangaFromIdProvider call(
+    String mangaId,
+  ) {
+    return _FetchMangaFromIdProvider(
+      mangaId,
+    );
+  }
+
+  @override
+  _FetchMangaFromIdProvider getProviderOverride(
+    covariant _FetchMangaFromIdProvider provider,
+  ) {
+    return call(
+      provider.mangaId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchMangaFromIdProvider';
+}
+
+/// See also [_fetchMangaFromId].
+class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
+  /// See also [_fetchMangaFromId].
+  _FetchMangaFromIdProvider(
+    this.mangaId,
+  ) : super.internal(
+          (ref) => _fetchMangaFromId(
+            ref,
+            mangaId,
+          ),
+          from: _fetchMangaFromIdProvider,
+          name: r'_fetchMangaFromIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchMangaFromIdHash,
+          dependencies: _FetchMangaFromIdFamily._dependencies,
+          allTransitiveDependencies:
+              _FetchMangaFromIdFamily._allTransitiveDependencies,
+        );
+
+  final String mangaId;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchMangaFromIdProvider && other.mangaId == mangaId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, mangaId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$fetchReadChaptersRedunHash() =>
+    r'ee6e26ca0ad2a94741b4f9afe8e5e7ec62fe52ef';
 typedef _FetchReadChaptersRedunRef = AutoDisposeFutureProviderRef<void>;
 
 /// See also [_fetchReadChaptersRedun].

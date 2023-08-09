@@ -6,7 +6,7 @@ part of 'reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchChapterPagesHash() => r'd95fb71f4cc56d537abd2ffe7db4441503825b39';
+String _$fetchChapterDataHash() => r'9e8b6fa7433ff78d9562ff05a58747eca63f1c30';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,6 +29,88 @@ class _SystemHash {
   }
 }
 
+typedef _FetchChapterDataRef = AutoDisposeFutureProviderRef<ReaderData>;
+
+/// See also [_fetchChapterData].
+@ProviderFor(_fetchChapterData)
+const _fetchChapterDataProvider = _FetchChapterDataFamily();
+
+/// See also [_fetchChapterData].
+class _FetchChapterDataFamily extends Family<AsyncValue<ReaderData>> {
+  /// See also [_fetchChapterData].
+  const _FetchChapterDataFamily();
+
+  /// See also [_fetchChapterData].
+  _FetchChapterDataProvider call(
+    String chapterId,
+  ) {
+    return _FetchChapterDataProvider(
+      chapterId,
+    );
+  }
+
+  @override
+  _FetchChapterDataProvider getProviderOverride(
+    covariant _FetchChapterDataProvider provider,
+  ) {
+    return call(
+      provider.chapterId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchChapterDataProvider';
+}
+
+/// See also [_fetchChapterData].
+class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
+  /// See also [_fetchChapterData].
+  _FetchChapterDataProvider(
+    this.chapterId,
+  ) : super.internal(
+          (ref) => _fetchChapterData(
+            ref,
+            chapterId,
+          ),
+          from: _fetchChapterDataProvider,
+          name: r'_fetchChapterDataProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchChapterDataHash,
+          dependencies: _FetchChapterDataFamily._dependencies,
+          allTransitiveDependencies:
+              _FetchChapterDataFamily._allTransitiveDependencies,
+        );
+
+  final String chapterId;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchChapterDataProvider && other.chapterId == chapterId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, chapterId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$fetchChapterPagesHash() => r'd95fb71f4cc56d537abd2ffe7db4441503825b39';
 typedef _FetchChapterPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
 
 /// See also [_fetchChapterPages].
