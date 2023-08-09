@@ -198,11 +198,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               snap: false,
               floating: false,
               expandedHeight: 200.0,
-              leading: context.canPop()
-                  ? BackButton(
-                      onPressed: () => context.pop(),
-                    )
-                  : null,
+              leading: BackButton(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/');
+                  }
+                },
+              ),
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   manga.attributes.title.get('en'),

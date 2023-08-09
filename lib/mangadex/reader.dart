@@ -118,6 +118,7 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
           onLinkPressed: () {
             context.go('/title/${value.manga.id}', extra: value.manga);
           },
+          backRoute: '/',
         );
       case AsyncError(:final error, :final stackTrace):
         final messenger = ScaffoldMessenger.of(context);
@@ -146,6 +147,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
     required this.manga,
     this.link,
     this.onLinkPressed,
+    this.backRoute,
   });
 
   final String title;
@@ -153,6 +155,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   final Manga manga;
   final Widget? link;
   final VoidCallback? onLinkPressed;
+  final String? backRoute;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -205,6 +208,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           link: link,
           onLinkPressed: onLinkPressed,
           externalUrl: chapter.attributes.externalUrl,
+          backRoute: backRoute,
         );
       case _:
         return const Center(

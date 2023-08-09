@@ -148,11 +148,15 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                       pinned: true,
                       snap: false,
                       floating: false,
-                      leading: context.canPop()
-                          ? BackButton(
-                              onPressed: () => context.pop(),
-                            )
-                          : null,
+                      leading: BackButton(
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/');
+                          }
+                        },
+                      ),
                       flexibleSpace: GestureDetector(
                         onTap: () {
                           scrollController.animateTo(0.0,

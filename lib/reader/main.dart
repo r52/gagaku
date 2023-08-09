@@ -24,6 +24,7 @@ class ReaderWidget extends HookConsumerWidget {
     this.link,
     this.onLinkPressed,
     this.externalUrl,
+    this.backRoute,
   });
 
   final Iterable<ReaderPage> pages;
@@ -34,6 +35,9 @@ class ReaderWidget extends HookConsumerWidget {
   final Widget? link;
   final VoidCallback? onLinkPressed;
   final String? externalUrl;
+
+  // Backup route for BackButton if nav stack cannot pop
+  final String? backRoute;
 
   ItemPosition? _getListViewFirstShownPage(Iterable<ItemPosition> positions) {
     if (positions.isNotEmpty) {
@@ -400,15 +404,15 @@ class ReaderWidget extends HookConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: AppBar(
-        leading: context.canPop()
-            ? BackButton(
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  }
-                },
-              )
-            : null,
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else if (backRoute != null) {
+              context.go(backRoute!);
+            }
+          },
+        ),
         title: ListTile(
           title: Text(
             title,

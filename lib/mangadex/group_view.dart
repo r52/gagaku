@@ -318,11 +318,15 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: context.canPop()
-            ? BackButton(
-                onPressed: () => context.pop(),
-              )
-            : null,
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
         flexibleSpace: GestureDetector(
           onTap: () {
             controllers[view.value.index].animateTo(0.0,
