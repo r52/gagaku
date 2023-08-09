@@ -7,7 +7,7 @@ part of 'reader.dart';
 // **************************************************************************
 
 String _$fetchWebChapterInfoHash() =>
-    r'a5a674e754d891f40b456c3b066d9c1105d7b9be';
+    r'19a39d1b745fd329d6845bb254994d8a68983cbe';
 
 /// Copied from Dart SDK
 class _SystemHash {

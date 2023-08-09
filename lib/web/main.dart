@@ -19,53 +19,36 @@ class WebSourcesHome extends HookConsumerWidget {
     final scrollController = useScrollController();
     final history = ref.watch(webSourceHistoryProvider);
 
-    void openManga(ProxyInfo info, WebManga manga) {
-      GoRouter.of(context)
-          .push('/read/${info.proxy}/${info.code}', extra: manga);
-    }
-
-    void openChapter(ProxyInfo info, {WebReaderData? data}) {
-      GoRouter.of(context).push(
-          '/read/${info.proxy}/${info.code}/${info.chapter}/1/',
-          extra: data);
-    }
-
-    Future<HistoryLink?> parseUrl(String url) async {
+    Future<bool> parseUrl(String url) async {
       if (url.startsWith('https://imgur.com/a/')) {
         final src = url.substring(20);
         final code = '/read/api/imgur/chapter/$src';
-        context.push('/read/imgur/$src/1/1/',
-            extra: WebReaderData(source: code));
-        return HistoryLink(title: url, url: url);
+        GoRouter.of(context)
+            .push('/read/imgur/$src/1/1/', extra: WebReaderData(source: code));
+        ref
+            .read(webSourceHistoryProvider.notifier)
+            .add(HistoryLink(title: url, url: url));
+        return true;
       }
 
       if (url.startsWith('https://cubari.moe/read/')) {
         final info = api.parseUrl(url);
 
         if (info == null) {
-          return null;
+          return false;
         }
 
-        final proxy = await api.handleProxy(info);
-
-        if (proxy.code != null) {
-          openChapter(info, data: WebReaderData(source: proxy.code!));
-          return HistoryLink(title: '${info.proxy}: ${proxy.code}', url: url);
+        if (info.chapter != null) {
+          GoRouter.of(context)
+              .push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
+        } else {
+          GoRouter.of(context).push('/read/${info.proxy}/${info.code}');
         }
 
-        if (proxy.manga != null) {
-          if (info.chapter != null) {
-            openChapter(info);
-          } else {
-            openManga(info, proxy.manga!);
-          }
-          return HistoryLink(
-              title: '${info.proxy}: ${proxy.manga?.title}',
-              url: info.getURL());
-        }
+        return true;
       }
 
-      return null;
+      return false;
     }
 
     Future<void> openLinkDialog() async {
@@ -111,9 +94,7 @@ class WebSourcesHome extends HookConsumerWidget {
       if (result != null) {
         final parseResult = await parseUrl(result);
 
-        if (parseResult != null) {
-          ref.read(webSourceHistoryProvider.notifier).add(parseResult);
-        } else {
+        if (!parseResult) {
           messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(const SnackBar(
@@ -246,11 +227,7 @@ class WebSourcesHome extends HookConsumerWidget {
                           final messenger = ScaffoldMessenger.of(context);
                           final parseResult = await parseUrl(item.url);
 
-                          if (parseResult != null) {
-                            ref
-                                .read(webSourceHistoryProvider.notifier)
-                                .add(parseResult);
-                          } else {
+                          if (!parseResult) {
                             messenger
                               ..removeCurrentSnackBar()
                               ..showSnackBar(const SnackBar(

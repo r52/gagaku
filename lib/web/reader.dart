@@ -63,6 +63,8 @@ Future<WebReaderData> _fetchWebChapterInfo(
   final proxy = await api.handleProxy(info);
 
   if (proxy.code != null) {
+    ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(
+        title: '${info.proxy}: ${info.code}', url: '${info.getURL()}1/1/'));
     return WebReaderData(source: proxy.code!);
   }
 
