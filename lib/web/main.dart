@@ -20,11 +20,13 @@ class WebSourcesHome extends HookConsumerWidget {
     final history = ref.watch(webSourceHistoryProvider);
 
     void openManga(ProxyInfo info, WebManga manga) {
-      context.push('/read/${info.proxy}/${info.code}', extra: manga);
+      GoRouter.of(context)
+          .push('/read/${info.proxy}/${info.code}', extra: manga);
     }
 
     void openChapter(ProxyInfo info, {WebReaderData? data}) {
-      context.push('/read/${info.proxy}/${info.code}/${info.chapter}/1/',
+      GoRouter.of(context).push(
+          '/read/${info.proxy}/${info.code}/${info.chapter}/1/',
           extra: data);
     }
 

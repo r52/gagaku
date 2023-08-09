@@ -91,6 +91,9 @@ class _AppState extends State<App> {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     debugLogDiagnostics: !kReleaseMode,
+    onException: (_, GoRouterState state, GoRouter router) {
+      router.go('/404', extra: state.uri.toString());
+    },
     routes: <RouteBase>[
       // MD endpoints
       GoRoute(
@@ -238,6 +241,13 @@ class _AppState extends State<App> {
           ),
         ],
       ),
+      // Error route
+      GoRoute(
+        path: '/404',
+        builder: (BuildContext context, GoRouterState state) {
+          return NotFoundScreen(uri: state.extra as String? ?? '');
+        },
+      ),
     ],
   );
 
@@ -290,6 +300,33 @@ class _AppState extends State<App> {
       ),
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
+    );
+  }
+}
+
+class NotFoundScreen extends StatelessWidget {
+  const NotFoundScreen({super.key, required this.uri});
+
+  final String uri;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Page Not Found'),
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
+      ),
+      body: Center(
+        child: Text("Can't find a page for: $uri"),
+      ),
     );
   }
 }
