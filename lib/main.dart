@@ -16,6 +16,7 @@ import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:gagaku/web/main.dart';
 import 'package:gagaku/web/manga_view.dart';
@@ -146,58 +147,68 @@ class _AppState extends State<App> {
         routes: <RouteBase>[
           GoRoute(
             path: '/',
-            builder: (BuildContext context, GoRouterState state) {
-              return MangaDexGlobalFeed(
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexGlobalFeed(
                 controller: _controllers[0],
-              );
-            },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
           ),
           GoRoute(
             path: GagakuRoute.mangafeed,
-            builder: (BuildContext context, GoRouterState state) {
-              return MangaDexLoginWidget(
-                key: const Key('mangafeed'),
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.mangafeed),
                 builder: (context, ref) {
                   return MangaDexMangaFeed(
                     controller: _controllers[1],
                   );
                 },
-              );
-            },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
           ),
           GoRoute(
             path: GagakuRoute.chapterfeed,
-            builder: (BuildContext context, GoRouterState state) {
-              return MangaDexLoginWidget(
-                key: const Key('chapterfeed'),
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.chapterfeed),
                 builder: (context, ref) {
                   return MangaDexChapterFeed(
                     controller: _controllers[2],
                   );
                 },
-              );
-            },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
           ),
           GoRoute(
             path: GagakuRoute.library,
-            builder: (BuildContext context, GoRouterState state) {
-              return MangaDexLoginWidget(
-                key: const Key('userlibrary'),
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.library),
                 builder: (context, ref) {
                   return MangaDexLibraryView(
                     controller: _controllers[3],
                   );
                 },
-              );
-            },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
           ),
           GoRoute(
             path: GagakuRoute.history,
-            builder: (BuildContext context, GoRouterState state) {
-              return MangaDexHistoryFeed(
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexHistoryFeed(
                 controller: _controllers[4],
-              );
-            },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
           ),
         ],
       ),

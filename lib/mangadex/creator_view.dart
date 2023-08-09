@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -32,15 +31,7 @@ Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
   return CustomTransitionPage<void>(
     key: state.pageKey,
     child: child,
-    transitionsBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation, Widget child) =>
-        SharedAxisTransition(
-      fillColor: Theme.of(context).cardColor,
-      animation: animation,
-      secondaryAnimation: secondaryAnimation,
-      transitionType: SharedAxisTransitionType.scaled,
-      child: child,
-    ),
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
 }
 

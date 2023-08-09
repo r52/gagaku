@@ -34,15 +34,7 @@ Page<dynamic> buildGroupViewPage(BuildContext context, GoRouterState state) {
   return CustomTransitionPage<void>(
     key: state.pageKey,
     child: child,
-    transitionsBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation, Widget child) =>
-        SharedAxisTransition(
-      fillColor: Theme.of(context).cardColor,
-      animation: animation,
-      secondaryAnimation: secondaryAnimation,
-      transitionType: SharedAxisTransitionType.scaled,
-      child: child,
-    ),
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
 }
 
@@ -244,6 +236,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         ],
       ),
       Consumer(
+        key: const Key('/group?tab=feed'),
         builder: (context, ref, child) {
           return ChapterFeedWidget(
             provider: _fetchGroupFeedProvider(group),
@@ -262,6 +255,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         },
       ),
       Consumer(
+        key: const Key('/group?tab=titles'),
         builder: (context, ref, child) {
           final mangas = ref.watch(_fetchGroupTitlesProvider(group));
           final isLoading = ref.watch(groupTitlesProvider(group)).isLoading;

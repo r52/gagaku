@@ -35,15 +35,7 @@ Page<dynamic> buildMangaViewPage(BuildContext context, GoRouterState state) {
   return CustomTransitionPage<void>(
     key: state.pageKey,
     child: child,
-    transitionsBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation, Widget child) =>
-        SharedAxisTransition(
-      fillColor: Theme.of(context).cardColor,
-      animation: animation,
-      secondaryAnimation: secondaryAnimation,
-      transitionType: SharedAxisTransitionType.scaled,
-      child: child,
-    ),
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
 }
 

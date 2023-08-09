@@ -159,17 +159,7 @@ class MangaDexHome extends HookConsumerWidget {
       ),
       drawer: const MainDrawer(),
       body: Center(
-        child: PageTransitionSwitcher(
-          transitionBuilder: (child, animation, secondaryAnimation) {
-            return SharedAxisTransition(
-              animation: animation,
-              secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.horizontal,
-              child: child,
-            );
-          },
-          child: child,
-        ),
+        child: child,
       ),
       bottomNavigationBar: NavigationBar(
         height: 60,
