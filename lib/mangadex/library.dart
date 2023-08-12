@@ -27,29 +27,33 @@ class MangaDexLibraryView extends ConsumerWidget {
       body: Center(
         child: Column(
           children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ToggleButtons(
-                  isSelected: List<bool>.generate(
-                      MangaReadingStatus.values.skip(1).length,
-                      (index) => type.index == (index + 1)),
-                  onPressed: (index) {
-                    ref.read(libraryViewTypeProvider.notifier).state =
-                        MangaReadingStatus.values.skip(1).elementAt(index);
-                  },
-                  children: [
-                    ...MangaReadingStatus.values
-                        .skip(1)
-                        .map((e) => Text(
-                              e.formatted,
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ))
-                        .toList()
-                  ],
+            ScrollConfiguration(
+              behavior: MouseTouchScrollBehavior(),
+              child: Scrollbar(
+                child: SingleChildScrollView(
+                  primary: true,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 10.0),
+                  scrollDirection: Axis.horizontal,
+                  child: ToggleButtons(
+                    isSelected: List<bool>.generate(
+                        MangaReadingStatus.values.skip(1).length,
+                        (index) => type.index == (index + 1)),
+                    onPressed: (index) {
+                      ref.read(libraryViewTypeProvider.notifier).state =
+                          MangaReadingStatus.values.skip(1).elementAt(index);
+                    },
+                    children: [
+                      ...MangaReadingStatus.values
+                          .skip(1)
+                          .map((e) => Text(
+                                e.formatted,
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ))
+                          .toList()
+                    ],
+                  ),
                 ),
               ),
             ),

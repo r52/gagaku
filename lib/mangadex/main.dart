@@ -48,7 +48,7 @@ class MangaDexHome extends HookConsumerWidget {
       ),
       NavigationDestination(
         icon: Icon(Icons.history),
-        label: 'Reading History',
+        label: 'History',
       )
     ];
 

@@ -10,7 +10,6 @@ import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:dash_flags/dash_flags.dart' as dashflag;
 
 import 'types.dart';
 
@@ -293,10 +292,12 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     final pubtime = timeago.format(chapter.attributes.publishAt);
 
-    final flagChip = dashflag.CountryFlag(
-      country:
-          dashflag.Country.fromCode(chapter.attributes.translatedLanguage.flag),
-      height: screenSizeSmall ? 15 : 18,
+    final flagChip = Text(
+      chapter.attributes.translatedLanguage.flag,
+      style: TextStyle(
+        fontFamily: 'Twemoji',
+        fontSize: screenSizeSmall ? 15 : 18,
+      ),
     );
 
     final groups = chapter.getGroups();
