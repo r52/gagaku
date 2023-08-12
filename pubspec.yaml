@@ -117,7 +117,7 @@ flutter:
   fonts:
     - family: Twemoji
       fonts:
-        - asset: assets/fonts/Twemoji.Mozilla.ttf
+        - asset: fonts/Twemoji.Mozilla.ttf
 
 flutter_native_splash:
   color: "#ffffff"
