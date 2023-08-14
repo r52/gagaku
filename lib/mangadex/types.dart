@@ -304,6 +304,8 @@ mixin MangaDexUUID {
 
   @override
   int get hashCode => Object.hash(runtimeType, id);
+
+  Map<String, dynamic> toJson();
 }
 
 mixin ShortLivedData {

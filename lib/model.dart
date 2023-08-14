@@ -21,3 +21,4 @@ abstract class GagakuRoute {
 }
 
 const gagakuBox = 'gagaku_box';
+const gagakuCache = 'gagaku_cache';
