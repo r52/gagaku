@@ -925,7 +925,7 @@ class ReadChapterSet with ShortLivedData {
 
 // Deprecated old style login types
 @freezed
-class OldToken with _$OldToken {
+class OldToken with _$OldToken, ShortLivedData {
   OldToken._();
 
   static const int expiryTime = 600; // seconds (10 minutes)
@@ -938,10 +938,10 @@ class OldToken with _$OldToken {
   factory OldToken.fromJson(Map<String, dynamic> json) =>
       _$OldTokenFromJson(json);
 
-  final DateTime expiresAt =
+  @override
+  final DateTime expiry =
       DateTime.now().add(const Duration(seconds: expiryTime));
 
-  Duration get timeUntilExpiry => expiresAt.difference(DateTime.now());
-  bool get expired => (DateTime.now().compareTo(expiresAt) >= 0);
+  Duration get timeUntilExpiry => expiry.difference(DateTime.now());
   bool get isValid => (session.isNotEmpty && refresh.isNotEmpty);
 }

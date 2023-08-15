@@ -149,7 +149,7 @@ class MangaDexModel {
         return false;
       }
 
-      return _token!.expired;
+      return _token!.isExpired();
     });
   }
 
