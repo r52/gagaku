@@ -36,7 +36,7 @@ class CacheEntry with ShortLivedData {
   String get entry => _entry;
 
   CacheEntry(this._entry,
-      {DateTime? expire, Duration duration = const Duration(minutes: 10)})
+      {DateTime? expire, Duration duration = const Duration(minutes: 15)})
       : expiry = (expire != null) ? expire : DateTime.now().add(duration);
 }
 
@@ -149,7 +149,7 @@ class CacheManager {
   /// If [overwrite] is true, then the entry is inserted regardless, overwriting
   /// existing values
   Future<void> put(String key, dynamic val, bool overwrite,
-      [Duration expiry = const Duration(minutes: 10)]) async {
+      [Duration expiry = const Duration(minutes: 15)]) async {
     final entry = CacheEntry(json.encode(val), duration: expiry);
     if (!await exists(key)) {
       _cache.putIfAbsent(key, () => entry);
@@ -170,7 +170,7 @@ class CacheManager {
 
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
   Future<void> putAllAPIResolved(Iterable<MangaDexUUID> list,
-      [Duration expiry = const Duration(minutes: 10)]) async {
+      [Duration expiry = const Duration(minutes: 15)]) async {
     final resolved = list.map((e) =>
         MapEntry(e.id, CacheEntry(json.encode(e.toJson()), duration: expiry)));
 
@@ -193,7 +193,7 @@ class CacheManager {
   /// if requested, as a part of a special query given by [key]
   Future<void> putSpecialList(String key, Iterable<MangaDexUUID> list,
       {bool resolve = true,
-      Duration expiry = const Duration(minutes: 10)}) async {
+      Duration expiry = const Duration(minutes: 15)}) async {
     logger.d('CacheManager: caching list: $key for ${expiry.toString()}');
 
     // Transform data list to a list of uuids
