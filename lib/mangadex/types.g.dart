@@ -168,6 +168,8 @@ _$_CoverArtAttributes _$$_CoverArtAttributesFromJson(
     _$_CoverArtAttributes(
       volume: json['volume'] as String?,
       fileName: json['fileName'] as String,
+      description: json['description'] as String?,
+      locale: json['locale'] as String?,
     );
 
 Map<String, dynamic> _$$_CoverArtAttributesToJson(
@@ -175,6 +177,8 @@ Map<String, dynamic> _$$_CoverArtAttributesToJson(
     <String, dynamic>{
       'volume': instance.volume,
       'fileName': instance.fileName,
+      'description': instance.description,
+      'locale': instance.locale,
     };
 
 _$_UserAttributes _$$_UserAttributesFromJson(Map<String, dynamic> json) =>

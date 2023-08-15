@@ -900,6 +900,12 @@ class MangaDexModel {
       [int offset = 0]) async {
     final settings = ref.read(mdConfigProvider);
 
+    final key = 'fetchMangaChapters(${manga.id},$offset)';
+
+    if (await _cache.exists(key)) {
+      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
+    }
+
     // Download missing data
     final queryParams = {
       'limit': MangaDexEndpoints.apiQueryLimit.toString(),
@@ -931,7 +937,7 @@ class MangaDexModel {
       final result = ChapterList.fromJson(body);
 
       // Cache the data
-      _cache.putAllAPIResolved(result.data);
+      _cache.putSpecialList(key, result.data, resolve: true);
 
       return result.data;
     }
@@ -1125,8 +1131,13 @@ class MangaDexModel {
   }
 
   /// Retrieve cover art for a specific manga
-  Future<List<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
-    // Download missing data
+  Future<Iterable<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
+    final key = 'getCoverList(${manga.id},$offset)';
+
+    if (await _cache.exists(key)) {
+      return _cache.getSpecialList<Cover>(key, CoverArt.fromJson);
+    }
+
     final queryParams = {
       'limit': MangaDexEndpoints.apiSearchLimit.toString(),
       'offset': offset.toString(),
@@ -1142,6 +1153,9 @@ class MangaDexModel {
       final Map<String, dynamic> body = json.decode(response.body);
 
       final result = CoverList.fromJson(body);
+
+      // Cache the data
+      _cache.putSpecialList(key, result.data, resolve: true);
 
       return result.data;
     }
@@ -1692,8 +1706,10 @@ class MangaChapters extends _$MangaChapters {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      api.invalidateAll('fetchMangaChapters(${manga.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchMangaChapters(_offset);
@@ -1747,6 +1763,17 @@ class MangaCovers extends _$MangaCovers {
       // Otherwise, do nothing because there is no more content
       _atEnd = true;
     }
+  }
+
+  Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      api.invalidateAll('getCoverList(${manga.id}');
+      _offset = 0;
+      _atEnd = false;
+      return _fetchCovers(_offset);
+    });
   }
 }
 

@@ -449,6 +449,8 @@ class CoverArtAttributes with _$CoverArtAttributes {
   const factory CoverArtAttributes({
     String? volume,
     required String fileName,
+    String? description,
+    String? locale,
   }) = _CoverArtAttributes;
 
   factory CoverArtAttributes.fromJson(Map<String, dynamic> json) =>

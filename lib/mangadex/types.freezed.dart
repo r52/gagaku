@@ -1610,6 +1610,8 @@ CoverArtAttributes _$CoverArtAttributesFromJson(Map<String, dynamic> json) {
 mixin _$CoverArtAttributes {
   String? get volume => throw _privateConstructorUsedError;
   String get fileName => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  String? get locale => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1623,7 +1625,8 @@ abstract class $CoverArtAttributesCopyWith<$Res> {
           CoverArtAttributes value, $Res Function(CoverArtAttributes) then) =
       _$CoverArtAttributesCopyWithImpl<$Res, CoverArtAttributes>;
   @useResult
-  $Res call({String? volume, String fileName});
+  $Res call(
+      {String? volume, String fileName, String? description, String? locale});
 }
 
 /// @nodoc
@@ -1641,6 +1644,8 @@ class _$CoverArtAttributesCopyWithImpl<$Res, $Val extends CoverArtAttributes>
   $Res call({
     Object? volume = freezed,
     Object? fileName = null,
+    Object? description = freezed,
+    Object? locale = freezed,
   }) {
     return _then(_value.copyWith(
       volume: freezed == volume
@@ -1651,6 +1656,14 @@ class _$CoverArtAttributesCopyWithImpl<$Res, $Val extends CoverArtAttributes>
           ? _value.fileName
           : fileName // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      locale: freezed == locale
+          ? _value.locale
+          : locale // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -1663,7 +1676,8 @@ abstract class _$$_CoverArtAttributesCopyWith<$Res>
       __$$_CoverArtAttributesCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? volume, String fileName});
+  $Res call(
+      {String? volume, String fileName, String? description, String? locale});
 }
 
 /// @nodoc
@@ -1679,6 +1693,8 @@ class __$$_CoverArtAttributesCopyWithImpl<$Res>
   $Res call({
     Object? volume = freezed,
     Object? fileName = null,
+    Object? description = freezed,
+    Object? locale = freezed,
   }) {
     return _then(_$_CoverArtAttributes(
       volume: freezed == volume
@@ -1689,6 +1705,14 @@ class __$$_CoverArtAttributesCopyWithImpl<$Res>
           ? _value.fileName
           : fileName // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      locale: freezed == locale
+          ? _value.locale
+          : locale // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1698,7 +1722,8 @@ class __$$_CoverArtAttributesCopyWithImpl<$Res>
 class _$_CoverArtAttributes
     with DiagnosticableTreeMixin
     implements _CoverArtAttributes {
-  const _$_CoverArtAttributes({this.volume, required this.fileName});
+  const _$_CoverArtAttributes(
+      {this.volume, required this.fileName, this.description, this.locale});
 
   factory _$_CoverArtAttributes.fromJson(Map<String, dynamic> json) =>
       _$$_CoverArtAttributesFromJson(json);
@@ -1707,10 +1732,14 @@ class _$_CoverArtAttributes
   final String? volume;
   @override
   final String fileName;
+  @override
+  final String? description;
+  @override
+  final String? locale;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CoverArtAttributes(volume: $volume, fileName: $fileName)';
+    return 'CoverArtAttributes(volume: $volume, fileName: $fileName, description: $description, locale: $locale)';
   }
 
   @override
@@ -1719,7 +1748,9 @@ class _$_CoverArtAttributes
     properties
       ..add(DiagnosticsProperty('type', 'CoverArtAttributes'))
       ..add(DiagnosticsProperty('volume', volume))
-      ..add(DiagnosticsProperty('fileName', fileName));
+      ..add(DiagnosticsProperty('fileName', fileName))
+      ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('locale', locale));
   }
 
   @override
@@ -1729,12 +1760,16 @@ class _$_CoverArtAttributes
             other is _$_CoverArtAttributes &&
             (identical(other.volume, volume) || other.volume == volume) &&
             (identical(other.fileName, fileName) ||
-                other.fileName == fileName));
+                other.fileName == fileName) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.locale, locale) || other.locale == locale));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, volume, fileName);
+  int get hashCode =>
+      Object.hash(runtimeType, volume, fileName, description, locale);
 
   @JsonKey(ignore: true)
   @override
@@ -1754,7 +1789,9 @@ class _$_CoverArtAttributes
 abstract class _CoverArtAttributes implements CoverArtAttributes {
   const factory _CoverArtAttributes(
       {final String? volume,
-      required final String fileName}) = _$_CoverArtAttributes;
+      required final String fileName,
+      final String? description,
+      final String? locale}) = _$_CoverArtAttributes;
 
   factory _CoverArtAttributes.fromJson(Map<String, dynamic> json) =
       _$_CoverArtAttributes.fromJson;
@@ -1763,6 +1800,10 @@ abstract class _CoverArtAttributes implements CoverArtAttributes {
   String? get volume;
   @override
   String get fileName;
+  @override
+  String? get description;
+  @override
+  String? get locale;
   @override
   @JsonKey(ignore: true)
   _$$_CoverArtAttributesCopyWith<_$_CoverArtAttributes> get copyWith =>

@@ -182,8 +182,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
         onRefresh: () async {
           switch (view.value) {
             case _ViewType.chapters:
+              ref.read(mangaChaptersProvider(manga).notifier).clear();
               return await ref.refresh(mangaChaptersProvider(manga).future);
             case _ViewType.art:
+              ref.read(mangaCoversProvider(manga).notifier).clear();
               return await ref.refresh(mangaCoversProvider(manga).future);
             default:
               break;

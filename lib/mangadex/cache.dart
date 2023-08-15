@@ -18,7 +18,7 @@ class CacheEntryAdapter extends TypeAdapter<CacheEntry> {
     final expiry = DateTime.parse(reader.readString());
     final entry = reader.readString();
 
-    return CacheEntry(entry, expiry: expiry);
+    return CacheEntry(entry, expire: expiry);
   }
 
   @override
@@ -30,19 +30,14 @@ class CacheEntryAdapter extends TypeAdapter<CacheEntry> {
 
 class CacheEntry with ShortLivedData {
   @override
-  late final DateTime expiry;
+  final DateTime expiry;
 
   final String _entry;
   String get entry => _entry;
 
   CacheEntry(this._entry,
-      {DateTime? expiry, Duration duration = const Duration(minutes: 10)}) {
-    if (expiry != null) {
-      this.expiry = expiry;
-    } else {
-      this.expiry = DateTime.now().add(duration);
-    }
-  }
+      {DateTime? expire, Duration duration = const Duration(minutes: 10)})
+      : expiry = (expire != null) ? expire : DateTime.now().add(duration);
 }
 
 class CacheManager {
@@ -57,7 +52,7 @@ class CacheManager {
   CacheManager() : _box = Hive.lazyBox(gagakuCache);
 
   /// Prunes all expired entries
-  Future<void> _pruneExpired() async {
+  Future<void> _pruneExpiredMemory() async {
     logger.d('CacheManager: pruning expired entries...');
 
     final matchingKeys = <String>{};
@@ -67,6 +62,20 @@ class CacheManager {
       }
     }
     _cache.removeWhere((key, value) => matchingKeys.contains(key));
+    await _box.deleteAll(matchingKeys);
+  }
+
+  Future<void> _pruneExpiredDisk() async {
+    logger.d('CacheManager: pruning expired entries from disk...');
+
+    final matchingKeys = <String>{};
+    for (final (key as String) in _box.keys) {
+      final entry = await _box.get(key);
+      if (entry != null && entry.isExpired()) {
+        matchingKeys.add(key);
+      }
+    }
+
     await _box.deleteAll(matchingKeys);
   }
 
@@ -118,7 +127,7 @@ class CacheManager {
       if (!_cache[key]!.isExpired()) {
         exists = true;
       } else {
-        remove(key);
+        await remove(key);
       }
     }
 
@@ -150,9 +159,12 @@ class CacheManager {
       await _box.put(key, entry);
     }
 
-    if (_cache.length > _preferredMaxEntries ||
-        _box.length > _preferredMaxDiskEntries) {
-      _pruneExpired();
+    if (_cache.length > _preferredMaxEntries) {
+      _pruneExpiredMemory();
+    }
+
+    if (_box.length > _preferredMaxDiskEntries) {
+      _pruneExpiredDisk();
     }
   }
 
@@ -168,9 +180,12 @@ class CacheManager {
       await _box.put(e.key, e.value);
     }
 
-    if (_cache.length > _preferredMaxEntries ||
-        _box.length > _preferredMaxDiskEntries) {
-      _pruneExpired();
+    if (_cache.length > _preferredMaxEntries) {
+      _pruneExpiredMemory();
+    }
+
+    if (_box.length > _preferredMaxDiskEntries) {
+      _pruneExpiredDisk();
     }
   }
 
@@ -179,7 +194,7 @@ class CacheManager {
   Future<void> putSpecialList(String key, Iterable<MangaDexUUID> list,
       {bool resolve = true,
       Duration expiry = const Duration(minutes: 10)}) async {
-    logger.d('CacheManager: caching list: $key');
+    logger.d('CacheManager: caching list: $key for ${expiry.toString()}');
 
     // Transform data list to a list of uuids
     final ids = list.map((e) => e.id).toList();
