@@ -1709,7 +1709,7 @@ class MangaChapters extends _$MangaChapters {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      api.invalidateAll('fetchMangaChapters(${manga.id}');
+      await api.invalidateAll('fetchMangaChapters(${manga.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchMangaChapters(_offset);
@@ -1769,7 +1769,7 @@ class MangaCovers extends _$MangaCovers {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      api.invalidateAll('getCoverList(${manga.id}');
+      await api.invalidateAll('getCoverList(${manga.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchCovers(_offset);
