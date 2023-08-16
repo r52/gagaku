@@ -828,6 +828,13 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                             ContentRatingChip(
                                 rating: manga.attributes.contentRating),
                             ...manga.attributes.tags
+                                .where((tag) =>
+                                    tag.attributes.group == TagGroup.content)
+                                .map((e) => ContentChip(
+                                    content: e.attributes.name.get('en'))),
+                            ...manga.attributes.tags
+                                .where((tag) =>
+                                    tag.attributes.group != TagGroup.content)
                                 .map(
                                   (e) => IconTextChip(
                                       text: Text(e.attributes.name.get('en'))),
@@ -911,6 +918,11 @@ class _ListMangaItem extends ConsumerWidget {
                     runSpacing: 4.0,
                     children: [
                       ContentRatingChip(rating: manga.attributes.contentRating),
+                      ...manga.attributes.tags
+                          .where(
+                              (tag) => tag.attributes.group == TagGroup.content)
+                          .map((e) => ContentChip(
+                              content: e.attributes.name.get('en'))),
                       if (manga.attributes.tags.isNotEmpty)
                         ...manga.attributes.tags
                             .where((tag) =>
@@ -1059,6 +1071,31 @@ class ContentRatingChip extends StatelessWidget {
       color: iconColor,
       text: Text(
         rating.formatted,
+      ),
+    );
+  }
+}
+
+class ContentChip extends StatelessWidget {
+  const ContentChip({Key? key, required this.content}) : super(key: key);
+
+  final String content;
+
+  @override
+  Widget build(BuildContext context) {
+    var iconColor = Colors.orange;
+
+    switch (content) {
+      case 'Gore':
+      case 'Sexual Violence':
+        iconColor = Colors.red;
+        break;
+    }
+
+    return IconTextChip(
+      color: iconColor,
+      text: Text(
+        content,
       ),
     );
   }

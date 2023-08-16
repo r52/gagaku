@@ -509,6 +509,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   runSpacing: 4.0,
                   children: [
                     ContentRatingChip(rating: manga.attributes.contentRating),
+                    ...manga.attributes.tags
+                        .where(
+                            (tag) => tag.attributes.group == TagGroup.content)
+                        .map((e) =>
+                            ContentChip(content: e.attributes.name.get('en'))),
                     const SizedBox(
                       width: 2,
                     ),
