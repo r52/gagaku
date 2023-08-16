@@ -22,7 +22,7 @@ class WebReaderData {
     this.onLinkPressed,
   });
 
-  final String source;
+  final dynamic source;
   final String? title;
   final WebManga? manga;
   final Widget? link;
@@ -91,9 +91,15 @@ Future<WebReaderData> _fetchWebChapterInfo(
 }
 
 @riverpod
-Future<List<ReaderPage>> _getPages(_GetPagesRef ref, String code) async {
-  final api = ref.watch(proxyProvider);
-  final pages = await api.getChapter(code);
+Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
+  List<String> pages;
+
+  if (source is List) {
+    pages = List<String>.from(source);
+  } else {
+    final api = ref.watch(proxyProvider);
+    pages = await api.getChapter(source);
+  }
 
   return pages
       .map((e) => ReaderPage(
@@ -159,7 +165,7 @@ class WebSourceReaderWidget extends ConsumerWidget {
     this.onLinkPressed,
   });
 
-  final String source;
+  final dynamic source;
   final String? title;
   final WebManga? manga;
   final Widget? link;
@@ -167,10 +173,12 @@ class WebSourceReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String name = source;
+    String name = '';
 
     if (title != null) {
       name = title!;
+    } else if (source is String) {
+      name = source;
     }
 
     final pages = ref.watch(_getPagesProvider(source));

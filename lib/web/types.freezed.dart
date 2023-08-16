@@ -319,6 +319,7 @@ mixin _$WebManga {
   String get artist => throw _privateConstructorUsedError;
   String get author => throw _privateConstructorUsedError;
   String get cover => throw _privateConstructorUsedError;
+  Map<String, String>? get groups => throw _privateConstructorUsedError;
   Map<String, WebChapter> get chapters => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -338,6 +339,7 @@ abstract class $WebMangaCopyWith<$Res> {
       String artist,
       String author,
       String cover,
+      Map<String, String>? groups,
       Map<String, WebChapter> chapters});
 }
 
@@ -359,6 +361,7 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
     Object? artist = null,
     Object? author = null,
     Object? cover = null,
+    Object? groups = freezed,
     Object? chapters = null,
   }) {
     return _then(_value.copyWith(
@@ -382,6 +385,10 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
           ? _value.cover
           : cover // ignore: cast_nullable_to_non_nullable
               as String,
+      groups: freezed == groups
+          ? _value.groups
+          : groups // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>?,
       chapters: null == chapters
           ? _value.chapters
           : chapters // ignore: cast_nullable_to_non_nullable
@@ -403,6 +410,7 @@ abstract class _$$_WebMangaCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
       String artist,
       String author,
       String cover,
+      Map<String, String>? groups,
       Map<String, WebChapter> chapters});
 }
 
@@ -422,6 +430,7 @@ class __$$_WebMangaCopyWithImpl<$Res>
     Object? artist = null,
     Object? author = null,
     Object? cover = null,
+    Object? groups = freezed,
     Object? chapters = null,
   }) {
     return _then(_$_WebManga(
@@ -445,6 +454,10 @@ class __$$_WebMangaCopyWithImpl<$Res>
           ? _value.cover
           : cover // ignore: cast_nullable_to_non_nullable
               as String,
+      groups: freezed == groups
+          ? _value._groups
+          : groups // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>?,
       chapters: null == chapters
           ? _value._chapters
           : chapters // ignore: cast_nullable_to_non_nullable
@@ -462,8 +475,10 @@ class _$_WebManga extends _WebManga {
       required this.artist,
       required this.author,
       required this.cover,
+      final Map<String, String>? groups,
       required final Map<String, WebChapter> chapters})
-      : _chapters = chapters,
+      : _groups = groups,
+        _chapters = chapters,
         super._();
 
   factory _$_WebManga.fromJson(Map<String, dynamic> json) =>
@@ -479,6 +494,16 @@ class _$_WebManga extends _WebManga {
   final String author;
   @override
   final String cover;
+  final Map<String, String>? _groups;
+  @override
+  Map<String, String>? get groups {
+    final value = _groups;
+    if (value == null) return null;
+    if (_groups is EqualUnmodifiableMapView) return _groups;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   final Map<String, WebChapter> _chapters;
   @override
   Map<String, WebChapter> get chapters {
@@ -489,7 +514,7 @@ class _$_WebManga extends _WebManga {
 
   @override
   String toString() {
-    return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, chapters: $chapters)';
+    return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, chapters: $chapters)';
   }
 
   @override
@@ -503,13 +528,21 @@ class _$_WebManga extends _WebManga {
             (identical(other.artist, artist) || other.artist == artist) &&
             (identical(other.author, author) || other.author == author) &&
             (identical(other.cover, cover) || other.cover == cover) &&
+            const DeepCollectionEquality().equals(other._groups, _groups) &&
             const DeepCollectionEquality().equals(other._chapters, _chapters));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, title, description, artist,
-      author, cover, const DeepCollectionEquality().hash(_chapters));
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      description,
+      artist,
+      author,
+      cover,
+      const DeepCollectionEquality().hash(_groups),
+      const DeepCollectionEquality().hash(_chapters));
 
   @JsonKey(ignore: true)
   @override
@@ -532,6 +565,7 @@ abstract class _WebManga extends WebManga {
       required final String artist,
       required final String author,
       required final String cover,
+      final Map<String, String>? groups,
       required final Map<String, WebChapter> chapters}) = _$_WebManga;
   const _WebManga._() : super._();
 
@@ -547,6 +581,8 @@ abstract class _WebManga extends WebManga {
   String get author;
   @override
   String get cover;
+  @override
+  Map<String, String>? get groups;
   @override
   Map<String, WebChapter> get chapters;
   @override
@@ -565,7 +601,9 @@ mixin _$WebChapter {
   String get volume => throw _privateConstructorUsedError;
   @EpochTimestampSerializer()
   DateTime? get lastUpdated => throw _privateConstructorUsedError;
-  Map<String, String> get groups => throw _privateConstructorUsedError;
+  @MappedEpochTimestampSerializer()
+  DateTime? get releaseDate => throw _privateConstructorUsedError;
+  Map<String, dynamic> get groups => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -583,7 +621,8 @@ abstract class $WebChapterCopyWith<$Res> {
       {String title,
       String volume,
       @EpochTimestampSerializer() DateTime? lastUpdated,
-      Map<String, String> groups});
+      @MappedEpochTimestampSerializer() DateTime? releaseDate,
+      Map<String, dynamic> groups});
 }
 
 /// @nodoc
@@ -602,6 +641,7 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
     Object? title = null,
     Object? volume = null,
     Object? lastUpdated = freezed,
+    Object? releaseDate = freezed,
     Object? groups = null,
   }) {
     return _then(_value.copyWith(
@@ -617,10 +657,14 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      releaseDate: freezed == releaseDate
+          ? _value.releaseDate
+          : releaseDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       groups: null == groups
           ? _value.groups
           : groups // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
+              as Map<String, dynamic>,
     ) as $Val);
   }
 }
@@ -637,7 +681,8 @@ abstract class _$$_WebChapterCopyWith<$Res>
       {String title,
       String volume,
       @EpochTimestampSerializer() DateTime? lastUpdated,
-      Map<String, String> groups});
+      @MappedEpochTimestampSerializer() DateTime? releaseDate,
+      Map<String, dynamic> groups});
 }
 
 /// @nodoc
@@ -654,6 +699,7 @@ class __$$_WebChapterCopyWithImpl<$Res>
     Object? title = null,
     Object? volume = null,
     Object? lastUpdated = freezed,
+    Object? releaseDate = freezed,
     Object? groups = null,
   }) {
     return _then(_$_WebChapter(
@@ -669,10 +715,14 @@ class __$$_WebChapterCopyWithImpl<$Res>
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      releaseDate: freezed == releaseDate
+          ? _value.releaseDate
+          : releaseDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       groups: null == groups
           ? _value._groups
           : groups // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
+              as Map<String, dynamic>,
     ));
   }
 }
@@ -685,7 +735,8 @@ class _$_WebChapter extends _WebChapter {
       {required this.title,
       required this.volume,
       @EpochTimestampSerializer() this.lastUpdated,
-      required final Map<String, String> groups})
+      @MappedEpochTimestampSerializer() this.releaseDate,
+      required final Map<String, dynamic> groups})
       : _groups = groups,
         super._();
 
@@ -699,9 +750,12 @@ class _$_WebChapter extends _WebChapter {
   @override
   @EpochTimestampSerializer()
   final DateTime? lastUpdated;
-  final Map<String, String> _groups;
   @override
-  Map<String, String> get groups {
+  @MappedEpochTimestampSerializer()
+  final DateTime? releaseDate;
+  final Map<String, dynamic> _groups;
+  @override
+  Map<String, dynamic> get groups {
     if (_groups is EqualUnmodifiableMapView) return _groups;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableMapView(_groups);
@@ -709,7 +763,7 @@ class _$_WebChapter extends _WebChapter {
 
   @override
   String toString() {
-    return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, groups: $groups)';
+    return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
   }
 
   @override
@@ -721,13 +775,15 @@ class _$_WebChapter extends _WebChapter {
             (identical(other.volume, volume) || other.volume == volume) &&
             (identical(other.lastUpdated, lastUpdated) ||
                 other.lastUpdated == lastUpdated) &&
+            (identical(other.releaseDate, releaseDate) ||
+                other.releaseDate == releaseDate) &&
             const DeepCollectionEquality().equals(other._groups, _groups));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, title, volume, lastUpdated,
-      const DeepCollectionEquality().hash(_groups));
+      releaseDate, const DeepCollectionEquality().hash(_groups));
 
   @JsonKey(ignore: true)
   @override
@@ -748,7 +804,8 @@ abstract class _WebChapter extends WebChapter {
       {required final String title,
       required final String volume,
       @EpochTimestampSerializer() final DateTime? lastUpdated,
-      required final Map<String, String> groups}) = _$_WebChapter;
+      @MappedEpochTimestampSerializer() final DateTime? releaseDate,
+      required final Map<String, dynamic> groups}) = _$_WebChapter;
   const _WebChapter._() : super._();
 
   factory _WebChapter.fromJson(Map<String, dynamic> json) =
@@ -762,7 +819,10 @@ abstract class _WebChapter extends WebChapter {
   @EpochTimestampSerializer()
   DateTime? get lastUpdated;
   @override
-  Map<String, String> get groups;
+  @MappedEpochTimestampSerializer()
+  DateTime? get releaseDate;
+  @override
+  Map<String, dynamic> get groups;
   @override
   @JsonKey(ignore: true)
   _$$_WebChapterCopyWith<_$_WebChapter> get copyWith =>

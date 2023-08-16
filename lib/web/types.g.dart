@@ -24,6 +24,9 @@ _$_WebManga _$$_WebMangaFromJson(Map<String, dynamic> json) => _$_WebManga(
       artist: json['artist'] as String,
       author: json['author'] as String,
       cover: json['cover'] as String,
+      groups: (json['groups'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
       chapters: (json['chapters'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
       ),
@@ -36,6 +39,7 @@ Map<String, dynamic> _$$_WebMangaToJson(_$_WebManga instance) =>
       'artist': instance.artist,
       'author': instance.author,
       'cover': instance.cover,
+      'groups': instance.groups,
       'chapters': instance.chapters,
     };
 
@@ -45,7 +49,9 @@ _$_WebChapter _$$_WebChapterFromJson(Map<String, dynamic> json) =>
       volume: json['volume'] as String,
       lastUpdated:
           const EpochTimestampSerializer().fromJson(json['last_updated']),
-      groups: Map<String, String>.from(json['groups'] as Map),
+      releaseDate:
+          const MappedEpochTimestampSerializer().fromJson(json['release_date']),
+      groups: json['groups'] as Map<String, dynamic>,
     );
 
 Map<String, dynamic> _$$_WebChapterToJson(_$_WebChapter instance) =>
@@ -54,6 +60,8 @@ Map<String, dynamic> _$$_WebChapterToJson(_$_WebChapter instance) =>
       'volume': instance.volume,
       'last_updated':
           const EpochTimestampSerializer().toJson(instance.lastUpdated),
+      'release_date':
+          const MappedEpochTimestampSerializer().toJson(instance.releaseDate),
       'groups': instance.groups,
     };
 
