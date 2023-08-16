@@ -27,7 +27,7 @@ extension MDCacheManagerExt on CacheManager {
     final ids = list.map((e) => e.id).toList();
 
     // Overwrite any previous entries
-    put(key, ids, true, expiry);
+    await put(key, ids, true, expiry);
 
     if (resolve) {
       await putAllAPIResolved(list, expiry);
