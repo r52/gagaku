@@ -361,7 +361,7 @@ class CreatorTitlesProvider
   }
 }
 
-String _$mangaChaptersHash() => r'6f031d7b72ab53a434981bc6e0131e341c3e20eb';
+String _$mangaChaptersHash() => r'74cbf3b45413db87c22b3971de100ff673499f36';
 
 abstract class _$MangaChapters extends BuildlessAsyncNotifier<List<Chapter>> {
   late final Manga manga;
@@ -457,7 +457,7 @@ class MangaChaptersProvider
   }
 }
 
-String _$mangaCoversHash() => r'5a688c411dc7100278f6719eb42382e91457d78c';
+String _$mangaCoversHash() => r'53e93ef0159dc2a20beb82d03b60bcab5d67fbe8';
 
 abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<Cover>> {
   late final Manga manga;

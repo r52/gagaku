@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:gagaku/log.dart';
+import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/cache.dart';
 import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -105,6 +106,7 @@ MangaDexModel mangadex(MangadexRef ref) {
 
 class MangaDexModel {
   MangaDexModel(this.ref) {
+    _cache = ref.watch(cacheProvider);
     _future = refreshToken();
   }
 
@@ -116,7 +118,7 @@ class MangaDexModel {
   late Future _future;
   Future get future => _future;
 
-  final CacheManager _cache = CacheManager();
+  late final CacheManager _cache;
 
   // void _urlLauncher(String url) async {
   //   var uri = Uri.parse(url);

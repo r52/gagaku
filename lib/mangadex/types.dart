@@ -308,12 +308,6 @@ mixin MangaDexUUID {
   Map<String, dynamic> toJson();
 }
 
-mixin ShortLivedData {
-  DateTime get expiry;
-
-  bool isExpired() => DateTime.now().compareTo(expiry) >= 0;
-}
-
 @freezed
 class ChapterList with _$ChapterList {
   const factory ChapterList(
@@ -849,7 +843,7 @@ class SelfRatingResponse with _$SelfRatingResponse {
 }
 
 @freezed
-class SelfRating with _$SelfRating, ShortLivedData {
+class SelfRating with _$SelfRating, ExpiringData {
   SelfRating._();
 
   factory SelfRating({
@@ -883,7 +877,7 @@ class ChapterFeedItemData {
   List<Chapter> chapters = [];
 }
 
-class ReadChapterSet with ShortLivedData {
+class ReadChapterSet with ExpiringData {
   ReadChapterSet(this.mangaId, this._chapters);
 
   final String mangaId;
@@ -925,7 +919,7 @@ class ReadChapterSet with ShortLivedData {
 
 // Deprecated old style login types
 @freezed
-class OldToken with _$OldToken, ShortLivedData {
+class OldToken with _$OldToken, ExpiringData {
   OldToken._();
 
   static const int expiryTime = 600; // seconds (10 minutes)

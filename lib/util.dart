@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+mixin ExpiringData {
+  DateTime get expiry;
+
+  bool isExpired() => DateTime.now().compareTo(expiry) >= 0;
+}
+
 extension IterableAsync<T> on Iterable<T> {
   Future<Iterable<T>> whereAsync(Future<bool> Function(T) test) async {
     final futures = map((e) async => (e, await test(e)));
