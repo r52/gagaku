@@ -143,13 +143,13 @@ class WebChapter with _$WebChapter {
       _$WebChapterFromJson(json);
 
   String getTitle(String index) {
-    String title = 'Chapter $index';
+    String output = index;
 
     if (title.isNotEmpty) {
-      title += ' - $title';
+      output += ': $title';
     }
 
-    return title;
+    return output;
   }
 }
 
