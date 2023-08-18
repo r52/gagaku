@@ -177,6 +177,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
       return () => scrollController.removeListener(controllerAtEdge);
     }, [scrollController]);
 
+    final formatTags = manga.attributes.tags
+        .where((tag) => tag.attributes.group == TagGroup.format);
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
@@ -519,9 +522,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     ),
                     if (manga.attributes.tags.isNotEmpty)
                       ...manga.attributes.tags
-                          .where((tag) =>
-                              (tag.attributes.group == TagGroup.genre ||
-                                  tag.attributes.group == TagGroup.theme))
+                          .where(
+                              (tag) => tag.attributes.group != TagGroup.content)
                           .map(
                             (e) => IconTextChip(
                                 text: Text(e.attributes.name.get('en'))),
@@ -762,6 +764,25 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             children: manga.attributes.tags
                                 .where((tag) =>
                                     tag.attributes.group == TagGroup.theme)
+                                .map((e) => IconTextChip(
+                                    text: Text(e.attributes.name.get('en'))))
+                                .toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (formatTags.isNotEmpty)
+                    ExpansionTile(
+                      expandedAlignment: Alignment.centerLeft,
+                      title: const Text('Format'),
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          color: theme.colorScheme.background,
+                          child: Wrap(
+                            spacing: 4.0,
+                            runSpacing: 4.0,
+                            children: formatTags
                                 .map((e) => IconTextChip(
                                     text: Text(e.attributes.name.get('en'))))
                                 .toList(),
