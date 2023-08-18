@@ -294,62 +294,55 @@ class ChapterButtonWidget extends StatelessWidget {
       timestamp = Text(timeago.format(chapter.releaseDate!));
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(color: theme.colorScheme.background, width: 4.0),
-        ),
+    return ListTile(
+      onTap: () {
+        context.push('/read/${info.proxy}/${info.code}/$name/1/',
+            extra: WebReaderData(
+              source: chapter.groups.entries.first.value,
+              title: title,
+              manga: manga,
+              link: link,
+              onLinkPressed: onLinkPressed,
+            ));
+      },
+      tileColor: theme.colorScheme.primaryContainer,
+      dense: true,
+      minVerticalPadding: 0.0,
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
+      minLeadingWidth: 0.0,
+      title: Text(
+        title,
+        style: TextStyle(color: theme.colorScheme.primary),
       ),
-      child: ListTile(
-        onTap: () {
-          context.push('/read/${info.proxy}/${info.code}/$name/1/',
-              extra: WebReaderData(
-                source: chapter.groups.entries.first.value,
-                title: title,
-                manga: manga,
-                link: link,
-                onLinkPressed: onLinkPressed,
-              ));
-        },
-        tileColor: theme.colorScheme.primaryContainer,
-        dense: true,
-        minVerticalPadding: 0.0,
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
-        minLeadingWidth: 0.0,
-        title: Text(
-          title,
-          style: TextStyle(color: theme.colorScheme.primary),
-        ),
-        trailing: !screenSizeSmall
-            ? FittedBox(
-                fit: BoxFit.fill,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconTextChip(
-                      icon: const Icon(Icons.group, size: 20),
-                      text: Text(manga.groups != null &&
-                              manga.groups?.containsKey(group) == true
-                          ? manga.groups![group]!
-                          : group),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(Icons.schedule, size: 20),
-                    const SizedBox(width: 5),
-                    if (timestamp != null) timestamp
-                  ],
-                ),
-              )
-            : Row(
+      trailing: !screenSizeSmall
+          ? FittedBox(
+              fit: BoxFit.fill,
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.schedule, size: 15),
+                  IconTextChip(
+                    icon: const Icon(Icons.group, size: 20),
+                    text: Text(manga.groups != null &&
+                            manga.groups?.containsKey(group) == true
+                        ? manga.groups![group]!
+                        : group),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.schedule, size: 20),
                   const SizedBox(width: 5),
                   if (timestamp != null) timestamp
                 ],
               ),
-      ),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.schedule, size: 15),
+                const SizedBox(width: 5),
+                if (timestamp != null) timestamp
+              ],
+            ),
     );
   }
 }
