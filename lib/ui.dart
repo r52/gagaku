@@ -113,33 +113,30 @@ class IconTextChip extends HookWidget {
 }
 
 class TriStateChip extends StatelessWidget {
-  const TriStateChip(
-      {super.key,
-      required this.label,
-      this.labelStyle,
-      this.labelPadding,
-      required this.value,
-      required this.onChanged,
-      this.side,
-      this.shape,
-      this.clipBehavior = Clip.none,
-      this.focusNode,
-      this.autofocus = false,
-      this.backgroundColor,
-      this.padding,
-      this.visualDensity,
-      this.materialTapTargetSize,
-      this.elevation,
-      this.shadowColor,
-      this.selectedColor,
-      this.unselectedColor})
-      : assert(onChanged != null),
+  const TriStateChip({
+    super.key,
+    required this.label,
+    this.labelStyle,
+    this.labelPadding,
+    required this.value,
+    required this.onChanged,
+    this.shape,
+    this.clipBehavior = Clip.none,
+    this.focusNode,
+    this.autofocus = false,
+    this.backgroundColor,
+    this.padding,
+    this.visualDensity,
+    this.materialTapTargetSize,
+    this.elevation,
+    this.shadowColor,
+    this.selectedColor,
+  })  : assert(onChanged != null),
         assert(elevation == null || elevation >= 0.0);
 
   final Widget label;
   final TextStyle? labelStyle;
   final EdgeInsetsGeometry? labelPadding;
-  final BorderSide? side;
   final OutlinedBorder? shape;
   final Clip clipBehavior;
   final FocusNode? focusNode;
@@ -154,7 +151,6 @@ class TriStateChip extends StatelessWidget {
   final bool? value;
   final ValueChanged<bool?>? onChanged;
   final Color? selectedColor;
-  final Color? unselectedColor;
 
   void _onPressed() {
     switch (value) {
@@ -170,23 +166,34 @@ class TriStateChip extends StatelessWidget {
     }
   }
 
+  BorderSide? _getBorder(Set<MaterialState> states) {
+    if (selectedColor == null) {
+      return null;
+    }
+
+    if (value == false) {
+      return BorderSide(color: selectedColor!);
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
 
     Widget? avatar;
-    Color? bgColor = backgroundColor;
+    bool selected = false;
 
     switch (value) {
       case null:
         break;
       case true:
-        avatar = const Icon(Icons.add);
-        bgColor = selectedColor;
+        selected = true;
         break;
       case false:
         avatar = const Icon(Icons.remove);
-        bgColor = unselectedColor;
+        selected = false;
         break;
     }
 
@@ -195,8 +202,8 @@ class TriStateChip extends StatelessWidget {
       label: label,
       onPressed: _onPressed,
       labelStyle: labelStyle,
-      backgroundColor: bgColor,
-      side: side,
+      selectedColor: selectedColor,
+      side: MaterialStateBorderSide.resolveWith(_getBorder),
       shape: shape,
       clipBehavior: clipBehavior,
       focusNode: focusNode,
@@ -205,6 +212,8 @@ class TriStateChip extends StatelessWidget {
       visualDensity: visualDensity,
       labelPadding: labelPadding,
       isEnabled: true,
+      selected: selected,
+      backgroundColor: backgroundColor,
       materialTapTargetSize: materialTapTargetSize,
       elevation: elevation,
       shadowColor: shadowColor,
