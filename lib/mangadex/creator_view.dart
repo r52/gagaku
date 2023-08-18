@@ -183,6 +183,14 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                     color: theme.colorScheme.surfaceVariant,
                                     child: MarkdownBody(
                                       data: desc,
+                                      onTapLink: (text, url, title) async {
+                                        if (url != null) {
+                                          if (!await launchUrl(
+                                              Uri.parse(url))) {
+                                            throw 'Could not launch $url';
+                                          }
+                                        }
+                                      },
                                     ),
                                   ),
                                 ],

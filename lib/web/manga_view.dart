@@ -1,5 +1,6 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
@@ -10,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
 
 part 'manga_view.g.dart';
 
@@ -169,8 +171,17 @@ class WebMangaViewWidget extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(8),
-                  color: theme.colorScheme.background,
-                  child: Text(manga.description),
+                  color: theme.colorScheme.surfaceVariant,
+                  child: MarkdownBody(
+                    data: manga.description,
+                    onTapLink: (text, url, title) async {
+                      if (url != null) {
+                        if (!await launchUrl(Uri.parse(url))) {
+                          throw 'Could not launch $url';
+                        }
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
