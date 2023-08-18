@@ -861,8 +861,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               ),
                             ButtonChip(
                               onPressed: () async {
-                                final url =
-                                    'https://mangadex.org/title/${manga.id}';
+                                final route =
+                                    GoRouterState.of(context).uri.toString();
+                                final url = 'https://mangadex.org$route';
                                 if (!await launchUrl(Uri.parse(url))) {
                                   throw 'Could not launch $url';
                                 }

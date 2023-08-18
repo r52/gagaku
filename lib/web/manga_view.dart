@@ -222,6 +222,33 @@ class WebMangaViewWidget extends StatelessWidget {
                   ),
                 ],
               ),
+              ExpansionTile(
+                expandedAlignment: Alignment.centerLeft,
+                title: const Text('Links'),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: theme.colorScheme.background,
+                    child: Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
+                      children: [
+                        ButtonChip(
+                          onPressed: () async {
+                            final route =
+                                GoRouterState.of(context).uri.toString();
+                            final url = 'https://cubari.moe$route';
+                            if (!await launchUrl(Uri.parse(url))) {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          text: const Text('Open on cubari.moe'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
