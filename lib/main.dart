@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
 import 'package:gagaku/mangadex/creator_view.dart';
 import 'package:gagaku/mangadex/group_view.dart';
@@ -45,7 +46,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
+  Hive.registerAdapter(CacheEntryAdapter());
   await Hive.openBox(gagakuBox);
+  await Hive.openLazyBox<CacheEntry>(gagakuCache);
 
   final appdir = await getApplicationSupportDirectory();
 

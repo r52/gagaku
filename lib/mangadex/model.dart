@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:gagaku/log.dart';
+import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/cache.dart';
 import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -105,6 +106,7 @@ MangaDexModel mangadex(MangadexRef ref) {
 
 class MangaDexModel {
   MangaDexModel(this.ref) {
+    _cache = ref.watch(cacheProvider);
     _future = refreshToken();
   }
 
@@ -116,7 +118,7 @@ class MangaDexModel {
   late Future _future;
   Future get future => _future;
 
-  final CacheManager _cache = CacheManager();
+  late final CacheManager _cache;
 
   // void _urlLauncher(String url) async {
   //   var uri = Uri.parse(url);
@@ -149,7 +151,7 @@ class MangaDexModel {
         return false;
       }
 
-      return _token!.expired;
+      return _token!.isExpired();
     });
   }
 
@@ -349,9 +351,13 @@ class MangaDexModel {
   ///
   /// [item] - key of the item to be invalidated
   Future<void> invalidateCacheItem(String item) async {
-    if (_cache.exists(item)) {
-      _cache.remove(item);
+    if (await _cache.exists(item)) {
+      await _cache.remove(item);
     }
+  }
+
+  Future<void> invalidateAll(String startsWith) async {
+    await _cache.invalidateAll(startsWith);
   }
 
   /// Fetches the latest chapters feed of the MangaDex user
@@ -367,6 +373,12 @@ class MangaDexModel {
     if (!await loggedIn()) {
       throw Exception(
           "fetchUserFeed() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final key = 'fetchUserFeed($offset)';
+
+    if (await _cache.exists(key)) {
+      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
     }
 
     final settings = ref.read(mdConfigProvider);
@@ -401,8 +413,8 @@ class MangaDexModel {
 
       final result = ChapterList.fromJson(body);
 
-      // Cache the data
-      _cache.putAllAPIResolved(result.data);
+      // Cache the data and list
+      _cache.putSpecialList(key, result.data, resolve: true);
 
       return result.data;
     }
@@ -428,6 +440,12 @@ class MangaDexModel {
   Future<Iterable<Chapter>> fetchChapterFeed(
       {int offset = 0, Group? group}) async {
     final settings = ref.read(mdConfigProvider);
+
+    final key = 'fetchChapterFeed(${group?.id},$offset)';
+
+    if (await _cache.exists(key)) {
+      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
+    }
 
     // Download missing data
     final queryParams = {
@@ -461,8 +479,8 @@ class MangaDexModel {
 
       final result = ChapterList.fromJson(body);
 
-      // Cache the data
-      _cache.putAllAPIResolved(result.data);
+      // Cache the data and list
+      _cache.putSpecialList(key, result.data, resolve: true);
 
       return result.data;
     }
@@ -480,7 +498,9 @@ class MangaDexModel {
 
     final list = <Chapter>[];
 
-    final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
+    final fetch =
+        (await uuids.whereAsync((id) async => !await _cache.exists(id)))
+            .toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
@@ -523,8 +543,8 @@ class MangaDexModel {
 
     // Craft the list
     for (final id in uuids) {
-      if (_cache.exists(id)) {
-        list.add(_cache.get<Chapter>(id));
+      if (await _cache.exists(id)) {
+        list.add(_cache.get<Chapter>(id, Chapter.fromJson));
       }
     }
 
@@ -546,7 +566,9 @@ class MangaDexModel {
     Set<Manga> list = <Manga>{};
 
     if (ids != null) {
-      final fetch = ids.where((id) => (!_cache.exists(id))).toList();
+      final fetch =
+          (await ids.whereAsync((id) async => !await _cache.exists(id)))
+              .toList();
 
       if (fetch.isNotEmpty) {
         int start = 0, end = 0;
@@ -581,8 +603,8 @@ class MangaDexModel {
 
       // Craft the list
       for (final id in ids) {
-        if (_cache.exists(id)) {
-          list.add(_cache.get<Manga>(id));
+        if (await _cache.exists(id)) {
+          list.add(_cache.get<Manga>(id, Manga.fromJson));
         }
       }
     } else if (filterId != null) {
@@ -880,6 +902,12 @@ class MangaDexModel {
       [int offset = 0]) async {
     final settings = ref.read(mdConfigProvider);
 
+    final key = 'fetchMangaChapters(${manga.id},$offset)';
+
+    if (await _cache.exists(key)) {
+      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
+    }
+
     // Download missing data
     final queryParams = {
       'limit': MangaDexEndpoints.apiQueryLimit.toString(),
@@ -911,7 +939,7 @@ class MangaDexModel {
       final result = ChapterList.fromJson(body);
 
       // Cache the data
-      _cache.putAllAPIResolved(result.data);
+      _cache.putSpecialList(key, result.data, resolve: true);
 
       return result.data;
     }
@@ -1005,8 +1033,13 @@ class MangaDexModel {
           "fetchUserLibrary() called on invalid token/login. Shouldn't ever get here");
     }
 
-    if (_cache.exists(CacheLists.library)) {
-      return _cache.get<LibraryMap>(CacheLists.library);
+    decoder(String key, value) =>
+        MapEntry(key, MangaReadingStatusExt.parse(value));
+
+    if (await _cache.exists(CacheLists.library)) {
+      return _cache.get<LibraryMap>(CacheLists.library, (decoded) {
+        return decoded.map(decoder);
+      });
     }
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
@@ -1014,7 +1047,7 @@ class MangaDexModel {
     final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = jsonDecode(response.body);
+      final Map<String, dynamic> body = json.decode(response.body);
 
       if (body['statuses'] is List) {
         // If the api returns a List, then the result is null
@@ -1023,10 +1056,9 @@ class MangaDexModel {
 
       final mlist = body['statuses'] as Map<String, dynamic>;
 
-      final libMap = mlist.map(
-          (key, value) => MapEntry(key, MangaReadingStatusExt.parse(value)));
+      final libMap = mlist.map(decoder);
 
-      _cache.put(CacheLists.library, libMap, true);
+      _cache.put(CacheLists.library, mlist, true);
 
       return libMap;
     }
@@ -1040,8 +1072,8 @@ class MangaDexModel {
 
   /// Retrieve all MangaDex tags
   Future<Iterable<Tag>> getTagList() async {
-    if (_cache.exists(CacheLists.tags)) {
-      return _cache.getSpecialList<Tag>(CacheLists.tags);
+    if (await _cache.exists(CacheLists.tags)) {
+      return _cache.getSpecialList<Tag>(CacheLists.tags, Tag.fromJson);
     }
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
@@ -1055,7 +1087,7 @@ class MangaDexModel {
 
       // Cache the data and list
       _cache.putSpecialList(CacheLists.tags, result.data,
-          resolve: true, expiry: 65535);
+          resolve: true, expiry: const Duration(days: 7));
 
       return result.data;
     }
@@ -1101,8 +1133,13 @@ class MangaDexModel {
   }
 
   /// Retrieve cover art for a specific manga
-  Future<List<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
-    // Download missing data
+  Future<Iterable<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
+    final key = 'getCoverList(${manga.id},$offset)';
+
+    if (await _cache.exists(key)) {
+      return _cache.getSpecialList<Cover>(key, CoverArt.fromJson);
+    }
+
     final queryParams = {
       'limit': MangaDexEndpoints.apiSearchLimit.toString(),
       'offset': offset.toString(),
@@ -1118,6 +1155,9 @@ class MangaDexModel {
       final Map<String, dynamic> body = json.decode(response.body);
 
       final result = CoverList.fromJson(body);
+
+      // Cache the data
+      _cache.putSpecialList(key, result.data, resolve: true);
 
       return result.data;
     }
@@ -1205,7 +1245,9 @@ class MangaDexModel {
   Future<List<Group>> fetchGroups(Iterable<String> uuids) async {
     final list = <Group>[];
 
-    final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
+    final fetch =
+        (await uuids.whereAsync((id) async => !await _cache.exists(id)))
+            .toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
@@ -1244,8 +1286,8 @@ class MangaDexModel {
 
     // Craft the list
     for (final id in uuids) {
-      if (_cache.exists(id)) {
-        list.add(_cache.get<Group>(id));
+      if (await _cache.exists(id)) {
+        list.add(_cache.get<Group>(id, ScanlationGroup.fromJson));
       }
     }
 
@@ -1256,7 +1298,9 @@ class MangaDexModel {
   Future<List<CreatorType>> fetchCreators(Iterable<String> uuids) async {
     final list = <CreatorType>[];
 
-    final fetch = uuids.where((id) => (!_cache.exists(id))).toList();
+    final fetch =
+        (await uuids.whereAsync((id) async => !await _cache.exists(id)))
+            .toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
@@ -1295,8 +1339,8 @@ class MangaDexModel {
 
     // Craft the list
     for (final id in uuids) {
-      if (_cache.exists(id)) {
-        list.add(_cache.get<CreatorType>(id));
+      if (await _cache.exists(id)) {
+        list.add(_cache.get<CreatorType>(id, Author.fromJson));
       }
     }
 
@@ -1361,8 +1405,10 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      await api.invalidateAll('fetchUserFeed');
       _offset = 0;
       _atEnd = false;
       return _fetchLatestChapters(_offset);
@@ -1422,8 +1468,10 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      await api.invalidateAll('fetchChapterFeed');
       _offset = 0;
       _atEnd = false;
       return _fetchLatestChapters(_offset);
@@ -1481,8 +1529,10 @@ class GroupFeed extends _$GroupFeed {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      await api.invalidateAll('fetchChapterFeed(${group.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchChapters(_offset);
@@ -1658,8 +1708,10 @@ class MangaChapters extends _$MangaChapters {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      await api.invalidateAll('fetchMangaChapters(${manga.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchMangaChapters(_offset);
@@ -1713,6 +1765,17 @@ class MangaCovers extends _$MangaCovers {
       // Otherwise, do nothing because there is no more content
       _atEnd = true;
     }
+  }
+
+  Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await api.invalidateAll('getCoverList(${manga.id}');
+      _offset = 0;
+      _atEnd = false;
+      return _fetchCovers(_offset);
+    });
   }
 }
 
@@ -2130,7 +2193,7 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
           status == MangaReadingStatus.remove ? null : status;
       bool success = await api.setMangaReadingStatus(manga, resolved);
       if (success) {
-        api.invalidateCacheItem(CacheLists.library);
+        await api.invalidateCacheItem(CacheLists.library);
         ref.invalidate(userLibraryProvider);
 
         return resolved;

@@ -219,6 +219,8 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
       fontWeight: FontWeight.bold,
     );
 
+    const selectedChipColor = Colors.deepOrangeAccent;
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -267,7 +269,8 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                   .map(
                     (e) => InputChip(
                       label: Text(e.attributes.name.get('en')),
-                      avatar: const Icon(Icons.add),
+                      showCheckmark: true,
+                      selected: true,
                       onDeleted: () {
                         fil.value = fil.value.copyWith(
                           includedTags: fil.value.includedTags
@@ -275,7 +278,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                               .toSet(),
                         );
                       },
-                      backgroundColor: Colors.deepOrangeAccent,
+                      selectedColor: selectedChipColor,
                     ),
                   )
                   .toList(),
@@ -283,7 +286,10 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                   .map(
                     (e) => InputChip(
                       label: Text(e.attributes.name.get('en')),
-                      avatar: const Icon(Icons.remove),
+                      avatar: Icon(
+                        Icons.remove,
+                        color: theme.colorScheme.primary,
+                      ),
                       onDeleted: () {
                         fil.value = fil.value.copyWith(
                           excludedTags: fil.value.excludedTags
@@ -291,7 +297,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                               .toSet(),
                         );
                       },
-                      backgroundColor: theme.disabledColor,
+                      side: const BorderSide(color: selectedChipColor),
                     ),
                   )
                   .toList()
@@ -330,7 +336,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                         .map(
                           (e) => FilterChip(
                             label: Text(e.formatted),
-                            selectedColor: Colors.deepOrangeAccent,
+                            selectedColor: selectedChipColor,
                             selected: fil.value.contentRating.contains(e),
                             onSelected: (bool value) {
                               if (value) {
@@ -362,7 +368,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                     children: MangaDemographic.values
                         .map((e) => FilterChip(
                               label: Text(e.formatted),
-                              selectedColor: Colors.deepOrangeAccent,
+                              selectedColor: selectedChipColor,
                               selected:
                                   fil.value.publicationDemographic.contains(e),
                               onSelected: (bool value) {
@@ -397,7 +403,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                         .map(
                           (e) => FilterChip(
                             label: Text(e.formatted),
-                            selectedColor: Colors.deepOrangeAccent,
+                            selectedColor: selectedChipColor,
                             selected: fil.value.status.contains(e),
                             onSelected: (bool value) {
                               if (value) {
@@ -429,8 +435,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                           .map(
                             (e) => TriStateChip(
                               label: Text(e.attributes.name.get('en')),
-                              selectedColor: Colors.deepOrangeAccent,
-                              unselectedColor: theme.disabledColor,
+                              selectedColor: selectedChipColor,
                               onChanged: (bool? value) {
                                 switch (value) {
                                   case null:

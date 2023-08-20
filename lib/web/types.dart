@@ -14,6 +14,7 @@ class ProxyInfo with _$ProxyInfo {
   }) = _ProxyInfo;
 
   String getURL() => 'https://cubari.moe/read/$proxy/$code/';
+  String getKey() => '$proxy/$code';
 }
 
 class ProxyData {
@@ -32,7 +33,9 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
       return null;
     }
 
-    return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
+    final epoch = timestamp is int ? timestamp : int.parse(timestamp);
+
+    return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
   }
 
   @override
@@ -42,6 +45,36 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
     }
 
     return (date.millisecondsSinceEpoch / 1000).toString();
+  }
+}
+
+class MappedEpochTimestampSerializer
+    implements JsonConverter<DateTime?, dynamic> {
+  const MappedEpochTimestampSerializer();
+
+  @override
+  DateTime? fromJson(dynamic timestamp) {
+    if (timestamp == null) {
+      return null;
+    }
+
+    if (timestamp is! Map<String, dynamic>) {
+      return null;
+    }
+
+    final date = timestamp.entries.first.value;
+    final epoch = date is int ? date : int.parse(date);
+
+    return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+  }
+
+  @override
+  dynamic toJson(DateTime? date) {
+    if (date == null) {
+      return null;
+    }
+
+    return {'0': (date.millisecondsSinceEpoch / 1000).toString()};
   }
 }
 
@@ -77,6 +110,7 @@ class WebManga with _$WebManga {
     required String artist,
     required String author,
     required String cover,
+    Map<String, String>? groups,
     required Map<String, WebChapter> chapters,
   }) = _WebManga;
 
@@ -101,20 +135,21 @@ class WebChapter with _$WebChapter {
     required String title,
     required String volume,
     @EpochTimestampSerializer() DateTime? lastUpdated,
-    required Map<String, String> groups,
+    @MappedEpochTimestampSerializer() DateTime? releaseDate,
+    required Map<String, dynamic> groups,
   }) = _WebChapter;
 
   factory WebChapter.fromJson(Map<String, dynamic> json) =>
       _$WebChapterFromJson(json);
 
   String getTitle(String index) {
-    String title = 'Chapter $index';
+    String output = index;
 
     if (title.isNotEmpty) {
-      title += ' - $title';
+      output += ': $title';
     }
 
-    return title;
+    return output;
   }
 }
 

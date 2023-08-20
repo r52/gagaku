@@ -112,7 +112,7 @@ class _FetchWebChapterInfoProvider
   }
 }
 
-String _$getPagesHash() => r'dd2d588d01548fc382730f7c547fd2bfbe4e87ce';
+String _$getPagesHash() => r'2f561a3d26939d96cfbadbfa68d5ce72f08e92f4';
 typedef _GetPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
 
 /// See also [_getPages].
@@ -126,10 +126,10 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
 
   /// See also [_getPages].
   _GetPagesProvider call(
-    String code,
+    dynamic source,
   ) {
     return _GetPagesProvider(
-      code,
+      source,
     );
   }
 
@@ -138,7 +138,7 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
     covariant _GetPagesProvider provider,
   ) {
     return call(
-      provider.code,
+      provider.source,
     );
   }
 
@@ -161,11 +161,11 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
 class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
   /// See also [_getPages].
   _GetPagesProvider(
-    this.code,
+    this.source,
   ) : super.internal(
           (ref) => _getPages(
             ref,
-            code,
+            source,
           ),
           from: _getPagesProvider,
           name: r'_getPagesProvider',
@@ -177,17 +177,17 @@ class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
           allTransitiveDependencies: _GetPagesFamily._allTransitiveDependencies,
         );
 
-  final String code;
+  final dynamic source;
 
   @override
   bool operator ==(Object other) {
-    return other is _GetPagesProvider && other.code == code;
+    return other is _GetPagesProvider && other.source == source;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, code.hashCode);
+    hash = _SystemHash.combine(hash, source.hashCode);
 
     return _SystemHash.finish(hash);
   }

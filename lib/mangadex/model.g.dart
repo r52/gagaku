@@ -21,7 +21,7 @@ final mangadexProvider = Provider<MangaDexModel>.internal(
 
 typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$latestChaptersFeedHash() =>
-    r'ea75ba36369bdde3c5c2eb72f6c98bd779ded249';
+    r'60d043a5de065e52957daa4d989266e69faef500';
 
 /// See also [LatestChaptersFeed].
 @ProviderFor(LatestChaptersFeed)
@@ -37,7 +37,7 @@ final latestChaptersFeedProvider =
 );
 
 typedef _$LatestChaptersFeed = AsyncNotifier<List<Chapter>>;
-String _$latestGlobalFeedHash() => r'9288dcf6c19e330f5af2651f1ed0c8e89c396ebe';
+String _$latestGlobalFeedHash() => r'9bfa9061fd0965dac54ac74eb8327367238d5f2a';
 
 /// See also [LatestGlobalFeed].
 @ProviderFor(LatestGlobalFeed)
@@ -53,7 +53,7 @@ final latestGlobalFeedProvider =
 );
 
 typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
-String _$groupFeedHash() => r'a63a0998fe40860c6833e550fb67459de7ce9fbb';
+String _$groupFeedHash() => r'd75febca41e84cb2349b467a01e6e75226838f06';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -361,7 +361,7 @@ class CreatorTitlesProvider
   }
 }
 
-String _$mangaChaptersHash() => r'eef92125eaf26472423ff81cd42d29e549bfccdd';
+String _$mangaChaptersHash() => r'74cbf3b45413db87c22b3971de100ff673499f36';
 
 abstract class _$MangaChapters extends BuildlessAsyncNotifier<List<Chapter>> {
   late final Manga manga;
@@ -457,7 +457,7 @@ class MangaChaptersProvider
   }
 }
 
-String _$mangaCoversHash() => r'95729bda618963c0109cdac05d33be8c23761e0c';
+String _$mangaCoversHash() => r'53e93ef0159dc2a20beb82d03b60bcab5d67fbe8';
 
 abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<Cover>> {
   late final Manga manga;
@@ -805,7 +805,7 @@ final ratingsProvider =
 );
 
 typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
-String _$readingStatusHash() => r'c6928956665b33e7a7559ae2ba0d669ab8a2a577';
+String _$readingStatusHash() => r'910a1148a373a364b8246af6f85d7a2f525d0bd9';
 
 abstract class _$ReadingStatus
     extends BuildlessAsyncNotifier<MangaReadingStatus?> {

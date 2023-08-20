@@ -177,13 +177,18 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
       return () => scrollController.removeListener(controllerAtEdge);
     }, [scrollController]);
 
+    final formatTags = manga.attributes.tags
+        .where((tag) => tag.attributes.group == TagGroup.format);
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
           switch (view.value) {
             case _ViewType.chapters:
+              ref.read(mangaChaptersProvider(manga).notifier).clear();
               return await ref.refresh(mangaChaptersProvider(manga).future);
             case _ViewType.art:
+              ref.read(mangaCoversProvider(manga).notifier).clear();
               return await ref.refresh(mangaCoversProvider(manga).future);
             default:
               break;
@@ -507,14 +512,18 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   runSpacing: 4.0,
                   children: [
                     ContentRatingChip(rating: manga.attributes.contentRating),
+                    ...manga.attributes.tags
+                        .where(
+                            (tag) => tag.attributes.group == TagGroup.content)
+                        .map((e) =>
+                            ContentChip(content: e.attributes.name.get('en'))),
                     const SizedBox(
                       width: 2,
                     ),
                     if (manga.attributes.tags.isNotEmpty)
                       ...manga.attributes.tags
-                          .where((tag) =>
-                              (tag.attributes.group == TagGroup.genre ||
-                                  tag.attributes.group == TagGroup.theme))
+                          .where(
+                              (tag) => tag.attributes.group != TagGroup.content)
                           .map(
                             (e) => IconTextChip(
                                 text: Text(e.attributes.name.get('en'))),
@@ -643,6 +652,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             color: theme.colorScheme.surfaceVariant,
                             child: MarkdownBody(
                               data: desc,
+                              onTapLink: (text, url, title) async {
+                                if (url != null) {
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                }
+                              },
                             ),
                           ),
                         ],
@@ -762,10 +778,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                  if (manga.attributes.links != null)
+                  if (formatTags.isNotEmpty)
                     ExpansionTile(
                       expandedAlignment: Alignment.centerLeft,
-                      title: const Text('Track'),
+                      title: const Text('Format'),
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
@@ -773,63 +789,92 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           child: Wrap(
                             spacing: 4.0,
                             runSpacing: 4.0,
-                            children: [
-                              if (manga.attributes.links?.raw != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final url = manga.attributes.links!.raw!;
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('Official Raw'),
-                                ),
-                              if (manga.attributes.links?.mu != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final seriesnum = int.tryParse(
-                                        manga.attributes.links!.mu!);
-                                    var url =
-                                        'https://www.mangaupdates.com/series/${manga.attributes.links!.mu!}';
-
-                                    if (seriesnum != null) {
-                                      url =
-                                          'https://www.mangaupdates.com/series.html?id=${manga.attributes.links!.mu!}';
-                                    }
-
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('MangaUpdates'),
-                                ),
-                              if (manga.attributes.links?.al != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final url =
-                                        'https://anilist.co/manga/${manga.attributes.links!.al!}';
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('AniList'),
-                                ),
-                              if (manga.attributes.links?.mal != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final url =
-                                        'https://myanimelist.net/manga/${manga.attributes.links!.mal!}';
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('MyAnimeList'),
-                                ),
-                            ],
+                            children: formatTags
+                                .map((e) => IconTextChip(
+                                    text: Text(e.attributes.name.get('en'))))
+                                .toList(),
                           ),
                         ),
                       ],
                     ),
+                  ExpansionTile(
+                    expandedAlignment: Alignment.centerLeft,
+                    title: const Text('Track'),
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        color: theme.colorScheme.background,
+                        child: Wrap(
+                          spacing: 4.0,
+                          runSpacing: 4.0,
+                          children: [
+                            if (manga.attributes.links?.raw != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final url = manga.attributes.links!.raw!;
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('Official Raw'),
+                              ),
+                            if (manga.attributes.links?.mu != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final seriesnum =
+                                      int.tryParse(manga.attributes.links!.mu!);
+                                  var url =
+                                      'https://www.mangaupdates.com/series/${manga.attributes.links!.mu!}';
+
+                                  if (seriesnum != null) {
+                                    url =
+                                        'https://www.mangaupdates.com/series.html?id=${manga.attributes.links!.mu!}';
+                                  }
+
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('MangaUpdates'),
+                              ),
+                            if (manga.attributes.links?.al != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final url =
+                                      'https://anilist.co/manga/${manga.attributes.links!.al!}';
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('AniList'),
+                              ),
+                            if (manga.attributes.links?.mal != null)
+                              ButtonChip(
+                                onPressed: () async {
+                                  final url =
+                                      'https://myanimelist.net/manga/${manga.attributes.links!.mal!}';
+                                  if (!await launchUrl(Uri.parse(url))) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: const Text('MyAnimeList'),
+                              ),
+                            ButtonChip(
+                              onPressed: () async {
+                                final route =
+                                    GoRouterState.of(context).uri.toString();
+                                final url = 'https://mangadex.org$route';
+                                if (!await launchUrl(Uri.parse(url))) {
+                                  throw 'Could not launch $url';
+                                }
+                              },
+                              text: const Text('Open on MangaDex'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                   if (lastvolchap != null)
                     ExpansionTile(
                       title: const Text('Final Volume/Chapter'),

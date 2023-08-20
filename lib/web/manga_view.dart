@@ -1,5 +1,6 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
@@ -10,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
 
 part 'manga_view.g.dart';
 
@@ -69,14 +71,22 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final api = ref.watch(proxyProvider);
     final info = ProxyInfo(proxy: proxy, code: code);
     final manga = ref.watch(_fetchWebMangaInfoProvider(info));
 
     Widget child;
+    PreferredSizeWidget? appBar;
 
     switch (manga) {
       case AsyncData(:final value):
-        return WebMangaViewWidget(manga: value, info: info);
+        child = RefreshIndicator(
+          onRefresh: () async {
+            await api.invalidateAll(info.getKey());
+            return await ref.refresh(_fetchWebMangaInfoProvider(info).future);
+          },
+          child: WebMangaViewWidget(manga: value, info: info),
+        );
       case AsyncError(:final error, :final stackTrace):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
@@ -84,6 +94,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
             error: error, stackTrace: stackTrace);
 
         child = Styles.errorColumn(error, stackTrace);
+        appBar = AppBar();
         break;
       case _:
         child = Styles.listSpinner;
@@ -91,6 +102,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
     }
 
     return Scaffold(
+      appBar: appBar,
       body: child,
     );
   }
@@ -112,131 +124,165 @@ class WebMangaViewWidget extends StatelessWidget {
     chapterlist
         .sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
 
-    return Scaffold(
-      body: CustomScrollView(
-        scrollBehavior: MouseTouchScrollBehavior(),
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            snap: false,
-            floating: false,
-            expandedHeight: 200.0,
-            leading: context.canPop()
-                ? BackButton(
-                    onPressed: () => context.pop(),
-                  )
-                : null,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                manga.title,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  shadows: <Shadow>[
-                    Shadow(
-                      offset: Offset(2.0, 2.0),
-                      blurRadius: 1.0,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                  ],
-                ),
-              ),
-              background: ExtendedImage.network(
-                manga.cover,
-                cache: true,
-                colorBlendMode: BlendMode.modulate,
-                color: Colors.grey,
-                fit: BoxFit.cover,
-                loadStateChanged: extendedImageLoadStateHandler,
-              ),
-            ),
-          ),
-          if (manga.description.isNotEmpty)
-            SliverToBoxAdapter(
-              child: ExpansionTile(
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                title: const Text('Synopsis'),
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.background,
-                    child: Text(manga.description),
+    return CustomScrollView(
+      scrollBehavior: MouseTouchScrollBehavior(),
+      slivers: <Widget>[
+        SliverAppBar(
+          pinned: true,
+          snap: false,
+          floating: false,
+          expandedHeight: 200.0,
+          leading: context.canPop()
+              ? BackButton(
+                  onPressed: () => context.pop(),
+                )
+              : null,
+          flexibleSpace: FlexibleSpaceBar(
+            title: Text(
+              manga.title,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(2.0, 2.0),
+                    blurRadius: 1.0,
+                    color: Color.fromARGB(255, 0, 0, 0),
                   ),
                 ],
               ),
             ),
+            background: ExtendedImage.network(
+              manga.cover,
+              cache: true,
+              colorBlendMode: BlendMode.modulate,
+              color: Colors.grey,
+              fit: BoxFit.cover,
+              loadStateChanged: extendedImageLoadStateHandler,
+            ),
+          ),
+        ),
+        if (manga.description.isNotEmpty)
           SliverToBoxAdapter(
             child: ExpansionTile(
-              title: const Text('Info'),
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              title: const Text('Synopsis'),
               children: [
-                ExpansionTile(
-                  title: const Text('Author'),
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      color: theme.colorScheme.background,
-                      child: Row(
-                        children: [
-                          IconTextChip(
-                            text: Text(manga.author),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                ExpansionTile(
-                  title: const Text('Artist'),
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      color: theme.colorScheme.background,
-                      child: Row(
-                        children: [
-                          IconTextChip(
-                            text: Text(manga.artist),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  color: theme.colorScheme.surfaceVariant,
+                  child: MarkdownBody(
+                    data: manga.description,
+                    onTapLink: (text, url, title) async {
+                      if (url != null) {
+                        if (!await launchUrl(Uri.parse(url))) {
+                          throw 'Could not launch $url';
+                        }
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
           ),
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              color: theme.cardColor,
-              child: const Text(
-                'Chapters',
-                style: TextStyle(fontSize: 24),
+        SliverToBoxAdapter(
+          child: ExpansionTile(
+            title: const Text('Info'),
+            children: [
+              ExpansionTile(
+                title: const Text('Author'),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: theme.colorScheme.background,
+                    child: Row(
+                      children: [
+                        IconTextChip(
+                          text: Text(manga.author),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
+              ExpansionTile(
+                title: const Text('Artist'),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: theme.colorScheme.background,
+                    child: Row(
+                      children: [
+                        IconTextChip(
+                          text: Text(manga.artist),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                expandedAlignment: Alignment.centerLeft,
+                title: const Text('Links'),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: theme.colorScheme.background,
+                    child: Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
+                      children: [
+                        ButtonChip(
+                          onPressed: () async {
+                            final route =
+                                GoRouterState.of(context).uri.toString();
+                            final url = 'https://cubari.moe$route';
+                            if (!await launchUrl(Uri.parse(url))) {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          text: const Text('Open on cubari.moe'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            color: theme.cardColor,
+            child: const Text(
+              'Chapters',
+              style: TextStyle(fontSize: 24),
             ),
           ),
-          SliverList.builder(
-            itemBuilder: (BuildContext context, int index) {
-              final e = chapterlist.elementAt(index);
+        ),
+        SliverList.builder(
+          itemBuilder: (BuildContext context, int index) {
+            final e = chapterlist.elementAt(index);
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                child: ChapterButtonWidget(
-                  name: e.name,
-                  chapter: e.chapter,
-                  manga: manga,
-                  info: info,
-                  link: Text(
-                    manga.title,
-                    style: const TextStyle(fontSize: 24),
-                  ),
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2.0),
+              child: ChapterButtonWidget(
+                name: e.name,
+                chapter: e.chapter,
+                manga: manga,
+                info: info,
+                link: Text(
+                  manga.title,
+                  style: const TextStyle(fontSize: 24),
                 ),
-              );
-            },
-            itemCount: manga.chapters.length,
-          ),
-        ],
-      ),
+              ),
+            );
+          },
+          itemCount: manga.chapters.length,
+        ),
+      ],
     );
   }
 }
@@ -265,62 +311,65 @@ class ChapterButtonWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     String title = chapter.getTitle(name);
+    String group = chapter.groups.entries.first.key;
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(color: theme.colorScheme.background, width: 4.0),
-        ),
+    Widget? timestamp;
+
+    if (chapter.lastUpdated != null) {
+      timestamp = Text(timeago.format(chapter.lastUpdated!));
+    } else if (chapter.releaseDate != null) {
+      timestamp = Text(timeago.format(chapter.releaseDate!));
+    }
+
+    return ListTile(
+      onTap: () {
+        context.push('/read/${info.proxy}/${info.code}/$name/1/',
+            extra: WebReaderData(
+              source: chapter.groups.entries.first.value,
+              title: title,
+              manga: manga,
+              link: link,
+              onLinkPressed: onLinkPressed,
+            ));
+      },
+      tileColor: theme.colorScheme.primaryContainer,
+      dense: true,
+      minVerticalPadding: 0.0,
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
+      minLeadingWidth: 0.0,
+      title: Text(
+        title,
+        style: TextStyle(color: theme.colorScheme.primary),
       ),
-      child: ListTile(
-        onTap: () {
-          context.push('/read/${info.proxy}/${info.code}/$name/1/',
-              extra: WebReaderData(
-                source: chapter.groups.entries.first.value,
-                title: title,
-                manga: manga,
-                link: link,
-                onLinkPressed: onLinkPressed,
-              ));
-        },
-        tileColor: theme.colorScheme.primaryContainer,
-        dense: true,
-        minVerticalPadding: 0.0,
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
-        minLeadingWidth: 0.0,
-        title: Text(
-          title,
-          style: TextStyle(color: theme.colorScheme.primary),
-        ),
-        trailing: !screenSizeSmall
-            ? FittedBox(
-                fit: BoxFit.fill,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconTextChip(
-                      icon: const Icon(Icons.group, size: 20),
-                      text: Text(chapter.groups.entries.first.key),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(Icons.schedule, size: 20),
-                    const SizedBox(width: 5),
-                    if (chapter.lastUpdated != null)
-                      Text(timeago.format(chapter.lastUpdated!))
-                  ],
-                ),
-              )
-            : Row(
+      trailing: !screenSizeSmall
+          ? FittedBox(
+              fit: BoxFit.fill,
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.schedule, size: 15),
+                  IconTextChip(
+                    icon: const Icon(Icons.group, size: 20),
+                    text: Text(manga.groups != null &&
+                            manga.groups?.containsKey(group) == true
+                        ? manga.groups![group]!
+                        : group),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.schedule, size: 20),
                   const SizedBox(width: 5),
-                  if (chapter.lastUpdated != null)
-                    Text(timeago.format(chapter.lastUpdated!))
+                  if (timestamp != null) timestamp
                 ],
               ),
-      ),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.schedule, size: 15),
+                const SizedBox(width: 5),
+                if (timestamp != null) timestamp
+              ],
+            ),
     );
   }
 }

@@ -304,12 +304,8 @@ mixin MangaDexUUID {
 
   @override
   int get hashCode => Object.hash(runtimeType, id);
-}
 
-mixin ShortLivedData {
-  DateTime get expiry;
-
-  bool isExpired() => DateTime.now().compareTo(expiry) >= 0;
+  Map<String, dynamic> toJson();
 }
 
 @freezed
@@ -447,6 +443,8 @@ class CoverArtAttributes with _$CoverArtAttributes {
   const factory CoverArtAttributes({
     String? volume,
     required String fileName,
+    String? description,
+    String? locale,
   }) = _CoverArtAttributes;
 
   factory CoverArtAttributes.fromJson(Map<String, dynamic> json) =>
@@ -845,7 +843,7 @@ class SelfRatingResponse with _$SelfRatingResponse {
 }
 
 @freezed
-class SelfRating with _$SelfRating, ShortLivedData {
+class SelfRating with _$SelfRating, ExpiringData {
   SelfRating._();
 
   factory SelfRating({
@@ -879,7 +877,7 @@ class ChapterFeedItemData {
   List<Chapter> chapters = [];
 }
 
-class ReadChapterSet with ShortLivedData {
+class ReadChapterSet with ExpiringData {
   ReadChapterSet(this.mangaId, this._chapters);
 
   final String mangaId;
@@ -921,7 +919,7 @@ class ReadChapterSet with ShortLivedData {
 
 // Deprecated old style login types
 @freezed
-class OldToken with _$OldToken {
+class OldToken with _$OldToken, ExpiringData {
   OldToken._();
 
   static const int expiryTime = 600; // seconds (10 minutes)
@@ -934,10 +932,10 @@ class OldToken with _$OldToken {
   factory OldToken.fromJson(Map<String, dynamic> json) =>
       _$OldTokenFromJson(json);
 
-  final DateTime expiresAt =
+  @override
+  final DateTime expiry =
       DateTime.now().add(const Duration(seconds: expiryTime));
 
-  Duration get timeUntilExpiry => expiresAt.difference(DateTime.now());
-  bool get expired => (DateTime.now().compareTo(expiresAt) >= 0);
+  Duration get timeUntilExpiry => expiry.difference(DateTime.now());
   bool get isValid => (session.isNotEmpty && refresh.isNotEmpty);
 }

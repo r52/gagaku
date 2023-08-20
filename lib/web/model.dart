@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:gagaku/cache.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/web/types.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,10 +18,23 @@ ProxyHandler proxy(ProxyRef ref) {
 }
 
 class ProxyHandler {
-  ProxyHandler(this.ref);
+  ProxyHandler(this.ref) {
+    _cache = ref.watch(cacheProvider);
+  }
 
   final Ref ref;
   final http.Client _client = http.Client();
+  late final CacheManager _cache;
+
+  Future<void> invalidateCacheItem(String item) async {
+    if (await _cache.exists(item)) {
+      await _cache.remove(item);
+    }
+  }
+
+  Future<void> invalidateAll(String startsWith) async {
+    await _cache.invalidateAll(startsWith);
+  }
 
   ProxyInfo? parseUrl(String url) {
     var src = url.substring(24);
@@ -41,10 +56,10 @@ class ProxyHandler {
     ProxyData p = ProxyData();
 
     switch (info.proxy) {
-      case 'gist':
-        final manga = await _getMangaFromGist(info.code);
-        p.manga = manga;
-        break;
+      // case 'gist':
+      //   final manga = await _getMangaFromGist(info.code);
+      //   p.manga = manga;
+      //   break;
       case 'imgur':
         final code = '/read/api/imgur/chapter/${info.code}';
         p.code = code;
@@ -60,8 +75,14 @@ class ProxyHandler {
   }
 
   Future<WebManga> _getMangaFromProxy(ProxyInfo info) async {
+    final key = info.getKey();
     final url =
         "https://cubari.moe/read/api/${info.proxy}/series/${info.code}/";
+
+    if (await _cache.exists(key)) {
+      logger.d('CacheManager: retrieving entry $key');
+      return _cache.get<WebManga>(key, WebManga.fromJson);
+    }
 
     final response = await _client.get(Uri.parse(url));
 
@@ -69,56 +90,69 @@ class ProxyHandler {
       final body = json.decode(response.body);
       final manga = WebManga.fromJson(body);
 
+      logger.d('CacheManager: caching entry $key');
+      _cache.put(key, body, true, const Duration(days: 1));
+
       return manga;
     }
 
     throw Exception("Failed to download manga data");
   }
 
-  Future<WebManga> _getMangaFromGist(String code) async {
-    var url = '';
+  // Future<WebManga> _getMangaFromGist(ProxyInfo info) async {
+  //   var url = '';
 
-    if (code.length > 5) {
-      // Pretty bad way of determining whether its an old git.io link but w/e
-      Codec<String, String> b64 = utf8.fuse(base64Url);
-      String link = b64.decode('$code==');
-      final schema = link.split('/');
-      var baseUrl = 'https://raw.githubusercontent.com/';
+  //   if (info.code.length > 5) {
+  //     // Pretty bad way of determining whether its an old git.io link but w/e
+  //     Codec<String, String> b64 = utf8.fuse(base64Url);
+  //     String link = b64.decode(base64.normalize(info.code));
+  //     final schema = link.split('/');
+  //     var baseUrl = 'https://raw.githubusercontent.com/';
 
-      if (schema.isEmpty || schema.length < 3) {
-        throw Exception("Bad url/gist code $code");
-      }
+  //     if (schema.isEmpty || schema.length < 3) {
+  //       throw Exception("Bad url/gist code ${info.code}");
+  //     }
 
-      switch (schema[0]) {
-        case 'raw':
-          baseUrl = 'https://raw.githubusercontent.com/';
-          break;
-        case 'gist':
-          baseUrl = 'https://gist.githubusercontent.com/';
-          break;
-        default:
-          throw Exception("Unknown schema ${schema[0]}");
-      }
+  //     switch (schema[0]) {
+  //       case 'raw':
+  //         baseUrl = 'https://raw.githubusercontent.com/';
+  //         break;
+  //       case 'gist':
+  //         baseUrl = 'https://gist.githubusercontent.com/';
+  //         break;
+  //       default:
+  //         throw Exception("Unknown schema ${schema[0]}");
+  //     }
 
-      url = '$baseUrl${link.substring(link.indexOf('/') + 1)}';
-    } else {
-      url = 'https://git.io/$code';
-    }
+  //     url = '$baseUrl${link.substring(link.indexOf('/') + 1)}';
+  //   } else {
+  //     url = 'https://git.io/${info.code}';
+  //   }
 
-    if (url.isNotEmpty) {
-      final response = await _client.get(Uri.parse(url));
+  //   if (url.isNotEmpty) {
+  //     final key = info.getKey();
 
-      if (response.statusCode == 200) {
-        final body = json.decode(response.body);
-        final manga = WebManga.fromJson(body);
+  //     if (await _cache.exists(key)) {
+  //       logger.d('CacheManager: retrieving entry $key');
+  //       return _cache.get<WebManga>(key, WebManga.fromJson);
+  //     }
 
-        return manga;
-      }
-    }
+  //     final response = await _client.get(Uri.parse(url));
 
-    // Throw if failure
-    throw Exception("Failed to download manga data");
-  }
+  //     if (response.statusCode == 200) {
+  //       final body = json.decode(response.body);
+  //       final manga = WebManga.fromJson(body);
+
+  //       logger.d('CacheManager: caching entry $key');
+  //       _cache.put(key, body, true, const Duration(days: 1));
+
+  //       return manga;
+  //     }
+  //   }
+
+  //   // Throw if failure
+  //   throw Exception("Failed to download manga data");
+  // }
 
   Future<List<String>> getChapter(String code) async {
     final url = "https://cubari.moe$code";
