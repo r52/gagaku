@@ -196,6 +196,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
         },
         child: CustomScrollView(
           controller: scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
           scrollBehavior: MouseTouchScrollBehavior(),
           slivers: <Widget>[
             SliverAppBar(
