@@ -99,11 +99,11 @@ class _$MangaFiltersCopyWithImpl<$Res, $Val extends MangaFilters>
 }
 
 /// @nodoc
-abstract class _$$_MangaFiltersCopyWith<$Res>
+abstract class _$$MangaFiltersImplCopyWith<$Res>
     implements $MangaFiltersCopyWith<$Res> {
-  factory _$$_MangaFiltersCopyWith(
-          _$_MangaFilters value, $Res Function(_$_MangaFilters) then) =
-      __$$_MangaFiltersCopyWithImpl<$Res>;
+  factory _$$MangaFiltersImplCopyWith(
+          _$MangaFiltersImpl value, $Res Function(_$MangaFiltersImpl) then) =
+      __$$MangaFiltersImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -116,11 +116,11 @@ abstract class _$$_MangaFiltersCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_MangaFiltersCopyWithImpl<$Res>
-    extends _$MangaFiltersCopyWithImpl<$Res, _$_MangaFilters>
-    implements _$$_MangaFiltersCopyWith<$Res> {
-  __$$_MangaFiltersCopyWithImpl(
-      _$_MangaFilters _value, $Res Function(_$_MangaFilters) _then)
+class __$$MangaFiltersImplCopyWithImpl<$Res>
+    extends _$MangaFiltersCopyWithImpl<$Res, _$MangaFiltersImpl>
+    implements _$$MangaFiltersImplCopyWith<$Res> {
+  __$$MangaFiltersImplCopyWithImpl(
+      _$MangaFiltersImpl _value, $Res Function(_$MangaFiltersImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -133,7 +133,7 @@ class __$$_MangaFiltersCopyWithImpl<$Res>
     Object? contentRating = null,
     Object? order = null,
   }) {
-    return _then(_$_MangaFilters(
+    return _then(_$MangaFiltersImpl(
       includedTags: null == includedTags
           ? _value._includedTags
           : includedTags // ignore: cast_nullable_to_non_nullable
@@ -164,8 +164,8 @@ class __$$_MangaFiltersCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaFilters extends _MangaFilters with DiagnosticableTreeMixin {
-  const _$_MangaFilters(
+class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
+  const _$MangaFiltersImpl(
       {final Set<Tag> includedTags = const {},
       final Set<Tag> excludedTags = const {},
       final Set<MangaStatus> status = const {},
@@ -179,8 +179,8 @@ class _$_MangaFilters extends _MangaFilters with DiagnosticableTreeMixin {
         _contentRating = contentRating,
         super._();
 
-  factory _$_MangaFilters.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaFiltersFromJson(json);
+  factory _$MangaFiltersImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaFiltersImplFromJson(json);
 
   final Set<Tag> _includedTags;
   @override
@@ -255,7 +255,7 @@ class _$_MangaFilters extends _MangaFilters with DiagnosticableTreeMixin {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MangaFilters &&
+            other is _$MangaFiltersImpl &&
             const DeepCollectionEquality()
                 .equals(other._includedTags, _includedTags) &&
             const DeepCollectionEquality()
@@ -282,12 +282,12 @@ class _$_MangaFilters extends _MangaFilters with DiagnosticableTreeMixin {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaFiltersCopyWith<_$_MangaFilters> get copyWith =>
-      __$$_MangaFiltersCopyWithImpl<_$_MangaFilters>(this, _$identity);
+  _$$MangaFiltersImplCopyWith<_$MangaFiltersImpl> get copyWith =>
+      __$$MangaFiltersImplCopyWithImpl<_$MangaFiltersImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaFiltersToJson(
+    return _$$MangaFiltersImplToJson(
       this,
     );
   }
@@ -300,11 +300,11 @@ abstract class _MangaFilters extends MangaFilters {
       final Set<MangaStatus> status,
       final Set<MangaDemographic> publicationDemographic,
       final Set<ContentRating> contentRating,
-      final FilterOrder order}) = _$_MangaFilters;
+      final FilterOrder order}) = _$MangaFiltersImpl;
   const _MangaFilters._() : super._();
 
   factory _MangaFilters.fromJson(Map<String, dynamic> json) =
-      _$_MangaFilters.fromJson;
+      _$MangaFiltersImpl.fromJson;
 
   @override
   Set<Tag> get includedTags;
@@ -320,7 +320,7 @@ abstract class _MangaFilters extends MangaFilters {
   FilterOrder get order;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaFiltersCopyWith<_$_MangaFilters> get copyWith =>
+  _$$MangaFiltersImplCopyWith<_$MangaFiltersImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -384,11 +384,12 @@ class _$MangaSearchParametersCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$_MangaSearchParametersCopyWith<$Res>
+abstract class _$$MangaSearchParametersImplCopyWith<$Res>
     implements $MangaSearchParametersCopyWith<$Res> {
-  factory _$$_MangaSearchParametersCopyWith(_$_MangaSearchParameters value,
-          $Res Function(_$_MangaSearchParameters) then) =
-      __$$_MangaSearchParametersCopyWithImpl<$Res>;
+  factory _$$MangaSearchParametersImplCopyWith(
+          _$MangaSearchParametersImpl value,
+          $Res Function(_$MangaSearchParametersImpl) then) =
+      __$$MangaSearchParametersImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String query, MangaFilters filter});
@@ -398,11 +399,12 @@ abstract class _$$_MangaSearchParametersCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_MangaSearchParametersCopyWithImpl<$Res>
-    extends _$MangaSearchParametersCopyWithImpl<$Res, _$_MangaSearchParameters>
-    implements _$$_MangaSearchParametersCopyWith<$Res> {
-  __$$_MangaSearchParametersCopyWithImpl(_$_MangaSearchParameters _value,
-      $Res Function(_$_MangaSearchParameters) _then)
+class __$$MangaSearchParametersImplCopyWithImpl<$Res>
+    extends _$MangaSearchParametersCopyWithImpl<$Res,
+        _$MangaSearchParametersImpl>
+    implements _$$MangaSearchParametersImplCopyWith<$Res> {
+  __$$MangaSearchParametersImplCopyWithImpl(_$MangaSearchParametersImpl _value,
+      $Res Function(_$MangaSearchParametersImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -411,7 +413,7 @@ class __$$_MangaSearchParametersCopyWithImpl<$Res>
     Object? query = null,
     Object? filter = null,
   }) {
-    return _then(_$_MangaSearchParameters(
+    return _then(_$MangaSearchParametersImpl(
       query: null == query
           ? _value.query
           : query // ignore: cast_nullable_to_non_nullable
@@ -426,10 +428,11 @@ class __$$_MangaSearchParametersCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_MangaSearchParameters
+class _$MangaSearchParametersImpl
     with DiagnosticableTreeMixin
     implements _MangaSearchParameters {
-  const _$_MangaSearchParameters({required this.query, required this.filter});
+  const _$MangaSearchParametersImpl(
+      {required this.query, required this.filter});
 
   @override
   final String query;
@@ -454,7 +457,7 @@ class _$_MangaSearchParameters
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MangaSearchParameters &&
+            other is _$MangaSearchParametersImpl &&
             (identical(other.query, query) || other.query == query) &&
             (identical(other.filter, filter) || other.filter == filter));
   }
@@ -465,15 +468,15 @@ class _$_MangaSearchParameters
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaSearchParametersCopyWith<_$_MangaSearchParameters> get copyWith =>
-      __$$_MangaSearchParametersCopyWithImpl<_$_MangaSearchParameters>(
-          this, _$identity);
+  _$$MangaSearchParametersImplCopyWith<_$MangaSearchParametersImpl>
+      get copyWith => __$$MangaSearchParametersImplCopyWithImpl<
+          _$MangaSearchParametersImpl>(this, _$identity);
 }
 
 abstract class _MangaSearchParameters implements MangaSearchParameters {
   const factory _MangaSearchParameters(
       {required final String query,
-      required final MangaFilters filter}) = _$_MangaSearchParameters;
+      required final MangaFilters filter}) = _$MangaSearchParametersImpl;
 
   @override
   String get query;
@@ -481,8 +484,8 @@ abstract class _MangaSearchParameters implements MangaSearchParameters {
   MangaFilters get filter;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaSearchParametersCopyWith<_$_MangaSearchParameters> get copyWith =>
-      throw _privateConstructorUsedError;
+  _$$MangaSearchParametersImplCopyWith<_$MangaSearchParametersImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -539,21 +542,22 @@ class _$LanguageCopyWithImpl<$Res, $Val extends Language>
 }
 
 /// @nodoc
-abstract class _$$_LanguageCopyWith<$Res> implements $LanguageCopyWith<$Res> {
-  factory _$$_LanguageCopyWith(
-          _$_Language value, $Res Function(_$_Language) then) =
-      __$$_LanguageCopyWithImpl<$Res>;
+abstract class _$$LanguageImplCopyWith<$Res>
+    implements $LanguageCopyWith<$Res> {
+  factory _$$LanguageImplCopyWith(
+          _$LanguageImpl value, $Res Function(_$LanguageImpl) then) =
+      __$$LanguageImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String name, String code, String flag});
 }
 
 /// @nodoc
-class __$$_LanguageCopyWithImpl<$Res>
-    extends _$LanguageCopyWithImpl<$Res, _$_Language>
-    implements _$$_LanguageCopyWith<$Res> {
-  __$$_LanguageCopyWithImpl(
-      _$_Language _value, $Res Function(_$_Language) _then)
+class __$$LanguageImplCopyWithImpl<$Res>
+    extends _$LanguageCopyWithImpl<$Res, _$LanguageImpl>
+    implements _$$LanguageImplCopyWith<$Res> {
+  __$$LanguageImplCopyWithImpl(
+      _$LanguageImpl _value, $Res Function(_$LanguageImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -563,7 +567,7 @@ class __$$_LanguageCopyWithImpl<$Res>
     Object? code = null,
     Object? flag = null,
   }) {
-    return _then(_$_Language(
+    return _then(_$LanguageImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -582,8 +586,8 @@ class __$$_LanguageCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Language with DiagnosticableTreeMixin implements _Language {
-  const _$_Language(
+class _$LanguageImpl with DiagnosticableTreeMixin implements _Language {
+  const _$LanguageImpl(
       {required this.name, required this.code, required this.flag});
 
   @override
@@ -612,7 +616,7 @@ class _$_Language with DiagnosticableTreeMixin implements _Language {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_Language &&
+            other is _$LanguageImpl &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.flag, flag) || other.flag == flag));
@@ -624,15 +628,15 @@ class _$_Language with DiagnosticableTreeMixin implements _Language {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_LanguageCopyWith<_$_Language> get copyWith =>
-      __$$_LanguageCopyWithImpl<_$_Language>(this, _$identity);
+  _$$LanguageImplCopyWith<_$LanguageImpl> get copyWith =>
+      __$$LanguageImplCopyWithImpl<_$LanguageImpl>(this, _$identity);
 }
 
 abstract class _Language implements Language {
   const factory _Language(
       {required final String name,
       required final String code,
-      required final String flag}) = _$_Language;
+      required final String flag}) = _$LanguageImpl;
 
   @override
   String get name;
@@ -642,7 +646,7 @@ abstract class _Language implements Language {
   String get flag;
   @override
   @JsonKey(ignore: true)
-  _$$_LanguageCopyWith<_$_Language> get copyWith =>
+  _$$LanguageImplCopyWith<_$LanguageImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -700,22 +704,22 @@ class _$ChapterListCopyWithImpl<$Res, $Val extends ChapterList>
 }
 
 /// @nodoc
-abstract class _$$_ChapterListCopyWith<$Res>
+abstract class _$$ChapterListImplCopyWith<$Res>
     implements $ChapterListCopyWith<$Res> {
-  factory _$$_ChapterListCopyWith(
-          _$_ChapterList value, $Res Function(_$_ChapterList) then) =
-      __$$_ChapterListCopyWithImpl<$Res>;
+  factory _$$ChapterListImplCopyWith(
+          _$ChapterListImpl value, $Res Function(_$ChapterListImpl) then) =
+      __$$ChapterListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<Chapter> data, int total});
 }
 
 /// @nodoc
-class __$$_ChapterListCopyWithImpl<$Res>
-    extends _$ChapterListCopyWithImpl<$Res, _$_ChapterList>
-    implements _$$_ChapterListCopyWith<$Res> {
-  __$$_ChapterListCopyWithImpl(
-      _$_ChapterList _value, $Res Function(_$_ChapterList) _then)
+class __$$ChapterListImplCopyWithImpl<$Res>
+    extends _$ChapterListCopyWithImpl<$Res, _$ChapterListImpl>
+    implements _$$ChapterListImplCopyWith<$Res> {
+  __$$ChapterListImplCopyWithImpl(
+      _$ChapterListImpl _value, $Res Function(_$ChapterListImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -724,7 +728,7 @@ class __$$_ChapterListCopyWithImpl<$Res>
     Object? data = null,
     Object? total = null,
   }) {
-    return _then(_$_ChapterList(
+    return _then(_$ChapterListImpl(
       null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
@@ -739,11 +743,11 @@ class __$$_ChapterListCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ChapterList with DiagnosticableTreeMixin implements _ChapterList {
-  const _$_ChapterList(final List<Chapter> data, this.total) : _data = data;
+class _$ChapterListImpl with DiagnosticableTreeMixin implements _ChapterList {
+  const _$ChapterListImpl(final List<Chapter> data, this.total) : _data = data;
 
-  factory _$_ChapterList.fromJson(Map<String, dynamic> json) =>
-      _$$_ChapterListFromJson(json);
+  factory _$ChapterListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterListImplFromJson(json);
 
   final List<Chapter> _data;
   @override
@@ -774,7 +778,7 @@ class _$_ChapterList with DiagnosticableTreeMixin implements _ChapterList {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ChapterList &&
+            other is _$ChapterListImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.total, total) || other.total == total));
   }
@@ -787,12 +791,12 @@ class _$_ChapterList with DiagnosticableTreeMixin implements _ChapterList {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ChapterListCopyWith<_$_ChapterList> get copyWith =>
-      __$$_ChapterListCopyWithImpl<_$_ChapterList>(this, _$identity);
+  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
+      __$$ChapterListImplCopyWithImpl<_$ChapterListImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ChapterListToJson(
+    return _$$ChapterListImplToJson(
       this,
     );
   }
@@ -800,10 +804,10 @@ class _$_ChapterList with DiagnosticableTreeMixin implements _ChapterList {
 
 abstract class _ChapterList implements ChapterList {
   const factory _ChapterList(final List<Chapter> data, final int total) =
-      _$_ChapterList;
+      _$ChapterListImpl;
 
   factory _ChapterList.fromJson(Map<String, dynamic> json) =
-      _$_ChapterList.fromJson;
+      _$ChapterListImpl.fromJson;
 
   @override
   List<Chapter> get data;
@@ -811,7 +815,7 @@ abstract class _ChapterList implements ChapterList {
   int get total;
   @override
   @JsonKey(ignore: true)
-  _$$_ChapterListCopyWith<_$_ChapterList> get copyWith =>
+  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -886,10 +890,10 @@ class _$ChapterCopyWithImpl<$Res, $Val extends Chapter>
 }
 
 /// @nodoc
-abstract class _$$_ChapterCopyWith<$Res> implements $ChapterCopyWith<$Res> {
-  factory _$$_ChapterCopyWith(
-          _$_Chapter value, $Res Function(_$_Chapter) then) =
-      __$$_ChapterCopyWithImpl<$Res>;
+abstract class _$$ChapterImplCopyWith<$Res> implements $ChapterCopyWith<$Res> {
+  factory _$$ChapterImplCopyWith(
+          _$ChapterImpl value, $Res Function(_$ChapterImpl) then) =
+      __$$ChapterImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -902,10 +906,11 @@ abstract class _$$_ChapterCopyWith<$Res> implements $ChapterCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_ChapterCopyWithImpl<$Res>
-    extends _$ChapterCopyWithImpl<$Res, _$_Chapter>
-    implements _$$_ChapterCopyWith<$Res> {
-  __$$_ChapterCopyWithImpl(_$_Chapter _value, $Res Function(_$_Chapter) _then)
+class __$$ChapterImplCopyWithImpl<$Res>
+    extends _$ChapterCopyWithImpl<$Res, _$ChapterImpl>
+    implements _$$ChapterImplCopyWith<$Res> {
+  __$$ChapterImplCopyWithImpl(
+      _$ChapterImpl _value, $Res Function(_$ChapterImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -915,7 +920,7 @@ class __$$_ChapterCopyWithImpl<$Res>
     Object? attributes = null,
     Object? relationships = null,
   }) {
-    return _then(_$_Chapter(
+    return _then(_$ChapterImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -934,16 +939,16 @@ class __$$_ChapterCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_Chapter extends _Chapter with DiagnosticableTreeMixin {
-  const _$_Chapter(
+class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
+  const _$ChapterImpl(
       {required this.id,
       required this.attributes,
       required final List<Relationship> relationships})
       : _relationships = relationships,
         super._();
 
-  factory _$_Chapter.fromJson(Map<String, dynamic> json) =>
-      _$$_ChapterFromJson(json);
+  factory _$ChapterImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterImplFromJson(json);
 
   @override
   final String id;
@@ -975,12 +980,12 @@ class _$_Chapter extends _Chapter with DiagnosticableTreeMixin {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ChapterCopyWith<_$_Chapter> get copyWith =>
-      __$$_ChapterCopyWithImpl<_$_Chapter>(this, _$identity);
+  _$$ChapterImplCopyWith<_$ChapterImpl> get copyWith =>
+      __$$ChapterImplCopyWithImpl<_$ChapterImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ChapterToJson(
+    return _$$ChapterImplToJson(
       this,
     );
   }
@@ -990,10 +995,10 @@ abstract class _Chapter extends Chapter {
   const factory _Chapter(
       {required final String id,
       required final ChapterAttributes attributes,
-      required final List<Relationship> relationships}) = _$_Chapter;
+      required final List<Relationship> relationships}) = _$ChapterImpl;
   const _Chapter._() : super._();
 
-  factory _Chapter.fromJson(Map<String, dynamic> json) = _$_Chapter.fromJson;
+  factory _Chapter.fromJson(Map<String, dynamic> json) = _$ChapterImpl.fromJson;
 
   @override
   String get id;
@@ -1003,7 +1008,7 @@ abstract class _Chapter extends Chapter {
   List<Relationship> get relationships;
   @override
   @JsonKey(ignore: true)
-  _$$_ChapterCopyWith<_$_Chapter> get copyWith =>
+  _$$ChapterImplCopyWith<_$ChapterImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1133,11 +1138,11 @@ class _$ChapterAttributesCopyWithImpl<$Res, $Val extends ChapterAttributes>
 }
 
 /// @nodoc
-abstract class _$$_ChapterAttributesCopyWith<$Res>
+abstract class _$$ChapterAttributesImplCopyWith<$Res>
     implements $ChapterAttributesCopyWith<$Res> {
-  factory _$$_ChapterAttributesCopyWith(_$_ChapterAttributes value,
-          $Res Function(_$_ChapterAttributes) then) =
-      __$$_ChapterAttributesCopyWithImpl<$Res>;
+  factory _$$ChapterAttributesImplCopyWith(_$ChapterAttributesImpl value,
+          $Res Function(_$ChapterAttributesImpl) then) =
+      __$$ChapterAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -1157,11 +1162,11 @@ abstract class _$$_ChapterAttributesCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_ChapterAttributesCopyWithImpl<$Res>
-    extends _$ChapterAttributesCopyWithImpl<$Res, _$_ChapterAttributes>
-    implements _$$_ChapterAttributesCopyWith<$Res> {
-  __$$_ChapterAttributesCopyWithImpl(
-      _$_ChapterAttributes _value, $Res Function(_$_ChapterAttributes) _then)
+class __$$ChapterAttributesImplCopyWithImpl<$Res>
+    extends _$ChapterAttributesCopyWithImpl<$Res, _$ChapterAttributesImpl>
+    implements _$$ChapterAttributesImplCopyWith<$Res> {
+  __$$ChapterAttributesImplCopyWithImpl(_$ChapterAttributesImpl _value,
+      $Res Function(_$ChapterAttributesImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1178,7 +1183,7 @@ class __$$_ChapterAttributesCopyWithImpl<$Res>
     Object? updatedAt = null,
     Object? publishAt = null,
   }) {
-    return _then(_$_ChapterAttributes(
+    return _then(_$ChapterAttributesImpl(
       title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -1225,10 +1230,10 @@ class __$$_ChapterAttributesCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ChapterAttributes
+class _$ChapterAttributesImpl
     with DiagnosticableTreeMixin
     implements _ChapterAttributes {
-  const _$_ChapterAttributes(
+  const _$ChapterAttributesImpl(
       {this.title,
       this.volume,
       this.chapter,
@@ -1240,8 +1245,8 @@ class _$_ChapterAttributes
       @TimestampSerializer() required this.updatedAt,
       @TimestampSerializer() required this.publishAt});
 
-  factory _$_ChapterAttributes.fromJson(Map<String, dynamic> json) =>
-      _$$_ChapterAttributesFromJson(json);
+  factory _$ChapterAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterAttributesImplFromJson(json);
 
   @override
   final String? title;
@@ -1294,7 +1299,7 @@ class _$_ChapterAttributes
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ChapterAttributes &&
+            other is _$ChapterAttributesImpl &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.volume, volume) || other.volume == volume) &&
             (identical(other.chapter, chapter) || other.chapter == chapter) &&
@@ -1331,13 +1336,13 @@ class _$_ChapterAttributes
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ChapterAttributesCopyWith<_$_ChapterAttributes> get copyWith =>
-      __$$_ChapterAttributesCopyWithImpl<_$_ChapterAttributes>(
+  _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
+      __$$ChapterAttributesImplCopyWithImpl<_$ChapterAttributesImpl>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ChapterAttributesToJson(
+    return _$$ChapterAttributesImplToJson(
       this,
     );
   }
@@ -1355,10 +1360,10 @@ abstract class _ChapterAttributes implements ChapterAttributes {
           @TimestampSerializer() required final DateTime createdAt,
           @TimestampSerializer() required final DateTime updatedAt,
           @TimestampSerializer() required final DateTime publishAt}) =
-      _$_ChapterAttributes;
+      _$ChapterAttributesImpl;
 
   factory _ChapterAttributes.fromJson(Map<String, dynamic> json) =
-      _$_ChapterAttributes.fromJson;
+      _$ChapterAttributesImpl.fromJson;
 
   @override
   String? get title;
@@ -1386,7 +1391,7 @@ abstract class _ChapterAttributes implements ChapterAttributes {
   DateTime get publishAt;
   @override
   @JsonKey(ignore: true)
-  _$$_ChapterAttributesCopyWith<_$_ChapterAttributes> get copyWith =>
+  _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1459,12 +1464,12 @@ class _$ScanlationGroupAttributesCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$_ScanlationGroupAttributesCopyWith<$Res>
+abstract class _$$ScanlationGroupAttributesImplCopyWith<$Res>
     implements $ScanlationGroupAttributesCopyWith<$Res> {
-  factory _$$_ScanlationGroupAttributesCopyWith(
-          _$_ScanlationGroupAttributes value,
-          $Res Function(_$_ScanlationGroupAttributes) then) =
-      __$$_ScanlationGroupAttributesCopyWithImpl<$Res>;
+  factory _$$ScanlationGroupAttributesImplCopyWith(
+          _$ScanlationGroupAttributesImpl value,
+          $Res Function(_$ScanlationGroupAttributesImpl) then) =
+      __$$ScanlationGroupAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -1472,13 +1477,13 @@ abstract class _$$_ScanlationGroupAttributesCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_ScanlationGroupAttributesCopyWithImpl<$Res>
+class __$$ScanlationGroupAttributesImplCopyWithImpl<$Res>
     extends _$ScanlationGroupAttributesCopyWithImpl<$Res,
-        _$_ScanlationGroupAttributes>
-    implements _$$_ScanlationGroupAttributesCopyWith<$Res> {
-  __$$_ScanlationGroupAttributesCopyWithImpl(
-      _$_ScanlationGroupAttributes _value,
-      $Res Function(_$_ScanlationGroupAttributes) _then)
+        _$ScanlationGroupAttributesImpl>
+    implements _$$ScanlationGroupAttributesImplCopyWith<$Res> {
+  __$$ScanlationGroupAttributesImplCopyWithImpl(
+      _$ScanlationGroupAttributesImpl _value,
+      $Res Function(_$ScanlationGroupAttributesImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1489,7 +1494,7 @@ class __$$_ScanlationGroupAttributesCopyWithImpl<$Res>
     Object? discord = freezed,
     Object? description = freezed,
   }) {
-    return _then(_$_ScanlationGroupAttributes(
+    return _then(_$ScanlationGroupAttributesImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -1512,14 +1517,14 @@ class __$$_ScanlationGroupAttributesCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ScanlationGroupAttributes
+class _$ScanlationGroupAttributesImpl
     with DiagnosticableTreeMixin
     implements _ScanlationGroupAttributes {
-  const _$_ScanlationGroupAttributes(
+  const _$ScanlationGroupAttributesImpl(
       {required this.name, this.website, this.discord, this.description});
 
-  factory _$_ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) =>
-      _$$_ScanlationGroupAttributesFromJson(json);
+  factory _$ScanlationGroupAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ScanlationGroupAttributesImplFromJson(json);
 
   @override
   final String name;
@@ -1550,7 +1555,7 @@ class _$_ScanlationGroupAttributes
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ScanlationGroupAttributes &&
+            other is _$ScanlationGroupAttributesImpl &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.website, website) || other.website == website) &&
             (identical(other.discord, discord) || other.discord == discord) &&
@@ -1566,13 +1571,13 @@ class _$_ScanlationGroupAttributes
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ScanlationGroupAttributesCopyWith<_$_ScanlationGroupAttributes>
-      get copyWith => __$$_ScanlationGroupAttributesCopyWithImpl<
-          _$_ScanlationGroupAttributes>(this, _$identity);
+  _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
+      get copyWith => __$$ScanlationGroupAttributesImplCopyWithImpl<
+          _$ScanlationGroupAttributesImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ScanlationGroupAttributesToJson(
+    return _$$ScanlationGroupAttributesImplToJson(
       this,
     );
   }
@@ -1583,10 +1588,10 @@ abstract class _ScanlationGroupAttributes implements ScanlationGroupAttributes {
       {required final String name,
       final String? website,
       final String? discord,
-      final String? description}) = _$_ScanlationGroupAttributes;
+      final String? description}) = _$ScanlationGroupAttributesImpl;
 
   factory _ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) =
-      _$_ScanlationGroupAttributes.fromJson;
+      _$ScanlationGroupAttributesImpl.fromJson;
 
   @override
   String get name;
@@ -1598,7 +1603,7 @@ abstract class _ScanlationGroupAttributes implements ScanlationGroupAttributes {
   String? get description;
   @override
   @JsonKey(ignore: true)
-  _$$_ScanlationGroupAttributesCopyWith<_$_ScanlationGroupAttributes>
+  _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -1669,11 +1674,11 @@ class _$CoverArtAttributesCopyWithImpl<$Res, $Val extends CoverArtAttributes>
 }
 
 /// @nodoc
-abstract class _$$_CoverArtAttributesCopyWith<$Res>
+abstract class _$$CoverArtAttributesImplCopyWith<$Res>
     implements $CoverArtAttributesCopyWith<$Res> {
-  factory _$$_CoverArtAttributesCopyWith(_$_CoverArtAttributes value,
-          $Res Function(_$_CoverArtAttributes) then) =
-      __$$_CoverArtAttributesCopyWithImpl<$Res>;
+  factory _$$CoverArtAttributesImplCopyWith(_$CoverArtAttributesImpl value,
+          $Res Function(_$CoverArtAttributesImpl) then) =
+      __$$CoverArtAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -1681,11 +1686,11 @@ abstract class _$$_CoverArtAttributesCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_CoverArtAttributesCopyWithImpl<$Res>
-    extends _$CoverArtAttributesCopyWithImpl<$Res, _$_CoverArtAttributes>
-    implements _$$_CoverArtAttributesCopyWith<$Res> {
-  __$$_CoverArtAttributesCopyWithImpl(
-      _$_CoverArtAttributes _value, $Res Function(_$_CoverArtAttributes) _then)
+class __$$CoverArtAttributesImplCopyWithImpl<$Res>
+    extends _$CoverArtAttributesCopyWithImpl<$Res, _$CoverArtAttributesImpl>
+    implements _$$CoverArtAttributesImplCopyWith<$Res> {
+  __$$CoverArtAttributesImplCopyWithImpl(_$CoverArtAttributesImpl _value,
+      $Res Function(_$CoverArtAttributesImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1696,7 +1701,7 @@ class __$$_CoverArtAttributesCopyWithImpl<$Res>
     Object? description = freezed,
     Object? locale = freezed,
   }) {
-    return _then(_$_CoverArtAttributes(
+    return _then(_$CoverArtAttributesImpl(
       volume: freezed == volume
           ? _value.volume
           : volume // ignore: cast_nullable_to_non_nullable
@@ -1719,14 +1724,14 @@ class __$$_CoverArtAttributesCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_CoverArtAttributes
+class _$CoverArtAttributesImpl
     with DiagnosticableTreeMixin
     implements _CoverArtAttributes {
-  const _$_CoverArtAttributes(
+  const _$CoverArtAttributesImpl(
       {this.volume, required this.fileName, this.description, this.locale});
 
-  factory _$_CoverArtAttributes.fromJson(Map<String, dynamic> json) =>
-      _$$_CoverArtAttributesFromJson(json);
+  factory _$CoverArtAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CoverArtAttributesImplFromJson(json);
 
   @override
   final String? volume;
@@ -1757,7 +1762,7 @@ class _$_CoverArtAttributes
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_CoverArtAttributes &&
+            other is _$CoverArtAttributesImpl &&
             (identical(other.volume, volume) || other.volume == volume) &&
             (identical(other.fileName, fileName) ||
                 other.fileName == fileName) &&
@@ -1774,13 +1779,13 @@ class _$_CoverArtAttributes
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_CoverArtAttributesCopyWith<_$_CoverArtAttributes> get copyWith =>
-      __$$_CoverArtAttributesCopyWithImpl<_$_CoverArtAttributes>(
+  _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
+      __$$CoverArtAttributesImplCopyWithImpl<_$CoverArtAttributesImpl>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_CoverArtAttributesToJson(
+    return _$$CoverArtAttributesImplToJson(
       this,
     );
   }
@@ -1791,10 +1796,10 @@ abstract class _CoverArtAttributes implements CoverArtAttributes {
       {final String? volume,
       required final String fileName,
       final String? description,
-      final String? locale}) = _$_CoverArtAttributes;
+      final String? locale}) = _$CoverArtAttributesImpl;
 
   factory _CoverArtAttributes.fromJson(Map<String, dynamic> json) =
-      _$_CoverArtAttributes.fromJson;
+      _$CoverArtAttributesImpl.fromJson;
 
   @override
   String? get volume;
@@ -1806,7 +1811,7 @@ abstract class _CoverArtAttributes implements CoverArtAttributes {
   String? get locale;
   @override
   @JsonKey(ignore: true)
-  _$$_CoverArtAttributesCopyWith<_$_CoverArtAttributes> get copyWith =>
+  _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1858,22 +1863,22 @@ class _$UserAttributesCopyWithImpl<$Res, $Val extends UserAttributes>
 }
 
 /// @nodoc
-abstract class _$$_UserAttributesCopyWith<$Res>
+abstract class _$$UserAttributesImplCopyWith<$Res>
     implements $UserAttributesCopyWith<$Res> {
-  factory _$$_UserAttributesCopyWith(
-          _$_UserAttributes value, $Res Function(_$_UserAttributes) then) =
-      __$$_UserAttributesCopyWithImpl<$Res>;
+  factory _$$UserAttributesImplCopyWith(_$UserAttributesImpl value,
+          $Res Function(_$UserAttributesImpl) then) =
+      __$$UserAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String username});
 }
 
 /// @nodoc
-class __$$_UserAttributesCopyWithImpl<$Res>
-    extends _$UserAttributesCopyWithImpl<$Res, _$_UserAttributes>
-    implements _$$_UserAttributesCopyWith<$Res> {
-  __$$_UserAttributesCopyWithImpl(
-      _$_UserAttributes _value, $Res Function(_$_UserAttributes) _then)
+class __$$UserAttributesImplCopyWithImpl<$Res>
+    extends _$UserAttributesCopyWithImpl<$Res, _$UserAttributesImpl>
+    implements _$$UserAttributesImplCopyWith<$Res> {
+  __$$UserAttributesImplCopyWithImpl(
+      _$UserAttributesImpl _value, $Res Function(_$UserAttributesImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1881,7 +1886,7 @@ class __$$_UserAttributesCopyWithImpl<$Res>
   $Res call({
     Object? username = null,
   }) {
-    return _then(_$_UserAttributes(
+    return _then(_$UserAttributesImpl(
       username: null == username
           ? _value.username
           : username // ignore: cast_nullable_to_non_nullable
@@ -1892,13 +1897,13 @@ class __$$_UserAttributesCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_UserAttributes
+class _$UserAttributesImpl
     with DiagnosticableTreeMixin
     implements _UserAttributes {
-  const _$_UserAttributes({required this.username});
+  const _$UserAttributesImpl({required this.username});
 
-  factory _$_UserAttributes.fromJson(Map<String, dynamic> json) =>
-      _$$_UserAttributesFromJson(json);
+  factory _$UserAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserAttributesImplFromJson(json);
 
   @override
   final String username;
@@ -1920,7 +1925,7 @@ class _$_UserAttributes
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_UserAttributes &&
+            other is _$UserAttributesImpl &&
             (identical(other.username, username) ||
                 other.username == username));
   }
@@ -1932,12 +1937,13 @@ class _$_UserAttributes
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_UserAttributesCopyWith<_$_UserAttributes> get copyWith =>
-      __$$_UserAttributesCopyWithImpl<_$_UserAttributes>(this, _$identity);
+  _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
+      __$$UserAttributesImplCopyWithImpl<_$UserAttributesImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_UserAttributesToJson(
+    return _$$UserAttributesImplToJson(
       this,
     );
   }
@@ -1945,16 +1951,16 @@ class _$_UserAttributes
 
 abstract class _UserAttributes implements UserAttributes {
   const factory _UserAttributes({required final String username}) =
-      _$_UserAttributes;
+      _$UserAttributesImpl;
 
   factory _UserAttributes.fromJson(Map<String, dynamic> json) =
-      _$_UserAttributes.fromJson;
+      _$UserAttributesImpl.fromJson;
 
   @override
   String get username;
   @override
   @JsonKey(ignore: true)
-  _$$_UserAttributesCopyWith<_$_UserAttributes> get copyWith =>
+  _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2065,11 +2071,11 @@ class _$AuthorAttributesCopyWithImpl<$Res, $Val extends AuthorAttributes>
 }
 
 /// @nodoc
-abstract class _$$_AuthorAttributesCopyWith<$Res>
+abstract class _$$AuthorAttributesImplCopyWith<$Res>
     implements $AuthorAttributesCopyWith<$Res> {
-  factory _$$_AuthorAttributesCopyWith(
-          _$_AuthorAttributes value, $Res Function(_$_AuthorAttributes) then) =
-      __$$_AuthorAttributesCopyWithImpl<$Res>;
+  factory _$$AuthorAttributesImplCopyWith(_$AuthorAttributesImpl value,
+          $Res Function(_$AuthorAttributesImpl) then) =
+      __$$AuthorAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -2085,11 +2091,11 @@ abstract class _$$_AuthorAttributesCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_AuthorAttributesCopyWithImpl<$Res>
-    extends _$AuthorAttributesCopyWithImpl<$Res, _$_AuthorAttributes>
-    implements _$$_AuthorAttributesCopyWith<$Res> {
-  __$$_AuthorAttributesCopyWithImpl(
-      _$_AuthorAttributes _value, $Res Function(_$_AuthorAttributes) _then)
+class __$$AuthorAttributesImplCopyWithImpl<$Res>
+    extends _$AuthorAttributesCopyWithImpl<$Res, _$AuthorAttributesImpl>
+    implements _$$AuthorAttributesImplCopyWith<$Res> {
+  __$$AuthorAttributesImplCopyWithImpl(_$AuthorAttributesImpl _value,
+      $Res Function(_$AuthorAttributesImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -2105,7 +2111,7 @@ class __$$_AuthorAttributesCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
-    return _then(_$_AuthorAttributes(
+    return _then(_$AuthorAttributesImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -2148,10 +2154,10 @@ class __$$_AuthorAttributesCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_AuthorAttributes
+class _$AuthorAttributesImpl
     with DiagnosticableTreeMixin
     implements _AuthorAttributes {
-  const _$_AuthorAttributes(
+  const _$AuthorAttributesImpl(
       {required this.name,
       this.imageUrl,
       required final Map<String, String> biography,
@@ -2163,8 +2169,8 @@ class _$_AuthorAttributes
       @TimestampSerializer() required this.updatedAt})
       : _biography = biography;
 
-  factory _$_AuthorAttributes.fromJson(Map<String, dynamic> json) =>
-      _$$_AuthorAttributesFromJson(json);
+  factory _$AuthorAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AuthorAttributesImplFromJson(json);
 
   @override
   final String name;
@@ -2218,7 +2224,7 @@ class _$_AuthorAttributes
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_AuthorAttributes &&
+            other is _$AuthorAttributesImpl &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.imageUrl, imageUrl) ||
                 other.imageUrl == imageUrl) &&
@@ -2251,12 +2257,13 @@ class _$_AuthorAttributes
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_AuthorAttributesCopyWith<_$_AuthorAttributes> get copyWith =>
-      __$$_AuthorAttributesCopyWithImpl<_$_AuthorAttributes>(this, _$identity);
+  _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
+      __$$AuthorAttributesImplCopyWithImpl<_$AuthorAttributesImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_AuthorAttributesToJson(
+    return _$$AuthorAttributesImplToJson(
       this,
     );
   }
@@ -2273,10 +2280,10 @@ abstract class _AuthorAttributes implements AuthorAttributes {
           final String? website,
           @TimestampSerializer() required final DateTime createdAt,
           @TimestampSerializer() required final DateTime updatedAt}) =
-      _$_AuthorAttributes;
+      _$AuthorAttributesImpl;
 
   factory _AuthorAttributes.fromJson(Map<String, dynamic> json) =
-      _$_AuthorAttributes.fromJson;
+      _$AuthorAttributesImpl.fromJson;
 
   @override
   String get name;
@@ -2300,7 +2307,7 @@ abstract class _AuthorAttributes implements AuthorAttributes {
   DateTime get updatedAt;
   @override
   @JsonKey(ignore: true)
-  _$$_AuthorAttributesCopyWith<_$_AuthorAttributes> get copyWith =>
+  _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2439,22 +2446,22 @@ class _$RelationshipCopyWithImpl<$Res, $Val extends Relationship>
 }
 
 /// @nodoc
-abstract class _$$RelationshipMangaCopyWith<$Res>
+abstract class _$$RelationshipMangaImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$RelationshipMangaCopyWith(
-          _$RelationshipManga value, $Res Function(_$RelationshipManga) then) =
-      __$$RelationshipMangaCopyWithImpl<$Res>;
+  factory _$$RelationshipMangaImplCopyWith(_$RelationshipMangaImpl value,
+          $Res Function(_$RelationshipMangaImpl) then) =
+      __$$RelationshipMangaImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id});
 }
 
 /// @nodoc
-class __$$RelationshipMangaCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipManga>
-    implements _$$RelationshipMangaCopyWith<$Res> {
-  __$$RelationshipMangaCopyWithImpl(
-      _$RelationshipManga _value, $Res Function(_$RelationshipManga) _then)
+class __$$RelationshipMangaImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipMangaImpl>
+    implements _$$RelationshipMangaImplCopyWith<$Res> {
+  __$$RelationshipMangaImplCopyWithImpl(_$RelationshipMangaImpl _value,
+      $Res Function(_$RelationshipMangaImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -2462,7 +2469,7 @@ class __$$RelationshipMangaCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
   }) {
-    return _then(_$RelationshipManga(
+    return _then(_$RelationshipMangaImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -2473,14 +2480,14 @@ class __$$RelationshipMangaCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RelationshipManga
+class _$RelationshipMangaImpl
     with DiagnosticableTreeMixin
     implements RelationshipManga {
-  const _$RelationshipManga({required this.id, final String? $type})
+  const _$RelationshipMangaImpl({required this.id, final String? $type})
       : $type = $type ?? 'manga';
 
-  factory _$RelationshipManga.fromJson(Map<String, dynamic> json) =>
-      _$$RelationshipMangaFromJson(json);
+  factory _$RelationshipMangaImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RelationshipMangaImplFromJson(json);
 
   @override
   final String id;
@@ -2504,8 +2511,9 @@ class _$RelationshipManga
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$RelationshipMangaCopyWith<_$RelationshipManga> get copyWith =>
-      __$$RelationshipMangaCopyWithImpl<_$RelationshipManga>(this, _$identity);
+  _$$RelationshipMangaImplCopyWith<_$RelationshipMangaImpl> get copyWith =>
+      __$$RelationshipMangaImplCopyWithImpl<_$RelationshipMangaImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -2602,7 +2610,7 @@ class _$RelationshipManga
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RelationshipMangaToJson(
+    return _$$RelationshipMangaImplToJson(
       this,
     );
   }
@@ -2610,25 +2618,25 @@ class _$RelationshipManga
 
 abstract class RelationshipManga implements Relationship {
   const factory RelationshipManga({required final String id}) =
-      _$RelationshipManga;
+      _$RelationshipMangaImpl;
 
   factory RelationshipManga.fromJson(Map<String, dynamic> json) =
-      _$RelationshipManga.fromJson;
+      _$RelationshipMangaImpl.fromJson;
 
   @override
   String get id;
   @override
   @JsonKey(ignore: true)
-  _$$RelationshipMangaCopyWith<_$RelationshipManga> get copyWith =>
+  _$$RelationshipMangaImplCopyWith<_$RelationshipMangaImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$RelationshipUserCopyWith<$Res>
+abstract class _$$RelationshipUserImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$RelationshipUserCopyWith(
-          _$RelationshipUser value, $Res Function(_$RelationshipUser) then) =
-      __$$RelationshipUserCopyWithImpl<$Res>;
+  factory _$$RelationshipUserImplCopyWith(_$RelationshipUserImpl value,
+          $Res Function(_$RelationshipUserImpl) then) =
+      __$$RelationshipUserImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, UserAttributes attributes});
@@ -2637,11 +2645,11 @@ abstract class _$$RelationshipUserCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$RelationshipUserCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipUser>
-    implements _$$RelationshipUserCopyWith<$Res> {
-  __$$RelationshipUserCopyWithImpl(
-      _$RelationshipUser _value, $Res Function(_$RelationshipUser) _then)
+class __$$RelationshipUserImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipUserImpl>
+    implements _$$RelationshipUserImplCopyWith<$Res> {
+  __$$RelationshipUserImplCopyWithImpl(_$RelationshipUserImpl _value,
+      $Res Function(_$RelationshipUserImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -2650,7 +2658,7 @@ class __$$RelationshipUserCopyWithImpl<$Res>
     Object? id = null,
     Object? attributes = null,
   }) {
-    return _then(_$RelationshipUser(
+    return _then(_$RelationshipUserImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -2673,15 +2681,15 @@ class __$$RelationshipUserCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RelationshipUser
+class _$RelationshipUserImpl
     with DiagnosticableTreeMixin
     implements RelationshipUser {
-  const _$RelationshipUser(
+  const _$RelationshipUserImpl(
       {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'user';
 
-  factory _$RelationshipUser.fromJson(Map<String, dynamic> json) =>
-      _$$RelationshipUserFromJson(json);
+  factory _$RelationshipUserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RelationshipUserImplFromJson(json);
 
   @override
   final String id;
@@ -2708,8 +2716,9 @@ class _$RelationshipUser
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$RelationshipUserCopyWith<_$RelationshipUser> get copyWith =>
-      __$$RelationshipUserCopyWithImpl<_$RelationshipUser>(this, _$identity);
+  _$$RelationshipUserImplCopyWith<_$RelationshipUserImpl> get copyWith =>
+      __$$RelationshipUserImplCopyWithImpl<_$RelationshipUserImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -2806,7 +2815,7 @@ class _$RelationshipUser
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RelationshipUserToJson(
+    return _$$RelationshipUserImplToJson(
       this,
     );
   }
@@ -2815,24 +2824,26 @@ class _$RelationshipUser
 abstract class RelationshipUser implements Relationship {
   const factory RelationshipUser(
       {required final String id,
-      required final UserAttributes attributes}) = _$RelationshipUser;
+      required final UserAttributes attributes}) = _$RelationshipUserImpl;
 
   factory RelationshipUser.fromJson(Map<String, dynamic> json) =
-      _$RelationshipUser.fromJson;
+      _$RelationshipUserImpl.fromJson;
 
   @override
   String get id;
   UserAttributes get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$RelationshipUserCopyWith<_$RelationshipUser> get copyWith =>
+  _$$RelationshipUserImplCopyWith<_$RelationshipUserImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ArtistCopyWith<$Res> implements $RelationshipCopyWith<$Res> {
-  factory _$$ArtistCopyWith(_$Artist value, $Res Function(_$Artist) then) =
-      __$$ArtistCopyWithImpl<$Res>;
+abstract class _$$ArtistImplCopyWith<$Res>
+    implements $RelationshipCopyWith<$Res> {
+  factory _$$ArtistImplCopyWith(
+          _$ArtistImpl value, $Res Function(_$ArtistImpl) then) =
+      __$$ArtistImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, AuthorAttributes attributes});
@@ -2841,10 +2852,11 @@ abstract class _$$ArtistCopyWith<$Res> implements $RelationshipCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$ArtistCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$Artist>
-    implements _$$ArtistCopyWith<$Res> {
-  __$$ArtistCopyWithImpl(_$Artist _value, $Res Function(_$Artist) _then)
+class __$$ArtistImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$ArtistImpl>
+    implements _$$ArtistImplCopyWith<$Res> {
+  __$$ArtistImplCopyWithImpl(
+      _$ArtistImpl _value, $Res Function(_$ArtistImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -2853,7 +2865,7 @@ class __$$ArtistCopyWithImpl<$Res>
     Object? id = null,
     Object? attributes = null,
   }) {
-    return _then(_$Artist(
+    return _then(_$ArtistImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -2876,13 +2888,13 @@ class __$$ArtistCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$Artist with DiagnosticableTreeMixin implements Artist {
-  const _$Artist(
+class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
+  const _$ArtistImpl(
       {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'artist';
 
-  factory _$Artist.fromJson(Map<String, dynamic> json) =>
-      _$$ArtistFromJson(json);
+  factory _$ArtistImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtistImplFromJson(json);
 
   @override
   final String id;
@@ -2909,8 +2921,8 @@ class _$Artist with DiagnosticableTreeMixin implements Artist {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ArtistCopyWith<_$Artist> get copyWith =>
-      __$$ArtistCopyWithImpl<_$Artist>(this, _$identity);
+  _$$ArtistImplCopyWith<_$ArtistImpl> get copyWith =>
+      __$$ArtistImplCopyWithImpl<_$ArtistImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -3007,7 +3019,7 @@ class _$Artist with DiagnosticableTreeMixin implements Artist {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArtistToJson(
+    return _$$ArtistImplToJson(
       this,
     );
   }
@@ -3016,23 +3028,25 @@ class _$Artist with DiagnosticableTreeMixin implements Artist {
 abstract class Artist implements Relationship, CreatorType {
   const factory Artist(
       {required final String id,
-      required final AuthorAttributes attributes}) = _$Artist;
+      required final AuthorAttributes attributes}) = _$ArtistImpl;
 
-  factory Artist.fromJson(Map<String, dynamic> json) = _$Artist.fromJson;
+  factory Artist.fromJson(Map<String, dynamic> json) = _$ArtistImpl.fromJson;
 
   @override
   String get id;
   AuthorAttributes get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$ArtistCopyWith<_$Artist> get copyWith =>
+  _$$ArtistImplCopyWith<_$ArtistImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$AuthorCopyWith<$Res> implements $RelationshipCopyWith<$Res> {
-  factory _$$AuthorCopyWith(_$Author value, $Res Function(_$Author) then) =
-      __$$AuthorCopyWithImpl<$Res>;
+abstract class _$$AuthorImplCopyWith<$Res>
+    implements $RelationshipCopyWith<$Res> {
+  factory _$$AuthorImplCopyWith(
+          _$AuthorImpl value, $Res Function(_$AuthorImpl) then) =
+      __$$AuthorImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, AuthorAttributes attributes});
@@ -3041,10 +3055,11 @@ abstract class _$$AuthorCopyWith<$Res> implements $RelationshipCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$AuthorCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$Author>
-    implements _$$AuthorCopyWith<$Res> {
-  __$$AuthorCopyWithImpl(_$Author _value, $Res Function(_$Author) _then)
+class __$$AuthorImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$AuthorImpl>
+    implements _$$AuthorImplCopyWith<$Res> {
+  __$$AuthorImplCopyWithImpl(
+      _$AuthorImpl _value, $Res Function(_$AuthorImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3053,7 +3068,7 @@ class __$$AuthorCopyWithImpl<$Res>
     Object? id = null,
     Object? attributes = null,
   }) {
-    return _then(_$Author(
+    return _then(_$AuthorImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -3076,13 +3091,13 @@ class __$$AuthorCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$Author with DiagnosticableTreeMixin implements Author {
-  const _$Author(
+class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
+  const _$AuthorImpl(
       {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'author';
 
-  factory _$Author.fromJson(Map<String, dynamic> json) =>
-      _$$AuthorFromJson(json);
+  factory _$AuthorImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AuthorImplFromJson(json);
 
   @override
   final String id;
@@ -3109,8 +3124,8 @@ class _$Author with DiagnosticableTreeMixin implements Author {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$AuthorCopyWith<_$Author> get copyWith =>
-      __$$AuthorCopyWithImpl<_$Author>(this, _$identity);
+  _$$AuthorImplCopyWith<_$AuthorImpl> get copyWith =>
+      __$$AuthorImplCopyWithImpl<_$AuthorImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -3207,7 +3222,7 @@ class _$Author with DiagnosticableTreeMixin implements Author {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AuthorToJson(
+    return _$$AuthorImplToJson(
       this,
     );
   }
@@ -3216,36 +3231,36 @@ class _$Author with DiagnosticableTreeMixin implements Author {
 abstract class Author implements Relationship, CreatorType {
   const factory Author(
       {required final String id,
-      required final AuthorAttributes attributes}) = _$Author;
+      required final AuthorAttributes attributes}) = _$AuthorImpl;
 
-  factory Author.fromJson(Map<String, dynamic> json) = _$Author.fromJson;
+  factory Author.fromJson(Map<String, dynamic> json) = _$AuthorImpl.fromJson;
 
   @override
   String get id;
   AuthorAttributes get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$AuthorCopyWith<_$Author> get copyWith =>
+  _$$AuthorImplCopyWith<_$AuthorImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$RelationshipCreatorCopyWith<$Res>
+abstract class _$$RelationshipCreatorImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$RelationshipCreatorCopyWith(_$RelationshipCreator value,
-          $Res Function(_$RelationshipCreator) then) =
-      __$$RelationshipCreatorCopyWithImpl<$Res>;
+  factory _$$RelationshipCreatorImplCopyWith(_$RelationshipCreatorImpl value,
+          $Res Function(_$RelationshipCreatorImpl) then) =
+      __$$RelationshipCreatorImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id});
 }
 
 /// @nodoc
-class __$$RelationshipCreatorCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipCreator>
-    implements _$$RelationshipCreatorCopyWith<$Res> {
-  __$$RelationshipCreatorCopyWithImpl(
-      _$RelationshipCreator _value, $Res Function(_$RelationshipCreator) _then)
+class __$$RelationshipCreatorImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipCreatorImpl>
+    implements _$$RelationshipCreatorImplCopyWith<$Res> {
+  __$$RelationshipCreatorImplCopyWithImpl(_$RelationshipCreatorImpl _value,
+      $Res Function(_$RelationshipCreatorImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3253,7 +3268,7 @@ class __$$RelationshipCreatorCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
   }) {
-    return _then(_$RelationshipCreator(
+    return _then(_$RelationshipCreatorImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -3264,14 +3279,14 @@ class __$$RelationshipCreatorCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RelationshipCreator
+class _$RelationshipCreatorImpl
     with DiagnosticableTreeMixin
     implements RelationshipCreator {
-  const _$RelationshipCreator({required this.id, final String? $type})
+  const _$RelationshipCreatorImpl({required this.id, final String? $type})
       : $type = $type ?? 'creator';
 
-  factory _$RelationshipCreator.fromJson(Map<String, dynamic> json) =>
-      _$$RelationshipCreatorFromJson(json);
+  factory _$RelationshipCreatorImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RelationshipCreatorImplFromJson(json);
 
   @override
   final String id;
@@ -3295,8 +3310,8 @@ class _$RelationshipCreator
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$RelationshipCreatorCopyWith<_$RelationshipCreator> get copyWith =>
-      __$$RelationshipCreatorCopyWithImpl<_$RelationshipCreator>(
+  _$$RelationshipCreatorImplCopyWith<_$RelationshipCreatorImpl> get copyWith =>
+      __$$RelationshipCreatorImplCopyWithImpl<_$RelationshipCreatorImpl>(
           this, _$identity);
 
   @override
@@ -3394,7 +3409,7 @@ class _$RelationshipCreator
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RelationshipCreatorToJson(
+    return _$$RelationshipCreatorImplToJson(
       this,
     );
   }
@@ -3402,25 +3417,25 @@ class _$RelationshipCreator
 
 abstract class RelationshipCreator implements Relationship {
   const factory RelationshipCreator({required final String id}) =
-      _$RelationshipCreator;
+      _$RelationshipCreatorImpl;
 
   factory RelationshipCreator.fromJson(Map<String, dynamic> json) =
-      _$RelationshipCreator.fromJson;
+      _$RelationshipCreatorImpl.fromJson;
 
   @override
   String get id;
   @override
   @JsonKey(ignore: true)
-  _$$RelationshipCreatorCopyWith<_$RelationshipCreator> get copyWith =>
+  _$$RelationshipCreatorImplCopyWith<_$RelationshipCreatorImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$CoverArtCopyWith<$Res>
+abstract class _$$CoverArtImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$CoverArtCopyWith(
-          _$CoverArt value, $Res Function(_$CoverArt) then) =
-      __$$CoverArtCopyWithImpl<$Res>;
+  factory _$$CoverArtImplCopyWith(
+          _$CoverArtImpl value, $Res Function(_$CoverArtImpl) then) =
+      __$$CoverArtImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, CoverArtAttributes? attributes});
@@ -3429,10 +3444,11 @@ abstract class _$$CoverArtCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$CoverArtCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$CoverArt>
-    implements _$$CoverArtCopyWith<$Res> {
-  __$$CoverArtCopyWithImpl(_$CoverArt _value, $Res Function(_$CoverArt) _then)
+class __$$CoverArtImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$CoverArtImpl>
+    implements _$$CoverArtImplCopyWith<$Res> {
+  __$$CoverArtImplCopyWithImpl(
+      _$CoverArtImpl _value, $Res Function(_$CoverArtImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3441,7 +3457,7 @@ class __$$CoverArtCopyWithImpl<$Res>
     Object? id = null,
     Object? attributes = freezed,
   }) {
-    return _then(_$CoverArt(
+    return _then(_$CoverArtImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -3468,13 +3484,13 @@ class __$$CoverArtCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
-  const _$CoverArt(
+class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
+  const _$CoverArtImpl(
       {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'cover_art';
 
-  factory _$CoverArt.fromJson(Map<String, dynamic> json) =>
-      _$$CoverArtFromJson(json);
+  factory _$CoverArtImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CoverArtImplFromJson(json);
 
   @override
   final String id;
@@ -3501,8 +3517,8 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$CoverArtCopyWith<_$CoverArt> get copyWith =>
-      __$$CoverArtCopyWithImpl<_$CoverArt>(this, _$identity);
+  _$$CoverArtImplCopyWith<_$CoverArtImpl> get copyWith =>
+      __$$CoverArtImplCopyWithImpl<_$CoverArtImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -3599,7 +3615,7 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CoverArtToJson(
+    return _$$CoverArtImplToJson(
       this,
     );
   }
@@ -3608,25 +3624,26 @@ class _$CoverArt with DiagnosticableTreeMixin implements CoverArt {
 abstract class CoverArt implements Relationship, Cover {
   const factory CoverArt(
       {required final String id,
-      required final CoverArtAttributes? attributes}) = _$CoverArt;
+      required final CoverArtAttributes? attributes}) = _$CoverArtImpl;
 
-  factory CoverArt.fromJson(Map<String, dynamic> json) = _$CoverArt.fromJson;
+  factory CoverArt.fromJson(Map<String, dynamic> json) =
+      _$CoverArtImpl.fromJson;
 
   @override
   String get id;
   CoverArtAttributes? get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$CoverArtCopyWith<_$CoverArt> get copyWith =>
+  _$$CoverArtImplCopyWith<_$CoverArtImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ScanlationGroupCopyWith<$Res>
+abstract class _$$ScanlationGroupImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$ScanlationGroupCopyWith(
-          _$ScanlationGroup value, $Res Function(_$ScanlationGroup) then) =
-      __$$ScanlationGroupCopyWithImpl<$Res>;
+  factory _$$ScanlationGroupImplCopyWith(_$ScanlationGroupImpl value,
+          $Res Function(_$ScanlationGroupImpl) then) =
+      __$$ScanlationGroupImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, ScanlationGroupAttributes attributes});
@@ -3635,11 +3652,11 @@ abstract class _$$ScanlationGroupCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ScanlationGroupCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$ScanlationGroup>
-    implements _$$ScanlationGroupCopyWith<$Res> {
-  __$$ScanlationGroupCopyWithImpl(
-      _$ScanlationGroup _value, $Res Function(_$ScanlationGroup) _then)
+class __$$ScanlationGroupImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$ScanlationGroupImpl>
+    implements _$$ScanlationGroupImplCopyWith<$Res> {
+  __$$ScanlationGroupImplCopyWithImpl(
+      _$ScanlationGroupImpl _value, $Res Function(_$ScanlationGroupImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3648,7 +3665,7 @@ class __$$ScanlationGroupCopyWithImpl<$Res>
     Object? id = null,
     Object? attributes = null,
   }) {
-    return _then(_$ScanlationGroup(
+    return _then(_$ScanlationGroupImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -3671,15 +3688,15 @@ class __$$ScanlationGroupCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ScanlationGroup
+class _$ScanlationGroupImpl
     with DiagnosticableTreeMixin
     implements ScanlationGroup {
-  const _$ScanlationGroup(
+  const _$ScanlationGroupImpl(
       {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'scanlation_group';
 
-  factory _$ScanlationGroup.fromJson(Map<String, dynamic> json) =>
-      _$$ScanlationGroupFromJson(json);
+  factory _$ScanlationGroupImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ScanlationGroupImplFromJson(json);
 
   @override
   final String id;
@@ -3706,8 +3723,9 @@ class _$ScanlationGroup
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ScanlationGroupCopyWith<_$ScanlationGroup> get copyWith =>
-      __$$ScanlationGroupCopyWithImpl<_$ScanlationGroup>(this, _$identity);
+  _$$ScanlationGroupImplCopyWith<_$ScanlationGroupImpl> get copyWith =>
+      __$$ScanlationGroupImplCopyWithImpl<_$ScanlationGroupImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -3804,7 +3822,7 @@ class _$ScanlationGroup
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ScanlationGroupToJson(
+    return _$$ScanlationGroupImplToJson(
       this,
     );
   }
@@ -3812,18 +3830,19 @@ class _$ScanlationGroup
 
 abstract class ScanlationGroup implements Relationship, Group {
   const factory ScanlationGroup(
-      {required final String id,
-      required final ScanlationGroupAttributes attributes}) = _$ScanlationGroup;
+          {required final String id,
+          required final ScanlationGroupAttributes attributes}) =
+      _$ScanlationGroupImpl;
 
   factory ScanlationGroup.fromJson(Map<String, dynamic> json) =
-      _$ScanlationGroup.fromJson;
+      _$ScanlationGroupImpl.fromJson;
 
   @override
   String get id;
   ScanlationGroupAttributes get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$ScanlationGroupCopyWith<_$ScanlationGroup> get copyWith =>
+  _$$ScanlationGroupImplCopyWith<_$ScanlationGroupImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -3887,22 +3906,22 @@ class _$ChapterAPIDataCopyWithImpl<$Res, $Val extends ChapterAPIData>
 }
 
 /// @nodoc
-abstract class _$$_ChapterAPIDataCopyWith<$Res>
+abstract class _$$ChapterAPIDataImplCopyWith<$Res>
     implements $ChapterAPIDataCopyWith<$Res> {
-  factory _$$_ChapterAPIDataCopyWith(
-          _$_ChapterAPIData value, $Res Function(_$_ChapterAPIData) then) =
-      __$$_ChapterAPIDataCopyWithImpl<$Res>;
+  factory _$$ChapterAPIDataImplCopyWith(_$ChapterAPIDataImpl value,
+          $Res Function(_$ChapterAPIDataImpl) then) =
+      __$$ChapterAPIDataImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String hash, List<String> data, List<String> dataSaver});
 }
 
 /// @nodoc
-class __$$_ChapterAPIDataCopyWithImpl<$Res>
-    extends _$ChapterAPIDataCopyWithImpl<$Res, _$_ChapterAPIData>
-    implements _$$_ChapterAPIDataCopyWith<$Res> {
-  __$$_ChapterAPIDataCopyWithImpl(
-      _$_ChapterAPIData _value, $Res Function(_$_ChapterAPIData) _then)
+class __$$ChapterAPIDataImplCopyWithImpl<$Res>
+    extends _$ChapterAPIDataCopyWithImpl<$Res, _$ChapterAPIDataImpl>
+    implements _$$ChapterAPIDataImplCopyWith<$Res> {
+  __$$ChapterAPIDataImplCopyWithImpl(
+      _$ChapterAPIDataImpl _value, $Res Function(_$ChapterAPIDataImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3912,7 +3931,7 @@ class __$$_ChapterAPIDataCopyWithImpl<$Res>
     Object? data = null,
     Object? dataSaver = null,
   }) {
-    return _then(_$_ChapterAPIData(
+    return _then(_$ChapterAPIDataImpl(
       hash: null == hash
           ? _value.hash
           : hash // ignore: cast_nullable_to_non_nullable
@@ -3931,18 +3950,18 @@ class __$$_ChapterAPIDataCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ChapterAPIData
+class _$ChapterAPIDataImpl
     with DiagnosticableTreeMixin
     implements _ChapterAPIData {
-  const _$_ChapterAPIData(
+  const _$ChapterAPIDataImpl(
       {required this.hash,
       required final List<String> data,
       required final List<String> dataSaver})
       : _data = data,
         _dataSaver = dataSaver;
 
-  factory _$_ChapterAPIData.fromJson(Map<String, dynamic> json) =>
-      _$$_ChapterAPIDataFromJson(json);
+  factory _$ChapterAPIDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterAPIDataImplFromJson(json);
 
   @override
   final String hash;
@@ -3981,7 +4000,7 @@ class _$_ChapterAPIData
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ChapterAPIData &&
+            other is _$ChapterAPIDataImpl &&
             (identical(other.hash, hash) || other.hash == hash) &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             const DeepCollectionEquality()
@@ -3999,12 +4018,13 @@ class _$_ChapterAPIData
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ChapterAPIDataCopyWith<_$_ChapterAPIData> get copyWith =>
-      __$$_ChapterAPIDataCopyWithImpl<_$_ChapterAPIData>(this, _$identity);
+  _$$ChapterAPIDataImplCopyWith<_$ChapterAPIDataImpl> get copyWith =>
+      __$$ChapterAPIDataImplCopyWithImpl<_$ChapterAPIDataImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ChapterAPIDataToJson(
+    return _$$ChapterAPIDataImplToJson(
       this,
     );
   }
@@ -4014,10 +4034,10 @@ abstract class _ChapterAPIData implements ChapterAPIData {
   const factory _ChapterAPIData(
       {required final String hash,
       required final List<String> data,
-      required final List<String> dataSaver}) = _$_ChapterAPIData;
+      required final List<String> dataSaver}) = _$ChapterAPIDataImpl;
 
   factory _ChapterAPIData.fromJson(Map<String, dynamic> json) =
-      _$_ChapterAPIData.fromJson;
+      _$ChapterAPIDataImpl.fromJson;
 
   @override
   String get hash;
@@ -4027,7 +4047,7 @@ abstract class _ChapterAPIData implements ChapterAPIData {
   List<String> get dataSaver;
   @override
   @JsonKey(ignore: true)
-  _$$_ChapterAPIDataCopyWith<_$_ChapterAPIData> get copyWith =>
+  _$$ChapterAPIDataImplCopyWith<_$ChapterAPIDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4095,11 +4115,11 @@ class _$ChapterAPICopyWithImpl<$Res, $Val extends ChapterAPI>
 }
 
 /// @nodoc
-abstract class _$$_ChapterAPICopyWith<$Res>
+abstract class _$$ChapterAPIImplCopyWith<$Res>
     implements $ChapterAPICopyWith<$Res> {
-  factory _$$_ChapterAPICopyWith(
-          _$_ChapterAPI value, $Res Function(_$_ChapterAPI) then) =
-      __$$_ChapterAPICopyWithImpl<$Res>;
+  factory _$$ChapterAPIImplCopyWith(
+          _$ChapterAPIImpl value, $Res Function(_$ChapterAPIImpl) then) =
+      __$$ChapterAPIImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String baseUrl, ChapterAPIData chapter});
@@ -4109,11 +4129,11 @@ abstract class _$$_ChapterAPICopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_ChapterAPICopyWithImpl<$Res>
-    extends _$ChapterAPICopyWithImpl<$Res, _$_ChapterAPI>
-    implements _$$_ChapterAPICopyWith<$Res> {
-  __$$_ChapterAPICopyWithImpl(
-      _$_ChapterAPI _value, $Res Function(_$_ChapterAPI) _then)
+class __$$ChapterAPIImplCopyWithImpl<$Res>
+    extends _$ChapterAPICopyWithImpl<$Res, _$ChapterAPIImpl>
+    implements _$$ChapterAPIImplCopyWith<$Res> {
+  __$$ChapterAPIImplCopyWithImpl(
+      _$ChapterAPIImpl _value, $Res Function(_$ChapterAPIImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -4122,7 +4142,7 @@ class __$$_ChapterAPICopyWithImpl<$Res>
     Object? baseUrl = null,
     Object? chapter = null,
   }) {
-    return _then(_$_ChapterAPI(
+    return _then(_$ChapterAPIImpl(
       baseUrl: null == baseUrl
           ? _value.baseUrl
           : baseUrl // ignore: cast_nullable_to_non_nullable
@@ -4137,12 +4157,12 @@ class __$$_ChapterAPICopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ChapterAPI extends _ChapterAPI with DiagnosticableTreeMixin {
-  const _$_ChapterAPI({required this.baseUrl, required this.chapter})
+class _$ChapterAPIImpl extends _ChapterAPI with DiagnosticableTreeMixin {
+  const _$ChapterAPIImpl({required this.baseUrl, required this.chapter})
       : super._();
 
-  factory _$_ChapterAPI.fromJson(Map<String, dynamic> json) =>
-      _$$_ChapterAPIFromJson(json);
+  factory _$ChapterAPIImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterAPIImplFromJson(json);
 
   @override
   final String baseUrl;
@@ -4167,7 +4187,7 @@ class _$_ChapterAPI extends _ChapterAPI with DiagnosticableTreeMixin {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ChapterAPI &&
+            other is _$ChapterAPIImpl &&
             (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl) &&
             (identical(other.chapter, chapter) || other.chapter == chapter));
   }
@@ -4179,12 +4199,12 @@ class _$_ChapterAPI extends _ChapterAPI with DiagnosticableTreeMixin {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ChapterAPICopyWith<_$_ChapterAPI> get copyWith =>
-      __$$_ChapterAPICopyWithImpl<_$_ChapterAPI>(this, _$identity);
+  _$$ChapterAPIImplCopyWith<_$ChapterAPIImpl> get copyWith =>
+      __$$ChapterAPIImplCopyWithImpl<_$ChapterAPIImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ChapterAPIToJson(
+    return _$$ChapterAPIImplToJson(
       this,
     );
   }
@@ -4193,11 +4213,11 @@ class _$_ChapterAPI extends _ChapterAPI with DiagnosticableTreeMixin {
 abstract class _ChapterAPI extends ChapterAPI {
   const factory _ChapterAPI(
       {required final String baseUrl,
-      required final ChapterAPIData chapter}) = _$_ChapterAPI;
+      required final ChapterAPIData chapter}) = _$ChapterAPIImpl;
   const _ChapterAPI._() : super._();
 
   factory _ChapterAPI.fromJson(Map<String, dynamic> json) =
-      _$_ChapterAPI.fromJson;
+      _$ChapterAPIImpl.fromJson;
 
   @override
   String get baseUrl;
@@ -4205,7 +4225,7 @@ abstract class _ChapterAPI extends ChapterAPI {
   ChapterAPIData get chapter;
   @override
   @JsonKey(ignore: true)
-  _$$_ChapterAPICopyWith<_$_ChapterAPI> get copyWith =>
+  _$$ChapterAPIImplCopyWith<_$ChapterAPIImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4262,21 +4282,22 @@ class _$CoverListCopyWithImpl<$Res, $Val extends CoverList>
 }
 
 /// @nodoc
-abstract class _$$_CoverListCopyWith<$Res> implements $CoverListCopyWith<$Res> {
-  factory _$$_CoverListCopyWith(
-          _$_CoverList value, $Res Function(_$_CoverList) then) =
-      __$$_CoverListCopyWithImpl<$Res>;
+abstract class _$$CoverListImplCopyWith<$Res>
+    implements $CoverListCopyWith<$Res> {
+  factory _$$CoverListImplCopyWith(
+          _$CoverListImpl value, $Res Function(_$CoverListImpl) then) =
+      __$$CoverListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<CoverArt> data, int total});
 }
 
 /// @nodoc
-class __$$_CoverListCopyWithImpl<$Res>
-    extends _$CoverListCopyWithImpl<$Res, _$_CoverList>
-    implements _$$_CoverListCopyWith<$Res> {
-  __$$_CoverListCopyWithImpl(
-      _$_CoverList _value, $Res Function(_$_CoverList) _then)
+class __$$CoverListImplCopyWithImpl<$Res>
+    extends _$CoverListCopyWithImpl<$Res, _$CoverListImpl>
+    implements _$$CoverListImplCopyWith<$Res> {
+  __$$CoverListImplCopyWithImpl(
+      _$CoverListImpl _value, $Res Function(_$CoverListImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -4285,7 +4306,7 @@ class __$$_CoverListCopyWithImpl<$Res>
     Object? data = null,
     Object? total = null,
   }) {
-    return _then(_$_CoverList(
+    return _then(_$CoverListImpl(
       null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
@@ -4300,11 +4321,11 @@ class __$$_CoverListCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_CoverList with DiagnosticableTreeMixin implements _CoverList {
-  const _$_CoverList(final List<CoverArt> data, this.total) : _data = data;
+class _$CoverListImpl with DiagnosticableTreeMixin implements _CoverList {
+  const _$CoverListImpl(final List<CoverArt> data, this.total) : _data = data;
 
-  factory _$_CoverList.fromJson(Map<String, dynamic> json) =>
-      _$$_CoverListFromJson(json);
+  factory _$CoverListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CoverListImplFromJson(json);
 
   final List<CoverArt> _data;
   @override
@@ -4335,7 +4356,7 @@ class _$_CoverList with DiagnosticableTreeMixin implements _CoverList {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_CoverList &&
+            other is _$CoverListImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.total, total) || other.total == total));
   }
@@ -4348,12 +4369,12 @@ class _$_CoverList with DiagnosticableTreeMixin implements _CoverList {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_CoverListCopyWith<_$_CoverList> get copyWith =>
-      __$$_CoverListCopyWithImpl<_$_CoverList>(this, _$identity);
+  _$$CoverListImplCopyWith<_$CoverListImpl> get copyWith =>
+      __$$CoverListImplCopyWithImpl<_$CoverListImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_CoverListToJson(
+    return _$$CoverListImplToJson(
       this,
     );
   }
@@ -4361,10 +4382,10 @@ class _$_CoverList with DiagnosticableTreeMixin implements _CoverList {
 
 abstract class _CoverList implements CoverList {
   const factory _CoverList(final List<CoverArt> data, final int total) =
-      _$_CoverList;
+      _$CoverListImpl;
 
   factory _CoverList.fromJson(Map<String, dynamic> json) =
-      _$_CoverList.fromJson;
+      _$CoverListImpl.fromJson;
 
   @override
   List<CoverArt> get data;
@@ -4372,7 +4393,7 @@ abstract class _CoverList implements CoverList {
   int get total;
   @override
   @JsonKey(ignore: true)
-  _$$_CoverListCopyWith<_$_CoverList> get copyWith =>
+  _$$CoverListImplCopyWith<_$CoverListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4429,21 +4450,22 @@ class _$MangaListCopyWithImpl<$Res, $Val extends MangaList>
 }
 
 /// @nodoc
-abstract class _$$_MangaListCopyWith<$Res> implements $MangaListCopyWith<$Res> {
-  factory _$$_MangaListCopyWith(
-          _$_MangaList value, $Res Function(_$_MangaList) then) =
-      __$$_MangaListCopyWithImpl<$Res>;
+abstract class _$$MangaListImplCopyWith<$Res>
+    implements $MangaListCopyWith<$Res> {
+  factory _$$MangaListImplCopyWith(
+          _$MangaListImpl value, $Res Function(_$MangaListImpl) then) =
+      __$$MangaListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<Manga> data, int total});
 }
 
 /// @nodoc
-class __$$_MangaListCopyWithImpl<$Res>
-    extends _$MangaListCopyWithImpl<$Res, _$_MangaList>
-    implements _$$_MangaListCopyWith<$Res> {
-  __$$_MangaListCopyWithImpl(
-      _$_MangaList _value, $Res Function(_$_MangaList) _then)
+class __$$MangaListImplCopyWithImpl<$Res>
+    extends _$MangaListCopyWithImpl<$Res, _$MangaListImpl>
+    implements _$$MangaListImplCopyWith<$Res> {
+  __$$MangaListImplCopyWithImpl(
+      _$MangaListImpl _value, $Res Function(_$MangaListImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -4452,7 +4474,7 @@ class __$$_MangaListCopyWithImpl<$Res>
     Object? data = null,
     Object? total = null,
   }) {
-    return _then(_$_MangaList(
+    return _then(_$MangaListImpl(
       null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
@@ -4467,11 +4489,11 @@ class __$$_MangaListCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaList with DiagnosticableTreeMixin implements _MangaList {
-  const _$_MangaList(final List<Manga> data, this.total) : _data = data;
+class _$MangaListImpl with DiagnosticableTreeMixin implements _MangaList {
+  const _$MangaListImpl(final List<Manga> data, this.total) : _data = data;
 
-  factory _$_MangaList.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaListFromJson(json);
+  factory _$MangaListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaListImplFromJson(json);
 
   final List<Manga> _data;
   @override
@@ -4502,7 +4524,7 @@ class _$_MangaList with DiagnosticableTreeMixin implements _MangaList {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MangaList &&
+            other is _$MangaListImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.total, total) || other.total == total));
   }
@@ -4515,12 +4537,12 @@ class _$_MangaList with DiagnosticableTreeMixin implements _MangaList {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaListCopyWith<_$_MangaList> get copyWith =>
-      __$$_MangaListCopyWithImpl<_$_MangaList>(this, _$identity);
+  _$$MangaListImplCopyWith<_$MangaListImpl> get copyWith =>
+      __$$MangaListImplCopyWithImpl<_$MangaListImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaListToJson(
+    return _$$MangaListImplToJson(
       this,
     );
   }
@@ -4528,10 +4550,10 @@ class _$_MangaList with DiagnosticableTreeMixin implements _MangaList {
 
 abstract class _MangaList implements MangaList {
   const factory _MangaList(final List<Manga> data, final int total) =
-      _$_MangaList;
+      _$MangaListImpl;
 
   factory _MangaList.fromJson(Map<String, dynamic> json) =
-      _$_MangaList.fromJson;
+      _$MangaListImpl.fromJson;
 
   @override
   List<Manga> get data;
@@ -4539,7 +4561,7 @@ abstract class _MangaList implements MangaList {
   int get total;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaListCopyWith<_$_MangaList> get copyWith =>
+  _$$MangaListImplCopyWith<_$MangaListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4596,21 +4618,22 @@ class _$GroupListCopyWithImpl<$Res, $Val extends GroupList>
 }
 
 /// @nodoc
-abstract class _$$_GroupListCopyWith<$Res> implements $GroupListCopyWith<$Res> {
-  factory _$$_GroupListCopyWith(
-          _$_GroupList value, $Res Function(_$_GroupList) then) =
-      __$$_GroupListCopyWithImpl<$Res>;
+abstract class _$$GroupListImplCopyWith<$Res>
+    implements $GroupListCopyWith<$Res> {
+  factory _$$GroupListImplCopyWith(
+          _$GroupListImpl value, $Res Function(_$GroupListImpl) then) =
+      __$$GroupListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<ScanlationGroup> data, int total});
 }
 
 /// @nodoc
-class __$$_GroupListCopyWithImpl<$Res>
-    extends _$GroupListCopyWithImpl<$Res, _$_GroupList>
-    implements _$$_GroupListCopyWith<$Res> {
-  __$$_GroupListCopyWithImpl(
-      _$_GroupList _value, $Res Function(_$_GroupList) _then)
+class __$$GroupListImplCopyWithImpl<$Res>
+    extends _$GroupListCopyWithImpl<$Res, _$GroupListImpl>
+    implements _$$GroupListImplCopyWith<$Res> {
+  __$$GroupListImplCopyWithImpl(
+      _$GroupListImpl _value, $Res Function(_$GroupListImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -4619,7 +4642,7 @@ class __$$_GroupListCopyWithImpl<$Res>
     Object? data = null,
     Object? total = null,
   }) {
-    return _then(_$_GroupList(
+    return _then(_$GroupListImpl(
       null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
@@ -4634,12 +4657,12 @@ class __$$_GroupListCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_GroupList with DiagnosticableTreeMixin implements _GroupList {
-  const _$_GroupList(final List<ScanlationGroup> data, this.total)
+class _$GroupListImpl with DiagnosticableTreeMixin implements _GroupList {
+  const _$GroupListImpl(final List<ScanlationGroup> data, this.total)
       : _data = data;
 
-  factory _$_GroupList.fromJson(Map<String, dynamic> json) =>
-      _$$_GroupListFromJson(json);
+  factory _$GroupListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GroupListImplFromJson(json);
 
   final List<ScanlationGroup> _data;
   @override
@@ -4670,7 +4693,7 @@ class _$_GroupList with DiagnosticableTreeMixin implements _GroupList {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_GroupList &&
+            other is _$GroupListImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.total, total) || other.total == total));
   }
@@ -4683,12 +4706,12 @@ class _$_GroupList with DiagnosticableTreeMixin implements _GroupList {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_GroupListCopyWith<_$_GroupList> get copyWith =>
-      __$$_GroupListCopyWithImpl<_$_GroupList>(this, _$identity);
+  _$$GroupListImplCopyWith<_$GroupListImpl> get copyWith =>
+      __$$GroupListImplCopyWithImpl<_$GroupListImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_GroupListToJson(
+    return _$$GroupListImplToJson(
       this,
     );
   }
@@ -4696,10 +4719,10 @@ class _$_GroupList with DiagnosticableTreeMixin implements _GroupList {
 
 abstract class _GroupList implements GroupList {
   const factory _GroupList(final List<ScanlationGroup> data, final int total) =
-      _$_GroupList;
+      _$GroupListImpl;
 
   factory _GroupList.fromJson(Map<String, dynamic> json) =
-      _$_GroupList.fromJson;
+      _$GroupListImpl.fromJson;
 
   @override
   List<ScanlationGroup> get data;
@@ -4707,7 +4730,7 @@ abstract class _GroupList implements GroupList {
   int get total;
   @override
   @JsonKey(ignore: true)
-  _$$_GroupListCopyWith<_$_GroupList> get copyWith =>
+  _$$GroupListImplCopyWith<_$GroupListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4765,22 +4788,22 @@ class _$CreatorListCopyWithImpl<$Res, $Val extends CreatorList>
 }
 
 /// @nodoc
-abstract class _$$_CreatorListListCopyWith<$Res>
+abstract class _$$CreatorListListImplCopyWith<$Res>
     implements $CreatorListCopyWith<$Res> {
-  factory _$$_CreatorListListCopyWith(
-          _$_CreatorListList value, $Res Function(_$_CreatorListList) then) =
-      __$$_CreatorListListCopyWithImpl<$Res>;
+  factory _$$CreatorListListImplCopyWith(_$CreatorListListImpl value,
+          $Res Function(_$CreatorListListImpl) then) =
+      __$$CreatorListListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<Author> data, int total});
 }
 
 /// @nodoc
-class __$$_CreatorListListCopyWithImpl<$Res>
-    extends _$CreatorListCopyWithImpl<$Res, _$_CreatorListList>
-    implements _$$_CreatorListListCopyWith<$Res> {
-  __$$_CreatorListListCopyWithImpl(
-      _$_CreatorListList _value, $Res Function(_$_CreatorListList) _then)
+class __$$CreatorListListImplCopyWithImpl<$Res>
+    extends _$CreatorListCopyWithImpl<$Res, _$CreatorListListImpl>
+    implements _$$CreatorListListImplCopyWith<$Res> {
+  __$$CreatorListListImplCopyWithImpl(
+      _$CreatorListListImpl _value, $Res Function(_$CreatorListListImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -4789,7 +4812,7 @@ class __$$_CreatorListListCopyWithImpl<$Res>
     Object? data = null,
     Object? total = null,
   }) {
-    return _then(_$_CreatorListList(
+    return _then(_$CreatorListListImpl(
       null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
@@ -4804,13 +4827,14 @@ class __$$_CreatorListListCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_CreatorListList
+class _$CreatorListListImpl
     with DiagnosticableTreeMixin
     implements _CreatorListList {
-  const _$_CreatorListList(final List<Author> data, this.total) : _data = data;
+  const _$CreatorListListImpl(final List<Author> data, this.total)
+      : _data = data;
 
-  factory _$_CreatorListList.fromJson(Map<String, dynamic> json) =>
-      _$$_CreatorListListFromJson(json);
+  factory _$CreatorListListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CreatorListListImplFromJson(json);
 
   final List<Author> _data;
   @override
@@ -4841,7 +4865,7 @@ class _$_CreatorListList
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_CreatorListList &&
+            other is _$CreatorListListImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.total, total) || other.total == total));
   }
@@ -4854,12 +4878,13 @@ class _$_CreatorListList
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_CreatorListListCopyWith<_$_CreatorListList> get copyWith =>
-      __$$_CreatorListListCopyWithImpl<_$_CreatorListList>(this, _$identity);
+  _$$CreatorListListImplCopyWith<_$CreatorListListImpl> get copyWith =>
+      __$$CreatorListListImplCopyWithImpl<_$CreatorListListImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_CreatorListListToJson(
+    return _$$CreatorListListImplToJson(
       this,
     );
   }
@@ -4867,10 +4892,10 @@ class _$_CreatorListList
 
 abstract class _CreatorListList implements CreatorList {
   const factory _CreatorListList(final List<Author> data, final int total) =
-      _$_CreatorListList;
+      _$CreatorListListImpl;
 
   factory _CreatorListList.fromJson(Map<String, dynamic> json) =
-      _$_CreatorListList.fromJson;
+      _$CreatorListListImpl.fromJson;
 
   @override
   List<Author> get data;
@@ -4878,7 +4903,7 @@ abstract class _CreatorListList implements CreatorList {
   int get total;
   @override
   @JsonKey(ignore: true)
-  _$$_CreatorListListCopyWith<_$_CreatorListList> get copyWith =>
+  _$$CreatorListListImplCopyWith<_$CreatorListListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4953,9 +4978,10 @@ class _$MangaCopyWithImpl<$Res, $Val extends Manga>
 }
 
 /// @nodoc
-abstract class _$$_MangaCopyWith<$Res> implements $MangaCopyWith<$Res> {
-  factory _$$_MangaCopyWith(_$_Manga value, $Res Function(_$_Manga) then) =
-      __$$_MangaCopyWithImpl<$Res>;
+abstract class _$$MangaImplCopyWith<$Res> implements $MangaCopyWith<$Res> {
+  factory _$$MangaImplCopyWith(
+          _$MangaImpl value, $Res Function(_$MangaImpl) then) =
+      __$$MangaImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -4968,9 +4994,11 @@ abstract class _$$_MangaCopyWith<$Res> implements $MangaCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_MangaCopyWithImpl<$Res> extends _$MangaCopyWithImpl<$Res, _$_Manga>
-    implements _$$_MangaCopyWith<$Res> {
-  __$$_MangaCopyWithImpl(_$_Manga _value, $Res Function(_$_Manga) _then)
+class __$$MangaImplCopyWithImpl<$Res>
+    extends _$MangaCopyWithImpl<$Res, _$MangaImpl>
+    implements _$$MangaImplCopyWith<$Res> {
+  __$$MangaImplCopyWithImpl(
+      _$MangaImpl _value, $Res Function(_$MangaImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -4980,7 +5008,7 @@ class __$$_MangaCopyWithImpl<$Res> extends _$MangaCopyWithImpl<$Res, _$_Manga>
     Object? attributes = null,
     Object? relationships = null,
   }) {
-    return _then(_$_Manga(
+    return _then(_$MangaImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -4999,16 +5027,16 @@ class __$$_MangaCopyWithImpl<$Res> extends _$MangaCopyWithImpl<$Res, _$_Manga>
 
 /// @nodoc
 @JsonSerializable()
-class _$_Manga extends _Manga with DiagnosticableTreeMixin {
-  _$_Manga(
+class _$MangaImpl extends _Manga with DiagnosticableTreeMixin {
+  _$MangaImpl(
       {required this.id,
       required this.attributes,
       required final List<Relationship> relationships})
       : _relationships = relationships,
         super._();
 
-  factory _$_Manga.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaFromJson(json);
+  factory _$MangaImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaImplFromJson(json);
 
   @override
   final String id;
@@ -5040,12 +5068,12 @@ class _$_Manga extends _Manga with DiagnosticableTreeMixin {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaCopyWith<_$_Manga> get copyWith =>
-      __$$_MangaCopyWithImpl<_$_Manga>(this, _$identity);
+  _$$MangaImplCopyWith<_$MangaImpl> get copyWith =>
+      __$$MangaImplCopyWithImpl<_$MangaImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaToJson(
+    return _$$MangaImplToJson(
       this,
     );
   }
@@ -5055,10 +5083,10 @@ abstract class _Manga extends Manga {
   factory _Manga(
       {required final String id,
       required final MangaAttributes attributes,
-      required final List<Relationship> relationships}) = _$_Manga;
+      required final List<Relationship> relationships}) = _$MangaImpl;
   _Manga._() : super._();
 
-  factory _Manga.fromJson(Map<String, dynamic> json) = _$_Manga.fromJson;
+  factory _Manga.fromJson(Map<String, dynamic> json) = _$MangaImpl.fromJson;
 
   @override
   String get id;
@@ -5068,7 +5096,7 @@ abstract class _Manga extends Manga {
   List<Relationship> get relationships;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaCopyWith<_$_Manga> get copyWith =>
+  _$$MangaImplCopyWith<_$MangaImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -5138,22 +5166,22 @@ class _$MangaLinksCopyWithImpl<$Res, $Val extends MangaLinks>
 }
 
 /// @nodoc
-abstract class _$$_MangaLinksCopyWith<$Res>
+abstract class _$$MangaLinksImplCopyWith<$Res>
     implements $MangaLinksCopyWith<$Res> {
-  factory _$$_MangaLinksCopyWith(
-          _$_MangaLinks value, $Res Function(_$_MangaLinks) then) =
-      __$$_MangaLinksCopyWithImpl<$Res>;
+  factory _$$MangaLinksImplCopyWith(
+          _$MangaLinksImpl value, $Res Function(_$MangaLinksImpl) then) =
+      __$$MangaLinksImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String? raw, String? al, String? mu, String? mal});
 }
 
 /// @nodoc
-class __$$_MangaLinksCopyWithImpl<$Res>
-    extends _$MangaLinksCopyWithImpl<$Res, _$_MangaLinks>
-    implements _$$_MangaLinksCopyWith<$Res> {
-  __$$_MangaLinksCopyWithImpl(
-      _$_MangaLinks _value, $Res Function(_$_MangaLinks) _then)
+class __$$MangaLinksImplCopyWithImpl<$Res>
+    extends _$MangaLinksCopyWithImpl<$Res, _$MangaLinksImpl>
+    implements _$$MangaLinksImplCopyWith<$Res> {
+  __$$MangaLinksImplCopyWithImpl(
+      _$MangaLinksImpl _value, $Res Function(_$MangaLinksImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -5164,7 +5192,7 @@ class __$$_MangaLinksCopyWithImpl<$Res>
     Object? mu = freezed,
     Object? mal = freezed,
   }) {
-    return _then(_$_MangaLinks(
+    return _then(_$MangaLinksImpl(
       raw: freezed == raw
           ? _value.raw
           : raw // ignore: cast_nullable_to_non_nullable
@@ -5187,11 +5215,11 @@ class __$$_MangaLinksCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
-  const _$_MangaLinks({this.raw, this.al, this.mu, this.mal});
+class _$MangaLinksImpl with DiagnosticableTreeMixin implements _MangaLinks {
+  const _$MangaLinksImpl({this.raw, this.al, this.mu, this.mal});
 
-  factory _$_MangaLinks.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaLinksFromJson(json);
+  factory _$MangaLinksImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaLinksImplFromJson(json);
 
   @override
   final String? raw;
@@ -5222,7 +5250,7 @@ class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MangaLinks &&
+            other is _$MangaLinksImpl &&
             (identical(other.raw, raw) || other.raw == raw) &&
             (identical(other.al, al) || other.al == al) &&
             (identical(other.mu, mu) || other.mu == mu) &&
@@ -5236,12 +5264,12 @@ class _$_MangaLinks with DiagnosticableTreeMixin implements _MangaLinks {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaLinksCopyWith<_$_MangaLinks> get copyWith =>
-      __$$_MangaLinksCopyWithImpl<_$_MangaLinks>(this, _$identity);
+  _$$MangaLinksImplCopyWith<_$MangaLinksImpl> get copyWith =>
+      __$$MangaLinksImplCopyWithImpl<_$MangaLinksImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaLinksToJson(
+    return _$$MangaLinksImplToJson(
       this,
     );
   }
@@ -5252,10 +5280,10 @@ abstract class _MangaLinks implements MangaLinks {
       {final String? raw,
       final String? al,
       final String? mu,
-      final String? mal}) = _$_MangaLinks;
+      final String? mal}) = _$MangaLinksImpl;
 
   factory _MangaLinks.fromJson(Map<String, dynamic> json) =
-      _$_MangaLinks.fromJson;
+      _$MangaLinksImpl.fromJson;
 
   @override
   String? get raw;
@@ -5267,7 +5295,7 @@ abstract class _MangaLinks implements MangaLinks {
   String? get mal;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaLinksCopyWith<_$_MangaLinks> get copyWith =>
+  _$$MangaLinksImplCopyWith<_$MangaLinksImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -5445,11 +5473,11 @@ class _$MangaAttributesCopyWithImpl<$Res, $Val extends MangaAttributes>
 }
 
 /// @nodoc
-abstract class _$$_MangaAttributesCopyWith<$Res>
+abstract class _$$MangaAttributesImplCopyWith<$Res>
     implements $MangaAttributesCopyWith<$Res> {
-  factory _$$_MangaAttributesCopyWith(
-          _$_MangaAttributes value, $Res Function(_$_MangaAttributes) then) =
-      __$$_MangaAttributesCopyWithImpl<$Res>;
+  factory _$$MangaAttributesImplCopyWith(_$MangaAttributesImpl value,
+          $Res Function(_$MangaAttributesImpl) then) =
+      __$$MangaAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -5476,11 +5504,11 @@ abstract class _$$_MangaAttributesCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_MangaAttributesCopyWithImpl<$Res>
-    extends _$MangaAttributesCopyWithImpl<$Res, _$_MangaAttributes>
-    implements _$$_MangaAttributesCopyWith<$Res> {
-  __$$_MangaAttributesCopyWithImpl(
-      _$_MangaAttributes _value, $Res Function(_$_MangaAttributes) _then)
+class __$$MangaAttributesImplCopyWithImpl<$Res>
+    extends _$MangaAttributesCopyWithImpl<$Res, _$MangaAttributesImpl>
+    implements _$$MangaAttributesImplCopyWith<$Res> {
+  __$$MangaAttributesImplCopyWithImpl(
+      _$MangaAttributesImpl _value, $Res Function(_$MangaAttributesImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -5502,7 +5530,7 @@ class __$$_MangaAttributesCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
-    return _then(_$_MangaAttributes(
+    return _then(_$MangaAttributesImpl(
       title: null == title
           ? _value._title
           : title // ignore: cast_nullable_to_non_nullable
@@ -5569,10 +5597,10 @@ class __$$_MangaAttributesCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaAttributes
+class _$MangaAttributesImpl
     with DiagnosticableTreeMixin
     implements _MangaAttributes {
-  const _$_MangaAttributes(
+  const _$MangaAttributesImpl(
       {required final Map<String, String> title,
       required final List<Map<String, String>> altTitles,
       required final Map<String, String> description,
@@ -5593,8 +5621,8 @@ class _$_MangaAttributes
         _description = description,
         _tags = tags;
 
-  factory _$_MangaAttributes.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaAttributesFromJson(json);
+  factory _$MangaAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaAttributesImplFromJson(json);
 
   final Map<String, String> _title;
   @override
@@ -5686,7 +5714,7 @@ class _$_MangaAttributes
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MangaAttributes &&
+            other is _$MangaAttributesImpl &&
             const DeepCollectionEquality().equals(other._title, _title) &&
             const DeepCollectionEquality()
                 .equals(other._altTitles, _altTitles) &&
@@ -5736,12 +5764,13 @@ class _$_MangaAttributes
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaAttributesCopyWith<_$_MangaAttributes> get copyWith =>
-      __$$_MangaAttributesCopyWithImpl<_$_MangaAttributes>(this, _$identity);
+  _$$MangaAttributesImplCopyWith<_$MangaAttributesImpl> get copyWith =>
+      __$$MangaAttributesImplCopyWithImpl<_$MangaAttributesImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaAttributesToJson(
+    return _$$MangaAttributesImplToJson(
       this,
     );
   }
@@ -5764,10 +5793,10 @@ abstract class _MangaAttributes implements MangaAttributes {
           required final int version,
           @TimestampSerializer() required final DateTime createdAt,
           @TimestampSerializer() required final DateTime updatedAt}) =
-      _$_MangaAttributes;
+      _$MangaAttributesImpl;
 
   factory _MangaAttributes.fromJson(Map<String, dynamic> json) =
-      _$_MangaAttributes.fromJson;
+      _$MangaAttributesImpl.fromJson;
 
   @override
   Map<String, String> get title;
@@ -5804,7 +5833,7 @@ abstract class _MangaAttributes implements MangaAttributes {
   DateTime get updatedAt;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaAttributesCopyWith<_$_MangaAttributes> get copyWith =>
+  _$$MangaAttributesImplCopyWith<_$MangaAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -5869,9 +5898,9 @@ class _$TagCopyWithImpl<$Res, $Val extends Tag> implements $TagCopyWith<$Res> {
 }
 
 /// @nodoc
-abstract class _$$_TagCopyWith<$Res> implements $TagCopyWith<$Res> {
-  factory _$$_TagCopyWith(_$_Tag value, $Res Function(_$_Tag) then) =
-      __$$_TagCopyWithImpl<$Res>;
+abstract class _$$TagImplCopyWith<$Res> implements $TagCopyWith<$Res> {
+  factory _$$TagImplCopyWith(_$TagImpl value, $Res Function(_$TagImpl) then) =
+      __$$TagImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, TagAttributes attributes});
@@ -5881,9 +5910,9 @@ abstract class _$$_TagCopyWith<$Res> implements $TagCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_TagCopyWithImpl<$Res> extends _$TagCopyWithImpl<$Res, _$_Tag>
-    implements _$$_TagCopyWith<$Res> {
-  __$$_TagCopyWithImpl(_$_Tag _value, $Res Function(_$_Tag) _then)
+class __$$TagImplCopyWithImpl<$Res> extends _$TagCopyWithImpl<$Res, _$TagImpl>
+    implements _$$TagImplCopyWith<$Res> {
+  __$$TagImplCopyWithImpl(_$TagImpl _value, $Res Function(_$TagImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -5892,7 +5921,7 @@ class __$$_TagCopyWithImpl<$Res> extends _$TagCopyWithImpl<$Res, _$_Tag>
     Object? id = null,
     Object? attributes = null,
   }) {
-    return _then(_$_Tag(
+    return _then(_$TagImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -5907,10 +5936,11 @@ class __$$_TagCopyWithImpl<$Res> extends _$TagCopyWithImpl<$Res, _$_Tag>
 
 /// @nodoc
 @JsonSerializable()
-class _$_Tag with DiagnosticableTreeMixin implements _Tag {
-  const _$_Tag({required this.id, required this.attributes});
+class _$TagImpl with DiagnosticableTreeMixin implements _Tag {
+  const _$TagImpl({required this.id, required this.attributes});
 
-  factory _$_Tag.fromJson(Map<String, dynamic> json) => _$$_TagFromJson(json);
+  factory _$TagImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TagImplFromJson(json);
 
   @override
   final String id;
@@ -5934,12 +5964,12 @@ class _$_Tag with DiagnosticableTreeMixin implements _Tag {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_TagCopyWith<_$_Tag> get copyWith =>
-      __$$_TagCopyWithImpl<_$_Tag>(this, _$identity);
+  _$$TagImplCopyWith<_$TagImpl> get copyWith =>
+      __$$TagImplCopyWithImpl<_$TagImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_TagToJson(
+    return _$$TagImplToJson(
       this,
     );
   }
@@ -5948,9 +5978,9 @@ class _$_Tag with DiagnosticableTreeMixin implements _Tag {
 abstract class _Tag implements Tag {
   const factory _Tag(
       {required final String id,
-      required final TagAttributes attributes}) = _$_Tag;
+      required final TagAttributes attributes}) = _$TagImpl;
 
-  factory _Tag.fromJson(Map<String, dynamic> json) = _$_Tag.fromJson;
+  factory _Tag.fromJson(Map<String, dynamic> json) = _$TagImpl.fromJson;
 
   @override
   String get id;
@@ -5958,7 +5988,8 @@ abstract class _Tag implements Tag {
   TagAttributes get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$_TagCopyWith<_$_Tag> get copyWith => throw _privateConstructorUsedError;
+  _$$TagImplCopyWith<_$TagImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 TagAttributes _$TagAttributesFromJson(Map<String, dynamic> json) {
@@ -6024,11 +6055,11 @@ class _$TagAttributesCopyWithImpl<$Res, $Val extends TagAttributes>
 }
 
 /// @nodoc
-abstract class _$$_TagAttributesCopyWith<$Res>
+abstract class _$$TagAttributesImplCopyWith<$Res>
     implements $TagAttributesCopyWith<$Res> {
-  factory _$$_TagAttributesCopyWith(
-          _$_TagAttributes value, $Res Function(_$_TagAttributes) then) =
-      __$$_TagAttributesCopyWithImpl<$Res>;
+  factory _$$TagAttributesImplCopyWith(
+          _$TagAttributesImpl value, $Res Function(_$TagAttributesImpl) then) =
+      __$$TagAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -6038,11 +6069,11 @@ abstract class _$$_TagAttributesCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_TagAttributesCopyWithImpl<$Res>
-    extends _$TagAttributesCopyWithImpl<$Res, _$_TagAttributes>
-    implements _$$_TagAttributesCopyWith<$Res> {
-  __$$_TagAttributesCopyWithImpl(
-      _$_TagAttributes _value, $Res Function(_$_TagAttributes) _then)
+class __$$TagAttributesImplCopyWithImpl<$Res>
+    extends _$TagAttributesCopyWithImpl<$Res, _$TagAttributesImpl>
+    implements _$$TagAttributesImplCopyWith<$Res> {
+  __$$TagAttributesImplCopyWithImpl(
+      _$TagAttributesImpl _value, $Res Function(_$TagAttributesImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -6052,7 +6083,7 @@ class __$$_TagAttributesCopyWithImpl<$Res>
     Object? description = null,
     Object? group = null,
   }) {
-    return _then(_$_TagAttributes(
+    return _then(_$TagAttributesImpl(
       name: null == name
           ? _value._name
           : name // ignore: cast_nullable_to_non_nullable
@@ -6071,16 +6102,18 @@ class __$$_TagAttributesCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_TagAttributes with DiagnosticableTreeMixin implements _TagAttributes {
-  const _$_TagAttributes(
+class _$TagAttributesImpl
+    with DiagnosticableTreeMixin
+    implements _TagAttributes {
+  const _$TagAttributesImpl(
       {required final Map<String, String> name,
       required final Map<String, String> description,
       required this.group})
       : _name = name,
         _description = description;
 
-  factory _$_TagAttributes.fromJson(Map<String, dynamic> json) =>
-      _$$_TagAttributesFromJson(json);
+  factory _$TagAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TagAttributesImplFromJson(json);
 
   final Map<String, String> _name;
   @override
@@ -6120,7 +6153,7 @@ class _$_TagAttributes with DiagnosticableTreeMixin implements _TagAttributes {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_TagAttributes &&
+            other is _$TagAttributesImpl &&
             const DeepCollectionEquality().equals(other._name, _name) &&
             const DeepCollectionEquality()
                 .equals(other._description, _description) &&
@@ -6138,12 +6171,12 @@ class _$_TagAttributes with DiagnosticableTreeMixin implements _TagAttributes {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_TagAttributesCopyWith<_$_TagAttributes> get copyWith =>
-      __$$_TagAttributesCopyWithImpl<_$_TagAttributes>(this, _$identity);
+  _$$TagAttributesImplCopyWith<_$TagAttributesImpl> get copyWith =>
+      __$$TagAttributesImplCopyWithImpl<_$TagAttributesImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_TagAttributesToJson(
+    return _$$TagAttributesImplToJson(
       this,
     );
   }
@@ -6153,10 +6186,10 @@ abstract class _TagAttributes implements TagAttributes {
   const factory _TagAttributes(
       {required final Map<String, String> name,
       required final Map<String, String> description,
-      required final TagGroup group}) = _$_TagAttributes;
+      required final TagGroup group}) = _$TagAttributesImpl;
 
   factory _TagAttributes.fromJson(Map<String, dynamic> json) =
-      _$_TagAttributes.fromJson;
+      _$TagAttributesImpl.fromJson;
 
   @override
   Map<String, String> get name;
@@ -6166,7 +6199,7 @@ abstract class _TagAttributes implements TagAttributes {
   TagGroup get group;
   @override
   @JsonKey(ignore: true)
-  _$$_TagAttributesCopyWith<_$_TagAttributes> get copyWith =>
+  _$$TagAttributesImplCopyWith<_$TagAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -6224,22 +6257,22 @@ class _$TagResponseCopyWithImpl<$Res, $Val extends TagResponse>
 }
 
 /// @nodoc
-abstract class _$$_TagResponseCopyWith<$Res>
+abstract class _$$TagResponseImplCopyWith<$Res>
     implements $TagResponseCopyWith<$Res> {
-  factory _$$_TagResponseCopyWith(
-          _$_TagResponse value, $Res Function(_$_TagResponse) then) =
-      __$$_TagResponseCopyWithImpl<$Res>;
+  factory _$$TagResponseImplCopyWith(
+          _$TagResponseImpl value, $Res Function(_$TagResponseImpl) then) =
+      __$$TagResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<Tag> data, int total});
 }
 
 /// @nodoc
-class __$$_TagResponseCopyWithImpl<$Res>
-    extends _$TagResponseCopyWithImpl<$Res, _$_TagResponse>
-    implements _$$_TagResponseCopyWith<$Res> {
-  __$$_TagResponseCopyWithImpl(
-      _$_TagResponse _value, $Res Function(_$_TagResponse) _then)
+class __$$TagResponseImplCopyWithImpl<$Res>
+    extends _$TagResponseCopyWithImpl<$Res, _$TagResponseImpl>
+    implements _$$TagResponseImplCopyWith<$Res> {
+  __$$TagResponseImplCopyWithImpl(
+      _$TagResponseImpl _value, $Res Function(_$TagResponseImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -6248,7 +6281,7 @@ class __$$_TagResponseCopyWithImpl<$Res>
     Object? data = null,
     Object? total = null,
   }) {
-    return _then(_$_TagResponse(
+    return _then(_$TagResponseImpl(
       null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
@@ -6263,11 +6296,11 @@ class __$$_TagResponseCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_TagResponse with DiagnosticableTreeMixin implements _TagResponse {
-  const _$_TagResponse(final List<Tag> data, this.total) : _data = data;
+class _$TagResponseImpl with DiagnosticableTreeMixin implements _TagResponse {
+  const _$TagResponseImpl(final List<Tag> data, this.total) : _data = data;
 
-  factory _$_TagResponse.fromJson(Map<String, dynamic> json) =>
-      _$$_TagResponseFromJson(json);
+  factory _$TagResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TagResponseImplFromJson(json);
 
   final List<Tag> _data;
   @override
@@ -6298,7 +6331,7 @@ class _$_TagResponse with DiagnosticableTreeMixin implements _TagResponse {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_TagResponse &&
+            other is _$TagResponseImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.total, total) || other.total == total));
   }
@@ -6311,12 +6344,12 @@ class _$_TagResponse with DiagnosticableTreeMixin implements _TagResponse {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_TagResponseCopyWith<_$_TagResponse> get copyWith =>
-      __$$_TagResponseCopyWithImpl<_$_TagResponse>(this, _$identity);
+  _$$TagResponseImplCopyWith<_$TagResponseImpl> get copyWith =>
+      __$$TagResponseImplCopyWithImpl<_$TagResponseImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_TagResponseToJson(
+    return _$$TagResponseImplToJson(
       this,
     );
   }
@@ -6324,10 +6357,10 @@ class _$_TagResponse with DiagnosticableTreeMixin implements _TagResponse {
 
 abstract class _TagResponse implements TagResponse {
   const factory _TagResponse(final List<Tag> data, final int total) =
-      _$_TagResponse;
+      _$TagResponseImpl;
 
   factory _TagResponse.fromJson(Map<String, dynamic> json) =
-      _$_TagResponse.fromJson;
+      _$TagResponseImpl.fromJson;
 
   @override
   List<Tag> get data;
@@ -6335,7 +6368,7 @@ abstract class _TagResponse implements TagResponse {
   int get total;
   @override
   @JsonKey(ignore: true)
-  _$$_TagResponseCopyWith<_$_TagResponse> get copyWith =>
+  _$$TagResponseImplCopyWith<_$TagResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -6390,23 +6423,25 @@ class _$MangaStatisticsResponseCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$_MangaStatisticsResponseCopyWith<$Res>
+abstract class _$$MangaStatisticsResponseImplCopyWith<$Res>
     implements $MangaStatisticsResponseCopyWith<$Res> {
-  factory _$$_MangaStatisticsResponseCopyWith(_$_MangaStatisticsResponse value,
-          $Res Function(_$_MangaStatisticsResponse) then) =
-      __$$_MangaStatisticsResponseCopyWithImpl<$Res>;
+  factory _$$MangaStatisticsResponseImplCopyWith(
+          _$MangaStatisticsResponseImpl value,
+          $Res Function(_$MangaStatisticsResponseImpl) then) =
+      __$$MangaStatisticsResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({Map<String, MangaStatistics> statistics});
 }
 
 /// @nodoc
-class __$$_MangaStatisticsResponseCopyWithImpl<$Res>
+class __$$MangaStatisticsResponseImplCopyWithImpl<$Res>
     extends _$MangaStatisticsResponseCopyWithImpl<$Res,
-        _$_MangaStatisticsResponse>
-    implements _$$_MangaStatisticsResponseCopyWith<$Res> {
-  __$$_MangaStatisticsResponseCopyWithImpl(_$_MangaStatisticsResponse _value,
-      $Res Function(_$_MangaStatisticsResponse) _then)
+        _$MangaStatisticsResponseImpl>
+    implements _$$MangaStatisticsResponseImplCopyWith<$Res> {
+  __$$MangaStatisticsResponseImplCopyWithImpl(
+      _$MangaStatisticsResponseImpl _value,
+      $Res Function(_$MangaStatisticsResponseImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -6414,7 +6449,7 @@ class __$$_MangaStatisticsResponseCopyWithImpl<$Res>
   $Res call({
     Object? statistics = null,
   }) {
-    return _then(_$_MangaStatisticsResponse(
+    return _then(_$MangaStatisticsResponseImpl(
       null == statistics
           ? _value._statistics
           : statistics // ignore: cast_nullable_to_non_nullable
@@ -6425,15 +6460,15 @@ class __$$_MangaStatisticsResponseCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaStatisticsResponse
+class _$MangaStatisticsResponseImpl
     with DiagnosticableTreeMixin
     implements _MangaStatisticsResponse {
-  const _$_MangaStatisticsResponse(
+  const _$MangaStatisticsResponseImpl(
       final Map<String, MangaStatistics> statistics)
       : _statistics = statistics;
 
-  factory _$_MangaStatisticsResponse.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaStatisticsResponseFromJson(json);
+  factory _$MangaStatisticsResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaStatisticsResponseImplFromJson(json);
 
   final Map<String, MangaStatistics> _statistics;
   @override
@@ -6460,7 +6495,7 @@ class _$_MangaStatisticsResponse
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MangaStatisticsResponse &&
+            other is _$MangaStatisticsResponseImpl &&
             const DeepCollectionEquality()
                 .equals(other._statistics, _statistics));
   }
@@ -6473,14 +6508,13 @@ class _$_MangaStatisticsResponse
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaStatisticsResponseCopyWith<_$_MangaStatisticsResponse>
-      get copyWith =>
-          __$$_MangaStatisticsResponseCopyWithImpl<_$_MangaStatisticsResponse>(
-              this, _$identity);
+  _$$MangaStatisticsResponseImplCopyWith<_$MangaStatisticsResponseImpl>
+      get copyWith => __$$MangaStatisticsResponseImplCopyWithImpl<
+          _$MangaStatisticsResponseImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaStatisticsResponseToJson(
+    return _$$MangaStatisticsResponseImplToJson(
       this,
     );
   }
@@ -6489,16 +6523,16 @@ class _$_MangaStatisticsResponse
 abstract class _MangaStatisticsResponse implements MangaStatisticsResponse {
   const factory _MangaStatisticsResponse(
           final Map<String, MangaStatistics> statistics) =
-      _$_MangaStatisticsResponse;
+      _$MangaStatisticsResponseImpl;
 
   factory _MangaStatisticsResponse.fromJson(Map<String, dynamic> json) =
-      _$_MangaStatisticsResponse.fromJson;
+      _$MangaStatisticsResponseImpl.fromJson;
 
   @override
   Map<String, MangaStatistics> get statistics;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaStatisticsResponseCopyWith<_$_MangaStatisticsResponse>
+  _$$MangaStatisticsResponseImplCopyWith<_$MangaStatisticsResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -6588,11 +6622,11 @@ class _$MangaStatisticsCopyWithImpl<$Res, $Val extends MangaStatistics>
 }
 
 /// @nodoc
-abstract class _$$_MangaStatisticsCopyWith<$Res>
+abstract class _$$MangaStatisticsImplCopyWith<$Res>
     implements $MangaStatisticsCopyWith<$Res> {
-  factory _$$_MangaStatisticsCopyWith(
-          _$_MangaStatistics value, $Res Function(_$_MangaStatistics) then) =
-      __$$_MangaStatisticsCopyWithImpl<$Res>;
+  factory _$$MangaStatisticsImplCopyWith(_$MangaStatisticsImpl value,
+          $Res Function(_$MangaStatisticsImpl) then) =
+      __$$MangaStatisticsImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -6607,11 +6641,11 @@ abstract class _$$_MangaStatisticsCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_MangaStatisticsCopyWithImpl<$Res>
-    extends _$MangaStatisticsCopyWithImpl<$Res, _$_MangaStatistics>
-    implements _$$_MangaStatisticsCopyWith<$Res> {
-  __$$_MangaStatisticsCopyWithImpl(
-      _$_MangaStatistics _value, $Res Function(_$_MangaStatistics) _then)
+class __$$MangaStatisticsImplCopyWithImpl<$Res>
+    extends _$MangaStatisticsCopyWithImpl<$Res, _$MangaStatisticsImpl>
+    implements _$$MangaStatisticsImplCopyWith<$Res> {
+  __$$MangaStatisticsImplCopyWithImpl(
+      _$MangaStatisticsImpl _value, $Res Function(_$MangaStatisticsImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -6621,7 +6655,7 @@ class __$$_MangaStatisticsCopyWithImpl<$Res>
     Object? rating = null,
     Object? follows = null,
   }) {
-    return _then(_$_MangaStatistics(
+    return _then(_$MangaStatisticsImpl(
       comments: freezed == comments
           ? _value.comments
           : comments // ignore: cast_nullable_to_non_nullable
@@ -6640,14 +6674,14 @@ class __$$_MangaStatisticsCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaStatistics
+class _$MangaStatisticsImpl
     with DiagnosticableTreeMixin
     implements _MangaStatistics {
-  const _$_MangaStatistics(
+  const _$MangaStatisticsImpl(
       {this.comments, required this.rating, required this.follows});
 
-  factory _$_MangaStatistics.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaStatisticsFromJson(json);
+  factory _$MangaStatisticsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaStatisticsImplFromJson(json);
 
   @override
   final StatisticsDetailsComments? comments;
@@ -6675,7 +6709,7 @@ class _$_MangaStatistics
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MangaStatistics &&
+            other is _$MangaStatisticsImpl &&
             (identical(other.comments, comments) ||
                 other.comments == comments) &&
             (identical(other.rating, rating) || other.rating == rating) &&
@@ -6689,12 +6723,13 @@ class _$_MangaStatistics
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaStatisticsCopyWith<_$_MangaStatistics> get copyWith =>
-      __$$_MangaStatisticsCopyWithImpl<_$_MangaStatistics>(this, _$identity);
+  _$$MangaStatisticsImplCopyWith<_$MangaStatisticsImpl> get copyWith =>
+      __$$MangaStatisticsImplCopyWithImpl<_$MangaStatisticsImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaStatisticsToJson(
+    return _$$MangaStatisticsImplToJson(
       this,
     );
   }
@@ -6704,10 +6739,10 @@ abstract class _MangaStatistics implements MangaStatistics {
   const factory _MangaStatistics(
       {final StatisticsDetailsComments? comments,
       required final StatisticsDetailsRating rating,
-      required final int follows}) = _$_MangaStatistics;
+      required final int follows}) = _$MangaStatisticsImpl;
 
   factory _MangaStatistics.fromJson(Map<String, dynamic> json) =
-      _$_MangaStatistics.fromJson;
+      _$MangaStatisticsImpl.fromJson;
 
   @override
   StatisticsDetailsComments? get comments;
@@ -6717,7 +6752,7 @@ abstract class _MangaStatistics implements MangaStatistics {
   int get follows;
   @override
   @JsonKey(ignore: true)
-  _$$_MangaStatisticsCopyWith<_$_MangaStatistics> get copyWith =>
+  _$$MangaStatisticsImplCopyWith<_$MangaStatisticsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -6777,25 +6812,25 @@ class _$StatisticsDetailsCommentsCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$_StatisticsDetailsCommentsCopyWith<$Res>
+abstract class _$$StatisticsDetailsCommentsImplCopyWith<$Res>
     implements $StatisticsDetailsCommentsCopyWith<$Res> {
-  factory _$$_StatisticsDetailsCommentsCopyWith(
-          _$_StatisticsDetailsComments value,
-          $Res Function(_$_StatisticsDetailsComments) then) =
-      __$$_StatisticsDetailsCommentsCopyWithImpl<$Res>;
+  factory _$$StatisticsDetailsCommentsImplCopyWith(
+          _$StatisticsDetailsCommentsImpl value,
+          $Res Function(_$StatisticsDetailsCommentsImpl) then) =
+      __$$StatisticsDetailsCommentsImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int threadId, int repliesCount});
 }
 
 /// @nodoc
-class __$$_StatisticsDetailsCommentsCopyWithImpl<$Res>
+class __$$StatisticsDetailsCommentsImplCopyWithImpl<$Res>
     extends _$StatisticsDetailsCommentsCopyWithImpl<$Res,
-        _$_StatisticsDetailsComments>
-    implements _$$_StatisticsDetailsCommentsCopyWith<$Res> {
-  __$$_StatisticsDetailsCommentsCopyWithImpl(
-      _$_StatisticsDetailsComments _value,
-      $Res Function(_$_StatisticsDetailsComments) _then)
+        _$StatisticsDetailsCommentsImpl>
+    implements _$$StatisticsDetailsCommentsImplCopyWith<$Res> {
+  __$$StatisticsDetailsCommentsImplCopyWithImpl(
+      _$StatisticsDetailsCommentsImpl _value,
+      $Res Function(_$StatisticsDetailsCommentsImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -6804,7 +6839,7 @@ class __$$_StatisticsDetailsCommentsCopyWithImpl<$Res>
     Object? threadId = null,
     Object? repliesCount = null,
   }) {
-    return _then(_$_StatisticsDetailsComments(
+    return _then(_$StatisticsDetailsCommentsImpl(
       threadId: null == threadId
           ? _value.threadId
           : threadId // ignore: cast_nullable_to_non_nullable
@@ -6819,14 +6854,14 @@ class __$$_StatisticsDetailsCommentsCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_StatisticsDetailsComments
+class _$StatisticsDetailsCommentsImpl
     with DiagnosticableTreeMixin
     implements _StatisticsDetailsComments {
-  const _$_StatisticsDetailsComments(
+  const _$StatisticsDetailsCommentsImpl(
       {required this.threadId, required this.repliesCount});
 
-  factory _$_StatisticsDetailsComments.fromJson(Map<String, dynamic> json) =>
-      _$$_StatisticsDetailsCommentsFromJson(json);
+  factory _$StatisticsDetailsCommentsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$StatisticsDetailsCommentsImplFromJson(json);
 
   @override
   final int threadId;
@@ -6851,7 +6886,7 @@ class _$_StatisticsDetailsComments
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_StatisticsDetailsComments &&
+            other is _$StatisticsDetailsCommentsImpl &&
             (identical(other.threadId, threadId) ||
                 other.threadId == threadId) &&
             (identical(other.repliesCount, repliesCount) ||
@@ -6865,13 +6900,13 @@ class _$_StatisticsDetailsComments
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_StatisticsDetailsCommentsCopyWith<_$_StatisticsDetailsComments>
-      get copyWith => __$$_StatisticsDetailsCommentsCopyWithImpl<
-          _$_StatisticsDetailsComments>(this, _$identity);
+  _$$StatisticsDetailsCommentsImplCopyWith<_$StatisticsDetailsCommentsImpl>
+      get copyWith => __$$StatisticsDetailsCommentsImplCopyWithImpl<
+          _$StatisticsDetailsCommentsImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_StatisticsDetailsCommentsToJson(
+    return _$$StatisticsDetailsCommentsImplToJson(
       this,
     );
   }
@@ -6880,10 +6915,10 @@ class _$_StatisticsDetailsComments
 abstract class _StatisticsDetailsComments implements StatisticsDetailsComments {
   const factory _StatisticsDetailsComments(
       {required final int threadId,
-      required final int repliesCount}) = _$_StatisticsDetailsComments;
+      required final int repliesCount}) = _$StatisticsDetailsCommentsImpl;
 
   factory _StatisticsDetailsComments.fromJson(Map<String, dynamic> json) =
-      _$_StatisticsDetailsComments.fromJson;
+      _$StatisticsDetailsCommentsImpl.fromJson;
 
   @override
   int get threadId;
@@ -6891,7 +6926,7 @@ abstract class _StatisticsDetailsComments implements StatisticsDetailsComments {
   int get repliesCount;
   @override
   @JsonKey(ignore: true)
-  _$$_StatisticsDetailsCommentsCopyWith<_$_StatisticsDetailsComments>
+  _$$StatisticsDetailsCommentsImplCopyWith<_$StatisticsDetailsCommentsImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -6951,23 +6986,25 @@ class _$StatisticsDetailsRatingCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$_StatisticsDetailsRatingCopyWith<$Res>
+abstract class _$$StatisticsDetailsRatingImplCopyWith<$Res>
     implements $StatisticsDetailsRatingCopyWith<$Res> {
-  factory _$$_StatisticsDetailsRatingCopyWith(_$_StatisticsDetailsRating value,
-          $Res Function(_$_StatisticsDetailsRating) then) =
-      __$$_StatisticsDetailsRatingCopyWithImpl<$Res>;
+  factory _$$StatisticsDetailsRatingImplCopyWith(
+          _$StatisticsDetailsRatingImpl value,
+          $Res Function(_$StatisticsDetailsRatingImpl) then) =
+      __$$StatisticsDetailsRatingImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({double? average, double bayesian});
 }
 
 /// @nodoc
-class __$$_StatisticsDetailsRatingCopyWithImpl<$Res>
+class __$$StatisticsDetailsRatingImplCopyWithImpl<$Res>
     extends _$StatisticsDetailsRatingCopyWithImpl<$Res,
-        _$_StatisticsDetailsRating>
-    implements _$$_StatisticsDetailsRatingCopyWith<$Res> {
-  __$$_StatisticsDetailsRatingCopyWithImpl(_$_StatisticsDetailsRating _value,
-      $Res Function(_$_StatisticsDetailsRating) _then)
+        _$StatisticsDetailsRatingImpl>
+    implements _$$StatisticsDetailsRatingImplCopyWith<$Res> {
+  __$$StatisticsDetailsRatingImplCopyWithImpl(
+      _$StatisticsDetailsRatingImpl _value,
+      $Res Function(_$StatisticsDetailsRatingImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -6976,7 +7013,7 @@ class __$$_StatisticsDetailsRatingCopyWithImpl<$Res>
     Object? average = freezed,
     Object? bayesian = null,
   }) {
-    return _then(_$_StatisticsDetailsRating(
+    return _then(_$StatisticsDetailsRatingImpl(
       average: freezed == average
           ? _value.average
           : average // ignore: cast_nullable_to_non_nullable
@@ -6991,13 +7028,13 @@ class __$$_StatisticsDetailsRatingCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_StatisticsDetailsRating
+class _$StatisticsDetailsRatingImpl
     with DiagnosticableTreeMixin
     implements _StatisticsDetailsRating {
-  const _$_StatisticsDetailsRating({this.average, required this.bayesian});
+  const _$StatisticsDetailsRatingImpl({this.average, required this.bayesian});
 
-  factory _$_StatisticsDetailsRating.fromJson(Map<String, dynamic> json) =>
-      _$$_StatisticsDetailsRatingFromJson(json);
+  factory _$StatisticsDetailsRatingImpl.fromJson(Map<String, dynamic> json) =>
+      _$$StatisticsDetailsRatingImplFromJson(json);
 
   @override
   final double? average;
@@ -7022,7 +7059,7 @@ class _$_StatisticsDetailsRating
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_StatisticsDetailsRating &&
+            other is _$StatisticsDetailsRatingImpl &&
             (identical(other.average, average) || other.average == average) &&
             (identical(other.bayesian, bayesian) ||
                 other.bayesian == bayesian));
@@ -7035,14 +7072,13 @@ class _$_StatisticsDetailsRating
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_StatisticsDetailsRatingCopyWith<_$_StatisticsDetailsRating>
-      get copyWith =>
-          __$$_StatisticsDetailsRatingCopyWithImpl<_$_StatisticsDetailsRating>(
-              this, _$identity);
+  _$$StatisticsDetailsRatingImplCopyWith<_$StatisticsDetailsRatingImpl>
+      get copyWith => __$$StatisticsDetailsRatingImplCopyWithImpl<
+          _$StatisticsDetailsRatingImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_StatisticsDetailsRatingToJson(
+    return _$$StatisticsDetailsRatingImplToJson(
       this,
     );
   }
@@ -7051,10 +7087,10 @@ class _$_StatisticsDetailsRating
 abstract class _StatisticsDetailsRating implements StatisticsDetailsRating {
   const factory _StatisticsDetailsRating(
       {final double? average,
-      required final double bayesian}) = _$_StatisticsDetailsRating;
+      required final double bayesian}) = _$StatisticsDetailsRatingImpl;
 
   factory _StatisticsDetailsRating.fromJson(Map<String, dynamic> json) =
-      _$_StatisticsDetailsRating.fromJson;
+      _$StatisticsDetailsRatingImpl.fromJson;
 
   @override
   double? get average;
@@ -7062,7 +7098,7 @@ abstract class _StatisticsDetailsRating implements StatisticsDetailsRating {
   double get bayesian;
   @override
   @JsonKey(ignore: true)
-  _$$_StatisticsDetailsRatingCopyWith<_$_StatisticsDetailsRating>
+  _$$StatisticsDetailsRatingImplCopyWith<_$StatisticsDetailsRatingImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -7114,22 +7150,22 @@ class _$SelfRatingResponseCopyWithImpl<$Res, $Val extends SelfRatingResponse>
 }
 
 /// @nodoc
-abstract class _$$_SelfRatingResponseCopyWith<$Res>
+abstract class _$$SelfRatingResponseImplCopyWith<$Res>
     implements $SelfRatingResponseCopyWith<$Res> {
-  factory _$$_SelfRatingResponseCopyWith(_$_SelfRatingResponse value,
-          $Res Function(_$_SelfRatingResponse) then) =
-      __$$_SelfRatingResponseCopyWithImpl<$Res>;
+  factory _$$SelfRatingResponseImplCopyWith(_$SelfRatingResponseImpl value,
+          $Res Function(_$SelfRatingResponseImpl) then) =
+      __$$SelfRatingResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({Map<String, SelfRating> ratings});
 }
 
 /// @nodoc
-class __$$_SelfRatingResponseCopyWithImpl<$Res>
-    extends _$SelfRatingResponseCopyWithImpl<$Res, _$_SelfRatingResponse>
-    implements _$$_SelfRatingResponseCopyWith<$Res> {
-  __$$_SelfRatingResponseCopyWithImpl(
-      _$_SelfRatingResponse _value, $Res Function(_$_SelfRatingResponse) _then)
+class __$$SelfRatingResponseImplCopyWithImpl<$Res>
+    extends _$SelfRatingResponseCopyWithImpl<$Res, _$SelfRatingResponseImpl>
+    implements _$$SelfRatingResponseImplCopyWith<$Res> {
+  __$$SelfRatingResponseImplCopyWithImpl(_$SelfRatingResponseImpl _value,
+      $Res Function(_$SelfRatingResponseImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -7137,7 +7173,7 @@ class __$$_SelfRatingResponseCopyWithImpl<$Res>
   $Res call({
     Object? ratings = null,
   }) {
-    return _then(_$_SelfRatingResponse(
+    return _then(_$SelfRatingResponseImpl(
       null == ratings
           ? _value._ratings
           : ratings // ignore: cast_nullable_to_non_nullable
@@ -7148,14 +7184,14 @@ class __$$_SelfRatingResponseCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_SelfRatingResponse
+class _$SelfRatingResponseImpl
     with DiagnosticableTreeMixin
     implements _SelfRatingResponse {
-  const _$_SelfRatingResponse(final Map<String, SelfRating> ratings)
+  const _$SelfRatingResponseImpl(final Map<String, SelfRating> ratings)
       : _ratings = ratings;
 
-  factory _$_SelfRatingResponse.fromJson(Map<String, dynamic> json) =>
-      _$$_SelfRatingResponseFromJson(json);
+  factory _$SelfRatingResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SelfRatingResponseImplFromJson(json);
 
   final Map<String, SelfRating> _ratings;
   @override
@@ -7182,7 +7218,7 @@ class _$_SelfRatingResponse
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_SelfRatingResponse &&
+            other is _$SelfRatingResponseImpl &&
             const DeepCollectionEquality().equals(other._ratings, _ratings));
   }
 
@@ -7194,13 +7230,13 @@ class _$_SelfRatingResponse
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_SelfRatingResponseCopyWith<_$_SelfRatingResponse> get copyWith =>
-      __$$_SelfRatingResponseCopyWithImpl<_$_SelfRatingResponse>(
+  _$$SelfRatingResponseImplCopyWith<_$SelfRatingResponseImpl> get copyWith =>
+      __$$SelfRatingResponseImplCopyWithImpl<_$SelfRatingResponseImpl>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_SelfRatingResponseToJson(
+    return _$$SelfRatingResponseImplToJson(
       this,
     );
   }
@@ -7208,16 +7244,16 @@ class _$_SelfRatingResponse
 
 abstract class _SelfRatingResponse implements SelfRatingResponse {
   const factory _SelfRatingResponse(final Map<String, SelfRating> ratings) =
-      _$_SelfRatingResponse;
+      _$SelfRatingResponseImpl;
 
   factory _SelfRatingResponse.fromJson(Map<String, dynamic> json) =
-      _$_SelfRatingResponse.fromJson;
+      _$SelfRatingResponseImpl.fromJson;
 
   @override
   Map<String, SelfRating> get ratings;
   @override
   @JsonKey(ignore: true)
-  _$$_SelfRatingResponseCopyWith<_$_SelfRatingResponse> get copyWith =>
+  _$$SelfRatingResponseImplCopyWith<_$SelfRatingResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -7276,22 +7312,22 @@ class _$SelfRatingCopyWithImpl<$Res, $Val extends SelfRating>
 }
 
 /// @nodoc
-abstract class _$$_SelfRatingCopyWith<$Res>
+abstract class _$$SelfRatingImplCopyWith<$Res>
     implements $SelfRatingCopyWith<$Res> {
-  factory _$$_SelfRatingCopyWith(
-          _$_SelfRating value, $Res Function(_$_SelfRating) then) =
-      __$$_SelfRatingCopyWithImpl<$Res>;
+  factory _$$SelfRatingImplCopyWith(
+          _$SelfRatingImpl value, $Res Function(_$SelfRatingImpl) then) =
+      __$$SelfRatingImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int rating, @TimestampSerializer() DateTime createdAt});
 }
 
 /// @nodoc
-class __$$_SelfRatingCopyWithImpl<$Res>
-    extends _$SelfRatingCopyWithImpl<$Res, _$_SelfRating>
-    implements _$$_SelfRatingCopyWith<$Res> {
-  __$$_SelfRatingCopyWithImpl(
-      _$_SelfRating _value, $Res Function(_$_SelfRating) _then)
+class __$$SelfRatingImplCopyWithImpl<$Res>
+    extends _$SelfRatingCopyWithImpl<$Res, _$SelfRatingImpl>
+    implements _$$SelfRatingImplCopyWith<$Res> {
+  __$$SelfRatingImplCopyWithImpl(
+      _$SelfRatingImpl _value, $Res Function(_$SelfRatingImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -7300,7 +7336,7 @@ class __$$_SelfRatingCopyWithImpl<$Res>
     Object? rating = null,
     Object? createdAt = null,
   }) {
-    return _then(_$_SelfRating(
+    return _then(_$SelfRatingImpl(
       rating: null == rating
           ? _value.rating
           : rating // ignore: cast_nullable_to_non_nullable
@@ -7315,13 +7351,13 @@ class __$$_SelfRatingCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_SelfRating extends _SelfRating with DiagnosticableTreeMixin {
-  _$_SelfRating(
+class _$SelfRatingImpl extends _SelfRating with DiagnosticableTreeMixin {
+  _$SelfRatingImpl(
       {required this.rating, @TimestampSerializer() required this.createdAt})
       : super._();
 
-  factory _$_SelfRating.fromJson(Map<String, dynamic> json) =>
-      _$$_SelfRatingFromJson(json);
+  factory _$SelfRatingImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SelfRatingImplFromJson(json);
 
   @override
   final int rating;
@@ -7347,7 +7383,7 @@ class _$_SelfRating extends _SelfRating with DiagnosticableTreeMixin {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_SelfRating &&
+            other is _$SelfRatingImpl &&
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
@@ -7360,12 +7396,12 @@ class _$_SelfRating extends _SelfRating with DiagnosticableTreeMixin {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_SelfRatingCopyWith<_$_SelfRating> get copyWith =>
-      __$$_SelfRatingCopyWithImpl<_$_SelfRating>(this, _$identity);
+  _$$SelfRatingImplCopyWith<_$SelfRatingImpl> get copyWith =>
+      __$$SelfRatingImplCopyWithImpl<_$SelfRatingImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_SelfRatingToJson(
+    return _$$SelfRatingImplToJson(
       this,
     );
   }
@@ -7375,11 +7411,11 @@ abstract class _SelfRating extends SelfRating {
   factory _SelfRating(
           {required final int rating,
           @TimestampSerializer() required final DateTime createdAt}) =
-      _$_SelfRating;
+      _$SelfRatingImpl;
   _SelfRating._() : super._();
 
   factory _SelfRating.fromJson(Map<String, dynamic> json) =
-      _$_SelfRating.fromJson;
+      _$SelfRatingImpl.fromJson;
 
   @override
   int get rating;
@@ -7388,7 +7424,7 @@ abstract class _SelfRating extends SelfRating {
   DateTime get createdAt;
   @override
   @JsonKey(ignore: true)
-  _$$_SelfRatingCopyWith<_$_SelfRating> get copyWith =>
+  _$$SelfRatingImplCopyWith<_$SelfRatingImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -7445,21 +7481,22 @@ class _$OldTokenCopyWithImpl<$Res, $Val extends OldToken>
 }
 
 /// @nodoc
-abstract class _$$_OldTokenCopyWith<$Res> implements $OldTokenCopyWith<$Res> {
-  factory _$$_OldTokenCopyWith(
-          _$_OldToken value, $Res Function(_$_OldToken) then) =
-      __$$_OldTokenCopyWithImpl<$Res>;
+abstract class _$$OldTokenImplCopyWith<$Res>
+    implements $OldTokenCopyWith<$Res> {
+  factory _$$OldTokenImplCopyWith(
+          _$OldTokenImpl value, $Res Function(_$OldTokenImpl) then) =
+      __$$OldTokenImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String session, String refresh});
 }
 
 /// @nodoc
-class __$$_OldTokenCopyWithImpl<$Res>
-    extends _$OldTokenCopyWithImpl<$Res, _$_OldToken>
-    implements _$$_OldTokenCopyWith<$Res> {
-  __$$_OldTokenCopyWithImpl(
-      _$_OldToken _value, $Res Function(_$_OldToken) _then)
+class __$$OldTokenImplCopyWithImpl<$Res>
+    extends _$OldTokenCopyWithImpl<$Res, _$OldTokenImpl>
+    implements _$$OldTokenImplCopyWith<$Res> {
+  __$$OldTokenImplCopyWithImpl(
+      _$OldTokenImpl _value, $Res Function(_$OldTokenImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -7468,7 +7505,7 @@ class __$$_OldTokenCopyWithImpl<$Res>
     Object? session = null,
     Object? refresh = null,
   }) {
-    return _then(_$_OldToken(
+    return _then(_$OldTokenImpl(
       session: null == session
           ? _value.session
           : session // ignore: cast_nullable_to_non_nullable
@@ -7483,11 +7520,11 @@ class __$$_OldTokenCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_OldToken extends _OldToken with DiagnosticableTreeMixin {
-  _$_OldToken({required this.session, required this.refresh}) : super._();
+class _$OldTokenImpl extends _OldToken with DiagnosticableTreeMixin {
+  _$OldTokenImpl({required this.session, required this.refresh}) : super._();
 
-  factory _$_OldToken.fromJson(Map<String, dynamic> json) =>
-      _$$_OldTokenFromJson(json);
+  factory _$OldTokenImpl.fromJson(Map<String, dynamic> json) =>
+      _$$OldTokenImplFromJson(json);
 
   @override
   final String session;
@@ -7512,7 +7549,7 @@ class _$_OldToken extends _OldToken with DiagnosticableTreeMixin {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_OldToken &&
+            other is _$OldTokenImpl &&
             (identical(other.session, session) || other.session == session) &&
             (identical(other.refresh, refresh) || other.refresh == refresh));
   }
@@ -7524,12 +7561,12 @@ class _$_OldToken extends _OldToken with DiagnosticableTreeMixin {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_OldTokenCopyWith<_$_OldToken> get copyWith =>
-      __$$_OldTokenCopyWithImpl<_$_OldToken>(this, _$identity);
+  _$$OldTokenImplCopyWith<_$OldTokenImpl> get copyWith =>
+      __$$OldTokenImplCopyWithImpl<_$OldTokenImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_OldTokenToJson(
+    return _$$OldTokenImplToJson(
       this,
     );
   }
@@ -7538,10 +7575,11 @@ class _$_OldToken extends _OldToken with DiagnosticableTreeMixin {
 abstract class _OldToken extends OldToken {
   factory _OldToken(
       {required final String session,
-      required final String refresh}) = _$_OldToken;
+      required final String refresh}) = _$OldTokenImpl;
   _OldToken._() : super._();
 
-  factory _OldToken.fromJson(Map<String, dynamic> json) = _$_OldToken.fromJson;
+  factory _OldToken.fromJson(Map<String, dynamic> json) =
+      _$OldTokenImpl.fromJson;
 
   @override
   String get session;
@@ -7549,6 +7587,6 @@ abstract class _OldToken extends OldToken {
   String get refresh;
   @override
   @JsonKey(ignore: true)
-  _$$_OldTokenCopyWith<_$_OldToken> get copyWith =>
+  _$$OldTokenImplCopyWith<_$OldTokenImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

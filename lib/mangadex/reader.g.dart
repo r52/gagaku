@@ -29,8 +29,6 @@ class _SystemHash {
   }
 }
 
-typedef _FetchChapterDataRef = AutoDisposeFutureProviderRef<ReaderData>;
-
 /// See also [_fetchChapterData].
 @ProviderFor(_fetchChapterData)
 const _fetchChapterDataProvider = _FetchChapterDataFamily();
@@ -77,10 +75,10 @@ class _FetchChapterDataFamily extends Family<AsyncValue<ReaderData>> {
 class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
   /// See also [_fetchChapterData].
   _FetchChapterDataProvider(
-    this.chapterId,
-  ) : super.internal(
+    String chapterId,
+  ) : this._internal(
           (ref) => _fetchChapterData(
-            ref,
+            ref as _FetchChapterDataRef,
             chapterId,
           ),
           from: _fetchChapterDataProvider,
@@ -92,9 +90,43 @@ class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
           dependencies: _FetchChapterDataFamily._dependencies,
           allTransitiveDependencies:
               _FetchChapterDataFamily._allTransitiveDependencies,
+          chapterId: chapterId,
         );
 
+  _FetchChapterDataProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.chapterId,
+  }) : super.internal();
+
   final String chapterId;
+
+  @override
+  Override overrideWith(
+    FutureOr<ReaderData> Function(_FetchChapterDataRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchChapterDataProvider._internal(
+        (ref) => create(ref as _FetchChapterDataRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        chapterId: chapterId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<ReaderData> createElement() {
+    return _FetchChapterDataProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -110,8 +142,21 @@ class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
   }
 }
 
+mixin _FetchChapterDataRef on AutoDisposeFutureProviderRef<ReaderData> {
+  /// The parameter `chapterId` of this provider.
+  String get chapterId;
+}
+
+class _FetchChapterDataProviderElement
+    extends AutoDisposeFutureProviderElement<ReaderData>
+    with _FetchChapterDataRef {
+  _FetchChapterDataProviderElement(super.provider);
+
+  @override
+  String get chapterId => (origin as _FetchChapterDataProvider).chapterId;
+}
+
 String _$fetchChapterPagesHash() => r'd95fb71f4cc56d537abd2ffe7db4441503825b39';
-typedef _FetchChapterPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
 
 /// See also [_fetchChapterPages].
 @ProviderFor(_fetchChapterPages)
@@ -160,10 +205,10 @@ class _FetchChapterPagesProvider
     extends AutoDisposeFutureProvider<List<ReaderPage>> {
   /// See also [_fetchChapterPages].
   _FetchChapterPagesProvider(
-    this.chapter,
-  ) : super.internal(
+    Chapter chapter,
+  ) : this._internal(
           (ref) => _fetchChapterPages(
-            ref,
+            ref as _FetchChapterPagesRef,
             chapter,
           ),
           from: _fetchChapterPagesProvider,
@@ -175,9 +220,43 @@ class _FetchChapterPagesProvider
           dependencies: _FetchChapterPagesFamily._dependencies,
           allTransitiveDependencies:
               _FetchChapterPagesFamily._allTransitiveDependencies,
+          chapter: chapter,
         );
 
+  _FetchChapterPagesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.chapter,
+  }) : super.internal();
+
   final Chapter chapter;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchChapterPagesProvider._internal(
+        (ref) => create(ref as _FetchChapterPagesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        chapter: chapter,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
+    return _FetchChapterPagesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -192,5 +271,19 @@ class _FetchChapterPagesProvider
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _FetchChapterPagesRef on AutoDisposeFutureProviderRef<List<ReaderPage>> {
+  /// The parameter `chapter` of this provider.
+  Chapter get chapter;
+}
+
+class _FetchChapterPagesProviderElement
+    extends AutoDisposeFutureProviderElement<List<ReaderPage>>
+    with _FetchChapterPagesRef {
+  _FetchChapterPagesProviderElement(super.provider);
+
+  @override
+  Chapter get chapter => (origin as _FetchChapterPagesProvider).chapter;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

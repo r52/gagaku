@@ -6,8 +6,8 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_ReaderConfig _$$_ReaderConfigFromJson(Map<String, dynamic> json) =>
-    _$_ReaderConfig(
+_$ReaderConfigImpl _$$ReaderConfigImplFromJson(Map<String, dynamic> json) =>
+    _$ReaderConfigImpl(
       direction:
           $enumDecodeNullable(_$ReaderDirectionEnumMap, json['direction']) ??
               ReaderDirection.leftToRight,
@@ -17,7 +17,7 @@ _$_ReaderConfig _$$_ReaderConfigFromJson(Map<String, dynamic> json) =>
       precacheCount: json['precacheCount'] as int? ?? 3,
     );
 
-Map<String, dynamic> _$$_ReaderConfigToJson(_$_ReaderConfig instance) =>
+Map<String, dynamic> _$$ReaderConfigImplToJson(_$ReaderConfigImpl instance) =>
     <String, dynamic>{
       'direction': _$ReaderDirectionEnumMap[instance.direction]!,
       'showProgressBar': instance.showProgressBar,
@@ -53,4 +53,4 @@ final readerSettingsProvider =
 
 typedef _$ReaderSettings = AutoDisposeNotifier<ReaderConfig>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

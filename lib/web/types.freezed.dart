@@ -68,21 +68,22 @@ class _$ProxyInfoCopyWithImpl<$Res, $Val extends ProxyInfo>
 }
 
 /// @nodoc
-abstract class _$$_ProxyInfoCopyWith<$Res> implements $ProxyInfoCopyWith<$Res> {
-  factory _$$_ProxyInfoCopyWith(
-          _$_ProxyInfo value, $Res Function(_$_ProxyInfo) then) =
-      __$$_ProxyInfoCopyWithImpl<$Res>;
+abstract class _$$ProxyInfoImplCopyWith<$Res>
+    implements $ProxyInfoCopyWith<$Res> {
+  factory _$$ProxyInfoImplCopyWith(
+          _$ProxyInfoImpl value, $Res Function(_$ProxyInfoImpl) then) =
+      __$$ProxyInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String proxy, String code, String? chapter});
 }
 
 /// @nodoc
-class __$$_ProxyInfoCopyWithImpl<$Res>
-    extends _$ProxyInfoCopyWithImpl<$Res, _$_ProxyInfo>
-    implements _$$_ProxyInfoCopyWith<$Res> {
-  __$$_ProxyInfoCopyWithImpl(
-      _$_ProxyInfo _value, $Res Function(_$_ProxyInfo) _then)
+class __$$ProxyInfoImplCopyWithImpl<$Res>
+    extends _$ProxyInfoCopyWithImpl<$Res, _$ProxyInfoImpl>
+    implements _$$ProxyInfoImplCopyWith<$Res> {
+  __$$ProxyInfoImplCopyWithImpl(
+      _$ProxyInfoImpl _value, $Res Function(_$ProxyInfoImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -92,7 +93,7 @@ class __$$_ProxyInfoCopyWithImpl<$Res>
     Object? code = null,
     Object? chapter = freezed,
   }) {
-    return _then(_$_ProxyInfo(
+    return _then(_$ProxyInfoImpl(
       proxy: null == proxy
           ? _value.proxy
           : proxy // ignore: cast_nullable_to_non_nullable
@@ -111,8 +112,8 @@ class __$$_ProxyInfoCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_ProxyInfo extends _ProxyInfo {
-  const _$_ProxyInfo({required this.proxy, required this.code, this.chapter})
+class _$ProxyInfoImpl extends _ProxyInfo {
+  const _$ProxyInfoImpl({required this.proxy, required this.code, this.chapter})
       : super._();
 
   @override
@@ -131,7 +132,7 @@ class _$_ProxyInfo extends _ProxyInfo {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ProxyInfo &&
+            other is _$ProxyInfoImpl &&
             (identical(other.proxy, proxy) || other.proxy == proxy) &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.chapter, chapter) || other.chapter == chapter));
@@ -143,15 +144,15 @@ class _$_ProxyInfo extends _ProxyInfo {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ProxyInfoCopyWith<_$_ProxyInfo> get copyWith =>
-      __$$_ProxyInfoCopyWithImpl<_$_ProxyInfo>(this, _$identity);
+  _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
+      __$$ProxyInfoImplCopyWithImpl<_$ProxyInfoImpl>(this, _$identity);
 }
 
 abstract class _ProxyInfo extends ProxyInfo {
   const factory _ProxyInfo(
       {required final String proxy,
       required final String code,
-      final String? chapter}) = _$_ProxyInfo;
+      final String? chapter}) = _$ProxyInfoImpl;
   const _ProxyInfo._() : super._();
 
   @override
@@ -162,7 +163,7 @@ abstract class _ProxyInfo extends ProxyInfo {
   String? get chapter;
   @override
   @JsonKey(ignore: true)
-  _$$_ProxyInfoCopyWith<_$_ProxyInfo> get copyWith =>
+  _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -220,22 +221,22 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
 }
 
 /// @nodoc
-abstract class _$$_HistoryLinkCopyWith<$Res>
+abstract class _$$HistoryLinkImplCopyWith<$Res>
     implements $HistoryLinkCopyWith<$Res> {
-  factory _$$_HistoryLinkCopyWith(
-          _$_HistoryLink value, $Res Function(_$_HistoryLink) then) =
-      __$$_HistoryLinkCopyWithImpl<$Res>;
+  factory _$$HistoryLinkImplCopyWith(
+          _$HistoryLinkImpl value, $Res Function(_$HistoryLinkImpl) then) =
+      __$$HistoryLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String title, String url});
 }
 
 /// @nodoc
-class __$$_HistoryLinkCopyWithImpl<$Res>
-    extends _$HistoryLinkCopyWithImpl<$Res, _$_HistoryLink>
-    implements _$$_HistoryLinkCopyWith<$Res> {
-  __$$_HistoryLinkCopyWithImpl(
-      _$_HistoryLink _value, $Res Function(_$_HistoryLink) _then)
+class __$$HistoryLinkImplCopyWithImpl<$Res>
+    extends _$HistoryLinkCopyWithImpl<$Res, _$HistoryLinkImpl>
+    implements _$$HistoryLinkImplCopyWith<$Res> {
+  __$$HistoryLinkImplCopyWithImpl(
+      _$HistoryLinkImpl _value, $Res Function(_$HistoryLinkImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -244,7 +245,7 @@ class __$$_HistoryLinkCopyWithImpl<$Res>
     Object? title = null,
     Object? url = null,
   }) {
-    return _then(_$_HistoryLink(
+    return _then(_$HistoryLinkImpl(
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -259,11 +260,11 @@ class __$$_HistoryLinkCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_HistoryLink extends _HistoryLink {
-  const _$_HistoryLink({required this.title, required this.url}) : super._();
+class _$HistoryLinkImpl extends _HistoryLink {
+  const _$HistoryLinkImpl({required this.title, required this.url}) : super._();
 
-  factory _$_HistoryLink.fromJson(Map<String, dynamic> json) =>
-      _$$_HistoryLinkFromJson(json);
+  factory _$HistoryLinkImpl.fromJson(Map<String, dynamic> json) =>
+      _$$HistoryLinkImplFromJson(json);
 
   @override
   final String title;
@@ -278,12 +279,12 @@ class _$_HistoryLink extends _HistoryLink {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_HistoryLinkCopyWith<_$_HistoryLink> get copyWith =>
-      __$$_HistoryLinkCopyWithImpl<_$_HistoryLink>(this, _$identity);
+  _$$HistoryLinkImplCopyWith<_$HistoryLinkImpl> get copyWith =>
+      __$$HistoryLinkImplCopyWithImpl<_$HistoryLinkImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_HistoryLinkToJson(
+    return _$$HistoryLinkImplToJson(
       this,
     );
   }
@@ -292,11 +293,11 @@ class _$_HistoryLink extends _HistoryLink {
 abstract class _HistoryLink extends HistoryLink {
   const factory _HistoryLink(
       {required final String title,
-      required final String url}) = _$_HistoryLink;
+      required final String url}) = _$HistoryLinkImpl;
   const _HistoryLink._() : super._();
 
   factory _HistoryLink.fromJson(Map<String, dynamic> json) =
-      _$_HistoryLink.fromJson;
+      _$HistoryLinkImpl.fromJson;
 
   @override
   String get title;
@@ -304,7 +305,7 @@ abstract class _HistoryLink extends HistoryLink {
   String get url;
   @override
   @JsonKey(ignore: true)
-  _$$_HistoryLinkCopyWith<_$_HistoryLink> get copyWith =>
+  _$$HistoryLinkImplCopyWith<_$HistoryLinkImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -398,10 +399,11 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
 }
 
 /// @nodoc
-abstract class _$$_WebMangaCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
-  factory _$$_WebMangaCopyWith(
-          _$_WebManga value, $Res Function(_$_WebManga) then) =
-      __$$_WebMangaCopyWithImpl<$Res>;
+abstract class _$$WebMangaImplCopyWith<$Res>
+    implements $WebMangaCopyWith<$Res> {
+  factory _$$WebMangaImplCopyWith(
+          _$WebMangaImpl value, $Res Function(_$WebMangaImpl) then) =
+      __$$WebMangaImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -415,11 +417,11 @@ abstract class _$$_WebMangaCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_WebMangaCopyWithImpl<$Res>
-    extends _$WebMangaCopyWithImpl<$Res, _$_WebManga>
-    implements _$$_WebMangaCopyWith<$Res> {
-  __$$_WebMangaCopyWithImpl(
-      _$_WebManga _value, $Res Function(_$_WebManga) _then)
+class __$$WebMangaImplCopyWithImpl<$Res>
+    extends _$WebMangaCopyWithImpl<$Res, _$WebMangaImpl>
+    implements _$$WebMangaImplCopyWith<$Res> {
+  __$$WebMangaImplCopyWithImpl(
+      _$WebMangaImpl _value, $Res Function(_$WebMangaImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -433,7 +435,7 @@ class __$$_WebMangaCopyWithImpl<$Res>
     Object? groups = freezed,
     Object? chapters = null,
   }) {
-    return _then(_$_WebManga(
+    return _then(_$WebMangaImpl(
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -468,8 +470,8 @@ class __$$_WebMangaCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_WebManga extends _WebManga {
-  const _$_WebManga(
+class _$WebMangaImpl extends _WebManga {
+  const _$WebMangaImpl(
       {required this.title,
       required this.description,
       required this.artist,
@@ -481,8 +483,8 @@ class _$_WebManga extends _WebManga {
         _chapters = chapters,
         super._();
 
-  factory _$_WebManga.fromJson(Map<String, dynamic> json) =>
-      _$$_WebMangaFromJson(json);
+  factory _$WebMangaImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebMangaImplFromJson(json);
 
   @override
   final String title;
@@ -521,7 +523,7 @@ class _$_WebManga extends _WebManga {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_WebManga &&
+            other is _$WebMangaImpl &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -547,12 +549,12 @@ class _$_WebManga extends _WebManga {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_WebMangaCopyWith<_$_WebManga> get copyWith =>
-      __$$_WebMangaCopyWithImpl<_$_WebManga>(this, _$identity);
+  _$$WebMangaImplCopyWith<_$WebMangaImpl> get copyWith =>
+      __$$WebMangaImplCopyWithImpl<_$WebMangaImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_WebMangaToJson(
+    return _$$WebMangaImplToJson(
       this,
     );
   }
@@ -566,10 +568,11 @@ abstract class _WebManga extends WebManga {
       required final String author,
       required final String cover,
       final Map<String, String>? groups,
-      required final Map<String, WebChapter> chapters}) = _$_WebManga;
+      required final Map<String, WebChapter> chapters}) = _$WebMangaImpl;
   const _WebManga._() : super._();
 
-  factory _WebManga.fromJson(Map<String, dynamic> json) = _$_WebManga.fromJson;
+  factory _WebManga.fromJson(Map<String, dynamic> json) =
+      _$WebMangaImpl.fromJson;
 
   @override
   String get title;
@@ -587,7 +590,7 @@ abstract class _WebManga extends WebManga {
   Map<String, WebChapter> get chapters;
   @override
   @JsonKey(ignore: true)
-  _$$_WebMangaCopyWith<_$_WebManga> get copyWith =>
+  _$$WebMangaImplCopyWith<_$WebMangaImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -670,11 +673,11 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
 }
 
 /// @nodoc
-abstract class _$$_WebChapterCopyWith<$Res>
+abstract class _$$WebChapterImplCopyWith<$Res>
     implements $WebChapterCopyWith<$Res> {
-  factory _$$_WebChapterCopyWith(
-          _$_WebChapter value, $Res Function(_$_WebChapter) then) =
-      __$$_WebChapterCopyWithImpl<$Res>;
+  factory _$$WebChapterImplCopyWith(
+          _$WebChapterImpl value, $Res Function(_$WebChapterImpl) then) =
+      __$$WebChapterImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -686,11 +689,11 @@ abstract class _$$_WebChapterCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_WebChapterCopyWithImpl<$Res>
-    extends _$WebChapterCopyWithImpl<$Res, _$_WebChapter>
-    implements _$$_WebChapterCopyWith<$Res> {
-  __$$_WebChapterCopyWithImpl(
-      _$_WebChapter _value, $Res Function(_$_WebChapter) _then)
+class __$$WebChapterImplCopyWithImpl<$Res>
+    extends _$WebChapterCopyWithImpl<$Res, _$WebChapterImpl>
+    implements _$$WebChapterImplCopyWith<$Res> {
+  __$$WebChapterImplCopyWithImpl(
+      _$WebChapterImpl _value, $Res Function(_$WebChapterImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -702,7 +705,7 @@ class __$$_WebChapterCopyWithImpl<$Res>
     Object? releaseDate = freezed,
     Object? groups = null,
   }) {
-    return _then(_$_WebChapter(
+    return _then(_$WebChapterImpl(
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -730,8 +733,8 @@ class __$$_WebChapterCopyWithImpl<$Res>
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class _$_WebChapter extends _WebChapter {
-  const _$_WebChapter(
+class _$WebChapterImpl extends _WebChapter {
+  const _$WebChapterImpl(
       {required this.title,
       required this.volume,
       @EpochTimestampSerializer() this.lastUpdated,
@@ -740,8 +743,8 @@ class _$_WebChapter extends _WebChapter {
       : _groups = groups,
         super._();
 
-  factory _$_WebChapter.fromJson(Map<String, dynamic> json) =>
-      _$$_WebChapterFromJson(json);
+  factory _$WebChapterImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebChapterImplFromJson(json);
 
   @override
   final String title;
@@ -770,7 +773,7 @@ class _$_WebChapter extends _WebChapter {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_WebChapter &&
+            other is _$WebChapterImpl &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.volume, volume) || other.volume == volume) &&
             (identical(other.lastUpdated, lastUpdated) ||
@@ -788,12 +791,12 @@ class _$_WebChapter extends _WebChapter {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_WebChapterCopyWith<_$_WebChapter> get copyWith =>
-      __$$_WebChapterCopyWithImpl<_$_WebChapter>(this, _$identity);
+  _$$WebChapterImplCopyWith<_$WebChapterImpl> get copyWith =>
+      __$$WebChapterImplCopyWithImpl<_$WebChapterImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_WebChapterToJson(
+    return _$$WebChapterImplToJson(
       this,
     );
   }
@@ -805,11 +808,11 @@ abstract class _WebChapter extends WebChapter {
       required final String volume,
       @EpochTimestampSerializer() final DateTime? lastUpdated,
       @MappedEpochTimestampSerializer() final DateTime? releaseDate,
-      required final Map<String, dynamic> groups}) = _$_WebChapter;
+      required final Map<String, dynamic> groups}) = _$WebChapterImpl;
   const _WebChapter._() : super._();
 
   factory _WebChapter.fromJson(Map<String, dynamic> json) =
-      _$_WebChapter.fromJson;
+      _$WebChapterImpl.fromJson;
 
   @override
   String get title;
@@ -825,7 +828,7 @@ abstract class _WebChapter extends WebChapter {
   Map<String, dynamic> get groups;
   @override
   @JsonKey(ignore: true)
-  _$$_WebChapterCopyWith<_$_WebChapter> get copyWith =>
+  _$$WebChapterImplCopyWith<_$WebChapterImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -882,21 +885,22 @@ class _$ImgurPageCopyWithImpl<$Res, $Val extends ImgurPage>
 }
 
 /// @nodoc
-abstract class _$$_ImgurPageCopyWith<$Res> implements $ImgurPageCopyWith<$Res> {
-  factory _$$_ImgurPageCopyWith(
-          _$_ImgurPage value, $Res Function(_$_ImgurPage) then) =
-      __$$_ImgurPageCopyWithImpl<$Res>;
+abstract class _$$ImgurPageImplCopyWith<$Res>
+    implements $ImgurPageCopyWith<$Res> {
+  factory _$$ImgurPageImplCopyWith(
+          _$ImgurPageImpl value, $Res Function(_$ImgurPageImpl) then) =
+      __$$ImgurPageImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String description, String src});
 }
 
 /// @nodoc
-class __$$_ImgurPageCopyWithImpl<$Res>
-    extends _$ImgurPageCopyWithImpl<$Res, _$_ImgurPage>
-    implements _$$_ImgurPageCopyWith<$Res> {
-  __$$_ImgurPageCopyWithImpl(
-      _$_ImgurPage _value, $Res Function(_$_ImgurPage) _then)
+class __$$ImgurPageImplCopyWithImpl<$Res>
+    extends _$ImgurPageCopyWithImpl<$Res, _$ImgurPageImpl>
+    implements _$$ImgurPageImplCopyWith<$Res> {
+  __$$ImgurPageImplCopyWithImpl(
+      _$ImgurPageImpl _value, $Res Function(_$ImgurPageImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -905,7 +909,7 @@ class __$$_ImgurPageCopyWithImpl<$Res>
     Object? description = null,
     Object? src = null,
   }) {
-    return _then(_$_ImgurPage(
+    return _then(_$ImgurPageImpl(
       description: null == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -920,11 +924,11 @@ class __$$_ImgurPageCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ImgurPage implements _ImgurPage {
-  const _$_ImgurPage({required this.description, required this.src});
+class _$ImgurPageImpl implements _ImgurPage {
+  const _$ImgurPageImpl({required this.description, required this.src});
 
-  factory _$_ImgurPage.fromJson(Map<String, dynamic> json) =>
-      _$$_ImgurPageFromJson(json);
+  factory _$ImgurPageImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ImgurPageImplFromJson(json);
 
   @override
   final String description;
@@ -940,7 +944,7 @@ class _$_ImgurPage implements _ImgurPage {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ImgurPage &&
+            other is _$ImgurPageImpl &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.src, src) || other.src == src));
@@ -953,12 +957,12 @@ class _$_ImgurPage implements _ImgurPage {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ImgurPageCopyWith<_$_ImgurPage> get copyWith =>
-      __$$_ImgurPageCopyWithImpl<_$_ImgurPage>(this, _$identity);
+  _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
+      __$$ImgurPageImplCopyWithImpl<_$ImgurPageImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ImgurPageToJson(
+    return _$$ImgurPageImplToJson(
       this,
     );
   }
@@ -967,10 +971,10 @@ class _$_ImgurPage implements _ImgurPage {
 abstract class _ImgurPage implements ImgurPage {
   const factory _ImgurPage(
       {required final String description,
-      required final String src}) = _$_ImgurPage;
+      required final String src}) = _$ImgurPageImpl;
 
   factory _ImgurPage.fromJson(Map<String, dynamic> json) =
-      _$_ImgurPage.fromJson;
+      _$ImgurPageImpl.fromJson;
 
   @override
   String get description;
@@ -978,6 +982,6 @@ abstract class _ImgurPage implements ImgurPage {
   String get src;
   @override
   @JsonKey(ignore: true)
-  _$$_ImgurPageCopyWith<_$_ImgurPage> get copyWith =>
+  _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

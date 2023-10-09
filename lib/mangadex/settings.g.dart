@@ -29,8 +29,6 @@ class _SystemHash {
   }
 }
 
-typedef _FetchGroupDataRef = AutoDisposeFutureProviderRef<Set<Group>>;
-
 /// See also [_fetchGroupData].
 @ProviderFor(_fetchGroupData)
 const _fetchGroupDataProvider = _FetchGroupDataFamily();
@@ -77,10 +75,10 @@ class _FetchGroupDataFamily extends Family<AsyncValue<Set<Group>>> {
 class _FetchGroupDataProvider extends AutoDisposeFutureProvider<Set<Group>> {
   /// See also [_fetchGroupData].
   _FetchGroupDataProvider(
-    this.uuids,
-  ) : super.internal(
+    Iterable<String> uuids,
+  ) : this._internal(
           (ref) => _fetchGroupData(
-            ref,
+            ref as _FetchGroupDataRef,
             uuids,
           ),
           from: _fetchGroupDataProvider,
@@ -92,9 +90,43 @@ class _FetchGroupDataProvider extends AutoDisposeFutureProvider<Set<Group>> {
           dependencies: _FetchGroupDataFamily._dependencies,
           allTransitiveDependencies:
               _FetchGroupDataFamily._allTransitiveDependencies,
+          uuids: uuids,
         );
 
+  _FetchGroupDataProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.uuids,
+  }) : super.internal();
+
   final Iterable<String> uuids;
+
+  @override
+  Override overrideWith(
+    FutureOr<Set<Group>> Function(_FetchGroupDataRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchGroupDataProvider._internal(
+        (ref) => create(ref as _FetchGroupDataRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        uuids: uuids,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Set<Group>> createElement() {
+    return _FetchGroupDataProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -109,5 +141,19 @@ class _FetchGroupDataProvider extends AutoDisposeFutureProvider<Set<Group>> {
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _FetchGroupDataRef on AutoDisposeFutureProviderRef<Set<Group>> {
+  /// The parameter `uuids` of this provider.
+  Iterable<String> get uuids;
+}
+
+class _FetchGroupDataProviderElement
+    extends AutoDisposeFutureProviderElement<Set<Group>>
+    with _FetchGroupDataRef {
+  _FetchGroupDataProviderElement(super.provider);
+
+  @override
+  Iterable<String> get uuids => (origin as _FetchGroupDataProvider).uuids;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -29,8 +29,6 @@ class _SystemHash {
   }
 }
 
-typedef _FetchMangaFromIdRef = AutoDisposeFutureProviderRef<Manga>;
-
 /// See also [_fetchMangaFromId].
 @ProviderFor(_fetchMangaFromId)
 const _fetchMangaFromIdProvider = _FetchMangaFromIdFamily();
@@ -77,10 +75,10 @@ class _FetchMangaFromIdFamily extends Family<AsyncValue<Manga>> {
 class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
   /// See also [_fetchMangaFromId].
   _FetchMangaFromIdProvider(
-    this.mangaId,
-  ) : super.internal(
+    String mangaId,
+  ) : this._internal(
           (ref) => _fetchMangaFromId(
-            ref,
+            ref as _FetchMangaFromIdRef,
             mangaId,
           ),
           from: _fetchMangaFromIdProvider,
@@ -92,9 +90,43 @@ class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
           dependencies: _FetchMangaFromIdFamily._dependencies,
           allTransitiveDependencies:
               _FetchMangaFromIdFamily._allTransitiveDependencies,
+          mangaId: mangaId,
         );
 
+  _FetchMangaFromIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.mangaId,
+  }) : super.internal();
+
   final String mangaId;
+
+  @override
+  Override overrideWith(
+    FutureOr<Manga> Function(_FetchMangaFromIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchMangaFromIdProvider._internal(
+        (ref) => create(ref as _FetchMangaFromIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        mangaId: mangaId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Manga> createElement() {
+    return _FetchMangaFromIdProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -110,9 +142,21 @@ class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
   }
 }
 
+mixin _FetchMangaFromIdRef on AutoDisposeFutureProviderRef<Manga> {
+  /// The parameter `mangaId` of this provider.
+  String get mangaId;
+}
+
+class _FetchMangaFromIdProviderElement
+    extends AutoDisposeFutureProviderElement<Manga> with _FetchMangaFromIdRef {
+  _FetchMangaFromIdProviderElement(super.provider);
+
+  @override
+  String get mangaId => (origin as _FetchMangaFromIdProvider).mangaId;
+}
+
 String _$fetchReadChaptersRedunHash() =>
     r'ee6e26ca0ad2a94741b4f9afe8e5e7ec62fe52ef';
-typedef _FetchReadChaptersRedunRef = AutoDisposeFutureProviderRef<void>;
 
 /// See also [_fetchReadChaptersRedun].
 @ProviderFor(_fetchReadChaptersRedun)
@@ -160,10 +204,10 @@ class _FetchReadChaptersRedunFamily extends Family<AsyncValue<void>> {
 class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
   /// See also [_fetchReadChaptersRedun].
   _FetchReadChaptersRedunProvider(
-    this.manga,
-  ) : super.internal(
+    Manga manga,
+  ) : this._internal(
           (ref) => _fetchReadChaptersRedun(
-            ref,
+            ref as _FetchReadChaptersRedunRef,
             manga,
           ),
           from: _fetchReadChaptersRedunProvider,
@@ -175,9 +219,43 @@ class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
           dependencies: _FetchReadChaptersRedunFamily._dependencies,
           allTransitiveDependencies:
               _FetchReadChaptersRedunFamily._allTransitiveDependencies,
+          manga: manga,
         );
 
+  _FetchReadChaptersRedunProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.manga,
+  }) : super.internal();
+
   final Manga manga;
+
+  @override
+  Override overrideWith(
+    FutureOr<void> Function(_FetchReadChaptersRedunRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchReadChaptersRedunProvider._internal(
+        (ref) => create(ref as _FetchReadChaptersRedunRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        manga: manga,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<void> createElement() {
+    return _FetchReadChaptersRedunProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -192,5 +270,19 @@ class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _FetchReadChaptersRedunRef on AutoDisposeFutureProviderRef<void> {
+  /// The parameter `manga` of this provider.
+  Manga get manga;
+}
+
+class _FetchReadChaptersRedunProviderElement
+    extends AutoDisposeFutureProviderElement<void>
+    with _FetchReadChaptersRedunRef {
+  _FetchReadChaptersRedunProviderElement(super.provider);
+
+  @override
+  Manga get manga => (origin as _FetchReadChaptersRedunProvider).manga;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

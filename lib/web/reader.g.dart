@@ -30,8 +30,6 @@ class _SystemHash {
   }
 }
 
-typedef _FetchWebChapterInfoRef = AutoDisposeFutureProviderRef<WebReaderData>;
-
 /// See also [_fetchWebChapterInfo].
 @ProviderFor(_fetchWebChapterInfo)
 const _fetchWebChapterInfoProvider = _FetchWebChapterInfoFamily();
@@ -79,10 +77,10 @@ class _FetchWebChapterInfoProvider
     extends AutoDisposeFutureProvider<WebReaderData> {
   /// See also [_fetchWebChapterInfo].
   _FetchWebChapterInfoProvider(
-    this.info,
-  ) : super.internal(
+    ProxyInfo info,
+  ) : this._internal(
           (ref) => _fetchWebChapterInfo(
-            ref,
+            ref as _FetchWebChapterInfoRef,
             info,
           ),
           from: _fetchWebChapterInfoProvider,
@@ -94,9 +92,43 @@ class _FetchWebChapterInfoProvider
           dependencies: _FetchWebChapterInfoFamily._dependencies,
           allTransitiveDependencies:
               _FetchWebChapterInfoFamily._allTransitiveDependencies,
+          info: info,
         );
 
+  _FetchWebChapterInfoProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.info,
+  }) : super.internal();
+
   final ProxyInfo info;
+
+  @override
+  Override overrideWith(
+    FutureOr<WebReaderData> Function(_FetchWebChapterInfoRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchWebChapterInfoProvider._internal(
+        (ref) => create(ref as _FetchWebChapterInfoRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        info: info,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<WebReaderData> createElement() {
+    return _FetchWebChapterInfoProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -112,8 +144,21 @@ class _FetchWebChapterInfoProvider
   }
 }
 
+mixin _FetchWebChapterInfoRef on AutoDisposeFutureProviderRef<WebReaderData> {
+  /// The parameter `info` of this provider.
+  ProxyInfo get info;
+}
+
+class _FetchWebChapterInfoProviderElement
+    extends AutoDisposeFutureProviderElement<WebReaderData>
+    with _FetchWebChapterInfoRef {
+  _FetchWebChapterInfoProviderElement(super.provider);
+
+  @override
+  ProxyInfo get info => (origin as _FetchWebChapterInfoProvider).info;
+}
+
 String _$getPagesHash() => r'2f561a3d26939d96cfbadbfa68d5ce72f08e92f4';
-typedef _GetPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
 
 /// See also [_getPages].
 @ProviderFor(_getPages)
@@ -161,10 +206,10 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
 class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
   /// See also [_getPages].
   _GetPagesProvider(
-    this.source,
-  ) : super.internal(
+    dynamic source,
+  ) : this._internal(
           (ref) => _getPages(
-            ref,
+            ref as _GetPagesRef,
             source,
           ),
           from: _getPagesProvider,
@@ -175,9 +220,43 @@ class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
                   : _$getPagesHash,
           dependencies: _GetPagesFamily._dependencies,
           allTransitiveDependencies: _GetPagesFamily._allTransitiveDependencies,
+          source: source,
         );
 
+  _GetPagesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.source,
+  }) : super.internal();
+
   final dynamic source;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ReaderPage>> Function(_GetPagesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _GetPagesProvider._internal(
+        (ref) => create(ref as _GetPagesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        source: source,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
+    return _GetPagesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -192,5 +271,19 @@ class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _GetPagesRef on AutoDisposeFutureProviderRef<List<ReaderPage>> {
+  /// The parameter `source` of this provider.
+  dynamic get source;
+}
+
+class _GetPagesProviderElement
+    extends AutoDisposeFutureProviderElement<List<ReaderPage>>
+    with _GetPagesRef {
+  _GetPagesProviderElement(super.provider);
+
+  @override
+  dynamic get source => (origin as _GetPagesProvider).source;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

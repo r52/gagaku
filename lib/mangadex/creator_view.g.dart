@@ -30,8 +30,6 @@ class _SystemHash {
   }
 }
 
-typedef _FetchCreatorFromIdRef = AutoDisposeFutureProviderRef<CreatorType>;
-
 /// See also [_fetchCreatorFromId].
 @ProviderFor(_fetchCreatorFromId)
 const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily();
@@ -79,10 +77,10 @@ class _FetchCreatorFromIdProvider
     extends AutoDisposeFutureProvider<CreatorType> {
   /// See also [_fetchCreatorFromId].
   _FetchCreatorFromIdProvider(
-    this.creatorId,
-  ) : super.internal(
+    String creatorId,
+  ) : this._internal(
           (ref) => _fetchCreatorFromId(
-            ref,
+            ref as _FetchCreatorFromIdRef,
             creatorId,
           ),
           from: _fetchCreatorFromIdProvider,
@@ -94,9 +92,43 @@ class _FetchCreatorFromIdProvider
           dependencies: _FetchCreatorFromIdFamily._dependencies,
           allTransitiveDependencies:
               _FetchCreatorFromIdFamily._allTransitiveDependencies,
+          creatorId: creatorId,
         );
 
+  _FetchCreatorFromIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.creatorId,
+  }) : super.internal();
+
   final String creatorId;
+
+  @override
+  Override overrideWith(
+    FutureOr<CreatorType> Function(_FetchCreatorFromIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchCreatorFromIdProvider._internal(
+        (ref) => create(ref as _FetchCreatorFromIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        creatorId: creatorId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<CreatorType> createElement() {
+    return _FetchCreatorFromIdProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -112,9 +144,22 @@ class _FetchCreatorFromIdProvider
   }
 }
 
+mixin _FetchCreatorFromIdRef on AutoDisposeFutureProviderRef<CreatorType> {
+  /// The parameter `creatorId` of this provider.
+  String get creatorId;
+}
+
+class _FetchCreatorFromIdProviderElement
+    extends AutoDisposeFutureProviderElement<CreatorType>
+    with _FetchCreatorFromIdRef {
+  _FetchCreatorFromIdProviderElement(super.provider);
+
+  @override
+  String get creatorId => (origin as _FetchCreatorFromIdProvider).creatorId;
+}
+
 String _$fetchCreatorTitlesHash() =>
     r'efd02209a7239c89af2fdf44b2e5db30b1626f4f';
-typedef _FetchCreatorTitlesRef = AutoDisposeFutureProviderRef<Iterable<Manga>>;
 
 /// See also [_fetchCreatorTitles].
 @ProviderFor(_fetchCreatorTitles)
@@ -163,10 +208,10 @@ class _FetchCreatorTitlesProvider
     extends AutoDisposeFutureProvider<Iterable<Manga>> {
   /// See also [_fetchCreatorTitles].
   _FetchCreatorTitlesProvider(
-    this.creator,
-  ) : super.internal(
+    CreatorType creator,
+  ) : this._internal(
           (ref) => _fetchCreatorTitles(
-            ref,
+            ref as _FetchCreatorTitlesRef,
             creator,
           ),
           from: _fetchCreatorTitlesProvider,
@@ -178,9 +223,43 @@ class _FetchCreatorTitlesProvider
           dependencies: _FetchCreatorTitlesFamily._dependencies,
           allTransitiveDependencies:
               _FetchCreatorTitlesFamily._allTransitiveDependencies,
+          creator: creator,
         );
 
+  _FetchCreatorTitlesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.creator,
+  }) : super.internal();
+
   final CreatorType creator;
+
+  @override
+  Override overrideWith(
+    FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchCreatorTitlesProvider._internal(
+        (ref) => create(ref as _FetchCreatorTitlesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        creator: creator,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+    return _FetchCreatorTitlesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -195,5 +274,19 @@ class _FetchCreatorTitlesProvider
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _FetchCreatorTitlesRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+  /// The parameter `creator` of this provider.
+  CreatorType get creator;
+}
+
+class _FetchCreatorTitlesProviderElement
+    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    with _FetchCreatorTitlesRef {
+  _FetchCreatorTitlesProviderElement(super.provider);
+
+  @override
+  CreatorType get creator => (origin as _FetchCreatorTitlesProvider).creator;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

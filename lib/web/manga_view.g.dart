@@ -29,8 +29,6 @@ class _SystemHash {
   }
 }
 
-typedef _FetchWebMangaInfoRef = AutoDisposeFutureProviderRef<WebManga>;
-
 /// See also [_fetchWebMangaInfo].
 @ProviderFor(_fetchWebMangaInfo)
 const _fetchWebMangaInfoProvider = _FetchWebMangaInfoFamily();
@@ -77,10 +75,10 @@ class _FetchWebMangaInfoFamily extends Family<AsyncValue<WebManga>> {
 class _FetchWebMangaInfoProvider extends AutoDisposeFutureProvider<WebManga> {
   /// See also [_fetchWebMangaInfo].
   _FetchWebMangaInfoProvider(
-    this.info,
-  ) : super.internal(
+    ProxyInfo info,
+  ) : this._internal(
           (ref) => _fetchWebMangaInfo(
-            ref,
+            ref as _FetchWebMangaInfoRef,
             info,
           ),
           from: _fetchWebMangaInfoProvider,
@@ -92,9 +90,43 @@ class _FetchWebMangaInfoProvider extends AutoDisposeFutureProvider<WebManga> {
           dependencies: _FetchWebMangaInfoFamily._dependencies,
           allTransitiveDependencies:
               _FetchWebMangaInfoFamily._allTransitiveDependencies,
+          info: info,
         );
 
+  _FetchWebMangaInfoProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.info,
+  }) : super.internal();
+
   final ProxyInfo info;
+
+  @override
+  Override overrideWith(
+    FutureOr<WebManga> Function(_FetchWebMangaInfoRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchWebMangaInfoProvider._internal(
+        (ref) => create(ref as _FetchWebMangaInfoRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        info: info,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<WebManga> createElement() {
+    return _FetchWebMangaInfoProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -109,5 +141,19 @@ class _FetchWebMangaInfoProvider extends AutoDisposeFutureProvider<WebManga> {
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _FetchWebMangaInfoRef on AutoDisposeFutureProviderRef<WebManga> {
+  /// The parameter `info` of this provider.
+  ProxyInfo get info;
+}
+
+class _FetchWebMangaInfoProviderElement
+    extends AutoDisposeFutureProviderElement<WebManga>
+    with _FetchWebMangaInfoRef {
+  _FetchWebMangaInfoProviderElement(super.provider);
+
+  @override
+  ProxyInfo get info => (origin as _FetchWebMangaInfoProvider).info;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

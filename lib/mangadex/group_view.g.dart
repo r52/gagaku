@@ -29,8 +29,6 @@ class _SystemHash {
   }
 }
 
-typedef _FetchGroupFromIdRef = AutoDisposeFutureProviderRef<Group>;
-
 /// See also [_fetchGroupFromId].
 @ProviderFor(_fetchGroupFromId)
 const _fetchGroupFromIdProvider = _FetchGroupFromIdFamily();
@@ -77,10 +75,10 @@ class _FetchGroupFromIdFamily extends Family<AsyncValue<Group>> {
 class _FetchGroupFromIdProvider extends AutoDisposeFutureProvider<Group> {
   /// See also [_fetchGroupFromId].
   _FetchGroupFromIdProvider(
-    this.groupId,
-  ) : super.internal(
+    String groupId,
+  ) : this._internal(
           (ref) => _fetchGroupFromId(
-            ref,
+            ref as _FetchGroupFromIdRef,
             groupId,
           ),
           from: _fetchGroupFromIdProvider,
@@ -92,9 +90,43 @@ class _FetchGroupFromIdProvider extends AutoDisposeFutureProvider<Group> {
           dependencies: _FetchGroupFromIdFamily._dependencies,
           allTransitiveDependencies:
               _FetchGroupFromIdFamily._allTransitiveDependencies,
+          groupId: groupId,
         );
 
+  _FetchGroupFromIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
   final String groupId;
+
+  @override
+  Override overrideWith(
+    FutureOr<Group> Function(_FetchGroupFromIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchGroupFromIdProvider._internal(
+        (ref) => create(ref as _FetchGroupFromIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Group> createElement() {
+    return _FetchGroupFromIdProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -110,9 +142,20 @@ class _FetchGroupFromIdProvider extends AutoDisposeFutureProvider<Group> {
   }
 }
 
+mixin _FetchGroupFromIdRef on AutoDisposeFutureProviderRef<Group> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _FetchGroupFromIdProviderElement
+    extends AutoDisposeFutureProviderElement<Group> with _FetchGroupFromIdRef {
+  _FetchGroupFromIdProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as _FetchGroupFromIdProvider).groupId;
+}
+
 String _$fetchGroupFeedHash() => r'2accd66c235ba80d1b919b2fe8e0299eb984ae5d';
-typedef _FetchGroupFeedRef
-    = AutoDisposeFutureProviderRef<List<ChapterFeedItemData>>;
 
 /// See also [_fetchGroupFeed].
 @ProviderFor(_fetchGroupFeed)
@@ -162,10 +205,10 @@ class _FetchGroupFeedProvider
     extends AutoDisposeFutureProvider<List<ChapterFeedItemData>> {
   /// See also [_fetchGroupFeed].
   _FetchGroupFeedProvider(
-    this.group,
-  ) : super.internal(
+    Group group,
+  ) : this._internal(
           (ref) => _fetchGroupFeed(
-            ref,
+            ref as _FetchGroupFeedRef,
             group,
           ),
           from: _fetchGroupFeedProvider,
@@ -177,9 +220,44 @@ class _FetchGroupFeedProvider
           dependencies: _FetchGroupFeedFamily._dependencies,
           allTransitiveDependencies:
               _FetchGroupFeedFamily._allTransitiveDependencies,
+          group: group,
         );
 
+  _FetchGroupFeedProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.group,
+  }) : super.internal();
+
   final Group group;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ChapterFeedItemData>> Function(_FetchGroupFeedRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchGroupFeedProvider._internal(
+        (ref) => create(ref as _FetchGroupFeedRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        group: group,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ChapterFeedItemData>> createElement() {
+    return _FetchGroupFeedProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -195,8 +273,22 @@ class _FetchGroupFeedProvider
   }
 }
 
+mixin _FetchGroupFeedRef
+    on AutoDisposeFutureProviderRef<List<ChapterFeedItemData>> {
+  /// The parameter `group` of this provider.
+  Group get group;
+}
+
+class _FetchGroupFeedProviderElement
+    extends AutoDisposeFutureProviderElement<List<ChapterFeedItemData>>
+    with _FetchGroupFeedRef {
+  _FetchGroupFeedProviderElement(super.provider);
+
+  @override
+  Group get group => (origin as _FetchGroupFeedProvider).group;
+}
+
 String _$fetchGroupTitlesHash() => r'7807d9d1023b067036001ef4fe0045d8b256766a';
-typedef _FetchGroupTitlesRef = AutoDisposeFutureProviderRef<Iterable<Manga>>;
 
 /// See also [_fetchGroupTitles].
 @ProviderFor(_fetchGroupTitles)
@@ -245,10 +337,10 @@ class _FetchGroupTitlesProvider
     extends AutoDisposeFutureProvider<Iterable<Manga>> {
   /// See also [_fetchGroupTitles].
   _FetchGroupTitlesProvider(
-    this.group,
-  ) : super.internal(
+    Group group,
+  ) : this._internal(
           (ref) => _fetchGroupTitles(
-            ref,
+            ref as _FetchGroupTitlesRef,
             group,
           ),
           from: _fetchGroupTitlesProvider,
@@ -260,9 +352,43 @@ class _FetchGroupTitlesProvider
           dependencies: _FetchGroupTitlesFamily._dependencies,
           allTransitiveDependencies:
               _FetchGroupTitlesFamily._allTransitiveDependencies,
+          group: group,
         );
 
+  _FetchGroupTitlesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.group,
+  }) : super.internal();
+
   final Group group;
+
+  @override
+  Override overrideWith(
+    FutureOr<Iterable<Manga>> Function(_FetchGroupTitlesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchGroupTitlesProvider._internal(
+        (ref) => create(ref as _FetchGroupTitlesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        group: group,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+    return _FetchGroupTitlesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -277,5 +403,19 @@ class _FetchGroupTitlesProvider
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _FetchGroupTitlesRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+  /// The parameter `group` of this provider.
+  Group get group;
+}
+
+class _FetchGroupTitlesProviderElement
+    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    with _FetchGroupTitlesRef {
+  _FetchGroupTitlesProviderElement(super.provider);
+
+  @override
+  Group get group => (origin as _FetchGroupTitlesProvider).group;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

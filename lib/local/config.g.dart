@@ -6,12 +6,13 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_LocalLibConfig _$$_LocalLibConfigFromJson(Map<String, dynamic> json) =>
-    _$_LocalLibConfig(
+_$LocalLibConfigImpl _$$LocalLibConfigImplFromJson(Map<String, dynamic> json) =>
+    _$LocalLibConfigImpl(
       libraryDirectory: json['libraryDirectory'] as String? ?? '',
     );
 
-Map<String, dynamic> _$$_LocalLibConfigToJson(_$_LocalLibConfig instance) =>
+Map<String, dynamic> _$$LocalLibConfigImplToJson(
+        _$LocalLibConfigImpl instance) =>
     <String, dynamic>{
       'libraryDirectory': instance.libraryDirectory,
     };
@@ -36,4 +37,4 @@ final localConfigProvider =
 
 typedef _$LocalConfig = Notifier<LocalLibConfig>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

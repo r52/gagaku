@@ -92,7 +92,7 @@ class HistoryLink with _$HistoryLink {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_HistoryLink &&
+            other is _$HistoryLinkImpl &&
             (identical(other.url, url) || other.url == url));
   }
 

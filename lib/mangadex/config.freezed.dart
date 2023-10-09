@@ -103,11 +103,11 @@ class _$MangaDexConfigCopyWithImpl<$Res, $Val extends MangaDexConfig>
 }
 
 /// @nodoc
-abstract class _$$_MangaDexConfigCopyWith<$Res>
+abstract class _$$MangaDexConfigImplCopyWith<$Res>
     implements $MangaDexConfigCopyWith<$Res> {
-  factory _$$_MangaDexConfigCopyWith(
-          _$_MangaDexConfig value, $Res Function(_$_MangaDexConfig) then) =
-      __$$_MangaDexConfigCopyWithImpl<$Res>;
+  factory _$$MangaDexConfigImplCopyWith(_$MangaDexConfigImpl value,
+          $Res Function(_$MangaDexConfigImpl) then) =
+      __$$MangaDexConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -119,11 +119,11 @@ abstract class _$$_MangaDexConfigCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_MangaDexConfigCopyWithImpl<$Res>
-    extends _$MangaDexConfigCopyWithImpl<$Res, _$_MangaDexConfig>
-    implements _$$_MangaDexConfigCopyWith<$Res> {
-  __$$_MangaDexConfigCopyWithImpl(
-      _$_MangaDexConfig _value, $Res Function(_$_MangaDexConfig) _then)
+class __$$MangaDexConfigImplCopyWithImpl<$Res>
+    extends _$MangaDexConfigCopyWithImpl<$Res, _$MangaDexConfigImpl>
+    implements _$$MangaDexConfigImplCopyWith<$Res> {
+  __$$MangaDexConfigImplCopyWithImpl(
+      _$MangaDexConfigImpl _value, $Res Function(_$MangaDexConfigImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -135,7 +135,7 @@ class __$$_MangaDexConfigCopyWithImpl<$Res>
     Object? dataSaver = null,
     Object? groupBlacklist = null,
   }) {
-    return _then(_$_MangaDexConfig(
+    return _then(_$MangaDexConfigImpl(
       translatedLanguages: null == translatedLanguages
           ? _value.translatedLanguages
           : translatedLanguages // ignore: cast_nullable_to_non_nullable
@@ -162,8 +162,8 @@ class __$$_MangaDexConfigCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaDexConfig implements _MangaDexConfig {
-  _$_MangaDexConfig(
+class _$MangaDexConfigImpl implements _MangaDexConfig {
+  _$MangaDexConfigImpl(
       {@LanguageConverter() this.translatedLanguages = const {},
       @LanguageConverter() this.originalLanguage = const {},
       this.contentRating = const {
@@ -174,8 +174,8 @@ class _$_MangaDexConfig implements _MangaDexConfig {
       this.dataSaver = false,
       this.groupBlacklist = const {}});
 
-  factory _$_MangaDexConfig.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaDexConfigFromJson(json);
+  factory _$MangaDexConfigImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaDexConfigImplFromJson(json);
 
   @override
   @JsonKey()
@@ -203,12 +203,13 @@ class _$_MangaDexConfig implements _MangaDexConfig {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaDexConfigCopyWith<_$_MangaDexConfig> get copyWith =>
-      __$$_MangaDexConfigCopyWithImpl<_$_MangaDexConfig>(this, _$identity);
+  _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
+      __$$MangaDexConfigImplCopyWithImpl<_$MangaDexConfigImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaDexConfigToJson(
+    return _$$MangaDexConfigImplToJson(
       this,
     );
   }
@@ -220,10 +221,10 @@ abstract class _MangaDexConfig implements MangaDexConfig {
       @LanguageConverter() Set<Language> originalLanguage,
       Set<ContentRating> contentRating,
       bool dataSaver,
-      Set<String> groupBlacklist}) = _$_MangaDexConfig;
+      Set<String> groupBlacklist}) = _$MangaDexConfigImpl;
 
   factory _MangaDexConfig.fromJson(Map<String, dynamic> json) =
-      _$_MangaDexConfig.fromJson;
+      _$MangaDexConfigImpl.fromJson;
 
   @override
   @LanguageConverter()
@@ -246,6 +247,6 @@ abstract class _MangaDexConfig implements MangaDexConfig {
   set groupBlacklist(Set<String> value);
   @override
   @JsonKey(ignore: true)
-  _$$_MangaDexConfigCopyWith<_$_MangaDexConfig> get copyWith =>
+  _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

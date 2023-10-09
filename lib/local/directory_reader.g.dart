@@ -29,8 +29,6 @@ class _SystemHash {
   }
 }
 
-typedef _GetDirectoryPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
-
 /// See also [_getDirectoryPages].
 @ProviderFor(_getDirectoryPages)
 const _getDirectoryPagesProvider = _GetDirectoryPagesFamily();
@@ -78,10 +76,10 @@ class _GetDirectoryPagesProvider
     extends AutoDisposeFutureProvider<List<ReaderPage>> {
   /// See also [_getDirectoryPages].
   _GetDirectoryPagesProvider(
-    this.path,
-  ) : super.internal(
+    String path,
+  ) : this._internal(
           (ref) => _getDirectoryPages(
-            ref,
+            ref as _GetDirectoryPagesRef,
             path,
           ),
           from: _getDirectoryPagesProvider,
@@ -93,9 +91,43 @@ class _GetDirectoryPagesProvider
           dependencies: _GetDirectoryPagesFamily._dependencies,
           allTransitiveDependencies:
               _GetDirectoryPagesFamily._allTransitiveDependencies,
+          path: path,
         );
 
+  _GetDirectoryPagesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.path,
+  }) : super.internal();
+
   final String path;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ReaderPage>> Function(_GetDirectoryPagesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _GetDirectoryPagesProvider._internal(
+        (ref) => create(ref as _GetDirectoryPagesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        path: path,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
+    return _GetDirectoryPagesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -110,5 +142,19 @@ class _GetDirectoryPagesProvider
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _GetDirectoryPagesRef on AutoDisposeFutureProviderRef<List<ReaderPage>> {
+  /// The parameter `path` of this provider.
+  String get path;
+}
+
+class _GetDirectoryPagesProviderElement
+    extends AutoDisposeFutureProviderElement<List<ReaderPage>>
+    with _GetDirectoryPagesRef {
+  _GetDirectoryPagesProviderElement(super.provider);
+
+  @override
+  String get path => (origin as _GetDirectoryPagesProvider).path;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

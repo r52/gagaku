@@ -131,8 +131,8 @@ class GroupFeedProvider
     extends AsyncNotifierProviderImpl<GroupFeed, List<Chapter>> {
   /// See also [GroupFeed].
   GroupFeedProvider(
-    this.group,
-  ) : super.internal(
+    Group group,
+  ) : this._internal(
           () => GroupFeed()..group = group,
           from: groupFeedProvider,
           name: r'groupFeedProvider',
@@ -142,9 +142,50 @@ class GroupFeedProvider
                   : _$groupFeedHash,
           dependencies: GroupFeedFamily._dependencies,
           allTransitiveDependencies: GroupFeedFamily._allTransitiveDependencies,
+          group: group,
         );
 
+  GroupFeedProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.group,
+  }) : super.internal();
+
   final Group group;
+
+  @override
+  FutureOr<List<Chapter>> runNotifierBuild(
+    covariant GroupFeed notifier,
+  ) {
+    return notifier.build(
+      group,
+    );
+  }
+
+  @override
+  Override overrideWith(GroupFeed Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupFeedProvider._internal(
+        () => create()..group = group,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        group: group,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<GroupFeed, List<Chapter>> createElement() {
+    return _GroupFeedProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -158,15 +199,20 @@ class GroupFeedProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin GroupFeedRef on AsyncNotifierProviderRef<List<Chapter>> {
+  /// The parameter `group` of this provider.
+  Group get group;
+}
+
+class _GroupFeedProviderElement
+    extends AsyncNotifierProviderElement<GroupFeed, List<Chapter>>
+    with GroupFeedRef {
+  _GroupFeedProviderElement(super.provider);
 
   @override
-  FutureOr<List<Chapter>> runNotifierBuild(
-    covariant GroupFeed notifier,
-  ) {
-    return notifier.build(
-      group,
-    );
-  }
+  Group get group => (origin as GroupFeedProvider).group;
 }
 
 String _$groupTitlesHash() => r'bb3138a274c1973f59fa2aa7c0a8b3c80b99a3ad';
@@ -226,8 +272,8 @@ class GroupTitlesProvider
     extends AsyncNotifierProviderImpl<GroupTitles, List<Manga>> {
   /// See also [GroupTitles].
   GroupTitlesProvider(
-    this.group,
-  ) : super.internal(
+    Group group,
+  ) : this._internal(
           () => GroupTitles()..group = group,
           from: groupTitlesProvider,
           name: r'groupTitlesProvider',
@@ -238,9 +284,50 @@ class GroupTitlesProvider
           dependencies: GroupTitlesFamily._dependencies,
           allTransitiveDependencies:
               GroupTitlesFamily._allTransitiveDependencies,
+          group: group,
         );
 
+  GroupTitlesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.group,
+  }) : super.internal();
+
   final Group group;
+
+  @override
+  FutureOr<List<Manga>> runNotifierBuild(
+    covariant GroupTitles notifier,
+  ) {
+    return notifier.build(
+      group,
+    );
+  }
+
+  @override
+  Override overrideWith(GroupTitles Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupTitlesProvider._internal(
+        () => create()..group = group,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        group: group,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<GroupTitles, List<Manga>> createElement() {
+    return _GroupTitlesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -254,15 +341,20 @@ class GroupTitlesProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin GroupTitlesRef on AsyncNotifierProviderRef<List<Manga>> {
+  /// The parameter `group` of this provider.
+  Group get group;
+}
+
+class _GroupTitlesProviderElement
+    extends AsyncNotifierProviderElement<GroupTitles, List<Manga>>
+    with GroupTitlesRef {
+  _GroupTitlesProviderElement(super.provider);
 
   @override
-  FutureOr<List<Manga>> runNotifierBuild(
-    covariant GroupTitles notifier,
-  ) {
-    return notifier.build(
-      group,
-    );
-  }
+  Group get group => (origin as GroupTitlesProvider).group;
 }
 
 String _$creatorTitlesHash() => r'873b599622ede2fbd363a8fe527bc111397538ae';
@@ -322,8 +414,8 @@ class CreatorTitlesProvider
     extends AsyncNotifierProviderImpl<CreatorTitles, List<Manga>> {
   /// See also [CreatorTitles].
   CreatorTitlesProvider(
-    this.creator,
-  ) : super.internal(
+    CreatorType creator,
+  ) : this._internal(
           () => CreatorTitles()..creator = creator,
           from: creatorTitlesProvider,
           name: r'creatorTitlesProvider',
@@ -334,9 +426,50 @@ class CreatorTitlesProvider
           dependencies: CreatorTitlesFamily._dependencies,
           allTransitiveDependencies:
               CreatorTitlesFamily._allTransitiveDependencies,
+          creator: creator,
         );
 
+  CreatorTitlesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.creator,
+  }) : super.internal();
+
   final CreatorType creator;
+
+  @override
+  FutureOr<List<Manga>> runNotifierBuild(
+    covariant CreatorTitles notifier,
+  ) {
+    return notifier.build(
+      creator,
+    );
+  }
+
+  @override
+  Override overrideWith(CreatorTitles Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: CreatorTitlesProvider._internal(
+        () => create()..creator = creator,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        creator: creator,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<CreatorTitles, List<Manga>> createElement() {
+    return _CreatorTitlesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -350,15 +483,20 @@ class CreatorTitlesProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin CreatorTitlesRef on AsyncNotifierProviderRef<List<Manga>> {
+  /// The parameter `creator` of this provider.
+  CreatorType get creator;
+}
+
+class _CreatorTitlesProviderElement
+    extends AsyncNotifierProviderElement<CreatorTitles, List<Manga>>
+    with CreatorTitlesRef {
+  _CreatorTitlesProviderElement(super.provider);
 
   @override
-  FutureOr<List<Manga>> runNotifierBuild(
-    covariant CreatorTitles notifier,
-  ) {
-    return notifier.build(
-      creator,
-    );
-  }
+  CreatorType get creator => (origin as CreatorTitlesProvider).creator;
 }
 
 String _$mangaChaptersHash() => r'74cbf3b45413db87c22b3971de100ff673499f36';
@@ -418,8 +556,8 @@ class MangaChaptersProvider
     extends AsyncNotifierProviderImpl<MangaChapters, List<Chapter>> {
   /// See also [MangaChapters].
   MangaChaptersProvider(
-    this.manga,
-  ) : super.internal(
+    Manga manga,
+  ) : this._internal(
           () => MangaChapters()..manga = manga,
           from: mangaChaptersProvider,
           name: r'mangaChaptersProvider',
@@ -430,9 +568,50 @@ class MangaChaptersProvider
           dependencies: MangaChaptersFamily._dependencies,
           allTransitiveDependencies:
               MangaChaptersFamily._allTransitiveDependencies,
+          manga: manga,
         );
 
+  MangaChaptersProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.manga,
+  }) : super.internal();
+
   final Manga manga;
+
+  @override
+  FutureOr<List<Chapter>> runNotifierBuild(
+    covariant MangaChapters notifier,
+  ) {
+    return notifier.build(
+      manga,
+    );
+  }
+
+  @override
+  Override overrideWith(MangaChapters Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: MangaChaptersProvider._internal(
+        () => create()..manga = manga,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        manga: manga,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<MangaChapters, List<Chapter>> createElement() {
+    return _MangaChaptersProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -446,15 +625,20 @@ class MangaChaptersProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin MangaChaptersRef on AsyncNotifierProviderRef<List<Chapter>> {
+  /// The parameter `manga` of this provider.
+  Manga get manga;
+}
+
+class _MangaChaptersProviderElement
+    extends AsyncNotifierProviderElement<MangaChapters, List<Chapter>>
+    with MangaChaptersRef {
+  _MangaChaptersProviderElement(super.provider);
 
   @override
-  FutureOr<List<Chapter>> runNotifierBuild(
-    covariant MangaChapters notifier,
-  ) {
-    return notifier.build(
-      manga,
-    );
-  }
+  Manga get manga => (origin as MangaChaptersProvider).manga;
 }
 
 String _$mangaCoversHash() => r'53e93ef0159dc2a20beb82d03b60bcab5d67fbe8';
@@ -514,8 +698,8 @@ class MangaCoversProvider
     extends AsyncNotifierProviderImpl<MangaCovers, List<Cover>> {
   /// See also [MangaCovers].
   MangaCoversProvider(
-    this.manga,
-  ) : super.internal(
+    Manga manga,
+  ) : this._internal(
           () => MangaCovers()..manga = manga,
           from: mangaCoversProvider,
           name: r'mangaCoversProvider',
@@ -526,9 +710,50 @@ class MangaCoversProvider
           dependencies: MangaCoversFamily._dependencies,
           allTransitiveDependencies:
               MangaCoversFamily._allTransitiveDependencies,
+          manga: manga,
         );
 
+  MangaCoversProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.manga,
+  }) : super.internal();
+
   final Manga manga;
+
+  @override
+  FutureOr<List<Cover>> runNotifierBuild(
+    covariant MangaCovers notifier,
+  ) {
+    return notifier.build(
+      manga,
+    );
+  }
+
+  @override
+  Override overrideWith(MangaCovers Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: MangaCoversProvider._internal(
+        () => create()..manga = manga,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        manga: manga,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<MangaCovers, List<Cover>> createElement() {
+    return _MangaCoversProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -542,15 +767,20 @@ class MangaCoversProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin MangaCoversRef on AsyncNotifierProviderRef<List<Cover>> {
+  /// The parameter `manga` of this provider.
+  Manga get manga;
+}
+
+class _MangaCoversProviderElement
+    extends AsyncNotifierProviderElement<MangaCovers, List<Cover>>
+    with MangaCoversRef {
+  _MangaCoversProviderElement(super.provider);
 
   @override
-  FutureOr<List<Cover>> runNotifierBuild(
-    covariant MangaCovers notifier,
-  ) {
-    return notifier.build(
-      manga,
-    );
-  }
+  Manga get manga => (origin as MangaCoversProvider).manga;
 }
 
 String _$readChaptersHash() => r'429f19ab4f255aee8b5e414fd754ac8621091dc2';
@@ -625,8 +855,8 @@ class UserLibraryProvider
     extends AsyncNotifierProviderImpl<UserLibrary, Iterable<Manga>> {
   /// See also [UserLibrary].
   UserLibraryProvider(
-    this.status,
-  ) : super.internal(
+    MangaReadingStatus status,
+  ) : this._internal(
           () => UserLibrary()..status = status,
           from: userLibraryProvider,
           name: r'userLibraryProvider',
@@ -637,9 +867,50 @@ class UserLibraryProvider
           dependencies: UserLibraryFamily._dependencies,
           allTransitiveDependencies:
               UserLibraryFamily._allTransitiveDependencies,
+          status: status,
         );
 
+  UserLibraryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.status,
+  }) : super.internal();
+
   final MangaReadingStatus status;
+
+  @override
+  FutureOr<Iterable<Manga>> runNotifierBuild(
+    covariant UserLibrary notifier,
+  ) {
+    return notifier.build(
+      status,
+    );
+  }
+
+  @override
+  Override overrideWith(UserLibrary Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: UserLibraryProvider._internal(
+        () => create()..status = status,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        status: status,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<UserLibrary, Iterable<Manga>> createElement() {
+    return _UserLibraryProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -653,15 +924,20 @@ class UserLibraryProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin UserLibraryRef on AsyncNotifierProviderRef<Iterable<Manga>> {
+  /// The parameter `status` of this provider.
+  MangaReadingStatus get status;
+}
+
+class _UserLibraryProviderElement
+    extends AsyncNotifierProviderElement<UserLibrary, Iterable<Manga>>
+    with UserLibraryRef {
+  _UserLibraryProviderElement(super.provider);
 
   @override
-  FutureOr<Iterable<Manga>> runNotifierBuild(
-    covariant UserLibrary notifier,
-  ) {
-    return notifier.build(
-      status,
-    );
-  }
+  MangaReadingStatus get status => (origin as UserLibraryProvider).status;
 }
 
 String _$tagListHash() => r'0a1fc9b1354d4786d8aac74ab1a13e872b6e9e1b';
@@ -736,8 +1012,8 @@ class MangaSearchProvider
     extends AutoDisposeAsyncNotifierProviderImpl<MangaSearch, List<Manga>> {
   /// See also [MangaSearch].
   MangaSearchProvider(
-    this.params,
-  ) : super.internal(
+    MangaSearchParameters params,
+  ) : this._internal(
           () => MangaSearch()..params = params,
           from: mangaSearchProvider,
           name: r'mangaSearchProvider',
@@ -748,9 +1024,51 @@ class MangaSearchProvider
           dependencies: MangaSearchFamily._dependencies,
           allTransitiveDependencies:
               MangaSearchFamily._allTransitiveDependencies,
+          params: params,
         );
 
+  MangaSearchProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.params,
+  }) : super.internal();
+
   final MangaSearchParameters params;
+
+  @override
+  FutureOr<List<Manga>> runNotifierBuild(
+    covariant MangaSearch notifier,
+  ) {
+    return notifier.build(
+      params,
+    );
+  }
+
+  @override
+  Override overrideWith(MangaSearch Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: MangaSearchProvider._internal(
+        () => create()..params = params,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        params: params,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<MangaSearch, List<Manga>>
+      createElement() {
+    return _MangaSearchProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -764,15 +1082,20 @@ class MangaSearchProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin MangaSearchRef on AutoDisposeAsyncNotifierProviderRef<List<Manga>> {
+  /// The parameter `params` of this provider.
+  MangaSearchParameters get params;
+}
+
+class _MangaSearchProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<MangaSearch, List<Manga>>
+    with MangaSearchRef {
+  _MangaSearchProviderElement(super.provider);
 
   @override
-  FutureOr<List<Manga>> runNotifierBuild(
-    covariant MangaSearch notifier,
-  ) {
-    return notifier.build(
-      params,
-    );
-  }
+  MangaSearchParameters get params => (origin as MangaSearchProvider).params;
 }
 
 String _$statisticsHash() => r'847be5129b04dafb2f25ea8cb8fc3a846342e358';
@@ -863,8 +1186,8 @@ class ReadingStatusProvider
     extends AsyncNotifierProviderImpl<ReadingStatus, MangaReadingStatus?> {
   /// See also [ReadingStatus].
   ReadingStatusProvider(
-    this.manga,
-  ) : super.internal(
+    Manga manga,
+  ) : this._internal(
           () => ReadingStatus()..manga = manga,
           from: readingStatusProvider,
           name: r'readingStatusProvider',
@@ -875,9 +1198,51 @@ class ReadingStatusProvider
           dependencies: ReadingStatusFamily._dependencies,
           allTransitiveDependencies:
               ReadingStatusFamily._allTransitiveDependencies,
+          manga: manga,
         );
 
+  ReadingStatusProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.manga,
+  }) : super.internal();
+
   final Manga manga;
+
+  @override
+  FutureOr<MangaReadingStatus?> runNotifierBuild(
+    covariant ReadingStatus notifier,
+  ) {
+    return notifier.build(
+      manga,
+    );
+  }
+
+  @override
+  Override overrideWith(ReadingStatus Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: ReadingStatusProvider._internal(
+        () => create()..manga = manga,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        manga: manga,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?>
+      createElement() {
+    return _ReadingStatusProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -891,15 +1256,20 @@ class ReadingStatusProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin ReadingStatusRef on AsyncNotifierProviderRef<MangaReadingStatus?> {
+  /// The parameter `manga` of this provider.
+  Manga get manga;
+}
+
+class _ReadingStatusProviderElement
+    extends AsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?>
+    with ReadingStatusRef {
+  _ReadingStatusProviderElement(super.provider);
 
   @override
-  FutureOr<MangaReadingStatus?> runNotifierBuild(
-    covariant ReadingStatus notifier,
-  ) {
-    return notifier.build(
-      manga,
-    );
-  }
+  Manga get manga => (origin as ReadingStatusProvider).manga;
 }
 
 String _$followingStatusHash() => r'fb96192a8468fb7dacb102b3b253c4235cd4c1cc';
@@ -959,8 +1329,8 @@ class FollowingStatusProvider
     extends AsyncNotifierProviderImpl<FollowingStatus, bool> {
   /// See also [FollowingStatus].
   FollowingStatusProvider(
-    this.manga,
-  ) : super.internal(
+    Manga manga,
+  ) : this._internal(
           () => FollowingStatus()..manga = manga,
           from: followingStatusProvider,
           name: r'followingStatusProvider',
@@ -971,9 +1341,50 @@ class FollowingStatusProvider
           dependencies: FollowingStatusFamily._dependencies,
           allTransitiveDependencies:
               FollowingStatusFamily._allTransitiveDependencies,
+          manga: manga,
         );
 
+  FollowingStatusProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.manga,
+  }) : super.internal();
+
   final Manga manga;
+
+  @override
+  FutureOr<bool> runNotifierBuild(
+    covariant FollowingStatus notifier,
+  ) {
+    return notifier.build(
+      manga,
+    );
+  }
+
+  @override
+  Override overrideWith(FollowingStatus Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: FollowingStatusProvider._internal(
+        () => create()..manga = manga,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        manga: manga,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<FollowingStatus, bool> createElement() {
+    return _FollowingStatusProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -987,15 +1398,20 @@ class FollowingStatusProvider
 
     return _SystemHash.finish(hash);
   }
+}
+
+mixin FollowingStatusRef on AsyncNotifierProviderRef<bool> {
+  /// The parameter `manga` of this provider.
+  Manga get manga;
+}
+
+class _FollowingStatusProviderElement
+    extends AsyncNotifierProviderElement<FollowingStatus, bool>
+    with FollowingStatusRef {
+  _FollowingStatusProviderElement(super.provider);
 
   @override
-  FutureOr<bool> runNotifierBuild(
-    covariant FollowingStatus notifier,
-  ) {
-    return notifier.build(
-      manga,
-    );
-  }
+  Manga get manga => (origin as FollowingStatusProvider).manga;
 }
 
 String _$mangaDexHistoryHash() => r'364392a2ac6c30f242510afe9ea65e021c131e43';
@@ -1030,4 +1446,4 @@ final authControlProvider =
 
 typedef _$AuthControl = AutoDisposeAsyncNotifier<bool>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

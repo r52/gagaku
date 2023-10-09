@@ -6,8 +6,8 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_MangaDexConfig _$$_MangaDexConfigFromJson(Map<String, dynamic> json) =>
-    _$_MangaDexConfig(
+_$MangaDexConfigImpl _$$MangaDexConfigImplFromJson(Map<String, dynamic> json) =>
+    _$MangaDexConfigImpl(
       translatedLanguages: (json['translatedLanguages'] as List<dynamic>?)
               ?.map(const LanguageConverter().fromJson)
               .toSet() ??
@@ -31,7 +31,8 @@ _$_MangaDexConfig _$$_MangaDexConfigFromJson(Map<String, dynamic> json) =>
           const {},
     );
 
-Map<String, dynamic> _$$_MangaDexConfigToJson(_$_MangaDexConfig instance) =>
+Map<String, dynamic> _$$MangaDexConfigImplToJson(
+        _$MangaDexConfigImpl instance) =>
     <String, dynamic>{
       'translatedLanguages': instance.translatedLanguages
           .map(const LanguageConverter().toJson)
@@ -73,4 +74,4 @@ final mdConfigProvider =
 
 typedef _$MdConfig = AutoDisposeNotifier<MangaDexConfig>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

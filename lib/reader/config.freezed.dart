@@ -100,11 +100,11 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
 }
 
 /// @nodoc
-abstract class _$$_ReaderConfigCopyWith<$Res>
+abstract class _$$ReaderConfigImplCopyWith<$Res>
     implements $ReaderConfigCopyWith<$Res> {
-  factory _$$_ReaderConfigCopyWith(
-          _$_ReaderConfig value, $Res Function(_$_ReaderConfig) then) =
-      __$$_ReaderConfigCopyWithImpl<$Res>;
+  factory _$$ReaderConfigImplCopyWith(
+          _$ReaderConfigImpl value, $Res Function(_$ReaderConfigImpl) then) =
+      __$$ReaderConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -116,11 +116,11 @@ abstract class _$$_ReaderConfigCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_ReaderConfigCopyWithImpl<$Res>
-    extends _$ReaderConfigCopyWithImpl<$Res, _$_ReaderConfig>
-    implements _$$_ReaderConfigCopyWith<$Res> {
-  __$$_ReaderConfigCopyWithImpl(
-      _$_ReaderConfig _value, $Res Function(_$_ReaderConfig) _then)
+class __$$ReaderConfigImplCopyWithImpl<$Res>
+    extends _$ReaderConfigCopyWithImpl<$Res, _$ReaderConfigImpl>
+    implements _$$ReaderConfigImplCopyWith<$Res> {
+  __$$ReaderConfigImplCopyWithImpl(
+      _$ReaderConfigImpl _value, $Res Function(_$ReaderConfigImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -132,7 +132,7 @@ class __$$_ReaderConfigCopyWithImpl<$Res>
     Object? swipeGestures = null,
     Object? precacheCount = null,
   }) {
-    return _then(_$_ReaderConfig(
+    return _then(_$ReaderConfigImpl(
       direction: null == direction
           ? _value.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -159,16 +159,16 @@ class __$$_ReaderConfigCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ReaderConfig implements _ReaderConfig {
-  const _$_ReaderConfig(
+class _$ReaderConfigImpl implements _ReaderConfig {
+  const _$ReaderConfigImpl(
       {this.direction = ReaderDirection.leftToRight,
       this.showProgressBar = false,
       this.clickToTurn = true,
       this.swipeGestures = true,
       this.precacheCount = 3});
 
-  factory _$_ReaderConfig.fromJson(Map<String, dynamic> json) =>
-      _$$_ReaderConfigFromJson(json);
+  factory _$ReaderConfigImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ReaderConfigImplFromJson(json);
 
   /// Reader direction
   @override
@@ -204,7 +204,7 @@ class _$_ReaderConfig implements _ReaderConfig {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ReaderConfig &&
+            other is _$ReaderConfigImpl &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             (identical(other.showProgressBar, showProgressBar) ||
@@ -225,12 +225,12 @@ class _$_ReaderConfig implements _ReaderConfig {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ReaderConfigCopyWith<_$_ReaderConfig> get copyWith =>
-      __$$_ReaderConfigCopyWithImpl<_$_ReaderConfig>(this, _$identity);
+  _$$ReaderConfigImplCopyWith<_$ReaderConfigImpl> get copyWith =>
+      __$$ReaderConfigImplCopyWithImpl<_$ReaderConfigImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ReaderConfigToJson(
+    return _$$ReaderConfigImplToJson(
       this,
     );
   }
@@ -242,10 +242,10 @@ abstract class _ReaderConfig implements ReaderConfig {
       final bool showProgressBar,
       final bool clickToTurn,
       final bool swipeGestures,
-      final int precacheCount}) = _$_ReaderConfig;
+      final int precacheCount}) = _$ReaderConfigImpl;
 
   factory _ReaderConfig.fromJson(Map<String, dynamic> json) =
-      _$_ReaderConfig.fromJson;
+      _$ReaderConfigImpl.fromJson;
 
   @override
 
@@ -269,6 +269,6 @@ abstract class _ReaderConfig implements ReaderConfig {
   int get precacheCount;
   @override
   @JsonKey(ignore: true)
-  _$$_ReaderConfigCopyWith<_$_ReaderConfig> get copyWith =>
+  _$$ReaderConfigImplCopyWith<_$ReaderConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

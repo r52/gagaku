@@ -29,8 +29,6 @@ class _SystemHash {
   }
 }
 
-typedef _GetArchivePagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
-
 /// See also [_getArchivePages].
 @ProviderFor(_getArchivePages)
 const _getArchivePagesProvider = _GetArchivePagesFamily();
@@ -78,10 +76,10 @@ class _GetArchivePagesProvider
     extends AutoDisposeFutureProvider<List<ReaderPage>> {
   /// See also [_getArchivePages].
   _GetArchivePagesProvider(
-    this.path,
-  ) : super.internal(
+    String path,
+  ) : this._internal(
           (ref) => _getArchivePages(
-            ref,
+            ref as _GetArchivePagesRef,
             path,
           ),
           from: _getArchivePagesProvider,
@@ -93,9 +91,43 @@ class _GetArchivePagesProvider
           dependencies: _GetArchivePagesFamily._dependencies,
           allTransitiveDependencies:
               _GetArchivePagesFamily._allTransitiveDependencies,
+          path: path,
         );
 
+  _GetArchivePagesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.path,
+  }) : super.internal();
+
   final String path;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ReaderPage>> Function(_GetArchivePagesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _GetArchivePagesProvider._internal(
+        (ref) => create(ref as _GetArchivePagesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        path: path,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
+    return _GetArchivePagesProviderElement(this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -110,5 +142,19 @@ class _GetArchivePagesProvider
     return _SystemHash.finish(hash);
   }
 }
+
+mixin _GetArchivePagesRef on AutoDisposeFutureProviderRef<List<ReaderPage>> {
+  /// The parameter `path` of this provider.
+  String get path;
+}
+
+class _GetArchivePagesProviderElement
+    extends AutoDisposeFutureProviderElement<List<ReaderPage>>
+    with _GetArchivePagesRef {
+  _GetArchivePagesProviderElement(super.provider);
+
+  @override
+  String get path => (origin as _GetArchivePagesProvider).path;
+}
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

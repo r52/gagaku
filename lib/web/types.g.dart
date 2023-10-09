@@ -6,19 +6,20 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_HistoryLink _$$_HistoryLinkFromJson(Map<String, dynamic> json) =>
-    _$_HistoryLink(
+_$HistoryLinkImpl _$$HistoryLinkImplFromJson(Map<String, dynamic> json) =>
+    _$HistoryLinkImpl(
       title: json['title'] as String,
       url: json['url'] as String,
     );
 
-Map<String, dynamic> _$$_HistoryLinkToJson(_$_HistoryLink instance) =>
+Map<String, dynamic> _$$HistoryLinkImplToJson(_$HistoryLinkImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'url': instance.url,
     };
 
-_$_WebManga _$$_WebMangaFromJson(Map<String, dynamic> json) => _$_WebManga(
+_$WebMangaImpl _$$WebMangaImplFromJson(Map<String, dynamic> json) =>
+    _$WebMangaImpl(
       title: json['title'] as String,
       description: json['description'] as String,
       artist: json['artist'] as String,
@@ -32,7 +33,7 @@ _$_WebManga _$$_WebMangaFromJson(Map<String, dynamic> json) => _$_WebManga(
       ),
     );
 
-Map<String, dynamic> _$$_WebMangaToJson(_$_WebManga instance) =>
+Map<String, dynamic> _$$WebMangaImplToJson(_$WebMangaImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
@@ -43,8 +44,8 @@ Map<String, dynamic> _$$_WebMangaToJson(_$_WebManga instance) =>
       'chapters': instance.chapters,
     };
 
-_$_WebChapter _$$_WebChapterFromJson(Map<String, dynamic> json) =>
-    _$_WebChapter(
+_$WebChapterImpl _$$WebChapterImplFromJson(Map<String, dynamic> json) =>
+    _$WebChapterImpl(
       title: json['title'] as String,
       volume: json['volume'] as String,
       lastUpdated:
@@ -54,7 +55,7 @@ _$_WebChapter _$$_WebChapterFromJson(Map<String, dynamic> json) =>
       groups: json['groups'] as Map<String, dynamic>,
     );
 
-Map<String, dynamic> _$$_WebChapterToJson(_$_WebChapter instance) =>
+Map<String, dynamic> _$$WebChapterImplToJson(_$WebChapterImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'volume': instance.volume,
@@ -65,12 +66,13 @@ Map<String, dynamic> _$$_WebChapterToJson(_$_WebChapter instance) =>
       'groups': instance.groups,
     };
 
-_$_ImgurPage _$$_ImgurPageFromJson(Map<String, dynamic> json) => _$_ImgurPage(
+_$ImgurPageImpl _$$ImgurPageImplFromJson(Map<String, dynamic> json) =>
+    _$ImgurPageImpl(
       description: json['description'] as String,
       src: json['src'] as String,
     );
 
-Map<String, dynamic> _$$_ImgurPageToJson(_$_ImgurPage instance) =>
+Map<String, dynamic> _$$ImgurPageImplToJson(_$ImgurPageImpl instance) =>
     <String, dynamic>{
       'description': instance.description,
       'src': instance.src,

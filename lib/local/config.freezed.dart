@@ -63,22 +63,22 @@ class _$LocalLibConfigCopyWithImpl<$Res, $Val extends LocalLibConfig>
 }
 
 /// @nodoc
-abstract class _$$_LocalLibConfigCopyWith<$Res>
+abstract class _$$LocalLibConfigImplCopyWith<$Res>
     implements $LocalLibConfigCopyWith<$Res> {
-  factory _$$_LocalLibConfigCopyWith(
-          _$_LocalLibConfig value, $Res Function(_$_LocalLibConfig) then) =
-      __$$_LocalLibConfigCopyWithImpl<$Res>;
+  factory _$$LocalLibConfigImplCopyWith(_$LocalLibConfigImpl value,
+          $Res Function(_$LocalLibConfigImpl) then) =
+      __$$LocalLibConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String libraryDirectory});
 }
 
 /// @nodoc
-class __$$_LocalLibConfigCopyWithImpl<$Res>
-    extends _$LocalLibConfigCopyWithImpl<$Res, _$_LocalLibConfig>
-    implements _$$_LocalLibConfigCopyWith<$Res> {
-  __$$_LocalLibConfigCopyWithImpl(
-      _$_LocalLibConfig _value, $Res Function(_$_LocalLibConfig) _then)
+class __$$LocalLibConfigImplCopyWithImpl<$Res>
+    extends _$LocalLibConfigCopyWithImpl<$Res, _$LocalLibConfigImpl>
+    implements _$$LocalLibConfigImplCopyWith<$Res> {
+  __$$LocalLibConfigImplCopyWithImpl(
+      _$LocalLibConfigImpl _value, $Res Function(_$LocalLibConfigImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -86,7 +86,7 @@ class __$$_LocalLibConfigCopyWithImpl<$Res>
   $Res call({
     Object? libraryDirectory = null,
   }) {
-    return _then(_$_LocalLibConfig(
+    return _then(_$LocalLibConfigImpl(
       libraryDirectory: null == libraryDirectory
           ? _value.libraryDirectory
           : libraryDirectory // ignore: cast_nullable_to_non_nullable
@@ -97,11 +97,11 @@ class __$$_LocalLibConfigCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_LocalLibConfig implements _LocalLibConfig {
-  _$_LocalLibConfig({this.libraryDirectory = ''});
+class _$LocalLibConfigImpl implements _LocalLibConfig {
+  _$LocalLibConfigImpl({this.libraryDirectory = ''});
 
-  factory _$_LocalLibConfig.fromJson(Map<String, dynamic> json) =>
-      _$$_LocalLibConfigFromJson(json);
+  factory _$LocalLibConfigImpl.fromJson(Map<String, dynamic> json) =>
+      _$$LocalLibConfigImplFromJson(json);
 
   @override
   @JsonKey()
@@ -115,28 +115,29 @@ class _$_LocalLibConfig implements _LocalLibConfig {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_LocalLibConfigCopyWith<_$_LocalLibConfig> get copyWith =>
-      __$$_LocalLibConfigCopyWithImpl<_$_LocalLibConfig>(this, _$identity);
+  _$$LocalLibConfigImplCopyWith<_$LocalLibConfigImpl> get copyWith =>
+      __$$LocalLibConfigImplCopyWithImpl<_$LocalLibConfigImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_LocalLibConfigToJson(
+    return _$$LocalLibConfigImplToJson(
       this,
     );
   }
 }
 
 abstract class _LocalLibConfig implements LocalLibConfig {
-  factory _LocalLibConfig({String libraryDirectory}) = _$_LocalLibConfig;
+  factory _LocalLibConfig({String libraryDirectory}) = _$LocalLibConfigImpl;
 
   factory _LocalLibConfig.fromJson(Map<String, dynamic> json) =
-      _$_LocalLibConfig.fromJson;
+      _$LocalLibConfigImpl.fromJson;
 
   @override
   String get libraryDirectory;
   set libraryDirectory(String value);
   @override
   @JsonKey(ignore: true)
-  _$$_LocalLibConfigCopyWith<_$_LocalLibConfig> get copyWith =>
+  _$$LocalLibConfigImplCopyWith<_$LocalLibConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
