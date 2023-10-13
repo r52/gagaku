@@ -48,6 +48,7 @@ class _FetchWebChapterInfoFamily extends Family<AsyncValue<WebReaderData>> {
     );
   }
 
+  @visibleForOverriding
   @override
   _FetchWebChapterInfoProvider getProviderOverride(
     covariant _FetchWebChapterInfoProvider provider,
@@ -178,6 +179,7 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   _GetPagesProvider getProviderOverride(
     covariant _GetPagesProvider provider,
@@ -286,4 +288,4 @@ class _GetPagesProviderElement
   dynamic get source => (origin as _GetPagesProvider).source;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter

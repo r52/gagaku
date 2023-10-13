@@ -47,6 +47,7 @@ class _FetchGroupFromIdFamily extends Family<AsyncValue<Group>> {
     );
   }
 
+  @visibleForOverriding
   @override
   _FetchGroupFromIdProvider getProviderOverride(
     covariant _FetchGroupFromIdProvider provider,
@@ -176,6 +177,7 @@ class _FetchGroupFeedFamily
     );
   }
 
+  @visibleForOverriding
   @override
   _FetchGroupFeedProvider getProviderOverride(
     covariant _FetchGroupFeedProvider provider,
@@ -308,6 +310,7 @@ class _FetchGroupTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   _FetchGroupTitlesProvider getProviderOverride(
     covariant _FetchGroupTitlesProvider provider,
@@ -418,4 +421,4 @@ class _FetchGroupTitlesProviderElement
   Group get group => (origin as _FetchGroupTitlesProvider).group;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter

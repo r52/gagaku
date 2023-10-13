@@ -102,6 +102,7 @@ class GroupFeedFamily extends Family<AsyncValue<List<Chapter>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   GroupFeedProvider getProviderOverride(
     covariant GroupFeedProvider provider,
@@ -243,6 +244,7 @@ class GroupTitlesFamily extends Family<AsyncValue<List<Manga>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   GroupTitlesProvider getProviderOverride(
     covariant GroupTitlesProvider provider,
@@ -385,6 +387,7 @@ class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   CreatorTitlesProvider getProviderOverride(
     covariant CreatorTitlesProvider provider,
@@ -527,6 +530,7 @@ class MangaChaptersFamily extends Family<AsyncValue<List<Chapter>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   MangaChaptersProvider getProviderOverride(
     covariant MangaChaptersProvider provider,
@@ -669,6 +673,7 @@ class MangaCoversFamily extends Family<AsyncValue<List<Cover>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   MangaCoversProvider getProviderOverride(
     covariant MangaCoversProvider provider,
@@ -788,7 +793,7 @@ String _$readChaptersHash() => r'429f19ab4f255aee8b5e414fd754ac8621091dc2';
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)
 final readChaptersProvider =
-    AsyncNotifierProvider<ReadChapters, Map<String, ReadChapterSet>>.internal(
+    AsyncNotifierProvider<ReadChapters, ReadChaptersMap>.internal(
   ReadChapters.new,
   name: r'readChaptersProvider',
   debugGetCreateSourceHash:
@@ -797,7 +802,7 @@ final readChaptersProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$ReadChapters = AsyncNotifier<Map<String, ReadChapterSet>>;
+typedef _$ReadChapters = AsyncNotifier<ReadChaptersMap>;
 String _$userLibraryHash() => r'db728effebe55f58d3dd147c3727b6fdf3db8f09';
 
 abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
@@ -826,6 +831,7 @@ class UserLibraryFamily extends Family<AsyncValue<Iterable<Manga>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   UserLibraryProvider getProviderOverride(
     covariant UserLibraryProvider provider,
@@ -983,6 +989,7 @@ class MangaSearchFamily extends Family<AsyncValue<List<Manga>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   MangaSearchProvider getProviderOverride(
     covariant MangaSearchProvider provider,
@@ -1157,6 +1164,7 @@ class ReadingStatusFamily extends Family<AsyncValue<MangaReadingStatus?>> {
     );
   }
 
+  @visibleForOverriding
   @override
   ReadingStatusProvider getProviderOverride(
     covariant ReadingStatusProvider provider,
@@ -1300,6 +1308,7 @@ class FollowingStatusFamily extends Family<AsyncValue<bool>> {
     );
   }
 
+  @visibleForOverriding
   @override
   FollowingStatusProvider getProviderOverride(
     covariant FollowingStatusProvider provider,
@@ -1446,4 +1455,4 @@ final authControlProvider =
 
 typedef _$AuthControl = AutoDisposeAsyncNotifier<bool>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter

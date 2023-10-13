@@ -48,6 +48,7 @@ class _FetchCreatorFromIdFamily extends Family<AsyncValue<CreatorType>> {
     );
   }
 
+  @visibleForOverriding
   @override
   _FetchCreatorFromIdProvider getProviderOverride(
     covariant _FetchCreatorFromIdProvider provider,
@@ -179,6 +180,7 @@ class _FetchCreatorTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
     );
   }
 
+  @visibleForOverriding
   @override
   _FetchCreatorTitlesProvider getProviderOverride(
     covariant _FetchCreatorTitlesProvider provider,
@@ -289,4 +291,4 @@ class _FetchCreatorTitlesProviderElement
   CreatorType get creator => (origin as _FetchCreatorTitlesProvider).creator;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter
