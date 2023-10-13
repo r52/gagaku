@@ -19,6 +19,7 @@ class MangaDexLibraryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final type = ref.watch(libraryViewTypeProvider);
     final results = ref.watch(userLibraryProvider(type));
     final isLoading = results.isLoading;
@@ -26,33 +27,37 @@ class MangaDexLibraryView extends ConsumerWidget {
     return Scaffold(
       body: Center(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ScrollConfiguration(
-              behavior: MouseTouchScrollBehavior(),
-              child: Scrollbar(
-                child: SingleChildScrollView(
-                  primary: true,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 10.0),
-                  scrollDirection: Axis.horizontal,
-                  child: ToggleButtons(
-                    isSelected: List<bool>.generate(
-                        MangaReadingStatus.values.skip(1).length,
-                        (index) => type.index == (index + 1)),
-                    onPressed: (index) {
-                      ref.read(libraryViewTypeProvider.notifier).state =
-                          MangaReadingStatus.values.skip(1).elementAt(index);
-                    },
-                    children: [
-                      ...MangaReadingStatus.values
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+                color: theme.colorScheme.background.withAlpha(200),
+              ),
+              child: DropdownButton<MangaReadingStatus>(
+                value: type,
+                icon: const Icon(Icons.arrow_drop_down),
+                iconSize: 24,
+                elevation: 16,
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepOrangeAccent,
+                ),
+                onChanged: (MangaReadingStatus? status) async {
+                  if (status != null) {
+                    ref.read(libraryViewTypeProvider.notifier).state = status;
+                  }
+                },
+                items: List<DropdownMenuItem<MangaReadingStatus>>.generate(
+                  MangaReadingStatus.values.skip(1).length,
+                  (int index) => DropdownMenuItem<MangaReadingStatus>(
+                    value: MangaReadingStatus.values.skip(1).elementAt(index),
+                    child: Text(
+                      MangaReadingStatus.values
                           .skip(1)
-                          .map((e) => Text(
-                                e.formatted,
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ))
-                          .toList()
-                    ],
+                          .elementAt(index)
+                          .formatted,
+                    ),
                   ),
                 ),
               ),
@@ -69,20 +74,30 @@ class MangaDexLibraryView extends ConsumerWidget {
 
                         return Styles.errorColumn(error, stackTrace);
                       }(),
-                    AsyncValue(:final value?) => MangaListWidget(
-                        title: Text(
-                          '${ref.watch(userLibraryProvider(type).notifier).total()} Mangas',
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        controller: controller,
-                        onAtEdge: () {
+                    AsyncValue(:final value?) => RefreshIndicator(
+                        onRefresh: () async {
                           final lt = ref.read(libraryViewTypeProvider);
-                          ref.read(userLibraryProvider(lt).notifier).getMore();
+                          return await ref
+                              .read(userLibraryProvider(lt).notifier)
+                              .clear(true);
                         },
-                        children: [
-                          MangaListViewSliver(items: value),
-                        ],
+                        child: MangaListWidget(
+                          title: Text(
+                            '${ref.watch(userLibraryProvider(type).notifier).total()} Mangas',
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          controller: controller,
+                          onAtEdge: () {
+                            final lt = ref.read(libraryViewTypeProvider);
+                            ref
+                                .read(userLibraryProvider(lt).notifier)
+                                .getMore();
+                          },
+                          children: [
+                            MangaListViewSliver(items: value),
+                          ],
+                        ),
                       ),
                     _ => const SizedBox.shrink(),
                   },

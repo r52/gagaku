@@ -351,9 +351,8 @@ class MangaDexModel {
   ///
   /// [item] - key of the item to be invalidated
   Future<void> invalidateCacheItem(String item) async {
-    if (await _cache.exists(item)) {
-      await _cache.remove(item);
-    }
+    logger.d("Invalidating cache item: $item");
+    await _cache.remove(item);
   }
 
   Future<void> invalidateAll(String startsWith) async {
@@ -1037,6 +1036,7 @@ class MangaDexModel {
         MapEntry(key, MangaReadingStatusExt.parse(value));
 
     if (await _cache.exists(CacheLists.library)) {
+      logger.d("Retrieving cached user library");
       return _cache.get<LibraryMap>(CacheLists.library, (decoded) {
         return decoded.map(decoder);
       });
@@ -1058,6 +1058,7 @@ class MangaDexModel {
 
       final libMap = mlist.map(decoder);
 
+      logger.d("Caching user library");
       _cache.put(CacheLists.library, mlist, true);
 
       return libMap;
@@ -1959,12 +1960,18 @@ class UserLibrary extends _$UserLibrary {
   }
 
   /// Clears the list and refetch from the beginning
-  Future<void> clear() async {
+  Future<void> clear(bool invalidate) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       _offset = 0;
       _atEnd = false;
       _currentPage = 0;
+
+      if (invalidate) {
+        final api = ref.watch(mangadexProvider);
+        await api.invalidateCacheItem(CacheLists.library);
+      }
+
       return _fetchAndCheck();
     });
   }
@@ -2193,8 +2200,20 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
           status == MangaReadingStatus.remove ? null : status;
       bool success = await api.setMangaReadingStatus(manga, resolved);
       if (success) {
-        await api.invalidateCacheItem(CacheLists.library);
-        ref.invalidate(userLibraryProvider);
+        bool invalidate = true;
+
+        if (oldstate != null) {
+          await ref
+              .read(userLibraryProvider(oldstate).notifier)
+              .clear(invalidate);
+          invalidate = false;
+        }
+
+        if (resolved != null) {
+          await ref
+              .read(userLibraryProvider(resolved).notifier)
+              .clear(invalidate);
+        }
 
         return resolved;
       }

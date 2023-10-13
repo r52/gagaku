@@ -803,7 +803,7 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<ReadChaptersMap>;
-String _$userLibraryHash() => r'db728effebe55f58d3dd147c3727b6fdf3db8f09';
+String _$userLibraryHash() => r'7436a7f1daf4dcbe341939986d25c3ee257d61bd';
 
 abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
   late final MangaReadingStatus status;
@@ -1135,7 +1135,7 @@ final ratingsProvider =
 );
 
 typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
-String _$readingStatusHash() => r'910a1148a373a364b8246af6f85d7a2f525d0bd9';
+String _$readingStatusHash() => r'fc8e8bbf79e41576eef27961ad38c0699f3d8358';
 
 abstract class _$ReadingStatus
     extends BuildlessAsyncNotifier<MangaReadingStatus?> {

@@ -11,8 +11,6 @@ part 'latest_feed.g.dart';
 Future<List<ChapterFeedItemData>> _fetchGlobalChapters(
     _FetchGlobalChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
-  final loggedin = await ref.watch(authControlProvider.future);
-
   final chapters = await ref.watch(latestGlobalFeedProvider.future);
 
   final mangaIds = chapters.map((e) => e.getMangaID()).toSet();
@@ -21,6 +19,8 @@ Future<List<ChapterFeedItemData>> _fetchGlobalChapters(
   final mangas = await api.fetchManga(ids: mangaIds);
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
+
+  final loggedin = await ref.watch(authControlProvider.future);
 
   if (loggedin) {
     await ref.watch(readChaptersProvider.notifier).get(mangas);
