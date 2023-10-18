@@ -629,6 +629,7 @@ class Manga with _$Manga, MangaDexUUID {
   late final List<CreatorType>? artist = getArtist();
   late final longStrip = isLongStrip();
   late final covers = getAllCoverArt();
+  late final related = getRelatedManga();
 
   List<CoverArtUrl> getAllCoverArt() {
     final coverRelations = <CoverArtAttributes>[];
@@ -715,6 +716,19 @@ class Manga with _$Manga, MangaDexUUID {
     }
 
     return false;
+  }
+
+  List<String> getRelatedManga() {
+    final mangaRs = relationships.where((element) => switch (element) {
+          RelationshipManga() => true,
+          _ => false,
+        });
+
+    if (mangaRs.isNotEmpty) {
+      return mangaRs.map((e) => e.id).toList();
+    }
+
+    return [];
   }
 }
 

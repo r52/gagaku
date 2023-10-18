@@ -286,5 +286,136 @@ class _FetchReadChaptersRedunProviderElement
   @override
   Manga get manga => (origin as _FetchReadChaptersRedunProvider).manga;
 }
+
+String _$fetchRelatedMangaHash() => r'b4fa1f593d88425b7b25806e263409df11b39d65';
+
+/// See also [_fetchRelatedManga].
+@ProviderFor(_fetchRelatedManga)
+const _fetchRelatedMangaProvider = _FetchRelatedMangaFamily();
+
+/// See also [_fetchRelatedManga].
+class _FetchRelatedMangaFamily extends Family<AsyncValue<Iterable<Manga>>> {
+  /// See also [_fetchRelatedManga].
+  const _FetchRelatedMangaFamily();
+
+  /// See also [_fetchRelatedManga].
+  _FetchRelatedMangaProvider call(
+    Manga manga,
+  ) {
+    return _FetchRelatedMangaProvider(
+      manga,
+    );
+  }
+
+  @visibleForOverriding
+  @override
+  _FetchRelatedMangaProvider getProviderOverride(
+    covariant _FetchRelatedMangaProvider provider,
+  ) {
+    return call(
+      provider.manga,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchRelatedMangaProvider';
+}
+
+/// See also [_fetchRelatedManga].
+class _FetchRelatedMangaProvider
+    extends AutoDisposeFutureProvider<Iterable<Manga>> {
+  /// See also [_fetchRelatedManga].
+  _FetchRelatedMangaProvider(
+    Manga manga,
+  ) : this._internal(
+          (ref) => _fetchRelatedManga(
+            ref as _FetchRelatedMangaRef,
+            manga,
+          ),
+          from: _fetchRelatedMangaProvider,
+          name: r'_fetchRelatedMangaProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchRelatedMangaHash,
+          dependencies: _FetchRelatedMangaFamily._dependencies,
+          allTransitiveDependencies:
+              _FetchRelatedMangaFamily._allTransitiveDependencies,
+          manga: manga,
+        );
+
+  _FetchRelatedMangaProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.manga,
+  }) : super.internal();
+
+  final Manga manga;
+
+  @override
+  Override overrideWith(
+    FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _FetchRelatedMangaProvider._internal(
+        (ref) => create(ref as _FetchRelatedMangaRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        manga: manga,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+    return _FetchRelatedMangaProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchRelatedMangaProvider && other.manga == manga;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, manga.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin _FetchRelatedMangaRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+  /// The parameter `manga` of this provider.
+  Manga get manga;
+}
+
+class _FetchRelatedMangaProviderElement
+    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    with _FetchRelatedMangaRef {
+  _FetchRelatedMangaProviderElement(super.provider);
+
+  @override
+  Manga get manga => (origin as _FetchRelatedMangaProvider).manga;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter
