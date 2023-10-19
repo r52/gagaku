@@ -84,6 +84,8 @@ class ReaderWidget extends HookConsumerWidget {
     final itemPositionsListener = useItemPositionsListener();
     final itemScrollController = useItemScrollController();
     final scrollOffsetController = useScrollOffsetController();
+    final currentImageScale =
+        useState<PhotoViewScaleState>(PhotoViewScaleState.initial);
 
     void cachePage(ReaderPage page) {
       precacheImage(page.provider, context);
@@ -123,6 +125,18 @@ class ReaderWidget extends HookConsumerWidget {
         }
       });
     }
+
+    useEffect(() {
+      void scaleStateListener(PhotoViewScaleState value) {
+        currentImageScale.value = value;
+      }
+
+      for (final c in scaleStateController) {
+        c.outputScaleStateStream.listen(scaleStateListener);
+      }
+
+      return null;
+    });
 
     useEffect(() {
       void pageCallback() {
@@ -697,7 +711,8 @@ class ReaderWidget extends HookConsumerWidget {
             return PageView.builder(
               allowImplicitScrolling: true,
               reverse: settings.direction == ReaderDirection.rightToLeft,
-              physics: (!settings.swipeGestures)
+              physics: (!settings.swipeGestures ||
+                      currentImageScale.value != PhotoViewScaleState.initial)
                   ? const NeverScrollableScrollPhysics()
                   : null,
               scrollBehavior: MouseTouchScrollBehavior(),
@@ -708,6 +723,8 @@ class ReaderWidget extends HookConsumerWidget {
               itemCount: pageCount,
               onPageChanged: (int index) {
                 focusNode.requestFocus();
+                currentImageScale.value =
+                    scaleStateController[index].scaleState;
               },
               itemBuilder: (BuildContext context, int index) {
                 final page = pages.elementAt(index);
