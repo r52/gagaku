@@ -125,6 +125,11 @@ class _FetchGroupFromIdProvider extends AutoDisposeFutureProvider<Group> {
   }
 
   @override
+  (String,) get argument {
+    return (groupId,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<Group> createElement() {
     return _FetchGroupFromIdProviderElement(this);
   }
@@ -254,6 +259,11 @@ class _FetchGroupFeedProvider
         group: group,
       ),
     );
+  }
+
+  @override
+  (Group,) get argument {
+    return (group,);
   }
 
   @override
@@ -389,6 +399,11 @@ class _FetchGroupTitlesProvider
   }
 
   @override
+  (Group,) get argument {
+    return (group,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
     return _FetchGroupTitlesProviderElement(this);
   }
@@ -421,4 +436,4 @@ class _FetchGroupTitlesProviderElement
   Group get group => (origin as _FetchGroupTitlesProvider).group;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package

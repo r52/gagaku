@@ -125,6 +125,11 @@ class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
   }
 
   @override
+  (String,) get argument {
+    return (mangaId,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<Manga> createElement() {
     return _FetchMangaFromIdProviderElement(this);
   }
@@ -252,6 +257,11 @@ class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
         manga: manga,
       ),
     );
+  }
+
+  @override
+  (Manga,) get argument {
+    return (manga,);
   }
 
   @override
@@ -386,6 +396,11 @@ class _FetchRelatedMangaProvider
   }
 
   @override
+  (Manga,) get argument {
+    return (manga,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
     return _FetchRelatedMangaProviderElement(this);
   }
@@ -418,4 +433,4 @@ class _FetchRelatedMangaProviderElement
   Manga get manga => (origin as _FetchRelatedMangaProvider).manga;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package

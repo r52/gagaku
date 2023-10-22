@@ -265,42 +265,38 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
       body: switch (tags) {
         AsyncData(:final value) => () {
             final selectedFilters = [
-              ...fil.value.includedTags
-                  .map(
-                    (e) => InputChip(
-                      label: Text(e.attributes.name.get('en')),
-                      showCheckmark: true,
-                      selected: true,
-                      onDeleted: () {
-                        fil.value = fil.value.copyWith(
-                          includedTags: fil.value.includedTags
-                              .where((element) => element != e)
-                              .toSet(),
-                        );
-                      },
-                      selectedColor: selectedChipColor,
-                    ),
-                  )
-                  .toList(),
-              ...fil.value.excludedTags
-                  .map(
-                    (e) => InputChip(
-                      label: Text(e.attributes.name.get('en')),
-                      avatar: Icon(
-                        Icons.remove,
-                        color: theme.colorScheme.primary,
-                      ),
-                      onDeleted: () {
-                        fil.value = fil.value.copyWith(
-                          excludedTags: fil.value.excludedTags
-                              .where((element) => element != e)
-                              .toSet(),
-                        );
-                      },
-                      side: const BorderSide(color: selectedChipColor),
-                    ),
-                  )
-                  .toList()
+              ...fil.value.includedTags.map(
+                (e) => InputChip(
+                  label: Text(e.attributes.name.get('en')),
+                  showCheckmark: true,
+                  selected: true,
+                  onDeleted: () {
+                    fil.value = fil.value.copyWith(
+                      includedTags: fil.value.includedTags
+                          .where((element) => element != e)
+                          .toSet(),
+                    );
+                  },
+                  selectedColor: selectedChipColor,
+                ),
+              ),
+              ...fil.value.excludedTags.map(
+                (e) => InputChip(
+                  label: Text(e.attributes.name.get('en')),
+                  avatar: Icon(
+                    Icons.remove,
+                    color: theme.colorScheme.primary,
+                  ),
+                  onDeleted: () {
+                    fil.value = fil.value.copyWith(
+                      excludedTags: fil.value.excludedTags
+                          .where((element) => element != e)
+                          .toSet(),
+                    );
+                  },
+                  side: const BorderSide(color: selectedChipColor),
+                ),
+              )
             ];
 
             return SafeArea(

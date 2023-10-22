@@ -127,6 +127,11 @@ class _FetchWebChapterInfoProvider
   }
 
   @override
+  (ProxyInfo,) get argument {
+    return (info,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<WebReaderData> createElement() {
     return _FetchWebChapterInfoProviderElement(this);
   }
@@ -256,6 +261,11 @@ class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
   }
 
   @override
+  (dynamic,) get argument {
+    return (source,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
     return _GetPagesProviderElement(this);
   }
@@ -288,4 +298,4 @@ class _GetPagesProviderElement
   dynamic get source => (origin as _GetPagesProvider).source;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package

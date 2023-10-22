@@ -46,7 +46,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
 }
 
 class MangaDexLoginScreen extends HookConsumerWidget {
-  const MangaDexLoginScreen({Key? key}) : super(key: key);
+  const MangaDexLoginScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

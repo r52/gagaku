@@ -127,6 +127,11 @@ class _FetchCreatorFromIdProvider
   }
 
   @override
+  (String,) get argument {
+    return (creatorId,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<CreatorType> createElement() {
     return _FetchCreatorFromIdProviderElement(this);
   }
@@ -259,6 +264,11 @@ class _FetchCreatorTitlesProvider
   }
 
   @override
+  (CreatorType,) get argument {
+    return (creator,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
     return _FetchCreatorTitlesProviderElement(this);
   }
@@ -291,4 +301,4 @@ class _FetchCreatorTitlesProviderElement
   CreatorType get creator => (origin as _FetchCreatorTitlesProvider).creator;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package

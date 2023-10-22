@@ -654,7 +654,7 @@ class MangaListViewSliver extends ConsumerWidget {
 }
 
 class _GridMangaItem extends StatelessWidget {
-  const _GridMangaItem({Key? key, required this.manga}) : super(key: key);
+  const _GridMangaItem({super.key, required this.manga});
 
   final Manga manga;
 
@@ -704,8 +704,7 @@ class _GridMangaItem extends StatelessWidget {
 }
 
 class _GridMangaDetailedItem extends ConsumerWidget {
-  const _GridMangaDetailedItem({Key? key, required this.manga})
-      : super(key: key);
+  const _GridMangaDetailedItem({super.key, required this.manga});
 
   final Manga manga;
 
@@ -838,8 +837,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 .map(
                                   (e) => IconTextChip(
                                       text: Text(e.attributes.name.get('en'))),
-                                )
-                                .toList(),
+                                ),
                           ],
                         ),
                         if (manga.attributes.description.isNotEmpty)
@@ -866,7 +864,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
 }
 
 class _ListMangaItem extends ConsumerWidget {
-  const _ListMangaItem({Key? key, required this.manga}) : super(key: key);
+  const _ListMangaItem({super.key, required this.manga});
 
   final Manga manga;
 
@@ -931,8 +929,7 @@ class _ListMangaItem extends ConsumerWidget {
                             .map(
                               (e) => IconTextChip(
                                   text: Text(e.attributes.name.get('en'))),
-                            )
-                            .toList(),
+                            ),
                     ],
                   ),
                   const SizedBox(
@@ -1011,7 +1008,7 @@ class _ListMangaItem extends ConsumerWidget {
 }
 
 class MangaStatusChip extends StatelessWidget {
-  const MangaStatusChip({Key? key, required this.status}) : super(key: key);
+  const MangaStatusChip({super.key, required this.status});
 
   final MangaStatus status;
 
@@ -1047,7 +1044,7 @@ class MangaStatusChip extends StatelessWidget {
 }
 
 class ContentRatingChip extends StatelessWidget {
-  const ContentRatingChip({Key? key, required this.rating}) : super(key: key);
+  const ContentRatingChip({super.key, required this.rating});
 
   final ContentRating rating;
 
@@ -1077,7 +1074,7 @@ class ContentRatingChip extends StatelessWidget {
 }
 
 class ContentChip extends StatelessWidget {
-  const ContentChip({Key? key, required this.content}) : super(key: key);
+  const ContentChip({super.key, required this.content});
 
   final String content;
 

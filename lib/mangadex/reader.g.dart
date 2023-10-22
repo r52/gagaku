@@ -125,6 +125,11 @@ class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
   }
 
   @override
+  (String,) get argument {
+    return (chapterId,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<ReaderData> createElement() {
     return _FetchChapterDataProviderElement(this);
   }
@@ -256,6 +261,11 @@ class _FetchChapterPagesProvider
   }
 
   @override
+  (Chapter,) get argument {
+    return (chapter,);
+  }
+
+  @override
   AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
     return _FetchChapterPagesProviderElement(this);
   }
@@ -288,4 +298,4 @@ class _FetchChapterPagesProviderElement
   Chapter get chapter => (origin as _FetchChapterPagesProvider).chapter;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package

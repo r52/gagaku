@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

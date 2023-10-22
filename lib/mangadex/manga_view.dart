@@ -546,8 +546,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             .map(
                               (e) => IconTextChip(
                                   text: Text(e.attributes.name.get('en'))),
-                            )
-                            .toList(),
+                            ),
                     ],
                   ),
                 ),
@@ -935,7 +934,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 5.0),
                               child: Text(e.name.capitalize())))
-                          .toList()
                     ],
                   ),
                 ),
