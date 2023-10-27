@@ -523,6 +523,7 @@ class MangaListWidget extends HookConsumerWidget {
     this.physics,
     this.onAtEdge,
     this.controller,
+    this.noController = false,
   });
 
   final Widget title;
@@ -531,15 +532,18 @@ class MangaListWidget extends HookConsumerWidget {
   final ScrollPhysics? physics;
   final VoidCallback? onAtEdge;
   final ScrollController? controller;
+  final bool noController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = controller ?? useScrollController();
+    final scrollController =
+        controller ?? (noController ? null : useScrollController());
     final view = ref.watch(_mangaListViewProvider);
 
     useEffect(() {
       void controllerAtEdge() {
-        if (onAtEdge != null &&
+        if (scrollController != null &&
+            onAtEdge != null &&
             scrollController.position.atEdge &&
             scrollController.position.pixels ==
                 scrollController.position.maxScrollExtent) {
@@ -547,8 +551,8 @@ class MangaListWidget extends HookConsumerWidget {
         }
       }
 
-      scrollController.addListener(controllerAtEdge);
-      return () => scrollController.removeListener(controllerAtEdge);
+      scrollController?.addListener(controllerAtEdge);
+      return () => scrollController?.removeListener(controllerAtEdge);
     }, [scrollController]);
 
     return CustomScrollView(

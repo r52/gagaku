@@ -1197,6 +1197,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             'Related Titles',
                             style: TextStyle(fontSize: 24),
                           ),
+                          noController: true,
                           children: [
                             MangaListViewSliver(items: value),
                           ],
