@@ -38,6 +38,20 @@ class _GetDirectoryPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   /// See also [_getDirectoryPages].
   const _GetDirectoryPagesFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_getDirectoryPagesProvider';
+
   /// See also [_getDirectoryPages].
   _GetDirectoryPagesProvider call(
     String path,
@@ -57,19 +71,28 @@ class _GetDirectoryPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<List<ReaderPage>> Function(_GetDirectoryPagesRef ref) create) {
+    return _$GetDirectoryPagesFamilyOverride(this, create);
+  }
+}
+
+class _$GetDirectoryPagesFamilyOverride
+    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+  _$GetDirectoryPagesFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<List<ReaderPage>> Function(_GetDirectoryPagesRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _GetDirectoryPagesFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_getDirectoryPagesProvider';
+  _GetDirectoryPagesProvider getProviderOverride(
+    covariant _GetDirectoryPagesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_getDirectoryPages].
@@ -96,7 +119,7 @@ class _GetDirectoryPagesProvider
         );
 
   _GetDirectoryPagesProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -109,7 +132,7 @@ class _GetDirectoryPagesProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(_GetDirectoryPagesRef provider) create,
+    FutureOr<List<ReaderPage>> Function(_GetDirectoryPagesRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -133,6 +156,20 @@ class _GetDirectoryPagesProvider
   @override
   AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
     return _GetDirectoryPagesProviderElement(this);
+  }
+
+  _GetDirectoryPagesProvider _copyWith(
+    FutureOr<List<ReaderPage>> Function(_GetDirectoryPagesRef ref) create,
+  ) {
+    return _GetDirectoryPagesProvider._internal(
+      (ref) => create(ref as _GetDirectoryPagesRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      path: path,
+    );
   }
 
   @override

@@ -38,6 +38,20 @@ class _FetchChapterDataFamily extends Family<AsyncValue<ReaderData>> {
   /// See also [_fetchChapterData].
   const _FetchChapterDataFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchChapterDataProvider';
+
   /// See also [_fetchChapterData].
   _FetchChapterDataProvider call(
     String chapterId,
@@ -57,19 +71,28 @@ class _FetchChapterDataFamily extends Family<AsyncValue<ReaderData>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create) {
+    return _$FetchChapterDataFamilyOverride(this, create);
+  }
+}
+
+class _$FetchChapterDataFamilyOverride
+    implements FamilyOverride<AsyncValue<ReaderData>> {
+  _$FetchChapterDataFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchChapterDataFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchChapterDataProvider';
+  _FetchChapterDataProvider getProviderOverride(
+    covariant _FetchChapterDataProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchChapterData].
@@ -95,7 +118,7 @@ class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
         );
 
   _FetchChapterDataProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -108,7 +131,7 @@ class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
 
   @override
   Override overrideWith(
-    FutureOr<ReaderData> Function(_FetchChapterDataRef provider) create,
+    FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -132,6 +155,20 @@ class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
   @override
   AutoDisposeFutureProviderElement<ReaderData> createElement() {
     return _FetchChapterDataProviderElement(this);
+  }
+
+  _FetchChapterDataProvider _copyWith(
+    FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create,
+  ) {
+    return _FetchChapterDataProvider._internal(
+      (ref) => create(ref as _FetchChapterDataRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      chapterId: chapterId,
+    );
   }
 
   @override
@@ -173,6 +210,20 @@ class _FetchChapterPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   /// See also [_fetchChapterPages].
   const _FetchChapterPagesFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchChapterPagesProvider';
+
   /// See also [_fetchChapterPages].
   _FetchChapterPagesProvider call(
     Chapter chapter,
@@ -192,19 +243,28 @@ class _FetchChapterPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create) {
+    return _$FetchChapterPagesFamilyOverride(this, create);
+  }
+}
+
+class _$FetchChapterPagesFamilyOverride
+    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+  _$FetchChapterPagesFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchChapterPagesFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchChapterPagesProvider';
+  _FetchChapterPagesProvider getProviderOverride(
+    covariant _FetchChapterPagesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchChapterPages].
@@ -231,7 +291,7 @@ class _FetchChapterPagesProvider
         );
 
   _FetchChapterPagesProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -244,7 +304,7 @@ class _FetchChapterPagesProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef provider) create,
+    FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -268,6 +328,20 @@ class _FetchChapterPagesProvider
   @override
   AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
     return _FetchChapterPagesProviderElement(this);
+  }
+
+  _FetchChapterPagesProvider _copyWith(
+    FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create,
+  ) {
+    return _FetchChapterPagesProvider._internal(
+      (ref) => create(ref as _FetchChapterPagesRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      chapter: chapter,
+    );
   }
 
   @override

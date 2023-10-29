@@ -38,6 +38,20 @@ class _FetchGroupDataFamily extends Family<AsyncValue<Set<Group>>> {
   /// See also [_fetchGroupData].
   const _FetchGroupDataFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchGroupDataProvider';
+
   /// See also [_fetchGroupData].
   _FetchGroupDataProvider call(
     Iterable<String> uuids,
@@ -57,19 +71,28 @@ class _FetchGroupDataFamily extends Family<AsyncValue<Set<Group>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<Set<Group>> Function(_FetchGroupDataRef ref) create) {
+    return _$FetchGroupDataFamilyOverride(this, create);
+  }
+}
+
+class _$FetchGroupDataFamilyOverride
+    implements FamilyOverride<AsyncValue<Set<Group>>> {
+  _$FetchGroupDataFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<Set<Group>> Function(_FetchGroupDataRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchGroupDataFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchGroupDataProvider';
+  _FetchGroupDataProvider getProviderOverride(
+    covariant _FetchGroupDataProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchGroupData].
@@ -95,7 +118,7 @@ class _FetchGroupDataProvider extends AutoDisposeFutureProvider<Set<Group>> {
         );
 
   _FetchGroupDataProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -108,7 +131,7 @@ class _FetchGroupDataProvider extends AutoDisposeFutureProvider<Set<Group>> {
 
   @override
   Override overrideWith(
-    FutureOr<Set<Group>> Function(_FetchGroupDataRef provider) create,
+    FutureOr<Set<Group>> Function(_FetchGroupDataRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -132,6 +155,20 @@ class _FetchGroupDataProvider extends AutoDisposeFutureProvider<Set<Group>> {
   @override
   AutoDisposeFutureProviderElement<Set<Group>> createElement() {
     return _FetchGroupDataProviderElement(this);
+  }
+
+  _FetchGroupDataProvider _copyWith(
+    FutureOr<Set<Group>> Function(_FetchGroupDataRef ref) create,
+  ) {
+    return _FetchGroupDataProvider._internal(
+      (ref) => create(ref as _FetchGroupDataRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      uuids: uuids,
+    );
   }
 
   @override

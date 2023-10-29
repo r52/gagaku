@@ -39,6 +39,20 @@ class _FetchCreatorFromIdFamily extends Family<AsyncValue<CreatorType>> {
   /// See also [_fetchCreatorFromId].
   const _FetchCreatorFromIdFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchCreatorFromIdProvider';
+
   /// See also [_fetchCreatorFromId].
   _FetchCreatorFromIdProvider call(
     String creatorId,
@@ -58,19 +72,28 @@ class _FetchCreatorFromIdFamily extends Family<AsyncValue<CreatorType>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<CreatorType> Function(_FetchCreatorFromIdRef ref) create) {
+    return _$FetchCreatorFromIdFamilyOverride(this, create);
+  }
+}
+
+class _$FetchCreatorFromIdFamilyOverride
+    implements FamilyOverride<AsyncValue<CreatorType>> {
+  _$FetchCreatorFromIdFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<CreatorType> Function(_FetchCreatorFromIdRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchCreatorFromIdFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchCreatorFromIdProvider';
+  _FetchCreatorFromIdProvider getProviderOverride(
+    covariant _FetchCreatorFromIdProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchCreatorFromId].
@@ -97,7 +120,7 @@ class _FetchCreatorFromIdProvider
         );
 
   _FetchCreatorFromIdProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -110,7 +133,7 @@ class _FetchCreatorFromIdProvider
 
   @override
   Override overrideWith(
-    FutureOr<CreatorType> Function(_FetchCreatorFromIdRef provider) create,
+    FutureOr<CreatorType> Function(_FetchCreatorFromIdRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -134,6 +157,20 @@ class _FetchCreatorFromIdProvider
   @override
   AutoDisposeFutureProviderElement<CreatorType> createElement() {
     return _FetchCreatorFromIdProviderElement(this);
+  }
+
+  _FetchCreatorFromIdProvider _copyWith(
+    FutureOr<CreatorType> Function(_FetchCreatorFromIdRef ref) create,
+  ) {
+    return _FetchCreatorFromIdProvider._internal(
+      (ref) => create(ref as _FetchCreatorFromIdRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      creatorId: creatorId,
+    );
   }
 
   @override
@@ -176,6 +213,20 @@ class _FetchCreatorTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
   /// See also [_fetchCreatorTitles].
   const _FetchCreatorTitlesFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchCreatorTitlesProvider';
+
   /// See also [_fetchCreatorTitles].
   _FetchCreatorTitlesProvider call(
     CreatorType creator,
@@ -195,19 +246,28 @@ class _FetchCreatorTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create) {
+    return _$FetchCreatorTitlesFamilyOverride(this, create);
+  }
+}
+
+class _$FetchCreatorTitlesFamilyOverride
+    implements FamilyOverride<AsyncValue<Iterable<Manga>>> {
+  _$FetchCreatorTitlesFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchCreatorTitlesFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchCreatorTitlesProvider';
+  _FetchCreatorTitlesProvider getProviderOverride(
+    covariant _FetchCreatorTitlesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchCreatorTitles].
@@ -234,7 +294,7 @@ class _FetchCreatorTitlesProvider
         );
 
   _FetchCreatorTitlesProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -247,7 +307,7 @@ class _FetchCreatorTitlesProvider
 
   @override
   Override overrideWith(
-    FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef provider) create,
+    FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -271,6 +331,20 @@ class _FetchCreatorTitlesProvider
   @override
   AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
     return _FetchCreatorTitlesProviderElement(this);
+  }
+
+  _FetchCreatorTitlesProvider _copyWith(
+    FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create,
+  ) {
+    return _FetchCreatorTitlesProvider._internal(
+      (ref) => create(ref as _FetchCreatorTitlesRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      creator: creator,
+    );
   }
 
   @override

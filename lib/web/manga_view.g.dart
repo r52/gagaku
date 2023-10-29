@@ -38,6 +38,20 @@ class _FetchWebMangaInfoFamily extends Family<AsyncValue<WebManga>> {
   /// See also [_fetchWebMangaInfo].
   const _FetchWebMangaInfoFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchWebMangaInfoProvider';
+
   /// See also [_fetchWebMangaInfo].
   _FetchWebMangaInfoProvider call(
     ProxyInfo info,
@@ -57,19 +71,28 @@ class _FetchWebMangaInfoFamily extends Family<AsyncValue<WebManga>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<WebManga> Function(_FetchWebMangaInfoRef ref) create) {
+    return _$FetchWebMangaInfoFamilyOverride(this, create);
+  }
+}
+
+class _$FetchWebMangaInfoFamilyOverride
+    implements FamilyOverride<AsyncValue<WebManga>> {
+  _$FetchWebMangaInfoFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<WebManga> Function(_FetchWebMangaInfoRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchWebMangaInfoFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchWebMangaInfoProvider';
+  _FetchWebMangaInfoProvider getProviderOverride(
+    covariant _FetchWebMangaInfoProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchWebMangaInfo].
@@ -95,7 +118,7 @@ class _FetchWebMangaInfoProvider extends AutoDisposeFutureProvider<WebManga> {
         );
 
   _FetchWebMangaInfoProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -108,7 +131,7 @@ class _FetchWebMangaInfoProvider extends AutoDisposeFutureProvider<WebManga> {
 
   @override
   Override overrideWith(
-    FutureOr<WebManga> Function(_FetchWebMangaInfoRef provider) create,
+    FutureOr<WebManga> Function(_FetchWebMangaInfoRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -132,6 +155,20 @@ class _FetchWebMangaInfoProvider extends AutoDisposeFutureProvider<WebManga> {
   @override
   AutoDisposeFutureProviderElement<WebManga> createElement() {
     return _FetchWebMangaInfoProviderElement(this);
+  }
+
+  _FetchWebMangaInfoProvider _copyWith(
+    FutureOr<WebManga> Function(_FetchWebMangaInfoRef ref) create,
+  ) {
+    return _FetchWebMangaInfoProvider._internal(
+      (ref) => create(ref as _FetchWebMangaInfoRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      info: info,
+    );
   }
 
   @override

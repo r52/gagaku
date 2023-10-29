@@ -93,6 +93,20 @@ class GroupFeedFamily extends Family<AsyncValue<List<Chapter>>> {
   /// See also [GroupFeed].
   const GroupFeedFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupFeedProvider';
+
   /// See also [GroupFeed].
   GroupFeedProvider call(
     Group group,
@@ -112,19 +126,27 @@ class GroupFeedFamily extends Family<AsyncValue<List<Chapter>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(GroupFeed Function() create) {
+    return _$GroupFeedFamilyOverride(this, create);
+  }
+}
+
+class _$GroupFeedFamilyOverride
+    implements FamilyOverride<AsyncValue<List<Chapter>>> {
+  _$GroupFeedFamilyOverride(this.overriddenFamily, this.create);
+
+  final GroupFeed Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final GroupFeedFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'groupFeedProvider';
+  GroupFeedProvider getProviderOverride(
+    covariant GroupFeedProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [GroupFeed].
@@ -147,7 +169,7 @@ class GroupFeedProvider
         );
 
   GroupFeedProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -191,6 +213,20 @@ class GroupFeedProvider
   @override
   AsyncNotifierProviderElement<GroupFeed, List<Chapter>> createElement() {
     return _GroupFeedProviderElement(this);
+  }
+
+  GroupFeedProvider _copyWith(
+    GroupFeed Function() create,
+  ) {
+    return GroupFeedProvider._internal(
+      () => create()..group = group,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      group: group,
+    );
   }
 
   @override
@@ -240,6 +276,20 @@ class GroupTitlesFamily extends Family<AsyncValue<List<Manga>>> {
   /// See also [GroupTitles].
   const GroupTitlesFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupTitlesProvider';
+
   /// See also [GroupTitles].
   GroupTitlesProvider call(
     Group group,
@@ -259,19 +309,27 @@ class GroupTitlesFamily extends Family<AsyncValue<List<Manga>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(GroupTitles Function() create) {
+    return _$GroupTitlesFamilyOverride(this, create);
+  }
+}
+
+class _$GroupTitlesFamilyOverride
+    implements FamilyOverride<AsyncValue<List<Manga>>> {
+  _$GroupTitlesFamilyOverride(this.overriddenFamily, this.create);
+
+  final GroupTitles Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final GroupTitlesFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'groupTitlesProvider';
+  GroupTitlesProvider getProviderOverride(
+    covariant GroupTitlesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [GroupTitles].
@@ -295,7 +353,7 @@ class GroupTitlesProvider
         );
 
   GroupTitlesProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -339,6 +397,20 @@ class GroupTitlesProvider
   @override
   AsyncNotifierProviderElement<GroupTitles, List<Manga>> createElement() {
     return _GroupTitlesProviderElement(this);
+  }
+
+  GroupTitlesProvider _copyWith(
+    GroupTitles Function() create,
+  ) {
+    return GroupTitlesProvider._internal(
+      () => create()..group = group,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      group: group,
+    );
   }
 
   @override
@@ -388,6 +460,20 @@ class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
   /// See also [CreatorTitles].
   const CreatorTitlesFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'creatorTitlesProvider';
+
   /// See also [CreatorTitles].
   CreatorTitlesProvider call(
     CreatorType creator,
@@ -407,19 +493,27 @@ class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(CreatorTitles Function() create) {
+    return _$CreatorTitlesFamilyOverride(this, create);
+  }
+}
+
+class _$CreatorTitlesFamilyOverride
+    implements FamilyOverride<AsyncValue<List<Manga>>> {
+  _$CreatorTitlesFamilyOverride(this.overriddenFamily, this.create);
+
+  final CreatorTitles Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final CreatorTitlesFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'creatorTitlesProvider';
+  CreatorTitlesProvider getProviderOverride(
+    covariant CreatorTitlesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [CreatorTitles].
@@ -443,7 +537,7 @@ class CreatorTitlesProvider
         );
 
   CreatorTitlesProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -487,6 +581,20 @@ class CreatorTitlesProvider
   @override
   AsyncNotifierProviderElement<CreatorTitles, List<Manga>> createElement() {
     return _CreatorTitlesProviderElement(this);
+  }
+
+  CreatorTitlesProvider _copyWith(
+    CreatorTitles Function() create,
+  ) {
+    return CreatorTitlesProvider._internal(
+      () => create()..creator = creator,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      creator: creator,
+    );
   }
 
   @override
@@ -536,6 +644,20 @@ class MangaChaptersFamily extends Family<AsyncValue<List<Chapter>>> {
   /// See also [MangaChapters].
   const MangaChaptersFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mangaChaptersProvider';
+
   /// See also [MangaChapters].
   MangaChaptersProvider call(
     Manga manga,
@@ -555,19 +677,27 @@ class MangaChaptersFamily extends Family<AsyncValue<List<Chapter>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(MangaChapters Function() create) {
+    return _$MangaChaptersFamilyOverride(this, create);
+  }
+}
+
+class _$MangaChaptersFamilyOverride
+    implements FamilyOverride<AsyncValue<List<Chapter>>> {
+  _$MangaChaptersFamilyOverride(this.overriddenFamily, this.create);
+
+  final MangaChapters Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final MangaChaptersFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'mangaChaptersProvider';
+  MangaChaptersProvider getProviderOverride(
+    covariant MangaChaptersProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [MangaChapters].
@@ -591,7 +721,7 @@ class MangaChaptersProvider
         );
 
   MangaChaptersProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -635,6 +765,20 @@ class MangaChaptersProvider
   @override
   AsyncNotifierProviderElement<MangaChapters, List<Chapter>> createElement() {
     return _MangaChaptersProviderElement(this);
+  }
+
+  MangaChaptersProvider _copyWith(
+    MangaChapters Function() create,
+  ) {
+    return MangaChaptersProvider._internal(
+      () => create()..manga = manga,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      manga: manga,
+    );
   }
 
   @override
@@ -684,6 +828,20 @@ class MangaCoversFamily extends Family<AsyncValue<List<Cover>>> {
   /// See also [MangaCovers].
   const MangaCoversFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mangaCoversProvider';
+
   /// See also [MangaCovers].
   MangaCoversProvider call(
     Manga manga,
@@ -703,19 +861,27 @@ class MangaCoversFamily extends Family<AsyncValue<List<Cover>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(MangaCovers Function() create) {
+    return _$MangaCoversFamilyOverride(this, create);
+  }
+}
+
+class _$MangaCoversFamilyOverride
+    implements FamilyOverride<AsyncValue<List<Cover>>> {
+  _$MangaCoversFamilyOverride(this.overriddenFamily, this.create);
+
+  final MangaCovers Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final MangaCoversFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'mangaCoversProvider';
+  MangaCoversProvider getProviderOverride(
+    covariant MangaCoversProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [MangaCovers].
@@ -739,7 +905,7 @@ class MangaCoversProvider
         );
 
   MangaCoversProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -783,6 +949,20 @@ class MangaCoversProvider
   @override
   AsyncNotifierProviderElement<MangaCovers, List<Cover>> createElement() {
     return _MangaCoversProviderElement(this);
+  }
+
+  MangaCoversProvider _copyWith(
+    MangaCovers Function() create,
+  ) {
+    return MangaCoversProvider._internal(
+      () => create()..manga = manga,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      manga: manga,
+    );
   }
 
   @override
@@ -847,6 +1027,20 @@ class UserLibraryFamily extends Family<AsyncValue<Iterable<Manga>>> {
   /// See also [UserLibrary].
   const UserLibraryFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'userLibraryProvider';
+
   /// See also [UserLibrary].
   UserLibraryProvider call(
     MangaReadingStatus status,
@@ -866,19 +1060,27 @@ class UserLibraryFamily extends Family<AsyncValue<Iterable<Manga>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(UserLibrary Function() create) {
+    return _$UserLibraryFamilyOverride(this, create);
+  }
+}
+
+class _$UserLibraryFamilyOverride
+    implements FamilyOverride<AsyncValue<Iterable<Manga>>> {
+  _$UserLibraryFamilyOverride(this.overriddenFamily, this.create);
+
+  final UserLibrary Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final UserLibraryFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'userLibraryProvider';
+  UserLibraryProvider getProviderOverride(
+    covariant UserLibraryProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [UserLibrary].
@@ -902,7 +1104,7 @@ class UserLibraryProvider
         );
 
   UserLibraryProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -946,6 +1148,20 @@ class UserLibraryProvider
   @override
   AsyncNotifierProviderElement<UserLibrary, Iterable<Manga>> createElement() {
     return _UserLibraryProviderElement(this);
+  }
+
+  UserLibraryProvider _copyWith(
+    UserLibrary Function() create,
+  ) {
+    return UserLibraryProvider._internal(
+      () => create()..status = status,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      status: status,
+    );
   }
 
   @override
@@ -1010,6 +1226,20 @@ class MangaSearchFamily extends Family<AsyncValue<List<Manga>>> {
   /// See also [MangaSearch].
   const MangaSearchFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mangaSearchProvider';
+
   /// See also [MangaSearch].
   MangaSearchProvider call(
     MangaSearchParameters params,
@@ -1029,19 +1259,27 @@ class MangaSearchFamily extends Family<AsyncValue<List<Manga>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(MangaSearch Function() create) {
+    return _$MangaSearchFamilyOverride(this, create);
+  }
+}
+
+class _$MangaSearchFamilyOverride
+    implements FamilyOverride<AsyncValue<List<Manga>>> {
+  _$MangaSearchFamilyOverride(this.overriddenFamily, this.create);
+
+  final MangaSearch Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final MangaSearchFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'mangaSearchProvider';
+  MangaSearchProvider getProviderOverride(
+    covariant MangaSearchProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [MangaSearch].
@@ -1065,7 +1303,7 @@ class MangaSearchProvider
         );
 
   MangaSearchProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -1110,6 +1348,20 @@ class MangaSearchProvider
   AutoDisposeAsyncNotifierProviderElement<MangaSearch, List<Manga>>
       createElement() {
     return _MangaSearchProviderElement(this);
+  }
+
+  MangaSearchProvider _copyWith(
+    MangaSearch Function() create,
+  ) {
+    return MangaSearchProvider._internal(
+      () => create()..params = params,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      params: params,
+    );
   }
 
   @override
@@ -1190,6 +1442,20 @@ class ReadingStatusFamily extends Family<AsyncValue<MangaReadingStatus?>> {
   /// See also [ReadingStatus].
   const ReadingStatusFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'readingStatusProvider';
+
   /// See also [ReadingStatus].
   ReadingStatusProvider call(
     Manga manga,
@@ -1209,19 +1475,27 @@ class ReadingStatusFamily extends Family<AsyncValue<MangaReadingStatus?>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(ReadingStatus Function() create) {
+    return _$ReadingStatusFamilyOverride(this, create);
+  }
+}
+
+class _$ReadingStatusFamilyOverride
+    implements FamilyOverride<AsyncValue<MangaReadingStatus?>> {
+  _$ReadingStatusFamilyOverride(this.overriddenFamily, this.create);
+
+  final ReadingStatus Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final ReadingStatusFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'readingStatusProvider';
+  ReadingStatusProvider getProviderOverride(
+    covariant ReadingStatusProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [ReadingStatus].
@@ -1245,7 +1519,7 @@ class ReadingStatusProvider
         );
 
   ReadingStatusProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -1290,6 +1564,20 @@ class ReadingStatusProvider
   AsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?>
       createElement() {
     return _ReadingStatusProviderElement(this);
+  }
+
+  ReadingStatusProvider _copyWith(
+    ReadingStatus Function() create,
+  ) {
+    return ReadingStatusProvider._internal(
+      () => create()..manga = manga,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      manga: manga,
+    );
   }
 
   @override
@@ -1339,6 +1627,20 @@ class FollowingStatusFamily extends Family<AsyncValue<bool>> {
   /// See also [FollowingStatus].
   const FollowingStatusFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'followingStatusProvider';
+
   /// See also [FollowingStatus].
   FollowingStatusProvider call(
     Manga manga,
@@ -1358,19 +1660,27 @@ class FollowingStatusFamily extends Family<AsyncValue<bool>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(FollowingStatus Function() create) {
+    return _$FollowingStatusFamilyOverride(this, create);
+  }
+}
+
+class _$FollowingStatusFamilyOverride
+    implements FamilyOverride<AsyncValue<bool>> {
+  _$FollowingStatusFamilyOverride(this.overriddenFamily, this.create);
+
+  final FollowingStatus Function() create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final FollowingStatusFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'followingStatusProvider';
+  FollowingStatusProvider getProviderOverride(
+    covariant FollowingStatusProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [FollowingStatus].
@@ -1394,7 +1704,7 @@ class FollowingStatusProvider
         );
 
   FollowingStatusProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -1438,6 +1748,20 @@ class FollowingStatusProvider
   @override
   AsyncNotifierProviderElement<FollowingStatus, bool> createElement() {
     return _FollowingStatusProviderElement(this);
+  }
+
+  FollowingStatusProvider _copyWith(
+    FollowingStatus Function() create,
+  ) {
+    return FollowingStatusProvider._internal(
+      () => create()..manga = manga,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      manga: manga,
+    );
   }
 
   @override

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

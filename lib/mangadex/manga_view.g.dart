@@ -38,6 +38,20 @@ class _FetchMangaFromIdFamily extends Family<AsyncValue<Manga>> {
   /// See also [_fetchMangaFromId].
   const _FetchMangaFromIdFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchMangaFromIdProvider';
+
   /// See also [_fetchMangaFromId].
   _FetchMangaFromIdProvider call(
     String mangaId,
@@ -57,19 +71,28 @@ class _FetchMangaFromIdFamily extends Family<AsyncValue<Manga>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create) {
+    return _$FetchMangaFromIdFamilyOverride(this, create);
+  }
+}
+
+class _$FetchMangaFromIdFamilyOverride
+    implements FamilyOverride<AsyncValue<Manga>> {
+  _$FetchMangaFromIdFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchMangaFromIdFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchMangaFromIdProvider';
+  _FetchMangaFromIdProvider getProviderOverride(
+    covariant _FetchMangaFromIdProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchMangaFromId].
@@ -95,7 +118,7 @@ class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
         );
 
   _FetchMangaFromIdProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -108,7 +131,7 @@ class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
 
   @override
   Override overrideWith(
-    FutureOr<Manga> Function(_FetchMangaFromIdRef provider) create,
+    FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -132,6 +155,20 @@ class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
   @override
   AutoDisposeFutureProviderElement<Manga> createElement() {
     return _FetchMangaFromIdProviderElement(this);
+  }
+
+  _FetchMangaFromIdProvider _copyWith(
+    FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create,
+  ) {
+    return _FetchMangaFromIdProvider._internal(
+      (ref) => create(ref as _FetchMangaFromIdRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      mangaId: mangaId,
+    );
   }
 
   @override
@@ -173,6 +210,20 @@ class _FetchReadChaptersRedunFamily extends Family<AsyncValue<void>> {
   /// See also [_fetchReadChaptersRedun].
   const _FetchReadChaptersRedunFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchReadChaptersRedunProvider';
+
   /// See also [_fetchReadChaptersRedun].
   _FetchReadChaptersRedunProvider call(
     Manga manga,
@@ -192,19 +243,28 @@ class _FetchReadChaptersRedunFamily extends Family<AsyncValue<void>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create) {
+    return _$FetchReadChaptersRedunFamilyOverride(this, create);
+  }
+}
+
+class _$FetchReadChaptersRedunFamilyOverride
+    implements FamilyOverride<AsyncValue<void>> {
+  _$FetchReadChaptersRedunFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchReadChaptersRedunFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchReadChaptersRedunProvider';
+  _FetchReadChaptersRedunProvider getProviderOverride(
+    covariant _FetchReadChaptersRedunProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchReadChaptersRedun].
@@ -230,7 +290,7 @@ class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
         );
 
   _FetchReadChaptersRedunProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -243,7 +303,7 @@ class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
 
   @override
   Override overrideWith(
-    FutureOr<void> Function(_FetchReadChaptersRedunRef provider) create,
+    FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -267,6 +327,20 @@ class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
   @override
   AutoDisposeFutureProviderElement<void> createElement() {
     return _FetchReadChaptersRedunProviderElement(this);
+  }
+
+  _FetchReadChaptersRedunProvider _copyWith(
+    FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create,
+  ) {
+    return _FetchReadChaptersRedunProvider._internal(
+      (ref) => create(ref as _FetchReadChaptersRedunRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      manga: manga,
+    );
   }
 
   @override
@@ -308,6 +382,20 @@ class _FetchRelatedMangaFamily extends Family<AsyncValue<Iterable<Manga>>> {
   /// See also [_fetchRelatedManga].
   const _FetchRelatedMangaFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchRelatedMangaProvider';
+
   /// See also [_fetchRelatedManga].
   _FetchRelatedMangaProvider call(
     Manga manga,
@@ -327,19 +415,28 @@ class _FetchRelatedMangaFamily extends Family<AsyncValue<Iterable<Manga>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create) {
+    return _$FetchRelatedMangaFamilyOverride(this, create);
+  }
+}
+
+class _$FetchRelatedMangaFamilyOverride
+    implements FamilyOverride<AsyncValue<Iterable<Manga>>> {
+  _$FetchRelatedMangaFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchRelatedMangaFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchRelatedMangaProvider';
+  _FetchRelatedMangaProvider getProviderOverride(
+    covariant _FetchRelatedMangaProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchRelatedManga].
@@ -366,7 +463,7 @@ class _FetchRelatedMangaProvider
         );
 
   _FetchRelatedMangaProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -379,7 +476,7 @@ class _FetchRelatedMangaProvider
 
   @override
   Override overrideWith(
-    FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef provider) create,
+    FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -403,6 +500,20 @@ class _FetchRelatedMangaProvider
   @override
   AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
     return _FetchRelatedMangaProviderElement(this);
+  }
+
+  _FetchRelatedMangaProvider _copyWith(
+    FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create,
+  ) {
+    return _FetchRelatedMangaProvider._internal(
+      (ref) => create(ref as _FetchRelatedMangaRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      manga: manga,
+    );
   }
 
   @override

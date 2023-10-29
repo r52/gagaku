@@ -12,6 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart' as custom_tabs;
 
 part 'manga_view.g.dart';
 
@@ -238,7 +239,24 @@ class WebMangaViewWidget extends StatelessWidget {
                             final route =
                                 GoRouterState.of(context).uri.toString();
                             final url = 'https://cubari.moe$route';
-                            if (!await launchUrl(Uri.parse(url))) {
+
+                            if (DeviceContext.isMobile()) {
+                              try {
+                                await custom_tabs.launch(
+                                  url,
+                                  customTabsOption:
+                                      const custom_tabs.CustomTabsOption(
+                                    extraCustomTabs: <String>[
+                                      'org.mozilla.firefox',
+                                      'com.microsoft.emmx',
+                                    ],
+                                  ),
+                                );
+                              } catch (e) {
+                                // An exception is thrown if browser app is not installed on Android device.
+                                debugPrint(e.toString());
+                              }
+                            } else if (!await launchUrl(Uri.parse(url))) {
                               throw 'Could not launch $url';
                             }
                           },

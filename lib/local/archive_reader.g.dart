@@ -38,6 +38,20 @@ class _GetArchivePagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   /// See also [_getArchivePages].
   const _GetArchivePagesFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_getArchivePagesProvider';
+
   /// See also [_getArchivePages].
   _GetArchivePagesProvider call(
     String path,
@@ -57,19 +71,28 @@ class _GetArchivePagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<List<ReaderPage>> Function(_GetArchivePagesRef ref) create) {
+    return _$GetArchivePagesFamilyOverride(this, create);
+  }
+}
+
+class _$GetArchivePagesFamilyOverride
+    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+  _$GetArchivePagesFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<List<ReaderPage>> Function(_GetArchivePagesRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _GetArchivePagesFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_getArchivePagesProvider';
+  _GetArchivePagesProvider getProviderOverride(
+    covariant _GetArchivePagesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_getArchivePages].
@@ -96,7 +119,7 @@ class _GetArchivePagesProvider
         );
 
   _GetArchivePagesProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -109,7 +132,7 @@ class _GetArchivePagesProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(_GetArchivePagesRef provider) create,
+    FutureOr<List<ReaderPage>> Function(_GetArchivePagesRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -133,6 +156,20 @@ class _GetArchivePagesProvider
   @override
   AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
     return _GetArchivePagesProviderElement(this);
+  }
+
+  _GetArchivePagesProvider _copyWith(
+    FutureOr<List<ReaderPage>> Function(_GetArchivePagesRef ref) create,
+  ) {
+    return _GetArchivePagesProvider._internal(
+      (ref) => create(ref as _GetArchivePagesRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      path: path,
+    );
   }
 
   @override

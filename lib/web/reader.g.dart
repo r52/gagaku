@@ -39,6 +39,20 @@ class _FetchWebChapterInfoFamily extends Family<AsyncValue<WebReaderData>> {
   /// See also [_fetchWebChapterInfo].
   const _FetchWebChapterInfoFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_fetchWebChapterInfoProvider';
+
   /// See also [_fetchWebChapterInfo].
   _FetchWebChapterInfoProvider call(
     ProxyInfo info,
@@ -58,19 +72,28 @@ class _FetchWebChapterInfoFamily extends Family<AsyncValue<WebReaderData>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<WebReaderData> Function(_FetchWebChapterInfoRef ref) create) {
+    return _$FetchWebChapterInfoFamilyOverride(this, create);
+  }
+}
+
+class _$FetchWebChapterInfoFamilyOverride
+    implements FamilyOverride<AsyncValue<WebReaderData>> {
+  _$FetchWebChapterInfoFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<WebReaderData> Function(_FetchWebChapterInfoRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _FetchWebChapterInfoFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchWebChapterInfoProvider';
+  _FetchWebChapterInfoProvider getProviderOverride(
+    covariant _FetchWebChapterInfoProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_fetchWebChapterInfo].
@@ -97,7 +120,7 @@ class _FetchWebChapterInfoProvider
         );
 
   _FetchWebChapterInfoProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -110,7 +133,7 @@ class _FetchWebChapterInfoProvider
 
   @override
   Override overrideWith(
-    FutureOr<WebReaderData> Function(_FetchWebChapterInfoRef provider) create,
+    FutureOr<WebReaderData> Function(_FetchWebChapterInfoRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -134,6 +157,20 @@ class _FetchWebChapterInfoProvider
   @override
   AutoDisposeFutureProviderElement<WebReaderData> createElement() {
     return _FetchWebChapterInfoProviderElement(this);
+  }
+
+  _FetchWebChapterInfoProvider _copyWith(
+    FutureOr<WebReaderData> Function(_FetchWebChapterInfoRef ref) create,
+  ) {
+    return _FetchWebChapterInfoProvider._internal(
+      (ref) => create(ref as _FetchWebChapterInfoRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      info: info,
+    );
   }
 
   @override
@@ -175,6 +212,20 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   /// See also [_getPages].
   const _GetPagesFamily();
 
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_getPagesProvider';
+
   /// See also [_getPages].
   _GetPagesProvider call(
     dynamic source,
@@ -194,19 +245,28 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
     );
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<List<ReaderPage>> Function(_GetPagesRef ref) create) {
+    return _$GetPagesFamilyOverride(this, create);
+  }
+}
+
+class _$GetPagesFamilyOverride
+    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+  _$GetPagesFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<List<ReaderPage>> Function(_GetPagesRef ref) create;
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+  final _GetPagesFamily overriddenFamily;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_getPagesProvider';
+  _GetPagesProvider getProviderOverride(
+    covariant _GetPagesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
 }
 
 /// See also [_getPages].
@@ -231,7 +291,7 @@ class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
         );
 
   _GetPagesProvider._internal(
-    super._createNotifier, {
+    super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -244,7 +304,7 @@ class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
 
   @override
   Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(_GetPagesRef provider) create,
+    FutureOr<List<ReaderPage>> Function(_GetPagesRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -268,6 +328,20 @@ class _GetPagesProvider extends AutoDisposeFutureProvider<List<ReaderPage>> {
   @override
   AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
     return _GetPagesProviderElement(this);
+  }
+
+  _GetPagesProvider _copyWith(
+    FutureOr<List<ReaderPage>> Function(_GetPagesRef ref) create,
+  ) {
+    return _GetPagesProvider._internal(
+      (ref) => create(ref as _GetPagesRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      source: source,
+    );
   }
 
   @override
