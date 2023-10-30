@@ -1407,12 +1407,12 @@ final statisticsProvider =
 );
 
 typedef _$Statistics = AsyncNotifier<Map<String, MangaStatistics>>;
-String _$ratingsHash() => r'd5689480a48de244cd7961f14e225e23811e08b9';
+String _$ratingsHash() => r'62e83d3af9beb2728a33b39b59be3b9354ad2dc2';
 
 /// See also [Ratings].
 @ProviderFor(Ratings)
 final ratingsProvider =
-    AsyncNotifierProvider<Ratings, Map<String, SelfRating>>.internal(
+    AsyncNotifierProvider<Ratings, Map<String, SelfRating?>>.internal(
   Ratings.new,
   name: r'ratingsProvider',
   debugGetCreateSourceHash:
@@ -1421,7 +1421,7 @@ final ratingsProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
+typedef _$Ratings = AsyncNotifier<Map<String, SelfRating?>>;
 String _$readingStatusHash() => r'fc8e8bbf79e41576eef27961ad38c0699f3d8358';
 
 abstract class _$ReadingStatus

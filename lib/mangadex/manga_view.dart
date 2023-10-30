@@ -469,12 +469,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   } else {
                     actions.addAll([
                       PopupMenuButton<int>(
+                        padding: const EdgeInsets.only(left: 8.0),
                         shape: const RoundedRectangleBorder(),
                         tooltip: 'Rating',
                         icon: Container(
                           padding: const EdgeInsets.all(6.0),
                           decoration: BoxDecoration(
-                            color: ratings.containsKey(manga.id)
+                            color: ratings.containsKey(manga.id) &&
+                                    ratings[manga.id] != null
                                 ? Colors.deepOrange
                                 : Colors.grey.shade600,
                             borderRadius:
@@ -483,7 +485,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           child: Row(
                             children: [
                               const Icon(Icons.star_border),
-                              if (ratings.containsKey(manga.id)) ...[
+                              if (ratings.containsKey(manga.id) &&
+                                  ratings[manga.id] != null) ...[
                                 const SizedBox(
                                   width: 4.0,
                                 ),
