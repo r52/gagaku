@@ -476,7 +476,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           padding: const EdgeInsets.all(6.0),
                           decoration: BoxDecoration(
                             color: ratings.containsKey(manga.id) &&
-                                    ratings[manga.id] != null
+                                    ratings[manga.id]!.rating > 0
                                 ? Colors.deepOrange
                                 : Colors.grey.shade600,
                             borderRadius:
@@ -486,7 +486,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             children: [
                               const Icon(Icons.star_border),
                               if (ratings.containsKey(manga.id) &&
-                                  ratings[manga.id] != null) ...[
+                                  ratings[manga.id]!.rating > 0) ...[
                                 const SizedBox(
                                   width: 4.0,
                                 ),

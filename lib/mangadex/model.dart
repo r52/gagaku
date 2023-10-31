@@ -1173,7 +1173,7 @@ class MangaDexModel {
   ///
   /// Do not use directly. Prefer [ratingsProvider] for its caching and
   /// state management.
-  Future<Map<String, SelfRating?>> fetchRatings(Iterable<Manga> mangas) async {
+  Future<Map<String, SelfRating>> fetchRatings(Iterable<Manga> mangas) async {
     final fetch = mangas.map((e) => e.id);
 
     if (fetch.isNotEmpty) {
@@ -1189,10 +1189,10 @@ class MangaDexModel {
 
         if (body['ratings'] is List) {
           // If the api returns a List, then the result is null
-          Map<String, SelfRating?> map = {};
+          Map<String, SelfRating> map = {};
 
-          for (var m in mangas) {
-            map[m.id] = null;
+          for (final m in mangas) {
+            map[m.id] = SelfRating(rating: -1, createdAt: DateTime.now());
           }
 
           return map;
@@ -1200,7 +1200,15 @@ class MangaDexModel {
 
         final resp = SelfRatingResponse.fromJson(body);
 
-        return resp.ratings;
+        Map<String, SelfRating> map = resp.ratings;
+
+        for (final m in mangas) {
+          if (!map.containsKey(m.id)) {
+            map[m.id] = SelfRating(rating: -1, createdAt: DateTime.now());
+          }
+        }
+
+        return map;
       } else {
         // Throw if failure
         final msg =
@@ -2097,7 +2105,7 @@ class Statistics extends _$Statistics {
 
 @Riverpod(keepAlive: true)
 class Ratings extends _$Ratings {
-  Future<Map<String, SelfRating?>> _fetchRatings(Iterable<Manga> mangas) async {
+  Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return {};
@@ -2109,7 +2117,7 @@ class Ratings extends _$Ratings {
   }
 
   @override
-  FutureOr<Map<String, SelfRating?>> build() async {
+  FutureOr<Map<String, SelfRating>> build() async {
     return {};
   }
 
@@ -2157,7 +2165,8 @@ class Ratings extends _$Ratings {
       if (result) {
         switch (rating) {
           case null:
-            oldstate[manga.id] = null;
+            oldstate[manga.id] =
+                SelfRating(rating: -1, createdAt: DateTime.now());
             break;
           case _:
             oldstate[manga.id] =
