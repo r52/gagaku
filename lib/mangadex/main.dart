@@ -67,41 +67,41 @@ class MangaDexHome extends HookConsumerWidget {
         actions: [
           ButtonBar(
             children: [
-              OpenContainer(
-                closedColor: theme.cardColor,
-                closedShape: const CircleBorder(),
-                closedBuilder: (context, openContainer) {
-                  return Tooltip(
-                    message: 'Search Manga',
-                    child: IconButton(
+              Tooltip(
+                message: 'Search Manga',
+                child: OpenContainer(
+                  closedColor: theme.cardColor,
+                  closedShape: const CircleBorder(),
+                  closedBuilder: (context, openContainer) {
+                    return IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () {
                         openContainer();
                       },
-                    ),
-                  );
-                },
-                openBuilder: (context, closedContainer) {
-                  return const MangaDexSearchWidget();
-                },
+                    );
+                  },
+                  openBuilder: (context, closedContainer) {
+                    return const MangaDexSearchWidget();
+                  },
+                ),
               ),
-              OpenContainer<bool>(
-                closedColor: theme.cardColor,
-                closedShape: const CircleBorder(),
-                closedBuilder: (context, openContainer) {
-                  return Tooltip(
-                    message: 'MangaDex Settings',
-                    child: IconButton(
+              Tooltip(
+                message: 'MangaDex Settings',
+                child: OpenContainer<bool>(
+                  closedColor: theme.cardColor,
+                  closedShape: const CircleBorder(),
+                  closedBuilder: (context, openContainer) {
+                    return IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () {
                         openContainer();
                       },
-                    ),
-                  );
-                },
-                openBuilder: (context, closedContainer) {
-                  return const MangaDexSettingsWidget();
-                },
+                    );
+                  },
+                  openBuilder: (context, closedContainer) {
+                    return const MangaDexSettingsWidget();
+                  },
+                ),
               ),
               Consumer(
                 builder: (context, ref, child) {
