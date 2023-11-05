@@ -212,6 +212,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               break;
           }
         },
+        notificationPredicate: (notification) {
+          // Always handle refresh
+          return true;
+        },
         child: NestedScrollView(
           scrollBehavior: MouseTouchScrollBehavior(),
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
