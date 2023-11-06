@@ -35,7 +35,7 @@ class _SystemHash {
 const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily();
 
 /// See also [_fetchCreatorFromId].
-class _FetchCreatorFromIdFamily extends Family<AsyncValue<CreatorType>> {
+class _FetchCreatorFromIdFamily extends Family {
   /// See also [_fetchCreatorFromId].
   const _FetchCreatorFromIdFamily();
 
@@ -79,8 +79,7 @@ class _FetchCreatorFromIdFamily extends Family<AsyncValue<CreatorType>> {
   }
 }
 
-class _$FetchCreatorFromIdFamilyOverride
-    implements FamilyOverride<AsyncValue<CreatorType>> {
+class _$FetchCreatorFromIdFamilyOverride implements FamilyOverride {
   _$FetchCreatorFromIdFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<CreatorType> Function(_FetchCreatorFromIdRef ref) create;
@@ -209,7 +208,7 @@ String _$fetchCreatorTitlesHash() =>
 const _fetchCreatorTitlesProvider = _FetchCreatorTitlesFamily();
 
 /// See also [_fetchCreatorTitles].
-class _FetchCreatorTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
+class _FetchCreatorTitlesFamily extends Family {
   /// See also [_fetchCreatorTitles].
   const _FetchCreatorTitlesFamily();
 
@@ -253,8 +252,7 @@ class _FetchCreatorTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
   }
 }
 
-class _$FetchCreatorTitlesFamilyOverride
-    implements FamilyOverride<AsyncValue<Iterable<Manga>>> {
+class _$FetchCreatorTitlesFamilyOverride implements FamilyOverride {
   _$FetchCreatorTitlesFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create;

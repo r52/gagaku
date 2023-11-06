@@ -270,8 +270,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       ref.watch(followingStatusProvider(manga)).valueOrNull;
                   final readProvider = ref.watch(readingStatusProvider(manga));
                   final ratingProv = ref.watch(ratingsProvider);
+                  final userListsProv = ref.watch(userListsProvider);
                   final reading = readProvider.valueOrNull;
                   final ratings = ratingProv.valueOrNull;
+                  final userLists = userListsProv.valueOrNull;
 
                   if (following == null || readProvider.isLoading) {
                     actions.add(const Padding(
@@ -509,13 +511,187 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             10,
                             (index) => PopupMenuItem<int>(
                               value: index + 1,
-                              child: Text('${index + 1}'),
+                              child: Text(RatingLabel[index + 1]),
                             ),
                           ).reversed.toList();
 
-                          items.add(const PopupMenuItem<int>(
-                            value: 0,
-                            child: Text('Remove'),
+                          if (ratings.containsKey(manga.id) &&
+                              ratings[manga.id]!.rating > 0) {
+                            items.add(const PopupMenuItem<int>(
+                              value: 0,
+                              child: Text('Remove Rating'),
+                            ));
+                          }
+
+                          return items;
+                        },
+                      ),
+                    ]);
+                  }
+
+                  if (userListsProv.isLoading || userLists == null) {
+                    actions.add(const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ));
+                  } else {
+                    actions.addAll([
+                      PopupMenuButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        shape: const RoundedRectangleBorder(),
+                        tooltip: 'User Lists',
+                        icon: Container(
+                          padding: const EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade600,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(6.0)),
+                          ),
+                          child: const Icon(Icons.playlist_add),
+                        ),
+                        itemBuilder: (context) {
+                          final items = List.generate(
+                            userLists.length,
+                            (index) => PopupMenuItem(
+                              // value: userLists.elementAt(index).id,
+                              child: StatefulBuilder(
+                                builder: (_, setState) => CheckboxListTile(
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  title: Text(userLists
+                                      .elementAt(index)
+                                      .attributes
+                                      .name),
+                                  value: userLists
+                                      .elementAt(index)
+                                      .set
+                                      .contains(manga.id),
+                                  onChanged: (bool? value) async {
+                                    await ref
+                                        .read(userListsProvider.notifier)
+                                        .updateList(userLists.elementAt(index),
+                                            manga, value == true);
+
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                            ),
+                          ).toList();
+
+                          items.add(PopupMenuItem(
+                            child: const Text('+ Create new list'),
+                            onTap: () async {
+                              final messenger = ScaffoldMessenger.of(context);
+
+                              final result = await showDialog<(String, bool)>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return HookBuilder(
+                                      builder: (context) {
+                                        final nav = Navigator.of(context);
+                                        final nameController =
+                                            useTextEditingController();
+                                        final nameIsEmpty =
+                                            useListenableSelector(
+                                                nameController,
+                                                () => nameController
+                                                    .text.isEmpty);
+                                        final nprivate = useState(true);
+
+                                        return AlertDialog(
+                                          title: const Text('Create New List'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              TextFormField(
+                                                controller: nameController,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  filled: true,
+                                                  labelText: 'List Name',
+                                                ),
+                                                autovalidateMode:
+                                                    AutovalidateMode
+                                                        .onUserInteraction,
+                                                validator: (String? value) {
+                                                  return (value == null ||
+                                                          value.isEmpty)
+                                                      ? 'List name cannot be empty.'
+                                                      : null;
+                                                },
+                                              ),
+                                              CheckboxListTile(
+                                                controlAffinity:
+                                                    ListTileControlAffinity
+                                                        .leading,
+                                                title:
+                                                    const Text('Private list'),
+                                                value: nprivate.value,
+                                                onChanged: (bool? value) async {
+                                                  nprivate.value =
+                                                      (value == true);
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: const Text('Cancel'),
+                                              onPressed: () {
+                                                nav.pop(null);
+                                              },
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: nameIsEmpty
+                                                  ? null
+                                                  : () {
+                                                      if (nameController
+                                                          .text.isNotEmpty) {
+                                                        nav.pop((
+                                                          nameController.text,
+                                                          nprivate.value
+                                                        ));
+                                                      }
+                                                    },
+                                              child: const Text('Create'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  });
+
+                              if (result != null) {
+                                final success = await ref
+                                    .read(userListsProvider.notifier)
+                                    .newList(result.$1, result.$2);
+
+                                if (success) {
+                                  messenger
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      const SnackBar(
+                                        content: Text('New list created.'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                } else {
+                                  messenger
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Failed create list.'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                }
+                              }
+                            },
                           ));
 
                           return items;

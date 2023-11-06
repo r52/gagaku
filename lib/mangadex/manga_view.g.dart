@@ -34,7 +34,7 @@ class _SystemHash {
 const _fetchMangaFromIdProvider = _FetchMangaFromIdFamily();
 
 /// See also [_fetchMangaFromId].
-class _FetchMangaFromIdFamily extends Family<AsyncValue<Manga>> {
+class _FetchMangaFromIdFamily extends Family {
   /// See also [_fetchMangaFromId].
   const _FetchMangaFromIdFamily();
 
@@ -78,8 +78,7 @@ class _FetchMangaFromIdFamily extends Family<AsyncValue<Manga>> {
   }
 }
 
-class _$FetchMangaFromIdFamilyOverride
-    implements FamilyOverride<AsyncValue<Manga>> {
+class _$FetchMangaFromIdFamilyOverride implements FamilyOverride {
   _$FetchMangaFromIdFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create;
@@ -206,7 +205,7 @@ String _$fetchReadChaptersRedunHash() =>
 const _fetchReadChaptersRedunProvider = _FetchReadChaptersRedunFamily();
 
 /// See also [_fetchReadChaptersRedun].
-class _FetchReadChaptersRedunFamily extends Family<AsyncValue<void>> {
+class _FetchReadChaptersRedunFamily extends Family {
   /// See also [_fetchReadChaptersRedun].
   const _FetchReadChaptersRedunFamily();
 
@@ -250,8 +249,7 @@ class _FetchReadChaptersRedunFamily extends Family<AsyncValue<void>> {
   }
 }
 
-class _$FetchReadChaptersRedunFamilyOverride
-    implements FamilyOverride<AsyncValue<void>> {
+class _$FetchReadChaptersRedunFamilyOverride implements FamilyOverride {
   _$FetchReadChaptersRedunFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create;
@@ -378,7 +376,7 @@ String _$fetchRelatedMangaHash() => r'b4fa1f593d88425b7b25806e263409df11b39d65';
 const _fetchRelatedMangaProvider = _FetchRelatedMangaFamily();
 
 /// See also [_fetchRelatedManga].
-class _FetchRelatedMangaFamily extends Family<AsyncValue<Iterable<Manga>>> {
+class _FetchRelatedMangaFamily extends Family {
   /// See also [_fetchRelatedManga].
   const _FetchRelatedMangaFamily();
 
@@ -422,8 +420,7 @@ class _FetchRelatedMangaFamily extends Family<AsyncValue<Iterable<Manga>>> {
   }
 }
 
-class _$FetchRelatedMangaFamilyOverride
-    implements FamilyOverride<AsyncValue<Iterable<Manga>>> {
+class _$FetchRelatedMangaFamilyOverride implements FamilyOverride {
   _$FetchRelatedMangaFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create;

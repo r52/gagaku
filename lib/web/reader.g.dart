@@ -35,7 +35,7 @@ class _SystemHash {
 const _fetchWebChapterInfoProvider = _FetchWebChapterInfoFamily();
 
 /// See also [_fetchWebChapterInfo].
-class _FetchWebChapterInfoFamily extends Family<AsyncValue<WebReaderData>> {
+class _FetchWebChapterInfoFamily extends Family {
   /// See also [_fetchWebChapterInfo].
   const _FetchWebChapterInfoFamily();
 
@@ -79,8 +79,7 @@ class _FetchWebChapterInfoFamily extends Family<AsyncValue<WebReaderData>> {
   }
 }
 
-class _$FetchWebChapterInfoFamilyOverride
-    implements FamilyOverride<AsyncValue<WebReaderData>> {
+class _$FetchWebChapterInfoFamilyOverride implements FamilyOverride {
   _$FetchWebChapterInfoFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<WebReaderData> Function(_FetchWebChapterInfoRef ref) create;
@@ -208,7 +207,7 @@ String _$getPagesHash() => r'2f561a3d26939d96cfbadbfa68d5ce72f08e92f4';
 const _getPagesProvider = _GetPagesFamily();
 
 /// See also [_getPages].
-class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
+class _GetPagesFamily extends Family {
   /// See also [_getPages].
   const _GetPagesFamily();
 
@@ -252,8 +251,7 @@ class _GetPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   }
 }
 
-class _$GetPagesFamilyOverride
-    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+class _$GetPagesFamilyOverride implements FamilyOverride {
   _$GetPagesFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<List<ReaderPage>> Function(_GetPagesRef ref) create;

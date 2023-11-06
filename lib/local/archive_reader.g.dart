@@ -34,7 +34,7 @@ class _SystemHash {
 const _getArchivePagesProvider = _GetArchivePagesFamily();
 
 /// See also [_getArchivePages].
-class _GetArchivePagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
+class _GetArchivePagesFamily extends Family {
   /// See also [_getArchivePages].
   const _GetArchivePagesFamily();
 
@@ -78,8 +78,7 @@ class _GetArchivePagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   }
 }
 
-class _$GetArchivePagesFamilyOverride
-    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+class _$GetArchivePagesFamilyOverride implements FamilyOverride {
   _$GetArchivePagesFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<List<ReaderPage>> Function(_GetArchivePagesRef ref) create;

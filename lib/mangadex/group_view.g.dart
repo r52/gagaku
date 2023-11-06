@@ -34,7 +34,7 @@ class _SystemHash {
 const _fetchGroupFromIdProvider = _FetchGroupFromIdFamily();
 
 /// See also [_fetchGroupFromId].
-class _FetchGroupFromIdFamily extends Family<AsyncValue<Group>> {
+class _FetchGroupFromIdFamily extends Family {
   /// See also [_fetchGroupFromId].
   const _FetchGroupFromIdFamily();
 
@@ -78,8 +78,7 @@ class _FetchGroupFromIdFamily extends Family<AsyncValue<Group>> {
   }
 }
 
-class _$FetchGroupFromIdFamilyOverride
-    implements FamilyOverride<AsyncValue<Group>> {
+class _$FetchGroupFromIdFamilyOverride implements FamilyOverride {
   _$FetchGroupFromIdFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<Group> Function(_FetchGroupFromIdRef ref) create;
@@ -205,8 +204,7 @@ String _$fetchGroupFeedHash() => r'2accd66c235ba80d1b919b2fe8e0299eb984ae5d';
 const _fetchGroupFeedProvider = _FetchGroupFeedFamily();
 
 /// See also [_fetchGroupFeed].
-class _FetchGroupFeedFamily
-    extends Family<AsyncValue<List<ChapterFeedItemData>>> {
+class _FetchGroupFeedFamily extends Family {
   /// See also [_fetchGroupFeed].
   const _FetchGroupFeedFamily();
 
@@ -251,8 +249,7 @@ class _FetchGroupFeedFamily
   }
 }
 
-class _$FetchGroupFeedFamilyOverride
-    implements FamilyOverride<AsyncValue<List<ChapterFeedItemData>>> {
+class _$FetchGroupFeedFamilyOverride implements FamilyOverride {
   _$FetchGroupFeedFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<List<ChapterFeedItemData>> Function(_FetchGroupFeedRef ref)
@@ -382,7 +379,7 @@ String _$fetchGroupTitlesHash() => r'7807d9d1023b067036001ef4fe0045d8b256766a';
 const _fetchGroupTitlesProvider = _FetchGroupTitlesFamily();
 
 /// See also [_fetchGroupTitles].
-class _FetchGroupTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
+class _FetchGroupTitlesFamily extends Family {
   /// See also [_fetchGroupTitles].
   const _FetchGroupTitlesFamily();
 
@@ -426,8 +423,7 @@ class _FetchGroupTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
   }
 }
 
-class _$FetchGroupTitlesFamilyOverride
-    implements FamilyOverride<AsyncValue<Iterable<Manga>>> {
+class _$FetchGroupTitlesFamilyOverride implements FamilyOverride {
   _$FetchGroupTitlesFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<Iterable<Manga>> Function(_FetchGroupTitlesRef ref) create;

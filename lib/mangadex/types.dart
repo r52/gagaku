@@ -82,6 +82,20 @@ extension MangaReadingStatusExt on MangaReadingStatus {
   }
 }
 
+const RatingLabel = [
+  'Remove Rating',
+  '(1) Appalling',
+  '(2) Horrible',
+  '(3) Very Bad',
+  '(4) Bad',
+  '(5) Average',
+  '(6) Fine',
+  '(7) Good',
+  '(8) Very Good',
+  '(9) Great',
+  '(10) Masterpiece',
+];
+
 enum TagGroup { content, format, genre, theme }
 
 extension TagGroupExt on TagGroup {
@@ -106,6 +120,8 @@ enum FilterOrder {
   title_asc,
   title_desc,
 }
+
+enum CustomListVisibility { private, public }
 
 extension FilterOrderExt on FilterOrder {
   String get formatted => const [
@@ -373,13 +389,13 @@ class Chapter with _$Chapter, MangaDexUUID {
 
   String getMangaID() {
     final mangas = relationships.where((element) => switch (element) {
-          RelationshipManga() => true,
+          MangaID() => true,
           _ => false,
         });
 
     if (mangas.isNotEmpty) {
       final m = switch (mangas.first) {
-        RelationshipManga(:final id) => id,
+        MangaID(:final id) => id,
         _ => '',
       };
       return m;
@@ -396,7 +412,7 @@ class Chapter with _$Chapter, MangaDexUUID {
 
     if (user.isNotEmpty) {
       final u = switch (user.first) {
-        RelationshipUser(:final attributes) => attributes.username,
+        RelationshipUser(:final attributes) => attributes?.username ?? '',
         _ => '',
       };
       return u;
@@ -500,11 +516,11 @@ abstract class CreatorType with MangaDexUUID {
 class Relationship with _$Relationship, MangaDexUUID {
   const factory Relationship.manga({
     required String id,
-  }) = RelationshipManga;
+  }) = MangaID;
 
   const factory Relationship.user({
     required String id,
-    required UserAttributes attributes,
+    required UserAttributes? attributes,
   }) = RelationshipUser;
 
   @Implements<CreatorType>()
@@ -521,7 +537,7 @@ class Relationship with _$Relationship, MangaDexUUID {
 
   const factory Relationship.creator({
     required String id,
-  }) = RelationshipCreator;
+  }) = CreatorID;
 
   @FreezedUnionValue('cover_art')
   @Implements<Cover>()
@@ -720,7 +736,7 @@ class Manga with _$Manga, MangaDexUUID {
 
   List<String> getRelatedManga() {
     final mangaRs = relationships.where((element) => switch (element) {
-          RelationshipManga() => true,
+          MangaID() => true,
           _ => false,
         });
 
@@ -870,6 +886,58 @@ class SelfRating with _$SelfRating, ExpiringData {
 
   factory SelfRating.fromJson(Map<String, dynamic> json) =>
       _$SelfRatingFromJson(json);
+}
+
+@freezed
+class CustomListList with _$CustomListList {
+  const factory CustomListList(
+    List<CustomList> data,
+    int total,
+  ) = _CustomListList;
+
+  factory CustomListList.fromJson(Map<String, dynamic> json) =>
+      _$CustomListListFromJson(json);
+}
+
+@freezed
+class CustomList with _$CustomList, MangaDexUUID {
+  CustomList._();
+
+  factory CustomList({
+    required String id,
+    required CustomListAttributes attributes,
+    required List<Relationship> relationships,
+  }) = _CustomList;
+
+  late final set = _convertIDs();
+
+  factory CustomList.fromJson(Map<String, dynamic> json) =>
+      _$CustomListFromJson(json);
+
+  Set<String> _convertIDs() {
+    final rs = relationships.where((element) => switch (element) {
+          MangaID() => true,
+          _ => false,
+        });
+
+    if (rs.isNotEmpty) {
+      return rs.map((e) => (e as MangaID).id).toSet();
+    }
+
+    return {};
+  }
+}
+
+@freezed
+class CustomListAttributes with _$CustomListAttributes {
+  const factory CustomListAttributes({
+    required String name,
+    required CustomListVisibility visibility,
+    required int version,
+  }) = _CustomListAttributes;
+
+  factory CustomListAttributes.fromJson(Map<String, dynamic> json) =>
+      _$CustomListAttributesFromJson(json);
 }
 
 class PageData {

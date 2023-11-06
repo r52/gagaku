@@ -2314,7 +2314,7 @@ abstract class _AuthorAttributes implements AuthorAttributes {
 Relationship _$RelationshipFromJson(Map<String, dynamic> json) {
   switch (json['type']) {
     case 'manga':
-      return RelationshipManga.fromJson(json);
+      return MangaID.fromJson(json);
     case 'user':
       return RelationshipUser.fromJson(json);
     case 'artist':
@@ -2322,7 +2322,7 @@ Relationship _$RelationshipFromJson(Map<String, dynamic> json) {
     case 'author':
       return Author.fromJson(json);
     case 'creator':
-      return RelationshipCreator.fromJson(json);
+      return CreatorID.fromJson(json);
     case 'cover_art':
       return CoverArt.fromJson(json);
     case 'scanlation_group':
@@ -2340,7 +2340,7 @@ mixin _$Relationship {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2352,7 +2352,7 @@ mixin _$Relationship {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2363,7 +2363,7 @@ mixin _$Relationship {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2374,33 +2374,33 @@ mixin _$Relationship {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -2446,22 +2446,22 @@ class _$RelationshipCopyWithImpl<$Res, $Val extends Relationship>
 }
 
 /// @nodoc
-abstract class _$$RelationshipMangaImplCopyWith<$Res>
+abstract class _$$MangaIDImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$RelationshipMangaImplCopyWith(_$RelationshipMangaImpl value,
-          $Res Function(_$RelationshipMangaImpl) then) =
-      __$$RelationshipMangaImplCopyWithImpl<$Res>;
+  factory _$$MangaIDImplCopyWith(
+          _$MangaIDImpl value, $Res Function(_$MangaIDImpl) then) =
+      __$$MangaIDImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id});
 }
 
 /// @nodoc
-class __$$RelationshipMangaImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipMangaImpl>
-    implements _$$RelationshipMangaImplCopyWith<$Res> {
-  __$$RelationshipMangaImplCopyWithImpl(_$RelationshipMangaImpl _value,
-      $Res Function(_$RelationshipMangaImpl) _then)
+class __$$MangaIDImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$MangaIDImpl>
+    implements _$$MangaIDImplCopyWith<$Res> {
+  __$$MangaIDImplCopyWithImpl(
+      _$MangaIDImpl _value, $Res Function(_$MangaIDImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -2469,7 +2469,7 @@ class __$$RelationshipMangaImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
   }) {
-    return _then(_$RelationshipMangaImpl(
+    return _then(_$MangaIDImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -2480,14 +2480,12 @@ class __$$RelationshipMangaImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RelationshipMangaImpl
-    with DiagnosticableTreeMixin
-    implements RelationshipManga {
-  const _$RelationshipMangaImpl({required this.id, final String? $type})
+class _$MangaIDImpl with DiagnosticableTreeMixin implements MangaID {
+  const _$MangaIDImpl({required this.id, final String? $type})
       : $type = $type ?? 'manga';
 
-  factory _$RelationshipMangaImpl.fromJson(Map<String, dynamic> json) =>
-      _$$RelationshipMangaImplFromJson(json);
+  factory _$MangaIDImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaIDImplFromJson(json);
 
   @override
   final String id;
@@ -2511,15 +2509,14 @@ class _$RelationshipMangaImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$RelationshipMangaImplCopyWith<_$RelationshipMangaImpl> get copyWith =>
-      __$$RelationshipMangaImplCopyWithImpl<_$RelationshipMangaImpl>(
-          this, _$identity);
+  _$$MangaIDImplCopyWith<_$MangaIDImpl> get copyWith =>
+      __$$MangaIDImplCopyWithImpl<_$MangaIDImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2534,7 +2531,7 @@ class _$RelationshipMangaImpl
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2548,7 +2545,7 @@ class _$RelationshipMangaImpl
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2565,11 +2562,11 @@ class _$RelationshipMangaImpl
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) {
@@ -2579,11 +2576,11 @@ class _$RelationshipMangaImpl
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) {
@@ -2593,11 +2590,11 @@ class _$RelationshipMangaImpl
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -2610,24 +2607,22 @@ class _$RelationshipMangaImpl
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RelationshipMangaImplToJson(
+    return _$$MangaIDImplToJson(
       this,
     );
   }
 }
 
-abstract class RelationshipManga implements Relationship {
-  const factory RelationshipManga({required final String id}) =
-      _$RelationshipMangaImpl;
+abstract class MangaID implements Relationship {
+  const factory MangaID({required final String id}) = _$MangaIDImpl;
 
-  factory RelationshipManga.fromJson(Map<String, dynamic> json) =
-      _$RelationshipMangaImpl.fromJson;
+  factory MangaID.fromJson(Map<String, dynamic> json) = _$MangaIDImpl.fromJson;
 
   @override
   String get id;
   @override
   @JsonKey(ignore: true)
-  _$$RelationshipMangaImplCopyWith<_$RelationshipMangaImpl> get copyWith =>
+  _$$MangaIDImplCopyWith<_$MangaIDImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2639,9 +2634,9 @@ abstract class _$$RelationshipUserImplCopyWith<$Res>
       __$$RelationshipUserImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, UserAttributes attributes});
+  $Res call({String id, UserAttributes? attributes});
 
-  $UserAttributesCopyWith<$Res> get attributes;
+  $UserAttributesCopyWith<$Res>? get attributes;
 }
 
 /// @nodoc
@@ -2656,24 +2651,28 @@ class __$$RelationshipUserImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? attributes = null,
+    Object? attributes = freezed,
   }) {
     return _then(_$RelationshipUserImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      attributes: null == attributes
+      attributes: freezed == attributes
           ? _value.attributes
           : attributes // ignore: cast_nullable_to_non_nullable
-              as UserAttributes,
+              as UserAttributes?,
     ));
   }
 
   @override
   @pragma('vm:prefer-inline')
-  $UserAttributesCopyWith<$Res> get attributes {
-    return $UserAttributesCopyWith<$Res>(_value.attributes, (value) {
+  $UserAttributesCopyWith<$Res>? get attributes {
+    if (_value.attributes == null) {
+      return null;
+    }
+
+    return $UserAttributesCopyWith<$Res>(_value.attributes!, (value) {
       return _then(_value.copyWith(attributes: value));
     });
   }
@@ -2694,7 +2693,7 @@ class _$RelationshipUserImpl
   @override
   final String id;
   @override
-  final UserAttributes attributes;
+  final UserAttributes? attributes;
 
   @JsonKey(name: 'type')
   final String $type;
@@ -2724,7 +2723,7 @@ class _$RelationshipUserImpl
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2739,7 +2738,7 @@ class _$RelationshipUserImpl
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2753,7 +2752,7 @@ class _$RelationshipUserImpl
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2770,11 +2769,11 @@ class _$RelationshipUserImpl
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) {
@@ -2784,11 +2783,11 @@ class _$RelationshipUserImpl
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) {
@@ -2798,11 +2797,11 @@ class _$RelationshipUserImpl
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -2824,14 +2823,14 @@ class _$RelationshipUserImpl
 abstract class RelationshipUser implements Relationship {
   const factory RelationshipUser(
       {required final String id,
-      required final UserAttributes attributes}) = _$RelationshipUserImpl;
+      required final UserAttributes? attributes}) = _$RelationshipUserImpl;
 
   factory RelationshipUser.fromJson(Map<String, dynamic> json) =
       _$RelationshipUserImpl.fromJson;
 
   @override
   String get id;
-  UserAttributes get attributes;
+  UserAttributes? get attributes;
   @override
   @JsonKey(ignore: true)
   _$$RelationshipUserImplCopyWith<_$RelationshipUserImpl> get copyWith =>
@@ -2928,7 +2927,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -2943,7 +2942,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -2957,7 +2956,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -2974,11 +2973,11 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) {
@@ -2988,11 +2987,11 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) {
@@ -3002,11 +3001,11 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -3131,7 +3130,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -3146,7 +3145,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -3160,7 +3159,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -3177,11 +3176,11 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) {
@@ -3191,11 +3190,11 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) {
@@ -3205,11 +3204,11 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -3245,22 +3244,22 @@ abstract class Author implements Relationship, CreatorType {
 }
 
 /// @nodoc
-abstract class _$$RelationshipCreatorImplCopyWith<$Res>
+abstract class _$$CreatorIDImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$RelationshipCreatorImplCopyWith(_$RelationshipCreatorImpl value,
-          $Res Function(_$RelationshipCreatorImpl) then) =
-      __$$RelationshipCreatorImplCopyWithImpl<$Res>;
+  factory _$$CreatorIDImplCopyWith(
+          _$CreatorIDImpl value, $Res Function(_$CreatorIDImpl) then) =
+      __$$CreatorIDImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id});
 }
 
 /// @nodoc
-class __$$RelationshipCreatorImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipCreatorImpl>
-    implements _$$RelationshipCreatorImplCopyWith<$Res> {
-  __$$RelationshipCreatorImplCopyWithImpl(_$RelationshipCreatorImpl _value,
-      $Res Function(_$RelationshipCreatorImpl) _then)
+class __$$CreatorIDImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$CreatorIDImpl>
+    implements _$$CreatorIDImplCopyWith<$Res> {
+  __$$CreatorIDImplCopyWithImpl(
+      _$CreatorIDImpl _value, $Res Function(_$CreatorIDImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3268,7 +3267,7 @@ class __$$RelationshipCreatorImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
   }) {
-    return _then(_$RelationshipCreatorImpl(
+    return _then(_$CreatorIDImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -3279,14 +3278,12 @@ class __$$RelationshipCreatorImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RelationshipCreatorImpl
-    with DiagnosticableTreeMixin
-    implements RelationshipCreator {
-  const _$RelationshipCreatorImpl({required this.id, final String? $type})
+class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
+  const _$CreatorIDImpl({required this.id, final String? $type})
       : $type = $type ?? 'creator';
 
-  factory _$RelationshipCreatorImpl.fromJson(Map<String, dynamic> json) =>
-      _$$RelationshipCreatorImplFromJson(json);
+  factory _$CreatorIDImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CreatorIDImplFromJson(json);
 
   @override
   final String id;
@@ -3310,15 +3307,14 @@ class _$RelationshipCreatorImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$RelationshipCreatorImplCopyWith<_$RelationshipCreatorImpl> get copyWith =>
-      __$$RelationshipCreatorImplCopyWithImpl<_$RelationshipCreatorImpl>(
-          this, _$identity);
+  _$$CreatorIDImplCopyWith<_$CreatorIDImpl> get copyWith =>
+      __$$CreatorIDImplCopyWithImpl<_$CreatorIDImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -3333,7 +3329,7 @@ class _$RelationshipCreatorImpl
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -3347,7 +3343,7 @@ class _$RelationshipCreatorImpl
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -3364,11 +3360,11 @@ class _$RelationshipCreatorImpl
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) {
@@ -3378,11 +3374,11 @@ class _$RelationshipCreatorImpl
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) {
@@ -3392,11 +3388,11 @@ class _$RelationshipCreatorImpl
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -3409,24 +3405,23 @@ class _$RelationshipCreatorImpl
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RelationshipCreatorImplToJson(
+    return _$$CreatorIDImplToJson(
       this,
     );
   }
 }
 
-abstract class RelationshipCreator implements Relationship {
-  const factory RelationshipCreator({required final String id}) =
-      _$RelationshipCreatorImpl;
+abstract class CreatorID implements Relationship {
+  const factory CreatorID({required final String id}) = _$CreatorIDImpl;
 
-  factory RelationshipCreator.fromJson(Map<String, dynamic> json) =
-      _$RelationshipCreatorImpl.fromJson;
+  factory CreatorID.fromJson(Map<String, dynamic> json) =
+      _$CreatorIDImpl.fromJson;
 
   @override
   String get id;
   @override
   @JsonKey(ignore: true)
-  _$$RelationshipCreatorImplCopyWith<_$RelationshipCreatorImpl> get copyWith =>
+  _$$CreatorIDImplCopyWith<_$CreatorIDImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -3524,7 +3519,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -3539,7 +3534,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -3553,7 +3548,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -3570,11 +3565,11 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) {
@@ -3584,11 +3579,11 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) {
@@ -3598,11 +3593,11 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -3731,7 +3726,7 @@ class _$ScanlationGroupImpl
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) manga,
-    required TResult Function(String id, UserAttributes attributes) user,
+    required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
     required TResult Function(String id, AuthorAttributes attributes) author,
     required TResult Function(String id) creator,
@@ -3746,7 +3741,7 @@ class _$ScanlationGroupImpl
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? manga,
-    TResult? Function(String id, UserAttributes attributes)? user,
+    TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
     TResult? Function(String id, AuthorAttributes attributes)? author,
     TResult? Function(String id)? creator,
@@ -3760,7 +3755,7 @@ class _$ScanlationGroupImpl
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? manga,
-    TResult Function(String id, UserAttributes attributes)? user,
+    TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
     TResult Function(String id, AuthorAttributes attributes)? author,
     TResult Function(String id)? creator,
@@ -3777,11 +3772,11 @@ class _$ScanlationGroupImpl
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(RelationshipManga value) manga,
+    required TResult Function(MangaID value) manga,
     required TResult Function(RelationshipUser value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
-    required TResult Function(RelationshipCreator value) creator,
+    required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(ScanlationGroup value) group,
   }) {
@@ -3791,11 +3786,11 @@ class _$ScanlationGroupImpl
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(RelationshipManga value)? manga,
+    TResult? Function(MangaID value)? manga,
     TResult? Function(RelationshipUser value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
-    TResult? Function(RelationshipCreator value)? creator,
+    TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(ScanlationGroup value)? group,
   }) {
@@ -3805,11 +3800,11 @@ class _$ScanlationGroupImpl
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(RelationshipManga value)? manga,
+    TResult Function(MangaID value)? manga,
     TResult Function(RelationshipUser value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
-    TResult Function(RelationshipCreator value)? creator,
+    TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(ScanlationGroup value)? group,
     required TResult orElse(),
@@ -7426,6 +7421,564 @@ abstract class _SelfRating extends SelfRating {
   @JsonKey(ignore: true)
   _$$SelfRatingImplCopyWith<_$SelfRatingImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+CustomListList _$CustomListListFromJson(Map<String, dynamic> json) {
+  return _CustomListList.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CustomListList {
+  List<CustomList> get data => throw _privateConstructorUsedError;
+  int get total => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CustomListListCopyWith<CustomListList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CustomListListCopyWith<$Res> {
+  factory $CustomListListCopyWith(
+          CustomListList value, $Res Function(CustomListList) then) =
+      _$CustomListListCopyWithImpl<$Res, CustomListList>;
+  @useResult
+  $Res call({List<CustomList> data, int total});
+}
+
+/// @nodoc
+class _$CustomListListCopyWithImpl<$Res, $Val extends CustomListList>
+    implements $CustomListListCopyWith<$Res> {
+  _$CustomListListCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<CustomList>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CustomListListImplCopyWith<$Res>
+    implements $CustomListListCopyWith<$Res> {
+  factory _$$CustomListListImplCopyWith(_$CustomListListImpl value,
+          $Res Function(_$CustomListListImpl) then) =
+      __$$CustomListListImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<CustomList> data, int total});
+}
+
+/// @nodoc
+class __$$CustomListListImplCopyWithImpl<$Res>
+    extends _$CustomListListCopyWithImpl<$Res, _$CustomListListImpl>
+    implements _$$CustomListListImplCopyWith<$Res> {
+  __$$CustomListListImplCopyWithImpl(
+      _$CustomListListImpl _value, $Res Function(_$CustomListListImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_$CustomListListImpl(
+      null == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<CustomList>,
+      null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CustomListListImpl
+    with DiagnosticableTreeMixin
+    implements _CustomListList {
+  const _$CustomListListImpl(final List<CustomList> data, this.total)
+      : _data = data;
+
+  factory _$CustomListListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CustomListListImplFromJson(json);
+
+  final List<CustomList> _data;
+  @override
+  List<CustomList> get data {
+    if (_data is EqualUnmodifiableListView) return _data;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_data);
+  }
+
+  @override
+  final int total;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'CustomListList(data: $data, total: $total)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CustomListList'))
+      ..add(DiagnosticsProperty('data', data))
+      ..add(DiagnosticsProperty('total', total));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CustomListListImpl &&
+            const DeepCollectionEquality().equals(other._data, _data) &&
+            (identical(other.total, total) || other.total == total));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_data), total);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CustomListListImplCopyWith<_$CustomListListImpl> get copyWith =>
+      __$$CustomListListImplCopyWithImpl<_$CustomListListImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CustomListListImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CustomListList implements CustomListList {
+  const factory _CustomListList(final List<CustomList> data, final int total) =
+      _$CustomListListImpl;
+
+  factory _CustomListList.fromJson(Map<String, dynamic> json) =
+      _$CustomListListImpl.fromJson;
+
+  @override
+  List<CustomList> get data;
+  @override
+  int get total;
+  @override
+  @JsonKey(ignore: true)
+  _$$CustomListListImplCopyWith<_$CustomListListImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+CustomList _$CustomListFromJson(Map<String, dynamic> json) {
+  return _CustomList.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CustomList {
+  String get id => throw _privateConstructorUsedError;
+  CustomListAttributes get attributes => throw _privateConstructorUsedError;
+  List<Relationship> get relationships => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CustomListCopyWith<CustomList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CustomListCopyWith<$Res> {
+  factory $CustomListCopyWith(
+          CustomList value, $Res Function(CustomList) then) =
+      _$CustomListCopyWithImpl<$Res, CustomList>;
+  @useResult
+  $Res call(
+      {String id,
+      CustomListAttributes attributes,
+      List<Relationship> relationships});
+
+  $CustomListAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class _$CustomListCopyWithImpl<$Res, $Val extends CustomList>
+    implements $CustomListCopyWith<$Res> {
+  _$CustomListCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+    Object? relationships = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as CustomListAttributes,
+      relationships: null == relationships
+          ? _value.relationships
+          : relationships // ignore: cast_nullable_to_non_nullable
+              as List<Relationship>,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $CustomListAttributesCopyWith<$Res> get attributes {
+    return $CustomListAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$CustomListImplCopyWith<$Res>
+    implements $CustomListCopyWith<$Res> {
+  factory _$$CustomListImplCopyWith(
+          _$CustomListImpl value, $Res Function(_$CustomListImpl) then) =
+      __$$CustomListImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      CustomListAttributes attributes,
+      List<Relationship> relationships});
+
+  @override
+  $CustomListAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class __$$CustomListImplCopyWithImpl<$Res>
+    extends _$CustomListCopyWithImpl<$Res, _$CustomListImpl>
+    implements _$$CustomListImplCopyWith<$Res> {
+  __$$CustomListImplCopyWithImpl(
+      _$CustomListImpl _value, $Res Function(_$CustomListImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+    Object? relationships = null,
+  }) {
+    return _then(_$CustomListImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as CustomListAttributes,
+      relationships: null == relationships
+          ? _value._relationships
+          : relationships // ignore: cast_nullable_to_non_nullable
+              as List<Relationship>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CustomListImpl extends _CustomList with DiagnosticableTreeMixin {
+  _$CustomListImpl(
+      {required this.id,
+      required this.attributes,
+      required final List<Relationship> relationships})
+      : _relationships = relationships,
+        super._();
+
+  factory _$CustomListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CustomListImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final CustomListAttributes attributes;
+  final List<Relationship> _relationships;
+  @override
+  List<Relationship> get relationships {
+    if (_relationships is EqualUnmodifiableListView) return _relationships;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_relationships);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'CustomList(id: $id, attributes: $attributes, relationships: $relationships)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CustomList'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('attributes', attributes))
+      ..add(DiagnosticsProperty('relationships', relationships));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
+      __$$CustomListImplCopyWithImpl<_$CustomListImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CustomListImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CustomList extends CustomList {
+  factory _CustomList(
+      {required final String id,
+      required final CustomListAttributes attributes,
+      required final List<Relationship> relationships}) = _$CustomListImpl;
+  _CustomList._() : super._();
+
+  factory _CustomList.fromJson(Map<String, dynamic> json) =
+      _$CustomListImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  CustomListAttributes get attributes;
+  @override
+  List<Relationship> get relationships;
+  @override
+  @JsonKey(ignore: true)
+  _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+CustomListAttributes _$CustomListAttributesFromJson(Map<String, dynamic> json) {
+  return _CustomListAttributes.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CustomListAttributes {
+  String get name => throw _privateConstructorUsedError;
+  CustomListVisibility get visibility => throw _privateConstructorUsedError;
+  int get version => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CustomListAttributesCopyWith<CustomListAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CustomListAttributesCopyWith<$Res> {
+  factory $CustomListAttributesCopyWith(CustomListAttributes value,
+          $Res Function(CustomListAttributes) then) =
+      _$CustomListAttributesCopyWithImpl<$Res, CustomListAttributes>;
+  @useResult
+  $Res call({String name, CustomListVisibility visibility, int version});
+}
+
+/// @nodoc
+class _$CustomListAttributesCopyWithImpl<$Res,
+        $Val extends CustomListAttributes>
+    implements $CustomListAttributesCopyWith<$Res> {
+  _$CustomListAttributesCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? visibility = null,
+    Object? version = null,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      visibility: null == visibility
+          ? _value.visibility
+          : visibility // ignore: cast_nullable_to_non_nullable
+              as CustomListVisibility,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CustomListAttributesImplCopyWith<$Res>
+    implements $CustomListAttributesCopyWith<$Res> {
+  factory _$$CustomListAttributesImplCopyWith(_$CustomListAttributesImpl value,
+          $Res Function(_$CustomListAttributesImpl) then) =
+      __$$CustomListAttributesImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String name, CustomListVisibility visibility, int version});
+}
+
+/// @nodoc
+class __$$CustomListAttributesImplCopyWithImpl<$Res>
+    extends _$CustomListAttributesCopyWithImpl<$Res, _$CustomListAttributesImpl>
+    implements _$$CustomListAttributesImplCopyWith<$Res> {
+  __$$CustomListAttributesImplCopyWithImpl(_$CustomListAttributesImpl _value,
+      $Res Function(_$CustomListAttributesImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? visibility = null,
+    Object? version = null,
+  }) {
+    return _then(_$CustomListAttributesImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      visibility: null == visibility
+          ? _value.visibility
+          : visibility // ignore: cast_nullable_to_non_nullable
+              as CustomListVisibility,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CustomListAttributesImpl
+    with DiagnosticableTreeMixin
+    implements _CustomListAttributes {
+  const _$CustomListAttributesImpl(
+      {required this.name, required this.visibility, required this.version});
+
+  factory _$CustomListAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CustomListAttributesImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final CustomListVisibility visibility;
+  @override
+  final int version;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'CustomListAttributes(name: $name, visibility: $visibility, version: $version)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CustomListAttributes'))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('visibility', visibility))
+      ..add(DiagnosticsProperty('version', version));
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CustomListAttributesImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.visibility, visibility) ||
+                other.visibility == visibility) &&
+            (identical(other.version, version) || other.version == version));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, name, visibility, version);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CustomListAttributesImplCopyWith<_$CustomListAttributesImpl>
+      get copyWith =>
+          __$$CustomListAttributesImplCopyWithImpl<_$CustomListAttributesImpl>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CustomListAttributesImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CustomListAttributes implements CustomListAttributes {
+  const factory _CustomListAttributes(
+      {required final String name,
+      required final CustomListVisibility visibility,
+      required final int version}) = _$CustomListAttributesImpl;
+
+  factory _CustomListAttributes.fromJson(Map<String, dynamic> json) =
+      _$CustomListAttributesImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  CustomListVisibility get visibility;
+  @override
+  int get version;
+  @override
+  @JsonKey(ignore: true)
+  _$$CustomListAttributesImplCopyWith<_$CustomListAttributesImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 OldToken _$OldTokenFromJson(Map<String, dynamic> json) {

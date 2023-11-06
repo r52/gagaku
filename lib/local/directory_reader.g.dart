@@ -34,7 +34,7 @@ class _SystemHash {
 const _getDirectoryPagesProvider = _GetDirectoryPagesFamily();
 
 /// See also [_getDirectoryPages].
-class _GetDirectoryPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
+class _GetDirectoryPagesFamily extends Family {
   /// See also [_getDirectoryPages].
   const _GetDirectoryPagesFamily();
 
@@ -78,8 +78,7 @@ class _GetDirectoryPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   }
 }
 
-class _$GetDirectoryPagesFamilyOverride
-    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+class _$GetDirectoryPagesFamilyOverride implements FamilyOverride {
   _$GetDirectoryPagesFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<List<ReaderPage>> Function(_GetDirectoryPagesRef ref) create;

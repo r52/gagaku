@@ -34,7 +34,7 @@ class _SystemHash {
 const _fetchChapterDataProvider = _FetchChapterDataFamily();
 
 /// See also [_fetchChapterData].
-class _FetchChapterDataFamily extends Family<AsyncValue<ReaderData>> {
+class _FetchChapterDataFamily extends Family {
   /// See also [_fetchChapterData].
   const _FetchChapterDataFamily();
 
@@ -78,8 +78,7 @@ class _FetchChapterDataFamily extends Family<AsyncValue<ReaderData>> {
   }
 }
 
-class _$FetchChapterDataFamilyOverride
-    implements FamilyOverride<AsyncValue<ReaderData>> {
+class _$FetchChapterDataFamilyOverride implements FamilyOverride {
   _$FetchChapterDataFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create;
@@ -206,7 +205,7 @@ String _$fetchChapterPagesHash() => r'd95fb71f4cc56d537abd2ffe7db4441503825b39';
 const _fetchChapterPagesProvider = _FetchChapterPagesFamily();
 
 /// See also [_fetchChapterPages].
-class _FetchChapterPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
+class _FetchChapterPagesFamily extends Family {
   /// See also [_fetchChapterPages].
   const _FetchChapterPagesFamily();
 
@@ -250,8 +249,7 @@ class _FetchChapterPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
   }
 }
 
-class _$FetchChapterPagesFamilyOverride
-    implements FamilyOverride<AsyncValue<List<ReaderPage>>> {
+class _$FetchChapterPagesFamilyOverride implements FamilyOverride {
   _$FetchChapterPagesFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create;

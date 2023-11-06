@@ -89,7 +89,7 @@ abstract class _$GroupFeed extends BuildlessAsyncNotifier<List<Chapter>> {
 const groupFeedProvider = GroupFeedFamily();
 
 /// See also [GroupFeed].
-class GroupFeedFamily extends Family<AsyncValue<List<Chapter>>> {
+class GroupFeedFamily extends Family {
   /// See also [GroupFeed].
   const GroupFeedFamily();
 
@@ -132,8 +132,7 @@ class GroupFeedFamily extends Family<AsyncValue<List<Chapter>>> {
   }
 }
 
-class _$GroupFeedFamilyOverride
-    implements FamilyOverride<AsyncValue<List<Chapter>>> {
+class _$GroupFeedFamilyOverride implements FamilyOverride {
   _$GroupFeedFamilyOverride(this.overriddenFamily, this.create);
 
   final GroupFeed Function() create;
@@ -272,7 +271,7 @@ abstract class _$GroupTitles extends BuildlessAsyncNotifier<List<Manga>> {
 const groupTitlesProvider = GroupTitlesFamily();
 
 /// See also [GroupTitles].
-class GroupTitlesFamily extends Family<AsyncValue<List<Manga>>> {
+class GroupTitlesFamily extends Family {
   /// See also [GroupTitles].
   const GroupTitlesFamily();
 
@@ -315,8 +314,7 @@ class GroupTitlesFamily extends Family<AsyncValue<List<Manga>>> {
   }
 }
 
-class _$GroupTitlesFamilyOverride
-    implements FamilyOverride<AsyncValue<List<Manga>>> {
+class _$GroupTitlesFamilyOverride implements FamilyOverride {
   _$GroupTitlesFamilyOverride(this.overriddenFamily, this.create);
 
   final GroupTitles Function() create;
@@ -456,7 +454,7 @@ abstract class _$CreatorTitles extends BuildlessAsyncNotifier<List<Manga>> {
 const creatorTitlesProvider = CreatorTitlesFamily();
 
 /// See also [CreatorTitles].
-class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
+class CreatorTitlesFamily extends Family {
   /// See also [CreatorTitles].
   const CreatorTitlesFamily();
 
@@ -499,8 +497,7 @@ class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
   }
 }
 
-class _$CreatorTitlesFamilyOverride
-    implements FamilyOverride<AsyncValue<List<Manga>>> {
+class _$CreatorTitlesFamilyOverride implements FamilyOverride {
   _$CreatorTitlesFamilyOverride(this.overriddenFamily, this.create);
 
   final CreatorTitles Function() create;
@@ -640,7 +637,7 @@ abstract class _$MangaChapters extends BuildlessAsyncNotifier<List<Chapter>> {
 const mangaChaptersProvider = MangaChaptersFamily();
 
 /// See also [MangaChapters].
-class MangaChaptersFamily extends Family<AsyncValue<List<Chapter>>> {
+class MangaChaptersFamily extends Family {
   /// See also [MangaChapters].
   const MangaChaptersFamily();
 
@@ -683,8 +680,7 @@ class MangaChaptersFamily extends Family<AsyncValue<List<Chapter>>> {
   }
 }
 
-class _$MangaChaptersFamilyOverride
-    implements FamilyOverride<AsyncValue<List<Chapter>>> {
+class _$MangaChaptersFamilyOverride implements FamilyOverride {
   _$MangaChaptersFamilyOverride(this.overriddenFamily, this.create);
 
   final MangaChapters Function() create;
@@ -824,7 +820,7 @@ abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<Cover>> {
 const mangaCoversProvider = MangaCoversFamily();
 
 /// See also [MangaCovers].
-class MangaCoversFamily extends Family<AsyncValue<List<Cover>>> {
+class MangaCoversFamily extends Family {
   /// See also [MangaCovers].
   const MangaCoversFamily();
 
@@ -867,8 +863,7 @@ class MangaCoversFamily extends Family<AsyncValue<List<Cover>>> {
   }
 }
 
-class _$MangaCoversFamilyOverride
-    implements FamilyOverride<AsyncValue<List<Cover>>> {
+class _$MangaCoversFamilyOverride implements FamilyOverride {
   _$MangaCoversFamilyOverride(this.overriddenFamily, this.create);
 
   final MangaCovers Function() create;
@@ -1023,7 +1018,7 @@ abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
 const userLibraryProvider = UserLibraryFamily();
 
 /// See also [UserLibrary].
-class UserLibraryFamily extends Family<AsyncValue<Iterable<Manga>>> {
+class UserLibraryFamily extends Family {
   /// See also [UserLibrary].
   const UserLibraryFamily();
 
@@ -1066,8 +1061,7 @@ class UserLibraryFamily extends Family<AsyncValue<Iterable<Manga>>> {
   }
 }
 
-class _$UserLibraryFamilyOverride
-    implements FamilyOverride<AsyncValue<Iterable<Manga>>> {
+class _$UserLibraryFamilyOverride implements FamilyOverride {
   _$UserLibraryFamilyOverride(this.overriddenFamily, this.create);
 
   final UserLibrary Function() create;
@@ -1192,6 +1186,21 @@ class _UserLibraryProviderElement
   MangaReadingStatus get status => (origin as UserLibraryProvider).status;
 }
 
+String _$userListsHash() => r'87a5cd88ae4ffaeb93c9d1ac74291461335ebcbf';
+
+/// See also [UserLists].
+@ProviderFor(UserLists)
+final userListsProvider =
+    AsyncNotifierProvider<UserLists, List<CustomList>>.internal(
+  UserLists.new,
+  name: r'userListsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$userListsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$UserLists = AsyncNotifier<List<CustomList>>;
 String _$tagListHash() => r'0a1fc9b1354d4786d8aac74ab1a13e872b6e9e1b';
 
 /// See also [TagList].
@@ -1222,7 +1231,7 @@ abstract class _$MangaSearch
 const mangaSearchProvider = MangaSearchFamily();
 
 /// See also [MangaSearch].
-class MangaSearchFamily extends Family<AsyncValue<List<Manga>>> {
+class MangaSearchFamily extends Family {
   /// See also [MangaSearch].
   const MangaSearchFamily();
 
@@ -1265,8 +1274,7 @@ class MangaSearchFamily extends Family<AsyncValue<List<Manga>>> {
   }
 }
 
-class _$MangaSearchFamilyOverride
-    implements FamilyOverride<AsyncValue<List<Manga>>> {
+class _$MangaSearchFamilyOverride implements FamilyOverride {
   _$MangaSearchFamilyOverride(this.overriddenFamily, this.create);
 
   final MangaSearch Function() create;
@@ -1438,7 +1446,7 @@ abstract class _$ReadingStatus
 const readingStatusProvider = ReadingStatusFamily();
 
 /// See also [ReadingStatus].
-class ReadingStatusFamily extends Family<AsyncValue<MangaReadingStatus?>> {
+class ReadingStatusFamily extends Family {
   /// See also [ReadingStatus].
   const ReadingStatusFamily();
 
@@ -1481,8 +1489,7 @@ class ReadingStatusFamily extends Family<AsyncValue<MangaReadingStatus?>> {
   }
 }
 
-class _$ReadingStatusFamilyOverride
-    implements FamilyOverride<AsyncValue<MangaReadingStatus?>> {
+class _$ReadingStatusFamilyOverride implements FamilyOverride {
   _$ReadingStatusFamilyOverride(this.overriddenFamily, this.create);
 
   final ReadingStatus Function() create;
@@ -1623,7 +1630,7 @@ abstract class _$FollowingStatus extends BuildlessAsyncNotifier<bool> {
 const followingStatusProvider = FollowingStatusFamily();
 
 /// See also [FollowingStatus].
-class FollowingStatusFamily extends Family<AsyncValue<bool>> {
+class FollowingStatusFamily extends Family {
   /// See also [FollowingStatus].
   const FollowingStatusFamily();
 
@@ -1666,8 +1673,7 @@ class FollowingStatusFamily extends Family<AsyncValue<bool>> {
   }
 }
 
-class _$FollowingStatusFamilyOverride
-    implements FamilyOverride<AsyncValue<bool>> {
+class _$FollowingStatusFamilyOverride implements FamilyOverride {
   _$FollowingStatusFamilyOverride(this.overriddenFamily, this.create);
 
   final FollowingStatus Function() create;

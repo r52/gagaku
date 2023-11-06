@@ -222,15 +222,13 @@ Map<String, dynamic> _$$AuthorAttributesImplToJson(
       'updatedAt': const TimestampSerializer().toJson(instance.updatedAt),
     };
 
-_$RelationshipMangaImpl _$$RelationshipMangaImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RelationshipMangaImpl(
+_$MangaIDImpl _$$MangaIDImplFromJson(Map<String, dynamic> json) =>
+    _$MangaIDImpl(
       id: json['id'] as String,
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$RelationshipMangaImplToJson(
-        _$RelationshipMangaImpl instance) =>
+Map<String, dynamic> _$$MangaIDImplToJson(_$MangaIDImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': instance.$type,
@@ -240,8 +238,9 @@ _$RelationshipUserImpl _$$RelationshipUserImplFromJson(
         Map<String, dynamic> json) =>
     _$RelationshipUserImpl(
       id: json['id'] as String,
-      attributes:
-          UserAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
+      attributes: json['attributes'] == null
+          ? null
+          : UserAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 
@@ -281,15 +280,13 @@ Map<String, dynamic> _$$AuthorImplToJson(_$AuthorImpl instance) =>
       'type': instance.$type,
     };
 
-_$RelationshipCreatorImpl _$$RelationshipCreatorImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RelationshipCreatorImpl(
+_$CreatorIDImpl _$$CreatorIDImplFromJson(Map<String, dynamic> json) =>
+    _$CreatorIDImpl(
       id: json['id'] as String,
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$RelationshipCreatorImplToJson(
-        _$RelationshipCreatorImpl instance) =>
+Map<String, dynamic> _$$CreatorIDImplToJson(_$CreatorIDImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': instance.$type,
@@ -631,6 +628,60 @@ Map<String, dynamic> _$$SelfRatingImplToJson(_$SelfRatingImpl instance) =>
       'rating': instance.rating,
       'createdAt': const TimestampSerializer().toJson(instance.createdAt),
     };
+
+_$CustomListListImpl _$$CustomListListImplFromJson(Map<String, dynamic> json) =>
+    _$CustomListListImpl(
+      (json['data'] as List<dynamic>)
+          .map((e) => CustomList.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      json['total'] as int,
+    );
+
+Map<String, dynamic> _$$CustomListListImplToJson(
+        _$CustomListListImpl instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'total': instance.total,
+    };
+
+_$CustomListImpl _$$CustomListImplFromJson(Map<String, dynamic> json) =>
+    _$CustomListImpl(
+      id: json['id'] as String,
+      attributes: CustomListAttributes.fromJson(
+          json['attributes'] as Map<String, dynamic>),
+      relationships: (json['relationships'] as List<dynamic>)
+          .map((e) => Relationship.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$CustomListImplToJson(_$CustomListImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'attributes': instance.attributes,
+      'relationships': instance.relationships,
+    };
+
+_$CustomListAttributesImpl _$$CustomListAttributesImplFromJson(
+        Map<String, dynamic> json) =>
+    _$CustomListAttributesImpl(
+      name: json['name'] as String,
+      visibility:
+          $enumDecode(_$CustomListVisibilityEnumMap, json['visibility']),
+      version: json['version'] as int,
+    );
+
+Map<String, dynamic> _$$CustomListAttributesImplToJson(
+        _$CustomListAttributesImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'visibility': _$CustomListVisibilityEnumMap[instance.visibility]!,
+      'version': instance.version,
+    };
+
+const _$CustomListVisibilityEnumMap = {
+  CustomListVisibility.private: 'private',
+  CustomListVisibility.public: 'public',
+};
 
 _$OldTokenImpl _$$OldTokenImplFromJson(Map<String, dynamic> json) =>
     _$OldTokenImpl(

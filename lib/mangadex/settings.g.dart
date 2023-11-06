@@ -34,7 +34,7 @@ class _SystemHash {
 const _fetchGroupDataProvider = _FetchGroupDataFamily();
 
 /// See also [_fetchGroupData].
-class _FetchGroupDataFamily extends Family<AsyncValue<Set<Group>>> {
+class _FetchGroupDataFamily extends Family {
   /// See also [_fetchGroupData].
   const _FetchGroupDataFamily();
 
@@ -78,8 +78,7 @@ class _FetchGroupDataFamily extends Family<AsyncValue<Set<Group>>> {
   }
 }
 
-class _$FetchGroupDataFamilyOverride
-    implements FamilyOverride<AsyncValue<Set<Group>>> {
+class _$FetchGroupDataFamilyOverride implements FamilyOverride {
   _$FetchGroupDataFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<Set<Group>> Function(_FetchGroupDataRef ref) create;

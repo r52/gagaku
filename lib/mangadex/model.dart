@@ -90,6 +90,21 @@ abstract class MangaDexEndpoints {
 
   /// Gets author/creator info
   static const creator = '/author';
+
+  /// Gets logged user [CustomList] list
+  static const userList = '/user/list';
+
+  /// Adds/removes manga to/from CustomList
+  static const updateMangaInList = '/manga/{id}/list/{listId}';
+
+  /// Create list
+  static const createList = '/list';
+
+  /// Get/update/delete CustomList
+  static const modifyList = '/list/{id}';
+
+  /// (Future) Follow/unfollow CustomList
+  static const followList = '/list/{id}/follow';
 }
 
 abstract class CacheLists {
@@ -1366,6 +1381,122 @@ class MangaDexModel {
 
     return list;
   }
+
+  /// Fetches logged user's [CustomList] list
+  ///
+  /// Each operation that queries the MangaDex API is limited to
+  /// [MangaDexEndpoints.apiQueryLimit] number of items.
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// Do not use directly. Use [userListsProvider] instead
+  Future<Iterable<CustomList>> fetchUserList([int offset = 0]) async {
+    if (!await loggedIn()) {
+      throw Exception(
+          "fetchUserList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    // Download missing data
+    final queryParams = {
+      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+      'offset': offset.toString(),
+    };
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.userList, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      final result = CustomListList.fromJson(body);
+
+      return result.data;
+    }
+
+    // Throw if failure
+    final msg = "fetchUserList() failed. Response code: ${response.statusCode}";
+    logger.e(msg, error: response.body);
+    throw Exception(msg);
+  }
+
+  /// Adds/removes a [Manga] from a [CustomList]
+  Future<bool> updateMangaInCustomList(
+      CustomList list, Manga manga, bool add) async {
+    if (!await loggedIn()) {
+      throw Exception(
+          "updateMangaInCustomList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.updateMangaInList
+            .replaceFirst('{id}', manga.id)
+            .replaceFirst('{listId}', list.id));
+
+    http.Response? response;
+
+    if (add) {
+      response = await _client.post(uri);
+    } else {
+      response = await _client.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        return true;
+      }
+    }
+
+    // Log the failure
+    logger.w(
+        "updateMangaInCustomList(${list.id}, ${manga.id}, $add) returned code ${response.statusCode}",
+        error: response.body);
+
+    return false;
+  }
+
+  /// Creates a new [CustomList]
+  Future<CustomList?> createNewList(String name, bool private) async {
+    if (!await loggedIn()) {
+      throw Exception(
+          "createNewList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final uri =
+        MangaDexEndpoints.api.replace(path: MangaDexEndpoints.createList);
+
+    final params = {
+      'name': name,
+      'visibility': private ? 'private' : 'public',
+      'manga': [],
+      'version': 1,
+    };
+
+    final response = await _client.post(uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(params));
+
+    if (response.statusCode >= 200 && response.statusCode <= 201) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        // Process new list
+        final nlist = CustomList.fromJson(body['data']);
+
+        return nlist;
+      }
+    }
+
+    // Log the failure
+    logger.w(
+        "createNewList($name, $private) returned code ${response.statusCode}",
+        error: response.body);
+
+    return null;
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -1992,6 +2123,121 @@ class UserLibrary extends _$UserLibrary {
       }
 
       return _fetchAndCheck();
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class UserLists extends _$UserLists {
+  int _offset = 0;
+  bool _atEnd = false;
+
+  Future<List<CustomList>> _fetch(int offset) async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return [];
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final lists = await api.fetchUserList(offset);
+
+    return lists.toList();
+  }
+
+  @override
+  FutureOr<List<CustomList>> build() async {
+    return _fetch(0);
+  }
+
+  Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate = state.valueOrNull ?? [];
+    // If there is more content, get more
+    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
+        !_atEnd) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final manga = await _fetch(_offset + MangaDexEndpoints.apiQueryLimit);
+        _offset += MangaDexEndpoints.apiQueryLimit;
+
+        if (manga.isEmpty) {
+          _atEnd = true;
+        }
+
+        return [...oldstate, ...manga];
+      });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
+    }
+  }
+
+  Future<void> updateList(CustomList list, Manga manga, bool add) async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = state.valueOrNull ?? [];
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final item = oldstate.firstWhere((element) => element.id == list.id);
+
+      final result = await api.updateMangaInCustomList(list, manga, add);
+
+      if (result) {
+        if (add) {
+          item.set.add(manga.id);
+        } else {
+          item.set.remove(manga.id);
+        }
+      }
+
+      // TODO: caching perhaps
+
+      return [...oldstate];
+    });
+  }
+
+  Future<bool> newList(String name, bool private) async {
+    if (state.isLoading || state.isReloading) {
+      return false;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = state.valueOrNull ?? [];
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.createNewList(name, private);
+
+      if (result != null) {
+        return [...oldstate, result];
+      }
+
+      // TODO: caching perhaps
+
+      return [...oldstate];
+    });
+
+    return (state.valueOrNull ?? []).length != oldstate.length;
+  }
+
+  /// Clears the list and refetch from the beginning
+  Future<void> clear() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      _offset = 0;
+      _atEnd = false;
+      return _fetch(_offset);
     });
   }
 }

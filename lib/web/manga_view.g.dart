@@ -34,7 +34,7 @@ class _SystemHash {
 const _fetchWebMangaInfoProvider = _FetchWebMangaInfoFamily();
 
 /// See also [_fetchWebMangaInfo].
-class _FetchWebMangaInfoFamily extends Family<AsyncValue<WebManga>> {
+class _FetchWebMangaInfoFamily extends Family {
   /// See also [_fetchWebMangaInfo].
   const _FetchWebMangaInfoFamily();
 
@@ -78,8 +78,7 @@ class _FetchWebMangaInfoFamily extends Family<AsyncValue<WebManga>> {
   }
 }
 
-class _$FetchWebMangaInfoFamilyOverride
-    implements FamilyOverride<AsyncValue<WebManga>> {
+class _$FetchWebMangaInfoFamilyOverride implements FamilyOverride {
   _$FetchWebMangaInfoFamilyOverride(this.overriddenFamily, this.create);
 
   final FutureOr<WebManga> Function(_FetchWebMangaInfoRef ref) create;
