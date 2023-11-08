@@ -278,3 +278,83 @@ class WebSourceHistory extends _$WebSourceHistory {
     });
   }
 }
+
+@Riverpod(keepAlive: true)
+class WebReadMarkers extends _$WebReadMarkers {
+  Future<Map<String, Set<String>>> _fetch() async {
+    final box = Hive.box(gagakuBox);
+    final str = box.get('web_read_history');
+
+    if (str == null || (str as String).isEmpty) {
+      return <String, Set<String>>{};
+    }
+
+    Map<String, dynamic> content = json.decode(str);
+    final markers = content.map((m, s) => MapEntry(m, Set<String>.from(s)));
+
+    return markers;
+  }
+
+  @override
+  FutureOr<Map<String, Set<String>>> build() async {
+    return _fetch();
+  }
+
+  Future<void> clear() async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final empty = <String, Set<String>>{};
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_read_history', json.encode({}));
+
+      return empty;
+    });
+  }
+
+  Future<void> set(String manga, String chapter, bool setRead) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.valueOrNull ?? <String, Set<String>>{};
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final keyExists = oldstate.containsKey(manga);
+
+      // Refresh
+      if (keyExists) {
+        switch (setRead) {
+          case true:
+            oldstate[manga]?.add(chapter);
+            break;
+          case false:
+            oldstate[manga]?.remove(chapter);
+            break;
+        }
+
+        if (oldstate[manga]!.isEmpty) {
+          oldstate.remove(manga);
+        }
+      } else {
+        if (setRead) {
+          oldstate[manga] = {chapter};
+        }
+      }
+
+      final converted =
+          oldstate.map((key, value) => MapEntry(key, value.toList()));
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_read_history', json.encode(converted));
+
+      return {...oldstate};
+    });
+  }
+}

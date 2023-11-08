@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
@@ -19,6 +22,8 @@ class WebReaderData {
     this.title,
     this.manga,
     this.link,
+    this.info,
+    this.readKey,
     this.onLinkPressed,
   });
 
@@ -26,6 +31,8 @@ class WebReaderData {
   final String? title;
   final WebManga? manga;
   final Widget? link;
+  final ProxyInfo? info;
+  final String? readKey;
   final VoidCallback? onLinkPressed;
 }
 
@@ -40,6 +47,8 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
       manga: data.manga,
       title: data.title,
       link: data.link,
+      info: data.info,
+      readKey: data.readKey,
       onLinkPressed: data.onLinkPressed,
     );
   } else {
@@ -83,6 +92,8 @@ Future<WebReaderData> _fetchWebChapterInfo(
           proxy.manga!.title,
           style: const TextStyle(fontSize: 24),
         ),
+        info: info,
+        readKey: info.chapter,
       );
     }
   }
@@ -134,6 +145,8 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
           manga: value.manga,
           title: value.title,
           link: value.link,
+          info: value.info,
+          readKey: value.readKey,
           onLinkPressed: value.onLinkPressed,
         );
       case AsyncError(:final error, :final stackTrace):
@@ -155,13 +168,15 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
   }
 }
 
-class WebSourceReaderWidget extends ConsumerWidget {
+class WebSourceReaderWidget extends HookConsumerWidget {
   const WebSourceReaderWidget({
     super.key,
     required this.source,
     this.title,
     this.manga,
     this.link,
+    this.info,
+    this.readKey,
     this.onLinkPressed,
   });
 
@@ -169,10 +184,13 @@ class WebSourceReaderWidget extends ConsumerWidget {
   final String? title;
   final WebManga? manga;
   final Widget? link;
+  final ProxyInfo? info;
+  final String? readKey;
   final VoidCallback? onLinkPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final timer = useRef<Timer?>(null);
     String name = '';
 
     if (title != null) {
@@ -182,6 +200,20 @@ class WebSourceReaderWidget extends ConsumerWidget {
     }
 
     final pages = ref.watch(_getPagesProvider(source));
+
+    useEffect(() {
+      if (timer.value?.isActive ?? false) timer.value?.cancel();
+
+      timer.value = Timer(const Duration(milliseconds: 2000), () async {
+        if (info != null && readKey != null) {
+          ref
+              .read(webReadMarkersProvider.notifier)
+              .set(info!.getURL(), readKey!, true);
+        }
+      });
+
+      return () => timer.value?.cancel();
+    });
 
     switch (pages) {
       case AsyncValue(:final error?, :final stackTrace?):

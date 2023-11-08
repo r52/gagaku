@@ -109,7 +109,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
   }
 }
 
-class WebMangaViewWidget extends StatelessWidget {
+class WebMangaViewWidget extends ConsumerWidget {
   const WebMangaViewWidget(
       {super.key, required this.manga, required this.info});
 
@@ -117,13 +117,15 @@ class WebMangaViewWidget extends StatelessWidget {
   final ProxyInfo info;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final chapterlist = manga.chapters.entries
         .map((e) => ChapterEntry(e.key, e.value))
         .toList();
     chapterlist
         .sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
+
+    final readMarkers = ref.watch(webReadMarkersProvider).valueOrNull;
 
     return CustomScrollView(
       scrollBehavior: MouseTouchScrollBehavior(),
@@ -291,6 +293,7 @@ class WebMangaViewWidget extends StatelessWidget {
                 chapter: e.chapter,
                 manga: manga,
                 info: info,
+                isRead: readMarkers?[info.getURL()]?.contains(e.name) ?? false,
                 link: Text(
                   manga.title,
                   style: const TextStyle(fontSize: 24),
@@ -305,13 +308,14 @@ class WebMangaViewWidget extends StatelessWidget {
   }
 }
 
-class ChapterButtonWidget extends StatelessWidget {
+class ChapterButtonWidget extends ConsumerWidget {
   const ChapterButtonWidget({
     super.key,
     required this.name,
     required this.chapter,
     required this.manga,
     required this.info,
+    required this.isRead,
     this.link,
     this.onLinkPressed,
   });
@@ -320,13 +324,15 @@ class ChapterButtonWidget extends StatelessWidget {
   final WebChapter chapter;
   final WebManga manga;
   final ProxyInfo info;
+  final bool isRead;
   final Widget? link;
   final VoidCallback? onLinkPressed;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
+    final tileColor = theme.colorScheme.primaryContainer;
 
     String title = chapter.getTitle(name);
     String group = chapter.groups.entries.first.key;
@@ -339,6 +345,35 @@ class ChapterButtonWidget extends StatelessWidget {
       timestamp = Text(timeago.format(chapter.releaseDate!));
     }
 
+    final border = Border(
+      left: BorderSide(
+          color: isRead == true ? tileColor : Colors.blue, width: 4.0),
+    );
+
+    final textstyle = TextStyle(
+        color: (isRead == true
+            ? theme.highlightColor
+            : theme.colorScheme.primary));
+
+    final markReadBtn = IconButton(
+      onPressed: () async {
+        bool set = !isRead;
+
+        ref.read(webReadMarkersProvider.notifier).set(info.getURL(), name, set);
+      },
+      padding: const EdgeInsets.all(0.0),
+      splashRadius: 15,
+      iconSize: 20,
+      tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
+      icon: Icon(isRead == true ? Icons.visibility_off : Icons.visibility,
+          color: (isRead == true
+              ? theme.highlightColor
+              : theme.primaryIconTheme.color)),
+      constraints: const BoxConstraints(
+          minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
+      visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
+    );
+
     return ListTile(
       onTap: () {
         context.push('/read/${info.proxy}/${info.code}/$name/1/',
@@ -347,6 +382,8 @@ class ChapterButtonWidget extends StatelessWidget {
               title: title,
               manga: manga,
               link: link,
+              info: info,
+              readKey: name,
               onLinkPressed: onLinkPressed,
             ));
       },
@@ -356,9 +393,11 @@ class ChapterButtonWidget extends StatelessWidget {
       contentPadding:
           EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
       minLeadingWidth: 0.0,
+      leading: markReadBtn,
+      shape: border,
       title: Text(
         title,
-        style: TextStyle(color: theme.colorScheme.primary),
+        style: textstyle,
       ),
       trailing: !screenSizeSmall
           ? FittedBox(
