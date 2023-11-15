@@ -84,7 +84,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
         child = RefreshIndicator(
           onRefresh: () async {
             await api.invalidateAll(info.getKey());
-            return await ref.refresh(_fetchWebMangaInfoProvider(info).future);
+            return ref.refresh(_fetchWebMangaInfoProvider(info).future);
           },
           child: WebMangaViewWidget(manga: value, info: info),
         );

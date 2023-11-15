@@ -65,9 +65,7 @@ class MangaDexHistoryFeed extends ConsumerWidget {
       provider: _fetchHistoryFeedProvider,
       title: 'Reading History (local)',
       emptyText: 'No reading history!',
-      onRefresh: () async {
-        return await ref.refresh(mangaDexHistoryProvider.future);
-      },
+      onRefresh: () => ref.refresh(mangaDexHistoryProvider.future),
       controller: controller,
       restorationId: 'history_list_offset',
     );

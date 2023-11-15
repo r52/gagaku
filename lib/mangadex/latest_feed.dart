@@ -64,12 +64,10 @@ class MangaDexGlobalFeed extends ConsumerWidget {
     return ChapterFeedWidget(
       provider: _fetchGlobalChaptersProvider,
       title: 'Latest Uploads',
-      onAtEdge: () {
-        ref.read(latestGlobalFeedProvider.notifier).getMore();
-      },
-      onRefresh: () async {
+      onAtEdge: () => ref.read(latestGlobalFeedProvider.notifier).getMore(),
+      onRefresh: () {
         ref.read(latestGlobalFeedProvider.notifier).clear();
-        return await ref.refresh(_fetchGlobalChaptersProvider.future);
+        return ref.refresh(_fetchGlobalChaptersProvider.future);
       },
       controller: controller,
       restorationId: 'global_list_offset',

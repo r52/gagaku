@@ -50,9 +50,9 @@ class MangaDexMangaFeed extends ConsumerWidget {
                     error: error, stackTrace: stackTrace);
 
                 return RefreshIndicator(
-                  onRefresh: () async {
+                  onRefresh: () {
                     ref.invalidate(latestChaptersFeedProvider);
-                    return await ref.refresh(_fetchMangaFeedProvider.future);
+                    return ref.refresh(_fetchMangaFeedProvider.future);
                   },
                   child: Styles.errorList(error, stackTrace),
                 );
@@ -63,9 +63,9 @@ class MangaDexMangaFeed extends ConsumerWidget {
                 }
 
                 return RefreshIndicator(
-                  onRefresh: () async {
+                  onRefresh: () {
                     ref.read(latestChaptersFeedProvider.notifier).clear();
-                    return await ref.refresh(_fetchMangaFeedProvider.future);
+                    return ref.refresh(_fetchMangaFeedProvider.future);
                   },
                   child: MangaListWidget(
                     title: const Text(

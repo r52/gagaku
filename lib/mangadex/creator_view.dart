@@ -123,9 +123,9 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                   error: error, stackTrace: stackTrace);
 
               return RefreshIndicator(
-                onRefresh: () async {
+                onRefresh: () {
                   ref.invalidate(creatorTitlesProvider(creator));
-                  return await ref
+                  return ref
                       .refresh(_fetchCreatorTitlesProvider(creator).future);
                 },
                 child: Styles.errorList(error, stackTrace),
@@ -137,9 +137,9 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
               }
 
               return RefreshIndicator(
-                onRefresh: () async {
+                onRefresh: () {
                   ref.read(creatorTitlesProvider(creator).notifier).clear();
-                  return await ref
+                  return ref
                       .refresh(_fetchCreatorTitlesProvider(creator).future);
                 },
                 child: MangaListWidget(

@@ -178,9 +178,7 @@ class LocalLibraryHome extends HookConsumerWidget {
             }
 
             return RefreshIndicator(
-              onRefresh: () async {
-                return await ref.refresh(localLibraryProvider.future);
-              },
+              onRefresh: () => ref.refresh(localLibraryProvider.future),
               child: child,
             );
           case AsyncError(:final error, :final stackTrace):
@@ -190,9 +188,7 @@ class LocalLibraryHome extends HookConsumerWidget {
                 error: error, stackTrace: stackTrace);
 
             return RefreshIndicator(
-              onRefresh: () async {
-                return await ref.refresh(localLibraryProvider.future);
-              },
+              onRefresh: () => ref.refresh(localLibraryProvider.future),
               child: Styles.errorList(error, stackTrace),
             );
           case _:

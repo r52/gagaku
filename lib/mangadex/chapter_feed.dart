@@ -59,12 +59,10 @@ class MangaDexChapterFeed extends ConsumerWidget {
       provider: _fetchChaptersProvider,
       title: 'Latest Chapters',
       emptyText: 'Find some manga to follow!',
-      onAtEdge: () {
-        ref.read(latestChaptersFeedProvider.notifier).getMore();
-      },
-      onRefresh: () async {
+      onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
+      onRefresh: () {
         ref.read(latestChaptersFeedProvider.notifier).clear();
-        return await ref.refresh(_fetchChaptersProvider.future);
+        return ref.refresh(_fetchChaptersProvider.future);
       },
       controller: controller,
       restorationId: 'chapter_list_offset',
