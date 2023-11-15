@@ -63,6 +63,8 @@ class MangaDexLoginScreen extends HookConsumerWidget {
         clientIdController, () => clientIdController.text.isEmpty);
     final clientSecretIsEmpty = useListenableSelector(
         clientSecretController, () => clientSecretController.text.isEmpty);
+    final pendingLogin = useState<Future<bool>?>(null);
+    final snapshot = useFuture(pendingLogin.value);
 
     final storage = Hive.box(gagakuBox);
     final user = storage.get('username') as String?;
@@ -78,138 +80,148 @@ class MangaDexLoginScreen extends HookConsumerWidget {
         leading: const BackButton(),
         title: const Text('Login to MangaDex'),
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          children: <Widget>[
-            const SizedBox(height: 200.0),
-            AutofillGroup(
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: usernameController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      labelText: 'Username',
-                    ),
-                    autofillHints: const [AutofillHints.username],
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (String? value) {
-                      return (value == null || value.isEmpty)
-                          ? 'Username cannot be empty.'
-                          : null;
-                    },
-                  ),
-                  const SizedBox(height: 12.0),
-                  TextFormField(
-                    controller: passwordController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      labelText: 'Password',
-                    ),
-                    obscureText: true,
-                    autofillHints: const [AutofillHints.password],
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (String? value) {
-                      return (value == null || value.isEmpty)
-                          ? 'Password cannot be empty.'
-                          : null;
-                    },
-                  ),
-                  const SizedBox(height: 12.0),
-                  TextFormField(
-                    controller: clientIdController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      labelText: 'Client ID',
-                    ),
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (String? value) {
-                      return (value == null || value.isEmpty)
-                          ? 'Client ID cannot be empty.'
-                          : null;
-                    },
-                  ),
-                  const SizedBox(height: 12.0),
-                  TextFormField(
-                    controller: clientSecretController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      labelText: 'Client Secret',
-                    ),
-                    obscureText: true,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (String? value) {
-                      return (value == null || value.isEmpty)
-                          ? 'Client Secret cannot be empty.'
-                          : null;
-                    },
-                  ),
-                ],
-              ),
-            ),
-            ButtonBar(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               children: <Widget>[
-                TextButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () {
-                    passwordController.clear();
-                    context.pop();
-                  },
-                ),
-                ElevatedButton(
-                  onPressed: (usernameIsEmpty ||
-                          passwordIsEmpty ||
-                          clientIdIsEmpty ||
-                          clientSecretIsEmpty)
-                      ? null
-                      : () async {
-                          final router = GoRouter.of(context);
-                          final messenger = ScaffoldMessenger.of(context);
-
-                          if (usernameController.text.isNotEmpty &&
-                              passwordController.text.isNotEmpty &&
-                              clientIdController.text.isNotEmpty &&
-                              clientSecretController.text.isNotEmpty) {
-                            final loginSuccess = await ref
-                                .read(authControlProvider.notifier)
-                                .login(
-                                    usernameController.text,
-                                    passwordController.text,
-                                    clientIdController.text,
-                                    clientSecretController.text);
-
-                            if (loginSuccess) {
-                              router.pop();
-                              passwordController.clear();
-                            } else {
-                              messenger
-                                ..removeCurrentSnackBar()
-                                ..showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Failed to login.'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                            }
-                          } else {
-                            messenger
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'Username/Password/Client ID/Client Secret cannot be empty.'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                          }
+                const SizedBox(height: 200.0),
+                AutofillGroup(
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: usernameController,
+                        decoration: const InputDecoration(
+                          filled: true,
+                          labelText: 'Username',
+                        ),
+                        autofillHints: const [AutofillHints.username],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          return (value == null || value.isEmpty)
+                              ? 'Username cannot be empty.'
+                              : null;
                         },
-                  child: const Text('LOGIN'),
+                      ),
+                      const SizedBox(height: 12.0),
+                      TextFormField(
+                        controller: passwordController,
+                        decoration: const InputDecoration(
+                          filled: true,
+                          labelText: 'Password',
+                        ),
+                        obscureText: true,
+                        autofillHints: const [AutofillHints.password],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          return (value == null || value.isEmpty)
+                              ? 'Password cannot be empty.'
+                              : null;
+                        },
+                      ),
+                      const SizedBox(height: 12.0),
+                      TextFormField(
+                        controller: clientIdController,
+                        decoration: const InputDecoration(
+                          filled: true,
+                          labelText: 'Client ID',
+                        ),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          return (value == null || value.isEmpty)
+                              ? 'Client ID cannot be empty.'
+                              : null;
+                        },
+                      ),
+                      const SizedBox(height: 12.0),
+                      TextFormField(
+                        controller: clientSecretController,
+                        decoration: const InputDecoration(
+                          filled: true,
+                          labelText: 'Client Secret',
+                        ),
+                        obscureText: true,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          return (value == null || value.isEmpty)
+                              ? 'Client Secret cannot be empty.'
+                              : null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                ButtonBar(
+                  children: <Widget>[
+                    TextButton(
+                      child: const Text('CANCEL'),
+                      onPressed: () {
+                        passwordController.clear();
+                        context.pop();
+                      },
+                    ),
+                    ElevatedButton(
+                      onPressed: (usernameIsEmpty ||
+                              passwordIsEmpty ||
+                              clientIdIsEmpty ||
+                              clientSecretIsEmpty)
+                          ? null
+                          : () async {
+                              final router = GoRouter.of(context);
+                              final messenger = ScaffoldMessenger.of(context);
+
+                              if (usernameController.text.isNotEmpty &&
+                                  passwordController.text.isNotEmpty &&
+                                  clientIdController.text.isNotEmpty &&
+                                  clientSecretController.text.isNotEmpty) {
+                                final loginSuccess = ref
+                                    .read(authControlProvider.notifier)
+                                    .login(
+                                        usernameController.text,
+                                        passwordController.text,
+                                        clientIdController.text,
+                                        clientSecretController.text);
+
+                                loginSuccess.then((success) {
+                                  if (success) {
+                                    router.pop();
+                                    passwordController.clear();
+                                  } else {
+                                    messenger
+                                      ..removeCurrentSnackBar()
+                                      ..showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Failed to login.'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                  }
+                                });
+
+                                pendingLogin.value = loginSuccess;
+                              } else {
+                                messenger
+                                  ..removeCurrentSnackBar()
+                                  ..showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Username/Password/Client ID/Client Secret cannot be empty.'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                              }
+                            },
+                      child: const Text('LOGIN'),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          if (snapshot.connectionState == ConnectionState.waiting)
+            ...Styles.loadingOverlay
+        ],
       ),
     );
   }
