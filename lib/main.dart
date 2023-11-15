@@ -11,7 +11,7 @@ import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/history_feed.dart';
 import 'package:gagaku/mangadex/latest_feed.dart';
 import 'package:gagaku/mangadex/library.dart';
-import 'package:gagaku/mangadex/login_old.dart';
+import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/manga_view.dart';

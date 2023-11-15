@@ -682,15 +682,3 @@ const _$CustomListVisibilityEnumMap = {
   CustomListVisibility.private: 'private',
   CustomListVisibility.public: 'public',
 };
-
-_$OldTokenImpl _$$OldTokenImplFromJson(Map<String, dynamic> json) =>
-    _$OldTokenImpl(
-      session: json['session'] as String,
-      refresh: json['refresh'] as String,
-    );
-
-Map<String, dynamic> _$$OldTokenImplToJson(_$OldTokenImpl instance) =>
-    <String, dynamic>{
-      'session': instance.session,
-      'refresh': instance.refresh,
-    };

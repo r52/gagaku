@@ -5,6 +5,7 @@ import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MangaDexLoginWidget extends ConsumerWidget {
@@ -52,10 +53,25 @@ class MangaDexLoginScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final usernameController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final clientIdController = useTextEditingController();
+    final clientSecretController = useTextEditingController();
     final usernameIsEmpty = useListenableSelector(
         usernameController, () => usernameController.text.isEmpty);
     final passwordIsEmpty = useListenableSelector(
         passwordController, () => passwordController.text.isEmpty);
+    final clientIdIsEmpty = useListenableSelector(
+        clientIdController, () => clientIdController.text.isEmpty);
+    final clientSecretIsEmpty = useListenableSelector(
+        clientSecretController, () => clientSecretController.text.isEmpty);
+
+    final storage = Hive.box(gagakuBox);
+    final user = storage.get('username') as String?;
+    final clientId = storage.get('clientId') as String?;
+    final clientSecret = storage.get('clientSecret') as String?;
+
+    usernameController.text = user ?? '';
+    clientIdController.text = clientId ?? '';
+    clientSecretController.text = clientSecret ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -100,6 +116,35 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                           : null;
                     },
                   ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    controller: clientIdController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      labelText: 'Client ID',
+                    ),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (String? value) {
+                      return (value == null || value.isEmpty)
+                          ? 'Client ID cannot be empty.'
+                          : null;
+                    },
+                  ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    controller: clientSecretController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      labelText: 'Client Secret',
+                    ),
+                    obscureText: true,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (String? value) {
+                      return (value == null || value.isEmpty)
+                          ? 'Client Secret cannot be empty.'
+                          : null;
+                    },
+                  ),
                 ],
               ),
             ),
@@ -108,28 +153,34 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                 TextButton(
                   child: const Text('CANCEL'),
                   onPressed: () {
-                    usernameController.clear();
                     passwordController.clear();
                     context.pop();
                   },
                 ),
                 ElevatedButton(
-                  onPressed: (usernameIsEmpty || passwordIsEmpty)
+                  onPressed: (usernameIsEmpty ||
+                          passwordIsEmpty ||
+                          clientIdIsEmpty ||
+                          clientSecretIsEmpty)
                       ? null
                       : () async {
                           final router = GoRouter.of(context);
                           final messenger = ScaffoldMessenger.of(context);
 
                           if (usernameController.text.isNotEmpty &&
-                              passwordController.text.isNotEmpty) {
-                            var loginSuccess = await ref
+                              passwordController.text.isNotEmpty &&
+                              clientIdController.text.isNotEmpty &&
+                              clientSecretController.text.isNotEmpty) {
+                            final loginSuccess = await ref
                                 .read(authControlProvider.notifier)
-                                .login(usernameController.text,
-                                    passwordController.text);
+                                .login(
+                                    usernameController.text,
+                                    passwordController.text,
+                                    clientIdController.text,
+                                    clientSecretController.text);
 
                             if (loginSuccess) {
                               router.pop();
-                              usernameController.clear();
                               passwordController.clear();
                             } else {
                               messenger
@@ -147,7 +198,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                               ..showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                      'Username and Password cannot be empty.'),
+                                      'Username/Password/Client ID/Client Secret cannot be empty.'),
                                   backgroundColor: Colors.red,
                                 ),
                               );

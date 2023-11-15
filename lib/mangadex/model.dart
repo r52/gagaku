@@ -14,6 +14,8 @@ import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mutex/mutex.dart';
+import 'package:openid_client/openid_client.dart';
+import 'package:openid_client/openid_client_io.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
@@ -34,7 +36,7 @@ abstract class MangaDexEndpoints {
   static const refresh = '/auth/refresh';
 
   /// App Client ID
-  /// TODO change this when client ID reg becomes available
+  /// TODO change this when public clients become available
   static const clientId = 'thirdparty-oauth-client';
 
   /// User chapter feed. Returns [Chapter]s
@@ -114,6 +116,10 @@ abstract class CacheLists {
   static const tags = 'tags';
 }
 
+extension TokenHelper on TokenResponse {
+  bool get isValid => accessToken != null && refreshToken != null;
+}
+
 @Riverpod(keepAlive: true)
 MangaDexModel mangadex(MangadexRef ref) {
   return MangaDexModel(ref);
@@ -126,8 +132,8 @@ class MangaDexModel {
   }
 
   final Ref ref;
-  //TokenResponse? _token;
-  OldToken? _token;
+  TokenResponse? _token;
+  Credential? _credential;
   final _tokenMutex = ReadWriteMutex();
   http.Client _client = RateLimitedClient();
   late Future _future;
@@ -144,19 +150,13 @@ class MangaDexModel {
   //   }
   // }
 
-  // bool _tokenExpired(TokenResponse token) {
-  //   return token.expiresAt != null
-  //       ? (DateTime.now().difference(token.expiresAt!).inMinutes > -5)
-  //       : false;
-  // }
-
   Future<Duration?> timeUntilTokenExpiry() async {
     return await _tokenMutex.protectRead(() async {
       if (_token == null) {
         return null;
       }
 
-      return _token!.timeUntilExpiry;
+      return _token!.expiresIn;
     });
   }
 
@@ -166,199 +166,141 @@ class MangaDexModel {
         return false;
       }
 
-      return _token!.isExpired();
+      return _token!.expiresIn!.inSeconds <= 0;
     });
   }
 
   Future<bool> loggedIn() async {
     return await _tokenMutex.protectRead(() async {
-      return (_token != null && _client is AuthenticatedClient);
+      return (_token != null && _credential != null && _token!.isValid);
     });
   }
 
-  // Future<void> refreshToken() async {
-  //   const storage = FlutterSecureStorage();
-  //   bool accessTokenSaved = await storage.read(key: 'accessToken') != null;
-
-  //   if (accessTokenSaved) {
-  //     final tt = await storage.read(key: 'tokenType');
-  //     final rt = await storage.read(key: 'refreshToken');
-  //     final it = await storage.read(key: 'idToken');
-
-  //     var issuer = await Issuer.discover(MangaDexEndpoints.provider);
-  //     var client = Client(issuer, MangaDexEndpoints.clientId);
-
-  //     var credential = client.createCredential(
-  //       accessToken: null, // force use refresh to get new token
-  //       tokenType: tt,
-  //       refreshToken: rt,
-  //       idToken: it,
-  //     );
-
-  //     credential.validateToken(validateClaims: true, validateExpiry: true);
-
-  //     try {
-  //       final token = await credential.getTokenResponse();
-  //       _saveToken(token);
-
-  //       _token = token;
-  //       _client = credential.createHttpClient();
-  //     } catch (e) {
-  //       print("Error during token refresh: ${e.toString()}");
-  //     }
-  //   }
-  // }
-
   Future<void> refreshToken() async {
-    await _tokenMutex.protectWrite(() async {
+    return await _tokenMutex.protectWrite(() async {
       // Clear old data
       _token = null;
 
       final storage = Hive.box(gagakuBox);
-      String? strken = await storage.get('oldtoken') as String?;
+      bool accessTokenSaved = storage.get('accessToken') != null;
 
-      if (strken != null) {
-        final jstr = json.decode(strken);
-        OldToken token = OldToken.fromJson(jstr);
+      if (accessTokenSaved) {
+        final tt = storage.get('tokenType') as String;
+        final rt = storage.get('refreshToken') as String;
+        final it = storage.get('idToken') as String;
+        final clientId = storage.get('clientId') as String;
+        final clientSecret = storage.get('clientSecret') as String;
 
-        if (token.isValid) {
-          Map<String, String> payload = {'token': token.refresh};
+        final issuer = _credential?.client.issuer ??
+            await Issuer.discover(MangaDexEndpoints.provider);
+        final client = _credential?.client ??
+            Client(issuer, clientId, clientSecret: clientSecret);
 
-          final response = await http.post(
-              MangaDexEndpoints.api.replace(path: MangaDexEndpoints.refresh),
-              headers: {'Content-Type': 'application/json'},
-              body: json.encode(payload));
+        final credential = _credential ??
+            client.createCredential(
+              accessToken: null, // force use refresh to get new token
+              tokenType: tt,
+              refreshToken: rt,
+              idToken: it,
+            );
 
-          if (response.statusCode == 200) {
-            Map<String, dynamic> body = json.decode(response.body);
+        try {
+          credential.validateToken(validateClaims: true, validateExpiry: true);
+          final token = await credential.getTokenResponse();
+          if (token.isValid) {
+            _saveToken(token);
 
-            if (body['result'] == 'ok') {
-              OldToken t = OldToken.fromJson(body['token']);
-
-              if (t.isValid) {
-                await _saveToken(t);
-                _token = t;
-                _client = AuthenticatedClient(RateLimitedClient(), t);
-                logger.i("refreshToken(): MangaDex token refreshed");
-                return;
-              }
-            }
+            _token = token;
+            _client = credential.createHttpClient(RateLimitedClient());
+            _credential = credential;
+            logger.i("refreshToken(): MangaDex token refreshed");
+            return;
           }
 
-          logger.w("refreshToken() returned code ${response.statusCode}",
-              error: response.body);
+          // If any steps fail, assign a default client
+          logger.w("refreshToken() returned error ${token['error']}",
+              error: token.toString());
+          _client = RateLimitedClient();
+        } catch (e) {
+          logger.w("refreshToken() error ${e.toString()}", error: e);
+          _client = RateLimitedClient();
         }
       }
-
-      // If any steps fail, assign a default client
-      _client = RateLimitedClient();
     });
   }
 
-  // Future<void> authenticate() async {
-  //   var issuer = await Issuer.discover(MangaDexEndpoints.provider);
-  //   var client = Client(issuer, MangaDexEndpoints.clientId);
+  Future<void> authenticate(
+      String user, String pass, String clientId, String clientSecret) async {
+    final issuer = await Issuer.discover(MangaDexEndpoints.provider);
 
-  //   var authenticator = Authenticator(
-  //     client,
-  //     scopes: ['openid', 'profile'],
-  //     //redirectUri: Uri.parse('https://localhost/'),
-  //     port: 3000,
-  //     urlLancher: _urlLauncher,
-  //   );
+    final client = Client(issuer, clientId, clientSecret: clientSecret);
 
-  //   var credential = await authenticator.authorize();
+    final flow = Flow.password(client);
 
-  //   if (Platform.isAndroid || Platform.isIOS) {
-  //     closeInAppWebView();
-  //   }
+    final credential =
+        await flow.loginWithPassword(username: user, password: pass);
 
-  //   final token = await credential.getTokenResponse();
-  //   _saveToken(token);
+    final token = await credential.getTokenResponse();
 
-  //   _token = token;
-  //   _client = credential.createHttpClient();
-  // }
+    if (token.isValid) {
+      return await _tokenMutex.protectWrite(() async {
+        await _saveToken(token);
+        await _saveCredentials(user, clientId, clientSecret);
+        _token = token;
+        _client = credential.createHttpClient(RateLimitedClient());
+        _credential = credential;
 
-  Future<void> authenticate(String user, String pass) async {
-    Map<String, String> payload = {'username': user, 'password': pass};
-
-    final response = await http.post(
-        MangaDexEndpoints.api.replace(path: MangaDexEndpoints.login),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload));
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> body = jsonDecode(response.body);
-
-      if (body['result'] == 'ok') {
-        OldToken t = OldToken.fromJson(body['token']);
-
-        if (t.isValid) {
-          return await _tokenMutex.protectWrite(() async {
-            await _saveToken(t);
-            _token = t;
-            _client = AuthenticatedClient(RateLimitedClient(), t);
-
-            logger.i("authenticate(): MangaDex user logged in");
-          });
-        }
-      }
+        logger.i("authenticate(): MangaDex user logged in");
+      });
     }
 
-    logger.w("authenticate() returned code ${response.statusCode}",
-        error: response.body);
+    logger.w("authenticate() returned error ${token['error']}",
+        error: token.toString());
   }
 
-  // Future<void> _saveToken(TokenResponse token) async {
-  //   final storage = Hive.box(gagakuBox);
-
-  //   await storage.put('accessToken', token.accessToken);
-  //   await storage.put('refreshToken', token.refreshToken);
-  //   await storage.put('tokenType', token.tokenType);
-  //   await storage.put(
-  //       'idToken', token.idToken.toCompactSerialization());
-  // }
-
-  Future<void> _saveToken(OldToken token) async {
+  Future<void> _saveCredentials(
+      String username, String clientId, String clientSecret) async {
     final storage = Hive.box(gagakuBox);
-    await storage.put('oldtoken', json.encode(token.toJson()));
+
+    await storage.put('username', username);
+    await storage.put('clientId', clientId);
+    await storage.put('clientSecret', clientSecret);
   }
 
-  // Future<void> logout() async {
-  //   _token = null;
-  //   _client = null;
+  Future<void> _saveToken(TokenResponse token) async {
+    final storage = Hive.box(gagakuBox);
 
-  //   final storage = Hive.box(gagakuBox);
-  //   await storage.delete('accessToken');
-  //   await storage.delete('refreshToken');
-  //   await storage.delete('tokenType');
-  //   await storage.delete('idToken');
-  // }
+    await storage.put('accessToken', token.accessToken);
+    await storage.put('refreshToken', token.refreshToken);
+    await storage.put('tokenType', token.tokenType);
+    await storage.put('idToken', token.idToken.toCompactSerialization());
+  }
 
   Future<void> logout() async {
-    if (await loggedIn()) {
-      final response = await _client
-          .post(MangaDexEndpoints.api.replace(path: MangaDexEndpoints.logout));
+    if (await loggedIn() && _credential != null) {
+      final logoutUrl = _credential!.generateLogoutUrl();
+      if (logoutUrl != null) {
+        final response = await _client.post(logoutUrl);
 
-      if (response.statusCode == 200) {
-        Map<String, dynamic> body = jsonDecode(response.body);
-
-        if (body['result'] == 'ok') {
+        if (response.statusCode == 200) {
           return await _tokenMutex.protectWrite(() async {
             _token = null;
             _client = RateLimitedClient();
+            _credential = null;
 
             final storage = Hive.box(gagakuBox);
-            await storage.delete('oldtoken');
+            await storage.delete('accessToken');
+            await storage.delete('refreshToken');
+            await storage.delete('tokenType');
+            await storage.delete('idToken');
 
             logger.i("logout(): MangaDex user logged out");
           });
         }
-      }
 
-      logger.w("logout() returned code ${response.statusCode}",
-          error: response.body);
+        logger.w("logout() returned code ${response.statusCode}",
+            error: response.body);
+      }
     }
   }
 
@@ -1471,8 +1413,6 @@ class MangaDexModel {
     final params = {
       'name': name,
       'visibility': private ? 'private' : 'public',
-      'manga': [],
-      'version': 1,
     };
 
     final response = await _client.post(uri,
@@ -2608,9 +2548,9 @@ class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
     final expireTime = await api.timeUntilTokenExpiry();
 
     if (expireTime != null) {
-      final delay = expireTime + const Duration(seconds: 10);
-      logger.d("AuthControl: setting stale time to ${delay.inSeconds} seconds");
-      staleTime(delay);
+      logger.d(
+          "AuthControl: setting stale time to ${expireTime.inSeconds} seconds");
+      staleTime(expireTime);
     }
   }
 
@@ -2633,11 +2573,12 @@ class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
     return await _build();
   }
 
-  Future<bool> login(String user, String pass) async {
+  Future<bool> login(
+      String user, String pass, String clientId, String clientSecret) async {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await api.authenticate(user, pass);
+      await api.authenticate(user, pass, clientId, clientSecret);
       await _setStaleTime();
       return await api.loggedIn();
     });
@@ -2670,20 +2611,5 @@ class RateLimitedClient extends http.BaseClient {
       request.headers[HttpHeaders.userAgentHeader] = await userAgent;
       return baseClient.send(request);
     });
-  }
-}
-
-// Deprecated stuff
-class AuthenticatedClient extends http.BaseClient {
-  final OldToken token;
-  final http.Client baseClient;
-
-  AuthenticatedClient(this.baseClient, this.token);
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    request.headers[HttpHeaders.authorizationHeader] =
-        'Bearer ${token.session}';
-    return baseClient.send(request);
   }
 }

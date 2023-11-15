@@ -998,26 +998,3 @@ class ReadChapterSet with ExpiringData {
     updateExpiry();
   }
 }
-
-// Deprecated old style login types
-@freezed
-class OldToken with _$OldToken, ExpiringData {
-  OldToken._();
-
-  static const int expiryTime = 600; // seconds (10 minutes)
-
-  factory OldToken({
-    required String session,
-    required String refresh,
-  }) = _OldToken;
-
-  factory OldToken.fromJson(Map<String, dynamic> json) =>
-      _$OldTokenFromJson(json);
-
-  @override
-  final DateTime expiry =
-      DateTime.now().add(const Duration(seconds: expiryTime));
-
-  Duration get timeUntilExpiry => expiry.difference(DateTime.now());
-  bool get isValid => (session.isNotEmpty && refresh.isNotEmpty);
-}
