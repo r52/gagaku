@@ -1472,7 +1472,7 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
       return;
     }
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -1535,7 +1535,7 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
       return;
     }
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -1596,7 +1596,7 @@ class GroupFeed extends _$GroupFeed {
       return;
     }
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -1657,7 +1657,7 @@ class GroupTitles extends _$GroupTitles {
       return;
     }
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -1716,7 +1716,7 @@ class CreatorTitles extends _$CreatorTitles {
       return;
     }
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -1775,9 +1775,9 @@ class MangaChapters extends _$MangaChapters {
       return;
     }
 
-    final oldstate = state.valueOrNull;
+    final oldstate = await future;
     // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit &&
+    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
       state = const AsyncValue.loading();
       state = await AsyncValue.guard(() async {
@@ -1789,7 +1789,7 @@ class MangaChapters extends _$MangaChapters {
           _atEnd = true;
         }
 
-        return [...oldstate!, ...chapters];
+        return [...oldstate, ...chapters];
       });
     } else {
       // Otherwise, do nothing because there is no more content
@@ -1836,7 +1836,7 @@ class MangaCovers extends _$MangaCovers {
       return;
     }
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiSearchLimit &&
         !_atEnd) {
@@ -1895,12 +1895,7 @@ class ReadChapters extends _$ReadChapters {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) =>
@@ -1918,13 +1913,8 @@ class ReadChapters extends _$ReadChapters {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -2033,7 +2023,7 @@ class UserLibrary extends _$UserLibrary {
       return;
     }
 
-    final oldstate = state.valueOrNull;
+    final oldstate = await future;
     // If there is more content, get more
     if (_currentPage == _offset + MangaDexEndpoints.apiQueryLimit && !_atEnd) {
       state = const AsyncValue.loading();
@@ -2041,7 +2031,7 @@ class UserLibrary extends _$UserLibrary {
         _offset += MangaDexEndpoints.apiQueryLimit;
         final mangas = await _fetchAndCheck();
 
-        return [...oldstate!, ...mangas];
+        return [...oldstate, ...mangas];
       });
     } else {
       // Otherwise, do nothing because there is no more content
@@ -2098,7 +2088,7 @@ class UserLists extends _$UserLists {
       return;
     }
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     // If there is more content, get more
     if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
         !_atEnd) {
@@ -2126,7 +2116,7 @@ class UserLists extends _$UserLists {
 
     final api = ref.watch(mangadexProvider);
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final item = oldstate.firstWhere((element) => element.id == list.id);
@@ -2154,7 +2144,7 @@ class UserLists extends _$UserLists {
 
     final api = ref.watch(mangadexProvider);
 
-    final oldstate = state.valueOrNull ?? [];
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final result = await api.createNewList(name, private);
@@ -2235,9 +2225,9 @@ class MangaSearch extends _$MangaSearch {
       return;
     }
 
-    final oldstate = state.valueOrNull;
+    final oldstate = await future;
     // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiSearchLimit &&
+    if (oldstate.length == _offset + MangaDexEndpoints.apiSearchLimit &&
         !_atEnd) {
       state = const AsyncValue.loading();
       state = await AsyncValue.guard(() async {
@@ -2248,7 +2238,7 @@ class MangaSearch extends _$MangaSearch {
           _atEnd = true;
         }
 
-        return [...oldstate!, ...list];
+        return [...oldstate, ...list];
       });
     } else {
       // Otherwise, do nothing because there is no more content
@@ -2274,12 +2264,7 @@ class Statistics extends _$Statistics {
 
   /// Fetch statistics for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
@@ -2314,12 +2299,7 @@ class Ratings extends _$Ratings {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) =>
@@ -2336,13 +2316,8 @@ class Ratings extends _$Ratings {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -2393,13 +2368,8 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull;
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       MangaReadingStatus? resolved =
@@ -2456,13 +2426,8 @@ class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull ?? false;
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       bool success = await api.setMangaFollowing(manga, following);
@@ -2502,12 +2467,7 @@ class MangaDexHistory extends _$MangaDexHistory {
   }
 
   Future<void> add(Chapter chapter) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? Queue<Chapter>();
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final cpy = Queue.of(oldstate);
