@@ -71,9 +71,12 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final clientId = storage.get('clientId') as String?;
     final clientSecret = storage.get('clientSecret') as String?;
 
-    usernameController.text = user ?? '';
-    clientIdController.text = clientId ?? '';
-    clientSecretController.text = clientSecret ?? '';
+    useEffect(() {
+      usernameController.text = user ?? '';
+      clientIdController.text = clientId ?? '';
+      clientSecretController.text = clientSecret ?? '';
+      return null;
+    }, [null]);
 
     return Scaffold(
       appBar: AppBar(
