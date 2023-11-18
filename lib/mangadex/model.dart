@@ -28,12 +28,9 @@ abstract class MangaDexEndpoints {
   static const apiQueryLimit = 50;
   static const apiSearchLimit = 10;
 
-  // For future OAuth
+  // OAuth provider
   static final provider =
       Uri.parse('https://auth.mangadex.org/realms/mangadex');
-  static const login = '/auth/login';
-  static const logout = '/auth/logout';
-  static const refresh = '/auth/refresh';
 
   /// App Client ID
   /// TODO change this when public clients become available
