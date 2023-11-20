@@ -20,6 +20,8 @@ class MainDrawer extends ConsumerWidget {
     switch (location) {
       case GagakuRoute.local:
         return 1;
+      case GagakuRoute.config:
+        return 3;
       case '/':
       case GagakuRoute.chapterfeed:
       case GagakuRoute.library:
@@ -39,6 +41,9 @@ class MainDrawer extends ConsumerWidget {
         break;
       case 2:
         GoRouter.of(context).go(GagakuRoute.web);
+        break;
+      case 3:
+        GoRouter.of(context).go(GagakuRoute.config);
         break;
     }
   }
@@ -81,6 +86,11 @@ class MainDrawer extends ConsumerWidget {
           icon: Icon(Icons.language_outlined),
           selectedIcon: Icon(Icons.language),
           label: Text('Web Sources'),
+        ),
+        const NavigationDrawerDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings),
+          label: Text('Settings'),
         ),
         const Divider(),
         FutureBuilder(

@@ -320,7 +320,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                             elevation: 16,
                                             underline: Container(
                                               height: 2,
-                                              color: Colors.deepOrangeAccent,
+                                              color: theme.colorScheme
+                                                  .tertiaryContainer,
                                             ),
                                             onChanged: (MangaReadingStatus?
                                                 status) async {
@@ -433,7 +434,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           elevation: 16,
                           underline: Container(
                             height: 2,
-                            color: Colors.deepOrangeAccent,
+                            color: theme.colorScheme.tertiaryContainer,
                           ),
                           onChanged: (MangaReadingStatus? status) async {
                             ref
@@ -485,7 +486,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             color: ratings.containsKey(manga.id) &&
                                     ratings[manga.id]!.rating > 0
                                 ? Colors.deepOrange
-                                : Colors.grey.shade600,
+                                : theme.colorScheme.surfaceVariant,
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(6.0)),
                           ),
@@ -548,7 +549,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         icon: Container(
                           padding: const EdgeInsets.all(6.0),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade600,
+                            color: theme.colorScheme.surfaceVariant,
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(6.0)),
                           ),
@@ -764,6 +765,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         Icons.star_border,
                                         color: Colors.amber,
                                         size: 18,
+                                        shadows: [
+                                          Shadow(
+                                            offset: Offset(1.0, 1.0),
+                                          ),
+                                        ],
                                       ),
                                       text: Text(
                                         value[manga.id]
@@ -773,6 +779,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                             statsError,
                                         style: const TextStyle(
                                           color: Colors.amber,
+                                          shadows: [
+                                            Shadow(
+                                              offset: Offset(1.0, 1.0),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),

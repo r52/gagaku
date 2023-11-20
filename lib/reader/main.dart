@@ -498,7 +498,7 @@ class ReaderWidget extends HookConsumerWidget {
                         style: TextStyle(color: theme.colorScheme.primary),
                         underline: Container(
                           height: 2,
-                          color: Colors.deepPurpleAccent,
+                          color: theme.colorScheme.tertiaryContainer,
                         ),
                         onChanged: (int? index) {
                           if (index != null) {
@@ -623,7 +623,7 @@ class ReaderWidget extends HookConsumerWidget {
                     elevation: 16,
                     underline: Container(
                       height: 2,
-                      color: Colors.deepPurpleAccent,
+                      color: theme.colorScheme.tertiaryContainer,
                     ),
                     onChanged: (int? value) {
                       if (value != null) {

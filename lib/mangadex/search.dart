@@ -56,7 +56,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
             elevation: 16,
             underline: Container(
               height: 2,
-              color: Colors.deepOrangeAccent,
+              color: Theme.of(context).colorScheme.tertiaryContainer,
             ),
             onChanged: (FilterOrder? order) async {
               if (order != null) {
@@ -219,7 +219,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
       fontWeight: FontWeight.bold,
     );
 
-    const selectedChipColor = Colors.deepOrangeAccent;
+    final selectedChipColor = theme.colorScheme.tertiaryContainer;
 
     return Scaffold(
       appBar: AppBar(
@@ -294,7 +294,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                           .toSet(),
                     );
                   },
-                  side: const BorderSide(color: selectedChipColor),
+                  side: BorderSide(color: selectedChipColor),
                 ),
               )
             ];

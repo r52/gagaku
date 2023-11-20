@@ -780,6 +780,11 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                           Icons.star_border,
                                           color: Colors.amber,
                                           size: 18,
+                                          shadows: [
+                                            Shadow(
+                                              offset: Offset(1.0, 1.0),
+                                            ),
+                                          ],
                                         ),
                                         text: Text(
                                           value[manga.id]
@@ -789,6 +794,11 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                               statsError,
                                           style: const TextStyle(
                                             color: Colors.amber,
+                                            shadows: [
+                                              Shadow(
+                                                offset: Offset(1.0, 1.0),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -960,6 +970,11 @@ class _ListMangaItem extends ConsumerWidget {
                                     Icons.star_border,
                                     color: Colors.amber,
                                     size: 18,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(1.0, 1.0),
+                                      ),
+                                    ],
                                   ),
                                   text: Text(
                                     value[manga.id]
@@ -969,6 +984,11 @@ class _ListMangaItem extends ConsumerWidget {
                                         statsError,
                                     style: const TextStyle(
                                       color: Colors.amber,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(1.0, 1.0),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

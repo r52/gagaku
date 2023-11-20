@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/config.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/cache.dart';
@@ -16,6 +17,7 @@ import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/settings.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:gagaku/web/main.dart';
@@ -79,14 +81,14 @@ void main() async {
   runApp(const ProviderScope(child: App()));
 }
 
-class App extends StatefulWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  State<App> createState() => _AppState();
+  ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> {
+class _AppState extends ConsumerState<App> {
   final List<ScrollController> _controllers = [];
 
   late final GoRouter _router = GoRouter(
@@ -228,6 +230,13 @@ class _AppState extends State<App> {
           ),
         ],
       ),
+      // Settings route
+      GoRoute(
+        path: GagakuRoute.config,
+        builder: (BuildContext context, GoRouterState state) {
+          return const SettingsHome();
+        },
+      ),
       // Error route
       GoRoute(
         path: '/404',
@@ -262,12 +271,14 @@ class _AppState extends State<App> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final config = ref.watch(gagakuSettingsProvider);
+
     return MaterialApp.router(
       title: 'Gagaku',
       theme: ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.amber, brightness: Brightness.light),
+            seedColor: config.theme, brightness: Brightness.light),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
@@ -277,13 +288,14 @@ class _AppState extends State<App> {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.amber, brightness: Brightness.dark),
+            seedColor: config.theme, brightness: Brightness.dark),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
         ),
         useMaterial3: true,
       ),
+      themeMode: config.themeMode,
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
     );

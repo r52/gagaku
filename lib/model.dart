@@ -17,6 +17,8 @@ abstract class GagakuRoute {
   static const web = '/read';
   static const webManga = ':proxy/:code';
   static const webMangaFull = ':proxy/:code/:chapter/:page';
+
+  static const config = '/config';
 }
 
 const gagakuBox = 'gagaku_box';
