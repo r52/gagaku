@@ -41,7 +41,7 @@ class MangaDexLibraryView extends ConsumerWidget {
                 elevation: 16,
                 underline: Container(
                   height: 2,
-                  color: Colors.deepOrangeAccent,
+                  color: theme.colorScheme.tertiaryContainer,
                 ),
                 onChanged: (MangaReadingStatus? status) async {
                   if (status != null) {
