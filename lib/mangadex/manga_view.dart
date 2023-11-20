@@ -179,9 +179,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final formatTags = manga.attributes.tags
         .where((tag) => tag.attributes.group == TagGroup.format);
 
-    bool onScrollNotification(ScrollNotification notification) {
+    bool onScrollNotification(ScrollEndNotification notification) {
       if (notification.depth == 0 &&
           notification.metrics.axis == Axis.vertical &&
+          notification.metrics.axisDirection == AxisDirection.down &&
           notification.metrics.atEdge &&
           notification.metrics.pixels == notification.metrics.maxScrollExtent) {
         switch (view.value) {
@@ -1158,7 +1159,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           return Styles.errorColumn(error, stackTrace);
                         }(),
                       AsyncValue(:final value?) =>
-                        NotificationListener<ScrollNotification>(
+                        NotificationListener<ScrollEndNotification>(
                           onNotification: onScrollNotification,
                           child: CustomScrollView(
                             slivers: [
@@ -1271,7 +1272,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           return Styles.errorColumn(error, stackTrace);
                         }(),
                       AsyncValue(:final value?) =>
-                        NotificationListener<ScrollNotification>(
+                        NotificationListener<ScrollEndNotification>(
                           onNotification: onScrollNotification,
                           child: CustomScrollView(
                             slivers: [
