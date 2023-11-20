@@ -68,10 +68,6 @@ class MangaDexMangaFeed extends ConsumerWidget {
                     return ref.refresh(_fetchMangaFeedProvider.future);
                   },
                   child: MangaListWidget(
-                    title: const Text(
-                      'Latest Updates',
-                      style: TextStyle(fontSize: 24),
-                    ),
                     physics: const AlwaysScrollableScrollPhysics(),
                     controller: controller,
                     onAtEdge: () =>

@@ -13,7 +13,6 @@ import 'package:gagaku/mangadex/latest_feed.dart';
 import 'package:gagaku/mangadex/library.dart';
 import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/main.dart';
-import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/model.dart';
@@ -162,21 +161,6 @@ class _AppState extends State<App> {
             ),
           ),
           GoRoute(
-            path: GagakuRoute.mangafeed,
-            pageBuilder: (context, state) => CustomTransitionPage<void>(
-              key: state.pageKey,
-              child: MangaDexLoginWidget(
-                key: const Key(GagakuRoute.mangafeed),
-                builder: (context, ref) {
-                  return MangaDexMangaFeed(
-                    controller: _controllers[1],
-                  );
-                },
-              ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
-            ),
-          ),
-          GoRoute(
             path: GagakuRoute.chapterfeed,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
@@ -184,7 +168,7 @@ class _AppState extends State<App> {
                 key: const Key(GagakuRoute.chapterfeed),
                 builder: (context, ref) {
                   return MangaDexChapterFeed(
-                    controller: _controllers[2],
+                    controller: _controllers[1],
                   );
                 },
               ),
@@ -199,7 +183,7 @@ class _AppState extends State<App> {
                 key: const Key(GagakuRoute.library),
                 builder: (context, ref) {
                   return MangaDexLibraryView(
-                    controller: _controllers[3],
+                    controller: _controllers[2],
                   );
                 },
               ),
@@ -211,7 +195,7 @@ class _AppState extends State<App> {
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
               child: MangaDexHistoryFeed(
-                controller: _controllers[4],
+                controller: _controllers[3],
               ),
               transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
             ),
@@ -259,7 +243,6 @@ class _AppState extends State<App> {
     super.initState();
 
     _controllers.addAll([
-      ScrollController(),
       ScrollController(),
       ScrollController(),
       ScrollController(),

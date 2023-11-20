@@ -1,5 +1,4 @@
 abstract class GagakuRoute {
-  static const mangafeed = '/titles/mangafeed';
   static const chapterfeed = '/titles/feed';
   static const library = '/titles/follows';
   static const history = '/my/history';

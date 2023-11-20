@@ -25,7 +25,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
   const ChapterFeedWidget({
     super.key,
     required this.provider,
-    required this.title,
+    this.title,
     this.emptyText,
     this.onAtEdge,
     required this.onRefresh,
@@ -34,7 +34,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
   });
 
   final AutoDisposeFutureProvider<List<ChapterFeedItemData>> provider;
-  final String title;
+  final String? title;
   final String? emptyText;
   final VoidCallback? onAtEdge;
   final RefreshCallback onRefresh;
@@ -89,18 +89,19 @@ class ChapterFeedWidget extends HookConsumerWidget {
                 onRefresh: onRefresh,
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 10.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(fontSize: 24),
-                          )
-                        ],
+                    if (title != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 10.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              title!,
+                              style: const TextStyle(fontSize: 24),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
                     Expanded(
                       child: ListView.builder(
                         controller: scrollController,
@@ -182,7 +183,7 @@ class ChapterFeedItem extends ConsumerWidget {
       style: TextButton.styleFrom(
         minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
-        foregroundColor: theme.colorScheme.onSurface,
+        foregroundColor: theme.colorScheme.onBackground,
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
@@ -519,7 +520,7 @@ class ChapterButtonWidget extends ConsumerWidget {
 class MangaListWidget extends HookConsumerWidget {
   const MangaListWidget({
     super.key,
-    required this.title,
+    this.title,
     required this.children,
     this.leading = const <Widget>[],
     this.physics,
@@ -528,7 +529,7 @@ class MangaListWidget extends HookConsumerWidget {
     this.noController = false,
   });
 
-  final Widget title;
+  final Widget? title;
   final List<Widget> children;
   final List<Widget> leading;
   final ScrollPhysics? physics;
@@ -569,7 +570,7 @@ class MangaListWidget extends HookConsumerWidget {
                 const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
             child: Row(
               children: [
-                title,
+                if (title != null) title!,
                 const Spacer(),
                 ToggleButtons(
                   isSelected: List<bool>.generate(MangaListView.values.length,
