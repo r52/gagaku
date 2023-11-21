@@ -33,6 +33,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.8"
+  ansicolor:
+    dependency: transitive
+    description:
+      name: ansicolor
+      sha256: "8bf17a8ff6ea17499e40a2d2542c2f481cd7615760c6d34065cb22bfd22e6880"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   archive:
     dependency: "direct main"
     description:
@@ -181,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: code_builder
-      sha256: "1be9be30396d7e4c0db42c35ea6ccd7cc6a1e19916b5dc64d6ac216b5544d677"
+      sha256: b2151ce26a06171005b379ecff6e08d34c470180ffe16b8e14b6d52be292b55f
       url: "https://pub.dev"
     source: hosted
-    version: "4.7.0"
+    version: "4.8.0"
   collection:
     dependency: transitive
     description:
@@ -229,26 +237,26 @@ packages:
     dependency: "direct dev"
     description:
       name: custom_lint
-      sha256: f9a828b696930cf8307f9a3617b2b65c9b370e484dc845d69100cadb77506778
+      sha256: "198ec6b8e084d22f508a76556c9afcfb71706ad3f42b083fe0ee923351a96d90"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.6"
+    version: "0.5.7"
   custom_lint_builder:
     dependency: transitive
     description:
       name: custom_lint_builder
-      sha256: c6f656a4d83385fc0656ae60410ed06bb382898c45627bfb8bbaa323aea97883
+      sha256: dfcfa987d2bd9d0ba751ef4bdef0f6c1aa0062f2a67fe716fd5f3f8b709d6418
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.6"
+    version: "0.5.7"
   custom_lint_core:
     dependency: transitive
     description:
       name: custom_lint_core
-      sha256: e20a67737adcf0cf2465e734dd624af535add11f9edd1f2d444909b5b0749650
+      sha256: f84c3fe2f27ef3b8831953e477e59d4a29c2952623f9eac450d7b40d9cdd94cc
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.6"
+    version: "0.5.7"
   dart_style:
     dependency: transitive
     description:
@@ -378,10 +386,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_native_splash
-      sha256: d93394f22f73e810bda59e11ebe83329c5511d6460b6b7509c4e1f3c92d6d625
+      sha256: c4d899312b36e7454bedfd0a4740275837b99e532d81c8477579d8183db1de6c
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.5"
+    version: "2.3.6"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -394,10 +402,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_riverpod
-      sha256: da76755eeb463d9b53a4d7733172140cf67304c3f759608fa52637cc1aebdbb0
+      sha256: "8dab4bc3682fbc71f432b95389839ecf734948161f3797a0b990095db2f90bdc"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.0"
+    version: "3.0.0-dev.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -476,10 +484,10 @@ packages:
     dependency: "direct main"
     description:
       name: hooks_riverpod
-      sha256: "8593ab634a334d313be205de688ab70f5413349cd3d5abaddebb7384ff434e60"
+      sha256: "433c90a47d7808a30b3429a4283bb55d32a4974782f9484e7d053370185ea2a1"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.0"
+    version: "3.0.0-dev.2"
   hotreloader:
     dependency: transitive
     description:
@@ -677,10 +685,10 @@ packages:
     dependency: "direct main"
     description:
       name: package_info_plus
-      sha256: "7e76fad405b3e4016cd39d08f455a4eb5199723cf594cd1b8916d47140d93017"
+      sha256: "88bc797f44a94814f2213db1c9bd5badebafdfb8290ca9f78d4b9ee2a3db4d79"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "5.0.1"
   package_info_plus_platform_interface:
     dependency: transitive
     description:
@@ -821,42 +829,42 @@ packages:
     dependency: transitive
     description:
       name: riverpod
-      sha256: "41918a79bdc9d32b53e0abe7048a773aece57e2398f4dc73e1c66389d7d2b723"
+      sha256: "5bf1b0376b57e21623a62ec5bf8eae6097bf3bed2df781d6837482c09048f915"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.0"
+    version: "3.0.0-dev.2"
   riverpod_analyzer_utils:
     dependency: transitive
     description:
       name: riverpod_analyzer_utils
-      sha256: "76426d3153ade666120770aa33f09ea106c0140685b38d93675b4761ec08a1f8"
+      sha256: b6e782db97522de3ad797210bd3babbdb0a67da899aaa6ffbb6572108bdbf48d
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0-dev.0"
+    version: "1.0.0-dev.1"
   riverpod_annotation:
     dependency: "direct main"
     description:
       name: riverpod_annotation
-      sha256: d152596665f0d23a046886c1e2367182bb1c39a3b71ce47285e704aa9d6a4b62
+      sha256: fdbee9c3f82d76fe4bdcce2a3fe2f4f8ef56d19ce4307447db4531220edec151
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.0"
+    version: "3.0.0-dev.2"
   riverpod_generator:
     dependency: "direct dev"
     description:
       name: riverpod_generator
-      sha256: "9ee3a790ced817c5397b1cd1c62257ea6c38bd4be403aee8d1f6f708a90c47b1"
+      sha256: e68d7f5e3f7e50150b1dcbc21a9081b5021f8b4bc54aaf036d3b69e650af7132
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.8"
+    version: "3.0.0-dev.10"
   riverpod_lint:
     dependency: "direct dev"
     description:
       name: riverpod_lint
-      sha256: c68f358dd83d884f56627b9e103934a9369c2bdeb1118b2b0aaa928fc8b207de
+      sha256: "83fcd3376ba772f3242fc5b2d1cea56baa6fdeed89fed86f8d6e910c904267ba"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.1"
+    version: "3.0.0-dev.3"
   rxdart:
     dependency: transitive
     description:
@@ -1034,10 +1042,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_ios
-      sha256: "4ac97281cf60e2e8c5cc703b2b28528f9b50c8f7cebc71df6bdf0845f647268a"
+      sha256: bba3373219b7abb6b5e0d071b0fe66dfbe005d07517a68e38d4fc3638f35c6d3
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.0"
+    version: "6.2.1"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -1167,5 +1175,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.2.0-194.0.dev <4.0.0"
+  dart: ">=3.2.0 <4.0.0"
   flutter: ">=3.16.0"

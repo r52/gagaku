@@ -57,8 +57,8 @@ class MangaDexMangaFeed extends ConsumerWidget {
                   child: Styles.errorList(error, stackTrace),
                 );
               }(),
-            AsyncValue(:final value?) => () {
-                if (value.isEmpty) {
+            AsyncValue(:final value, hasValue: true) => () {
+                if (value!.isEmpty) {
                   return const Text('Find some manga to follow!');
                 }
 

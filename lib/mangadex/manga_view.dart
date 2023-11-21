@@ -1387,14 +1387,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                           return Styles.errorColumn(error, stackTrace);
                         }(),
-                      AsyncValue(:final value?) => MangaListWidget(
+                      AsyncValue(:final value, hasValue: true) =>
+                        MangaListWidget(
                           title: const Text(
                             'Related Titles',
                             style: TextStyle(fontSize: 24),
                           ),
                           noController: true,
                           children: [
-                            MangaListViewSliver(items: value),
+                            MangaListViewSliver(items: value!),
                           ],
                         ),
                       _ => const SizedBox.shrink(),

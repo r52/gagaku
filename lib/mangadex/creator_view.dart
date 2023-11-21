@@ -131,8 +131,8 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                 child: Styles.errorList(error, stackTrace),
               );
             }(),
-          AsyncValue(:final value?) => () {
-              if (value.isEmpty) {
+          AsyncValue(:final value, hasValue: true) => () {
+              if (value!.isEmpty) {
                 return const Text('No manga!');
               }
 

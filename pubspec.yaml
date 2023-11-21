@@ -51,7 +51,7 @@ dependencies:
       ref: password
   logger: ^2.0.0
   mutex: ^3.0.1
-  package_info_plus: ^4.0.2
+  package_info_plus: ^5.0.1
   path: ^1.8.3
   path_provider: ^2.0.15
   photo_view: ^0.14.0

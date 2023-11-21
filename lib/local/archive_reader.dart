@@ -115,8 +115,8 @@ class ArchiveReaderWidget extends ConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(:final value?):
-        if (value.isEmpty) {
+      case AsyncValue(:final value, hasValue: true):
+        if (value!.isEmpty) {
           return const Center(
             child: Text("This archive contains no images!"),
           );
