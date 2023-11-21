@@ -660,28 +660,51 @@ class MangaListViewSliver extends ConsumerWidget {
   }
 }
 
-class _GridMangaItem extends StatelessWidget {
+class _GridMangaItem extends HookWidget {
   const _GridMangaItem({super.key, required this.manga});
 
   final Manga manga;
 
   @override
   Widget build(BuildContext context) {
+    final aniController =
+        useAnimationController(duration: const Duration(milliseconds: 100));
+    final gradient =
+        useAnimation(aniController.drive(Styles.coverArtGradientTween));
+
     final Widget image = Material(
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4.0))),
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       clipBehavior: Clip.antiAlias,
-      child: ExtendedImage.network(
-        manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-        cache: true,
-        loadStateChanged: extendedImageLoadStateHandler,
-        width: 256.0,
+      child: ShaderMask(
+        shaderCallback: (rect) {
+          return LinearGradient(
+            begin: gradient,
+            end: Alignment.bottomCenter,
+            colors: const [Colors.black, Colors.transparent],
+          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
+        },
+        blendMode: BlendMode.dstIn,
+        child: ExtendedImage.network(
+          manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+          cache: true,
+          loadStateChanged: extendedImageLoadStateHandler,
+          width: 256.0,
+        ),
       ),
     );
 
     return InkWell(
       onTap: () {
         context.push('/title/${manga.id}', extra: manga);
+      },
+      onHover: (hovering) {
+        if (hovering) {
+          aniController.forward();
+        } else {
+          aniController.reverse();
+        }
       },
       child: GridTile(
         footer: SizedBox(
@@ -693,7 +716,6 @@ class _GridMangaItem extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: GridTileBar(
-              backgroundColor: Colors.black45,
               title: Text(
                 manga.attributes.title.get('en'),
                 softWrap: true,

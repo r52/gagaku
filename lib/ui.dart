@@ -274,6 +274,9 @@ class SettingCardWidget extends StatelessWidget {
 }
 
 class Styles {
+  static final coverArtGradientTween =
+      Tween(begin: Alignment.center, end: Alignment.topCenter);
+
   static const List<Widget> loadingOverlay = [
     Opacity(
       opacity: 0.75,

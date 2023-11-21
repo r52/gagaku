@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/ui.dart';
 
@@ -70,7 +71,7 @@ class LibraryListWidget extends StatelessWidget {
   }
 }
 
-class _GridLibraryItem extends StatelessWidget {
+class _GridLibraryItem extends HookWidget {
   const _GridLibraryItem({required this.item, this.onTap});
 
   final LocalLibraryItem item;
@@ -78,19 +79,34 @@ class _GridLibraryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final aniController =
+        useAnimationController(duration: const Duration(milliseconds: 100));
+    final gradient =
+        useAnimation(aniController.drive(Styles.coverArtGradientTween));
+
     final Widget image = Material(
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
-      child: item.thumbnail != null
-          ? Image.file(
-              File(item.thumbnail!),
-              width: 256.0,
-            )
-          : Icon(
-              item.isReadable ? Icons.menu_book : Icons.folder,
-              size: 128.0,
-            ),
+      child: ShaderMask(
+        shaderCallback: (rect) {
+          return LinearGradient(
+            begin: gradient,
+            end: Alignment.bottomCenter,
+            colors: const [Colors.black, Colors.transparent],
+          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
+        },
+        blendMode: BlendMode.dstIn,
+        child: item.thumbnail != null
+            ? Image.file(
+                File(item.thumbnail!),
+                width: 256.0,
+              )
+            : Icon(
+                item.isReadable ? Icons.menu_book : Icons.folder,
+                size: 128.0,
+              ),
+      ),
     );
 
     return Tooltip(
@@ -100,6 +116,13 @@ class _GridLibraryItem extends StatelessWidget {
         onTap: () {
           if (onTap != null) {
             onTap!(item);
+          }
+        },
+        onHover: (hovering) {
+          if (hovering) {
+            aniController.forward();
+          } else {
+            aniController.reverse();
           }
         },
         child: GridTile(
@@ -112,7 +135,6 @@ class _GridLibraryItem extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: GridTileBar(
-                backgroundColor: Colors.black45,
                 title: Text(
                   item.name ?? item.path,
                   softWrap: true,

@@ -1410,7 +1410,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
   }
 }
 
-class _CoverArtItem extends StatelessWidget {
+class _CoverArtItem extends HookWidget {
   const _CoverArtItem({
     required this.cover,
     required this.manga,
@@ -1425,17 +1425,31 @@ class _CoverArtItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final aniController =
+        useAnimationController(duration: const Duration(milliseconds: 100));
+    final gradient =
+        useAnimation(aniController.drive(Styles.coverArtGradientTween));
     final url = manga.getUrlFromCover(cover);
 
     final Widget image = Material(
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
-      child: ExtendedImage.network(
-        url.quality(quality: CoverArtQuality.medium),
-        cache: true,
-        loadStateChanged: extendedImageLoadStateHandler,
-        width: 256.0,
+      child: ShaderMask(
+        shaderCallback: (rect) {
+          return LinearGradient(
+            begin: gradient,
+            end: Alignment.bottomCenter,
+            colors: const [Colors.black, Colors.transparent],
+          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
+        },
+        blendMode: BlendMode.dstIn,
+        child: ExtendedImage.network(
+          url.quality(quality: CoverArtQuality.medium),
+          cache: true,
+          loadStateChanged: extendedImageLoadStateHandler,
+          width: 256.0,
+        ),
       ),
     );
 
@@ -1445,6 +1459,13 @@ class _CoverArtItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
+          onHover: (hovering) {
+            if (hovering) {
+              aniController.forward();
+            } else {
+              aniController.reverse();
+            }
+          },
           child: GridTile(
             footer: cover.attributes?.volume != null
                 ? SizedBox(
@@ -1457,7 +1478,6 @@ class _CoverArtItem extends StatelessWidget {
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: GridTileBar(
-                        backgroundColor: Colors.black45,
                         title: Text(
                           'Volume ${cover.attributes!.volume!}',
                           softWrap: true,
