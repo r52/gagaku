@@ -337,12 +337,9 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         ),
         actions: [
           ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
+            style: Styles.buttonStyle(
               backgroundColor:
                   isBlacklisted ? Colors.green.shade900 : Colors.red.shade900,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(6.0)),
-              ),
             ),
             onPressed: () {
               if (isBlacklisted) {

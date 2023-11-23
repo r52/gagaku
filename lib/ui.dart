@@ -32,14 +32,11 @@ class ButtonChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final style = ElevatedButton.styleFrom(
+    final style = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
       textStyle:
           theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(6.0)),
-      ),
     );
 
     final btn = icon != null
@@ -274,6 +271,20 @@ class SettingCardWidget extends StatelessWidget {
 }
 
 class Styles {
+  static ButtonStyle buttonStyle({
+    Color? backgroundColor,
+    TextStyle? textStyle,
+    EdgeInsetsGeometry? padding,
+  }) =>
+      ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        textStyle: textStyle,
+        padding: padding,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(6.0)),
+        ),
+      );
+
   static final coverArtGradientTween =
       Tween(begin: Alignment.center, end: Alignment.topCenter);
 

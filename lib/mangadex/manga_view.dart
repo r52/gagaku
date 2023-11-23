@@ -288,12 +288,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   } else if (!following && reading == null) {
                     actions.addAll([
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(6.0)),
-                          ),
-                        ),
+                        style: Styles.buttonStyle(),
                         onPressed: () async {
                           final result = await showDialog<
                                   (MangaReadingStatus, bool)>(
@@ -401,12 +396,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       Tooltip(
                         message: following ? 'Unfollow Manga' : 'Follow Manga',
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(6.0)),
-                            ),
-                          ),
+                          style: Styles.buttonStyle(),
                           onPressed: () async {
                             bool set = !following;
                             ref
