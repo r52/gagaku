@@ -114,7 +114,7 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
 class _$GagakuConfigImpl implements _GagakuConfig {
   const _$GagakuConfigImpl(
       {this.themeMode = ThemeMode.system,
-      @ColorConverter() this.theme = Colors.amber});
+      @ColorConverter() this.theme = const Color(0xFFFFC107)});
 
   factory _$GagakuConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$GagakuConfigImplFromJson(json);

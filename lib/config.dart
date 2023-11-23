@@ -26,7 +26,7 @@ class GagakuConfig with _$GagakuConfig {
     @Default(ThemeMode.system) ThemeMode themeMode,
 
     /// Theme color
-    @Default(Colors.amber) @ColorConverter() Color theme,
+    @Default(Color(0xFFFFC107)) @ColorConverter() Color theme,
   }) = _GagakuConfig;
 
   factory GagakuConfig.fromJson(Map<String, dynamic> json) =>
