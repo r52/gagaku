@@ -1,7 +1,4 @@
 // ignore_for_file: unused_element
-
-import 'dart:math';
-
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +42,6 @@ class ChapterFeedWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final scrollController = controller ?? useScrollController();
     final results = ref.watch(provider);
     final isLoading = results.isLoading;
@@ -112,34 +108,51 @@ class ChapterFeedWidget extends HookConsumerWidget {
                         restorationId: restorationId,
                         padding: const EdgeInsets.all(6),
                         itemCount: value.length,
-                        itemExtentBuilder: (index, dimensions) {
-                          // Crude, hardcoded way to calculate item extent,
-                          // but immensely improves render performance
-                          // until flutter fixes this issue
-                          final buttonHeight = screenSizeSmall ? 113.0 : 70.0;
-                          const margins = 12.0 + 16.0;
-                          const textHeight = 21.0;
-                          final dividerHeight = screenSizeSmall ? 4.0 : 10.0;
-                          final imageHeight = screenSizeSmall ? 91.0 : 182.0;
+                        // itemExtentBuilder: (index, dimensions) {
+                        //   // Crude, hardcoded way to calculate item extent,
+                        //   // but immensely improves render performance
+                        //   // until flutter fixes this issue
+                        //   final buttonHeight = screenSizeSmall ? 113.0 : 70.0;
+                        //   const margins = 12.0 + 16.0;
+                        //   final textHeight = isMobile ? 32.0 : 21.0;
+                        //   final dividerHeight = screenSizeSmall ? 4.0 : 10.0;
+                        //   final imageHeight = screenSizeSmall ? 91.0 : 182.0;
 
-                          final numButtons =
-                              value.elementAt(index).chapters.length;
+                        //   final numButtons =
+                        //       value.elementAt(index).chapters.length;
+                        //   double additionalChips = 0.0;
 
-                          final totalBtnHeight = buttonHeight * numButtons +
-                              (screenSizeSmall
-                                  ? 0.0
-                                  : textHeight + dividerHeight);
+                        //   for (final chap in value.elementAt(index).chapters) {
+                        //     final groups = chap.getGroups();
+                        //     var nameLength = groups.fold(
+                        //         0,
+                        //         (previousValue, element) =>
+                        //             previousValue +
+                        //             element.attributes.name.length);
+                        //     final hasPub = chap.attributes.externalUrl != null;
+                        //     nameLength += hasPub ? 18 : 0;
 
-                          final finalBtnHeight =
-                              max(totalBtnHeight, imageHeight);
+                        //     final numLines = (nameLength / 25).ceil() - 1;
 
-                          final extent = margins +
-                              finalBtnHeight +
-                              (screenSizeSmall
-                                  ? textHeight + dividerHeight
-                                  : 0.0);
-                          return extent;
-                        },
+                        //     additionalChips +=
+                        //         numLines > 0 ? numLines * 26.0 : 0.0;
+                        //   }
+
+                        //   final totalBtnHeight = (buttonHeight * numButtons) +
+                        //       (screenSizeSmall
+                        //           ? additionalChips
+                        //           : textHeight + dividerHeight);
+
+                        //   final finalBtnHeight =
+                        //       max(totalBtnHeight, imageHeight);
+
+                        //   final extent = margins +
+                        //       finalBtnHeight +
+                        //       (screenSizeSmall
+                        //           ? textHeight + dividerHeight
+                        //           : 0.0);
+                        //   return extent;
+                        // },
                         itemBuilder: (context, index) {
                           return ChapterFeedItem(state: value.elementAt(index));
                         },
