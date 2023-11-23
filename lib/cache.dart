@@ -49,7 +49,7 @@ class CacheEntry with ExpiringData {
 }
 
 class CacheManager {
-  static const _preferredMaxEntries = 20000;
+  static const _preferredMaxEntries = 2000;
   static const _preferredMaxDiskEntries = 2000;
 
   final LazyBox<CacheEntry> _box;
@@ -167,6 +167,9 @@ class CacheManager {
       await _box.put(key, entry);
     }
 
+    logger.d(
+        "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
+
     if (_cache.length > _preferredMaxEntries) {
       _pruneExpiredMemory();
     }
@@ -181,6 +184,9 @@ class CacheManager {
   Future<void> putAll(Map<String, CacheEntry> map) async {
     _cache.addAll(map);
     await _box.putAll(map);
+
+    logger.d(
+        "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
 
     if (_cache.length > _preferredMaxEntries) {
       _pruneExpiredMemory();
