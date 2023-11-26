@@ -116,8 +116,6 @@ abstract class MangaDexEndpoints {
 }
 
 abstract class CacheLists {
-  static const latestChapters = 'latestChapters';
-  static const latestGlobalChapters = 'latestGlobalChapters';
   static const library = 'userLibrary';
   static const tags = 'tags';
 }
@@ -322,22 +320,29 @@ class MangaDexModel {
     await _cache.invalidateAll(startsWith);
   }
 
-  /// Fetches the latest chapters feed of the MangaDex user
+  /// Fetches a generic [ChapterList] feed based on given parameters, respecting
+  /// user settings.
   ///
   /// Each operation that queries the MangaDex API is limited to
   /// [MangaDexEndpoints.apiQueryLimit] number of items.
   ///
-  /// [offset] denotes the nth item to start fetching from.
+  /// [path]      the path to the feed on the MangaDex API
+  /// [feedKey]   sets the key for caching purposes
+  /// [offset]    denotes the nth item to start fetching from.
+  /// [entity]    a [MangaDexUUID] entity that the feed corresponds to
+  /// [orderKey]  order scheme
+  /// [order]     order direction
   ///
-  /// Do not use directly. The provider [latestChaptersFeedProvider] should be
-  /// used instead as it provides auto state management.
-  Future<Iterable<Chapter>> fetchUserFeed([int offset = 0]) async {
-    if (!await loggedIn()) {
-      throw Exception(
-          "fetchUserFeed() called on invalid token/login. Shouldn't ever get here");
-    }
-
-    final key = 'fetchUserFeed($offset)';
+  /// Use specific providers that determine the feed to fetch
+  Future<Iterable<Chapter>> fetchFeed({
+    required String path,
+    required String feedKey,
+    int offset = 0,
+    MangaDexUUID? entity,
+    String orderKey = 'publishAt',
+    String order = 'desc',
+  }) async {
+    final key = '$feedKey(${entity != null ? '${entity.id},' : ''}$offset)';
 
     if (await _cache.exists(key)) {
       return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
@@ -357,82 +362,18 @@ class MangaDexModel {
           .toList(),
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[publishAt]': 'desc',
+      'order[$orderKey]': order,
       'includes[]': ['scanlation_group', 'user']
     };
 
-    if (settings.groupBlacklist.isNotEmpty) {
-      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
-    }
-
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = ChapterList.fromJson(body);
-
-      // Cache the data and list
-      _cache.putSpecialList(key, result.data, resolve: true);
-
-      return result.data;
-    }
-
-    // Throw if failure
-    final msg = "fetchUserFeed() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
-  }
-
-  /// Fetches the chapter feed based on the given parameters
-  ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiQueryLimit] number of items.
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  ///
-  /// [group] specifies a specific scanlation group to retrieve the feed for.
-  /// Regular options apply.
-  ///
-  /// Do not use directly. The provider [latestGlobalFeedProvider] should be
-  /// used instead as it provides auto state management.
-  Future<Iterable<Chapter>> fetchChapterFeed(
-      {int offset = 0, Group? group}) async {
-    final settings = ref.read(mdConfigProvider);
-
-    final key = 'fetchChapterFeed(${group?.id},$offset)';
-
-    if (await _cache.exists(key)) {
-      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
-    }
-
-    // Download missing data
-    final queryParams = {
-      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
-      'offset': offset.toString(),
-      'translatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'includeFutureUpdates': '0',
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[publishAt]': 'desc',
-      'includes[]': ['scanlation_group', 'user']
-    };
-
-    if (group != null) {
-      queryParams['groups[]'] = group.id;
+    if (entity != null && entity is Group) {
+      queryParams['groups[]'] = entity.id;
     } else if (settings.groupBlacklist.isNotEmpty) {
       queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
     }
 
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.chapter, queryParameters: queryParams);
+    final uri =
+        MangaDexEndpoints.api.replace(path: path, queryParameters: queryParams);
 
     final response = await _client.get(uri);
 
@@ -448,70 +389,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "fetchChapterFeed() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
-  }
-
-  /// Fetches a CustomList's chapter feed based on the given parameters
-  ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiQueryLimit] number of items.
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  ///
-  /// Do not use directly. The relevant provider should be
-  /// used instead as it provides auto state management.
-  Future<Iterable<Chapter>> fetchListFeed(CustomList list,
-      {int offset = 0}) async {
-    final settings = ref.read(mdConfigProvider);
-
-    final key = 'fetchListFeed(${list.id},$offset)';
-
-    if (await _cache.exists(key)) {
-      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
-    }
-
-    // Download missing data
-    final queryParams = {
-      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
-      'offset': offset.toString(),
-      'translatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'includeFutureUpdates': '0',
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[publishAt]': 'desc',
-      'includes[]': ['scanlation_group', 'user']
-    };
-
-    if (settings.groupBlacklist.isNotEmpty) {
-      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
-    }
-
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.listFeed.replaceFirst('{id}', list.id),
-        queryParameters: queryParams);
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = ChapterList.fromJson(body);
-
-      // Cache the data and list
-      _cache.putSpecialList(key, result.data, resolve: true);
-
-      return result.data;
-    }
-
-    // Throw if failure
-    final msg = "fetchListFeed() failed. Response code: ${response.statusCode}";
+    final msg = "$feedKey() failed. Response code: ${response.statusCode}";
     logger.e(msg, error: response.body);
     throw Exception(msg);
   }
@@ -912,69 +790,6 @@ class MangaDexModel {
     return {};
   }
 
-  /// Fetches the latest chapters of a specific [manga]
-  ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiQueryLimit] number of items.
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  ///
-  /// Do not use directly. The [mangaChaptersProvider] provider should
-  /// be used instead as it provides results caching and auto state
-  /// management.
-  Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
-      [int offset = 0]) async {
-    final settings = ref.read(mdConfigProvider);
-
-    final key = 'fetchMangaChapters(${manga.id},$offset)';
-
-    if (await _cache.exists(key)) {
-      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
-    }
-
-    // Download missing data
-    final queryParams = {
-      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
-      'offset': offset.toString(),
-      'translatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[chapter]': 'desc',
-      'includes[]': ['scanlation_group', 'user']
-    };
-
-    if (settings.groupBlacklist.isNotEmpty) {
-      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
-    }
-
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
-        queryParameters: queryParams);
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = ChapterList.fromJson(body);
-
-      // Cache the data
-      _cache.putSpecialList(key, result.data, resolve: true);
-
-      return result.data;
-    }
-
-    // Throw if failure
-    final msg =
-        "fetchMangaChapters() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
-  }
-
   /// Sets the chapter read status [setRead] of the [chapters]
   Future<bool> setChaptersRead(
       Manga manga, Iterable<Chapter> chapters, bool setRead) async {
@@ -1160,7 +975,7 @@ class MangaDexModel {
 
   /// Retrieve cover art for a specific manga
   Future<Iterable<CoverArt>> getCoverList(Manga manga, [int offset = 0]) async {
-    final key = 'getCoverList(${manga.id},$offset)';
+    final key = 'CoverList(${manga.id},$offset)';
 
     if (await _cache.exists(key)) {
       return _cache.getSpecialList<CoverArt>(key, CoverArt.fromJson);
@@ -1593,6 +1408,7 @@ class MangaDexModel {
 class LatestChaptersFeed extends _$LatestChaptersFeed {
   int _offset = 0;
   bool _atEnd = false;
+  static const feedKey = 'LatestChaptersFeed';
 
   ///Fetch the latest chapters list based on offset
   Future<List<Chapter>> _fetchLatestChapters(int offset) async {
@@ -1602,7 +1418,11 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
     }
 
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchUserFeed(offset);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.feed,
+      feedKey: feedKey,
+      offset: offset,
+    );
 
     return chapters.toList();
   }
@@ -1649,7 +1469,7 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchUserFeed');
+      await api.invalidateAll(feedKey);
       _offset = 0;
       _atEnd = false;
       return _fetchLatestChapters(_offset);
@@ -1661,11 +1481,16 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 class LatestGlobalFeed extends _$LatestGlobalFeed {
   int _offset = 0;
   bool _atEnd = false;
+  static const feedKey = 'LatestGlobalFeed';
 
   ///Fetch the latest chapters list based on offset
   Future<List<Chapter>> _fetchLatestChapters(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchChapterFeed(offset: offset);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.chapter,
+      feedKey: feedKey,
+      offset: offset,
+    );
 
     return chapters.toList();
   }
@@ -1712,7 +1537,7 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchChapterFeed');
+      await api.invalidateAll(feedKey);
       _offset = 0;
       _atEnd = false;
       return _fetchLatestChapters(_offset);
@@ -1724,10 +1549,16 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
 class GroupFeed extends _$GroupFeed {
   int _offset = 0;
   bool _atEnd = false;
+  static const feedKey = 'GroupFeed';
 
   Future<List<Chapter>> _fetchChapters(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchChapterFeed(offset: offset, group: group);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.chapter,
+      feedKey: feedKey,
+      offset: offset,
+      entity: group,
+    );
 
     return chapters.toList();
   }
@@ -1773,7 +1604,7 @@ class GroupFeed extends _$GroupFeed {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchChapterFeed(${group.id}');
+      await api.invalidateAll('$feedKey(${group.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchChapters(_offset);
@@ -1903,10 +1734,17 @@ class CreatorTitles extends _$CreatorTitles {
 class MangaChapters extends _$MangaChapters {
   int _offset = 0;
   bool _atEnd = false;
+  static const feedKey = 'MangaChapters';
 
   Future<List<Chapter>> _fetchMangaChapters(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchMangaChapters(manga, offset);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
+      feedKey: feedKey,
+      offset: offset,
+      entity: manga,
+      orderKey: 'chapter',
+    );
 
     return chapters.toList();
   }
@@ -1952,7 +1790,7 @@ class MangaChapters extends _$MangaChapters {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchMangaChapters(${manga.id}');
+      await api.invalidateAll('$feedKey(${manga.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchMangaChapters(_offset);
@@ -2356,10 +2194,16 @@ class UserLists extends _$UserLists {
 class CustomListFeed extends _$CustomListFeed {
   int _offset = 0;
   bool _atEnd = false;
+  static const feedKey = 'CustomListFeed';
 
   Future<List<Chapter>> _fetchChapters(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchListFeed(list, offset: offset);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.listFeed.replaceFirst('{id}', list.id),
+      feedKey: feedKey,
+      offset: offset,
+      entity: list,
+    );
 
     return chapters.toList();
   }
@@ -2405,7 +2249,7 @@ class CustomListFeed extends _$CustomListFeed {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchListFeed(${list.id}');
+      await api.invalidateAll('$feedKey(${list.id}');
       _offset = 0;
       _atEnd = false;
       return _fetchChapters(_offset);
