@@ -1190,3 +1190,38 @@ class ContentChip extends StatelessWidget {
     );
   }
 }
+
+Future<bool?> showDeleteListDialog(
+        BuildContext context, String listName) async =>
+    await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        final nav = Navigator.of(context);
+        return AlertDialog(
+          title: const Text('Delete List'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  'Are you sure you want to permanently delete \'$listName\'?'),
+              const Text('NOTE: THIS ACTION IS IRREVERSIBLE'),
+            ],
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('No'),
+              onPressed: () {
+                nav.pop(null);
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                nav.pop(true);
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );

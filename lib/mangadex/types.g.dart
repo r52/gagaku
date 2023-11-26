@@ -234,9 +234,7 @@ Map<String, dynamic> _$$MangaIDImplToJson(_$MangaIDImpl instance) =>
       'type': instance.$type,
     };
 
-_$RelationshipUserImpl _$$RelationshipUserImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RelationshipUserImpl(
+_$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       id: json['id'] as String,
       attributes: json['attributes'] == null
           ? null
@@ -244,8 +242,7 @@ _$RelationshipUserImpl _$$RelationshipUserImplFromJson(
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$RelationshipUserImplToJson(
-        _$RelationshipUserImpl instance) =>
+Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'attributes': instance.attributes,
@@ -309,17 +306,14 @@ Map<String, dynamic> _$$CoverArtImplToJson(_$CoverArtImpl instance) =>
       'type': instance.$type,
     };
 
-_$ScanlationGroupImpl _$$ScanlationGroupImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ScanlationGroupImpl(
+_$GroupImpl _$$GroupImplFromJson(Map<String, dynamic> json) => _$GroupImpl(
       id: json['id'] as String,
       attributes: ScanlationGroupAttributes.fromJson(
           json['attributes'] as Map<String, dynamic>),
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$ScanlationGroupImplToJson(
-        _$ScanlationGroupImpl instance) =>
+Map<String, dynamic> _$$GroupImplToJson(_$GroupImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'attributes': instance.attributes,
@@ -385,7 +379,7 @@ Map<String, dynamic> _$$MangaListImplToJson(_$MangaListImpl instance) =>
 _$GroupListImpl _$$GroupListImplFromJson(Map<String, dynamic> json) =>
     _$GroupListImpl(
       (json['data'] as List<dynamic>)
-          .map((e) => ScanlationGroup.fromJson(e as Map<String, dynamic>))
+          .map((e) => Group.fromJson(e as Map<String, dynamic>))
           .toList(),
       json['total'] as int,
     );

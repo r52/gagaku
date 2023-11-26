@@ -2316,7 +2316,7 @@ Relationship _$RelationshipFromJson(Map<String, dynamic> json) {
     case 'manga':
       return MangaID.fromJson(json);
     case 'user':
-      return RelationshipUser.fromJson(json);
+      return User.fromJson(json);
     case 'artist':
       return Artist.fromJson(json);
     case 'author':
@@ -2326,7 +2326,7 @@ Relationship _$RelationshipFromJson(Map<String, dynamic> json) {
     case 'cover_art':
       return CoverArt.fromJson(json);
     case 'scanlation_group':
-      return ScanlationGroup.fromJson(json);
+      return Group.fromJson(json);
 
     default:
       throw CheckedFromJsonException(json, 'type', 'Relationship',
@@ -2375,34 +2375,34 @@ mixin _$Relationship {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -2563,12 +2563,12 @@ class _$MangaIDImpl with DiagnosticableTreeMixin implements MangaID {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) {
     return manga(this);
   }
@@ -2577,12 +2577,12 @@ class _$MangaIDImpl with DiagnosticableTreeMixin implements MangaID {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) {
     return manga?.call(this);
   }
@@ -2591,12 +2591,12 @@ class _$MangaIDImpl with DiagnosticableTreeMixin implements MangaID {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) {
     if (manga != null) {
@@ -2627,11 +2627,11 @@ abstract class MangaID implements Relationship {
 }
 
 /// @nodoc
-abstract class _$$RelationshipUserImplCopyWith<$Res>
+abstract class _$$UserImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$RelationshipUserImplCopyWith(_$RelationshipUserImpl value,
-          $Res Function(_$RelationshipUserImpl) then) =
-      __$$RelationshipUserImplCopyWithImpl<$Res>;
+  factory _$$UserImplCopyWith(
+          _$UserImpl value, $Res Function(_$UserImpl) then) =
+      __$$UserImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, UserAttributes? attributes});
@@ -2640,11 +2640,10 @@ abstract class _$$RelationshipUserImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$RelationshipUserImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$RelationshipUserImpl>
-    implements _$$RelationshipUserImplCopyWith<$Res> {
-  __$$RelationshipUserImplCopyWithImpl(_$RelationshipUserImpl _value,
-      $Res Function(_$RelationshipUserImpl) _then)
+class __$$UserImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$UserImpl>
+    implements _$$UserImplCopyWith<$Res> {
+  __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -2653,7 +2652,7 @@ class __$$RelationshipUserImplCopyWithImpl<$Res>
     Object? id = null,
     Object? attributes = freezed,
   }) {
-    return _then(_$RelationshipUserImpl(
+    return _then(_$UserImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -2680,15 +2679,13 @@ class __$$RelationshipUserImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RelationshipUserImpl
-    with DiagnosticableTreeMixin
-    implements RelationshipUser {
-  const _$RelationshipUserImpl(
+class _$UserImpl with DiagnosticableTreeMixin implements User {
+  const _$UserImpl(
       {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'user';
 
-  factory _$RelationshipUserImpl.fromJson(Map<String, dynamic> json) =>
-      _$$RelationshipUserImplFromJson(json);
+  factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserImplFromJson(json);
 
   @override
   final String id;
@@ -2715,9 +2712,8 @@ class _$RelationshipUserImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$RelationshipUserImplCopyWith<_$RelationshipUserImpl> get copyWith =>
-      __$$RelationshipUserImplCopyWithImpl<_$RelationshipUserImpl>(
-          this, _$identity);
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+      __$$UserImplCopyWithImpl<_$UserImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -2770,12 +2766,12 @@ class _$RelationshipUserImpl
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) {
     return user(this);
   }
@@ -2784,12 +2780,12 @@ class _$RelationshipUserImpl
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) {
     return user?.call(this);
   }
@@ -2798,12 +2794,12 @@ class _$RelationshipUserImpl
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) {
     if (user != null) {
@@ -2814,26 +2810,25 @@ class _$RelationshipUserImpl
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RelationshipUserImplToJson(
+    return _$$UserImplToJson(
       this,
     );
   }
 }
 
-abstract class RelationshipUser implements Relationship {
-  const factory RelationshipUser(
+abstract class User implements Relationship {
+  const factory User(
       {required final String id,
-      required final UserAttributes? attributes}) = _$RelationshipUserImpl;
+      required final UserAttributes? attributes}) = _$UserImpl;
 
-  factory RelationshipUser.fromJson(Map<String, dynamic> json) =
-      _$RelationshipUserImpl.fromJson;
+  factory User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
   @override
   String get id;
   UserAttributes? get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$RelationshipUserImplCopyWith<_$RelationshipUserImpl> get copyWith =>
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2974,12 +2969,12 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) {
     return artist(this);
   }
@@ -2988,12 +2983,12 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) {
     return artist?.call(this);
   }
@@ -3002,12 +2997,12 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) {
     if (artist != null) {
@@ -3177,12 +3172,12 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) {
     return author(this);
   }
@@ -3191,12 +3186,12 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) {
     return author?.call(this);
   }
@@ -3205,12 +3200,12 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) {
     if (author != null) {
@@ -3361,12 +3356,12 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) {
     return creator(this);
   }
@@ -3375,12 +3370,12 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) {
     return creator?.call(this);
   }
@@ -3389,12 +3384,12 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) {
     if (creator != null) {
@@ -3566,12 +3561,12 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) {
     return cover(this);
   }
@@ -3580,12 +3575,12 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) {
     return cover?.call(this);
   }
@@ -3594,12 +3589,12 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) {
     if (cover != null) {
@@ -3616,7 +3611,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   }
 }
 
-abstract class CoverArt implements Relationship, Cover {
+abstract class CoverArt implements Relationship {
   const factory CoverArt(
       {required final String id,
       required final CoverArtAttributes? attributes}) = _$CoverArtImpl;
@@ -3634,11 +3629,11 @@ abstract class CoverArt implements Relationship, Cover {
 }
 
 /// @nodoc
-abstract class _$$ScanlationGroupImplCopyWith<$Res>
+abstract class _$$GroupImplCopyWith<$Res>
     implements $RelationshipCopyWith<$Res> {
-  factory _$$ScanlationGroupImplCopyWith(_$ScanlationGroupImpl value,
-          $Res Function(_$ScanlationGroupImpl) then) =
-      __$$ScanlationGroupImplCopyWithImpl<$Res>;
+  factory _$$GroupImplCopyWith(
+          _$GroupImpl value, $Res Function(_$GroupImpl) then) =
+      __$$GroupImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, ScanlationGroupAttributes attributes});
@@ -3647,11 +3642,11 @@ abstract class _$$ScanlationGroupImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ScanlationGroupImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$ScanlationGroupImpl>
-    implements _$$ScanlationGroupImplCopyWith<$Res> {
-  __$$ScanlationGroupImplCopyWithImpl(
-      _$ScanlationGroupImpl _value, $Res Function(_$ScanlationGroupImpl) _then)
+class __$$GroupImplCopyWithImpl<$Res>
+    extends _$RelationshipCopyWithImpl<$Res, _$GroupImpl>
+    implements _$$GroupImplCopyWith<$Res> {
+  __$$GroupImplCopyWithImpl(
+      _$GroupImpl _value, $Res Function(_$GroupImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3660,7 +3655,7 @@ class __$$ScanlationGroupImplCopyWithImpl<$Res>
     Object? id = null,
     Object? attributes = null,
   }) {
-    return _then(_$ScanlationGroupImpl(
+    return _then(_$GroupImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -3683,15 +3678,13 @@ class __$$ScanlationGroupImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ScanlationGroupImpl
-    with DiagnosticableTreeMixin
-    implements ScanlationGroup {
-  const _$ScanlationGroupImpl(
+class _$GroupImpl with DiagnosticableTreeMixin implements Group {
+  const _$GroupImpl(
       {required this.id, required this.attributes, final String? $type})
       : $type = $type ?? 'scanlation_group';
 
-  factory _$ScanlationGroupImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ScanlationGroupImplFromJson(json);
+  factory _$GroupImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GroupImplFromJson(json);
 
   @override
   final String id;
@@ -3718,9 +3711,8 @@ class _$ScanlationGroupImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ScanlationGroupImplCopyWith<_$ScanlationGroupImpl> get copyWith =>
-      __$$ScanlationGroupImplCopyWithImpl<_$ScanlationGroupImpl>(
-          this, _$identity);
+  _$$GroupImplCopyWith<_$GroupImpl> get copyWith =>
+      __$$GroupImplCopyWithImpl<_$GroupImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -3773,12 +3765,12 @@ class _$ScanlationGroupImpl
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MangaID value) manga,
-    required TResult Function(RelationshipUser value) user,
+    required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
     required TResult Function(Author value) author,
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
-    required TResult Function(ScanlationGroup value) group,
+    required TResult Function(Group value) group,
   }) {
     return group(this);
   }
@@ -3787,12 +3779,12 @@ class _$ScanlationGroupImpl
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MangaID value)? manga,
-    TResult? Function(RelationshipUser value)? user,
+    TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
     TResult? Function(Author value)? author,
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
-    TResult? Function(ScanlationGroup value)? group,
+    TResult? Function(Group value)? group,
   }) {
     return group?.call(this);
   }
@@ -3801,12 +3793,12 @@ class _$ScanlationGroupImpl
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MangaID value)? manga,
-    TResult Function(RelationshipUser value)? user,
+    TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
     TResult Function(Author value)? author,
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
-    TResult Function(ScanlationGroup value)? group,
+    TResult Function(Group value)? group,
     required TResult orElse(),
   }) {
     if (group != null) {
@@ -3817,27 +3809,25 @@ class _$ScanlationGroupImpl
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ScanlationGroupImplToJson(
+    return _$$GroupImplToJson(
       this,
     );
   }
 }
 
-abstract class ScanlationGroup implements Relationship, Group {
-  const factory ScanlationGroup(
-          {required final String id,
-          required final ScanlationGroupAttributes attributes}) =
-      _$ScanlationGroupImpl;
+abstract class Group implements Relationship {
+  const factory Group(
+      {required final String id,
+      required final ScanlationGroupAttributes attributes}) = _$GroupImpl;
 
-  factory ScanlationGroup.fromJson(Map<String, dynamic> json) =
-      _$ScanlationGroupImpl.fromJson;
+  factory Group.fromJson(Map<String, dynamic> json) = _$GroupImpl.fromJson;
 
   @override
   String get id;
   ScanlationGroupAttributes get attributes;
   @override
   @JsonKey(ignore: true)
-  _$$ScanlationGroupImplCopyWith<_$ScanlationGroupImpl> get copyWith =>
+  _$$GroupImplCopyWith<_$GroupImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4566,7 +4556,7 @@ GroupList _$GroupListFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$GroupList {
-  List<ScanlationGroup> get data => throw _privateConstructorUsedError;
+  List<Group> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -4580,7 +4570,7 @@ abstract class $GroupListCopyWith<$Res> {
   factory $GroupListCopyWith(GroupList value, $Res Function(GroupList) then) =
       _$GroupListCopyWithImpl<$Res, GroupList>;
   @useResult
-  $Res call({List<ScanlationGroup> data, int total});
+  $Res call({List<Group> data, int total});
 }
 
 /// @nodoc
@@ -4603,7 +4593,7 @@ class _$GroupListCopyWithImpl<$Res, $Val extends GroupList>
       data: null == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<ScanlationGroup>,
+              as List<Group>,
       total: null == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
@@ -4620,7 +4610,7 @@ abstract class _$$GroupListImplCopyWith<$Res>
       __$$GroupListImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<ScanlationGroup> data, int total});
+  $Res call({List<Group> data, int total});
 }
 
 /// @nodoc
@@ -4641,7 +4631,7 @@ class __$$GroupListImplCopyWithImpl<$Res>
       null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<ScanlationGroup>,
+              as List<Group>,
       null == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
@@ -4653,15 +4643,14 @@ class __$$GroupListImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$GroupListImpl with DiagnosticableTreeMixin implements _GroupList {
-  const _$GroupListImpl(final List<ScanlationGroup> data, this.total)
-      : _data = data;
+  const _$GroupListImpl(final List<Group> data, this.total) : _data = data;
 
   factory _$GroupListImpl.fromJson(Map<String, dynamic> json) =>
       _$$GroupListImplFromJson(json);
 
-  final List<ScanlationGroup> _data;
+  final List<Group> _data;
   @override
-  List<ScanlationGroup> get data {
+  List<Group> get data {
     if (_data is EqualUnmodifiableListView) return _data;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_data);
@@ -4713,14 +4702,14 @@ class _$GroupListImpl with DiagnosticableTreeMixin implements _GroupList {
 }
 
 abstract class _GroupList implements GroupList {
-  const factory _GroupList(final List<ScanlationGroup> data, final int total) =
+  const factory _GroupList(final List<Group> data, final int total) =
       _$GroupListImpl;
 
   factory _GroupList.fromJson(Map<String, dynamic> json) =
       _$GroupListImpl.fromJson;
 
   @override
-  List<ScanlationGroup> get data;
+  List<Group> get data;
   @override
   int get total;
   @override

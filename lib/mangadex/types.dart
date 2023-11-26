@@ -75,11 +75,6 @@ extension MangaReadingStatusExt on MangaReadingStatus {
         'Re-reading',
         'Completed'
       ].elementAt(index);
-
-  static MangaReadingStatus parse(String key) {
-    return MangaReadingStatus.values
-        .firstWhere((element) => element.name == key);
-  }
 }
 
 const RatingLabel = [
@@ -372,50 +367,25 @@ class Chapter with _$Chapter, MangaDexUUID {
   }
 
   Iterable<Group> getGroups() {
-    final groups = <Group>{};
-
-    for (final g in relationships) {
-      switch (g) {
-        case ScanlationGroup():
-          groups.add(g);
-          break;
-        default:
-          break;
-      }
-    }
-
+    final groups = relationships.whereType<Group>();
     return groups;
   }
 
   String getMangaID() {
-    final mangas = relationships.where((element) => switch (element) {
-          MangaID() => true,
-          _ => false,
-        });
+    final mangas = relationships.whereType<MangaID>();
 
     if (mangas.isNotEmpty) {
-      final m = switch (mangas.first) {
-        MangaID(:final id) => id,
-        _ => '',
-      };
-      return m;
+      return mangas.first.id;
     }
 
     return '';
   }
 
   String getUploadUser() {
-    final user = relationships.where((element) => switch (element) {
-          RelationshipUser() => true,
-          _ => false,
-        });
+    final user = relationships.whereType<User>();
 
     if (user.isNotEmpty) {
-      final u = switch (user.first) {
-        RelationshipUser(:final attributes) => attributes?.username ?? '',
-        _ => '',
-      };
-      return u;
+      return user.first.attributes?.username ?? '';
     }
 
     return '';
@@ -495,17 +465,6 @@ class AuthorAttributes with _$AuthorAttributes {
       _$AuthorAttributesFromJson(json);
 }
 
-/// These classes are sued to expose the corresponding relationship union types
-/// for riverpod/other generators, so that the union type being generated
-/// doesn't need do be known during generation time.
-abstract class Group with MangaDexUUID {
-  ScanlationGroupAttributes get attributes;
-}
-
-abstract class Cover with MangaDexUUID {
-  CoverArtAttributes? get attributes;
-}
-
 abstract class CreatorType with MangaDexUUID {
   AuthorAttributes get attributes;
 }
@@ -521,7 +480,7 @@ class Relationship with _$Relationship, MangaDexUUID {
   const factory Relationship.user({
     required String id,
     required UserAttributes? attributes,
-  }) = RelationshipUser;
+  }) = User;
 
   @Implements<CreatorType>()
   const factory Relationship.artist({
@@ -540,18 +499,16 @@ class Relationship with _$Relationship, MangaDexUUID {
   }) = CreatorID;
 
   @FreezedUnionValue('cover_art')
-  @Implements<Cover>()
   const factory Relationship.cover({
     required String id,
     required CoverArtAttributes? attributes,
   }) = CoverArt;
 
   @FreezedUnionValue('scanlation_group')
-  @Implements<Group>()
   const factory Relationship.group({
     required String id,
     required ScanlationGroupAttributes attributes,
-  }) = ScanlationGroup;
+  }) = Group;
 
   factory Relationship.fromJson(Map<String, dynamic> json) =>
       _$RelationshipFromJson(json);
@@ -610,7 +567,7 @@ class MangaList with _$MangaList {
 @freezed
 class GroupList with _$GroupList {
   const factory GroupList(
-    List<ScanlationGroup> data,
+    List<Group> data,
     int total,
   ) = _GroupList;
 
@@ -682,7 +639,7 @@ class Manga with _$Manga, MangaDexUUID {
     return covers.first.quality(quality: quality);
   }
 
-  CoverArtUrl getUrlFromCover(Cover cover,
+  CoverArtUrl getUrlFromCover(CoverArt cover,
       {CoverArtQuality quality = CoverArtQuality.best}) {
     final filename = cover.attributes?.fileName;
 
@@ -695,26 +652,20 @@ class Manga with _$Manga, MangaDexUUID {
   }
 
   List<CreatorType>? getAuthor() {
-    final authorRs = relationships.where((element) => switch (element) {
-          Author() => true,
-          _ => false,
-        });
+    final authorRs = relationships.whereType<Author>();
 
     if (authorRs.isNotEmpty) {
-      return authorRs.map((e) => e as Author).toList();
+      return authorRs.toList();
     }
 
     return null;
   }
 
   List<CreatorType>? getArtist() {
-    final artistRs = relationships.where((element) => switch (element) {
-          Artist() => true,
-          _ => false,
-        });
+    final artistRs = relationships.whereType<Artist>();
 
     if (artistRs.isNotEmpty) {
-      return artistRs.map((e) => e as Artist).toList();
+      return artistRs.toList();
     }
 
     return null;
@@ -735,10 +686,7 @@ class Manga with _$Manga, MangaDexUUID {
   }
 
   List<String> getRelatedManga() {
-    final mangaRs = relationships.where((element) => switch (element) {
-          MangaID() => true,
-          _ => false,
-        });
+    final mangaRs = relationships.whereType<MangaID>();
 
     if (mangaRs.isNotEmpty) {
       return mangaRs.map((e) => e.id).toList();
@@ -910,21 +858,29 @@ class CustomList with _$CustomList, MangaDexUUID {
   }) = _CustomList;
 
   late final set = _convertIDs();
+  late final user = _getUser();
 
   factory CustomList.fromJson(Map<String, dynamic> json) =>
       _$CustomListFromJson(json);
 
   Set<String> _convertIDs() {
-    final rs = relationships.where((element) => switch (element) {
-          MangaID() => true,
-          _ => false,
-        });
+    final rs = relationships.whereType<MangaID>();
 
     if (rs.isNotEmpty) {
-      return rs.map((e) => (e as MangaID).id).toSet();
+      return rs.map((e) => e.id).toSet();
     }
 
     return {};
+  }
+
+  User? _getUser() {
+    final user = relationships.whereType<User>();
+
+    if (user.isNotEmpty) {
+      return user.first;
+    }
+
+    return null;
   }
 }
 

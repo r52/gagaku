@@ -25,6 +25,7 @@ class MainDrawer extends ConsumerWidget {
       case '/':
       case GagakuRoute.chapterfeed:
       case GagakuRoute.library:
+      case GagakuRoute.lists:
       case GagakuRoute.history:
       default:
         return 0;

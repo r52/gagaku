@@ -7,11 +7,14 @@ import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
+import 'package:gagaku/mangadex/create_list.dart';
 import 'package:gagaku/mangadex/creator_view.dart';
 import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/history_feed.dart';
 import 'package:gagaku/mangadex/latest_feed.dart';
 import 'package:gagaku/mangadex/library.dart';
+import 'package:gagaku/mangadex/list_view.dart';
+import 'package:gagaku/mangadex/lists.dart';
 import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
@@ -136,6 +139,28 @@ class _AppState extends ConsumerState<App> {
         pageBuilder: buildCreatorViewPage,
       ),
       GoRoute(
+        path: GagakuRoute.list,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildListViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.listAlt,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildListViewPage,
+      ),
+      // GoRoute(
+      //   path: GagakuRoute.listEdit,
+      //   parentNavigatorKey: _rootNavigatorKey,
+      //   pageBuilder: ,
+      // ),
+      GoRoute(
+        path: GagakuRoute.listCreate,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (BuildContext context, GoRouterState state) {
+          return const MangaDexCreateListScreen();
+        },
+      ),
+      GoRoute(
         path: GagakuRoute.login,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (BuildContext context, GoRouterState state) {
@@ -193,11 +218,26 @@ class _AppState extends ConsumerState<App> {
             ),
           ),
           GoRoute(
+            path: GagakuRoute.lists,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.lists),
+                builder: (context, ref) {
+                  return MangaDexListsView(
+                    controller: _controllers[3],
+                  );
+                },
+              ),
+              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+            ),
+          ),
+          GoRoute(
             path: GagakuRoute.history,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
               child: MangaDexHistoryFeed(
-                controller: _controllers[3],
+                controller: _controllers[4],
               ),
               transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
             ),
@@ -252,6 +292,7 @@ class _AppState extends ConsumerState<App> {
     super.initState();
 
     _controllers.addAll([
+      ScrollController(),
       ScrollController(),
       ScrollController(),
       ScrollController(),

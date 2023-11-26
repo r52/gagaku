@@ -1409,7 +1409,7 @@ class _CoverArtItem extends HookWidget {
     this.onTap,
   });
 
-  final Cover cover;
+  final CoverArt cover;
   final Manga manga;
   final int page;
   final VoidCallback? onTap;

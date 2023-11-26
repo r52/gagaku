@@ -32,15 +32,19 @@ class MangaDexHome extends HookConsumerWidget {
     const bottomNavigationBarItems = <Widget>[
       NavigationDestination(
         icon: Icon(Icons.home),
-        label: 'Latest Uploads',
+        label: 'Latest',
       ),
       NavigationDestination(
         icon: Icon(Icons.menu_book),
-        label: 'Following Feed',
+        label: 'My Feed',
       ),
       NavigationDestination(
         icon: Icon(Icons.collections),
         label: 'Library',
+      ),
+      NavigationDestination(
+        icon: Icon(Icons.list),
+        label: 'My Lists',
       ),
       NavigationDestination(
         icon: Icon(Icons.history),
@@ -191,6 +195,9 @@ class MangaDexHome extends HookConsumerWidget {
         GoRouter.of(context).go(GagakuRoute.library);
         break;
       case 3:
+        GoRouter.of(context).go(GagakuRoute.lists);
+        break;
+      case 4:
         GoRouter.of(context).go(GagakuRoute.history);
         break;
     }
@@ -204,8 +211,10 @@ class MangaDexHome extends HookConsumerWidget {
         return 1;
       case GagakuRoute.library:
         return 2;
-      case GagakuRoute.history:
+      case GagakuRoute.lists:
         return 3;
+      case GagakuRoute.history:
+        return 4;
       default:
         return 0;
     }

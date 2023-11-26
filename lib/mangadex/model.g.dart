@@ -805,12 +805,12 @@ class _MangaChaptersProviderElement
   Manga get manga => (origin as MangaChaptersProvider).manga;
 }
 
-String _$mangaCoversHash() => r'c694ebf3674071687746d8a039e9fb8a5683dc93';
+String _$mangaCoversHash() => r'e1a4b2d7652930b2f9aa3abaf85906db213f450c';
 
-abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<Cover>> {
+abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<CoverArt>> {
   late final Manga manga;
 
-  FutureOr<List<Cover>> build(
+  FutureOr<List<CoverArt>> build(
     Manga manga,
   );
 }
@@ -881,7 +881,7 @@ class _$MangaCoversFamilyOverride implements FamilyOverride {
 
 /// See also [MangaCovers].
 class MangaCoversProvider
-    extends AsyncNotifierProviderImpl<MangaCovers, List<Cover>> {
+    extends AsyncNotifierProviderImpl<MangaCovers, List<CoverArt>> {
   /// See also [MangaCovers].
   MangaCoversProvider(
     Manga manga,
@@ -912,7 +912,7 @@ class MangaCoversProvider
   final Manga manga;
 
   @override
-  FutureOr<List<Cover>> runNotifierBuild(
+  FutureOr<List<CoverArt>> runNotifierBuild(
     covariant MangaCovers notifier,
   ) {
     return notifier.build(
@@ -942,7 +942,7 @@ class MangaCoversProvider
   }
 
   @override
-  AsyncNotifierProviderElement<MangaCovers, List<Cover>> createElement() {
+  AsyncNotifierProviderElement<MangaCovers, List<CoverArt>> createElement() {
     return _MangaCoversProviderElement(this);
   }
 
@@ -974,13 +974,13 @@ class MangaCoversProvider
   }
 }
 
-mixin MangaCoversRef on AsyncNotifierProviderRef<List<Cover>> {
+mixin MangaCoversRef on AsyncNotifierProviderRef<List<CoverArt>> {
   /// The parameter `manga` of this provider.
   Manga get manga;
 }
 
 class _MangaCoversProviderElement
-    extends AsyncNotifierProviderElement<MangaCovers, List<Cover>>
+    extends AsyncNotifierProviderElement<MangaCovers, List<CoverArt>>
     with MangaCoversRef {
   _MangaCoversProviderElement(super.provider);
 
@@ -1186,7 +1186,7 @@ class _UserLibraryProviderElement
   MangaReadingStatus get status => (origin as UserLibraryProvider).status;
 }
 
-String _$userListsHash() => r'a918698a6f97e6de2eca4b55b10cc46c6b113f23';
+String _$userListsHash() => r'92054d600805fb54c26ee881d67b4bc76afdc72e';
 
 /// See also [UserLists].
 @ProviderFor(UserLists)
@@ -1201,6 +1201,375 @@ final userListsProvider =
 );
 
 typedef _$UserLists = AsyncNotifier<List<CustomList>>;
+String _$customListFeedHash() => r'66ab8f3a53c32d9d882fc72073954fa2e50baf5c';
+
+abstract class _$CustomListFeed extends BuildlessAsyncNotifier<List<Chapter>> {
+  late final CustomList list;
+
+  FutureOr<List<Chapter>> build(
+    CustomList list,
+  );
+}
+
+/// See also [CustomListFeed].
+@ProviderFor(CustomListFeed)
+const customListFeedProvider = CustomListFeedFamily();
+
+/// See also [CustomListFeed].
+class CustomListFeedFamily extends Family {
+  /// See also [CustomListFeed].
+  const CustomListFeedFamily();
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'customListFeedProvider';
+
+  /// See also [CustomListFeed].
+  CustomListFeedProvider call(
+    CustomList list,
+  ) {
+    return CustomListFeedProvider(
+      list,
+    );
+  }
+
+  @visibleForOverriding
+  @override
+  CustomListFeedProvider getProviderOverride(
+    covariant CustomListFeedProvider provider,
+  ) {
+    return call(
+      provider.list,
+    );
+  }
+
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(CustomListFeed Function() create) {
+    return _$CustomListFeedFamilyOverride(this, create);
+  }
+}
+
+class _$CustomListFeedFamilyOverride implements FamilyOverride {
+  _$CustomListFeedFamilyOverride(this.overriddenFamily, this.create);
+
+  final CustomListFeed Function() create;
+
+  @override
+  final CustomListFeedFamily overriddenFamily;
+
+  @override
+  CustomListFeedProvider getProviderOverride(
+    covariant CustomListFeedProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
+}
+
+/// See also [CustomListFeed].
+class CustomListFeedProvider
+    extends AsyncNotifierProviderImpl<CustomListFeed, List<Chapter>> {
+  /// See also [CustomListFeed].
+  CustomListFeedProvider(
+    CustomList list,
+  ) : this._internal(
+          () => CustomListFeed()..list = list,
+          from: customListFeedProvider,
+          name: r'customListFeedProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$customListFeedHash,
+          dependencies: CustomListFeedFamily._dependencies,
+          allTransitiveDependencies:
+              CustomListFeedFamily._allTransitiveDependencies,
+          list: list,
+        );
+
+  CustomListFeedProvider._internal(
+    super.create, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.list,
+  }) : super.internal();
+
+  final CustomList list;
+
+  @override
+  FutureOr<List<Chapter>> runNotifierBuild(
+    covariant CustomListFeed notifier,
+  ) {
+    return notifier.build(
+      list,
+    );
+  }
+
+  @override
+  Override overrideWith(CustomListFeed Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: CustomListFeedProvider._internal(
+        () => create()..list = list,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        list: list,
+      ),
+    );
+  }
+
+  @override
+  (CustomList,) get argument {
+    return (list,);
+  }
+
+  @override
+  AsyncNotifierProviderElement<CustomListFeed, List<Chapter>> createElement() {
+    return _CustomListFeedProviderElement(this);
+  }
+
+  CustomListFeedProvider _copyWith(
+    CustomListFeed Function() create,
+  ) {
+    return CustomListFeedProvider._internal(
+      () => create()..list = list,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      list: list,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CustomListFeedProvider && other.list == list;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, list.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin CustomListFeedRef on AsyncNotifierProviderRef<List<Chapter>> {
+  /// The parameter `list` of this provider.
+  CustomList get list;
+}
+
+class _CustomListFeedProviderElement
+    extends AsyncNotifierProviderElement<CustomListFeed, List<Chapter>>
+    with CustomListFeedRef {
+  _CustomListFeedProviderElement(super.provider);
+
+  @override
+  CustomList get list => (origin as CustomListFeedProvider).list;
+}
+
+String _$customListTitlesHash() => r'2e335d24ff74829f582c0d8377c60ca081163fd2';
+
+abstract class _$CustomListTitles
+    extends BuildlessAutoDisposeAsyncNotifier<Iterable<Manga>> {
+  late final CustomList list;
+
+  FutureOr<Iterable<Manga>> build(
+    CustomList list,
+  );
+}
+
+/// See also [CustomListTitles].
+@ProviderFor(CustomListTitles)
+const customListTitlesProvider = CustomListTitlesFamily();
+
+/// See also [CustomListTitles].
+class CustomListTitlesFamily extends Family {
+  /// See also [CustomListTitles].
+  const CustomListTitlesFamily();
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'customListTitlesProvider';
+
+  /// See also [CustomListTitles].
+  CustomListTitlesProvider call(
+    CustomList list,
+  ) {
+    return CustomListTitlesProvider(
+      list,
+    );
+  }
+
+  @visibleForOverriding
+  @override
+  CustomListTitlesProvider getProviderOverride(
+    covariant CustomListTitlesProvider provider,
+  ) {
+    return call(
+      provider.list,
+    );
+  }
+
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(CustomListTitles Function() create) {
+    return _$CustomListTitlesFamilyOverride(this, create);
+  }
+}
+
+class _$CustomListTitlesFamilyOverride implements FamilyOverride {
+  _$CustomListTitlesFamilyOverride(this.overriddenFamily, this.create);
+
+  final CustomListTitles Function() create;
+
+  @override
+  final CustomListTitlesFamily overriddenFamily;
+
+  @override
+  CustomListTitlesProvider getProviderOverride(
+    covariant CustomListTitlesProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
+}
+
+/// See also [CustomListTitles].
+class CustomListTitlesProvider extends AutoDisposeAsyncNotifierProviderImpl<
+    CustomListTitles, Iterable<Manga>> {
+  /// See also [CustomListTitles].
+  CustomListTitlesProvider(
+    CustomList list,
+  ) : this._internal(
+          () => CustomListTitles()..list = list,
+          from: customListTitlesProvider,
+          name: r'customListTitlesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$customListTitlesHash,
+          dependencies: CustomListTitlesFamily._dependencies,
+          allTransitiveDependencies:
+              CustomListTitlesFamily._allTransitiveDependencies,
+          list: list,
+        );
+
+  CustomListTitlesProvider._internal(
+    super.create, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.list,
+  }) : super.internal();
+
+  final CustomList list;
+
+  @override
+  FutureOr<Iterable<Manga>> runNotifierBuild(
+    covariant CustomListTitles notifier,
+  ) {
+    return notifier.build(
+      list,
+    );
+  }
+
+  @override
+  Override overrideWith(CustomListTitles Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: CustomListTitlesProvider._internal(
+        () => create()..list = list,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        list: list,
+      ),
+    );
+  }
+
+  @override
+  (CustomList,) get argument {
+    return (list,);
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<CustomListTitles, Iterable<Manga>>
+      createElement() {
+    return _CustomListTitlesProviderElement(this);
+  }
+
+  CustomListTitlesProvider _copyWith(
+    CustomListTitles Function() create,
+  ) {
+    return CustomListTitlesProvider._internal(
+      () => create()..list = list,
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      list: list,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CustomListTitlesProvider && other.list == list;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, list.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin CustomListTitlesRef
+    on AutoDisposeAsyncNotifierProviderRef<Iterable<Manga>> {
+  /// The parameter `list` of this provider.
+  CustomList get list;
+}
+
+class _CustomListTitlesProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<CustomListTitles,
+        Iterable<Manga>> with CustomListTitlesRef {
+  _CustomListTitlesProviderElement(super.provider);
+
+  @override
+  CustomList get list => (origin as CustomListTitlesProvider).list;
+}
+
 String _$tagListHash() => r'0a1fc9b1354d4786d8aac74ab1a13e872b6e9e1b';
 
 /// See also [TagList].
@@ -1814,7 +2183,21 @@ final mangaDexHistoryProvider =
 );
 
 typedef _$MangaDexHistory = AsyncNotifier<Queue<Chapter>>;
-String _$authControlHash() => r'7c76d1e532990ca742f04a2683bc8c4345b5cb9e';
+String _$loggedUserHash() => r'81ee0bde0e61ab2d4db0d8e7e3cd53ad937c1ec9';
+
+/// See also [LoggedUser].
+@ProviderFor(LoggedUser)
+final loggedUserProvider = AsyncNotifierProvider<LoggedUser, User?>.internal(
+  LoggedUser.new,
+  name: r'loggedUserProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$loggedUserHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$LoggedUser = AsyncNotifier<User?>;
+String _$authControlHash() => r'8c3f82807e4b82bcd39152fdc92f07e34febe176';
 
 /// See also [AuthControl].
 @ProviderFor(AuthControl)

@@ -2,6 +2,7 @@ abstract class GagakuRoute {
   static const chapterfeed = '/titles/feed';
   static const library = '/titles/follows';
   static const history = '/my/history';
+  static const lists = '/my/lists';
 
   static const login = '/login';
   static const manga = '/title/:mangaId';
@@ -11,6 +12,10 @@ abstract class GagakuRoute {
   static const chapter = '/chapter/:chapterId';
   static const group = '/group/:groupId';
   static const groupAlt = '/group/:groupId/:name';
+  static const list = '/list/:listId';
+  static const listAlt = '/list/:listId/:name';
+  static const listEdit = '/list/edit/:listId';
+  static const listCreate = '/create/list';
 
   static const local = '/local';
 
