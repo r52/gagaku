@@ -16,6 +16,9 @@ import 'types.dart';
 
 const statsError = 'Error Retrieving Stats';
 
+typedef MangaSelectCallback = void Function(Manga manga);
+typedef MangaButtonBuilderCallback = Widget Function(Manga manga);
+
 enum MangaListView { grid, list, detailed }
 
 final _mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
@@ -571,6 +574,7 @@ class MangaListWidget extends HookConsumerWidget {
     this.onAtEdge,
     this.controller,
     this.noController = false,
+    this.showToggle = true,
   });
 
   final Widget? title;
@@ -580,12 +584,14 @@ class MangaListWidget extends HookConsumerWidget {
   final VoidCallback? onAtEdge;
   final ScrollController? controller;
   final bool noController;
+  final bool showToggle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController =
         controller ?? (noController ? null : useScrollController());
-    final view = ref.watch(_mangaListViewProvider);
+    final view =
+        showToggle ? ref.watch(_mangaListViewProvider) : MangaListView.grid;
 
     useEffect(() {
       void controllerAtEdge() {
@@ -616,25 +622,26 @@ class MangaListWidget extends HookConsumerWidget {
               children: [
                 if (title != null) title!,
                 const Spacer(),
-                ToggleButtons(
-                  isSelected: List<bool>.generate(MangaListView.values.length,
-                      (index) => view.index == index),
-                  onPressed: (index) {
-                    ref.read(_mangaListViewProvider.notifier).state =
-                        MangaListView.values.elementAt(index);
-                  },
-                  children: const [
-                    Icon(
-                      Icons.grid_view,
-                    ),
-                    Icon(
-                      Icons.table_rows,
-                    ),
-                    Icon(
-                      Icons.view_list,
-                    ),
-                  ],
-                ),
+                if (showToggle)
+                  ToggleButtons(
+                    isSelected: List<bool>.generate(MangaListView.values.length,
+                        (index) => view.index == index),
+                    onPressed: (index) {
+                      ref.read(_mangaListViewProvider.notifier).state =
+                          MangaListView.values.elementAt(index);
+                    },
+                    children: const [
+                      Icon(
+                        Icons.grid_view,
+                      ),
+                      Icon(
+                        Icons.table_rows,
+                      ),
+                      Icon(
+                        Icons.view_list,
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -649,13 +656,20 @@ class MangaListViewSliver extends ConsumerWidget {
   const MangaListViewSliver({
     super.key,
     required this.items,
+    this.selectMode = false,
+    this.selectButton,
+    this.onSelected,
   });
 
   final Iterable<Manga> items;
+  final bool selectMode;
+  final MangaButtonBuilderCallback? selectButton;
+  final MangaSelectCallback? onSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final view = ref.watch(_mangaListViewProvider);
+    final view =
+        selectMode ? MangaListView.grid : ref.watch(_mangaListViewProvider);
     final onMobilePortrait =
         DeviceContext.isPortraitMode(context) && DeviceContext.isMobile();
 
@@ -696,7 +710,12 @@ class MangaListViewSliver extends ConsumerWidget {
           ),
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
-            return _GridMangaItem(manga: manga);
+            return _GridMangaItem(
+              manga: manga,
+              selectMode: selectMode,
+              selectButton: selectButton,
+              onSelected: onSelected,
+            );
           },
           itemCount: items.length,
         );
@@ -705,9 +724,18 @@ class MangaListViewSliver extends ConsumerWidget {
 }
 
 class _GridMangaItem extends HookWidget {
-  const _GridMangaItem({super.key, required this.manga});
+  const _GridMangaItem({
+    super.key,
+    required this.manga,
+    this.selectMode = false,
+    this.selectButton,
+    this.onSelected,
+  });
 
   final Manga manga;
+  final bool selectMode;
+  final MangaButtonBuilderCallback? selectButton;
+  final MangaSelectCallback? onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -751,6 +779,20 @@ class _GridMangaItem extends HookWidget {
         }
       },
       child: GridTile(
+        header: selectMode
+            ? Row(
+                children: [
+                  const Spacer(),
+                  FloatingActionButton(
+                    heroTag: manga.id,
+                    mini: true,
+                    shape: const CircleBorder(),
+                    onPressed: () => onSelected!(manga),
+                    child: selectButton!(manga),
+                  ),
+                ],
+              )
+            : null,
         footer: SizedBox(
           height: 60,
           child: Material(

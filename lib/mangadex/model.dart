@@ -1313,7 +1313,8 @@ class MangaDexModel {
   }
 
   /// Creates a new [CustomList]
-  Future<CustomList?> createNewList(String name, bool private) async {
+  Future<CustomList?> createNewList(
+      String name, bool private, Iterable<Manga> manga) async {
     if (!await loggedIn()) {
       throw Exception(
           "createNewList() called on invalid token/login. Shouldn't ever get here");
@@ -1325,6 +1326,7 @@ class MangaDexModel {
     final params = {
       'name': name,
       'visibility': private ? 'private' : 'public',
+      'manga': manga.map((e) => e.id).toList(),
     };
 
     final response = await _client.post(uri,
@@ -2144,9 +2146,6 @@ class UserLists extends _$UserLists {
 
       if (result) {
         set = oldstate.where((element) => element.id != list.id);
-
-        ref.invalidate(customListTitlesProvider(list));
-        ref.invalidate(customListFeedProvider(list));
       }
 
       return [...set];
@@ -2155,7 +2154,7 @@ class UserLists extends _$UserLists {
     return (state.valueOrNull ?? []).length != oldstate.length;
   }
 
-  Future<bool> newList(String name, bool private) async {
+  Future<bool> newList(String name, bool private, Iterable<Manga> manga) async {
     if (state.isLoading || state.isReloading) {
       return false;
     }
@@ -2165,7 +2164,7 @@ class UserLists extends _$UserLists {
     final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final result = await api.createNewList(name, private);
+      final result = await api.createNewList(name, private, manga);
 
       if (result != null) {
         return [...oldstate, result];

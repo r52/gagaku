@@ -19,6 +19,7 @@ import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/reader.dart';
+import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/settings.dart';
 import 'package:gagaku/ui.dart';
@@ -153,6 +154,11 @@ class _AppState extends ConsumerState<App> {
       //   parentNavigatorKey: _rootNavigatorKey,
       //   pageBuilder: ,
       // ),
+      GoRoute(
+        path: GagakuRoute.search,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: buildMDSearchPage,
+      ),
       GoRoute(
         path: GagakuRoute.listCreate,
         parentNavigatorKey: _rootNavigatorKey,

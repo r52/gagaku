@@ -662,7 +662,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               if (result != null) {
                                 final success = await ref
                                     .read(userListsProvider.notifier)
-                                    .newList(result.$1, result.$2);
+                                    .newList(result.$1, result.$2, []);
 
                                 if (success) {
                                   messenger

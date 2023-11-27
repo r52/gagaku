@@ -29,6 +29,25 @@ class MangaDexListsView extends HookConsumerWidget {
     final userListsProv = ref.watch(userListsProvider);
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+          tooltip: 'New List',
+          icon: const Icon(Icons.playlist_add),
+          label: const Text('New List'),
+          onPressed: () {
+            final messenger = ScaffoldMessenger.of(context);
+            context.push<bool>(GagakuRoute.listCreate).then((success) {
+              if (success == true) {
+                messenger
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(
+                      content: Text('New list created.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+              }
+            });
+          }),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,38 +79,6 @@ class MangaDexListsView extends HookConsumerWidget {
                   //     ),
                   //   ],
                   // ),
-                ],
-              ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-              child: Row(
-                children: [
-                  ElevatedButton.icon(
-                    style: Styles.buttonStyle(
-                      backgroundColor: Colors.green.shade900,
-                    ),
-                    icon: const Icon(Icons.add),
-                    label: const Text('New List'),
-                    onPressed: () {
-                      final messenger = ScaffoldMessenger.of(context);
-                      context
-                          .push<bool>(GagakuRoute.listCreate)
-                          .then((success) {
-                        if (success == true) {
-                          messenger
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              const SnackBar(
-                                content: Text('New list created.'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                        }
-                      });
-                    },
-                  ),
                 ],
               ),
             ),

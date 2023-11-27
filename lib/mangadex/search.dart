@@ -7,6 +7,8 @@ import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 //part 'search.g.dart';
@@ -14,8 +16,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final _searchParamsProvider = StateProvider(
     (ref) => const MangaSearchParameters(query: '', filter: MangaFilters()));
 
+Widget buildMDSearchPage(BuildContext context, GoRouterState state) {
+  final selectMode = state.uri.queryParameters['selectMode'] == 'true';
+  final selectedTitles = state.extra.asOrNull<Set<Manga>>();
+  return MangaDexSearchWidget(
+    selectMode: selectMode,
+    selectedTitles: selectedTitles,
+  );
+}
+
 class MangaDexSearchWidget extends HookConsumerWidget {
-  const MangaDexSearchWidget({super.key});
+  const MangaDexSearchWidget({
+    super.key,
+    this.selectMode = false,
+    this.selectedTitles,
+  });
+
+  final bool selectMode;
+  final Set<Manga>? selectedTitles;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +44,8 @@ class MangaDexSearchWidget extends HookConsumerWidget {
 
     final results = ref.watch(mangaSearchProvider(filter));
     final isLoading = results.isLoading && results.isReloading;
+
+    final selected = useState<Set<Manga>>(selectedTitles ?? {});
 
     useEffect(() {
       return () => debounce.value?.cancel();
@@ -84,8 +104,16 @@ class MangaDexSearchWidget extends HookConsumerWidget {
             final lt = ref.read(_searchParamsProvider);
             ref.read(mangaSearchProvider(lt).notifier).getMore();
           },
+          showToggle: !selectMode,
           leading: [
             SliverAppBar(
+              leading: BackButton(onPressed: () {
+                if (context.canPop()) {
+                  context.pop(selectMode ? selected.value : null);
+                } else {
+                  context.go('/');
+                }
+              }),
               pinned: true,
               snap: false,
               floating: false,
@@ -146,7 +174,24 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                 }(),
               AsyncValue(:final value?) => () {
                   if (value.isNotEmpty) {
-                    return MangaListViewSliver(items: value);
+                    return MangaListViewSliver(
+                      items: value,
+                      selectMode: selectMode,
+                      selectButton: (manga) {
+                        if (selected.value.contains(manga)) {
+                          return const Icon(Icons.remove);
+                        }
+
+                        return const Icon(Icons.add);
+                      },
+                      onSelected: (manga) {
+                        if (selected.value.contains(manga)) {
+                          selected.value = {...selected.value..remove(manga)};
+                        } else {
+                          selected.value = {...selected.value..add(manga)};
+                        }
+                      },
+                    );
                   }
 
                   return const SliverToBoxAdapter(

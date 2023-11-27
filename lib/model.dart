@@ -16,6 +16,7 @@ abstract class GagakuRoute {
   static const listAlt = '/list/:listId/:name';
   static const listEdit = '/list/edit/:listId';
   static const listCreate = '/create/list';
+  static const search = '/search';
 
   static const local = '/local';
 
