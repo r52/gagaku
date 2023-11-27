@@ -24,9 +24,23 @@ class MangaDexListsView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = controller ?? useScrollController();
     final theme = Theme.of(context);
     //final view = useState(_ListViewType.self);
     final userListsProv = ref.watch(userListsProvider);
+
+    useEffect(() {
+      void controllerAtEdge() {
+        if (scrollController.position.atEdge &&
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
+          ref.read(userListsProvider.notifier).getMore();
+        }
+      }
+
+      scrollController.addListener(controllerAtEdge);
+      return () => scrollController.removeListener(controllerAtEdge);
+    }, [scrollController]);
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
