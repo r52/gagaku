@@ -6,7 +6,7 @@ part of 'manga_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchMangaFromIdHash() => r'a0ad364f40eb3ded19c3a8012e0238c43a8f1d73';
+String _$fetchMangaFromIdHash() => r'aa14b104bfae399f4c9480fded6d7263eec0320d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -369,7 +369,7 @@ class _FetchReadChaptersRedunProviderElement
   Manga get manga => (origin as _FetchReadChaptersRedunProvider).manga;
 }
 
-String _$fetchRelatedMangaHash() => r'b4fa1f593d88425b7b25806e263409df11b39d65';
+String _$fetchRelatedMangaHash() => r'f598239af8912129cc7c170b59e75f616322ff59';
 
 /// See also [_fetchRelatedManga].
 @ProviderFor(_fetchRelatedManga)

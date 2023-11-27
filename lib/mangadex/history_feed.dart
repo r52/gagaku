@@ -18,7 +18,8 @@ Future<List<ChapterFeedItemData>> _fetchHistoryFeed(
   final mangaIds = chapters.map((e) => e.getMangaID()).toSet();
   mangaIds.removeWhere((element) => element.isEmpty);
 
-  final mangas = await api.fetchManga(ids: mangaIds);
+  final mangas =
+      await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
 

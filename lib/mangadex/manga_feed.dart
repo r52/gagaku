@@ -17,7 +17,8 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   final mangaids = chapters.map((e) => e.getMangaID()).toSet();
   mangaids.removeWhere((element) => element.isEmpty);
 
-  final mangas = await api.fetchManga(ids: mangaids);
+  final mangas =
+      await api.fetchManga(ids: mangaids, limit: MangaDexEndpoints.breakLimit);
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
 

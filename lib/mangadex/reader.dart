@@ -66,7 +66,8 @@ Future<ReaderData> _fetchChapterData(
   final chapter = chapters.first;
 
   final mangaId = chapter.getMangaID();
-  final mangas = await api.fetchManga(ids: [mangaId]);
+  final mangas =
+      await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
   final manga = mangas.first;
 
   final data = ReaderData(

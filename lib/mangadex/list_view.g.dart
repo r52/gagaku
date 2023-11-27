@@ -198,7 +198,7 @@ class _FetchListFromIdProviderElement
   String get listId => (origin as _FetchListFromIdProvider).listId;
 }
 
-String _$fetchListFeedHash() => r'8706dde3905759d148996ebbf85add52ba6c8c8e';
+String _$fetchListFeedHash() => r'4f41c43146a989372ae39f7c0fe479fea35adece';
 
 /// See also [_fetchListFeed].
 @ProviderFor(_fetchListFeed)

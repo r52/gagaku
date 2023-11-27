@@ -44,7 +44,8 @@ Page<dynamic> buildMangaViewPage(BuildContext context, GoRouterState state) {
 Future<Manga> _fetchMangaFromId(
     _FetchMangaFromIdRef ref, String mangaId) async {
   final api = ref.watch(mangadexProvider);
-  final manga = await api.fetchManga(ids: [mangaId]);
+  final manga =
+      await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
   return manga.first;
 }
 
@@ -71,7 +72,8 @@ Future<Iterable<Manga>> _fetchRelatedManga(
 
   if (related.isNotEmpty) {
     final api = ref.watch(mangadexProvider);
-    final mangas = await api.fetchManga(ids: related);
+    final mangas =
+        await api.fetchManga(ids: related, limit: MangaDexEndpoints.breakLimit);
 
     await ref.watch(statisticsProvider.notifier).get(mangas);
 

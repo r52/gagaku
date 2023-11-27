@@ -6,7 +6,7 @@ part of 'manga_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchMangaFeedHash() => r'7a1e8fda3fb4215e4472ac5c94ed8ba0e6fa6cac';
+String _$fetchMangaFeedHash() => r'26df6b3dd487b18b62a57afd54d5684aa253ff96';
 
 /// See also [_fetchMangaFeed].
 @ProviderFor(_fetchMangaFeed)

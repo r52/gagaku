@@ -21,7 +21,7 @@ final mangadexProvider = Provider<MangaDexModel>.internal(
 
 typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$latestChaptersFeedHash() =>
-    r'6ae2c4b9de80c65201e6089255ccd6c9a0ffb14b';
+    r'11901b8b90b8433dd8b1c858df2ccce411aa7a90';
 
 /// See also [LatestChaptersFeed].
 @ProviderFor(LatestChaptersFeed)
@@ -37,7 +37,7 @@ final latestChaptersFeedProvider =
 );
 
 typedef _$LatestChaptersFeed = AsyncNotifier<List<Chapter>>;
-String _$latestGlobalFeedHash() => r'93051137aeb6e7c9c3a4132105d3e88df8d3e257';
+String _$latestGlobalFeedHash() => r'4188560092c8fda11c0360de3ef590a4bc156298';
 
 /// See also [LatestGlobalFeed].
 @ProviderFor(LatestGlobalFeed)
@@ -53,7 +53,7 @@ final latestGlobalFeedProvider =
 );
 
 typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
-String _$groupFeedHash() => r'3bca3efeaef0c55717c7bc66c85d94e57c5f485f';
+String _$groupFeedHash() => r'09c82a216880b270063ef3bb929fff30ff157ae9';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -256,7 +256,7 @@ class _GroupFeedProviderElement
   Group get group => (origin as GroupFeedProvider).group;
 }
 
-String _$groupTitlesHash() => r'9f5a21c735f5e3bd4e1475e3432a8f37475211fe';
+String _$groupTitlesHash() => r'7d7cfe4a3db52d408ccd2e0216e4dc8be5d4ea87';
 
 abstract class _$GroupTitles extends BuildlessAsyncNotifier<List<Manga>> {
   late final Group group;
@@ -439,7 +439,7 @@ class _GroupTitlesProviderElement
   Group get group => (origin as GroupTitlesProvider).group;
 }
 
-String _$creatorTitlesHash() => r'cb26ec1c3b2ca6b7c5f3386187e77922deea9a3d';
+String _$creatorTitlesHash() => r'15fb55e2da847d0f1bd34892bd1df596286f38dc';
 
 abstract class _$CreatorTitles extends BuildlessAsyncNotifier<List<Manga>> {
   late final CreatorType creator;
@@ -622,7 +622,7 @@ class _CreatorTitlesProviderElement
   CreatorType get creator => (origin as CreatorTitlesProvider).creator;
 }
 
-String _$mangaChaptersHash() => r'6a07fbe89e9e005c73e3989bc464f64117a8c204';
+String _$mangaChaptersHash() => r'580cbb7d5c997362a4abba0ce76ebdee49e87032';
 
 abstract class _$MangaChapters extends BuildlessAsyncNotifier<List<Chapter>> {
   late final Manga manga;
@@ -805,7 +805,7 @@ class _MangaChaptersProviderElement
   Manga get manga => (origin as MangaChaptersProvider).manga;
 }
 
-String _$mangaCoversHash() => r'e1a4b2d7652930b2f9aa3abaf85906db213f450c';
+String _$mangaCoversHash() => r'80efd17406313663554809a874011d2296e2b347';
 
 abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<CoverArt>> {
   late final Manga manga;
@@ -1003,7 +1003,7 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<ReadChaptersMap>;
-String _$userLibraryHash() => r'16c08eb4daec2ee4a82638bf7b98fdcea575611d';
+String _$userLibraryHash() => r'027c6873e0dbe76dc38a25dfc26a8553d0efe7f3';
 
 abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
   late final MangaReadingStatus status;
@@ -1186,7 +1186,7 @@ class _UserLibraryProviderElement
   MangaReadingStatus get status => (origin as UserLibraryProvider).status;
 }
 
-String _$userListsHash() => r'61512f074643d5481782c458cdffebce47a9d6c9';
+String _$userListsHash() => r'050d23463b48b7454e9657b5cd1ad42d33875f49';
 
 /// See also [UserLists].
 @ProviderFor(UserLists)
@@ -1201,7 +1201,7 @@ final userListsProvider =
 );
 
 typedef _$UserLists = AsyncNotifier<List<CustomList>>;
-String _$customListFeedHash() => r'e286e47ae2e24acecdd46819f7cf394968e76129';
+String _$customListFeedHash() => r'b150cb1d3d9520dad5be588c10dc74f23237e1e4';
 
 abstract class _$CustomListFeed extends BuildlessAsyncNotifier<List<Chapter>> {
   late final CustomList list;
@@ -1384,7 +1384,7 @@ class _CustomListFeedProviderElement
   CustomList get list => (origin as CustomListFeedProvider).list;
 }
 
-String _$customListTitlesHash() => r'2e335d24ff74829f582c0d8377c60ca081163fd2';
+String _$customListTitlesHash() => r'cf32a8a2c6246fd90ef3df5ce1fa47f2c3335c1c';
 
 abstract class _$CustomListTitles
     extends BuildlessAutoDisposeAsyncNotifier<Iterable<Manga>> {
@@ -1584,7 +1584,7 @@ final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
 );
 
 typedef _$TagList = AsyncNotifier<Iterable<Tag>>;
-String _$mangaSearchHash() => r'24102ea4bfc9e92f70d2f72aa7d1d90b9259eb5a';
+String _$mangaSearchHash() => r'f50ed6b9cc900509321eb635d96f566fc3b333d1';
 
 abstract class _$MangaSearch
     extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
