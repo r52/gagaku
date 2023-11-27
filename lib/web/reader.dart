@@ -228,9 +228,9 @@ class WebSourceReaderWidget extends HookConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(:final value, hasValue: true):
+      case AsyncValue(:final value?):
         return ReaderWidget(
-          pages: value!,
+          pages: value,
           pageCount: value.length,
           title: name,
           isLongStrip: false, // TODO longstrip

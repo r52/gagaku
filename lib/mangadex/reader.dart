@@ -198,9 +198,9 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(:final value, hasValue: true):
+      case AsyncValue(:final value?):
         return ReaderWidget(
-          pages: value!,
+          pages: value,
           pageCount: value.length,
           title: title,
           subtitle: manga.attributes.title.get('en'),
