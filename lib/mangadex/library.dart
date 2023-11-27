@@ -29,38 +29,43 @@ class MangaDexLibraryView extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-                color: theme.colorScheme.background.withAlpha(200),
-              ),
-              child: DropdownButton<MangaReadingStatus>(
-                value: type,
-                icon: const Icon(Icons.arrow_drop_down),
-                iconSize: 24,
-                elevation: 16,
-                underline: Container(
-                  height: 2,
-                  color: theme.colorScheme.tertiaryContainer,
+            Row(
+              children: [
+                const SizedBox(
+                  width: 10,
                 ),
-                onChanged: (MangaReadingStatus? status) async {
-                  if (status != null) {
-                    ref.read(libraryViewTypeProvider.notifier).state = status;
-                  }
-                },
-                items: List<DropdownMenuItem<MangaReadingStatus>>.generate(
-                  MangaReadingStatus.values.skip(1).length,
-                  (int index) => DropdownMenuItem<MangaReadingStatus>(
-                    value: MangaReadingStatus.values.skip(1).elementAt(index),
-                    child: Text(
-                      MangaReadingStatus.values
+                DropdownMenu<MangaReadingStatus>(
+                  initialSelection: type,
+                  enableFilter: false,
+                  enableSearch: false,
+                  requestFocusOnTap: false,
+                  inputDecorationTheme: InputDecorationTheme(
+                    filled: true,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 2.0,
+                        color: theme.colorScheme.inversePrimary,
+                      ),
+                    ),
+                  ),
+                  onSelected: (MangaReadingStatus? status) async {
+                    if (status != null) {
+                      ref.read(libraryViewTypeProvider.notifier).state = status;
+                    }
+                  },
+                  dropdownMenuEntries:
+                      List<DropdownMenuEntry<MangaReadingStatus>>.generate(
+                    MangaReadingStatus.values.skip(1).length,
+                    (int index) => DropdownMenuEntry<MangaReadingStatus>(
+                      value: MangaReadingStatus.values.skip(1).elementAt(index),
+                      label: MangaReadingStatus.values
                           .skip(1)
                           .elementAt(index)
                           .formatted,
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
             Expanded(
               child: Stack(

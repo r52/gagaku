@@ -410,10 +410,10 @@ class ReaderWidget extends HookConsumerWidget {
       }
     }
 
-    final pageDropdownItems = List<DropdownMenuItem<int>>.generate(
+    final pageDropdownItems = List<DropdownMenuEntry<int>>.generate(
         pageCount,
-        (int index) => DropdownMenuItem<int>(
-            value: index, child: Text((index + 1).toString())));
+        (int index) => DropdownMenuEntry<int>(
+            value: index, label: (index + 1).toString()));
 
     return Scaffold(
       extendBodyBehindAppBar: false,
@@ -480,7 +480,7 @@ class ReaderWidget extends HookConsumerWidget {
                       return OutlinedButton(
                         onPressed:
                             (value > 0) ? () => jumpToPreviousPage() : null,
-                        child: const Text('Previous Page'),
+                        child: const Icon(Icons.arrow_back_ios_new),
                       );
                     },
                     valueListenable: currentPage,
@@ -490,22 +490,26 @@ class ReaderWidget extends HookConsumerWidget {
                   ),
                   ValueListenableBuilder<int>(
                     builder: (BuildContext context, int value, Widget? child) {
-                      return DropdownButton<int>(
-                        value: value,
-                        icon: const Icon(Icons.arrow_downward),
-                        iconSize: 24,
-                        elevation: 16,
-                        style: TextStyle(color: theme.colorScheme.primary),
-                        underline: Container(
-                          height: 2,
-                          color: theme.colorScheme.tertiaryContainer,
+                      return DropdownMenu<int>(
+                        initialSelection: value,
+                        width: 80.0,
+                        enableFilter: false,
+                        enableSearch: false,
+                        requestFocusOnTap: false,
+                        inputDecorationTheme: InputDecorationTheme(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 2.0,
+                              color: theme.colorScheme.inversePrimary,
+                            ),
+                          ),
                         ),
-                        onChanged: (int? index) {
+                        onSelected: (int? index) {
                           if (index != null) {
                             jumpToPage(index);
                           }
                         },
-                        items: pageDropdownItems,
+                        dropdownMenuEntries: pageDropdownItems,
                       );
                     },
                     valueListenable: currentPage,
@@ -519,7 +523,7 @@ class ReaderWidget extends HookConsumerWidget {
                         onPressed: (value < pageCount - 1)
                             ? () => jumpToNextPage()
                             : null,
-                        child: const Text('Next Page'),
+                        child: const Icon(Icons.arrow_forward_ios),
                       );
                     },
                     valueListenable: currentPage,
@@ -616,29 +620,34 @@ class ReaderWidget extends HookConsumerWidget {
                   const SizedBox(
                     width: 10,
                   ),
-                  DropdownButton<int>(
-                    value: settings.precacheCount,
-                    icon: const Icon(Icons.arrow_downward),
-                    iconSize: 24,
-                    elevation: 16,
-                    underline: Container(
-                      height: 2,
-                      color: theme.colorScheme.tertiaryContainer,
+                  DropdownMenu<int>(
+                    initialSelection: settings.precacheCount,
+                    width: 160.0,
+                    enableFilter: false,
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    inputDecorationTheme: InputDecorationTheme(
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 2.0,
+                          color: theme.colorScheme.inversePrimary,
+                        ),
+                      ),
                     ),
-                    onChanged: (int? value) {
+                    onSelected: (int? value) {
                       if (value != null) {
                         ref
                             .read(readerSettingsProvider.notifier)
                             .save(settings.copyWith(precacheCount: value));
                       }
                     },
-                    items: List<DropdownMenuItem<int>>.generate(
+                    dropdownMenuEntries: List<DropdownMenuEntry<int>>.generate(
                       10,
-                      (int index) => DropdownMenuItem<int>(
+                      (int index) => DropdownMenuEntry<int>(
                         value: index + 1,
-                        child: Text((index + 1 > 9)
+                        label: (index + 1 > 9)
                             ? 'Max (not recommended)'
-                            : (index + 1).toString()),
+                            : (index + 1).toString(),
                       ),
                     ),
                   ),

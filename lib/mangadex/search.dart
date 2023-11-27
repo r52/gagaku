@@ -49,16 +49,21 @@ class MangaDexSearchWidget extends HookConsumerWidget {
       children: [
         MangaListWidget(
           physics: const AlwaysScrollableScrollPhysics(),
-          title: DropdownButton<FilterOrder>(
-            value: filter.filter.order,
-            icon: const Icon(Icons.arrow_drop_down),
-            iconSize: 24,
-            elevation: 16,
-            underline: Container(
-              height: 2,
-              color: Theme.of(context).colorScheme.tertiaryContainer,
+          title: DropdownMenu<FilterOrder>(
+            initialSelection: filter.filter.order,
+            enableFilter: false,
+            enableSearch: false,
+            requestFocusOnTap: false,
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+              ),
             ),
-            onChanged: (FilterOrder? order) async {
+            onSelected: (FilterOrder? order) async {
               if (order != null) {
                 ref.read(_searchParamsProvider.notifier).state =
                     filter.copyWith(
@@ -67,13 +72,11 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                 );
               }
             },
-            items: List<DropdownMenuItem<FilterOrder>>.generate(
+            dropdownMenuEntries: List<DropdownMenuEntry<FilterOrder>>.generate(
               FilterOrder.values.length,
-              (int index) => DropdownMenuItem<FilterOrder>(
+              (int index) => DropdownMenuEntry<FilterOrder>(
                 value: FilterOrder.values.elementAt(index),
-                child: Text(
-                  FilterOrder.values.elementAt(index).formatted,
-                ),
+                label: FilterOrder.values.elementAt(index).formatted,
               ),
             ),
           ),

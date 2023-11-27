@@ -33,18 +33,18 @@ class SettingsHome extends HookConsumerWidget {
               ),
               builder: (context) {
                 return Center(
-                  child: DropdownButton<ThemeMode>(
-                    value: config.value.themeMode,
-                    items: const [
-                      DropdownMenuItem(
-                          value: ThemeMode.light, child: Text('Light')),
-                      DropdownMenuItem(
-                          value: ThemeMode.dark, child: Text('Dark')),
-                      DropdownMenuItem(
-                          value: ThemeMode.system,
-                          child: Text('System defined')),
+                  child: DropdownMenu<ThemeMode>(
+                    initialSelection: config.value.themeMode,
+                    requestFocusOnTap: false,
+                    enableSearch: false,
+                    enableFilter: false,
+                    dropdownMenuEntries: const [
+                      DropdownMenuEntry(value: ThemeMode.light, label: 'Light'),
+                      DropdownMenuEntry(value: ThemeMode.dark, label: 'Dark'),
+                      DropdownMenuEntry(
+                          value: ThemeMode.system, label: 'System defined'),
                     ],
-                    onChanged: (ThemeMode? value) {
+                    onSelected: (ThemeMode? value) {
                       if (value != null) {
                         final cfg = config.value.copyWith(themeMode: value);
                         ref.read(gagakuSettingsProvider.notifier).save(cfg);
@@ -65,37 +65,33 @@ class SettingsHome extends HookConsumerWidget {
               ),
               builder: (context) {
                 return Center(
-                  child: DropdownButton<Color>(
-                    value: config.value.theme,
-                    items: [
-                      DropdownMenuItem(
-                          value: Colors.amber.shade500,
-                          child: const Text('Amber (MD)')),
-                      DropdownMenuItem(
-                          value: Colors.blue.shade500,
-                          child: const Text('Blue (Gagaku)')),
-                      DropdownMenuItem(
-                          value: Colors.teal.shade500,
-                          child: const Text('Teal')),
-                      DropdownMenuItem(
-                          value: Colors.green.shade500,
-                          child: const Text('Green')),
-                      DropdownMenuItem(
+                  child: DropdownMenu<Color>(
+                    initialSelection: config.value.theme,
+                    enableSearch: false,
+                    enableFilter: false,
+                    requestFocusOnTap: false,
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry(
+                          value: Colors.amber.shade500, label: 'Amber (MD)'),
+                      DropdownMenuEntry(
+                          value: Colors.blue.shade500, label: 'Blue (Gagaku)'),
+                      DropdownMenuEntry(
+                          value: Colors.teal.shade500, label: 'Teal'),
+                      DropdownMenuEntry(
+                          value: Colors.green.shade500, label: 'Green'),
+                      DropdownMenuEntry(
                           value: Colors.lightGreen.shade500,
-                          child: const Text('Light Green')),
-                      DropdownMenuItem(
-                          value: Colors.red.shade500, child: const Text('Red')),
-                      DropdownMenuItem(
-                          value: Colors.orange.shade500,
-                          child: const Text('Orange')),
-                      DropdownMenuItem(
-                          value: Colors.yellow.shade500,
-                          child: const Text('Yellow')),
-                      DropdownMenuItem(
-                          value: Colors.purple.shade500,
-                          child: const Text('Purple')),
+                          label: 'Light Green'),
+                      DropdownMenuEntry(
+                          value: Colors.red.shade500, label: 'Red'),
+                      DropdownMenuEntry(
+                          value: Colors.orange.shade500, label: 'Orange'),
+                      DropdownMenuEntry(
+                          value: Colors.yellow.shade500, label: 'Yellow'),
+                      DropdownMenuEntry(
+                          value: Colors.purple.shade500, label: 'Purple'),
                     ],
-                    onChanged: (Color? value) {
+                    onSelected: (Color? value) {
                       if (value != null) {
                         final cfg = config.value.copyWith(theme: value);
                         ref.read(gagakuSettingsProvider.notifier).save(cfg);
