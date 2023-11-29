@@ -49,7 +49,7 @@ class CacheEntry with ExpiringData {
 }
 
 class CacheManager {
-  static const _preferredMaxEntries = 2000;
+  static const _preferredMaxEntries = 10000;
   static const _preferredMaxDiskEntries = 2000;
 
   final LazyBox<CacheEntry> _box;
