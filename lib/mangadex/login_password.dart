@@ -51,10 +51,15 @@ class MangaDexLoginScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final usernameController = useTextEditingController();
+    final storage = Hive.box(gagakuBox);
+    final user = storage.get('username') as String?;
+    final clientId = storage.get('clientId') as String?;
+    final clientSecret = storage.get('clientSecret') as String?;
+
+    final usernameController = useTextEditingController(text: user);
     final passwordController = useTextEditingController();
-    final clientIdController = useTextEditingController();
-    final clientSecretController = useTextEditingController();
+    final clientIdController = useTextEditingController(text: clientId);
+    final clientSecretController = useTextEditingController(text: clientSecret);
     final usernameIsEmpty = useListenableSelector(
         usernameController, () => usernameController.text.isEmpty);
     final passwordIsEmpty = useListenableSelector(
@@ -65,18 +70,6 @@ class MangaDexLoginScreen extends HookConsumerWidget {
         clientSecretController, () => clientSecretController.text.isEmpty);
     final pendingLogin = useState<Future<bool>?>(null);
     final snapshot = useFuture(pendingLogin.value);
-
-    final storage = Hive.box(gagakuBox);
-    final user = storage.get('username') as String?;
-    final clientId = storage.get('clientId') as String?;
-    final clientSecret = storage.get('clientSecret') as String?;
-
-    useEffect(() {
-      usernameController.text = user ?? '';
-      clientIdController.text = clientId ?? '';
-      clientSecretController.text = clientSecret ?? '';
-      return null;
-    }, [null]);
 
     return Scaffold(
       appBar: AppBar(
