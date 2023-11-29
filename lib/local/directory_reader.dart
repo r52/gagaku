@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
@@ -33,15 +34,21 @@ Future<List<ReaderPage>> _getDirectoryPages(
   final entities = await dir.list().toList();
   final files = entities.whereType<File>();
 
-  final pageFiles = files.where((element) =>
-      element.path.endsWith('.png') ||
-      element.path.endsWith('.jpg') ||
-      element.path.endsWith('.jpeg'));
+  final pageFiles = files
+      .where((element) =>
+          element.path.endsWith('.png') ||
+          element.path.endsWith('.jpg') ||
+          element.path.endsWith('.jpeg'))
+      .toList();
+
+  pageFiles.sort((a, b) =>
+      compareNatural(a.uri.pathSegments.last, b.uri.pathSegments.last));
 
   if (pageFiles.isNotEmpty) {
     final pages = <ReaderPage>[];
     for (final f in pageFiles) {
-      pages.add(ReaderPage(provider: FileImage(f)));
+      pages.add(
+          ReaderPage(provider: FileImage(f), sortKey: f.uri.pathSegments.last));
     }
 
     return pages;

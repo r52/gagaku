@@ -86,6 +86,7 @@ class ReaderWidget extends HookConsumerWidget {
     final scrollOffsetController = useScrollOffsetController();
     final currentImageScale =
         useState<PhotoViewScaleState>(PhotoViewScaleState.initial);
+    final subtext = useState<String?>(subtitle ?? pages.elementAt(0).sortKey);
 
     void cachePage(ReaderPage page) {
       precacheImage(page.provider, context);
@@ -144,6 +145,9 @@ class ReaderWidget extends HookConsumerWidget {
           currentPage.value = pageController.page!.toInt();
 
           cachePages();
+
+          subtext.value =
+              subtitle ?? pages.elementAt(currentPage.value).sortKey;
         }
       }
 
@@ -432,7 +436,7 @@ class ReaderWidget extends HookConsumerWidget {
             title,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          subtitle: subtitle != null ? Text(subtitle!) : null,
+          subtitle: subtext.value != null ? Text(subtext.value!) : null,
         ),
         actions: [
           Builder(

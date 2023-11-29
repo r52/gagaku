@@ -70,7 +70,7 @@ List<ReaderPage> _extractArchive(ArchiveType type, Uint8List bytes) {
             file.name.endsWith(".png") ||
             file.name.endsWith(".jpeg"))) {
       final data = file.content as Uint8List;
-      pages.add(ReaderPage(provider: MemoryImage(data)));
+      pages.add(ReaderPage(provider: MemoryImage(data), sortKey: file.name));
     }
   }
 

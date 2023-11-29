@@ -26,8 +26,9 @@ extension ReaderDirectionExt on ReaderDirection {
 
 class ReaderPage {
   final ImageProvider provider;
+  final String? sortKey;
 
   bool cached = false;
 
-  ReaderPage({required this.provider});
+  ReaderPage({required this.provider, this.sortKey});
 }
