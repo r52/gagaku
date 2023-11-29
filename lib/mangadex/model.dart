@@ -1216,6 +1216,35 @@ class MangaDexModel {
     return list;
   }
 
+  /// Fetches a [CustomList] by id
+  Future<CustomList?> fetchListById(String listId) async {
+    if (listId.isEmpty) {
+      logger.w('Invalid listId $listId');
+      return null;
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.modifyList.replaceFirst('{id}', listId));
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      final result = CustomList.fromJson(body['data']);
+
+      return result;
+    } else if (response.statusCode == 404) {
+      // List not found
+      return null;
+    }
+
+    // Throw if unknown code
+    final msg = "fetchListById() failed. Response code: ${response.statusCode}";
+    logger.e(msg, error: response.body);
+    throw Exception(msg);
+  }
+
   /// Fetches logged user's [CustomList] list
   ///
   /// [offset] denotes the nth item to start fetching from.
@@ -1320,8 +1349,8 @@ class MangaDexModel {
   }
 
   /// Creates a new [CustomList]
-  Future<CustomList?> createNewList(
-      String name, bool private, Iterable<Manga> manga) async {
+  Future<CustomList?> createNewList(String name,
+      CustomListVisibility visibility, Iterable<String> mangaIds) async {
     if (!await loggedIn()) {
       throw Exception(
           "createNewList() called on invalid token/login. Shouldn't ever get here");
@@ -1332,8 +1361,8 @@ class MangaDexModel {
 
     final params = {
       'name': name,
-      'visibility': private ? 'private' : 'public',
-      'manga': manga.map((e) => e.id).toList(),
+      'visibility': visibility.name,
+      'manga': mangaIds.toList(),
     };
 
     final response = await _client.post(uri,
@@ -1353,10 +1382,52 @@ class MangaDexModel {
 
     // Log the failure
     logger.w(
-        "createNewList($name, $private) returned code ${response.statusCode}",
+        "createNewList($name, ${visibility.name}) returned code ${response.statusCode}",
         error: response.body);
 
     return null;
+  }
+
+  /// Creates a new [CustomList]
+  Future<CustomList> editList(CustomList list, String name,
+      CustomListVisibility visibility, Iterable<String> mangaIds) async {
+    if (!await loggedIn()) {
+      throw Exception(
+          "editList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.modifyList.replaceFirst('{id}', list.id));
+
+    final params = {
+      'name': name,
+      'visibility': visibility.name,
+      'manga': mangaIds.toList(),
+      'version': list.attributes.version,
+    };
+
+    final response = await _client.put(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(params),
+    );
+
+    if (response.statusCode >= 200 && response.statusCode <= 201) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        // Process new list
+        final nlist = CustomList.fromJson(body['data']);
+
+        return nlist;
+      }
+    }
+
+    // Throw if failure
+    final msg =
+        "editList(${list.id}, ${visibility.name}) returned code ${response.statusCode}";
+    logger.e(msg, error: response.body);
+    throw Exception(msg);
   }
 
   /// Retrieves a [CustomList] by ID
@@ -2132,10 +2203,28 @@ class UserLists extends _$UserLists {
         ref.invalidate(customListFeedProvider(item));
       }
 
-      // TODO: caching perhaps
-
       return [...oldstate];
     });
+  }
+
+  Future<bool> editList(CustomList list, String name,
+      CustomListVisibility visibility, Iterable<String> mangaIds) async {
+    if (state.isLoading || state.isReloading) {
+      return false;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.editList(list, name, visibility, mangaIds);
+
+      final newlist = oldstate..removeWhere((element) => element.id == list.id);
+      return [...newlist, result];
+    });
+
+    return !state.hasError;
   }
 
   Future<bool> deleteList(CustomList list) async {
@@ -2162,7 +2251,8 @@ class UserLists extends _$UserLists {
     return (state.valueOrNull ?? []).length != oldstate.length;
   }
 
-  Future<bool> newList(String name, bool private, Iterable<Manga> manga) async {
+  Future<bool> newList(String name, CustomListVisibility visibility,
+      Iterable<String> mangaIds) async {
     if (state.isLoading || state.isReloading) {
       return false;
     }
@@ -2172,13 +2262,11 @@ class UserLists extends _$UserLists {
     final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final result = await api.createNewList(name, private, manga);
+      final result = await api.createNewList(name, visibility, mangaIds);
 
       if (result != null) {
         return [...oldstate, result];
       }
-
-      // TODO: caching perhaps
 
       return [...oldstate];
     });

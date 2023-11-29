@@ -18,7 +18,7 @@ final _searchParamsProvider = StateProvider(
 
 Widget buildMDSearchPage(BuildContext context, GoRouterState state) {
   final selectMode = state.uri.queryParameters['selectMode'] == 'true';
-  final selectedTitles = state.extra.asOrNull<Set<Manga>>();
+  final selectedTitles = state.extra.asOrNull<Set<String>>();
   return MangaDexSearchWidget(
     selectMode: selectMode,
     selectedTitles: selectedTitles,
@@ -33,7 +33,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
   });
 
   final bool selectMode;
-  final Set<Manga>? selectedTitles;
+  final Set<String>? selectedTitles;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,7 +45,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     final results = ref.watch(mangaSearchProvider(filter));
     final isLoading = results.isLoading && results.isReloading;
 
-    final selected = useState<Set<Manga>>(selectedTitles ?? {});
+    final selected = useState<Set<String>>(selectedTitles ?? {});
 
     useEffect(() {
       return () => debounce.value?.cancel();
@@ -178,17 +178,19 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                       items: value,
                       selectMode: selectMode,
                       selectButton: (manga) {
-                        if (selected.value.contains(manga)) {
+                        if (selected.value.contains(manga.id)) {
                           return const Icon(Icons.remove);
                         }
 
                         return const Icon(Icons.add);
                       },
                       onSelected: (manga) {
-                        if (selected.value.contains(manga)) {
-                          selected.value = {...selected.value..remove(manga)};
+                        if (selected.value.contains(manga.id)) {
+                          selected.value = {
+                            ...selected.value..remove(manga.id)
+                          };
                         } else {
-                          selected.value = {...selected.value..add(manga)};
+                          selected.value = {...selected.value..add(manga.id)};
                         }
                       },
                     );

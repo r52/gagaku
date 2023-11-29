@@ -1186,7 +1186,7 @@ class _UserLibraryProviderElement
   MangaReadingStatus get status => (origin as UserLibraryProvider).status;
 }
 
-String _$userListsHash() => r'050d23463b48b7454e9657b5cd1ad42d33875f49';
+String _$userListsHash() => r'f3dec5c4925cfab564fd7fc6d4b48c80a3f98a21';
 
 /// See also [UserLists].
 @ProviderFor(UserLists)

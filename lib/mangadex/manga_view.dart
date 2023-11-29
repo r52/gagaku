@@ -583,7 +583,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             onTap: () async {
                               final messenger = ScaffoldMessenger.of(context);
 
-                              final result = await showDialog<(String, bool)>(
+                              final result = await showDialog<
+                                      (String, CustomListVisibility)>(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return HookBuilder(
@@ -596,7 +597,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                 nameController,
                                                 () => nameController
                                                     .text.isEmpty);
-                                        final nprivate = useState(true);
+                                        final nprivate = useState(
+                                            CustomListVisibility.private);
 
                                         return AlertDialog(
                                           title: const Text('Create New List'),
@@ -626,10 +628,16 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                         .leading,
                                                 title:
                                                     const Text('Private list'),
-                                                value: nprivate.value,
+                                                value: nprivate.value ==
+                                                    CustomListVisibility
+                                                        .private,
                                                 onChanged: (bool? value) async {
                                                   nprivate.value =
-                                                      (value == true);
+                                                      (value == true)
+                                                          ? CustomListVisibility
+                                                              .private
+                                                          : CustomListVisibility
+                                                              .public;
                                                 },
                                               )
                                             ],

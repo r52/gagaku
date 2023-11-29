@@ -7,8 +7,8 @@ import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
-import 'package:gagaku/mangadex/create_list.dart';
 import 'package:gagaku/mangadex/creator_view.dart';
+import 'package:gagaku/mangadex/edit_list.dart';
 import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/history_feed.dart';
 import 'package:gagaku/mangadex/latest_feed.dart';
@@ -140,6 +140,11 @@ class _AppState extends ConsumerState<App> {
         pageBuilder: buildCreatorViewPage,
       ),
       GoRoute(
+        path: GagakuRoute.listEdit,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildListEditPage,
+      ),
+      GoRoute(
         path: GagakuRoute.list,
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: buildListViewPage,
@@ -149,11 +154,6 @@ class _AppState extends ConsumerState<App> {
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: buildListViewPage,
       ),
-      // GoRoute(
-      //   path: GagakuRoute.listEdit,
-      //   parentNavigatorKey: _rootNavigatorKey,
-      //   pageBuilder: ,
-      // ),
       GoRoute(
         path: GagakuRoute.search,
         parentNavigatorKey: _rootNavigatorKey,
@@ -163,7 +163,7 @@ class _AppState extends ConsumerState<App> {
         path: GagakuRoute.listCreate,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (BuildContext context, GoRouterState state) {
-          return const MangaDexCreateListScreen();
+          return const MangaDexEditListScreen();
         },
       ),
       GoRoute(

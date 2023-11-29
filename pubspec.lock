@@ -73,6 +73,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  auto_size_text:
+    dependency: transitive
+    description:
+      name: auto_size_text
+      sha256: "3f5261cd3fb5f2a9ab4e2fc3fba84fd9fcaac8821f20a1d4e71f557521b22599"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -117,10 +125,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_runner
-      sha256: "10c6bcdbf9d049a0b666702cf1cee4ddfdc38f02a19d35ae392863b47519848b"
+      sha256: "67d591d602906ef9201caf93452495ad1812bea2074f04e25dbd7c133785821b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.6"
+    version: "2.4.7"
   build_runner_core:
     dependency: transitive
     description:
@@ -508,10 +516,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: "759d1a329847dd0f39226c688d3e06a6b8679668e350e2891a6474f8b4bb8525"
+      sha256: d4872660c46d929f6b8a9ef4e7a7eff7e49bbf0c4ec3f385ee32df5119175139
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.2"
   http_client_helper:
     dependency: transitive
     description:
@@ -664,6 +672,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  number_paginator:
+    dependency: "direct main"
+    description:
+      name: number_paginator
+      sha256: e9a21f876b09ad41db5fb994883f52ceb54c5b18f611bf6015495487eb7300b1
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   openid_client:
     dependency: "direct main"
     description:

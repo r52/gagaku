@@ -207,9 +207,9 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                             .refresh(_fetchListTitlesProvider(list).future);
                       },
                       child: MangaListWidget(
-                        title: const Text(
-                          'List Titles',
-                          style: TextStyle(fontSize: 24),
+                        title: Text(
+                          'Titles (${list.set.length})',
+                          style: const TextStyle(fontSize: 24),
                         ),
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: controllers[0],
@@ -276,7 +276,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 ElevatedButton(
                   style: Styles.buttonStyle(),
                   onPressed: () {
-                    // TODO
+                    context.push('/list/edit/${list.id}', extra: list);
                   },
                   child: const Text('Edit'),
                 ),

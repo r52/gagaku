@@ -184,7 +184,8 @@ class MangaDexListsView extends HookConsumerWidget {
                                         }
                                         break;
                                       case _ListActions.edit:
-                                        // TODO
+                                        context.push('/list/edit/${item.id}',
+                                            extra: item);
                                         break;
                                       default:
                                         break;
