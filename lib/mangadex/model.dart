@@ -1430,31 +1430,6 @@ class MangaDexModel {
     throw Exception(msg);
   }
 
-  /// Retrieves a [CustomList] by ID
-  Future<CustomList?> getListById(String listId) async {
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.modifyList.replaceFirst('{id}', listId));
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> body = json.decode(response.body);
-
-      if (body['result'] == 'ok') {
-        // Process list
-        final nlist = CustomList.fromJson(body['data']);
-
-        return nlist;
-      }
-    }
-
-    // Log the failure
-    logger.w("getListById($listId) returned code ${response.statusCode}",
-        error: response.body);
-
-    return null;
-  }
-
   /// Get logged in user details
   Future<User> getLoggedUser() async {
     if (!await loggedIn()) {
@@ -2194,12 +2169,11 @@ class UserLists extends _$UserLists {
 
       if (result) {
         if (add) {
-          item.set.add(manga.id);
+          item.add(manga.id);
         } else {
-          item.set.remove(manga.id);
+          item.remove(manga.id);
         }
 
-        ref.invalidate(customListTitlesProvider(item));
         ref.invalidate(customListFeedProvider(item));
       }
 
@@ -2353,92 +2327,29 @@ class CustomListFeed extends _$CustomListFeed {
 }
 
 @riverpod
-class CustomListTitles extends _$CustomListTitles {
-  int _total = 0;
-  int _offset = 0;
-  int _currentPage = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.searchLimit;
+Future<Iterable<Manga>> getMangaListByPage(
+    GetMangaListByPageRef ref, Set<String> list, int page) async {
+  final start = page * MangaDexEndpoints.searchLimit;
+  final end = min((page + 1) * MangaDexEndpoints.searchLimit, list.length);
 
-  Future<Iterable<Manga>> _fetchTitles() async {
-    final api = ref.watch(mangadexProvider);
+  final range = list.toList().getRange(start, end);
 
-    final mangaids = list.set.toList();
+  final api = ref.watch(mangadexProvider);
+  final mangas =
+      await api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
 
-    _total = mangaids.length;
+  await ref.watch(statisticsProvider.notifier).get(mangas);
 
-    if (_offset > _total) {
-      // No more items
-      return [];
-    }
+  return mangas;
+}
 
-    final range = min(_total, _offset + limit);
-    final mangas = await api.fetchManga(
-        ids: mangaids.getRange(_offset, range), limit: limit);
-
-    _currentPage += (range - _offset);
-
-    if (mangas.isNotEmpty) {
-      await ref.read(statisticsProvider.notifier).get(mangas);
-    }
-
-    return mangas;
-  }
-
-  Future<Iterable<Manga>> _fetchAndCheck() async {
-    final mangas = await _fetchTitles();
-
-    if (mangas.isEmpty) {
-      _atEnd = true;
-    }
-
-    return mangas;
-  }
-
+@riverpod
+class ListById extends _$ListById {
   @override
-  FutureOr<Iterable<Manga>> build(CustomList list) async {
-    return _fetchAndCheck();
-  }
-
-  int total() {
-    return _total;
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (_currentPage == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        _offset += limit;
-        final mangas = await _fetchAndCheck();
-
-        return [...oldstate, ...mangas];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
-  }
-
-  /// Clears the list and refetch from the beginning
-  Future<void> clear() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      _currentPage = 0;
-
-      return _fetchAndCheck();
-    });
+  FutureOr<CustomList?> build(String listId) async {
+    final api = ref.watch(mangadexProvider);
+    final list = await api.fetchListById(listId);
+    return list;
   }
 }
 

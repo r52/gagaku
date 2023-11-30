@@ -12,9 +12,6 @@ import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'edit_list.g.dart';
 
 Page<dynamic> buildListEditPage(BuildContext context, GoRouterState state) {
   final list = state.extra.asOrNull<CustomList>();
@@ -37,29 +34,6 @@ Page<dynamic> buildListEditPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
-Future<CustomList?> _fetchListFromId(
-    _FetchListFromIdRef ref, String listId) async {
-  final api = ref.watch(mangadexProvider);
-  final list = await api.fetchListById(listId);
-  return list;
-}
-
-@riverpod
-Future<Iterable<Manga>> _getListPage(
-    _GetListPageRef ref, Set<String> list, int page) async {
-  final start = page * MangaDexEndpoints.searchLimit;
-  final end = min((page + 1) * MangaDexEndpoints.searchLimit, list.length);
-
-  final range = list.toList().getRange(start, end);
-
-  final api = ref.watch(mangadexProvider);
-  final mangas =
-      api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
-
-  return mangas;
-}
-
 class QueriedMangaDexEditListScreen extends ConsumerWidget {
   const QueriedMangaDexEditListScreen({super.key, required this.listId});
 
@@ -67,7 +41,7 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(_fetchListFromIdProvider(listId));
+    final list = ref.watch(listByIdProvider(listId));
 
     Widget child;
 
@@ -126,8 +100,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final selected = useState<Set<String>>(list != null ? {...list!.set} : {});
     final currentPage = useState(0);
 
-    final titlesProvider =
-        ref.watch(_getListPageProvider(selected.value, currentPage.value));
+    final titlesProvider = ref
+        .watch(getMangaListByPageProvider(selected.value, currentPage.value));
     final titles = titlesProvider.valueOrNull;
 
     final isLoading = titlesProvider.isLoading;

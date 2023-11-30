@@ -848,7 +848,7 @@ class CustomListList with _$CustomListList {
 }
 
 @freezed
-class CustomList with _$CustomList, MangaDexUUID {
+class CustomList with _$CustomList, MangaDexUUID, ChangeNotifier {
   CustomList._();
 
   factory CustomList({
@@ -862,6 +862,18 @@ class CustomList with _$CustomList, MangaDexUUID {
 
   factory CustomList.fromJson(Map<String, dynamic> json) =>
       _$CustomListFromJson(json);
+
+  bool add(String mangaId) {
+    final result = set.add(mangaId);
+    notifyListeners();
+    return result;
+  }
+
+  bool remove(String mangaId) {
+    final result = set.remove(mangaId);
+    notifyListeners();
+    return result;
+  }
 
   Set<String> _convertIDs() {
     final rs = relationships.whereType<MangaID>();

@@ -20,6 +20,224 @@ final mangadexProvider = Provider<MangaDexModel>.internal(
 );
 
 typedef MangadexRef = ProviderRef<MangaDexModel>;
+String _$getMangaListByPageHash() =>
+    r'cc3e8c47ec4b8e4fd8f65751a7c5a0e43700210d';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// See also [getMangaListByPage].
+@ProviderFor(getMangaListByPage)
+const getMangaListByPageProvider = GetMangaListByPageFamily();
+
+/// See also [getMangaListByPage].
+class GetMangaListByPageFamily extends Family {
+  /// See also [getMangaListByPage].
+  const GetMangaListByPageFamily();
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'getMangaListByPageProvider';
+
+  /// See also [getMangaListByPage].
+  GetMangaListByPageProvider call(
+    Set<String> list,
+    int page,
+  ) {
+    return GetMangaListByPageProvider(
+      list,
+      page,
+    );
+  }
+
+  @visibleForOverriding
+  @override
+  GetMangaListByPageProvider getProviderOverride(
+    covariant GetMangaListByPageProvider provider,
+  ) {
+    return call(
+      provider.list,
+      provider.page,
+    );
+  }
+
+  /// Enables overriding the behavior of this provider, no matter the parameters.
+  Override overrideWith(
+      FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create) {
+    return _$GetMangaListByPageFamilyOverride(this, create);
+  }
+}
+
+class _$GetMangaListByPageFamilyOverride implements FamilyOverride {
+  _$GetMangaListByPageFamilyOverride(this.overriddenFamily, this.create);
+
+  final FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create;
+
+  @override
+  final GetMangaListByPageFamily overriddenFamily;
+
+  @override
+  GetMangaListByPageProvider getProviderOverride(
+    covariant GetMangaListByPageProvider provider,
+  ) {
+    return provider._copyWith(create);
+  }
+}
+
+/// See also [getMangaListByPage].
+class GetMangaListByPageProvider
+    extends AutoDisposeFutureProvider<Iterable<Manga>> {
+  /// See also [getMangaListByPage].
+  GetMangaListByPageProvider(
+    Set<String> list,
+    int page,
+  ) : this._internal(
+          (ref) => getMangaListByPage(
+            ref as GetMangaListByPageRef,
+            list,
+            page,
+          ),
+          from: getMangaListByPageProvider,
+          name: r'getMangaListByPageProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$getMangaListByPageHash,
+          dependencies: GetMangaListByPageFamily._dependencies,
+          allTransitiveDependencies:
+              GetMangaListByPageFamily._allTransitiveDependencies,
+          list: list,
+          page: page,
+        );
+
+  GetMangaListByPageProvider._internal(
+    super.create, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.list,
+    required this.page,
+  }) : super.internal();
+
+  final Set<String> list;
+  final int page;
+
+  @override
+  Override overrideWith(
+    FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GetMangaListByPageProvider._internal(
+        (ref) => create(ref as GetMangaListByPageRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        list: list,
+        page: page,
+      ),
+    );
+  }
+
+  @override
+  (
+    Set<String>,
+    int,
+  ) get argument {
+    return (
+      list,
+      page,
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+    return _GetMangaListByPageProviderElement(this);
+  }
+
+  GetMangaListByPageProvider _copyWith(
+    FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create,
+  ) {
+    return GetMangaListByPageProvider._internal(
+      (ref) => create(ref as GetMangaListByPageRef),
+      name: name,
+      dependencies: dependencies,
+      allTransitiveDependencies: allTransitiveDependencies,
+      debugGetCreateSourceHash: debugGetCreateSourceHash,
+      from: from,
+      list: list,
+      page: page,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GetMangaListByPageProvider &&
+        other.list == list &&
+        other.page == page;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, list.hashCode);
+    hash = _SystemHash.combine(hash, page.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin GetMangaListByPageRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+  /// The parameter `list` of this provider.
+  Set<String> get list;
+
+  /// The parameter `page` of this provider.
+  int get page;
+}
+
+class _GetMangaListByPageProviderElement
+    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    with GetMangaListByPageRef {
+  _GetMangaListByPageProviderElement(super.provider);
+
+  @override
+  Set<String> get list => (origin as GetMangaListByPageProvider).list;
+  @override
+  int get page => (origin as GetMangaListByPageProvider).page;
+}
+
 String _$latestChaptersFeedHash() =>
     r'11901b8b90b8433dd8b1c858df2ccce411aa7a90';
 
@@ -54,27 +272,6 @@ final latestGlobalFeedProvider =
 
 typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
 String _$groupFeedHash() => r'09c82a216880b270063ef3bb929fff30ff157ae9';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
 
 abstract class _$GroupFeed extends BuildlessAsyncNotifier<List<Chapter>> {
   late final Group group;
@@ -1186,7 +1383,7 @@ class _UserLibraryProviderElement
   MangaReadingStatus get status => (origin as UserLibraryProvider).status;
 }
 
-String _$userListsHash() => r'f3dec5c4925cfab564fd7fc6d4b48c80a3f98a21';
+String _$userListsHash() => r'1fb7de4fdff228563df8cc43cc2783b7e1a5ffe2';
 
 /// See also [UserLists].
 @ProviderFor(UserLists)
@@ -1384,25 +1581,25 @@ class _CustomListFeedProviderElement
   CustomList get list => (origin as CustomListFeedProvider).list;
 }
 
-String _$customListTitlesHash() => r'cf32a8a2c6246fd90ef3df5ce1fa47f2c3335c1c';
+String _$listByIdHash() => r'd7bb16742fa5adaf821070f2fa0eafb072612156';
 
-abstract class _$CustomListTitles
-    extends BuildlessAutoDisposeAsyncNotifier<Iterable<Manga>> {
-  late final CustomList list;
+abstract class _$ListById
+    extends BuildlessAutoDisposeAsyncNotifier<CustomList?> {
+  late final String listId;
 
-  FutureOr<Iterable<Manga>> build(
-    CustomList list,
+  FutureOr<CustomList?> build(
+    String listId,
   );
 }
 
-/// See also [CustomListTitles].
-@ProviderFor(CustomListTitles)
-const customListTitlesProvider = CustomListTitlesFamily();
+/// See also [ListById].
+@ProviderFor(ListById)
+const listByIdProvider = ListByIdFamily();
 
-/// See also [CustomListTitles].
-class CustomListTitlesFamily extends Family {
-  /// See also [CustomListTitles].
-  const CustomListTitlesFamily();
+/// See also [ListById].
+class ListByIdFamily extends Family {
+  /// See also [ListById].
+  const ListByIdFamily();
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
 
@@ -1416,158 +1613,156 @@ class CustomListTitlesFamily extends Family {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'customListTitlesProvider';
+  String? get name => r'listByIdProvider';
 
-  /// See also [CustomListTitles].
-  CustomListTitlesProvider call(
-    CustomList list,
+  /// See also [ListById].
+  ListByIdProvider call(
+    String listId,
   ) {
-    return CustomListTitlesProvider(
-      list,
+    return ListByIdProvider(
+      listId,
     );
   }
 
   @visibleForOverriding
   @override
-  CustomListTitlesProvider getProviderOverride(
-    covariant CustomListTitlesProvider provider,
+  ListByIdProvider getProviderOverride(
+    covariant ListByIdProvider provider,
   ) {
     return call(
-      provider.list,
+      provider.listId,
     );
   }
 
   /// Enables overriding the behavior of this provider, no matter the parameters.
-  Override overrideWith(CustomListTitles Function() create) {
-    return _$CustomListTitlesFamilyOverride(this, create);
+  Override overrideWith(ListById Function() create) {
+    return _$ListByIdFamilyOverride(this, create);
   }
 }
 
-class _$CustomListTitlesFamilyOverride implements FamilyOverride {
-  _$CustomListTitlesFamilyOverride(this.overriddenFamily, this.create);
+class _$ListByIdFamilyOverride implements FamilyOverride {
+  _$ListByIdFamilyOverride(this.overriddenFamily, this.create);
 
-  final CustomListTitles Function() create;
-
-  @override
-  final CustomListTitlesFamily overriddenFamily;
+  final ListById Function() create;
 
   @override
-  CustomListTitlesProvider getProviderOverride(
-    covariant CustomListTitlesProvider provider,
+  final ListByIdFamily overriddenFamily;
+
+  @override
+  ListByIdProvider getProviderOverride(
+    covariant ListByIdProvider provider,
   ) {
     return provider._copyWith(create);
   }
 }
 
-/// See also [CustomListTitles].
-class CustomListTitlesProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    CustomListTitles, Iterable<Manga>> {
-  /// See also [CustomListTitles].
-  CustomListTitlesProvider(
-    CustomList list,
+/// See also [ListById].
+class ListByIdProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<ListById, CustomList?> {
+  /// See also [ListById].
+  ListByIdProvider(
+    String listId,
   ) : this._internal(
-          () => CustomListTitles()..list = list,
-          from: customListTitlesProvider,
-          name: r'customListTitlesProvider',
+          () => ListById()..listId = listId,
+          from: listByIdProvider,
+          name: r'listByIdProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$customListTitlesHash,
-          dependencies: CustomListTitlesFamily._dependencies,
-          allTransitiveDependencies:
-              CustomListTitlesFamily._allTransitiveDependencies,
-          list: list,
+                  : _$listByIdHash,
+          dependencies: ListByIdFamily._dependencies,
+          allTransitiveDependencies: ListByIdFamily._allTransitiveDependencies,
+          listId: listId,
         );
 
-  CustomListTitlesProvider._internal(
+  ListByIdProvider._internal(
     super.create, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.list,
+    required this.listId,
   }) : super.internal();
 
-  final CustomList list;
+  final String listId;
 
   @override
-  FutureOr<Iterable<Manga>> runNotifierBuild(
-    covariant CustomListTitles notifier,
+  FutureOr<CustomList?> runNotifierBuild(
+    covariant ListById notifier,
   ) {
     return notifier.build(
-      list,
+      listId,
     );
   }
 
   @override
-  Override overrideWith(CustomListTitles Function() create) {
+  Override overrideWith(ListById Function() create) {
     return ProviderOverride(
       origin: this,
-      override: CustomListTitlesProvider._internal(
-        () => create()..list = list,
+      override: ListByIdProvider._internal(
+        () => create()..listId = listId,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        list: list,
+        listId: listId,
       ),
     );
   }
 
   @override
-  (CustomList,) get argument {
-    return (list,);
+  (String,) get argument {
+    return (listId,);
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<CustomListTitles, Iterable<Manga>>
+  AutoDisposeAsyncNotifierProviderElement<ListById, CustomList?>
       createElement() {
-    return _CustomListTitlesProviderElement(this);
+    return _ListByIdProviderElement(this);
   }
 
-  CustomListTitlesProvider _copyWith(
-    CustomListTitles Function() create,
+  ListByIdProvider _copyWith(
+    ListById Function() create,
   ) {
-    return CustomListTitlesProvider._internal(
-      () => create()..list = list,
+    return ListByIdProvider._internal(
+      () => create()..listId = listId,
       name: name,
       dependencies: dependencies,
       allTransitiveDependencies: allTransitiveDependencies,
       debugGetCreateSourceHash: debugGetCreateSourceHash,
       from: from,
-      list: list,
+      listId: listId,
     );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is CustomListTitlesProvider && other.list == list;
+    return other is ListByIdProvider && other.listId == listId;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, list.hashCode);
+    hash = _SystemHash.combine(hash, listId.hashCode);
 
     return _SystemHash.finish(hash);
   }
 }
 
-mixin CustomListTitlesRef
-    on AutoDisposeAsyncNotifierProviderRef<Iterable<Manga>> {
-  /// The parameter `list` of this provider.
-  CustomList get list;
+mixin ListByIdRef on AutoDisposeAsyncNotifierProviderRef<CustomList?> {
+  /// The parameter `listId` of this provider.
+  String get listId;
 }
 
-class _CustomListTitlesProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<CustomListTitles,
-        Iterable<Manga>> with CustomListTitlesRef {
-  _CustomListTitlesProviderElement(super.provider);
+class _ListByIdProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<ListById, CustomList?>
+    with ListByIdRef {
+  _ListByIdProviderElement(super.provider);
 
   @override
-  CustomList get list => (origin as CustomListTitlesProvider).list;
+  String get listId => (origin as ListByIdProvider).listId;
 }
 
 String _$tagListHash() => r'0a1fc9b1354d4786d8aac74ab1a13e872b6e9e1b';

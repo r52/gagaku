@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,6 +11,7 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'list_view.g.dart';
@@ -34,14 +37,6 @@ Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
     child: child,
     transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
-}
-
-@riverpod
-Future<CustomList?> _fetchListFromId(
-    _FetchListFromIdRef ref, String listId) async {
-  final api = ref.watch(mangadexProvider);
-  final list = await api.getListById(listId);
-  return list;
 }
 
 @riverpod
@@ -89,17 +84,6 @@ Future<List<ChapterFeedItemData>> _fetchListFeed(
   return dlist;
 }
 
-@riverpod
-Future<Iterable<Manga>> _fetchListTitles(
-    _FetchListTitlesRef ref, CustomList list) async {
-  final mangas = await ref.watch(customListTitlesProvider(list).future);
-  await ref.watch(statisticsProvider.notifier).get(mangas);
-
-  ref.keepAlive();
-
-  return mangas;
-}
-
 class QueriedMangaDexListViewWidget extends ConsumerWidget {
   const QueriedMangaDexListViewWidget({super.key, required this.listId});
 
@@ -107,7 +91,7 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(_fetchListFromIdProvider(listId));
+    final list = ref.watch(listByIdProvider(listId));
 
     Widget child;
 
@@ -166,89 +150,6 @@ class MangaDexListViewWidget extends HookConsumerWidget {
     final controllers = [
       useScrollController(),
       useScrollController(),
-    ];
-
-    final tabs = <Widget>[
-      Consumer(
-        key: const Key('/list?tab=titles'),
-        builder: (context, ref, child) {
-          final mangas = ref.watch(_fetchListTitlesProvider(list));
-          final isLoading = ref.watch(customListTitlesProvider(list)).isLoading;
-
-          return Stack(
-            children: [
-              switch (mangas) {
-                AsyncValue(:final error?, :final stackTrace?) => () {
-                    final messenger = ScaffoldMessenger.of(context);
-                    Styles.showErrorSnackBar(messenger, '$error');
-                    logger.e("_fetchGroupTitlesProvider(group) failed",
-                        error: error, stackTrace: stackTrace);
-
-                    return RefreshIndicator(
-                      onRefresh: () {
-                        ref.invalidate(customListTitlesProvider(list));
-                        return ref
-                            .refresh(_fetchListTitlesProvider(list).future);
-                      },
-                      child: Styles.errorList(error, stackTrace),
-                    );
-                  }(),
-                AsyncValue(:final value?) => () {
-                    if (value.isEmpty) {
-                      return const Text('No manga!');
-                    }
-
-                    return RefreshIndicator(
-                      onRefresh: () {
-                        ref
-                            .read(customListTitlesProvider(list).notifier)
-                            .clear();
-                        return ref
-                            .refresh(_fetchListTitlesProvider(list).future);
-                      },
-                      child: MangaListWidget(
-                        title: Text(
-                          'Titles (${list.set.length})',
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        controller: controllers[0],
-                        onAtEdge: () => ref
-                            .read(customListTitlesProvider(list).notifier)
-                            .getMore(),
-                        children: [
-                          MangaListViewSliver(items: value),
-                        ],
-                      ),
-                    );
-                  }(),
-                _ => const Stack(
-                    children: Styles.loadingOverlay,
-                  ),
-              },
-              if (isLoading) ...Styles.loadingOverlay,
-            ],
-          );
-        },
-      ),
-      Consumer(
-        key: const Key('/list?tab=feed'),
-        builder: (context, ref, child) {
-          return ChapterFeedWidget(
-            provider: _fetchListFeedProvider(list),
-            title: 'List Feed',
-            emptyText: 'No chapters!',
-            onAtEdge: () =>
-                ref.read(customListFeedProvider(list).notifier).getMore(),
-            onRefresh: () {
-              ref.read(customListFeedProvider(list).notifier).clear();
-              return ref.refresh(_fetchListFeedProvider(list).future);
-            },
-            controller: controllers[1],
-            restorationId: 'list_feed_offset',
-          );
-        },
-      ),
     ];
 
     return Scaffold(
@@ -326,7 +227,94 @@ class MangaDexListViewWidget extends HookConsumerWidget {
               child: child,
             );
           },
-          child: tabs[view.value.index],
+          child: switch (view.value) {
+            _ViewType.titles => HookConsumer(
+                key: const Key('/list?tab=titles'),
+                builder: (context, ref, child) {
+                  final currentPage = useState(0);
+                  final currentList = useState({...list.set});
+
+                  final titlesProvider = ref.watch(getMangaListByPageProvider(
+                      currentList.value, currentPage.value));
+                  final mangas = titlesProvider.valueOrNull;
+
+                  final isLoading = titlesProvider.isLoading;
+
+                  useEffect(() {
+                    void onListChange() {
+                      currentList.value = {...list.set};
+                    }
+
+                    list.addListener(onListChange);
+                    return () => list.removeListener(onListChange);
+                  }, [list]);
+
+                  return Stack(
+                    children: [
+                      Column(
+                        children: [
+                          if (!titlesProvider.hasError) ...[
+                            Expanded(
+                              child: MangaListWidget(
+                                title: Text(
+                                  'Titles (${list.set.length})',
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                controller: controllers[0],
+                                children: [
+                                  if (mangas != null)
+                                    MangaListViewSliver(items: mangas),
+                                ],
+                              ),
+                            ),
+                            NumberPaginator(
+                              numberPages: max(
+                                  (list.set.length /
+                                          MangaDexEndpoints.searchLimit)
+                                      .ceil(),
+                                  1),
+                              onPageChange: (int index) {
+                                currentPage.value = index;
+                              },
+                            ),
+                          ],
+                          if (titlesProvider.hasError)
+                            RefreshIndicator(
+                              onRefresh: () => ref.refresh(
+                                  getMangaListByPageProvider(
+                                          currentList.value, currentPage.value)
+                                      .future),
+                              child: Styles.errorList(titlesProvider.error!,
+                                  titlesProvider.stackTrace!),
+                            ),
+                        ],
+                      ),
+                      if (isLoading) ...Styles.loadingOverlay
+                    ],
+                  );
+                },
+              ),
+            _ViewType.feed => Consumer(
+                key: const Key('/list?tab=feed'),
+                builder: (context, ref, child) {
+                  return ChapterFeedWidget(
+                    provider: _fetchListFeedProvider(list),
+                    title: 'List Feed',
+                    emptyText: 'No chapters!',
+                    onAtEdge: () => ref
+                        .read(customListFeedProvider(list).notifier)
+                        .getMore(),
+                    onRefresh: () {
+                      ref.read(customListFeedProvider(list).notifier).clear();
+                      return ref.refresh(_fetchListFeedProvider(list).future);
+                    },
+                    controller: controllers[1],
+                    restorationId: 'list_feed_offset',
+                  );
+                },
+              ),
+          },
         ),
       ),
       bottomNavigationBar: NavigationBar(
