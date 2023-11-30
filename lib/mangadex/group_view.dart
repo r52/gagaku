@@ -172,149 +172,149 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
       useScrollController(),
     ];
 
-    final tabs = <Widget>[
-      CustomScrollView(
-        controller: controllers[0],
-        scrollBehavior: MouseTouchScrollBehavior(),
-        slivers: <Widget>[
-          if (group.attributes.description != null)
-            SliverToBoxAdapter(
-              child: ExpansionTile(
-                initiallyExpanded: true,
-                title: const Text('Group Description'),
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.background,
-                    child: Text(group.attributes.description!),
-                  ),
-                ],
-              ),
-            ),
-          if (group.attributes.website != null ||
-              group.attributes.discord != null)
-            SliverToBoxAdapter(
-              child: ExpansionTile(
-                initiallyExpanded: true,
-                expandedAlignment: Alignment.centerLeft,
-                title: const Text('Links'),
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.background,
-                    child: Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: [
-                        if (group.attributes.website != null)
-                          ButtonChip(
-                            onPressed: () async {
-                              if (!await launchUrl(
-                                  Uri.parse(group.attributes.website!))) {
-                                throw 'Could not launch ${group.attributes.website!}';
-                              }
-                            },
-                            text: const Text('Website'),
-                          ),
-                        if (group.attributes.discord != null)
-                          ButtonChip(
-                            onPressed: () async {
-                              final url =
-                                  'https://discord.gg/${group.attributes.discord!}';
-                              if (!await launchUrl(Uri.parse(url))) {
-                                throw 'Could not launch $url';
-                              }
-                            },
-                            text: const Text('Discord'),
-                          ),
-                      ],
+    final tab = switch (view.value) {
+      _ViewType.info => CustomScrollView(
+          controller: controllers[0],
+          scrollBehavior: MouseTouchScrollBehavior(),
+          slivers: <Widget>[
+            if (group.attributes.description != null)
+              SliverToBoxAdapter(
+                child: ExpansionTile(
+                  initiallyExpanded: true,
+                  title: const Text('Group Description'),
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8),
+                      color: theme.colorScheme.background,
+                      child: Text(group.attributes.description!),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-        ],
-      ),
-      Consumer(
-        key: const Key('/group?tab=feed'),
-        builder: (context, ref, child) {
-          return ChapterFeedWidget(
-            provider: _fetchGroupFeedProvider(group),
-            title: 'Group Feed',
-            emptyText: 'No chapters!',
-            onAtEdge: () =>
-                ref.read(groupFeedProvider(group).notifier).getMore(),
-            onRefresh: () {
-              ref.read(groupFeedProvider(group).notifier).clear();
-              return ref.refresh(_fetchGroupFeedProvider(group).future);
-            },
-            controller: controllers[1],
-            restorationId: 'group_feed_offset',
-          );
-        },
-      ),
-      Consumer(
-        key: const Key('/group?tab=titles'),
-        builder: (context, ref, child) {
-          final mangas = ref.watch(_fetchGroupTitlesProvider(group));
-          final isLoading = ref.watch(groupTitlesProvider(group)).isLoading;
-
-          return Stack(
-            children: [
-              switch (mangas) {
-                AsyncValue(:final error?, :final stackTrace?) => () {
-                    final messenger = ScaffoldMessenger.of(context);
-                    Styles.showErrorSnackBar(messenger, '$error');
-                    logger.e("_fetchGroupTitlesProvider(group) failed",
-                        error: error, stackTrace: stackTrace);
-
-                    return RefreshIndicator(
-                      onRefresh: () {
-                        ref.invalidate(groupTitlesProvider(group));
-                        return ref
-                            .refresh(_fetchGroupTitlesProvider(group).future);
-                      },
-                      child: Styles.errorList(error, stackTrace),
-                    );
-                  }(),
-                AsyncValue(:final value?) => () {
-                    if (value.isEmpty) {
-                      return const Text('No manga!');
-                    }
-
-                    return RefreshIndicator(
-                      onRefresh: () {
-                        ref.read(groupTitlesProvider(group).notifier).clear();
-                        return ref
-                            .refresh(_fetchGroupTitlesProvider(group).future);
-                      },
-                      child: MangaListWidget(
-                        title: const Text(
-                          'Group Titles',
-                          style: TextStyle(fontSize: 24),
-                        ),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        controller: controllers[2],
-                        onAtEdge: () => ref
-                            .read(groupTitlesProvider(group).notifier)
-                            .getMore(),
+            if (group.attributes.website != null ||
+                group.attributes.discord != null)
+              SliverToBoxAdapter(
+                child: ExpansionTile(
+                  initiallyExpanded: true,
+                  expandedAlignment: Alignment.centerLeft,
+                  title: const Text('Links'),
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      color: theme.colorScheme.background,
+                      child: Wrap(
+                        spacing: 4.0,
+                        runSpacing: 4.0,
                         children: [
-                          MangaListViewSliver(items: value),
+                          if (group.attributes.website != null)
+                            ButtonChip(
+                              onPressed: () async {
+                                if (!await launchUrl(
+                                    Uri.parse(group.attributes.website!))) {
+                                  throw 'Could not launch ${group.attributes.website!}';
+                                }
+                              },
+                              text: const Text('Website'),
+                            ),
+                          if (group.attributes.discord != null)
+                            ButtonChip(
+                              onPressed: () async {
+                                final url =
+                                    'https://discord.gg/${group.attributes.discord!}';
+                                if (!await launchUrl(Uri.parse(url))) {
+                                  throw 'Could not launch $url';
+                                }
+                              },
+                              text: const Text('Discord'),
+                            ),
                         ],
                       ),
-                    );
-                  }(),
-                _ => const Stack(
-                    children: Styles.loadingOverlay,
-                  ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      _ViewType.feed => Consumer(
+          key: const Key('/group?tab=feed'),
+          builder: (context, ref, child) {
+            return ChapterFeedWidget(
+              provider: _fetchGroupFeedProvider(group),
+              title: 'Group Feed',
+              emptyText: 'No chapters!',
+              onAtEdge: () =>
+                  ref.read(groupFeedProvider(group).notifier).getMore(),
+              onRefresh: () {
+                ref.read(groupFeedProvider(group).notifier).clear();
+                return ref.refresh(_fetchGroupFeedProvider(group).future);
               },
-              if (isLoading) ...Styles.loadingOverlay,
-            ],
-          );
-        },
-      ),
-    ];
+              controller: controllers[1],
+              restorationId: 'group_feed_offset',
+            );
+          },
+        ),
+      _ViewType.titles => Consumer(
+          key: const Key('/group?tab=titles'),
+          builder: (context, ref, child) {
+            final mangas = ref.watch(_fetchGroupTitlesProvider(group));
+            final isLoading = ref.watch(groupTitlesProvider(group)).isLoading;
+
+            return Stack(
+              children: [
+                switch (mangas) {
+                  AsyncValue(:final error?, :final stackTrace?) => () {
+                      final messenger = ScaffoldMessenger.of(context);
+                      Styles.showErrorSnackBar(messenger, '$error');
+                      logger.e("_fetchGroupTitlesProvider(group) failed",
+                          error: error, stackTrace: stackTrace);
+
+                      return RefreshIndicator(
+                        onRefresh: () {
+                          ref.invalidate(groupTitlesProvider(group));
+                          return ref
+                              .refresh(_fetchGroupTitlesProvider(group).future);
+                        },
+                        child: Styles.errorList(error, stackTrace),
+                      );
+                    }(),
+                  AsyncValue(:final value?) => () {
+                      if (value.isEmpty) {
+                        return const Text('No manga!');
+                      }
+
+                      return RefreshIndicator(
+                        onRefresh: () {
+                          ref.read(groupTitlesProvider(group).notifier).clear();
+                          return ref
+                              .refresh(_fetchGroupTitlesProvider(group).future);
+                        },
+                        child: MangaListWidget(
+                          title: const Text(
+                            'Group Titles',
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          controller: controllers[2],
+                          onAtEdge: () => ref
+                              .read(groupTitlesProvider(group).notifier)
+                              .getMore(),
+                          children: [
+                            MangaListViewSliver(items: value),
+                          ],
+                        ),
+                      );
+                    }(),
+                  _ => const Stack(
+                      children: Styles.loadingOverlay,
+                    ),
+                },
+                if (isLoading) ...Styles.loadingOverlay,
+              ],
+            );
+          },
+        ),
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -370,7 +370,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               child: child,
             );
           },
-          child: tabs[view.value.index],
+          child: tab,
         ),
       ),
       bottomNavigationBar: NavigationBar(
