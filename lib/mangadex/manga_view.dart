@@ -228,7 +228,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 snap: false,
                 floating: false,
                 forceElevated: innerBoxIsScrolled,
-                expandedHeight: 200.0,
+                expandedHeight: 250.0,
+                collapsedHeight: 100.0,
                 leading: BackButton(
                   onPressed: () {
                     if (context.canPop()) {
@@ -239,14 +240,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   },
                 ),
                 flexibleSpace: FlexibleSpaceBar(
+                  expandedTitleScale: 3.0,
                   title: Text(
                     manga.attributes.title.get('en'),
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       shadows: <Shadow>[
                         Shadow(
-                          offset: Offset(2.0, 2.0),
+                          offset: Offset(1.0, 1.0),
                           blurRadius: 1.0,
                           color: Color.fromARGB(255, 0, 0, 0),
                         ),
@@ -418,6 +420,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       ),
                       DropdownMenu<MangaReadingStatus>(
                         initialSelection: reading,
+                        width: 180.0,
                         enableFilter: false,
                         enableSearch: false,
                         requestFocusOnTap: false,

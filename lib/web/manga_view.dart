@@ -134,21 +134,22 @@ class WebMangaViewWidget extends ConsumerWidget {
           pinned: true,
           snap: false,
           floating: false,
-          expandedHeight: 200.0,
+          expandedHeight: 250.0,
           leading: context.canPop()
               ? BackButton(
                   onPressed: () => context.pop(),
                 )
               : null,
           flexibleSpace: FlexibleSpaceBar(
+            expandedTitleScale: 3.0,
             title: Text(
               manga.title,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 shadows: <Shadow>[
                   Shadow(
-                    offset: Offset(2.0, 2.0),
+                    offset: Offset(1.0, 1.0),
                     blurRadius: 1.0,
                     color: Color.fromARGB(255, 0, 0, 0),
                   ),
