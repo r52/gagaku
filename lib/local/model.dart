@@ -1,24 +1,39 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:gagaku/local/config.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
+enum LibraryItemType { directory, archive }
+
+int compareLibraryItems(LocalLibraryItem a, LocalLibraryItem b) {
+  if (!a.isReadable && b.isReadable) {
+    return -1;
+  }
+
+  if (a.isReadable && !b.isReadable) {
+    return 1;
+  }
+
+  return compareNatural(a.name ?? a.path, b.name ?? b.path);
+}
+
 class LocalLibraryItem {
   LocalLibraryItem({
     required this.path,
+    required this.type,
     this.name,
     this.thumbnail,
-    this.isDirectory = false,
     this.isReadable = false,
     this.parent,
   });
 
-  String path;
-  String? name;
+  final String path;
+  final LibraryItemType type;
+  final String? name;
   String? thumbnail;
-  bool isDirectory;
   bool isReadable;
   LocalLibraryItem? parent;
   List<LocalLibraryItem> children = [];
@@ -35,7 +50,11 @@ class LocalLibrary extends _$LocalLibrary {
         : dir.path;
 
     final res = LocalLibraryItem(
-        path: dir.path, name: name, isDirectory: true, parent: parent);
+      path: dir.path,
+      name: name,
+      type: LibraryItemType.directory,
+      parent: parent,
+    );
 
     final isReadable = files.isNotEmpty &&
         files.every((element) =>
@@ -65,6 +84,8 @@ class LocalLibrary extends _$LocalLibrary {
       }
     }
 
+    res.children.sort(compareLibraryItems);
+
     if (res.children.isNotEmpty) {
       return res;
     }
@@ -81,6 +102,7 @@ class LocalLibrary extends _$LocalLibrary {
       // TODO thumbnail for archives?
       return LocalLibraryItem(
           path: file.path,
+          type: LibraryItemType.archive,
           name: file.uri.pathSegments.last,
           isReadable: true,
           parent: parent);
@@ -92,8 +114,8 @@ class LocalLibrary extends _$LocalLibrary {
   Future<LocalLibraryItem> _scanLibrary() async {
     final cfg = ref.watch(localConfigProvider);
     if (cfg.libraryDirectory.isNotEmpty) {
-      final top =
-          LocalLibraryItem(path: cfg.libraryDirectory, isDirectory: true);
+      final top = LocalLibraryItem(
+          path: cfg.libraryDirectory, type: LibraryItemType.directory);
 
       final dir = Directory(cfg.libraryDirectory);
       final entities = await dir.list().toList();
@@ -114,10 +136,12 @@ class LocalLibrary extends _$LocalLibrary {
         // otherwise skip
       }
 
+      top.children.sort(compareLibraryItems);
+
       return top;
     }
 
-    return LocalLibraryItem(path: '');
+    return LocalLibraryItem(path: '', type: LibraryItemType.directory);
   }
 
   @override
