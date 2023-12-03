@@ -2346,7 +2346,7 @@ Future<Iterable<Manga>> getMangaListByPage(
 @riverpod
 class ListById extends _$ListById {
   @override
-  FutureOr<CustomList?> build(String listId) async {
+  FutureOr<Raw<CustomList?>> build(String listId) async {
     final api = ref.watch(mangadexProvider);
     final list = await api.fetchListById(listId);
     return list;

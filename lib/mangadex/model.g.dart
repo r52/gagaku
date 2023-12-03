@@ -1581,13 +1581,13 @@ class _CustomListFeedProviderElement
   CustomList get list => (origin as CustomListFeedProvider).list;
 }
 
-String _$listByIdHash() => r'd7bb16742fa5adaf821070f2fa0eafb072612156';
+String _$listByIdHash() => r'73ef1c21cfbb9f5aa0325fb072e8529034e0c6b2';
 
 abstract class _$ListById
-    extends BuildlessAutoDisposeAsyncNotifier<CustomList?> {
+    extends BuildlessAutoDisposeAsyncNotifier<Raw<CustomList?>> {
   late final String listId;
 
-  FutureOr<CustomList?> build(
+  FutureOr<Raw<CustomList?>> build(
     String listId,
   );
 }
@@ -1658,7 +1658,7 @@ class _$ListByIdFamilyOverride implements FamilyOverride {
 
 /// See also [ListById].
 class ListByIdProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<ListById, CustomList?> {
+    extends AutoDisposeAsyncNotifierProviderImpl<ListById, Raw<CustomList?>> {
   /// See also [ListById].
   ListByIdProvider(
     String listId,
@@ -1688,7 +1688,7 @@ class ListByIdProvider
   final String listId;
 
   @override
-  FutureOr<CustomList?> runNotifierBuild(
+  FutureOr<Raw<CustomList?>> runNotifierBuild(
     covariant ListById notifier,
   ) {
     return notifier.build(
@@ -1718,7 +1718,7 @@ class ListByIdProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<ListById, CustomList?>
+  AutoDisposeAsyncNotifierProviderElement<ListById, Raw<CustomList?>>
       createElement() {
     return _ListByIdProviderElement(this);
   }
@@ -1751,13 +1751,13 @@ class ListByIdProvider
   }
 }
 
-mixin ListByIdRef on AutoDisposeAsyncNotifierProviderRef<CustomList?> {
+mixin ListByIdRef on AutoDisposeAsyncNotifierProviderRef<Raw<CustomList?>> {
   /// The parameter `listId` of this provider.
   String get listId;
 }
 
 class _ListByIdProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<ListById, CustomList?>
+    extends AutoDisposeAsyncNotifierProviderElement<ListById, Raw<CustomList?>>
     with ListByIdRef {
   _ListByIdProviderElement(super.provider);
 
