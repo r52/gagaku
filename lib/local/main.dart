@@ -15,7 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum LocalLibraryAction { open, settings }
 
-class LocalLibraryHome extends HookWidget {
+class LocalLibraryHome extends StatelessWidget {
   const LocalLibraryHome({super.key});
 
   Future<PlatformFile?> _pickMangaArchive() async {
@@ -44,7 +44,6 @@ class LocalLibraryHome extends HookWidget {
   Widget build(BuildContext context) {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
-    final currentItem = useState<LocalLibraryItem?>(null);
 
     return Scaffold(
       appBar: AppBar(
@@ -90,10 +89,16 @@ class LocalLibraryHome extends HookWidget {
         ],
       ),
       drawer: const MainDrawer(),
-      body: Consumer(
+      body: HookConsumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
           final settings = ref.watch(localConfigProvider);
           final result = ref.watch(localLibraryProvider);
+          final currentItem = useState<LocalLibraryItem?>(result.valueOrNull);
+
+          useEffect(() {
+            currentItem.value ??= result.valueOrNull;
+            return null;
+          }, [result]);
 
           if (DeviceContext.isMobile() || settings.libraryDirectory.isEmpty) {
             return Center(
@@ -134,7 +139,6 @@ class LocalLibraryHome extends HookWidget {
 
           switch (result) {
             case AsyncData(:final value):
-              currentItem.value ??= value;
               Widget child;
 
               if (value.children.isEmpty) {
@@ -156,7 +160,7 @@ class LocalLibraryHome extends HookWidget {
                     ],
                   ),
                 );
-              } else {
+              } else if (currentItem.value != null) {
                 child = LibraryListWidget(
                   title: Text(
                     currentItem.value!.path,
@@ -182,6 +186,8 @@ class LocalLibraryHome extends HookWidget {
                     }
                   },
                 );
+              } else {
+                return Styles.listSpinner;
               }
 
               return RefreshIndicator(
