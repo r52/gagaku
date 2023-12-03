@@ -117,8 +117,13 @@ class ArchiveReaderWidget extends ConsumerWidget {
         );
       case AsyncValue(:final value?):
         if (value.isEmpty) {
-          return const Center(
-            child: Text("This archive contains no images!"),
+          return Scaffold(
+            appBar: AppBar(
+              leading: const BackButton(),
+            ),
+            body: const Center(
+              child: Text("This archive contains no readable images!"),
+            ),
           );
         }
 
