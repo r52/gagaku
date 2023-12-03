@@ -61,6 +61,7 @@ dependencies:
   url_launcher: ^6.1.10
   number_paginator: ^0.4.0
   collection: ^1.18.0
+  device_info_plus: ^9.1.1
 
 dev_dependencies:
   flutter_test:

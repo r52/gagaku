@@ -6,7 +6,7 @@ part of 'archive_reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getArchivePagesHash() => r'90ba0b7cb5c10495145604e5aef6e6bfb34b21db';
+String _$getArchivePagesHash() => r'850aecb526023de58df1055c7b115cb2097bf7ed';
 
 /// Copied from Dart SDK
 class _SystemHash {

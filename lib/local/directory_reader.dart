@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/local/model.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
@@ -30,6 +31,7 @@ Route createDirectoryReaderRoute(
 @riverpod
 Future<List<ReaderPage>> _getDirectoryPages(
     _GetDirectoryPagesRef ref, String path) async {
+  final formats = await ref.watch(supportedFormatsProvider.future);
   final dir = Directory(path);
   final entities = await dir.list().toList();
   final files = entities.whereType<File>();
@@ -38,7 +40,8 @@ Future<List<ReaderPage>> _getDirectoryPages(
       .where((element) =>
           element.path.endsWith('.png') ||
           element.path.endsWith('.jpg') ||
-          element.path.endsWith('.jpeg'))
+          element.path.endsWith('.jpeg') ||
+          (formats.avif && element.path.endsWith(".avif")))
       .toList();
 
   pageFiles.sort((a, b) =>

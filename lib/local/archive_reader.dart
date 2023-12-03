@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/types.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
@@ -29,36 +30,43 @@ Route createArchiveReaderRoute(
   );
 }
 
+class _ExtractInfo {
+  const _ExtractInfo({
+    required this.type,
+    required this.formats,
+    required this.bytes,
+  });
+
+  final ArchiveType type;
+  final FormatInfo formats;
+  final Uint8List bytes;
+}
+
 @riverpod
 Future<List<ReaderPage>> _getArchivePages(
     _GetArchivePagesRef ref, String path) async {
+  final formats = await ref.watch(supportedFormatsProvider.future);
   final bytes = await File(path).readAsBytes();
 
   if (path.endsWith('.cbt') || path.endsWith('.tar')) {
-    return compute(_extractTar, bytes);
+    return compute(_extractArchive,
+        _ExtractInfo(type: ArchiveType.tar, formats: formats, bytes: bytes));
   }
 
-  return compute(_extractZip, bytes);
+  return compute(_extractArchive,
+      _ExtractInfo(type: ArchiveType.zip, formats: formats, bytes: bytes));
 }
 
-List<ReaderPage> _extractZip(Uint8List bytes) {
-  return _extractArchive(ArchiveType.zip, bytes);
-}
-
-List<ReaderPage> _extractTar(Uint8List bytes) {
-  return _extractArchive(ArchiveType.tar, bytes);
-}
-
-List<ReaderPage> _extractArchive(ArchiveType type, Uint8List bytes) {
+List<ReaderPage> _extractArchive(_ExtractInfo info) {
   Archive archive;
 
-  switch (type) {
+  switch (info.type) {
     case ArchiveType.tar:
-      archive = TarDecoder().decodeBytes(bytes);
+      archive = TarDecoder().decodeBytes(info.bytes);
       break;
     case ArchiveType.zip:
     default:
-      archive = ZipDecoder().decodeBytes(bytes);
+      archive = ZipDecoder().decodeBytes(info.bytes);
       break;
   }
 
@@ -68,7 +76,8 @@ List<ReaderPage> _extractArchive(ArchiveType type, Uint8List bytes) {
     if (file.isFile &&
         (file.name.endsWith(".jpg") ||
             file.name.endsWith(".png") ||
-            file.name.endsWith(".jpeg"))) {
+            file.name.endsWith(".jpeg") ||
+            (info.formats.avif && file.name.endsWith(".avif")))) {
       final data = file.content as Uint8List;
       pages.add(ReaderPage(provider: MemoryImage(data), sortKey: file.name));
     }

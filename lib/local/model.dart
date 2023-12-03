@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:gagaku/local/config.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -43,6 +44,8 @@ class LocalLibraryItem {
 class LocalLibrary extends _$LocalLibrary {
   Future<LocalLibraryItem?> _processDirectory(
       Directory dir, LocalLibraryItem? parent) async {
+    final formats = await ref.watch(supportedFormatsProvider.future);
+
     final entities = await dir.list().toList();
     final files = entities.whereType<File>();
     final name = (dir.uri.pathSegments.length - 2 >= 0)
@@ -60,7 +63,8 @@ class LocalLibrary extends _$LocalLibrary {
         files.every((element) =>
             element.path.endsWith(".jpg") ||
             element.path.endsWith(".png") ||
-            element.path.endsWith(".jpeg"));
+            element.path.endsWith(".jpeg") ||
+            (formats.avif && element.path.endsWith(".avif")));
 
     res.isReadable = isReadable;
 
@@ -154,5 +158,35 @@ class LocalLibrary extends _$LocalLibrary {
     state = await AsyncValue.guard(() async {
       return _scanLibrary();
     });
+  }
+}
+
+class FormatInfo {
+  const FormatInfo({
+    required this.avif,
+  });
+
+  final bool avif;
+}
+
+@Riverpod(keepAlive: true)
+class SupportedFormats extends _$SupportedFormats {
+  @override
+  FutureOr<FormatInfo> build() async {
+    bool avif = false;
+
+    final deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      avif = int.parse(androidInfo.version.release) >= 12;
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      avif = int.parse(iosInfo.systemVersion) >= 16;
+    } else if (Platform.isWindows) {
+      avif = true;
+    }
+
+    return FormatInfo(avif: avif);
   }
 }

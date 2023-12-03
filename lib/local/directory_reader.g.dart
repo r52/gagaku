@@ -6,7 +6,7 @@ part of 'directory_reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getDirectoryPagesHash() => r'fd752bf0b65417671ae778fa2e5a3dc92a3e4245';
+String _$getDirectoryPagesHash() => r'38bec9079efc237a841c33d9b54003bf8c4921c7';
 
 /// Copied from Dart SDK
 class _SystemHash {
