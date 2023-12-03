@@ -137,7 +137,7 @@ class ReaderWidget extends HookConsumerWidget {
       }
 
       return null;
-    });
+    }, []);
 
     useEffect(() {
       void pageCallback() {

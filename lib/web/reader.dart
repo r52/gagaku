@@ -231,7 +231,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       });
 
       return () => timer.value?.cancel();
-    });
+    }, []);
 
     switch (pages) {
       case AsyncValue(:final error?, :final stackTrace?):
