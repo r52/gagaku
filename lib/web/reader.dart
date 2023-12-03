@@ -4,6 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/model.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
@@ -120,11 +121,12 @@ Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
 }
 
 class QueriedWebSourceReaderWidget extends ConsumerWidget {
-  const QueriedWebSourceReaderWidget(
-      {super.key,
-      required this.proxy,
-      required this.code,
-      required this.chapter});
+  const QueriedWebSourceReaderWidget({
+    super.key,
+    required this.proxy,
+    required this.code,
+    required this.chapter,
+  });
 
   final String proxy;
   final String code;
@@ -137,6 +139,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
     final data = ref.watch(_fetchWebChapterInfoProvider(info));
 
     Widget child;
+    PreferredSizeWidget? appBar;
 
     switch (data) {
       case AsyncData(:final value):
@@ -148,6 +151,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
           info: value.info,
           readKey: value.readKey,
           onLinkPressed: value.onLinkPressed,
+          backRoute: GagakuRoute.web,
         );
       case AsyncError(:final error, :final stackTrace):
         final messenger = ScaffoldMessenger.of(context);
@@ -156,6 +160,17 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
             error: error, stackTrace: stackTrace);
 
         child = Styles.errorColumn(error, stackTrace);
+        appBar = AppBar(
+          leading: BackButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(GagakuRoute.web);
+              }
+            },
+          ),
+        );
         break;
       case _:
         child = Styles.listSpinner;
@@ -163,6 +178,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
     }
 
     return Scaffold(
+      appBar: appBar,
       body: child,
     );
   }
@@ -178,6 +194,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
     this.info,
     this.readKey,
     this.onLinkPressed,
+    this.backRoute,
   });
 
   final dynamic source;
@@ -187,6 +204,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
   final ProxyInfo? info;
   final String? readKey;
   final VoidCallback? onLinkPressed;
+  final String? backRoute;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -224,7 +242,15 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
         return Scaffold(
           appBar: AppBar(
-            leading: const BackButton(),
+            leading: BackButton(
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(backRoute ?? GagakuRoute.web);
+                }
+              },
+            ),
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
@@ -236,6 +262,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
           isLongStrip: false, // TODO longstrip
           link: link,
           onLinkPressed: onLinkPressed,
+          backRoute: backRoute,
         );
       case _:
         return const Center(

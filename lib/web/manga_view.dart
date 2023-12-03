@@ -2,6 +2,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:gagaku/web/model.dart';
@@ -95,7 +96,17 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
             error: error, stackTrace: stackTrace);
 
         child = Styles.errorColumn(error, stackTrace);
-        appBar = AppBar();
+        appBar = AppBar(
+          leading: BackButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(GagakuRoute.web);
+              }
+            },
+          ),
+        );
         break;
       case _:
         child = Styles.listSpinner;
@@ -135,11 +146,15 @@ class WebMangaViewWidget extends ConsumerWidget {
           snap: false,
           floating: false,
           expandedHeight: 250.0,
-          leading: context.canPop()
-              ? BackButton(
-                  onPressed: () => context.pop(),
-                )
-              : null,
+          leading: BackButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(GagakuRoute.web);
+              }
+            },
+          ),
           flexibleSpace: FlexibleSpaceBar(
             expandedTitleScale: 3.0,
             title: Text(
