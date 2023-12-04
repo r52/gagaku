@@ -128,7 +128,8 @@ class MangaDexListsView extends HookConsumerWidget {
                           itemCount: value.length,
                           itemBuilder: (BuildContext context, int index) {
                             final messenger = ScaffoldMessenger.of(context);
-                            final item = value.elementAt(index);
+                            final listref = value.elementAt(index);
+                            final item = listref.get<CustomList>();
 
                             return Card(
                               child: ListTile(
@@ -156,7 +157,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                         if (result == true) {
                                           ref
                                               .read(userListsProvider.notifier)
-                                              .deleteList(item)
+                                              .deleteList(listref)
                                               .then((success) {
                                             if (success == true) {
                                               messenger
@@ -185,7 +186,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                         break;
                                       case _ListActions.edit:
                                         context.push('/list/edit/${item.id}',
-                                            extra: item);
+                                            extra: listref);
                                         break;
                                       default:
                                         break;
@@ -213,7 +214,8 @@ class MangaDexListsView extends HookConsumerWidget {
                                   ],
                                 ),
                                 onTap: () {
-                                  context.push('/list/${item.id}', extra: item);
+                                  context.push('/list/${item.id}',
+                                      extra: listref);
                                 },
                               ),
                             );

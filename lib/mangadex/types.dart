@@ -305,17 +305,6 @@ class Languages {
 mixin MangaDexUUID {
   String get id;
 
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is MangaDexUUID &&
-            (identical(other.id, id) || other.id == id));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, id);
-
   Map<String, dynamic> toJson();
 }
 

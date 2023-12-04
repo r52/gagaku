@@ -44,7 +44,7 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
       return null;
     }
 
-    return (date.millisecondsSinceEpoch / 1000).toString();
+    return (date.millisecondsSinceEpoch / 1000).round().toString();
   }
 }
 
@@ -74,7 +74,7 @@ class MappedEpochTimestampSerializer
       return null;
     }
 
-    return {'0': (date.millisecondsSinceEpoch / 1000).toString()};
+    return {'0': (date.millisecondsSinceEpoch / 1000).round().toString()};
   }
 }
 

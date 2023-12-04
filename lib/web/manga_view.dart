@@ -95,7 +95,14 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
         logger.e("_fetchWebMangaInfoProvider($proxy/$code) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = RefreshIndicator(
+          onRefresh: () async {
+            await api.invalidateAll(info.getKey());
+            return ref.refresh(_fetchWebMangaInfoProvider(info).future);
+          },
+          child: Styles.errorList(error, stackTrace),
+        );
+
         appBar = AppBar(
           leading: BackButton(
             onPressed: () {

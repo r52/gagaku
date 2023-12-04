@@ -7,6 +7,7 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/types.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,7 @@ part 'list_view.g.dart';
 enum _ViewType { titles, feed }
 
 Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
-  final list = state.extra.asOrNull<CustomList>();
+  final list = state.extra.asOrNull<CRef>();
 
   Widget child;
 
@@ -128,13 +129,25 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
 class MangaDexListViewWidget extends HookConsumerWidget {
   const MangaDexListViewWidget({super.key, required this.list});
 
-  final CustomList list;
+  final CRef list;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final messenger = ScaffoldMessenger.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).valueOrNull;
+
+    final currentList = useState({...list.get<CustomList>().set});
+    final resolved = list.get<CustomList>();
+
+    void onListChange() {
+      currentList.value = {...list.get<CustomList>().set};
+    }
+
+    useEffect(() {
+      resolved.addListener(onListChange);
+      return () => resolved.removeListener(onListChange);
+    }, [list, list.ref]);
 
     const bottomNavigationBarItems = <Widget>[
       NavigationDestination(
@@ -170,14 +183,21 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 curve: Curves.easeInOut);
           },
           child: Styles.titleFlexBar(
-              context: context, title: list.attributes.name),
+              context: context, title: list.get<CustomList>().attributes.name),
         ),
-        actions: (list.user != null && me != null && list.user!.id == me.id)
+        actions: (list.get<CustomList>().user != null &&
+                me != null &&
+                list.get<CustomList>().user!.id == me.id)
             ? [
                 ElevatedButton(
                   style: Styles.buttonStyle(),
                   onPressed: () {
-                    context.push('/list/edit/${list.id}', extra: list);
+                    context
+                        .push('/list/edit/${list.get<CustomList>().id}',
+                            extra: list)
+                        .then((value) {
+                      onListChange();
+                    });
                   },
                   child: const Text('Edit'),
                 ),
@@ -188,7 +208,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                   style: Styles.buttonStyle(backgroundColor: Colors.red),
                   onPressed: () async {
                     final result = await showDeleteListDialog(
-                        context, list.attributes.name);
+                        context, list.get<CustomList>().attributes.name);
                     if (result == true) {
                       ref
                           .read(userListsProvider.notifier)
@@ -232,22 +252,12 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 key: const Key('/list?tab=titles'),
                 builder: (context, ref, child) {
                   final currentPage = useState(0);
-                  final currentList = useState({...list.set});
 
                   final titlesProvider = ref.watch(getMangaListByPageProvider(
                       currentList.value, currentPage.value));
                   final mangas = titlesProvider.valueOrNull;
 
                   final isLoading = titlesProvider.isLoading;
-
-                  useEffect(() {
-                    void onListChange() {
-                      currentList.value = {...list.set};
-                    }
-
-                    list.addListener(onListChange);
-                    return () => list.removeListener(onListChange);
-                  }, [list]);
 
                   return Stack(
                     children: [
@@ -257,7 +267,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                             Expanded(
                               child: MangaListWidget(
                                 title: Text(
-                                  'Titles (${list.set.length})',
+                                  'Titles (${list.get<CustomList>().set.length})',
                                   style: const TextStyle(fontSize: 24),
                                 ),
                                 physics: const AlwaysScrollableScrollPhysics(),
@@ -270,7 +280,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                             ),
                             NumberPaginator(
                               numberPages: max(
-                                  (list.set.length /
+                                  (list.get<CustomList>().set.length /
                                           MangaDexEndpoints.searchLimit)
                                       .ceil(),
                                   1),
@@ -299,15 +309,21 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 key: const Key('/list?tab=feed'),
                 builder: (context, ref, child) {
                   return ChapterFeedWidget(
-                    provider: _fetchListFeedProvider(list),
+                    provider: _fetchListFeedProvider(list.get<CustomList>()),
                     title: 'List Feed',
                     emptyText: 'No chapters!',
                     onAtEdge: () => ref
-                        .read(customListFeedProvider(list).notifier)
+                        .read(customListFeedProvider(list.get<CustomList>())
+                            .notifier)
                         .getMore(),
                     onRefresh: () {
-                      ref.read(customListFeedProvider(list).notifier).clear();
-                      return ref.refresh(_fetchListFeedProvider(list).future);
+                      ref
+                          .read(customListFeedProvider(list.get<CustomList>())
+                              .notifier)
+                          .clear();
+                      return ref.refresh(
+                          _fetchListFeedProvider(list.get<CustomList>())
+                              .future);
                     },
                     controller: controllers[1],
                     restorationId: 'list_feed_offset',

@@ -562,10 +562,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                       ListTileControlAffinity.leading,
                                   title: Text(userLists
                                       .elementAt(index)
+                                      .get<CustomList>()
                                       .attributes
                                       .name),
                                   value: userLists
                                       .elementAt(index)
+                                      .get<CustomList>()
                                       .set
                                       .contains(manga.id),
                                   onChanged: (bool? value) async {

@@ -7,6 +7,7 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/types.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 
 Page<dynamic> buildListEditPage(BuildContext context, GoRouterState state) {
-  final list = state.extra.asOrNull<CustomList>();
+  final list = state.extra.asOrNull<CRef>();
 
   Widget child;
 
@@ -78,26 +79,27 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
 class MangaDexEditListScreen extends HookConsumerWidget {
   const MangaDexEditListScreen({super.key, this.list});
 
-  final CustomList? list;
+  final CRef? list;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listNameController =
-        useTextEditingController(text: list?.attributes.name);
+        useTextEditingController(text: list?.get<CustomList>().attributes.name);
     final listNameChanged = useListenableSelector(
         listNameController,
         () => list != null
-            ? listNameController.text != list!.attributes.name
+            ? listNameController.text != list!.get<CustomList>().attributes.name
             : listNameController.text.isNotEmpty);
 
     final visibility = useState(list != null
-        ? list!.attributes.visibility
+        ? list!.get<CustomList>().attributes.visibility
         : CustomListVisibility.private);
 
     final pendingAction = useState<Future<bool>?>(null);
     final snapshot = useFuture(pendingAction.value);
 
-    final selected = useState<Set<String>>(list != null ? {...list!.set} : {});
+    final selected = useState<Set<String>>(
+        list != null ? {...list!.get<CustomList>().set} : {});
     final currentPage = useState(0);
 
     final titlesProvider = ref
@@ -133,9 +135,12 @@ class MangaDexEditListScreen extends HookConsumerWidget {
           ElevatedButton(
             style: Styles.buttonStyle(),
             onPressed: listNameChanged ||
-                    (list != null && !setEquals(selected.value, list!.set)) ||
                     (list != null &&
-                        visibility.value != list!.attributes.visibility)
+                        !setEquals(
+                            selected.value, list!.get<CustomList>().set)) ||
+                    (list != null &&
+                        visibility.value !=
+                            list!.get<CustomList>().attributes.visibility)
                 ? () async {
                     final messenger = ScaffoldMessenger.of(context);
 
@@ -258,7 +263,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 Expanded(
                   child: MangaListWidget(
                     title: Text(
-                      'Titles ${list != null ? '(${list!.set.length} > ${selected.value.length})' : '(${selected.value.length})'}',
+                      'Titles ${list != null ? '(${list!.get<CustomList>().set.length} > ${selected.value.length})' : '(${selected.value.length})'}',
                       style: const TextStyle(fontSize: 24),
                     ),
                     physics: const AlwaysScrollableScrollPhysics(),

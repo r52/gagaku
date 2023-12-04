@@ -81,7 +81,7 @@ class ProxyHandler {
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
-      return _cache.get<WebManga>(key, WebManga.fromJson);
+      return _cache.get(key, WebManga.fromJson).get<WebManga>();
     }
 
     final response = await _client.get(Uri.parse(url));
@@ -90,8 +90,10 @@ class ProxyHandler {
       final body = json.decode(response.body);
       final manga = WebManga.fromJson(body);
 
-      logger.d('CacheManager: caching entry $key');
-      _cache.put(key, body, true, const Duration(days: 1));
+      const expiry = Duration(days: 1);
+
+      logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
+      _cache.put(key, json.encode(manga.toJson()), manga, true, expiry: expiry);
 
       return manga;
     }
