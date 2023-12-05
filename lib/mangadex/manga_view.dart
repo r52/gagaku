@@ -143,18 +143,19 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
             return null;
           }(),
-        AsyncValue(:final value?) => value,
+        AsyncValue(valueOrNull: final data?) => data,
         _ => null,
       };
     }
 
-    final chapters = ref.watch(mangaChaptersProvider(manga));
-    final covers = ref.watch(mangaCoversProvider(manga));
-    final related = ref.watch(_fetchRelatedMangaProvider(manga));
+    final chapterProvider = ref.watch(mangaChaptersProvider(manga));
+    final coverProvider = ref.watch(mangaCoversProvider(manga));
+    final relatedProvider = ref.watch(_fetchRelatedMangaProvider(manga));
     final hasRelated = manga.related.isNotEmpty;
 
-    final isLoading =
-        chapters.isLoading || covers.isLoading || related.isLoading;
+    final isLoading = chapterProvider.isLoading ||
+        coverProvider.isLoading ||
+        relatedProvider.isLoading;
 
     String? lastvolchap;
 
@@ -747,11 +748,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   color: theme.cardColor,
                   child: Consumer(
                     builder: (context, ref, child) {
-                      final stats = ref.watch(statisticsProvider);
+                      final statsProvider = ref.watch(statisticsProvider);
                       return Wrap(
                         runSpacing: 4.0,
                         children: [
-                          ...switch (stats) {
+                          ...switch (statsProvider) {
                             // ignore: unused_local_variable
                             AsyncValue(:final error?, :final stackTrace?) => [
                                 const SizedBox(
@@ -761,8 +762,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   text: Text(statsError),
                                 )
                               ],
-                            AsyncValue(:final value?) => () {
-                                if (value.containsKey(manga.id)) {
+                            AsyncValue(valueOrNull: final stats?) => () {
+                                if (stats.containsKey(manga.id)) {
                                   return [
                                     IconTextChip(
                                       icon: const Icon(
@@ -776,7 +777,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         ],
                                       ),
                                       text: Text(
-                                        value[manga.id]
+                                        stats[manga.id]
                                                 ?.rating
                                                 .bayesian
                                                 .toStringAsFixed(2) ??
@@ -800,7 +801,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         size: 18,
                                       ),
                                       text: Text(
-                                        value[manga.id]?.follows.toString() ??
+                                        stats[manga.id]?.follows.toString() ??
                                             statsError,
                                       ),
                                     ),
@@ -1164,7 +1165,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               return Stack(
                 children: [
                   if (view.value == _ViewType.chapters)
-                    switch (chapters) {
+                    switch (chapterProvider) {
                       AsyncValue(:final error?, :final stackTrace?) => () {
                           final messenger = ScaffoldMessenger.of(context);
                           Styles.showErrorSnackBar(messenger, '$error');
@@ -1173,7 +1174,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                           return Styles.errorColumn(error, stackTrace);
                         }(),
-                      AsyncValue(:final value?) =>
+                      AsyncValue(valueOrNull: final chapters?) =>
                         NotificationListener<ScrollEndNotification>(
                           onNotification: onScrollNotification,
                           child: CustomScrollView(
@@ -1183,7 +1184,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   var lastChapIsSame = false;
                                   var nextChapIsSame = false;
 
-                                  final thischap = value.elementAt(index);
+                                  final thischap = chapters.elementAt(index);
                                   final chapbtn = ChapterButtonWidget(
                                     chapter: thischap,
                                     manga: manga,
@@ -1201,15 +1202,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   );
 
                                   if (index > 0) {
-                                    lastChapIsSame = value
+                                    lastChapIsSame = chapters
                                             .elementAt(index - 1)
                                             .attributes
                                             .chapter ==
                                         thischap.attributes.chapter;
                                   }
 
-                                  if (index < value.length - 1) {
-                                    nextChapIsSame = value
+                                  if (index < chapters.length - 1) {
+                                    nextChapIsSame = chapters
                                             .elementAt(index + 1)
                                             .attributes
                                             .chapter ==
@@ -1269,7 +1270,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     child: chapbtn,
                                   );
                                 },
-                                itemCount: value.length,
+                                itemCount: chapters.length,
                               )
                             ],
                           ),
@@ -1277,7 +1278,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       _ => const SizedBox.shrink(),
                     },
                   if (view.value == _ViewType.art)
-                    switch (covers) {
+                    switch (coverProvider) {
                       AsyncValue(:final error?, :final stackTrace?) => () {
                           final messenger = ScaffoldMessenger.of(context);
                           Styles.showErrorSnackBar(messenger, '$error');
@@ -1286,7 +1287,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                           return Styles.errorColumn(error, stackTrace);
                         }(),
-                      AsyncValue(:final value?) =>
+                      AsyncValue(valueOrNull: final covers?) =>
                         NotificationListener<ScrollEndNotification>(
                           onNotification: onScrollNotification,
                           child: CustomScrollView(
@@ -1300,7 +1301,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   childAspectRatio: 0.7,
                                 ),
                                 itemBuilder: (context, index) {
-                                  final cover = value.elementAt(index);
+                                  final cover = covers.elementAt(index);
                                   return _CoverArtItem(
                                     cover: cover,
                                     manga: manga,
@@ -1325,7 +1326,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                   (BuildContext context,
                                                       int id) {
                                                 final item =
-                                                    value.elementAt(id);
+                                                    covers.elementAt(id);
                                                 final url =
                                                     manga.getUrlFromCover(item);
                                                 Widget image =
@@ -1360,7 +1361,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                   return image;
                                                 }
                                               },
-                                              itemCount: value.length,
+                                              itemCount: covers.length,
                                               controller: PageController(
                                                 initialPage: index,
                                               ),
@@ -1372,7 +1373,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     },
                                   );
                                 },
-                                itemCount: value.length,
+                                itemCount: covers.length,
                               ),
                             ],
                           ),
@@ -1380,7 +1381,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       _ => const SizedBox.shrink(),
                     },
                   if (view.value == _ViewType.related)
-                    switch (related) {
+                    switch (relatedProvider) {
                       AsyncValue(:final error?, :final stackTrace?) => () {
                           final messenger = ScaffoldMessenger.of(context);
                           Styles.showErrorSnackBar(messenger, '$error');
@@ -1391,14 +1392,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                           return Styles.errorColumn(error, stackTrace);
                         }(),
-                      AsyncValue(:final value?) => MangaListWidget(
+                      AsyncValue(valueOrNull: final related?) =>
+                        MangaListWidget(
                           title: const Text(
                             'Related Titles',
                             style: TextStyle(fontSize: 24),
                           ),
                           noController: true,
                           children: [
-                            MangaListViewSliver(items: value),
+                            MangaListViewSliver(items: related),
                           ],
                         ),
                       _ => const SizedBox.shrink(),

@@ -42,8 +42,8 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     final controller = useTextEditingController();
     final debounce = useRef<Timer?>(null);
 
-    final results = ref.watch(mangaSearchProvider(filter));
-    final isLoading = results.isLoading && results.isReloading;
+    final searchProvider = ref.watch(mangaSearchProvider(filter));
+    final isLoading = searchProvider.isLoading && searchProvider.isReloading;
 
     final selected = useState<Set<String>>(selectedTitles ?? {});
 
@@ -161,7 +161,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
             ),
           ],
           children: [
-            switch (results) {
+            switch (searchProvider) {
               AsyncValue(:final error?, :final stackTrace?) => () {
                   final messenger = ScaffoldMessenger.of(context);
                   Styles.showErrorSnackBar(messenger, '$error');
@@ -172,10 +172,10 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                     child: Styles.errorColumn(error, stackTrace),
                   );
                 }(),
-              AsyncValue(:final value?) => () {
-                  if (value.isNotEmpty) {
+              AsyncValue(valueOrNull: final results?) => () {
+                  if (results.isNotEmpty) {
                     return MangaListViewSliver(
-                      items: value,
+                      items: results,
                       selectMode: selectMode,
                       selectButton: (manga) {
                         if (selected.value.contains(manga.id)) {
@@ -208,7 +208,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                   ),
                 ),
             },
-            if (!results.isLoading &&
+            if (!searchProvider.isLoading &&
                 !ref.watch(mangaSearchProvider(filter).notifier).isAtEnd())
               SliverToBoxAdapter(
                 child: Center(

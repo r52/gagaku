@@ -37,13 +37,13 @@ class MangaDexMangaFeed extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final results = ref.watch(_fetchMangaFeedProvider);
-    final isLoading = results.isLoading && !results.isRefreshing;
+    final feedProvider = ref.watch(_fetchMangaFeedProvider);
+    final isLoading = feedProvider.isLoading && !feedProvider.isRefreshing;
 
     return Center(
       child: Stack(
         children: [
-          switch (results) {
+          switch (feedProvider) {
             AsyncValue(:final error?, :final stackTrace?) => () {
                 final messenger = ScaffoldMessenger.of(context);
                 Styles.showErrorSnackBar(messenger, '$error');
@@ -58,8 +58,8 @@ class MangaDexMangaFeed extends ConsumerWidget {
                   child: Styles.errorList(error, stackTrace),
                 );
               }(),
-            AsyncValue(:final value?) => () {
-                if (value.isEmpty) {
+            AsyncValue(valueOrNull: final mangas?) => () {
+                if (mangas.isEmpty) {
                   return const Text('Find some manga to follow!');
                 }
 
@@ -74,7 +74,7 @@ class MangaDexMangaFeed extends ConsumerWidget {
                     onAtEdge: () =>
                         ref.read(latestChaptersFeedProvider.notifier).getMore(),
                     children: [
-                      MangaListViewSliver(items: value),
+                      MangaListViewSliver(items: mangas),
                     ],
                   ),
                 );

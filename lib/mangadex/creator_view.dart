@@ -98,8 +98,8 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = useScrollController();
     final theme = Theme.of(context);
-    final mangas = ref.watch(_fetchCreatorTitlesProvider(creator));
-    final isLoading = mangas.isLoading && !mangas.isRefreshing;
+    final titleProvider = ref.watch(_fetchCreatorTitlesProvider(creator));
+    final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
 
     Widget createLinkChip(String url, String text) {
       return ButtonChip(
@@ -115,7 +115,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
     return Scaffold(
         body: Stack(
       children: [
-        switch (mangas) {
+        switch (titleProvider) {
           AsyncValue(:final error?, :final stackTrace?) => () {
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$error');
@@ -131,8 +131,8 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                 child: Styles.errorList(error, stackTrace),
               );
             }(),
-          AsyncValue(:final value?) => () {
-              if (value.isEmpty) {
+          AsyncValue(valueOrNull: final mangas?) => () {
+              if (mangas.isEmpty) {
                 return const Text('No manga!');
               }
 
@@ -243,7 +243,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                       .read(creatorTitlesProvider(creator).notifier)
                       .getMore(),
                   children: [
-                    MangaListViewSliver(items: value),
+                    MangaListViewSliver(items: mangas),
                   ],
                 ),
               );

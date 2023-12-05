@@ -109,8 +109,8 @@ class MangaDexListsView extends HookConsumerWidget {
                       child: Styles.errorList(error, stackTrace),
                     );
                   }(),
-                AsyncValue(:final value?) => () {
-                    if (value.isEmpty) {
+                AsyncValue(valueOrNull: final lists?) => () {
+                    if (lists.isEmpty) {
                       return const Text('No lists!');
                     }
 
@@ -125,10 +125,10 @@ class MangaDexListsView extends HookConsumerWidget {
                           controller: controller,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.all(6),
-                          itemCount: value.length,
+                          itemCount: lists.length,
                           itemBuilder: (BuildContext context, int index) {
                             final messenger = ScaffoldMessenger.of(context);
-                            final listref = value.elementAt(index);
+                            final listref = lists.elementAt(index);
                             final item = listref.get<CustomList>();
 
                             return Card(

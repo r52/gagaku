@@ -217,7 +217,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       name = source;
     }
 
-    final pages = ref.watch(_getPagesProvider(source));
+    final pageProvider = ref.watch(_getPagesProvider(source));
 
     useEffect(() {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
@@ -233,7 +233,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       return () => timer.value?.cancel();
     }, []);
 
-    switch (pages) {
+    switch (pageProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
@@ -254,10 +254,10 @@ class WebSourceReaderWidget extends HookConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(:final value?):
+      case AsyncValue(valueOrNull: final pages?):
         return ReaderWidget(
-          pages: value,
-          pageCount: value.length,
+          pages: pages,
+          pageCount: pages.length,
           title: name,
           isLongStrip: false, // TODO longstrip
           link: link,

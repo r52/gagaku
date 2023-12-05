@@ -160,7 +160,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pages = ref.watch(_fetchChapterPagesProvider(chapter));
+    final pageProvider = ref.watch(_fetchChapterPagesProvider(chapter));
     final timer = useRef<Timer?>(null);
 
     useEffect(() {
@@ -186,7 +186,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       return () => timer.value?.cancel();
     }, [chapter]);
 
-    switch (pages) {
+    switch (pageProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
@@ -199,10 +199,10 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(:final value?):
+      case AsyncValue(valueOrNull: final pages?):
         return ReaderWidget(
-          pages: value,
-          pageCount: value.length,
+          pages: pages,
+          pageCount: pages.length,
           title: title,
           subtitle: manga.attributes.title.get('en'),
           isLongStrip: manga.longStrip,

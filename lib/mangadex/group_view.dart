@@ -257,12 +257,13 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
       _ViewType.titles => Consumer(
           key: const Key('/group?tab=titles'),
           builder: (context, ref, child) {
-            final mangas = ref.watch(_fetchGroupTitlesProvider(group));
-            final isLoading = mangas.isLoading && !mangas.isRefreshing;
+            final titleProvider = ref.watch(_fetchGroupTitlesProvider(group));
+            final isLoading =
+                titleProvider.isLoading && !titleProvider.isRefreshing;
 
             return Stack(
               children: [
-                switch (mangas) {
+                switch (titleProvider) {
                   AsyncValue(:final error?, :final stackTrace?) => () {
                       final messenger = ScaffoldMessenger.of(context);
                       Styles.showErrorSnackBar(messenger, '$error');
@@ -278,8 +279,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                         child: Styles.errorList(error, stackTrace),
                       );
                     }(),
-                  AsyncValue(:final value?) => () {
-                      if (value.isEmpty) {
+                  AsyncValue(valueOrNull: final mangas?) => () {
+                      if (mangas.isEmpty) {
                         return const Text('No manga!');
                       }
 
@@ -300,7 +301,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                               .read(groupTitlesProvider(group).notifier)
                               .getMore(),
                           children: [
-                            MangaListViewSliver(items: value),
+                            MangaListViewSliver(items: mangas),
                           ],
                         ),
                       );

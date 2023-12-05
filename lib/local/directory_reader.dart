@@ -76,7 +76,7 @@ class DirectoryReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pages = ref.watch(_getDirectoryPagesProvider(path));
+    final pageProvider = ref.watch(_getDirectoryPagesProvider(path));
     final theme = Theme.of(context);
 
     String strtitle = path;
@@ -85,7 +85,7 @@ class DirectoryReaderWidget extends ConsumerWidget {
       strtitle = title!;
     }
 
-    switch (pages) {
+    switch (pageProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
@@ -98,8 +98,8 @@ class DirectoryReaderWidget extends ConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(:final value?):
-        if (value.isEmpty) {
+      case AsyncValue(valueOrNull: final pages?):
+        if (pages.isEmpty) {
           return Scaffold(
             appBar: AppBar(
               leading: const BackButton(),
@@ -111,8 +111,8 @@ class DirectoryReaderWidget extends ConsumerWidget {
         }
 
         return ReaderWidget(
-          pages: value,
-          pageCount: value.length,
+          pages: pages,
+          pageCount: pages.length,
           title: strtitle,
           isLongStrip: false, // TODO longstrip
           link: link,

@@ -46,8 +46,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
-    final results = ref.watch(provider);
-    final isLoading = results.isLoading && !results.isRefreshing;
+    final resultProvider = ref.watch(provider);
+    final isLoading = resultProvider.isLoading && !resultProvider.isRefreshing;
 
     useEffect(() {
       void controllerAtEdge() {
@@ -64,7 +64,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
     }, [scrollController]);
 
     return Center(
-      child: switch (results) {
+      child: switch (resultProvider) {
         AsyncValue(:final error?, :final stackTrace?) => () {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');
@@ -76,8 +76,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
               child: Styles.errorList(error, stackTrace),
             );
           }(),
-        AsyncValue(:final value?) => () {
-            if (value.isEmpty) {
+        AsyncValue(valueOrNull: final results?) => () {
+            if (results.isEmpty) {
               return Text(emptyText ?? 'No results!');
             }
 
@@ -110,7 +110,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
                         physics: const AlwaysScrollableScrollPhysics(),
                         restorationId: restorationId,
                         padding: const EdgeInsets.all(6),
-                        itemCount: value.length,
+                        itemCount: results.length,
                         // itemExtentBuilder: (index, dimensions) {
                         //   // Crude, hardcoded way to calculate item extent,
                         //   // but immensely improves render performance
@@ -157,7 +157,8 @@ class ChapterFeedWidget extends HookConsumerWidget {
                         //   return extent;
                         // },
                         itemBuilder: (context, index) {
-                          return ChapterFeedItem(state: value.elementAt(index));
+                          return ChapterFeedItem(
+                              state: results.elementAt(index));
                         },
                       ),
                     ),
@@ -197,7 +198,7 @@ class ChapterFeedItem extends ConsumerWidget {
 
             return null;
           }(),
-        AsyncValue(:final value?) => value,
+        AsyncValue(valueOrNull: final data?) => data,
         _ => null,
       };
     }
@@ -825,7 +826,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final stats = ref.watch(statisticsProvider);
+    final statsProvider = ref.watch(statisticsProvider);
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -871,15 +872,15 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                         Wrap(
                           runSpacing: 4.0,
                           children: [
-                            ...switch (stats) {
+                            ...switch (statsProvider) {
                               // ignore: unused_local_variable
                               AsyncValue(:final error?, :final stackTrace?) => [
                                   const IconTextChip(
                                     text: Text(statsError),
                                   )
                                 ],
-                              AsyncValue(:final value?) => () {
-                                  if (value.containsKey(manga.id)) {
+                              AsyncValue(valueOrNull: final stats?) => () {
+                                  if (stats.containsKey(manga.id)) {
                                     return [
                                       IconTextChip(
                                         icon: const Icon(
@@ -893,7 +894,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                           ],
                                         ),
                                         text: Text(
-                                          value[manga.id]
+                                          stats[manga.id]
                                                   ?.rating
                                                   .bayesian
                                                   .toStringAsFixed(2) ??
@@ -917,7 +918,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                           size: 18,
                                         ),
                                         text: Text(
-                                          value[manga.id]?.follows.toString() ??
+                                          stats[manga.id]?.follows.toString() ??
                                               statsError,
                                         ),
                                       ),
@@ -994,7 +995,7 @@ class _ListMangaItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final stats = ref.watch(statisticsProvider);
+    final statsProvider = ref.watch(statisticsProvider);
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -1061,15 +1062,15 @@ class _ListMangaItem extends ConsumerWidget {
                   Wrap(
                     runSpacing: 4.0,
                     children: [
-                      ...switch (stats) {
+                      ...switch (statsProvider) {
                         // ignore: unused_local_variable
                         AsyncValue(:final error?, :final stackTrace?) => [
                             const IconTextChip(
                               text: Text(statsError),
                             )
                           ],
-                        AsyncValue(:final value?) => () {
-                            if (value.containsKey(manga.id)) {
+                        AsyncValue(valueOrNull: final stats?) => () {
+                            if (stats.containsKey(manga.id)) {
                               return [
                                 IconTextChip(
                                   icon: const Icon(
@@ -1083,7 +1084,7 @@ class _ListMangaItem extends ConsumerWidget {
                                     ],
                                   ),
                                   text: Text(
-                                    value[manga.id]
+                                    stats[manga.id]
                                             ?.rating
                                             .bayesian
                                             .toStringAsFixed(2) ??
@@ -1107,7 +1108,7 @@ class _ListMangaItem extends ConsumerWidget {
                                     size: 18,
                                   ),
                                   text: Text(
-                                    value[manga.id]?.follows.toString() ??
+                                    stats[manga.id]?.follows.toString() ??
                                         statsError,
                                   ),
                                 ),
