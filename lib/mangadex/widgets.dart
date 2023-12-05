@@ -197,9 +197,7 @@ class ChapterFeedItem extends ConsumerWidget {
 
             return null;
           }(),
-        AsyncValue(:final value?) => () {
-            return value;
-          }(),
+        AsyncValue(:final value?) => value,
         _ => null,
       };
     }

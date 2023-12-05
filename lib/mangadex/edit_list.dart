@@ -48,15 +48,16 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
 
     switch (list) {
       case AsyncData(:final value):
-        if (value == null) {
-          child = Center(
-            child: Text('Invalid listId $listId!'),
-          );
-        } else {
+        if (value != null) {
           return MangaDexEditListScreen(
             list: value,
           );
         }
+
+        child = Center(
+          child: Text('Invalid listId $listId!'),
+        );
+        break;
       case AsyncError(:final error, :final stackTrace):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');

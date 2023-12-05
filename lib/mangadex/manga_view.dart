@@ -143,9 +143,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
             return null;
           }(),
-        AsyncValue(:final value?) => () {
-            return value;
-          }(),
+        AsyncValue(:final value?) => value,
         _ => null,
       };
     }

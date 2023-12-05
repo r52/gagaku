@@ -98,15 +98,16 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
 
     switch (list) {
       case AsyncData(:final value):
-        if (value == null) {
-          return Center(
-            child: Text('List with ID $listId does not exist!'),
+        if (value != null) {
+          return MangaDexListViewWidget(
+            list: value,
           );
         }
 
-        return MangaDexListViewWidget(
-          list: value,
+        child = Center(
+          child: Text('List with ID $listId does not exist!'),
         );
+        break;
       case AsyncError(:final error, :final stackTrace):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');

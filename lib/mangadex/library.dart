@@ -50,9 +50,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
     Widget? paginator;
 
     switch (listProvider) {
-      case AsyncValue(:final valueOrNull?):
-        final list = valueOrNull;
-
+      case AsyncValue(valueOrNull: final list?):
         final titlesProvider =
             ref.watch(getMangaListByPageProvider(list, currentPage.value));
 
@@ -67,7 +65,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
         );
 
         child = switch (titlesProvider) {
-          AsyncValue(:final valueOrNull?) => RefreshIndicator(
+          AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
               onRefresh: () {
                 ref.read(userLibraryProvider.notifier).clear();
                 final lt = ref.read(libraryViewTypeProvider);
@@ -81,7 +79,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: controller,
                 children: [
-                  MangaListViewSliver(items: valueOrNull),
+                  MangaListViewSliver(items: mangas),
                 ],
               ),
             ),
@@ -89,7 +87,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$error');
               logger.e(
-                  "getMangaListByPageProvider(${valueOrNull.toString()}, ${currentPage.value}) failed",
+                  "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
                   error: error,
                   stackTrace: stackTrace);
 
@@ -119,7 +117,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
           child: Styles.errorList(error, stackTrace),
         );
         break;
-      default:
+      case _:
         child = Styles.listSpinner;
         break;
     }
