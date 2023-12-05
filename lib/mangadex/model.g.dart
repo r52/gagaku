@@ -21,7 +21,7 @@ final mangadexProvider = Provider<MangaDexModel>.internal(
 
 typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$getMangaListByPageHash() =>
-    r'cc3e8c47ec4b8e4fd8f65751a7c5a0e43700210d';
+    r'a0e31bd5226e46f7d9c3b9083875cf0aeecd6bcb';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -69,7 +69,7 @@ class GetMangaListByPageFamily extends Family {
 
   /// See also [getMangaListByPage].
   GetMangaListByPageProvider call(
-    Set<String> list,
+    Iterable<String> list,
     int page,
   ) {
     return GetMangaListByPageProvider(
@@ -117,7 +117,7 @@ class GetMangaListByPageProvider
     extends AutoDisposeFutureProvider<Iterable<Manga>> {
   /// See also [getMangaListByPage].
   GetMangaListByPageProvider(
-    Set<String> list,
+    Iterable<String> list,
     int page,
   ) : this._internal(
           (ref) => getMangaListByPage(
@@ -149,7 +149,7 @@ class GetMangaListByPageProvider
     required this.page,
   }) : super.internal();
 
-  final Set<String> list;
+  final Iterable<String> list;
   final int page;
 
   @override
@@ -173,7 +173,7 @@ class GetMangaListByPageProvider
 
   @override
   (
-    Set<String>,
+    Iterable<String>,
     int,
   ) get argument {
     return (
@@ -221,7 +221,7 @@ class GetMangaListByPageProvider
 
 mixin GetMangaListByPageRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
   /// The parameter `list` of this provider.
-  Set<String> get list;
+  Iterable<String> get list;
 
   /// The parameter `page` of this provider.
   int get page;
@@ -233,7 +233,7 @@ class _GetMangaListByPageProviderElement
   _GetMangaListByPageProviderElement(super.provider);
 
   @override
-  Set<String> get list => (origin as GetMangaListByPageProvider).list;
+  Iterable<String> get list => (origin as GetMangaListByPageProvider).list;
   @override
   int get page => (origin as GetMangaListByPageProvider).page;
 }
@@ -1200,189 +1200,22 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<ReadChaptersMap>;
-String _$userLibraryHash() => r'0226875ae56d1de3a5d63048dc2e3c5f8ba8f877';
-
-abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
-  late final MangaReadingStatus status;
-
-  FutureOr<Iterable<Manga>> build(
-    MangaReadingStatus status,
-  );
-}
+String _$userLibraryHash() => r'c6032a9cdb6ee4a4a766fb00c6f918a8e9fcc8f9';
 
 /// See also [UserLibrary].
 @ProviderFor(UserLibrary)
-const userLibraryProvider = UserLibraryFamily();
+final userLibraryProvider = AutoDisposeAsyncNotifierProvider<UserLibrary,
+    Map<String, MangaReadingStatus>>.internal(
+  UserLibrary.new,
+  name: r'userLibraryProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$userLibraryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-/// See also [UserLibrary].
-class UserLibraryFamily extends Family {
-  /// See also [UserLibrary].
-  const UserLibraryFamily();
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'userLibraryProvider';
-
-  /// See also [UserLibrary].
-  UserLibraryProvider call(
-    MangaReadingStatus status,
-  ) {
-    return UserLibraryProvider(
-      status,
-    );
-  }
-
-  @visibleForOverriding
-  @override
-  UserLibraryProvider getProviderOverride(
-    covariant UserLibraryProvider provider,
-  ) {
-    return call(
-      provider.status,
-    );
-  }
-
-  /// Enables overriding the behavior of this provider, no matter the parameters.
-  Override overrideWith(UserLibrary Function() create) {
-    return _$UserLibraryFamilyOverride(this, create);
-  }
-}
-
-class _$UserLibraryFamilyOverride implements FamilyOverride {
-  _$UserLibraryFamilyOverride(this.overriddenFamily, this.create);
-
-  final UserLibrary Function() create;
-
-  @override
-  final UserLibraryFamily overriddenFamily;
-
-  @override
-  UserLibraryProvider getProviderOverride(
-    covariant UserLibraryProvider provider,
-  ) {
-    return provider._copyWith(create);
-  }
-}
-
-/// See also [UserLibrary].
-class UserLibraryProvider
-    extends AsyncNotifierProviderImpl<UserLibrary, Iterable<Manga>> {
-  /// See also [UserLibrary].
-  UserLibraryProvider(
-    MangaReadingStatus status,
-  ) : this._internal(
-          () => UserLibrary()..status = status,
-          from: userLibraryProvider,
-          name: r'userLibraryProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$userLibraryHash,
-          dependencies: UserLibraryFamily._dependencies,
-          allTransitiveDependencies:
-              UserLibraryFamily._allTransitiveDependencies,
-          status: status,
-        );
-
-  UserLibraryProvider._internal(
-    super.create, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.status,
-  }) : super.internal();
-
-  final MangaReadingStatus status;
-
-  @override
-  FutureOr<Iterable<Manga>> runNotifierBuild(
-    covariant UserLibrary notifier,
-  ) {
-    return notifier.build(
-      status,
-    );
-  }
-
-  @override
-  Override overrideWith(UserLibrary Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: UserLibraryProvider._internal(
-        () => create()..status = status,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        status: status,
-      ),
-    );
-  }
-
-  @override
-  (MangaReadingStatus,) get argument {
-    return (status,);
-  }
-
-  @override
-  AsyncNotifierProviderElement<UserLibrary, Iterable<Manga>> createElement() {
-    return _UserLibraryProviderElement(this);
-  }
-
-  UserLibraryProvider _copyWith(
-    UserLibrary Function() create,
-  ) {
-    return UserLibraryProvider._internal(
-      () => create()..status = status,
-      name: name,
-      dependencies: dependencies,
-      allTransitiveDependencies: allTransitiveDependencies,
-      debugGetCreateSourceHash: debugGetCreateSourceHash,
-      from: from,
-      status: status,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is UserLibraryProvider && other.status == status;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, status.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin UserLibraryRef on AsyncNotifierProviderRef<Iterable<Manga>> {
-  /// The parameter `status` of this provider.
-  MangaReadingStatus get status;
-}
-
-class _UserLibraryProviderElement
-    extends AsyncNotifierProviderElement<UserLibrary, Iterable<Manga>>
-    with UserLibraryRef {
-  _UserLibraryProviderElement(super.provider);
-
-  @override
-  MangaReadingStatus get status => (origin as UserLibraryProvider).status;
-}
-
+typedef _$UserLibrary
+    = AutoDisposeAsyncNotifier<Map<String, MangaReadingStatus>>;
 String _$userListsHash() => r'520394fb69354ab7eb6eb2d96654fd020621bbd9';
 
 /// See also [UserLists].
@@ -1993,7 +1826,7 @@ final ratingsProvider =
 );
 
 typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
-String _$readingStatusHash() => r'4b85d356c66917d74f0fc4bc20554489ec17571c';
+String _$readingStatusHash() => r'3e4de5f6c7769b8f45ed120efeecdd4d96c36178';
 
 abstract class _$ReadingStatus
     extends BuildlessAsyncNotifier<MangaReadingStatus?> {

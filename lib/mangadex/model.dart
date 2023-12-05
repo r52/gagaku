@@ -2003,106 +2003,48 @@ class ReadChapters extends _$ReadChapters {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class UserLibrary extends _$UserLibrary {
-  int _total = 0;
-  int _offset = 0;
-  int _currentPage = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.searchLimit;
-
-  Future<Iterable<Manga>> _fetchUserLibrary() async {
+  Future<Map<String, MangaReadingStatus>> _fetchUserLibrary() async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
-      return [];
+      return {};
     }
 
     final api = ref.watch(mangadexProvider);
     final library = await api.fetchUserLibrary();
 
     if (library == null) {
-      return [];
+      return {};
     }
 
-    final results = library.entries
-        .where((element) => element.value == status)
-        .map((e) => e.key)
-        .toList();
-
-    _total = results.length;
-
-    if (_offset > _total) {
-      // No more items
-      return [];
-    }
-
-    final range = min(_total, _offset + limit);
-    final mangas = await api.fetchManga(
-        ids: results.getRange(_offset, range), limit: limit);
-
-    _currentPage += (range - _offset);
-
-    if (mangas.isNotEmpty) {
-      await ref.read(statisticsProvider.notifier).get(mangas);
-    }
-
-    return mangas;
-  }
-
-  Future<Iterable<Manga>> _fetchAndCheck() async {
-    final mangas = await _fetchUserLibrary();
-
-    if (mangas.isEmpty) {
-      _atEnd = true;
-    }
-
-    return mangas;
+    return library;
   }
 
   @override
-  FutureOr<Iterable<Manga>> build(MangaReadingStatus status) async {
-    return _fetchAndCheck();
+  FutureOr<Map<String, MangaReadingStatus>> build() async {
+    return _fetchUserLibrary();
   }
 
-  int total() {
-    return _total;
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
+  Future<void> set(Manga manga, MangaReadingStatus? status) async {
     final oldstate = await future;
-    // If there is more content, get more
-    if (_currentPage == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        _offset += limit;
-        final mangas = await _fetchAndCheck();
 
-        return [...oldstate, ...mangas];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      if (status == null) {
+        oldstate.remove(manga.id);
+      } else {
+        oldstate[manga.id] = status;
+      }
+
+      return {...oldstate};
+    });
   }
 
   /// Clears the list and refetch from the beginning
-  Future<void> clear(bool invalidate) async {
-    _offset = 0;
-    _atEnd = false;
-    _currentPage = 0;
-
-    if (invalidate) {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateCacheItem(CacheLists.library);
-    }
+  Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
+    await api.invalidateCacheItem(CacheLists.library);
 
     ref.invalidateSelf();
   }
@@ -2331,7 +2273,7 @@ class CustomListFeed extends _$CustomListFeed {
 
 @riverpod
 Future<Iterable<Manga>> getMangaListByPage(
-    GetMangaListByPageRef ref, Set<String> list, int page) async {
+    GetMangaListByPageRef ref, Iterable<String> list, int page) async {
   final start = page * MangaDexEndpoints.searchLimit;
   final end = min((page + 1) * MangaDexEndpoints.searchLimit, list.length);
 
@@ -2560,20 +2502,7 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
           status == MangaReadingStatus.remove ? null : status;
       bool success = await api.setMangaReadingStatus(manga, resolved);
       if (success) {
-        bool invalidate = true;
-
-        if (oldstate != null) {
-          await ref
-              .read(userLibraryProvider(oldstate).notifier)
-              .clear(invalidate);
-          invalidate = false;
-        }
-
-        if (resolved != null) {
-          await ref
-              .read(userLibraryProvider(resolved).notifier)
-              .clear(invalidate);
-        }
+        await ref.read(userLibraryProvider.notifier).set(manga, resolved);
 
         return resolved;
       }
