@@ -14,7 +14,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
     final auth = ref.watch(authControlProvider);
 
     switch (auth) {
-      case AsyncData(value: final loggedin):
+      case AsyncValue(valueOrNull: final loggedin?):
         if (loggedin) {
           return builder(context, ref);
         }
@@ -29,7 +29,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
             ),
           ),
         );
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         logger.e("authControlProvider failed",
             error: error, stackTrace: stackTrace);
         return Styles.errorColumn(error, stackTrace);

@@ -102,26 +102,26 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(_fetchChapterDataProvider(chapterId));
+    final dataProvider = ref.watch(_fetchChapterDataProvider(chapterId));
 
     Widget child;
 
-    switch (data) {
-      case AsyncData(:final value):
+    switch (dataProvider) {
+      case AsyncValue(valueOrNull: final data?):
         return MangaDexReaderWidget(
-          chapter: value.chapter,
-          manga: value.manga,
-          title: value.title,
+          chapter: data.chapter,
+          manga: data.manga,
+          title: data.title,
           link: Text(
-            value.manga.attributes.title.get('en'),
+            data.manga.attributes.title.get('en'),
             style: const TextStyle(fontSize: 18),
           ),
           onLinkPressed: () {
-            context.go('/title/${value.manga.id}', extra: value.manga);
+            context.go('/title/${data.manga.id}', extra: data.manga);
           },
           backRoute: '/',
         );
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchChapterDataProvider($chapterId) failed",

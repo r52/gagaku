@@ -108,7 +108,7 @@ class MangaDexHome extends HookConsumerWidget {
                   final auth = ref.watch(authControlProvider);
 
                   switch (auth) {
-                    case AsyncData(value: final loggedin):
+                    case AsyncValue(valueOrNull: final loggedin?):
                       // XXX: This changes when OAuth is released
                       Widget logbtn = Tooltip(
                         message: 'Login',
@@ -140,7 +140,7 @@ class MangaDexHome extends HookConsumerWidget {
                         ),
                         child: logbtn,
                       );
-                    case AsyncError(:final error, :final stackTrace):
+                    case AsyncValue(:final error?, :final stackTrace?):
                       final messenger = ScaffoldMessenger.of(context);
                       Styles.showErrorSnackBar(messenger, '$error');
                       logger.e("authControlProvider failed",

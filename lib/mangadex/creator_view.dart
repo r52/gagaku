@@ -61,16 +61,16 @@ class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final group = ref.watch(_fetchCreatorFromIdProvider(creatorId));
+    final creatorProvider = ref.watch(_fetchCreatorFromIdProvider(creatorId));
 
     Widget child;
 
-    switch (group) {
-      case AsyncData(:final value):
+    switch (creatorProvider) {
+      case AsyncValue(valueOrNull: final creator?):
         return MangaDexCreatorViewWidget(
-          creator: value,
+          creator: creator,
         );
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchCreatorFromIdProvider($creatorId) failed",

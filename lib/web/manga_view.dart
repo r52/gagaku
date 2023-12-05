@@ -75,21 +75,21 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
     final info = ProxyInfo(proxy: proxy, code: code);
-    final manga = ref.watch(_fetchWebMangaInfoProvider(info));
+    final mangaProvider = ref.watch(_fetchWebMangaInfoProvider(info));
 
     Widget child;
     PreferredSizeWidget? appBar;
 
-    switch (manga) {
-      case AsyncData(:final value):
+    switch (mangaProvider) {
+      case AsyncValue(valueOrNull: final manga?):
         child = RefreshIndicator(
           onRefresh: () async {
             await api.invalidateAll(info.getKey());
             return ref.refresh(_fetchWebMangaInfoProvider(info).future);
           },
-          child: WebMangaViewWidget(manga: value, info: info),
+          child: WebMangaViewWidget(manga: manga, info: info),
         );
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchWebMangaInfoProvider($proxy/$code) failed",

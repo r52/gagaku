@@ -92,13 +92,14 @@ class LocalLibraryHome extends StatelessWidget {
       body: HookConsumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
           final settings = ref.watch(localConfigProvider);
-          final result = ref.watch(localLibraryProvider);
-          final currentItem = useState<LocalLibraryItem?>(result.valueOrNull);
+          final libraryProvider = ref.watch(localLibraryProvider);
+          final currentItem =
+              useState<LocalLibraryItem?>(libraryProvider.valueOrNull);
 
           useEffect(() {
-            currentItem.value ??= result.valueOrNull;
+            currentItem.value ??= libraryProvider.valueOrNull;
             return null;
-          }, [result]);
+          }, [libraryProvider]);
 
           if (DeviceContext.isMobile() || settings.libraryDirectory.isEmpty) {
             return Center(
@@ -137,11 +138,11 @@ class LocalLibraryHome extends StatelessWidget {
             );
           }
 
-          switch (result) {
-            case AsyncData(:final value):
+          switch (libraryProvider) {
+            case AsyncValue(valueOrNull: final top?):
               Widget child;
 
-              if (value.children.isEmpty) {
+              if (top.children.isEmpty) {
                 child = Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -194,7 +195,7 @@ class LocalLibraryHome extends StatelessWidget {
                 onRefresh: () => ref.refresh(localLibraryProvider.future),
                 child: child,
               );
-            case AsyncError(:final error, :final stackTrace):
+            case AsyncValue(:final error?, :final stackTrace?):
               final messenger = ScaffoldMessenger.of(context);
               Styles.showErrorSnackBar(messenger, '$error');
               logger.e("localLibraryProvider failed",

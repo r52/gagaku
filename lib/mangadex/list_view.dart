@@ -92,15 +92,15 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(listByIdProvider(listId));
+    final listProvider = ref.watch(listByIdProvider(listId));
 
     Widget child;
 
-    switch (list) {
-      case AsyncData(:final value):
-        if (value != null) {
+    switch (listProvider) {
+      case AsyncValue(hasValue: true, valueOrNull: final list):
+        if (list != null) {
           return MangaDexListViewWidget(
-            list: value,
+            list: list,
           );
         }
 
@@ -108,7 +108,7 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
           child: Text('List with ID $listId does not exist!'),
         );
         break;
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchListFromIdProvider($listId) failed",

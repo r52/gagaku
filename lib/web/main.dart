@@ -17,7 +17,7 @@ class WebSourcesHome extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final urlFieldController = useTextEditingController();
     final scrollController = useScrollController();
-    final history = ref.watch(webSourceHistoryProvider);
+    final historyProvider = ref.watch(webSourceHistoryProvider);
 
     bool parseUrl(String url) {
       if (url.startsWith('https://imgur.com/a/')) {
@@ -152,9 +152,9 @@ class WebSourcesHome extends HookConsumerWidget {
         ],
       ),
       drawer: const MainDrawer(),
-      body: switch (history) {
-        AsyncData(:final value) => () {
-            if (value.isEmpty) {
+      body: switch (historyProvider) {
+        AsyncValue(valueOrNull: final history?) => () {
+            if (history.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -207,9 +207,9 @@ class WebSourcesHome extends HookConsumerWidget {
                     controller: scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(6),
-                    itemCount: value.length,
+                    itemCount: history.length,
                     itemBuilder: (context, index) {
-                      final item = value.elementAt(index);
+                      final item = history.elementAt(index);
                       return ListTile(
                         leading: const Icon(Icons.link),
                         trailing: IconButton(
@@ -243,7 +243,7 @@ class WebSourcesHome extends HookConsumerWidget {
               ],
             );
           }(),
-        AsyncError(:final error, :final stackTrace) =>
+        AsyncValue(:final error?, :final stackTrace?) =>
           Styles.errorColumn(error, stackTrace),
         _ => const Center(
             child: CircularProgressIndicator(),

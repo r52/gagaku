@@ -109,16 +109,16 @@ class QueriedMangaDexGroupViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final group = ref.watch(_fetchGroupFromIdProvider(groupId));
+    final groupProvider = ref.watch(_fetchGroupFromIdProvider(groupId));
 
     Widget child;
 
-    switch (group) {
-      case AsyncData(:final value):
+    switch (groupProvider) {
+      case AsyncValue(valueOrNull: final group?):
         return MangaDexGroupViewWidget(
-          group: value,
+          group: group,
         );
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchGroupFromIdProvider($groupId) failed",

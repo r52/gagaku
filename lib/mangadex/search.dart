@@ -262,7 +262,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final fil = useState(filter);
-    final tags = ref.watch(tagListProvider);
+    final tagsProvider = ref.watch(tagListProvider);
 
     const headingStyle = TextStyle(
       fontSize: 18,
@@ -312,8 +312,8 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
           )
         ],
       ),
-      body: switch (tags) {
-        AsyncData(:final value) => () {
+      body: switch (tagsProvider) {
+        AsyncValue(valueOrNull: final tags?) => () {
             final selectedFilters = [
               ...fil.value.includedTags.map(
                 (e) => InputChip(
@@ -476,7 +476,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                         group.formatted,
                         style: headingStyle,
                       ),
-                      children: value
+                      children: tags
                           .where((element) => element.attributes.group == group)
                           .map(
                             (e) => TriStateChip(
@@ -538,7 +538,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
               ),
             );
           }(),
-        AsyncError(:final error, :final stackTrace) => () {
+        AsyncValue(:final error?, :final stackTrace?) => () {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');
             logger.e("tagListProvider failed",

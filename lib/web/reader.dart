@@ -136,24 +136,24 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = ProxyInfo(
         proxy: proxy, code: code, chapter: chapter.replaceFirst('-', '.'));
-    final data = ref.watch(_fetchWebChapterInfoProvider(info));
+    final dataProvider = ref.watch(_fetchWebChapterInfoProvider(info));
 
     Widget child;
     PreferredSizeWidget? appBar;
 
-    switch (data) {
-      case AsyncData(:final value):
+    switch (dataProvider) {
+      case AsyncValue(valueOrNull: final data?):
         return WebSourceReaderWidget(
-          source: value.source,
-          manga: value.manga,
-          title: value.title,
-          link: value.link,
-          info: value.info,
-          readKey: value.readKey,
-          onLinkPressed: value.onLinkPressed,
+          source: data.source,
+          manga: data.manga,
+          title: data.title,
+          link: data.link,
+          info: data.info,
+          readKey: data.readKey,
+          onLinkPressed: data.onLinkPressed,
           backRoute: GagakuRoute.web,
         );
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchWebChapterInfoProvider($proxy/$code/$chapter) failed",

@@ -26,7 +26,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final cfg = ref.watch(mdConfigProvider);
     final config = useState(cfg);
-    final groups =
+    final groupDataProvider =
         ref.watch(_fetchGroupDataProvider(config.value.groupBlacklist));
 
     const spacing = 4.0;
@@ -229,11 +229,11 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
 
                 final children = <Widget>[];
 
-                switch (groups) {
-                  case AsyncData(:final value):
+                switch (groupDataProvider) {
+                  case AsyncValue(valueOrNull: final groups?):
                     for (final group in config.value.groupBlacklist) {
                       final groupInfo =
-                          value.firstWhere((element) => element.id == group);
+                          groups.firstWhere((element) => element.id == group);
                       children.add(InputChip(
                         label: Text(groupInfo.attributes.name),
                         onDeleted: () {
@@ -246,7 +246,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                       ));
                     }
                     break;
-                  case AsyncError(:final error, :final stackTrace):
+                  case AsyncValue(:final error?, :final stackTrace?):
                     final messenger = ScaffoldMessenger.of(context);
                     Styles.showErrorSnackBar(messenger, '$error');
                     logger.e("_fetchGroupDataProvider failed",

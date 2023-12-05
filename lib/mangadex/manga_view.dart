@@ -90,16 +90,16 @@ class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final manga = ref.watch(_fetchMangaFromIdProvider(mangaId));
+    final mangaProvider = ref.watch(_fetchMangaFromIdProvider(mangaId));
 
     Widget child;
 
-    switch (manga) {
-      case AsyncData(:final value):
+    switch (mangaProvider) {
+      case AsyncValue(valueOrNull: final manga?):
         return MangaDexMangaViewWidget(
-          manga: value,
+          manga: manga,
         );
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchMangaFromIdProvider($mangaId) failed",

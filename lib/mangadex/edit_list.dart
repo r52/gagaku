@@ -42,15 +42,15 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(listByIdProvider(listId));
+    final listProvider = ref.watch(listByIdProvider(listId));
 
     Widget child;
 
-    switch (list) {
-      case AsyncData(:final value):
-        if (value != null) {
+    switch (listProvider) {
+      case AsyncValue(hasValue: true, valueOrNull: final list):
+        if (list != null) {
           return MangaDexEditListScreen(
-            list: value,
+            list: list,
           );
         }
 
@@ -58,7 +58,7 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
           child: Text('Invalid listId $listId!'),
         );
         break;
-      case AsyncError(:final error, :final stackTrace):
+      case AsyncValue(:final error?, :final stackTrace?):
         final messenger = ScaffoldMessenger.of(context);
         Styles.showErrorSnackBar(messenger, '$error');
         logger.e("_fetchListFromIdProvider($listId) failed",
