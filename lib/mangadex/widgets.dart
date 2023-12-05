@@ -47,7 +47,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
     final results = ref.watch(provider);
-    final isLoading = results.isLoading;
+    final isLoading = results.isLoading && !results.isRefreshing;
 
     useEffect(() {
       void controllerAtEdge() {

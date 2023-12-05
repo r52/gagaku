@@ -38,7 +38,7 @@ class MangaDexMangaFeed extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final results = ref.watch(_fetchMangaFeedProvider);
-    final isLoading = results.isLoading;
+    final isLoading = results.isLoading && !results.isRefreshing;
 
     return Center(
       child: Stack(
@@ -52,7 +52,7 @@ class MangaDexMangaFeed extends ConsumerWidget {
 
                 return RefreshIndicator(
                   onRefresh: () {
-                    ref.invalidate(latestChaptersFeedProvider);
+                    ref.read(latestChaptersFeedProvider.notifier).clear();
                     return ref.refresh(_fetchMangaFeedProvider.future);
                   },
                   child: Styles.errorList(error, stackTrace),

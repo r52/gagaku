@@ -1553,13 +1553,10 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll(feedKey);
-      _offset = 0;
-      _atEnd = false;
-      return _fetchLatestChapters(_offset);
-    });
+    await api.invalidateAll(feedKey);
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -1621,13 +1618,10 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll(feedKey);
-      _offset = 0;
-      _atEnd = false;
-      return _fetchLatestChapters(_offset);
-    });
+    await api.invalidateAll(feedKey);
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -1688,13 +1682,10 @@ class GroupFeed extends _$GroupFeed {
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('$feedKey(${group.id}');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchChapters(_offset);
-    });
+    await api.invalidateAll('$feedKey(${group.id}');
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -1748,12 +1739,9 @@ class GroupTitles extends _$GroupTitles {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      return _fetchManga(_offset);
-    });
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -1807,12 +1795,9 @@ class CreatorTitles extends _$CreatorTitles {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      return _fetchManga(_offset);
-    });
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -1874,13 +1859,10 @@ class MangaChapters extends _$MangaChapters {
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('$feedKey(${manga.id}');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchMangaChapters(_offset);
-    });
+    await api.invalidateAll('$feedKey(${manga.id}');
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -1933,13 +1915,10 @@ class MangaCovers extends _$MangaCovers {
 
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('getCoverList(${manga.id}');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchCovers(_offset);
-    });
+    await api.invalidateAll('CoverList(${manga.id}');
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -2116,19 +2095,16 @@ class UserLibrary extends _$UserLibrary {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear(bool invalidate) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      _currentPage = 0;
+    _offset = 0;
+    _atEnd = false;
+    _currentPage = 0;
 
-      if (invalidate) {
-        final api = ref.watch(mangadexProvider);
-        await api.invalidateCacheItem(CacheLists.library);
-      }
+    if (invalidate) {
+      final api = ref.watch(mangadexProvider);
+      await api.invalidateCacheItem(CacheLists.library);
+    }
 
-      return _fetchAndCheck();
-    });
+    ref.invalidateSelf();
   }
 }
 
@@ -2283,12 +2259,9 @@ class UserLists extends _$UserLists {
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      return _fetch(_offset);
-    });
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
@@ -2349,13 +2322,10 @@ class CustomListFeed extends _$CustomListFeed {
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('$feedKey(${list.id}');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchChapters(_offset);
-    });
+    await api.invalidateAll('$feedKey(${list.id}');
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
   }
 }
 

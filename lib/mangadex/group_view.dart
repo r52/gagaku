@@ -258,7 +258,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
           key: const Key('/group?tab=titles'),
           builder: (context, ref, child) {
             final mangas = ref.watch(_fetchGroupTitlesProvider(group));
-            final isLoading = ref.watch(groupTitlesProvider(group)).isLoading;
+            final isLoading = mangas.isLoading && !mangas.isRefreshing;
 
             return Stack(
               children: [
@@ -271,7 +271,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
                       return RefreshIndicator(
                         onRefresh: () {
-                          ref.invalidate(groupTitlesProvider(group));
+                          ref.read(groupTitlesProvider(group).notifier).clear();
                           return ref
                               .refresh(_fetchGroupTitlesProvider(group).future);
                         },

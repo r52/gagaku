@@ -99,7 +99,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
     final scrollController = useScrollController();
     final theme = Theme.of(context);
     final mangas = ref.watch(_fetchCreatorTitlesProvider(creator));
-    final isLoading = ref.watch(creatorTitlesProvider(creator)).isLoading;
+    final isLoading = mangas.isLoading && !mangas.isRefreshing;
 
     Widget createLinkChip(String url, String text) {
       return ButtonChip(
@@ -124,7 +124,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
 
               return RefreshIndicator(
                 onRefresh: () {
-                  ref.invalidate(creatorTitlesProvider(creator));
+                  ref.read(creatorTitlesProvider(creator).notifier).clear();
                   return ref
                       .refresh(_fetchCreatorTitlesProvider(creator).future);
                 },
