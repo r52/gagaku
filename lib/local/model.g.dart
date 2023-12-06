@@ -6,7 +6,7 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$localLibraryHash() => r'402c2505ca34ce97b70a339d75bc5e3f30247006';
+String _$localLibraryHash() => r'72d7fe7f78b4d7c1c4e5a3ad08e03726a53c6ebd';
 
 /// See also [LocalLibrary].
 @ProviderFor(LocalLibrary)
@@ -21,7 +21,7 @@ final localLibraryProvider =
 );
 
 typedef _$LocalLibrary = AsyncNotifier<LocalLibraryItem>;
-String _$supportedFormatsHash() => r'18defcada507d1345ffeb4eaf581288668918bdc';
+String _$supportedFormatsHash() => r'3840c7ebd8357ef2b7163a74cb1335481d03be80';
 
 /// See also [SupportedFormats].
 @ProviderFor(SupportedFormats)

@@ -1490,7 +1490,7 @@ class MangaDexModel {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class LatestChaptersFeed extends _$LatestChaptersFeed {
   int _offset = 0;
   bool _atEnd = false;
@@ -1516,7 +1516,7 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
   }
 
   @override
-  FutureOr<List<Chapter>> build() async {
+  Future<List<Chapter>> build() async {
     return _fetchLatestChapters(0);
   }
 
@@ -1560,7 +1560,7 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class LatestGlobalFeed extends _$LatestGlobalFeed {
   int _offset = 0;
   bool _atEnd = false;
@@ -1581,7 +1581,7 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
   }
 
   @override
-  FutureOr<List<Chapter>> build() async {
+  Future<List<Chapter>> build() async {
     return _fetchLatestChapters(0);
   }
 
@@ -1625,7 +1625,7 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class GroupFeed extends _$GroupFeed {
   int _offset = 0;
   bool _atEnd = false;
@@ -1646,7 +1646,7 @@ class GroupFeed extends _$GroupFeed {
   }
 
   @override
-  FutureOr<List<Chapter>> build(Group group) async {
+  Future<List<Chapter>> build(Group group) async {
     return _fetchChapters(0);
   }
 
@@ -1689,7 +1689,7 @@ class GroupFeed extends _$GroupFeed {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class GroupTitles extends _$GroupTitles {
   int _offset = 0;
   bool _atEnd = false;
@@ -1704,7 +1704,7 @@ class GroupTitles extends _$GroupTitles {
   }
 
   @override
-  FutureOr<List<Manga>> build(Group group) async {
+  Future<List<Manga>> build(Group group) async {
     return _fetchManga(0);
   }
 
@@ -1745,7 +1745,7 @@ class GroupTitles extends _$GroupTitles {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class CreatorTitles extends _$CreatorTitles {
   int _offset = 0;
   bool _atEnd = false;
@@ -1760,7 +1760,7 @@ class CreatorTitles extends _$CreatorTitles {
   }
 
   @override
-  FutureOr<List<Manga>> build(CreatorType creator) async {
+  Future<List<Manga>> build(CreatorType creator) async {
     return _fetchManga(0);
   }
 
@@ -1801,8 +1801,8 @@ class CreatorTitles extends _$CreatorTitles {
   }
 }
 
-@Riverpod(keepAlive: true)
-class MangaChapters extends _$MangaChapters {
+@riverpod
+class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix {
   int _offset = 0;
   bool _atEnd = false;
   static const feedKey = 'MangaChapters';
@@ -1819,11 +1819,13 @@ class MangaChapters extends _$MangaChapters {
       orderKey: 'chapter',
     );
 
+    disposeAfter(const Duration(minutes: 5));
+
     return chapters.toList();
   }
 
   @override
-  FutureOr<List<Chapter>> build(Manga manga) async {
+  Future<List<Chapter>> build(Manga manga) async {
     return _fetchMangaChapters(0);
   }
 
@@ -1866,8 +1868,8 @@ class MangaChapters extends _$MangaChapters {
   }
 }
 
-@Riverpod(keepAlive: true)
-class MangaCovers extends _$MangaCovers {
+@riverpod
+class MangaCovers extends _$MangaCovers with AutoDisposeExpiryMix {
   int _offset = 0;
   bool _atEnd = false;
   static const limit = MangaDexEndpoints.searchLimit;
@@ -1876,11 +1878,13 @@ class MangaCovers extends _$MangaCovers {
     final api = ref.watch(mangadexProvider);
     final covers = await api.getCoverList(manga, limit: limit, offset: offset);
 
+    disposeAfter(const Duration(minutes: 5));
+
     return covers.toList();
   }
 
   @override
-  FutureOr<List<CoverArt>> build(Manga manga) async {
+  Future<List<CoverArt>> build(Manga manga) async {
     return _fetchCovers(0);
   }
 
@@ -1936,7 +1940,7 @@ class ReadChapters extends _$ReadChapters {
   }
 
   @override
-  FutureOr<ReadChaptersMap> build() async {
+  Future<ReadChaptersMap> build() async {
     return {};
   }
 
@@ -2004,8 +2008,9 @@ class ReadChapters extends _$ReadChapters {
 }
 
 @riverpod
-class UserLibrary extends _$UserLibrary {
-  Future<Map<String, MangaReadingStatus>> _fetchUserLibrary() async {
+class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
+  @override
+  Future<Map<String, MangaReadingStatus>> build() async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return {};
@@ -2018,12 +2023,9 @@ class UserLibrary extends _$UserLibrary {
       return {};
     }
 
-    return library;
-  }
+    disposeAfter(const Duration(minutes: 5));
 
-  @override
-  FutureOr<Map<String, MangaReadingStatus>> build() async {
-    return _fetchUserLibrary();
+    return library;
   }
 
   Future<void> set(Manga manga, MangaReadingStatus? status) async {
@@ -2050,8 +2052,8 @@ class UserLibrary extends _$UserLibrary {
   }
 }
 
-@Riverpod(keepAlive: true)
-class UserLists extends _$UserLists {
+@riverpod
+class UserLists extends _$UserLists with AutoDisposeExpiryMix {
   int _offset = 0;
   bool _atEnd = false;
   static const limit = MangaDexEndpoints.breakLimit;
@@ -2065,11 +2067,13 @@ class UserLists extends _$UserLists {
     final api = ref.watch(mangadexProvider);
     final lists = await api.fetchUserList(limit: limit, offset: offset);
 
+    disposeAfter(const Duration(minutes: 5));
+
     return lists.toList();
   }
 
   @override
-  FutureOr<List<CRef>> build() async {
+  Future<List<CRef>> build() async {
     return _fetch(0);
   }
 
@@ -2228,7 +2232,7 @@ class CustomListFeed extends _$CustomListFeed {
   }
 
   @override
-  FutureOr<List<Chapter>> build(CustomList list) async {
+  Future<List<Chapter>> build(CustomList list) async {
     return _fetchChapters(0);
   }
 
@@ -2291,27 +2295,25 @@ Future<Iterable<Manga>> getMangaListByPage(
 @riverpod
 class ListById extends _$ListById {
   @override
-  FutureOr<CRef?> build(String listId) async {
+  Future<CRef?> build(String listId) async {
     final api = ref.watch(mangadexProvider);
     final list = await api.fetchListById(listId);
     return list;
   }
 }
 
-@Riverpod(keepAlive: true)
-class TagList extends _$TagList {
+@riverpod
+class TagList extends _$TagList with AutoDisposeExpiryMix {
   ///Fetch the global tag list
-  Future<Iterable<Tag>> _fetchTagList() async {
+  @override
+  Future<Iterable<Tag>> build() async {
     final api = ref.watch(mangadexProvider);
 
     final list = await api.getTagList();
 
-    return list;
-  }
+    disposeAfter(const Duration(minutes: 5));
 
-  @override
-  FutureOr<Iterable<Tag>> build() async {
-    return _fetchTagList();
+    return list;
   }
 }
 
@@ -2335,7 +2337,7 @@ class MangaSearch extends _$MangaSearch {
   }
 
   @override
-  FutureOr<List<Manga>> build(MangaSearchParameters params) async {
+  Future<List<Manga>> build(MangaSearchParameters params) async {
     return _searchManga();
   }
 
@@ -2384,7 +2386,7 @@ class Statistics extends _$Statistics {
   }
 
   @override
-  FutureOr<Map<String, MangaStatistics>> build() async {
+  Future<Map<String, MangaStatistics>> build() async {
     return {};
   }
 
@@ -2414,7 +2416,7 @@ class Ratings extends _$Ratings {
   }
 
   @override
-  FutureOr<Map<String, SelfRating>> build() async {
+  Future<Map<String, SelfRating>> build() async {
     return {};
   }
 
@@ -2467,9 +2469,10 @@ class Ratings extends _$Ratings {
   }
 }
 
-@Riverpod(keepAlive: true)
-class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
-  Future<MangaReadingStatus?> _fetchReadingStatus() async {
+@riverpod
+class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
+  @override
+  Future<MangaReadingStatus?> build(Manga manga) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return null;
@@ -2478,14 +2481,9 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaReadingStatus(manga);
 
-    staleTime(const Duration(minutes: 10));
+    disposeAfter(const Duration(minutes: 5));
 
     return status;
-  }
-
-  @override
-  FutureOr<MangaReadingStatus?> build(Manga manga) async {
-    return _fetchReadingStatus();
   }
 
   Future<void> set(MangaReadingStatus? status) async {
@@ -2502,7 +2500,9 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
           status == MangaReadingStatus.remove ? null : status;
       bool success = await api.setMangaReadingStatus(manga, resolved);
       if (success) {
-        await ref.read(userLibraryProvider.notifier).set(manga, resolved);
+        if (ref.exists(userLibraryProvider)) {
+          await ref.read(userLibraryProvider.notifier).set(manga, resolved);
+        }
 
         return resolved;
       }
@@ -2512,9 +2512,10 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
   }
 }
 
-@Riverpod(keepAlive: true)
-class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
-  Future<bool> _fetchFollowingStatus() async {
+@riverpod
+class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
+  @override
+  Future<bool> build(Manga manga) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return false;
@@ -2523,14 +2524,9 @@ class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaFollowing(manga);
 
-    staleTime(const Duration(minutes: 10));
+    disposeAfter(const Duration(minutes: 5));
 
     return status;
-  }
-
-  @override
-  FutureOr<bool> build(Manga manga) async {
-    return _fetchFollowingStatus();
   }
 
   Future<void> set(bool following) async {
@@ -2555,9 +2551,10 @@ class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
 
 @Riverpod(keepAlive: true)
 class MangaDexHistory extends _$MangaDexHistory {
-  final _numItems = 50;
+  static const _numItems = 50;
 
-  Future<Queue<Chapter>> _fetch() async {
+  @override
+  Future<Queue<Chapter>> build() async {
     final box = Hive.box(gagakuBox);
     final str = box.get('mangadex_history');
 
@@ -2572,11 +2569,6 @@ class MangaDexHistory extends _$MangaDexHistory {
     final chapters = await api.fetchChapters(uuids);
 
     return Queue.of(chapters);
-  }
-
-  @override
-  FutureOr<Queue<Chapter>> build() async {
-    return _fetch();
   }
 
   Future<void> add(Chapter chapter) async {
@@ -2607,7 +2599,8 @@ class MangaDexHistory extends _$MangaDexHistory {
 
 @Riverpod(keepAlive: true)
 class LoggedUser extends _$LoggedUser {
-  Future<User?> _fetchLoggedUser() async {
+  @override
+  Future<User?> build() async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return null;
@@ -2618,18 +2611,13 @@ class LoggedUser extends _$LoggedUser {
 
     return user;
   }
-
-  @override
-  FutureOr<User?> build() async {
-    return _fetchLoggedUser();
-  }
 }
 
 @riverpod
-class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
+class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
   Future<void> invalidate() async {
     state = await AsyncValue.guard(() async {
-      return await _build();
+      return build();
     });
   }
 
@@ -2647,7 +2635,8 @@ class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
     }
   }
 
-  Future<bool> _build() async {
+  @override
+  Future<bool> build() async {
     final api = ref.watch(mangadexProvider);
     await api.future;
 
@@ -2658,12 +2647,7 @@ class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
 
     await _setStaleTime();
 
-    return await api.loggedIn();
-  }
-
-  @override
-  FutureOr<bool> build() async {
-    return await _build();
+    return api.loggedIn();
   }
 
   Future<bool> login(

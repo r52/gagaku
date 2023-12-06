@@ -257,7 +257,6 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       case AsyncValue(valueOrNull: final pages?):
         return ReaderWidget(
           pages: pages,
-          pageCount: pages.length,
           title: name,
           isLongStrip: false, // TODO longstrip
           link: link,

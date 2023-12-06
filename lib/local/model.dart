@@ -149,7 +149,7 @@ class LocalLibrary extends _$LocalLibrary {
   }
 
   @override
-  FutureOr<LocalLibraryItem> build() async {
+  Future<LocalLibraryItem> build() async {
     return _scanLibrary();
   }
 
@@ -172,7 +172,7 @@ class FormatInfo {
 @Riverpod(keepAlive: true)
 class SupportedFormats extends _$SupportedFormats {
   @override
-  FutureOr<FormatInfo> build() async {
+  Future<FormatInfo> build() async {
     bool avif = false;
 
     final deviceInfo = DeviceInfoPlugin();

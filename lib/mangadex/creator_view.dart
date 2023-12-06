@@ -49,7 +49,7 @@ Future<Iterable<Manga>> _fetchCreatorTitles(
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
   await ref.watch(statisticsProvider.notifier).get(mangas);
 
-  ref.keepAlive();
+  ref.disposeAfter(const Duration(minutes: 5));
 
   return mangas;
 }

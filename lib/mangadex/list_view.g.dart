@@ -6,7 +6,7 @@ part of 'list_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchListFeedHash() => r'4f41c43146a989372ae39f7c0fe479fea35adece';
+String _$fetchListFeedHash() => r'c366a9133d58190b00e0a7a97bde88b036c47461';
 
 /// Copied from Dart SDK
 class _SystemHash {

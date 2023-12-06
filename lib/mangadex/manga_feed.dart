@@ -4,6 +4,7 @@ import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -22,7 +23,7 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
 
-  ref.keepAlive();
+  ref.disposeAfter(const Duration(minutes: 5));
 
   return mangas;
 }

@@ -369,7 +369,7 @@ class _FetchReadChaptersRedunProviderElement
   Manga get manga => (origin as _FetchReadChaptersRedunProvider).manga;
 }
 
-String _$fetchRelatedMangaHash() => r'f598239af8912129cc7c170b59e75f616322ff59';
+String _$fetchRelatedMangaHash() => r'c9b5eae144026d0d3745d49df81d2b9c4842dc73';
 
 /// See also [_fetchRelatedManga].
 @ProviderFor(_fetchRelatedManga)

@@ -112,11 +112,11 @@ class DirectoryReaderWidget extends ConsumerWidget {
 
         return ReaderWidget(
           pages: pages,
-          pageCount: pages.length,
           title: strtitle,
           isLongStrip: false, // TODO longstrip
           link: link,
           onLinkPressed: onLinkPressed,
+          precache: false,
         );
       case _:
         return Center(

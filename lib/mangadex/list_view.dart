@@ -80,7 +80,7 @@ Future<List<ChapterFeedItemData>> _fetchListFeed(
     }
   }
 
-  ref.keepAlive();
+  ref.disposeAfter(const Duration(minutes: 5));
 
   return dlist;
 }

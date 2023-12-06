@@ -86,7 +86,7 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(
     }
   }
 
-  ref.keepAlive();
+  ref.disposeAfter(const Duration(minutes: 5));
 
   return dlist;
 }
@@ -97,7 +97,7 @@ Future<Iterable<Manga>> _fetchGroupTitles(
   final mangas = await ref.watch(groupTitlesProvider(group).future);
   await ref.watch(statisticsProvider.notifier).get(mangas);
 
-  ref.keepAlive();
+  ref.disposeAfter(const Duration(minutes: 5));
 
   return mangas;
 }

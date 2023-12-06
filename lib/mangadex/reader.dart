@@ -202,7 +202,6 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       case AsyncValue(valueOrNull: final pages?):
         return ReaderWidget(
           pages: pages,
-          pageCount: pages.length,
           title: title,
           subtitle: manga.attributes.title.get('en'),
           isLongStrip: manga.longStrip,

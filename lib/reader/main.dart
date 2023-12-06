@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -17,7 +19,6 @@ class ReaderWidget extends HookConsumerWidget {
   const ReaderWidget({
     super.key,
     required this.pages,
-    required this.pageCount,
     required this.title,
     this.subtitle,
     required this.isLongStrip,
@@ -28,7 +29,6 @@ class ReaderWidget extends HookConsumerWidget {
   });
 
   final Iterable<ReaderPage> pages;
-  final int pageCount;
   final String title;
   final String? subtitle;
   final bool isLongStrip;
@@ -71,6 +71,7 @@ class ReaderWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final pageCount = pages.length;
     final mediaContext = MediaQuery.of(context);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
@@ -127,47 +128,52 @@ class ReaderWidget extends HookConsumerWidget {
       });
     }
 
-    useEffect(() {
-      void scaleStateListener(PhotoViewScaleState value) {
-        currentImageScale.value = value;
+    void scaleStateListener(PhotoViewScaleState value) {
+      currentImageScale.value = value;
+    }
+
+    void pageCallback() {
+      if (pageController.page != null) {
+        currentPage.value = pageController.page!.toInt();
+
+        cachePages();
+
+        subtext.value = subtitle ?? pages.elementAt(currentPage.value).sortKey;
       }
+    }
+
+    void listPosCb() {
+      final positions = itemPositionsListener.itemPositions.value;
+
+      final min = _getListViewFirstShownPage(positions);
+
+      if (min != null) {
+        currentPage.value = min.index;
+
+        cachePages();
+      }
+    }
+
+    useEffect(() {
+      final subs = <StreamSubscription<PhotoViewScaleState>>[];
 
       for (final c in scaleStateController) {
-        c.outputScaleStateStream.listen(scaleStateListener);
+        subs.add(c.outputScaleStateStream.listen(scaleStateListener));
       }
 
-      return null;
+      return () {
+        for (final s in subs) {
+          s.cancel();
+        }
+      };
     }, []);
 
     useEffect(() {
-      void pageCallback() {
-        if (pageController.page != null) {
-          currentPage.value = pageController.page!.toInt();
-
-          cachePages();
-
-          subtext.value =
-              subtitle ?? pages.elementAt(currentPage.value).sortKey;
-        }
-      }
-
       pageController.addListener(pageCallback);
       return () => pageController.removeListener(pageCallback);
     }, [pageController, settings]);
 
     useEffect(() {
-      void listPosCb() {
-        final positions = itemPositionsListener.itemPositions.value;
-
-        final min = _getListViewFirstShownPage(positions);
-
-        if (min != null) {
-          currentPage.value = min.index;
-
-          cachePages();
-        }
-      }
-
       itemPositionsListener.itemPositions.addListener(listPosCb);
       return () =>
           itemPositionsListener.itemPositions.removeListener(listPosCb);

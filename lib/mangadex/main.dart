@@ -23,7 +23,8 @@ class MangaDexHome extends HookConsumerWidget {
     final lifecycle = useAppLifecycleState();
 
     useEffect(() {
-      if (lifecycle == AppLifecycleState.resumed) {
+      if (lifecycle == AppLifecycleState.resumed &&
+          ref.exists(authControlProvider)) {
         ref.read(authControlProvider.notifier).invalidate();
       }
       return null;

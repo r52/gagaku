@@ -5,6 +5,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 mixin ExpiringData {
@@ -76,7 +77,7 @@ class DeviceContext {
   }
 }
 
-mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
+mixin AutoDisposeExpiryMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
   Timer? _staleTimer;
   DateTime? _expiry;
 
@@ -84,6 +85,7 @@ mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
     _staleTimer?.cancel();
   }
 
+  /// Invalidates the provider after [expiry]
   void staleTime(Duration expiry) {
     _staleTimer?.cancel();
 
@@ -98,6 +100,30 @@ mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
         logger.d('${runtimeType.toString()}: staleTime expiry');
         ref.invalidateSelf();
       }
+    });
+
+    ref.onDispose(() {
+      logger.d('${runtimeType.toString()}: disposed');
+      _staleTimer?.cancel();
+    });
+  }
+
+  /// Keeps the provider alive for [duration] after pause
+  void disposeAfter(Duration duration) {
+    _staleTimer?.cancel();
+
+    final link = ref.keepAlive();
+
+    ref.onCancel(() {
+      _staleTimer = Timer(duration, () {
+        logger.d(
+            '${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+        link.close();
+      });
+    });
+
+    ref.onResume(() {
+      _staleTimer?.cancel();
     });
 
     ref.onDispose(() {
@@ -107,7 +133,7 @@ mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
   }
 }
 
-mixin AsyncNotifierMix<T> on BuildlessAsyncNotifier<T> {
+mixin ExpiryMix<T> on BuildlessAsyncNotifier<T> {
   Timer? _staleTimer;
   DateTime? _expiry;
 
@@ -115,6 +141,7 @@ mixin AsyncNotifierMix<T> on BuildlessAsyncNotifier<T> {
     _staleTimer?.cancel();
   }
 
+  /// Invalidates the provider after [expiry]
   void staleTime(Duration expiry) {
     _staleTimer?.cancel();
 
@@ -134,6 +161,62 @@ mixin AsyncNotifierMix<T> on BuildlessAsyncNotifier<T> {
     ref.onDispose(() {
       logger.d('${runtimeType.toString()}: disposed');
       _staleTimer?.cancel();
+    });
+  }
+
+  /// Keeps the provider alive for [duration] after pause
+  void disposeAfter(Duration duration) {
+    _staleTimer?.cancel();
+
+    ref.onCancel(() {
+      _staleTimer = Timer(duration, () {
+        logger.d(
+            '${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+        ref.invalidateSelf();
+      });
+    });
+
+    ref.onResume(() {
+      _staleTimer?.cancel();
+    });
+
+    ref.onDispose(() {
+      logger.d('${runtimeType.toString()}: disposed');
+      _staleTimer?.cancel();
+    });
+  }
+}
+
+// From riverpod doc https://riverpod.dev/docs/essentials/auto_dispose
+extension CacheForExtension on AutoDisposeRef<Object?> {
+  /// Keeps the provider alive for [duration].
+  void cacheFor(Duration duration) {
+    // Immediately prevent the state from getting destroyed.
+    final link = keepAlive();
+    // After duration has elapsed, we re-enable automatic disposal.
+    final timer = Timer(duration, link.close);
+
+    // Optional: when the provider is recomputed (such as with ref.watch),
+    // we cancel the pending timer.
+    onDispose(timer.cancel);
+  }
+
+  /// Keeps the provider alive for [duration] after pause
+  void disposeAfter(Duration duration) {
+    Timer? timer;
+
+    final link = keepAlive();
+
+    onCancel(() {
+      timer = Timer(duration, link.close);
+    });
+
+    onResume(() {
+      timer?.cancel();
+    });
+
+    onDispose(() {
+      timer?.cancel();
     });
   }
 }

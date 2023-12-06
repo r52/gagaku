@@ -239,12 +239,12 @@ class _GetMangaListByPageProviderElement
 }
 
 String _$latestChaptersFeedHash() =>
-    r'a566940690ce4e1a90031f045d9359b05b9ab41e';
+    r'0074fd45b0038212acec33db7984c23151bffd23';
 
 /// See also [LatestChaptersFeed].
 @ProviderFor(LatestChaptersFeed)
-final latestChaptersFeedProvider =
-    AsyncNotifierProvider<LatestChaptersFeed, List<Chapter>>.internal(
+final latestChaptersFeedProvider = AutoDisposeAsyncNotifierProvider<
+    LatestChaptersFeed, List<Chapter>>.internal(
   LatestChaptersFeed.new,
   name: r'latestChaptersFeedProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -254,13 +254,13 @@ final latestChaptersFeedProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$LatestChaptersFeed = AsyncNotifier<List<Chapter>>;
-String _$latestGlobalFeedHash() => r'35f25e9eaa14342aac0535a1c45c85c3e6bb190d';
+typedef _$LatestChaptersFeed = AutoDisposeAsyncNotifier<List<Chapter>>;
+String _$latestGlobalFeedHash() => r'022ff8d3ddd62b4d18c76da6224bead1f257912d';
 
 /// See also [LatestGlobalFeed].
 @ProviderFor(LatestGlobalFeed)
 final latestGlobalFeedProvider =
-    AsyncNotifierProvider<LatestGlobalFeed, List<Chapter>>.internal(
+    AutoDisposeAsyncNotifierProvider<LatestGlobalFeed, List<Chapter>>.internal(
   LatestGlobalFeed.new,
   name: r'latestGlobalFeedProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -270,10 +270,11 @@ final latestGlobalFeedProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
-String _$groupFeedHash() => r'da48dfc60207f331976e075afd6076f4136a99a7';
+typedef _$LatestGlobalFeed = AutoDisposeAsyncNotifier<List<Chapter>>;
+String _$groupFeedHash() => r'b1b14a927127c4e165f55f26ed83046eb9cf8dd1';
 
-abstract class _$GroupFeed extends BuildlessAsyncNotifier<List<Chapter>> {
+abstract class _$GroupFeed
+    extends BuildlessAutoDisposeAsyncNotifier<List<Chapter>> {
   late final Group group;
 
   FutureOr<List<Chapter>> build(
@@ -347,7 +348,7 @@ class _$GroupFeedFamilyOverride implements FamilyOverride {
 
 /// See also [GroupFeed].
 class GroupFeedProvider
-    extends AsyncNotifierProviderImpl<GroupFeed, List<Chapter>> {
+    extends AutoDisposeAsyncNotifierProviderImpl<GroupFeed, List<Chapter>> {
   /// See also [GroupFeed].
   GroupFeedProvider(
     Group group,
@@ -407,7 +408,8 @@ class GroupFeedProvider
   }
 
   @override
-  AsyncNotifierProviderElement<GroupFeed, List<Chapter>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<GroupFeed, List<Chapter>>
+      createElement() {
     return _GroupFeedProviderElement(this);
   }
 
@@ -439,13 +441,13 @@ class GroupFeedProvider
   }
 }
 
-mixin GroupFeedRef on AsyncNotifierProviderRef<List<Chapter>> {
+mixin GroupFeedRef on AutoDisposeAsyncNotifierProviderRef<List<Chapter>> {
   /// The parameter `group` of this provider.
   Group get group;
 }
 
 class _GroupFeedProviderElement
-    extends AsyncNotifierProviderElement<GroupFeed, List<Chapter>>
+    extends AutoDisposeAsyncNotifierProviderElement<GroupFeed, List<Chapter>>
     with GroupFeedRef {
   _GroupFeedProviderElement(super.provider);
 
@@ -453,9 +455,10 @@ class _GroupFeedProviderElement
   Group get group => (origin as GroupFeedProvider).group;
 }
 
-String _$groupTitlesHash() => r'3a6825ecdaa4901fdcf9b39586faeaa2f4d6602d';
+String _$groupTitlesHash() => r'73a90944cfa56ede59dac9647483825f58659dd1';
 
-abstract class _$GroupTitles extends BuildlessAsyncNotifier<List<Manga>> {
+abstract class _$GroupTitles
+    extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
   late final Group group;
 
   FutureOr<List<Manga>> build(
@@ -529,7 +532,7 @@ class _$GroupTitlesFamilyOverride implements FamilyOverride {
 
 /// See also [GroupTitles].
 class GroupTitlesProvider
-    extends AsyncNotifierProviderImpl<GroupTitles, List<Manga>> {
+    extends AutoDisposeAsyncNotifierProviderImpl<GroupTitles, List<Manga>> {
   /// See also [GroupTitles].
   GroupTitlesProvider(
     Group group,
@@ -590,7 +593,8 @@ class GroupTitlesProvider
   }
 
   @override
-  AsyncNotifierProviderElement<GroupTitles, List<Manga>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<GroupTitles, List<Manga>>
+      createElement() {
     return _GroupTitlesProviderElement(this);
   }
 
@@ -622,13 +626,13 @@ class GroupTitlesProvider
   }
 }
 
-mixin GroupTitlesRef on AsyncNotifierProviderRef<List<Manga>> {
+mixin GroupTitlesRef on AutoDisposeAsyncNotifierProviderRef<List<Manga>> {
   /// The parameter `group` of this provider.
   Group get group;
 }
 
 class _GroupTitlesProviderElement
-    extends AsyncNotifierProviderElement<GroupTitles, List<Manga>>
+    extends AutoDisposeAsyncNotifierProviderElement<GroupTitles, List<Manga>>
     with GroupTitlesRef {
   _GroupTitlesProviderElement(super.provider);
 
@@ -636,9 +640,10 @@ class _GroupTitlesProviderElement
   Group get group => (origin as GroupTitlesProvider).group;
 }
 
-String _$creatorTitlesHash() => r'f2820f6e4dd46cb1d5a281b73150db63c140ddd9';
+String _$creatorTitlesHash() => r'd27ec49f7d5b5932c423ff8cc06f68bf12bdeb15';
 
-abstract class _$CreatorTitles extends BuildlessAsyncNotifier<List<Manga>> {
+abstract class _$CreatorTitles
+    extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
   late final CreatorType creator;
 
   FutureOr<List<Manga>> build(
@@ -712,7 +717,7 @@ class _$CreatorTitlesFamilyOverride implements FamilyOverride {
 
 /// See also [CreatorTitles].
 class CreatorTitlesProvider
-    extends AsyncNotifierProviderImpl<CreatorTitles, List<Manga>> {
+    extends AutoDisposeAsyncNotifierProviderImpl<CreatorTitles, List<Manga>> {
   /// See also [CreatorTitles].
   CreatorTitlesProvider(
     CreatorType creator,
@@ -773,7 +778,8 @@ class CreatorTitlesProvider
   }
 
   @override
-  AsyncNotifierProviderElement<CreatorTitles, List<Manga>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<CreatorTitles, List<Manga>>
+      createElement() {
     return _CreatorTitlesProviderElement(this);
   }
 
@@ -805,13 +811,13 @@ class CreatorTitlesProvider
   }
 }
 
-mixin CreatorTitlesRef on AsyncNotifierProviderRef<List<Manga>> {
+mixin CreatorTitlesRef on AutoDisposeAsyncNotifierProviderRef<List<Manga>> {
   /// The parameter `creator` of this provider.
   CreatorType get creator;
 }
 
 class _CreatorTitlesProviderElement
-    extends AsyncNotifierProviderElement<CreatorTitles, List<Manga>>
+    extends AutoDisposeAsyncNotifierProviderElement<CreatorTitles, List<Manga>>
     with CreatorTitlesRef {
   _CreatorTitlesProviderElement(super.provider);
 
@@ -819,9 +825,10 @@ class _CreatorTitlesProviderElement
   CreatorType get creator => (origin as CreatorTitlesProvider).creator;
 }
 
-String _$mangaChaptersHash() => r'ae7efc1e625d3f6ef6ac95e298c7442e2451db3e';
+String _$mangaChaptersHash() => r'21cba142e506e729e048cbf8428dd6329349144a';
 
-abstract class _$MangaChapters extends BuildlessAsyncNotifier<List<Chapter>> {
+abstract class _$MangaChapters
+    extends BuildlessAutoDisposeAsyncNotifier<List<Chapter>> {
   late final Manga manga;
 
   FutureOr<List<Chapter>> build(
@@ -895,7 +902,7 @@ class _$MangaChaptersFamilyOverride implements FamilyOverride {
 
 /// See also [MangaChapters].
 class MangaChaptersProvider
-    extends AsyncNotifierProviderImpl<MangaChapters, List<Chapter>> {
+    extends AutoDisposeAsyncNotifierProviderImpl<MangaChapters, List<Chapter>> {
   /// See also [MangaChapters].
   MangaChaptersProvider(
     Manga manga,
@@ -956,7 +963,8 @@ class MangaChaptersProvider
   }
 
   @override
-  AsyncNotifierProviderElement<MangaChapters, List<Chapter>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<MangaChapters, List<Chapter>>
+      createElement() {
     return _MangaChaptersProviderElement(this);
   }
 
@@ -988,23 +996,24 @@ class MangaChaptersProvider
   }
 }
 
-mixin MangaChaptersRef on AsyncNotifierProviderRef<List<Chapter>> {
+mixin MangaChaptersRef on AutoDisposeAsyncNotifierProviderRef<List<Chapter>> {
   /// The parameter `manga` of this provider.
   Manga get manga;
 }
 
 class _MangaChaptersProviderElement
-    extends AsyncNotifierProviderElement<MangaChapters, List<Chapter>>
-    with MangaChaptersRef {
+    extends AutoDisposeAsyncNotifierProviderElement<MangaChapters,
+        List<Chapter>> with MangaChaptersRef {
   _MangaChaptersProviderElement(super.provider);
 
   @override
   Manga get manga => (origin as MangaChaptersProvider).manga;
 }
 
-String _$mangaCoversHash() => r'd1eb500bb618b55e3f18331ac1a6315cfd4e8f32';
+String _$mangaCoversHash() => r'da067c46fb69802cba3e3d49e23d5e00fa16a690';
 
-abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<CoverArt>> {
+abstract class _$MangaCovers
+    extends BuildlessAutoDisposeAsyncNotifier<List<CoverArt>> {
   late final Manga manga;
 
   FutureOr<List<CoverArt>> build(
@@ -1078,7 +1087,7 @@ class _$MangaCoversFamilyOverride implements FamilyOverride {
 
 /// See also [MangaCovers].
 class MangaCoversProvider
-    extends AsyncNotifierProviderImpl<MangaCovers, List<CoverArt>> {
+    extends AutoDisposeAsyncNotifierProviderImpl<MangaCovers, List<CoverArt>> {
   /// See also [MangaCovers].
   MangaCoversProvider(
     Manga manga,
@@ -1139,7 +1148,8 @@ class MangaCoversProvider
   }
 
   @override
-  AsyncNotifierProviderElement<MangaCovers, List<CoverArt>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<MangaCovers, List<CoverArt>>
+      createElement() {
     return _MangaCoversProviderElement(this);
   }
 
@@ -1171,13 +1181,13 @@ class MangaCoversProvider
   }
 }
 
-mixin MangaCoversRef on AsyncNotifierProviderRef<List<CoverArt>> {
+mixin MangaCoversRef on AutoDisposeAsyncNotifierProviderRef<List<CoverArt>> {
   /// The parameter `manga` of this provider.
   Manga get manga;
 }
 
 class _MangaCoversProviderElement
-    extends AsyncNotifierProviderElement<MangaCovers, List<CoverArt>>
+    extends AutoDisposeAsyncNotifierProviderElement<MangaCovers, List<CoverArt>>
     with MangaCoversRef {
   _MangaCoversProviderElement(super.provider);
 
@@ -1185,7 +1195,7 @@ class _MangaCoversProviderElement
   Manga get manga => (origin as MangaCoversProvider).manga;
 }
 
-String _$readChaptersHash() => r'05281e77132c04171cd00ac3df17ef9ade0b5be7';
+String _$readChaptersHash() => r'2ee4d46066d3d088132d42f9cfb0085b54bc294e';
 
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)
@@ -1200,7 +1210,7 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<ReadChaptersMap>;
-String _$userLibraryHash() => r'c6032a9cdb6ee4a4a766fb00c6f918a8e9fcc8f9';
+String _$userLibraryHash() => r'315c0431811071b209ea28fae40059e6e093d7e3';
 
 /// See also [UserLibrary].
 @ProviderFor(UserLibrary)
@@ -1216,11 +1226,12 @@ final userLibraryProvider = AutoDisposeAsyncNotifierProvider<UserLibrary,
 
 typedef _$UserLibrary
     = AutoDisposeAsyncNotifier<Map<String, MangaReadingStatus>>;
-String _$userListsHash() => r'520394fb69354ab7eb6eb2d96654fd020621bbd9';
+String _$userListsHash() => r'5addd53d5310bc02373461f125979f6d2ecb5b10';
 
 /// See also [UserLists].
 @ProviderFor(UserLists)
-final userListsProvider = AsyncNotifierProvider<UserLists, List<CRef>>.internal(
+final userListsProvider =
+    AutoDisposeAsyncNotifierProvider<UserLists, List<CRef>>.internal(
   UserLists.new,
   name: r'userListsProvider',
   debugGetCreateSourceHash:
@@ -1229,8 +1240,8 @@ final userListsProvider = AsyncNotifierProvider<UserLists, List<CRef>>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef _$UserLists = AsyncNotifier<List<CRef>>;
-String _$customListFeedHash() => r'262837ff25ee3079a07cd50ba4149c9889e1c399';
+typedef _$UserLists = AutoDisposeAsyncNotifier<List<CRef>>;
+String _$customListFeedHash() => r'b6cda3660905de48a833c01e93ff952d86c87ca8';
 
 abstract class _$CustomListFeed
     extends BuildlessAutoDisposeAsyncNotifier<List<Chapter>> {
@@ -1415,7 +1426,7 @@ class _CustomListFeedProviderElement
   CustomList get list => (origin as CustomListFeedProvider).list;
 }
 
-String _$listByIdHash() => r'f688363a0233869a74c238c474993856b0895b86';
+String _$listByIdHash() => r'1d2960e4ad6e1f5d8a329d1b6aa99b00fb75a726';
 
 abstract class _$ListById extends BuildlessAutoDisposeAsyncNotifier<CRef?> {
   late final String listId;
@@ -1597,11 +1608,12 @@ class _ListByIdProviderElement
   String get listId => (origin as ListByIdProvider).listId;
 }
 
-String _$tagListHash() => r'0a1fc9b1354d4786d8aac74ab1a13e872b6e9e1b';
+String _$tagListHash() => r'5d3bda30cfa4e84118d92e60be6dfa7b23364c85';
 
 /// See also [TagList].
 @ProviderFor(TagList)
-final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
+final tagListProvider =
+    AutoDisposeAsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
   TagList.new,
   name: r'tagListProvider',
   debugGetCreateSourceHash:
@@ -1610,8 +1622,8 @@ final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef _$TagList = AsyncNotifier<Iterable<Tag>>;
-String _$mangaSearchHash() => r'f50ed6b9cc900509321eb635d96f566fc3b333d1';
+typedef _$TagList = AutoDisposeAsyncNotifier<Iterable<Tag>>;
+String _$mangaSearchHash() => r'159ceccb8f506d719f9cac380bf9e9c6fccfc8f4';
 
 abstract class _$MangaSearch
     extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
@@ -1796,7 +1808,7 @@ class _MangaSearchProviderElement
   MangaSearchParameters get params => (origin as MangaSearchProvider).params;
 }
 
-String _$statisticsHash() => r'59223b4d71c465cc5914ff1379278ea1b704898b';
+String _$statisticsHash() => r'0eadddfe8d6c466b93a6aa044cd156e02348f664';
 
 /// See also [Statistics].
 @ProviderFor(Statistics)
@@ -1811,7 +1823,7 @@ final statisticsProvider =
 );
 
 typedef _$Statistics = AsyncNotifier<Map<String, MangaStatistics>>;
-String _$ratingsHash() => r'77d638e475ac3896aa51a8a0d64cda1940ec717f';
+String _$ratingsHash() => r'd1a9f106a0aa6f83917a96fb0bd0abf4102de40b';
 
 /// See also [Ratings].
 @ProviderFor(Ratings)
@@ -1826,10 +1838,10 @@ final ratingsProvider =
 );
 
 typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
-String _$readingStatusHash() => r'3e4de5f6c7769b8f45ed120efeecdd4d96c36178';
+String _$readingStatusHash() => r'd2a8a5435a9d4e8818ebf814652f65efed49bf3d';
 
 abstract class _$ReadingStatus
-    extends BuildlessAsyncNotifier<MangaReadingStatus?> {
+    extends BuildlessAutoDisposeAsyncNotifier<MangaReadingStatus?> {
   late final Manga manga;
 
   FutureOr<MangaReadingStatus?> build(
@@ -1902,8 +1914,8 @@ class _$ReadingStatusFamilyOverride implements FamilyOverride {
 }
 
 /// See also [ReadingStatus].
-class ReadingStatusProvider
-    extends AsyncNotifierProviderImpl<ReadingStatus, MangaReadingStatus?> {
+class ReadingStatusProvider extends AutoDisposeAsyncNotifierProviderImpl<
+    ReadingStatus, MangaReadingStatus?> {
   /// See also [ReadingStatus].
   ReadingStatusProvider(
     Manga manga,
@@ -1964,7 +1976,7 @@ class ReadingStatusProvider
   }
 
   @override
-  AsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?>
+  AutoDisposeAsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?>
       createElement() {
     return _ReadingStatusProviderElement(this);
   }
@@ -1997,23 +2009,25 @@ class ReadingStatusProvider
   }
 }
 
-mixin ReadingStatusRef on AsyncNotifierProviderRef<MangaReadingStatus?> {
+mixin ReadingStatusRef
+    on AutoDisposeAsyncNotifierProviderRef<MangaReadingStatus?> {
   /// The parameter `manga` of this provider.
   Manga get manga;
 }
 
 class _ReadingStatusProviderElement
-    extends AsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?>
-    with ReadingStatusRef {
+    extends AutoDisposeAsyncNotifierProviderElement<ReadingStatus,
+        MangaReadingStatus?> with ReadingStatusRef {
   _ReadingStatusProviderElement(super.provider);
 
   @override
   Manga get manga => (origin as ReadingStatusProvider).manga;
 }
 
-String _$followingStatusHash() => r'b7d5dc300375051d78fa6770d731cd1746ffbac0';
+String _$followingStatusHash() => r'a6108611a7a36518f2eef9b81a8861fdab800e2e';
 
-abstract class _$FollowingStatus extends BuildlessAsyncNotifier<bool> {
+abstract class _$FollowingStatus
+    extends BuildlessAutoDisposeAsyncNotifier<bool> {
   late final Manga manga;
 
   FutureOr<bool> build(
@@ -2087,7 +2101,7 @@ class _$FollowingStatusFamilyOverride implements FamilyOverride {
 
 /// See also [FollowingStatus].
 class FollowingStatusProvider
-    extends AsyncNotifierProviderImpl<FollowingStatus, bool> {
+    extends AutoDisposeAsyncNotifierProviderImpl<FollowingStatus, bool> {
   /// See also [FollowingStatus].
   FollowingStatusProvider(
     Manga manga,
@@ -2148,7 +2162,8 @@ class FollowingStatusProvider
   }
 
   @override
-  AsyncNotifierProviderElement<FollowingStatus, bool> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<FollowingStatus, bool>
+      createElement() {
     return _FollowingStatusProviderElement(this);
   }
 
@@ -2180,13 +2195,13 @@ class FollowingStatusProvider
   }
 }
 
-mixin FollowingStatusRef on AsyncNotifierProviderRef<bool> {
+mixin FollowingStatusRef on AutoDisposeAsyncNotifierProviderRef<bool> {
   /// The parameter `manga` of this provider.
   Manga get manga;
 }
 
 class _FollowingStatusProviderElement
-    extends AsyncNotifierProviderElement<FollowingStatus, bool>
+    extends AutoDisposeAsyncNotifierProviderElement<FollowingStatus, bool>
     with FollowingStatusRef {
   _FollowingStatusProviderElement(super.provider);
 
@@ -2194,7 +2209,7 @@ class _FollowingStatusProviderElement
   Manga get manga => (origin as FollowingStatusProvider).manga;
 }
 
-String _$mangaDexHistoryHash() => r'2bf96d936dd78622577da02c9400ad3dd5f9804f';
+String _$mangaDexHistoryHash() => r'721bf0e32dd60362d983be14996c01756687f48c';
 
 /// See also [MangaDexHistory].
 @ProviderFor(MangaDexHistory)
@@ -2210,7 +2225,7 @@ final mangaDexHistoryProvider =
 );
 
 typedef _$MangaDexHistory = AsyncNotifier<Queue<Chapter>>;
-String _$loggedUserHash() => r'81ee0bde0e61ab2d4db0d8e7e3cd53ad937c1ec9';
+String _$loggedUserHash() => r'57b59b906ca3803768fb2dd9e231239755558a97';
 
 /// See also [LoggedUser].
 @ProviderFor(LoggedUser)
@@ -2224,7 +2239,7 @@ final loggedUserProvider = AsyncNotifierProvider<LoggedUser, User?>.internal(
 );
 
 typedef _$LoggedUser = AsyncNotifier<User?>;
-String _$authControlHash() => r'8c3f82807e4b82bcd39152fdc92f07e34febe176';
+String _$authControlHash() => r'92fb30652060e54474fc220ec3b18f968d3f86be';
 
 /// See also [AuthControl].
 @ProviderFor(AuthControl)

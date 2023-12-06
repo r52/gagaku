@@ -77,6 +77,8 @@ Future<Iterable<Manga>> _fetchRelatedManga(
 
     await ref.watch(statisticsProvider.notifier).get(mangas);
 
+    ref.disposeAfter(const Duration(minutes: 5));
+
     return mangas;
   }
 

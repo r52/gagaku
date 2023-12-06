@@ -6,7 +6,7 @@ part of 'history_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchHistoryFeedHash() => r'9ebc456ac68d052aa711e8dfd9711f192f91809b';
+String _$fetchHistoryFeedHash() => r'23c88eeae70bc03dcb150d11f481692a155a2862';
 
 /// See also [_fetchHistoryFeed].
 @ProviderFor(_fetchHistoryFeed)
