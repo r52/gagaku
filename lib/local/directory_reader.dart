@@ -47,17 +47,21 @@ Future<List<ReaderPage>> _getDirectoryPages(
   pageFiles.sort((a, b) =>
       compareNatural(a.uri.pathSegments.last, b.uri.pathSegments.last));
 
-  if (pageFiles.isNotEmpty) {
-    final pages = <ReaderPage>[];
-    for (final f in pageFiles) {
-      pages.add(
-          ReaderPage(provider: FileImage(f), sortKey: f.uri.pathSegments.last));
-    }
-
-    return pages;
+  if (pageFiles.isEmpty) {
+    return [];
   }
 
-  return [];
+  final pages = <ReaderPage>[];
+  for (final f in pageFiles) {
+    pages.add(
+        ReaderPage(provider: FileImage(f), sortKey: f.uri.pathSegments.last));
+  }
+
+  ref.onDispose(() {
+    pages.clear();
+  });
+
+  return pages;
 }
 
 class DirectoryReaderWidget extends ConsumerWidget {
@@ -116,7 +120,6 @@ class DirectoryReaderWidget extends ConsumerWidget {
           isLongStrip: false, // TODO longstrip
           link: link,
           onLinkPressed: onLinkPressed,
-          precache: false,
         );
       case _:
         return Center(

@@ -83,14 +83,18 @@ Future<ReaderData> _fetchChapterData(
 Future<List<ReaderPage>> _fetchChapterPages(
     _FetchChapterPagesRef ref, Chapter chapter) async {
   final api = ref.watch(mangadexProvider);
-  var mpages = await api.getChapterServer(chapter);
+  final mpages = await api.getChapterServer(chapter);
 
-  var pages = mpages.pages.map((pageUrl) {
-    var url = mpages.baseUrl + pageUrl;
+  final pages = mpages.pages.map((pageUrl) {
+    final url = mpages.baseUrl + pageUrl;
     return ReaderPage(
       provider: ExtendedNetworkImageProvider(url),
     );
   }).toList();
+
+  ref.onDispose(() {
+    pages.clear();
+  });
 
   return pages;
 }

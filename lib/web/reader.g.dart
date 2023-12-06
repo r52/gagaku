@@ -200,7 +200,7 @@ class _FetchWebChapterInfoProviderElement
   ProxyInfo get info => (origin as _FetchWebChapterInfoProvider).info;
 }
 
-String _$getPagesHash() => r'2f561a3d26939d96cfbadbfa68d5ce72f08e92f4';
+String _$getPagesHash() => r'a928678606945b9ee26d648758a72311d6dad1f6';
 
 /// See also [_getPages].
 @ProviderFor(_getPages)

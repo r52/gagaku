@@ -104,20 +104,26 @@ Future<WebReaderData> _fetchWebChapterInfo(
 
 @riverpod
 Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
-  List<String> pages;
+  List<String> links;
 
   if (source is List) {
-    pages = List<String>.from(source);
+    links = List<String>.from(source);
   } else {
     final api = ref.watch(proxyProvider);
-    pages = await api.getChapter(source);
+    links = await api.getChapter(source);
   }
 
-  return pages
+  final pages = links
       .map((e) => ReaderPage(
             provider: ExtendedNetworkImageProvider(e),
           ))
       .toList();
+
+  ref.onDispose(() {
+    pages.clear();
+  });
+
+  return pages;
 }
 
 class QueriedWebSourceReaderWidget extends ConsumerWidget {

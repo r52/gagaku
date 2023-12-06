@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,39 +32,47 @@ class _ExtractInfo {
   const _ExtractInfo({
     required this.type,
     required this.formats,
-    required this.bytes,
+    required this.path,
   });
 
   final ArchiveType type;
   final FormatInfo formats;
-  final Uint8List bytes;
+  final String path;
 }
 
 @riverpod
 Future<List<ReaderPage>> _getArchivePages(
     _GetArchivePagesRef ref, String path) async {
   final formats = await ref.watch(supportedFormatsProvider.future);
-  final bytes = await File(path).readAsBytes();
+  var type = ArchiveType.zip;
 
   if (path.endsWith('.cbt') || path.endsWith('.tar')) {
-    return compute(_extractArchive,
-        _ExtractInfo(type: ArchiveType.tar, formats: formats, bytes: bytes));
+    type = ArchiveType.tar;
   }
 
-  return compute(_extractArchive,
-      _ExtractInfo(type: ArchiveType.zip, formats: formats, bytes: bytes));
+  final pages = await compute(
+      _extractArchive, _ExtractInfo(type: type, formats: formats, path: path));
+
+  /// pages MUST be cleared on dispose otherwise MemoryImage and its
+  /// accompanying Uint8List buffer won't get GC'd for whatever reason
+  ref.onDispose(() {
+    pages.clear();
+  });
+
+  return pages;
 }
 
-List<ReaderPage> _extractArchive(_ExtractInfo info) {
+Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
   Archive archive;
+  final file = InputFileStream(info.path);
 
   switch (info.type) {
     case ArchiveType.tar:
-      archive = TarDecoder().decodeBytes(info.bytes);
+      archive = TarDecoder().decodeBuffer(file);
       break;
     case ArchiveType.zip:
     default:
-      archive = ZipDecoder().decodeBytes(info.bytes);
+      archive = ZipDecoder().decodeBuffer(file);
       break;
   }
 
@@ -78,10 +84,14 @@ List<ReaderPage> _extractArchive(_ExtractInfo info) {
             file.name.endsWith(".png") ||
             file.name.endsWith(".jpeg") ||
             (info.formats.avif && file.name.endsWith(".avif")))) {
-      final data = file.content as Uint8List;
-      pages.add(ReaderPage(provider: MemoryImage(data), sortKey: file.name));
+      pages.add(ReaderPage(
+          provider: MemoryImage(file.content as Uint8List),
+          sortKey: file.name));
+      await file.close();
     }
   }
+
+  await archive.clear();
 
   return pages;
 }
@@ -103,7 +113,6 @@ class ArchiveReaderWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageProvider = ref.watch(_getArchivePagesProvider(path));
-    final theme = Theme.of(context);
 
     String strtitle = path;
 
@@ -138,7 +147,6 @@ class ArchiveReaderWidget extends ConsumerWidget {
 
         return ReaderWidget(
           pages: pages,
-          pageCount: pages.length,
           title: strtitle,
           isLongStrip: false, // TODO longstrip
           link: link,
@@ -152,7 +160,7 @@ class ArchiveReaderWidget extends ConsumerWidget {
               Text(
                 "Extracting archive...",
                 style: TextStyle(
-                  color: theme.colorScheme.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.normal,
                   fontSize: 18,
                   decoration: TextDecoration.none,
