@@ -2239,7 +2239,7 @@ final loggedUserProvider = AsyncNotifierProvider<LoggedUser, User?>.internal(
 );
 
 typedef _$LoggedUser = AsyncNotifier<User?>;
-String _$authControlHash() => r'92fb30652060e54474fc220ec3b18f968d3f86be';
+String _$authControlHash() => r'0504721d8fc03a16d43b65a21800adf08662b60a';
 
 /// See also [AuthControl].
 @ProviderFor(AuthControl)

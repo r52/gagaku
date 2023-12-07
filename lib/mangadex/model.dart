@@ -2620,9 +2620,15 @@ class LoggedUser extends _$LoggedUser {
 @riverpod
 class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
   Future<void> invalidate() async {
-    state = await AsyncValue.guard(() async {
-      return build();
-    });
+    final prevState = await future;
+
+    final refreshed = await build();
+
+    if (refreshed != prevState) {
+      state = await AsyncValue.guard(() async {
+        return refreshed;
+      });
+    }
   }
 
   Future<void> _setStaleTime() async {
