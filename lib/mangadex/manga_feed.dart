@@ -25,6 +25,10 @@ Future<Iterable<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
 
   ref.disposeAfter(const Duration(minutes: 5));
 
+  ref.onDispose(() {
+    mangas.clear();
+  });
+
   return mangas;
 }
 

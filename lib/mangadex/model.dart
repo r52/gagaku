@@ -456,7 +456,7 @@ class MangaDexModel {
   }
 
   /// Fetches a list of manga data given the query parameters
-  Future<Iterable<Manga>> fetchManga({
+  Future<List<Manga>> fetchManga({
     required int limit,
     Iterable<String>? ids,
     MangaDexUUID? filterId,
@@ -471,7 +471,7 @@ class MangaDexModel {
       'includes[]': ['cover_art', 'author', 'artist']
     };
 
-    Set<Manga> list = {};
+    final list = <Manga>[];
 
     if (ids != null) {
       final fetch =
@@ -1700,7 +1700,7 @@ class GroupTitles extends _$GroupTitles {
     final manga =
         await api.fetchManga(limit: limit, offset: offset, filterId: group);
 
-    return manga.toList();
+    return manga;
   }
 
   @override
@@ -1756,7 +1756,7 @@ class CreatorTitles extends _$CreatorTitles {
     final manga =
         await api.fetchManga(limit: limit, offset: offset, filterId: creator);
 
-    return manga.toList();
+    return manga;
   }
 
   @override
@@ -2288,6 +2288,10 @@ Future<Iterable<Manga>> getMangaListByPage(
       await api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
+
+  ref.onDispose(() {
+    mangas.clear();
+  });
 
   return mangas;
 }

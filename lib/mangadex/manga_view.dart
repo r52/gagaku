@@ -70,19 +70,23 @@ Future<Iterable<Manga>> _fetchRelatedManga(
     _FetchRelatedMangaRef ref, Manga manga) async {
   final related = manga.related;
 
-  if (related.isNotEmpty) {
-    final api = ref.watch(mangadexProvider);
-    final mangas =
-        await api.fetchManga(ids: related, limit: MangaDexEndpoints.breakLimit);
-
-    await ref.watch(statisticsProvider.notifier).get(mangas);
-
-    ref.disposeAfter(const Duration(minutes: 5));
-
-    return mangas;
+  if (related.isEmpty) {
+    return [];
   }
 
-  return [];
+  final api = ref.watch(mangadexProvider);
+  final mangas =
+      await api.fetchManga(ids: related, limit: MangaDexEndpoints.breakLimit);
+
+  await ref.watch(statisticsProvider.notifier).get(mangas);
+
+  ref.disposeAfter(const Duration(minutes: 5));
+
+  ref.onDispose(() {
+    mangas.clear();
+  });
+
+  return mangas;
 }
 
 class QueriedMangaDexMangaViewWidget extends ConsumerWidget {

@@ -51,6 +51,10 @@ Future<Iterable<Manga>> _fetchCreatorTitles(
 
   ref.disposeAfter(const Duration(minutes: 5));
 
+  ref.onDispose(() {
+    mangas.clear();
+  });
+
   return mangas;
 }
 

@@ -914,6 +914,10 @@ class ChapterFeedItemData {
   final String coverArt;
 
   List<Chapter> chapters = [];
+
+  void clear() {
+    chapters.clear();
+  }
 }
 
 class ReadChapterSet with ExpiringData {

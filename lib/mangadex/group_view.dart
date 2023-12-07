@@ -88,6 +88,13 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(
 
   ref.disposeAfter(const Duration(minutes: 5));
 
+  ref.onDispose(() {
+    for (final item in dlist) {
+      item.clear();
+    }
+    dlist.clear();
+  });
+
   return dlist;
 }
 
@@ -98,6 +105,10 @@ Future<Iterable<Manga>> _fetchGroupTitles(
   await ref.watch(statisticsProvider.notifier).get(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
+
+  ref.onDispose(() {
+    mangas.clear();
+  });
 
   return mangas;
 }

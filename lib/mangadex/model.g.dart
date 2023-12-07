@@ -21,7 +21,7 @@ final mangadexProvider = Provider<MangaDexModel>.internal(
 
 typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$getMangaListByPageHash() =>
-    r'a0e31bd5226e46f7d9c3b9083875cf0aeecd6bcb';
+    r'fd43cdfa3b99057519e9877f930db2ee7301afe7';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -455,7 +455,7 @@ class _GroupFeedProviderElement
   Group get group => (origin as GroupFeedProvider).group;
 }
 
-String _$groupTitlesHash() => r'73a90944cfa56ede59dac9647483825f58659dd1';
+String _$groupTitlesHash() => r'01622d91abc2d261539280a9b01e4ef097b63df4';
 
 abstract class _$GroupTitles
     extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
@@ -640,7 +640,7 @@ class _GroupTitlesProviderElement
   Group get group => (origin as GroupTitlesProvider).group;
 }
 
-String _$creatorTitlesHash() => r'd27ec49f7d5b5932c423ff8cc06f68bf12bdeb15';
+String _$creatorTitlesHash() => r'fe1dd23482de894d2a74e6172ddd1973a95e36c7';
 
 abstract class _$CreatorTitles
     extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {

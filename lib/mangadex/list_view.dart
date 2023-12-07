@@ -82,6 +82,13 @@ Future<List<ChapterFeedItemData>> _fetchListFeed(
 
   ref.disposeAfter(const Duration(minutes: 5));
 
+  ref.onDispose(() {
+    for (final item in dlist) {
+      item.clear();
+    }
+    dlist.clear();
+  });
+
   return dlist;
 }
 
