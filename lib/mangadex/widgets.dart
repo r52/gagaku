@@ -176,32 +176,15 @@ class ChapterFeedWidget extends HookConsumerWidget {
   }
 }
 
-class ChapterFeedItem extends ConsumerWidget {
+class ChapterFeedItem extends StatelessWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final ChapterFeedItemData state;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
-    ReadChaptersMap? readData;
-
-    if (loggedin) {
-      readData = switch (ref.watch(readChaptersProvider)) {
-        AsyncValue(:final error?, :final stackTrace?) => () {
-            final messenger = ScaffoldMessenger.of(context);
-            Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("readChaptersProvider failed",
-                error: error, stackTrace: stackTrace);
-
-            return null;
-          }(),
-        AsyncValue(valueOrNull: final data?) => data,
-        _ => null,
-      };
-    }
 
     final chapterBtns = state.chapters.map((e) {
       return Padding(
@@ -209,11 +192,6 @@ class ChapterFeedItem extends ConsumerWidget {
         child: ChapterButtonWidget(
           chapter: e,
           manga: state.manga,
-          loggedin: loggedin,
-          isRead: switch (readData) {
-            null => null,
-            _ => readData[state.manga.id]?.contains(e.id) == true,
-          },
           link: Text(
             state.manga.attributes.title.get('en'),
             style: const TextStyle(fontSize: 18),
@@ -250,11 +228,13 @@ class ChapterFeedItem extends ConsumerWidget {
       onPressed: () async {
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
-      child: ExtendedImage.network(state.coverArt,
-          loadStateChanged: extendedImageLoadStateHandler,
-          shape: BoxShape.rectangle,
-          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-          width: screenSizeSmall ? 64.0 : 128.0),
+      child: ExtendedImage.network(
+        state.coverArt,
+        loadStateChanged: extendedImageLoadStateHandler,
+        shape: BoxShape.rectangle,
+        borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+        width: screenSizeSmall ? 64.0 : 128.0,
+      ),
     );
 
     return Card(
@@ -310,16 +290,12 @@ class ChapterButtonWidget extends ConsumerWidget {
     super.key,
     required this.chapter,
     required this.manga,
-    required this.loggedin,
-    this.isRead,
     this.link,
     this.onLinkPressed,
   });
 
   final Chapter chapter;
   final Manga manga;
-  final bool loggedin;
-  final bool? isRead;
   final Widget? link;
   final VoidCallback? onLinkPressed;
 
@@ -332,6 +308,17 @@ class ChapterButtonWidget extends ConsumerWidget {
     final isEndChapter = manga.attributes.lastChapter != null &&
         manga.attributes.lastChapter?.isNotEmpty == true &&
         chapter.attributes.chapter == manga.attributes.lastChapter;
+
+    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
+    bool? isRead;
+
+    if (loggedin) {
+      isRead = ref.watch(readChaptersProvider.select((value) => switch (value) {
+            AsyncValue(valueOrNull: final data?) =>
+              data[manga.id]?.contains(chapter.id) == true,
+            _ => null,
+          }));
+    }
 
     String title = chapter.getTitle();
 
@@ -540,13 +527,16 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        context.push('/chapter/${chapter.id}',
-            extra: ReaderData(
-                title: title,
-                chapter: chapter,
-                manga: manga,
-                link: link,
-                onLinkPressed: onLinkPressed));
+        context.push(
+          '/chapter/${chapter.id}',
+          extra: ReaderData(
+            title: title,
+            chapter: chapter,
+            manga: manga,
+            link: link,
+            onLinkPressed: onLinkPressed,
+          ),
+        );
       },
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(4)),

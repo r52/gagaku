@@ -137,23 +137,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
     ref.watch(_fetchReadChaptersRedunProvider(manga));
 
-    ReadChaptersMap? readData;
-
-    if (loggedin) {
-      readData = switch (ref.watch(readChaptersProvider)) {
-        AsyncValue(:final error?, :final stackTrace?) => () {
-            final messenger = ScaffoldMessenger.of(context);
-            Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("readChaptersProvider failed",
-                error: error, stackTrace: stackTrace);
-
-            return null;
-          }(),
-        AsyncValue(valueOrNull: final data?) => data,
-        _ => null,
-      };
-    }
-
     final chapterProvider = ref.watch(mangaChaptersProvider(manga));
     final coverProvider = ref.watch(mangaCoversProvider(manga));
     final relatedProvider = ref.watch(_fetchRelatedMangaProvider(manga));
@@ -1194,13 +1177,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   final chapbtn = ChapterButtonWidget(
                                     chapter: thischap,
                                     manga: manga,
-                                    loggedin: loggedin,
-                                    isRead: switch (readData) {
-                                      null => null,
-                                      _ => readData[manga.id]
-                                              ?.contains(thischap.id) ==
-                                          true,
-                                    },
                                     link: Text(
                                       manga.attributes.title.get('en'),
                                       style: const TextStyle(fontSize: 24),
