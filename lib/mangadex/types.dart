@@ -663,15 +663,11 @@ class Manga with _$Manga, MangaDexUUID {
   bool isLongStrip() {
     final tags = attributes.tags;
 
-    final lstag = tags.where((e) =>
+    final lstag = tags.any((e) =>
         e.attributes.group == TagGroup.format &&
         e.attributes.name.get('en') == "Long Strip");
 
-    if (lstag.isNotEmpty) {
-      return true;
-    }
-
-    return false;
+    return lstag;
   }
 
   List<String> getRelatedManga() {
@@ -905,13 +901,13 @@ class PageData {
 }
 
 class ChapterFeedItemData {
-  ChapterFeedItemData({required this.manga})
-      : mangaId = manga.id,
-        coverArt = manga.getFirstCoverUrl(quality: CoverArtQuality.medium);
+  ChapterFeedItemData({required this.manga});
 
   final Manga manga;
-  final String mangaId;
-  final String coverArt;
+
+  String get mangaId => manga.id;
+  String get coverArt =>
+      manga.getFirstCoverUrl(quality: CoverArtQuality.medium);
 
   List<Chapter> chapters = [];
 

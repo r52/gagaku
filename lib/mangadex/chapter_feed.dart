@@ -29,22 +29,22 @@ Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
   // Craft feed items
-  List<ChapterFeedItemData> dlist = [];
-
-  for (final chapter in chapters) {
+  final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
     final cid = chapter.getMangaID();
     if (cid.isNotEmpty && mangaMap.containsKey(cid)) {
       ChapterFeedItemData? item;
-      if (dlist.isNotEmpty && dlist.last.mangaId == cid) {
-        item = dlist.last;
+      if (list.isNotEmpty && list.last.mangaId == cid) {
+        item = list.last;
       } else {
         item = ChapterFeedItemData(manga: mangaMap[cid]!);
-        dlist.add(item);
+        list.add(item);
       }
 
       item.chapters.add(chapter);
     }
-  }
+
+    return list;
+  });
 
   ref.disposeAfter(const Duration(minutes: 5));
 
