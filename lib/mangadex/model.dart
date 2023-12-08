@@ -2289,10 +2289,6 @@ Future<Iterable<Manga>> getMangaListByPage(
 
   await ref.watch(statisticsProvider.notifier).get(mangas);
 
-  ref.onDispose(() {
-    mangas.clear();
-  });
-
   return mangas;
 }
 

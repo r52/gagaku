@@ -21,7 +21,7 @@ final mangadexProvider = Provider<MangaDexModel>.internal(
 
 typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$getMangaListByPageHash() =>
-    r'fd43cdfa3b99057519e9877f930db2ee7301afe7';
+    r'a0e31bd5226e46f7d9c3b9083875cf0aeecd6bcb';
 
 /// Copied from Dart SDK
 class _SystemHash {

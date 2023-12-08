@@ -82,10 +82,6 @@ Future<Iterable<Manga>> _fetchRelatedManga(
 
   ref.disposeAfter(const Duration(minutes: 5));
 
-  ref.onDispose(() {
-    mangas.clear();
-  });
-
   return mangas;
 }
 
