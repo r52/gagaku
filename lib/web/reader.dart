@@ -232,7 +232,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
         if (info != null && readKey != null) {
           ref
               .read(webReadMarkersProvider.notifier)
-              .set(info!.getURL(), readKey!, true);
+              .set(info!.getKey(), readKey!, true);
         }
       });
 

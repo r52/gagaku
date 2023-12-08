@@ -127,7 +127,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
   }
 }
 
-class WebMangaViewWidget extends ConsumerWidget {
+class WebMangaViewWidget extends StatelessWidget {
   const WebMangaViewWidget(
       {super.key, required this.manga, required this.info});
 
@@ -135,15 +135,13 @@ class WebMangaViewWidget extends ConsumerWidget {
   final ProxyInfo info;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final chapterlist = manga.chapters.entries
         .map((e) => ChapterEntry(e.key, e.value))
         .toList();
     chapterlist
         .sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
-
-    final readMarkers = ref.watch(webReadMarkersProvider).valueOrNull;
 
     return CustomScrollView(
       scrollBehavior: MouseTouchScrollBehavior(),
@@ -312,11 +310,9 @@ class WebMangaViewWidget extends ConsumerWidget {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 2.0),
               child: ChapterButtonWidget(
-                name: e.name,
-                chapter: e.chapter,
+                data: e,
                 manga: manga,
                 info: info,
-                isRead: readMarkers?[info.getURL()]?.contains(e.name) ?? false,
                 link: Text(
                   manga.title,
                   style: const TextStyle(fontSize: 24),
@@ -334,20 +330,16 @@ class WebMangaViewWidget extends ConsumerWidget {
 class ChapterButtonWidget extends ConsumerWidget {
   const ChapterButtonWidget({
     super.key,
-    required this.name,
-    required this.chapter,
+    required this.data,
     required this.manga,
     required this.info,
-    required this.isRead,
     this.link,
     this.onLinkPressed,
   });
 
-  final String name;
-  final WebChapter chapter;
+  final ChapterEntry data;
   final WebManga manga;
   final ProxyInfo info;
-  final bool isRead;
   final Widget? link;
   final VoidCallback? onLinkPressed;
 
@@ -356,16 +348,25 @@ class ChapterButtonWidget extends ConsumerWidget {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
+    final name = data.name;
+    final key = info.getKey();
 
-    String title = chapter.getTitle(name);
-    String group = chapter.groups.entries.first.key;
+    final isRead =
+        ref.watch(webReadMarkersProvider.select((value) => switch (value) {
+              AsyncValue(valueOrNull: final data?) =>
+                data[key]?.contains(name) ?? false,
+              _ => false,
+            }));
+
+    String title = data.chapter.getTitle(name);
+    String group = data.chapter.groups.entries.first.key;
 
     Widget? timestamp;
 
-    if (chapter.lastUpdated != null) {
-      timestamp = Text(timeago.format(chapter.lastUpdated!));
-    } else if (chapter.releaseDate != null) {
-      timestamp = Text(timeago.format(chapter.releaseDate!));
+    if (data.chapter.lastUpdated != null) {
+      timestamp = Text(timeago.format(data.chapter.lastUpdated!));
+    } else if (data.chapter.releaseDate != null) {
+      timestamp = Text(timeago.format(data.chapter.releaseDate!));
     }
 
     final border = Border(
@@ -382,7 +383,7 @@ class ChapterButtonWidget extends ConsumerWidget {
       onPressed: () async {
         bool set = !isRead;
 
-        ref.read(webReadMarkersProvider.notifier).set(info.getURL(), name, set);
+        ref.read(webReadMarkersProvider.notifier).set(key, name, set);
       },
       padding: const EdgeInsets.all(0.0),
       splashRadius: 15,
@@ -401,7 +402,7 @@ class ChapterButtonWidget extends ConsumerWidget {
       onTap: () {
         context.push('/read/${info.proxy}/${info.code}/$name/1/',
             extra: WebReaderData(
-              source: chapter.groups.entries.first.value,
+              source: data.chapter.groups.entries.first.value,
               title: title,
               manga: manga,
               link: link,
