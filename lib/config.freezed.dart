@@ -136,7 +136,7 @@ class _$GagakuConfigImpl implements _GagakuConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$GagakuConfigImpl &&

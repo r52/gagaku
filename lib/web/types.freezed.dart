@@ -129,7 +129,7 @@ class _$ProxyInfoImpl extends _ProxyInfo {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ProxyInfoImpl &&
@@ -520,7 +520,7 @@ class _$WebMangaImpl extends _WebManga {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WebMangaImpl &&
@@ -770,7 +770,7 @@ class _$WebChapterImpl extends _WebChapter {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WebChapterImpl &&
@@ -941,7 +941,7 @@ class _$ImgurPageImpl implements _ImgurPage {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ImgurPageImpl &&

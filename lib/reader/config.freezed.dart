@@ -201,7 +201,7 @@ class _$ReaderConfigImpl implements _ReaderConfig {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ReaderConfigImpl &&
