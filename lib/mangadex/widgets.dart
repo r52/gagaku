@@ -309,6 +309,8 @@ class ChapterButtonWidget extends ConsumerWidget {
         manga.attributes.lastChapter?.isNotEmpty == true &&
         chapter.attributes.chapter == manga.attributes.lastChapter;
 
+    final isOfficialPub = chapter.attributes.externalUrl != null;
+
     final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     bool? isRead;
 
@@ -341,7 +343,8 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     for (final g in groups) {
       groupChips.add(IconTextChip(
-        icon: Icon(Icons.group, size: iconSize),
+        icon: Icon(isOfficialPub ? Icons.add_circle : Icons.group,
+            size: iconSize),
         text: Text(g.attributes.name.crop()),
         onPressed: () {
           context.push('/group/${g.id}', extra: g);
@@ -358,19 +361,25 @@ class ChapterButtonWidget extends ConsumerWidget {
       groupChips.add(rowPadding);
     }
 
-    final publisherChip = <Widget>[];
-    if (chapter.attributes.externalUrl != null) {
-      publisherChip.add(IconTextChip(
+    Widget userChip;
+
+    if (isOfficialPub) {
+      userChip = IconTextChip(
         icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
         text: const Text('Official Publisher'),
-      ));
-      publisherChip.add(rowPadding);
+      );
+    } else {
+      userChip = IconTextChip(
+        icon: Icon(Icons.person, size: iconSize),
+        text: Text(chapter.getUploadUser().crop()),
+      );
     }
 
-    final userChip = IconTextChip(
-      icon: Icon(Icons.person, size: iconSize),
-      text: Text(chapter.getUploadUser().crop()),
-    );
+    Widget? openIcon;
+
+    if (isOfficialPub) {
+      openIcon = Icon(Icons.open_in_new, size: iconSize);
+    }
 
     Widget? endChip;
     if (isEndChapter) {
@@ -456,6 +465,7 @@ class ChapterButtonWidget extends ConsumerWidget {
                 ],
                 flagChip,
                 rowPadding,
+                if (openIcon != null) ...[openIcon, rowPadding],
                 Flexible(
                   fit: FlexFit.tight,
                   child: Text(
@@ -486,12 +496,11 @@ class ChapterButtonWidget extends ConsumerWidget {
                 ? Wrap(
                     runSpacing: 2.0,
                     crossAxisAlignment: WrapCrossAlignment.start,
-                    children: [...groupChips, ...publisherChip],
+                    children: groupChips,
                   )
                 : Row(
                     children: [
                       ...groupChips,
-                      ...publisherChip,
                       const Spacer(),
                       userChip,
                     ],
