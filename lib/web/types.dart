@@ -33,7 +33,11 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
       return null;
     }
 
-    final epoch = timestamp is int ? timestamp : int.parse(timestamp);
+    final epoch = switch (timestamp) {
+      int t => t,
+      double d => d.round(),
+      _ => int.parse(timestamp),
+    };
 
     return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
   }
@@ -63,7 +67,12 @@ class MappedEpochTimestampSerializer
     }
 
     final date = timestamp.entries.first.value;
-    final epoch = date is int ? date : int.parse(date);
+
+    final epoch = switch (date) {
+      int t => t,
+      double d => d.round(),
+      _ => int.parse(date),
+    };
 
     return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
   }
@@ -132,8 +141,8 @@ class WebChapter with _$WebChapter {
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory WebChapter({
-    required String title,
-    required String volume,
+    String? title,
+    String? volume,
     @EpochTimestampSerializer() DateTime? lastUpdated,
     @MappedEpochTimestampSerializer() DateTime? releaseDate,
     required Map<String, dynamic> groups,
@@ -145,7 +154,7 @@ class WebChapter with _$WebChapter {
   String getTitle(String index) {
     String output = index;
 
-    if (title.isNotEmpty) {
+    if (title != null && title!.isNotEmpty) {
       output += ': $title';
     }
 

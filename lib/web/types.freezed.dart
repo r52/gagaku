@@ -600,8 +600,8 @@ WebChapter _$WebChapterFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WebChapter {
-  String get title => throw _privateConstructorUsedError;
-  String get volume => throw _privateConstructorUsedError;
+  String? get title => throw _privateConstructorUsedError;
+  String? get volume => throw _privateConstructorUsedError;
   @EpochTimestampSerializer()
   DateTime? get lastUpdated => throw _privateConstructorUsedError;
   @MappedEpochTimestampSerializer()
@@ -621,8 +621,8 @@ abstract class $WebChapterCopyWith<$Res> {
       _$WebChapterCopyWithImpl<$Res, WebChapter>;
   @useResult
   $Res call(
-      {String title,
-      String volume,
+      {String? title,
+      String? volume,
       @EpochTimestampSerializer() DateTime? lastUpdated,
       @MappedEpochTimestampSerializer() DateTime? releaseDate,
       Map<String, dynamic> groups});
@@ -641,21 +641,21 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = null,
-    Object? volume = null,
+    Object? title = freezed,
+    Object? volume = freezed,
     Object? lastUpdated = freezed,
     Object? releaseDate = freezed,
     Object? groups = null,
   }) {
     return _then(_value.copyWith(
-      title: null == title
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      volume: null == volume
+              as String?,
+      volume: freezed == volume
           ? _value.volume
           : volume // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       lastUpdated: freezed == lastUpdated
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
@@ -681,8 +681,8 @@ abstract class _$$WebChapterImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String title,
-      String volume,
+      {String? title,
+      String? volume,
       @EpochTimestampSerializer() DateTime? lastUpdated,
       @MappedEpochTimestampSerializer() DateTime? releaseDate,
       Map<String, dynamic> groups});
@@ -699,21 +699,21 @@ class __$$WebChapterImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = null,
-    Object? volume = null,
+    Object? title = freezed,
+    Object? volume = freezed,
     Object? lastUpdated = freezed,
     Object? releaseDate = freezed,
     Object? groups = null,
   }) {
     return _then(_$WebChapterImpl(
-      title: null == title
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      volume: null == volume
+              as String?,
+      volume: freezed == volume
           ? _value.volume
           : volume // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       lastUpdated: freezed == lastUpdated
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
@@ -735,8 +735,8 @@ class __$$WebChapterImplCopyWithImpl<$Res>
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _$WebChapterImpl extends _WebChapter {
   const _$WebChapterImpl(
-      {required this.title,
-      required this.volume,
+      {this.title,
+      this.volume,
       @EpochTimestampSerializer() this.lastUpdated,
       @MappedEpochTimestampSerializer() this.releaseDate,
       required final Map<String, dynamic> groups})
@@ -747,9 +747,9 @@ class _$WebChapterImpl extends _WebChapter {
       _$$WebChapterImplFromJson(json);
 
   @override
-  final String title;
+  final String? title;
   @override
-  final String volume;
+  final String? volume;
   @override
   @EpochTimestampSerializer()
   final DateTime? lastUpdated;
@@ -804,8 +804,8 @@ class _$WebChapterImpl extends _WebChapter {
 
 abstract class _WebChapter extends WebChapter {
   const factory _WebChapter(
-      {required final String title,
-      required final String volume,
+      {final String? title,
+      final String? volume,
       @EpochTimestampSerializer() final DateTime? lastUpdated,
       @MappedEpochTimestampSerializer() final DateTime? releaseDate,
       required final Map<String, dynamic> groups}) = _$WebChapterImpl;
@@ -815,9 +815,9 @@ abstract class _WebChapter extends WebChapter {
       _$WebChapterImpl.fromJson;
 
   @override
-  String get title;
+  String? get title;
   @override
-  String get volume;
+  String? get volume;
   @override
   @EpochTimestampSerializer()
   DateTime? get lastUpdated;

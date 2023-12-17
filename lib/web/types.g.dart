@@ -46,8 +46,8 @@ Map<String, dynamic> _$$WebMangaImplToJson(_$WebMangaImpl instance) =>
 
 _$WebChapterImpl _$$WebChapterImplFromJson(Map<String, dynamic> json) =>
     _$WebChapterImpl(
-      title: json['title'] as String,
-      volume: json['volume'] as String,
+      title: json['title'] as String?,
+      volume: json['volume'] as String?,
       lastUpdated:
           const EpochTimestampSerializer().fromJson(json['last_updated']),
       releaseDate:
