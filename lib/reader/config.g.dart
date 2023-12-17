@@ -8,6 +8,8 @@ part of 'config.dart';
 
 _$ReaderConfigImpl _$$ReaderConfigImplFromJson(Map<String, dynamic> json) =>
     _$ReaderConfigImpl(
+      format: $enumDecodeNullable(_$ReaderFormatEnumMap, json['format']) ??
+          ReaderFormat.single,
       direction:
           $enumDecodeNullable(_$ReaderDirectionEnumMap, json['direction']) ??
               ReaderDirection.leftToRight,
@@ -19,6 +21,7 @@ _$ReaderConfigImpl _$$ReaderConfigImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$ReaderConfigImplToJson(_$ReaderConfigImpl instance) =>
     <String, dynamic>{
+      'format': _$ReaderFormatEnumMap[instance.format]!,
       'direction': _$ReaderDirectionEnumMap[instance.direction]!,
       'showProgressBar': instance.showProgressBar,
       'clickToTurn': instance.clickToTurn,
@@ -26,10 +29,14 @@ Map<String, dynamic> _$$ReaderConfigImplToJson(_$ReaderConfigImpl instance) =>
       'precacheCount': instance.precacheCount,
     };
 
+const _$ReaderFormatEnumMap = {
+  ReaderFormat.single: 'single',
+  ReaderFormat.longstrip: 'longstrip',
+};
+
 const _$ReaderDirectionEnumMap = {
   ReaderDirection.leftToRight: 'leftToRight',
   ReaderDirection.rightToLeft: 'rightToLeft',
-  ReaderDirection.topToBottom: 'topToBottom',
 };
 
 // **************************************************************************

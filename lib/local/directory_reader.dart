@@ -117,7 +117,7 @@ class DirectoryReaderWidget extends ConsumerWidget {
         return ReaderWidget(
           pages: pages,
           title: strtitle,
-          isLongStrip: false, // TODO longstrip
+          longstrip: false, // TODO detect longstrip
           link: link,
           onLinkPressed: onLinkPressed,
         );

@@ -208,7 +208,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           pages: pages,
           title: title,
           subtitle: manga.attributes.title.get('en'),
-          isLongStrip: manga.longStrip,
+          longstrip: manga.longStrip,
           link: link,
           onLinkPressed: onLinkPressed,
           externalUrl: chapter.attributes.externalUrl,

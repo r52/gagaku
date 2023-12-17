@@ -20,6 +20,9 @@ ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ReaderConfig {
+  /// Reader format
+  ReaderFormat get format => throw _privateConstructorUsedError;
+
   /// Reader direction
   ReaderDirection get direction => throw _privateConstructorUsedError;
 
@@ -48,7 +51,8 @@ abstract class $ReaderConfigCopyWith<$Res> {
       _$ReaderConfigCopyWithImpl<$Res, ReaderConfig>;
   @useResult
   $Res call(
-      {ReaderDirection direction,
+      {ReaderFormat format,
+      ReaderDirection direction,
       bool showProgressBar,
       bool clickToTurn,
       bool swipeGestures,
@@ -68,6 +72,7 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? format = null,
     Object? direction = null,
     Object? showProgressBar = null,
     Object? clickToTurn = null,
@@ -75,6 +80,10 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
     Object? precacheCount = null,
   }) {
     return _then(_value.copyWith(
+      format: null == format
+          ? _value.format
+          : format // ignore: cast_nullable_to_non_nullable
+              as ReaderFormat,
       direction: null == direction
           ? _value.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -108,7 +117,8 @@ abstract class _$$ReaderConfigImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {ReaderDirection direction,
+      {ReaderFormat format,
+      ReaderDirection direction,
       bool showProgressBar,
       bool clickToTurn,
       bool swipeGestures,
@@ -126,6 +136,7 @@ class __$$ReaderConfigImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? format = null,
     Object? direction = null,
     Object? showProgressBar = null,
     Object? clickToTurn = null,
@@ -133,6 +144,10 @@ class __$$ReaderConfigImplCopyWithImpl<$Res>
     Object? precacheCount = null,
   }) {
     return _then(_$ReaderConfigImpl(
+      format: null == format
+          ? _value.format
+          : format // ignore: cast_nullable_to_non_nullable
+              as ReaderFormat,
       direction: null == direction
           ? _value.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -161,7 +176,8 @@ class __$$ReaderConfigImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ReaderConfigImpl implements _ReaderConfig {
   const _$ReaderConfigImpl(
-      {this.direction = ReaderDirection.leftToRight,
+      {this.format = ReaderFormat.single,
+      this.direction = ReaderDirection.leftToRight,
       this.showProgressBar = false,
       this.clickToTurn = true,
       this.swipeGestures = true,
@@ -169,6 +185,11 @@ class _$ReaderConfigImpl implements _ReaderConfig {
 
   factory _$ReaderConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReaderConfigImplFromJson(json);
+
+  /// Reader format
+  @override
+  @JsonKey()
+  final ReaderFormat format;
 
   /// Reader direction
   @override
@@ -197,7 +218,7 @@ class _$ReaderConfigImpl implements _ReaderConfig {
 
   @override
   String toString() {
-    return 'ReaderConfig(direction: $direction, showProgressBar: $showProgressBar, clickToTurn: $clickToTurn, swipeGestures: $swipeGestures, precacheCount: $precacheCount)';
+    return 'ReaderConfig(format: $format, direction: $direction, showProgressBar: $showProgressBar, clickToTurn: $clickToTurn, swipeGestures: $swipeGestures, precacheCount: $precacheCount)';
   }
 
   @override
@@ -205,6 +226,7 @@ class _$ReaderConfigImpl implements _ReaderConfig {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ReaderConfigImpl &&
+            (identical(other.format, format) || other.format == format) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             (identical(other.showProgressBar, showProgressBar) ||
@@ -219,8 +241,8 @@ class _$ReaderConfigImpl implements _ReaderConfig {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, direction, showProgressBar,
-      clickToTurn, swipeGestures, precacheCount);
+  int get hashCode => Object.hash(runtimeType, format, direction,
+      showProgressBar, clickToTurn, swipeGestures, precacheCount);
 
   @JsonKey(ignore: true)
   @override
@@ -238,7 +260,8 @@ class _$ReaderConfigImpl implements _ReaderConfig {
 
 abstract class _ReaderConfig implements ReaderConfig {
   const factory _ReaderConfig(
-      {final ReaderDirection direction,
+      {final ReaderFormat format,
+      final ReaderDirection direction,
       final bool showProgressBar,
       final bool clickToTurn,
       final bool swipeGestures,
@@ -247,6 +270,10 @@ abstract class _ReaderConfig implements ReaderConfig {
   factory _ReaderConfig.fromJson(Map<String, dynamic> json) =
       _$ReaderConfigImpl.fromJson;
 
+  @override
+
+  /// Reader format
+  ReaderFormat get format;
   @override
 
   /// Reader direction
