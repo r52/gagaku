@@ -98,7 +98,8 @@ class ProxyHandler {
       return manga;
     }
 
-    throw Exception("Failed to download manga data");
+    throw Exception(
+        "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
 
   // Future<WebManga> _getMangaFromGist(ProxyInfo info) async {
@@ -177,7 +178,8 @@ class ProxyHandler {
       }
     }
 
-    throw Exception("Failed to chapter data");
+    throw Exception(
+        "Failed to download chapter data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
 }
 

@@ -932,7 +932,7 @@ class MangaDexException implements Exception {
 
     if (errors != null && errors!.isNotEmpty) {
       final e = errors!.first;
-      report = '$report(${e.title})';
+      report = '$report(${e.title}:${e.status})';
 
       if (e.detail != null) {
         message = e.detail;

@@ -324,10 +324,21 @@ class MangaDexModel {
     await _cache.invalidateAll(startsWith);
   }
 
-  MangaDexException createException(String msg, ErrorResponse err) {
-    final excep = MangaDexException(msg, err.errors);
-    logger.e(msg, error: excep);
-    return excep;
+  Exception createException(String msg, http.Response response) {
+    final message =
+        "$msg\nServer returned ${response.statusCode}: ${response.reasonPhrase}";
+
+    if (response.statusCode == 500) {
+      logger.e(message);
+      return Exception(message);
+    }
+
+    // MD API error
+    final body = json.decode(response.body);
+    final err = ErrorResponse.fromJson(body);
+    final ex = MangaDexException(msg, err.errors);
+    logger.e(msg, error: ex);
+    return ex;
   }
 
   /// Fetches a generic [ChapterList] feed based on given parameters, respecting
@@ -386,9 +397,9 @@ class MangaDexModel {
         MangaDexEndpoints.api.replace(path: path, queryParameters: queryParams);
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
       final result = ChapterList.fromJson(body);
 
       // Cache the data and list
@@ -398,8 +409,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg = "$feedKey() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("$feedKey() failed.", response);
   }
 
   /// Fetches chapter data of the given chapter [uuids]
@@ -433,18 +443,16 @@ class MangaDexModel {
             path: MangaDexEndpoints.chapter, queryParameters: queryParams);
 
         final response = await _client.get(uri);
-        final Map<String, dynamic> body = json.decode(response.body);
 
         if (response.statusCode == 200) {
+          final Map<String, dynamic> body = json.decode(response.body);
           final result = ChapterList.fromJson(body);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
         } else {
           // Throw if failure
-          final msg =
-              "fetchChapters() failed. Response code: ${response.statusCode}";
-          createException(msg, ErrorResponse.fromJson(body));
+          throw createException("fetchChapters() failed.", response);
         }
       }
     }
@@ -495,18 +503,16 @@ class MangaDexModel {
               path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
           final response = await _client.get(uri);
-          final Map<String, dynamic> body = json.decode(response.body);
 
           if (response.statusCode == 200) {
+            final Map<String, dynamic> body = json.decode(response.body);
             final mangalist = MangaList.fromJson(body);
 
             // Cache the data
             await _cache.putAllAPIResolved(mangalist.data);
           } else {
             // Throw if failure
-            final msg =
-                "fetchManga(ids) failed. Response code: ${response.statusCode}";
-            throw createException(msg, ErrorResponse.fromJson(body));
+            throw createException("fetchManga(ids) failed.", response);
           }
         }
       }
@@ -528,7 +534,8 @@ class MangaDexModel {
           queryParams['group'] = id;
           break;
         default:
-          const msg = "fetchManga(filterId) failed. Invalid filter type.";
+          final msg =
+              "fetchManga(filterId) failed. Invalid filter type ${filterId.runtimeType}.";
           logger.e(msg);
           throw Exception(msg);
       }
@@ -537,9 +544,9 @@ class MangaDexModel {
           .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
       final response = await _client.get(uri);
-      final Map<String, dynamic> body = json.decode(response.body);
 
       if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
         final mangalist = MangaList.fromJson(body);
 
         // Cache the data
@@ -548,9 +555,7 @@ class MangaDexModel {
         return mangalist.data;
       } else {
         // Throw if failure
-        final msg =
-            "fetchManga(filterId) failed. Response code: ${response.statusCode}";
-        throw createException(msg, ErrorResponse.fromJson(body));
+        throw createException("fetchManga(filterId) failed.", response);
       }
     }
 
@@ -594,9 +599,9 @@ class MangaDexModel {
         .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
       final mlist = MangaList.fromJson(body);
 
       // Cache the data
@@ -606,8 +611,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg = "searchManga() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("searchManga() failed.", response);
   }
 
   /// Gets whether or not the user is following [manga]
@@ -679,9 +683,10 @@ class MangaDexModel {
         .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
     final response = await _client.get(uri);
-    Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
       if (body['result'] == 'ok') {
         MangaReadingStatus? status;
 
@@ -696,9 +701,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "getMangaReadingStatus() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("getMangaReadingStatus() failed.", response);
   }
 
   /// Sets the manga's reading status [status] of the [manga]
@@ -757,9 +760,10 @@ class MangaDexModel {
           path: MangaDexEndpoints.getRead, queryParameters: queryParams);
 
       final response = await _client.get(uri);
-      final Map<String, dynamic> body = json.decode(response.body);
 
       if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+
         if (body['data'] is List) {
           // Since grouped = true, if the api returns a List, then the result
           // is null
@@ -782,9 +786,7 @@ class MangaDexModel {
         return readmap;
       } else {
         // Throw if failure
-        final msg =
-            "fetchReadChapters() failed. Response code: ${response.statusCode}";
-        throw createException(msg, ErrorResponse.fromJson(body));
+        throw createException("fetchReadChapters() failed.", response);
       }
     }
 
@@ -840,9 +842,9 @@ class MangaDexModel {
         path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id));
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
       final apidat = ChapterAPI.fromJson(body);
 
       final chapterUrl = apidat.getUrl(settings.dataSaver);
@@ -859,9 +861,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "getChapterServer() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("getChapterServer() failed.", response);
   }
 
   /// Fetches the user's manga library
@@ -885,9 +885,10 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
       if (body['statuses'] is List) {
         // If the api returns a List, then the result is null
         return null;
@@ -904,9 +905,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "fetchUserLibrary() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("fetchUserLibrary() failed.", response);
   }
 
   /// Retrieve all MangaDex tags
@@ -919,9 +918,9 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
       final result = TagResponse.fromJson(body);
 
       // Cache the data and list
@@ -932,8 +931,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg = "getTagList() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("getTagList() failed.", response);
   }
 
   /// Fetches statistics of given [mangas]
@@ -951,17 +949,15 @@ class MangaDexModel {
           path: MangaDexEndpoints.statistics, queryParameters: queryParams);
 
       final response = await _client.get(uri);
-      final Map<String, dynamic> body = json.decode(response.body);
 
       if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
         final resp = MangaStatisticsResponse.fromJson(body);
 
         return resp.statistics;
       } else {
         // Throw if failure
-        final msg =
-            "fetchStatistics() failed. Response code: ${response.statusCode}";
-        throw createException(msg, ErrorResponse.fromJson(body));
+        throw createException("fetchStatistics() failed.", response);
       }
     }
 
@@ -991,9 +987,9 @@ class MangaDexModel {
         .replace(path: MangaDexEndpoints.cover, queryParameters: queryParams);
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
       final result = CoverList.fromJson(body);
 
       // Cache the data
@@ -1003,8 +999,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg = "getCoverList() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("getCoverList() failed.", response);
   }
 
   /// Fetches the user's self-rating of given [mangas]
@@ -1021,9 +1016,10 @@ class MangaDexModel {
           path: MangaDexEndpoints.getRating, queryParameters: queryParams);
 
       final response = await _client.get(uri);
-      final Map<String, dynamic> body = json.decode(response.body);
 
       if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+
         if (body['ratings'] is List) {
           // If the api returns a List, then the result is null
           Map<String, SelfRating> map = {};
@@ -1048,9 +1044,7 @@ class MangaDexModel {
         return map;
       } else {
         // Throw if failure
-        final msg =
-            "fetchRating() failed. Response code: ${response.statusCode}";
-        throw createException(msg, ErrorResponse.fromJson(body));
+        throw createException("fetchRating() failed.", response);
       }
     }
 
@@ -1122,18 +1116,16 @@ class MangaDexModel {
             path: MangaDexEndpoints.group, queryParameters: queryParams);
 
         final response = await _client.get(uri);
-        final Map<String, dynamic> body = json.decode(response.body);
 
         if (response.statusCode == 200) {
+          final Map<String, dynamic> body = json.decode(response.body);
           final result = GroupList.fromJson(body);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
         } else {
           // Throw if failure
-          final msg =
-              "fetchGroups() failed. Response code: ${response.statusCode}";
-          throw createException(msg, ErrorResponse.fromJson(body));
+          throw createException("fetchGroups() failed.", response);
         }
       }
     }
@@ -1173,18 +1165,16 @@ class MangaDexModel {
             path: MangaDexEndpoints.creator, queryParameters: queryParams);
 
         final response = await _client.get(uri);
-        final Map<String, dynamic> body = json.decode(response.body);
 
         if (response.statusCode == 200) {
+          final Map<String, dynamic> body = json.decode(response.body);
           final result = CreatorList.fromJson(body);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
         } else {
           // Throw if failure
-          final msg =
-              "fetchCreators() failed. Response code: ${response.statusCode}";
-          throw createException(msg, ErrorResponse.fromJson(body));
+          throw createException("fetchCreators() failed.", response);
         }
       }
     }
@@ -1214,9 +1204,9 @@ class MangaDexModel {
         path: MangaDexEndpoints.modifyList.replaceFirst('{id}', listId));
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
       final result = CustomList.fromJson(body['data']);
 
       // Cache the result
@@ -1228,8 +1218,7 @@ class MangaDexModel {
     }
 
     // Throw if unknown code
-    final msg = "fetchListById() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("fetchListById() failed.", response);
   }
 
   /// Fetches logged user's [CustomList] list
@@ -1254,9 +1243,9 @@ class MangaDexModel {
         path: MangaDexEndpoints.userList, queryParameters: queryParams);
 
     final response = await _client.get(uri);
-    final Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
       final result = CustomListList.fromJson(body);
 
       // Cache entries
@@ -1272,8 +1261,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg = "fetchUserList() failed. Response code: ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("fetchUserList() failed.", response);
   }
 
   /// Adds/removes a [Manga] from a [CustomList]
@@ -1415,9 +1403,9 @@ class MangaDexModel {
       body: json.encode(params),
     );
 
-    Map<String, dynamic> body = json.decode(response.body);
-
     if (response.statusCode >= 200 && response.statusCode <= 201) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
       if (body['result'] == 'ok') {
         // Process new list
         final nlist = CustomList.fromJson(body['data']);
@@ -1429,9 +1417,8 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "editList($id, ${visibility.name}) returned code ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException(
+        "editList($id, ${visibility.name}) failed.", response);
   }
 
   /// Get logged in user details
@@ -1444,9 +1431,10 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.me);
 
     final response = await _client.get(uri);
-    Map<String, dynamic> body = json.decode(response.body);
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
       if (body['result'] == 'ok') {
         // Process new list
         final user = User.fromJson(body['data']);
@@ -1456,8 +1444,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg = "getLoggedUser() returned code ${response.statusCode}";
-    throw createException(msg, ErrorResponse.fromJson(body));
+    throw createException("getLoggedUser() failed.", response);
   }
 }
 

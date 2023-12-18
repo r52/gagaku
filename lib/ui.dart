@@ -308,7 +308,7 @@ class Styles {
   static Widget errorColumn(Object err, StackTrace stack) => Center(
         child: Column(
           children: [
-            Text('Error: $err'),
+            Text('$err'),
             Text(stack.toString()),
           ],
         ),
@@ -320,7 +320,7 @@ class Styles {
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
-              Text('Error: $err'),
+              Text('$err'),
               Text(stack.toString()),
             ],
           ),
