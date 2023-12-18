@@ -676,3 +676,35 @@ const _$CustomListVisibilityEnumMap = {
   CustomListVisibility.private: 'private',
   CustomListVisibility.public: 'public',
 };
+
+_$ErrorResponseImpl _$$ErrorResponseImplFromJson(Map<String, dynamic> json) =>
+    _$ErrorResponseImpl(
+      json['result'] as String,
+      (json['errors'] as List<dynamic>)
+          .map((e) => MDError.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$ErrorResponseImplToJson(_$ErrorResponseImpl instance) =>
+    <String, dynamic>{
+      'result': instance.result,
+      'errors': instance.errors,
+    };
+
+_$MDErrorImpl _$$MDErrorImplFromJson(Map<String, dynamic> json) =>
+    _$MDErrorImpl(
+      id: json['id'] as String,
+      status: json['status'] as int,
+      title: json['title'] as String,
+      detail: json['detail'] as String?,
+      context: json['context'] as String?,
+    );
+
+Map<String, dynamic> _$$MDErrorImplToJson(_$MDErrorImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'status': instance.status,
+      'title': instance.title,
+      'detail': instance.detail,
+      'context': instance.context,
+    };

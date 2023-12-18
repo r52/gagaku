@@ -893,6 +893,60 @@ class CustomListAttributes with _$CustomListAttributes {
       _$CustomListAttributesFromJson(json);
 }
 
+@freezed
+class ErrorResponse with _$ErrorResponse {
+  const factory ErrorResponse(
+    String result,
+    List<MDError> errors,
+  ) = _ErrorResponse;
+
+  factory ErrorResponse.fromJson(Map<String, dynamic> json) =>
+      _$ErrorResponseFromJson(json);
+}
+
+@freezed
+class MDError with _$MDError {
+  const factory MDError({
+    required String id,
+    required int status,
+    required String title,
+    String? detail,
+    String? context,
+  }) = _MDError;
+
+  factory MDError.fromJson(Map<String, dynamic> json) =>
+      _$MDErrorFromJson(json);
+}
+
+class MangaDexException implements Exception {
+  final String message;
+  final List<MDError>? errors;
+
+  const MangaDexException([this.message = "", this.errors]);
+
+  @override
+  String toString() {
+    String report = "MangaDexException";
+
+    Object? message = this.message;
+
+    if (errors != null && errors!.isNotEmpty) {
+      final e = errors!.first;
+      report = '$report(${e.title})';
+
+      if (e.detail != null) {
+        message = e.detail;
+      }
+    }
+
+    if (message != null && "" != message) {
+      report = "$report: $message";
+    }
+
+    return report;
+  }
+}
+
 class PageData {
   const PageData(this.baseUrl, this.pages);
 

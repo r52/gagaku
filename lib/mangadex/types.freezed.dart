@@ -8128,3 +8128,395 @@ abstract class _CustomListAttributes implements CustomListAttributes {
   _$$CustomListAttributesImplCopyWith<_$CustomListAttributesImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
+
+ErrorResponse _$ErrorResponseFromJson(Map<String, dynamic> json) {
+  return _ErrorResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ErrorResponse {
+  String get result => throw _privateConstructorUsedError;
+  List<MDError> get errors => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ErrorResponseCopyWith<ErrorResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ErrorResponseCopyWith<$Res> {
+  factory $ErrorResponseCopyWith(
+          ErrorResponse value, $Res Function(ErrorResponse) then) =
+      _$ErrorResponseCopyWithImpl<$Res, ErrorResponse>;
+  @useResult
+  $Res call({String result, List<MDError> errors});
+}
+
+/// @nodoc
+class _$ErrorResponseCopyWithImpl<$Res, $Val extends ErrorResponse>
+    implements $ErrorResponseCopyWith<$Res> {
+  _$ErrorResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? result = null,
+    Object? errors = null,
+  }) {
+    return _then(_value.copyWith(
+      result: null == result
+          ? _value.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as String,
+      errors: null == errors
+          ? _value.errors
+          : errors // ignore: cast_nullable_to_non_nullable
+              as List<MDError>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ErrorResponseImplCopyWith<$Res>
+    implements $ErrorResponseCopyWith<$Res> {
+  factory _$$ErrorResponseImplCopyWith(
+          _$ErrorResponseImpl value, $Res Function(_$ErrorResponseImpl) then) =
+      __$$ErrorResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String result, List<MDError> errors});
+}
+
+/// @nodoc
+class __$$ErrorResponseImplCopyWithImpl<$Res>
+    extends _$ErrorResponseCopyWithImpl<$Res, _$ErrorResponseImpl>
+    implements _$$ErrorResponseImplCopyWith<$Res> {
+  __$$ErrorResponseImplCopyWithImpl(
+      _$ErrorResponseImpl _value, $Res Function(_$ErrorResponseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? result = null,
+    Object? errors = null,
+  }) {
+    return _then(_$ErrorResponseImpl(
+      null == result
+          ? _value.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as String,
+      null == errors
+          ? _value._errors
+          : errors // ignore: cast_nullable_to_non_nullable
+              as List<MDError>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ErrorResponseImpl
+    with DiagnosticableTreeMixin
+    implements _ErrorResponse {
+  const _$ErrorResponseImpl(this.result, final List<MDError> errors)
+      : _errors = errors;
+
+  factory _$ErrorResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ErrorResponseImplFromJson(json);
+
+  @override
+  final String result;
+  final List<MDError> _errors;
+  @override
+  List<MDError> get errors {
+    if (_errors is EqualUnmodifiableListView) return _errors;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_errors);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ErrorResponse(result: $result, errors: $errors)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ErrorResponse'))
+      ..add(DiagnosticsProperty('result', result))
+      ..add(DiagnosticsProperty('errors', errors));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ErrorResponseImpl &&
+            (identical(other.result, result) || other.result == result) &&
+            const DeepCollectionEquality().equals(other._errors, _errors));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, result, const DeepCollectionEquality().hash(_errors));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ErrorResponseImplCopyWith<_$ErrorResponseImpl> get copyWith =>
+      __$$ErrorResponseImplCopyWithImpl<_$ErrorResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ErrorResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ErrorResponse implements ErrorResponse {
+  const factory _ErrorResponse(
+      final String result, final List<MDError> errors) = _$ErrorResponseImpl;
+
+  factory _ErrorResponse.fromJson(Map<String, dynamic> json) =
+      _$ErrorResponseImpl.fromJson;
+
+  @override
+  String get result;
+  @override
+  List<MDError> get errors;
+  @override
+  @JsonKey(ignore: true)
+  _$$ErrorResponseImplCopyWith<_$ErrorResponseImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+MDError _$MDErrorFromJson(Map<String, dynamic> json) {
+  return _MDError.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MDError {
+  String get id => throw _privateConstructorUsedError;
+  int get status => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  String? get detail => throw _privateConstructorUsedError;
+  String? get context => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MDErrorCopyWith<MDError> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MDErrorCopyWith<$Res> {
+  factory $MDErrorCopyWith(MDError value, $Res Function(MDError) then) =
+      _$MDErrorCopyWithImpl<$Res, MDError>;
+  @useResult
+  $Res call(
+      {String id, int status, String title, String? detail, String? context});
+}
+
+/// @nodoc
+class _$MDErrorCopyWithImpl<$Res, $Val extends MDError>
+    implements $MDErrorCopyWith<$Res> {
+  _$MDErrorCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? status = null,
+    Object? title = null,
+    Object? detail = freezed,
+    Object? context = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as int,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      detail: freezed == detail
+          ? _value.detail
+          : detail // ignore: cast_nullable_to_non_nullable
+              as String?,
+      context: freezed == context
+          ? _value.context
+          : context // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$MDErrorImplCopyWith<$Res> implements $MDErrorCopyWith<$Res> {
+  factory _$$MDErrorImplCopyWith(
+          _$MDErrorImpl value, $Res Function(_$MDErrorImpl) then) =
+      __$$MDErrorImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id, int status, String title, String? detail, String? context});
+}
+
+/// @nodoc
+class __$$MDErrorImplCopyWithImpl<$Res>
+    extends _$MDErrorCopyWithImpl<$Res, _$MDErrorImpl>
+    implements _$$MDErrorImplCopyWith<$Res> {
+  __$$MDErrorImplCopyWithImpl(
+      _$MDErrorImpl _value, $Res Function(_$MDErrorImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? status = null,
+    Object? title = null,
+    Object? detail = freezed,
+    Object? context = freezed,
+  }) {
+    return _then(_$MDErrorImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as int,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      detail: freezed == detail
+          ? _value.detail
+          : detail // ignore: cast_nullable_to_non_nullable
+              as String?,
+      context: freezed == context
+          ? _value.context
+          : context // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MDErrorImpl with DiagnosticableTreeMixin implements _MDError {
+  const _$MDErrorImpl(
+      {required this.id,
+      required this.status,
+      required this.title,
+      this.detail,
+      this.context});
+
+  factory _$MDErrorImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MDErrorImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final int status;
+  @override
+  final String title;
+  @override
+  final String? detail;
+  @override
+  final String? context;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MDError(id: $id, status: $status, title: $title, detail: $detail, context: $context)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MDError'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('status', status))
+      ..add(DiagnosticsProperty('title', title))
+      ..add(DiagnosticsProperty('detail', detail))
+      ..add(DiagnosticsProperty('context', context));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MDErrorImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.detail, detail) || other.detail == detail) &&
+            (identical(other.context, context) || other.context == context));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, status, title, detail, context);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
+      __$$MDErrorImplCopyWithImpl<_$MDErrorImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MDErrorImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MDError implements MDError {
+  const factory _MDError(
+      {required final String id,
+      required final int status,
+      required final String title,
+      final String? detail,
+      final String? context}) = _$MDErrorImpl;
+
+  factory _MDError.fromJson(Map<String, dynamic> json) = _$MDErrorImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  int get status;
+  @override
+  String get title;
+  @override
+  String? get detail;
+  @override
+  String? get context;
+  @override
+  @JsonKey(ignore: true)
+  _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
