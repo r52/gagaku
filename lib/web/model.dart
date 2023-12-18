@@ -183,7 +183,7 @@ class ProxyHandler {
 
 @Riverpod(keepAlive: true)
 class WebSourceHistory extends _$WebSourceHistory {
-  final _numItems = 50;
+  static const _numItems = 250;
 
   Future<Queue<HistoryLink>> _fetch() async {
     final box = Hive.box(gagakuBox);

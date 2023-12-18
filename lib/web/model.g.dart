@@ -20,7 +20,7 @@ final proxyProvider = Provider<ProxyHandler>.internal(
 );
 
 typedef ProxyRef = ProviderRef<ProxyHandler>;
-String _$webSourceHistoryHash() => r'6ee2202cbc821ae1463075d7e85ffb8f03e3091a';
+String _$webSourceHistoryHash() => r'2a6d79dd62487489190d268d93bbe5d2550908a1';
 
 /// See also [WebSourceHistory].
 @ProviderFor(WebSourceHistory)
