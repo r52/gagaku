@@ -792,7 +792,7 @@ class _GridMangaItem extends HookWidget {
               )
             : null,
         footer: SizedBox(
-          height: 60,
+          height: 80,
           child: Material(
             color: Colors.transparent,
             shape: const RoundedRectangleBorder(
