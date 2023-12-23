@@ -984,6 +984,7 @@ class ReadChapterSet with ExpiringData {
   DateTime updateExpiry() => expiry = DateTime.now().add(_expiryDuration);
 
   bool contains(String entry) => _chapters.contains(entry);
+  bool containsAll(Iterable<String> entries) => _chapters.containsAll(entries);
   bool get isEmpty => _chapters.isEmpty;
   bool get isNotEmpty => _chapters.isNotEmpty;
 

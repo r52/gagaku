@@ -1140,6 +1140,86 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   ),
                 ),
               ),
+              if (view.value == _ViewType.chapters && loggedin)
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    color: theme.cardColor,
+                    child: Row(
+                      children: [
+                        const Spacer(),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final chapters = chapterProvider.valueOrNull;
+
+                            final allRead = chapters != null
+                                ? ref.watch(readChaptersProvider
+                                    .select((value) => switch (value) {
+                                          AsyncValue(
+                                            valueOrNull: final data?
+                                          ) =>
+                                            data[manga.id]?.containsAll(chapters
+                                                    .map((e) => e.id)) ==
+                                                true,
+                                          _ => false,
+                                        }))
+                                : false;
+
+                            final opt = allRead ? 'unread' : 'read';
+
+                            return ElevatedButton(
+                              style: Styles.buttonStyle(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0)),
+                              onPressed: () async {
+                                final result = await showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    final nav = Navigator.of(context);
+                                    return AlertDialog(
+                                      title: Text('Mark all as $opt'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              'Are you sure you want to mark all visible chapters as $opt?'),
+                                        ],
+                                      ),
+                                      actions: <Widget>[
+                                        ElevatedButton(
+                                          child: const Text('No'),
+                                          onPressed: () {
+                                            nav.pop(false);
+                                          },
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            nav.pop(true);
+                                          },
+                                          child: const Text('Yes'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+
+                                if (chapters != null && result == true) {
+                                  ref.read(readChaptersProvider.notifier).set(
+                                      manga,
+                                      read: !allRead ? chapters : null,
+                                      unread: allRead ? chapters : null);
+                                }
+                              },
+                              child: Text('Mark all visible as $opt'),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ];
           },
           body: SafeArea(
