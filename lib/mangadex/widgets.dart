@@ -947,8 +947,10 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                           spacing: 4.0,
                           runSpacing: 4.0,
                           children: [
-                            ContentRatingChip(
-                                rating: manga.attributes.contentRating),
+                            if (manga.attributes.contentRating !=
+                                ContentRating.safe)
+                              ContentRatingChip(
+                                  rating: manga.attributes.contentRating),
                             ...manga.attributes.tags
                                 .where((tag) =>
                                     tag.attributes.group == TagGroup.content)
@@ -1038,7 +1040,9 @@ class _ListMangaItem extends ConsumerWidget {
                     spacing: 4.0,
                     runSpacing: 4.0,
                     children: [
-                      ContentRatingChip(rating: manga.attributes.contentRating),
+                      if (manga.attributes.contentRating != ContentRating.safe)
+                        ContentRatingChip(
+                            rating: manga.attributes.contentRating),
                       ...manga.attributes.tags
                           .where(
                               (tag) => tag.attributes.group == TagGroup.content)

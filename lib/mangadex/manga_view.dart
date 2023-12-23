@@ -706,15 +706,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     spacing: 4.0,
                     runSpacing: 4.0,
                     children: [
-                      ContentRatingChip(rating: manga.attributes.contentRating),
+                      if (manga.attributes.contentRating != ContentRating.safe)
+                        ContentRatingChip(
+                            rating: manga.attributes.contentRating),
                       ...manga.attributes.tags
                           .where(
                               (tag) => tag.attributes.group == TagGroup.content)
                           .map((e) => ContentChip(
                               content: e.attributes.name.get('en'))),
-                      const SizedBox(
-                        width: 2,
-                      ),
                       if (manga.attributes.tags.isNotEmpty)
                         ...manga.attributes.tags
                             .where((tag) =>
