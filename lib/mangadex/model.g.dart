@@ -1195,7 +1195,7 @@ class _MangaCoversProviderElement
   Manga get manga => (origin as MangaCoversProvider).manga;
 }
 
-String _$readChaptersHash() => r'2ee4d46066d3d088132d42f9cfb0085b54bc294e';
+String _$readChaptersHash() => r'2466dc973def4eb07fc519e275161f8134e1cd96';
 
 /// See also [ReadChapters].
 @ProviderFor(ReadChapters)

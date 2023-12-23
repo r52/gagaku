@@ -793,9 +793,12 @@ class MangaDexModel {
     return {};
   }
 
-  /// Sets the chapter read status [setRead] of the [chapters]
+  /// Sets the given chapters as [read] or [unread]
   Future<bool> setChaptersRead(
-      Manga manga, Iterable<Chapter> chapters, bool setRead) async {
+    Manga manga, {
+    Iterable<Chapter>? read,
+    Iterable<Chapter>? unread,
+  }) async {
     if (!await loggedIn()) {
       throw StateError(
           "setChaptersRead() called on invalid token/login. Shouldn't ever get here");
@@ -803,10 +806,12 @@ class MangaDexModel {
 
     Map<String, dynamic> params = {};
 
-    if (setRead) {
-      params['chapterIdsRead'] = chapters.map((e) => e.id).toList();
-    } else {
-      params['chapterIdsUnread'] = chapters.map((e) => e.id).toList();
+    if (read != null && read.isNotEmpty) {
+      params['chapterIdsRead'] = read.map((e) => e.id).toList();
+    }
+
+    if (unread != null && unread.isNotEmpty) {
+      params['chapterIdsUnread'] = unread.map((e) => e.id).toList();
     }
 
     final uri = MangaDexEndpoints.api.replace(
@@ -823,7 +828,7 @@ class MangaDexModel {
 
     // Log the failure
     logger.w(
-        "setChaptersRead(${manga.id}, ${chapters.toString()}, $setRead) returned code ${response.statusCode}",
+        "setChaptersRead(${manga.id}, ${read.toString()}, ${unread.toString()}) returned code ${response.statusCode}",
         error: response.body);
 
     return false;
@@ -1921,7 +1926,10 @@ class ReadChapters extends _$ReadChapters {
 
   /// Sets a list of chapters for a manga read or unread
   Future<void> set(
-      Manga manga, Iterable<Chapter> chapters, bool setRead) async {
+    Manga manga, {
+    Iterable<Chapter>? read,
+    Iterable<Chapter>? unread,
+  }) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return;
@@ -1932,30 +1940,29 @@ class ReadChapters extends _$ReadChapters {
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final chapIdSet = chapters.map((e) => e.id).toSet();
-      bool result = await api.setChaptersRead(manga, chapters, setRead);
+      bool result =
+          await api.setChaptersRead(manga, read: read, unread: unread);
 
       if (result) {
         final keyExists = oldstate.containsKey(manga.id);
 
         // Refresh
         if (keyExists) {
-          switch (setRead) {
-            case true:
-              oldstate[manga.id]?.addAll(chapIdSet);
-              break;
-            case false:
-              oldstate[manga.id]?.removeAll(chapIdSet);
-              break;
+          if (read != null) {
+            oldstate[manga.id]?.addAll(read.map((e) => e.id));
+          }
+
+          if (unread != null) {
+            oldstate[manga.id]?.removeAll(unread.map((e) => e.id));
           }
         } else {
-          switch (setRead) {
-            case true:
-              oldstate[manga.id] = ReadChapterSet(manga.id, chapIdSet);
-              break;
-            case false:
-              oldstate[manga.id] = ReadChapterSet(manga.id, {});
-              break;
+          if (read != null) {
+            oldstate[manga.id] =
+                ReadChapterSet(manga.id, read.map((e) => e.id).toSet());
+          }
+
+          if (unread != null) {
+            oldstate[manga.id] = ReadChapterSet(manga.id, {});
           }
         }
       }

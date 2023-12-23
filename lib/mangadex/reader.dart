@@ -180,7 +180,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           final readData = await ref.read(readChaptersProvider.future);
 
           if (readData[manga.id]?.contains(chapter.id) != true) {
-            ref.read(readChaptersProvider.notifier).set(manga, [chapter], true);
+            ref.read(readChaptersProvider.notifier).set(manga, read: [chapter]);
           }
         }
 

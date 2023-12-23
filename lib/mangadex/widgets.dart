@@ -422,9 +422,9 @@ class ChapterButtonWidget extends ConsumerWidget {
         true || false => IconButton(
             onPressed: () async {
               bool set = !isRead!;
-              ref
-                  .read(readChaptersProvider.notifier)
-                  .set(manga, [chapter], set);
+              ref.read(readChaptersProvider.notifier).set(manga,
+                  read: set ? [chapter] : null,
+                  unread: !set ? [chapter] : null);
             },
             padding: const EdgeInsets.all(0.0),
             splashRadius: 15,
