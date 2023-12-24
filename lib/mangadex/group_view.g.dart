@@ -197,7 +197,7 @@ class _FetchGroupFromIdProviderElement
   String get groupId => (origin as _FetchGroupFromIdProvider).groupId;
 }
 
-String _$fetchGroupFeedHash() => r'9b4c0d353a721e8841233b9c0c6a2db2f8e97a65';
+String _$fetchGroupFeedHash() => r'80ad339c0313b6e3d0f75b4401959b6099d24a5d';
 
 /// See also [_fetchGroupFeed].
 @ProviderFor(_fetchGroupFeed)

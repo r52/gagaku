@@ -154,6 +154,46 @@ extension FilterOrderExt on FilterOrder {
       ].elementAt(index);
 }
 
+enum MangaRelations {
+  monochrome,
+  main_story,
+  adapted_from,
+  based_on,
+  prequel,
+  side_story,
+  doujinshi,
+  same_franchise,
+  shared_universe,
+  sequel,
+  spin_off,
+  alternate_story,
+  alternate_version,
+  preserialization,
+  colored,
+  serialization,
+}
+
+extension MangaRelationsExt on MangaRelations {
+  String get formatted => const [
+        'Monochrome',
+        'Main Story',
+        'Adapted from',
+        'Based on',
+        'Prequel',
+        'Side story',
+        'Doujinshi',
+        'Same franchise',
+        'Shared universe',
+        'Sequel',
+        'Spinoff',
+        'Alternate story',
+        'Alternate version',
+        'Pre-serialization',
+        'Colored',
+        'Serialization',
+      ].elementAt(index);
+}
+
 @freezed
 class MangaFilters with _$MangaFilters {
   const MangaFilters._();
@@ -360,14 +400,14 @@ class Chapter with _$Chapter, MangaDexUUID {
     return groups;
   }
 
-  String getMangaID() {
-    final mangas = relationships.whereType<MangaID>();
+  Manga getManga() {
+    final mangas = relationships.whereType<Manga>();
 
     if (mangas.isNotEmpty) {
-      return mangas.first.id;
+      return mangas.first;
     }
 
-    return '';
+    throw Exception('Chapter $id has no associated manga');
   }
 
   String getUploadUser() {
@@ -458,17 +498,19 @@ abstract class CreatorType with MangaDexUUID {
   AuthorAttributes get attributes;
 }
 
-/// END
-
 @Freezed(unionKey: 'type')
 class Relationship with _$Relationship, MangaDexUUID {
-  const factory Relationship.manga({
+  @With<MangaOps>()
+  factory Relationship.manga({
     required String id,
-  }) = MangaID;
+    MangaAttributes? attributes,
+    List<Relationship>? relationships,
+    MangaRelations? related,
+  }) = Manga;
 
   const factory Relationship.user({
     required String id,
-    required UserAttributes? attributes,
+    UserAttributes? attributes,
   }) = User;
 
   @Implements<CreatorType>()
@@ -490,7 +532,7 @@ class Relationship with _$Relationship, MangaDexUUID {
   @FreezedUnionValue('cover_art')
   const factory Relationship.cover({
     required String id,
-    required CoverArtAttributes? attributes,
+    CoverArtAttributes? attributes,
   }) = CoverArt;
 
   @FreezedUnionValue('scanlation_group')
@@ -575,35 +617,31 @@ class CreatorList with _$CreatorList {
       _$CreatorListFromJson(json);
 }
 
-@freezed
-class Manga with _$Manga, MangaDexUUID {
-  Manga._();
-
-  factory Manga({
-    required String id,
-    required MangaAttributes attributes,
-    required List<Relationship> relationships,
-  }) = _Manga;
-
-  factory Manga.fromJson(Map<String, dynamic> json) => _$MangaFromJson(json);
+mixin MangaOps {
+  String get id;
+  MangaAttributes? get attributes;
+  List<Relationship>? get relationships;
+  MangaRelations? get related;
 
   late final List<CreatorType>? author = getAuthor();
   late final List<CreatorType>? artist = getArtist();
   late final longStrip = isLongStrip();
   late final covers = getAllCoverArt();
-  late final related = getRelatedManga();
+  late final relatedMangas = getRelatedManga();
 
   List<CoverArtUrl> getAllCoverArt() {
     final coverRelations = <CoverArtAttributes>[];
 
-    for (final r in relationships) {
-      final cr = switch (r) {
-        CoverArt(:final attributes) => attributes,
-        _ => null,
-      };
+    if (relationships != null) {
+      for (final r in relationships!) {
+        final cr = switch (r) {
+          CoverArt(:final attributes) => attributes,
+          _ => null,
+        };
 
-      if (cr != null) {
-        coverRelations.add(cr);
+        if (cr != null) {
+          coverRelations.add(cr);
+        }
       }
     }
 
@@ -641,9 +679,9 @@ class Manga with _$Manga, MangaDexUUID {
   }
 
   List<CreatorType>? getAuthor() {
-    final authorRs = relationships.whereType<Author>();
+    final authorRs = relationships?.whereType<Author>();
 
-    if (authorRs.isNotEmpty) {
+    if (authorRs != null && authorRs.isNotEmpty) {
       return authorRs.toList();
     }
 
@@ -651,9 +689,9 @@ class Manga with _$Manga, MangaDexUUID {
   }
 
   List<CreatorType>? getArtist() {
-    final artistRs = relationships.whereType<Artist>();
+    final artistRs = relationships?.whereType<Artist>();
 
-    if (artistRs.isNotEmpty) {
+    if (artistRs != null && artistRs.isNotEmpty) {
       return artistRs.toList();
     }
 
@@ -661,7 +699,11 @@ class Manga with _$Manga, MangaDexUUID {
   }
 
   bool isLongStrip() {
-    final tags = attributes.tags;
+    if (attributes == null) {
+      return false;
+    }
+
+    final tags = attributes!.tags;
 
     final lstag = tags.any((e) =>
         e.attributes.group == TagGroup.format &&
@@ -670,11 +712,11 @@ class Manga with _$Manga, MangaDexUUID {
     return lstag;
   }
 
-  List<String> getRelatedManga() {
-    final mangaRs = relationships.whereType<MangaID>();
+  List<Manga> getRelatedManga() {
+    final mangaRs = relationships?.whereType<Manga>();
 
-    if (mangaRs.isNotEmpty) {
-      return mangaRs.map((e) => e.id).toList();
+    if (mangaRs != null && mangaRs.isNotEmpty) {
+      return mangaRs.toList();
     }
 
     return [];
@@ -861,7 +903,7 @@ class CustomList with _$CustomList, MangaDexUUID, ChangeNotifier {
   }
 
   Set<String> _convertIDs() {
-    final rs = relationships.whereType<MangaID>();
+    final rs = relationships.whereType<Manga>();
 
     if (rs.isNotEmpty) {
       return rs.map((e) => e.id).toSet();

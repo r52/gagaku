@@ -193,7 +193,7 @@ class ChapterFeedItem extends StatelessWidget {
           chapter: e,
           manga: state.manga,
           link: Text(
-            state.manga.attributes.title.get('en'),
+            state.manga.attributes!.title.get('en'),
             style: const TextStyle(fontSize: 18),
           ),
           onLinkPressed: () {
@@ -215,7 +215,7 @@ class ChapterFeedItem extends StatelessWidget {
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       child: Text(
-        state.manga.attributes.title.get('en'),
+        state.manga.attributes!.title.get('en'),
         overflow: TextOverflow.ellipsis,
       ),
     );
@@ -305,9 +305,9 @@ class ChapterButtonWidget extends ConsumerWidget {
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
     final iconSize = screenSizeSmall ? 15.0 : 20.0;
-    final isEndChapter = manga.attributes.lastChapter != null &&
-        manga.attributes.lastChapter?.isNotEmpty == true &&
-        chapter.attributes.chapter == manga.attributes.lastChapter;
+    final isEndChapter = manga.attributes!.lastChapter != null &&
+        manga.attributes!.lastChapter?.isNotEmpty == true &&
+        chapter.attributes.chapter == manga.attributes!.lastChapter;
 
     final isOfficialPub = chapter.attributes.externalUrl != null;
 
@@ -801,7 +801,7 @@ class _GridMangaItem extends HookWidget {
             clipBehavior: Clip.antiAlias,
             child: GridTileBar(
               title: Text(
-                manga.attributes.title.get('en'),
+                manga.attributes!.title.get('en'),
                 softWrap: true,
                 style: const TextStyle(
                   overflow: TextOverflow.fade,
@@ -843,7 +843,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                 context.push('/title/${manga.id}', extra: manga);
               },
               child: Text(
-                manga.attributes.title.get('en'),
+                manga.attributes!.title.get('en'),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -937,7 +937,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 ],
                             },
                             const SizedBox(width: 10),
-                            MangaStatusChip(status: manga.attributes.status),
+                            MangaStatusChip(status: manga.attributes!.status),
                           ],
                         ),
                         const SizedBox(
@@ -947,16 +947,16 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                           spacing: 4.0,
                           runSpacing: 4.0,
                           children: [
-                            if (manga.attributes.contentRating !=
+                            if (manga.attributes!.contentRating !=
                                 ContentRating.safe)
                               ContentRatingChip(
-                                  rating: manga.attributes.contentRating),
-                            ...manga.attributes.tags
+                                  rating: manga.attributes!.contentRating),
+                            ...manga.attributes!.tags
                                 .where((tag) =>
                                     tag.attributes.group == TagGroup.content)
                                 .map((e) => ContentChip(
                                     content: e.attributes.name.get('en'))),
-                            ...manga.attributes.tags
+                            ...manga.attributes!.tags
                                 .where((tag) =>
                                     tag.attributes.group != TagGroup.content)
                                 .map(
@@ -965,12 +965,12 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 ),
                           ],
                         ),
-                        if (manga.attributes.description.isNotEmpty)
+                        if (manga.attributes!.description.isNotEmpty)
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
-                                manga.attributes.description.get('en'),
+                                manga.attributes!.description.get('en'),
                                 overflow: TextOverflow.clip,
                               ),
                             ),
@@ -1031,7 +1031,7 @@ class _ListMangaItem extends ConsumerWidget {
                     onPressed: () async {
                       context.push('/title/${manga.id}', extra: manga);
                     },
-                    child: Text(manga.attributes.title.get('en')),
+                    child: Text(manga.attributes!.title.get('en')),
                   ),
                   const SizedBox(
                     height: 10,
@@ -1040,16 +1040,16 @@ class _ListMangaItem extends ConsumerWidget {
                     spacing: 4.0,
                     runSpacing: 4.0,
                     children: [
-                      if (manga.attributes.contentRating != ContentRating.safe)
+                      if (manga.attributes!.contentRating != ContentRating.safe)
                         ContentRatingChip(
-                            rating: manga.attributes.contentRating),
-                      ...manga.attributes.tags
+                            rating: manga.attributes!.contentRating),
+                      ...manga.attributes!.tags
                           .where(
                               (tag) => tag.attributes.group == TagGroup.content)
                           .map((e) => ContentChip(
                               content: e.attributes.name.get('en'))),
-                      if (manga.attributes.tags.isNotEmpty)
-                        ...manga.attributes.tags
+                      if (manga.attributes!.tags.isNotEmpty)
+                        ...manga.attributes!.tags
                             .where((tag) =>
                                 (tag.attributes.group == TagGroup.genre ||
                                     tag.attributes.group == TagGroup.theme))
@@ -1131,7 +1131,7 @@ class _ListMangaItem extends ConsumerWidget {
                           ],
                       },
                       const SizedBox(width: 10),
-                      MangaStatusChip(status: manga.attributes.status),
+                      MangaStatusChip(status: manga.attributes!.status),
                     ],
                   ),
                 ],

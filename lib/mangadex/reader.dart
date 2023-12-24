@@ -65,7 +65,7 @@ Future<ReaderData> _fetchChapterData(
   final chapters = await api.fetchChapters([chapterId]);
   final chapter = chapters.first;
 
-  final mangaId = chapter.getMangaID();
+  final mangaId = chapter.getManga().id;
   final mangas =
       await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
   final manga = mangas.first;
@@ -117,7 +117,7 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
           manga: data.manga,
           title: data.title,
           link: Text(
-            data.manga.attributes.title.get('en'),
+            data.manga.attributes!.title.get('en'),
             style: const TextStyle(fontSize: 18),
           ),
           onLinkPressed: () {
@@ -207,7 +207,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
         return ReaderWidget(
           pages: pages,
           title: title,
-          subtitle: manga.attributes.title.get('en'),
+          subtitle: manga.attributes!.title.get('en'),
           longstrip: manga.longStrip,
           link: link,
           onLinkPressed: onLinkPressed,

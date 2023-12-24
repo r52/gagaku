@@ -222,17 +222,46 @@ Map<String, dynamic> _$$AuthorAttributesImplToJson(
       'updatedAt': const TimestampSerializer().toJson(instance.updatedAt),
     };
 
-_$MangaIDImpl _$$MangaIDImplFromJson(Map<String, dynamic> json) =>
-    _$MangaIDImpl(
+_$MangaImpl _$$MangaImplFromJson(Map<String, dynamic> json) => _$MangaImpl(
       id: json['id'] as String,
+      attributes: json['attributes'] == null
+          ? null
+          : MangaAttributes.fromJson(
+              json['attributes'] as Map<String, dynamic>),
+      relationships: (json['relationships'] as List<dynamic>?)
+          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      related: $enumDecodeNullable(_$MangaRelationsEnumMap, json['related']),
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$$MangaIDImplToJson(_$MangaIDImpl instance) =>
+Map<String, dynamic> _$$MangaImplToJson(_$MangaImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'attributes': instance.attributes,
+      'relationships': instance.relationships,
+      'related': _$MangaRelationsEnumMap[instance.related],
       'type': instance.$type,
     };
+
+const _$MangaRelationsEnumMap = {
+  MangaRelations.monochrome: 'monochrome',
+  MangaRelations.main_story: 'main_story',
+  MangaRelations.adapted_from: 'adapted_from',
+  MangaRelations.based_on: 'based_on',
+  MangaRelations.prequel: 'prequel',
+  MangaRelations.side_story: 'side_story',
+  MangaRelations.doujinshi: 'doujinshi',
+  MangaRelations.same_franchise: 'same_franchise',
+  MangaRelations.shared_universe: 'shared_universe',
+  MangaRelations.sequel: 'sequel',
+  MangaRelations.spin_off: 'spin_off',
+  MangaRelations.alternate_story: 'alternate_story',
+  MangaRelations.alternate_version: 'alternate_version',
+  MangaRelations.preserialization: 'preserialization',
+  MangaRelations.colored: 'colored',
+  MangaRelations.serialization: 'serialization',
+};
 
 _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       id: json['id'] as String,
@@ -404,22 +433,6 @@ Map<String, dynamic> _$$CreatorListListImplToJson(
     <String, dynamic>{
       'data': instance.data,
       'total': instance.total,
-    };
-
-_$MangaImpl _$$MangaImplFromJson(Map<String, dynamic> json) => _$MangaImpl(
-      id: json['id'] as String,
-      attributes:
-          MangaAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
-      relationships: (json['relationships'] as List<dynamic>)
-          .map((e) => Relationship.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$$MangaImplToJson(_$MangaImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'attributes': instance.attributes,
-      'relationships': instance.relationships,
     };
 
 _$MangaLinksImpl _$$MangaLinksImplFromJson(Map<String, dynamic> json) =>
