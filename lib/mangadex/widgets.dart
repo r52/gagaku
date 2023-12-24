@@ -657,12 +657,14 @@ class MangaListViewSliver extends ConsumerWidget {
     this.selectMode = false,
     this.selectButton,
     this.onSelected,
+    this.headers,
   });
 
   final Iterable<Manga> items;
   final bool selectMode;
   final MangaButtonBuilderCallback? selectButton;
   final MangaSelectCallback? onSelected;
+  final Map<String, String>? headers;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -678,6 +680,7 @@ class MangaListViewSliver extends ConsumerWidget {
             final manga = items.elementAt(index);
             return _ListMangaItem(
               manga: manga,
+              header: headers?[manga.id],
             );
           },
           itemCount: items.length,
@@ -692,7 +695,10 @@ class MangaListViewSliver extends ConsumerWidget {
           ),
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
-            return _GridMangaDetailedItem(manga: manga);
+            return _GridMangaDetailedItem(
+              manga: manga,
+              header: headers?[manga.id],
+            );
           },
           itemCount: items.length,
         );
@@ -713,6 +719,7 @@ class MangaListViewSliver extends ConsumerWidget {
               selectMode: selectMode,
               selectButton: selectButton,
               onSelected: onSelected,
+              header: headers?[manga.id],
             );
           },
           itemCount: items.length,
@@ -728,12 +735,14 @@ class _GridMangaItem extends HookWidget {
     this.selectMode = false,
     this.selectButton,
     this.onSelected,
+    this.header,
   });
 
   final Manga manga;
   final bool selectMode;
   final MangaButtonBuilderCallback? selectButton;
   final MangaSelectCallback? onSelected;
+  final String? header;
 
   @override
   Widget build(BuildContext context) {
@@ -790,7 +799,29 @@ class _GridMangaItem extends HookWidget {
                   ),
                 ],
               )
-            : null,
+            : (header != null
+                ? SizedBox(
+                    height: 40,
+                    child: Material(
+                      color: Colors.transparent,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(4)),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: GridTileBar(
+                        backgroundColor: Colors.black87,
+                        title: Text(
+                          header!,
+                          softWrap: true,
+                          style: const TextStyle(
+                            overflow: TextOverflow.fade,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : null),
         footer: SizedBox(
           height: 80,
           child: Material(
@@ -817,9 +848,14 @@ class _GridMangaItem extends HookWidget {
 }
 
 class _GridMangaDetailedItem extends ConsumerWidget {
-  const _GridMangaDetailedItem({super.key, required this.manga});
+  const _GridMangaDetailedItem({
+    super.key,
+    required this.manga,
+    this.header,
+  });
 
   final Manga manga;
+  final String? header;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -868,6 +904,12 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (header != null) ...[
+                          IconTextChip(text: Text(header!)),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                        ],
                         Wrap(
                           runSpacing: 4.0,
                           children: [
@@ -989,9 +1031,14 @@ class _GridMangaDetailedItem extends ConsumerWidget {
 }
 
 class _ListMangaItem extends ConsumerWidget {
-  const _ListMangaItem({super.key, required this.manga});
+  const _ListMangaItem({
+    super.key,
+    required this.manga,
+    this.header,
+  });
 
   final Manga manga;
+  final String? header;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1036,6 +1083,12 @@ class _ListMangaItem extends ConsumerWidget {
                   const SizedBox(
                     height: 10,
                   ),
+                  if (header != null) ...[
+                    IconTextChip(text: Text(header!)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
                   Wrap(
                     spacing: 4.0,
                     runSpacing: 4.0,

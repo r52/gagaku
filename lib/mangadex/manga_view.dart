@@ -1458,7 +1458,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           ),
                           noController: true,
                           children: [
-                            MangaListViewSliver(items: related),
+                            MangaListViewSliver(
+                              items: related,
+                              headers: manga.relatedMangas.fold({},
+                                  (previousValue, element) {
+                                previousValue?[element.id] =
+                                    element.related!.formatted;
+                                return previousValue;
+                              }),
+                            ),
                           ],
                         ),
                       _ => const SizedBox.shrink(),
