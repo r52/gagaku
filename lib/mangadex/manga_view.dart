@@ -134,14 +134,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
     ref.watch(_fetchReadChaptersRedunProvider(manga));
 
-    final chapterProvider = ref.watch(mangaChaptersProvider(manga));
-    final coverProvider = ref.watch(mangaCoversProvider(manga));
-    final relatedProvider = ref.watch(_fetchRelatedMangaProvider(manga));
     final hasRelated = manga.relatedMangas.isNotEmpty;
-
-    final isLoading = chapterProvider.isLoading ||
-        coverProvider.isLoading ||
-        relatedProvider.isLoading;
 
     String? lastvolchap;
 
@@ -1151,7 +1144,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         const Spacer(),
                         Consumer(
                           builder: (context, ref, child) {
-                            final chapters = chapterProvider.valueOrNull;
+                            final chapters = ref
+                                .watch(mangaChaptersProvider(manga))
+                                .valueOrNull;
 
                             final allRead = chapters != null
                                 ? ref.watch(readChaptersProvider
@@ -1224,76 +1219,69 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             ];
           },
           body: SafeArea(
-            top: false,
-            bottom: false,
-            child: Builder(builder: (BuildContext context) {
-              return Stack(
-                children: [
-                  if (view.value == _ViewType.chapters)
-                    switch (chapterProvider) {
-                      AsyncValue(:final error?, :final stackTrace?) => () {
-                          final messenger = ScaffoldMessenger.of(context);
-                          Styles.showErrorSnackBar(messenger, '$error');
-                          logger.e("mangaChaptersProvider(${manga.id}) failed",
-                              error: error, stackTrace: stackTrace);
+              top: false,
+              bottom: false,
+              child: switch (view.value) {
+                _ViewType.chapters => Consumer(
+                    builder: (context, ref, child) {
+                      final chapterProvider =
+                          ref.watch(mangaChaptersProvider(manga));
 
-                          return Styles.errorColumn(error, stackTrace);
-                        }(),
-                      AsyncValue(valueOrNull: final chapters?) =>
-                        NotificationListener<ScrollEndNotification>(
-                          onNotification: onScrollNotification,
-                          child: CustomScrollView(
-                            slivers: [
-                              SliverList.builder(
-                                itemBuilder: (BuildContext context, int index) {
-                                  var lastChapIsSame = false;
-                                  var nextChapIsSame = false;
+                      return Stack(
+                        children: [
+                          switch (chapterProvider) {
+                            AsyncValue(:final error?, :final stackTrace?) =>
+                              () {
+                                final messenger = ScaffoldMessenger.of(context);
+                                Styles.showErrorSnackBar(messenger, '$error');
+                                logger.e(
+                                    "mangaChaptersProvider(${manga.id}) failed",
+                                    error: error,
+                                    stackTrace: stackTrace);
 
-                                  final thischap = chapters.elementAt(index);
-                                  final chapbtn = ChapterButtonWidget(
-                                    chapter: thischap,
-                                    manga: manga,
-                                    link: Text(
-                                      manga.attributes!.title.get('en'),
-                                      style: const TextStyle(fontSize: 24),
-                                    ),
-                                  );
+                                return Styles.errorColumn(error, stackTrace);
+                              }(),
+                            AsyncValue(valueOrNull: final chapters?) =>
+                              NotificationListener<ScrollEndNotification>(
+                                onNotification: onScrollNotification,
+                                child: CustomScrollView(
+                                  slivers: [
+                                    SliverList.builder(
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        var lastChapIsSame = false;
+                                        var nextChapIsSame = false;
 
-                                  if (index > 0) {
-                                    lastChapIsSame = chapters
-                                            .elementAt(index - 1)
-                                            .attributes
-                                            .chapter ==
-                                        thischap.attributes.chapter;
-                                  }
+                                        final thischap =
+                                            chapters.elementAt(index);
+                                        final chapbtn = ChapterButtonWidget(
+                                          chapter: thischap,
+                                          manga: manga,
+                                          link: Text(
+                                            manga.attributes!.title.get('en'),
+                                            style:
+                                                const TextStyle(fontSize: 24),
+                                          ),
+                                        );
 
-                                  if (index < chapters.length - 1) {
-                                    nextChapIsSame = chapters
-                                            .elementAt(index + 1)
-                                            .attributes
-                                            .chapter ==
-                                        thischap.attributes.chapter;
-                                  }
+                                        if (index > 0) {
+                                          lastChapIsSame = chapters
+                                                  .elementAt(index - 1)
+                                                  .attributes
+                                                  .chapter ==
+                                              thischap.attributes.chapter;
+                                        }
 
-                                  if (lastChapIsSame || nextChapIsSame) {
-                                    Widget child = Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.subdirectory_arrow_right,
-                                          size: 15.0,
-                                        ),
-                                        Flexible(
-                                          child: chapbtn,
-                                        ),
-                                      ],
-                                    );
+                                        if (index < chapters.length - 1) {
+                                          nextChapIsSame = chapters
+                                                  .elementAt(index + 1)
+                                                  .attributes
+                                                  .chapter ==
+                                              thischap.attributes.chapter;
+                                        }
 
-                                    if (!lastChapIsSame && nextChapIsSame) {
-                                      child = Wrap(
-                                        children: [
-                                          Text(
-                                              "Chapter ${thischap.attributes.chapter}"),
-                                          Row(
+                                        if (lastChapIsSame || nextChapIsSame) {
+                                          Widget child = Row(
                                             children: [
                                               const Icon(
                                                 Icons.subdirectory_arrow_right,
@@ -1303,179 +1291,235 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                 child: chapbtn,
                                               ),
                                             ],
-                                          ),
-                                        ],
-                                      );
-                                    }
+                                          );
 
-                                    return Padding(
-                                      padding: EdgeInsets.only(
-                                          top: (!lastChapIsSame &&
-                                                  nextChapIsSame)
-                                              ? 6.0
-                                              : 2.0,
-                                          bottom: (lastChapIsSame &&
-                                                  !nextChapIsSame)
-                                              ? 6.0
-                                              : 2.0),
-                                      child: child,
-                                    );
-                                  }
+                                          if (!lastChapIsSame &&
+                                              nextChapIsSame) {
+                                            child = Wrap(
+                                              children: [
+                                                Text(
+                                                    "Chapter ${thischap.attributes.chapter}"),
+                                                Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Icons
+                                                          .subdirectory_arrow_right,
+                                                      size: 15.0,
+                                                    ),
+                                                    Flexible(
+                                                      child: chapbtn,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            );
+                                          }
 
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 2.0),
-                                    child: chapbtn,
-                                  );
-                                },
-                                itemCount: chapters.length,
-                              )
-                            ],
-                          ),
-                        ),
-                      _ => const SizedBox.shrink(),
-                    },
-                  if (view.value == _ViewType.art)
-                    switch (coverProvider) {
-                      AsyncValue(:final error?, :final stackTrace?) => () {
-                          final messenger = ScaffoldMessenger.of(context);
-                          Styles.showErrorSnackBar(messenger, '$error');
-                          logger.e("mangaCoversProvider(${manga.id}) failed",
-                              error: error, stackTrace: stackTrace);
+                                          return Padding(
+                                            padding: EdgeInsets.only(
+                                                top: (!lastChapIsSame &&
+                                                        nextChapIsSame)
+                                                    ? 6.0
+                                                    : 2.0,
+                                                bottom: (lastChapIsSame &&
+                                                        !nextChapIsSame)
+                                                    ? 6.0
+                                                    : 2.0),
+                                            child: child,
+                                          );
+                                        }
 
-                          return Styles.errorColumn(error, stackTrace);
-                        }(),
-                      AsyncValue(valueOrNull: final covers?) =>
-                        NotificationListener<ScrollEndNotification>(
-                          onNotification: onScrollNotification,
-                          child: CustomScrollView(
-                            slivers: [
-                              SliverGrid.builder(
-                                gridDelegate:
-                                    const SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 256,
-                                  mainAxisSpacing: 8,
-                                  crossAxisSpacing: 8,
-                                  childAspectRatio: 0.7,
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 2.0),
+                                          child: chapbtn,
+                                        );
+                                      },
+                                      itemCount: chapters.length,
+                                    )
+                                  ],
                                 ),
-                                itemBuilder: (context, index) {
-                                  final cover = covers.elementAt(index);
-                                  return _CoverArtItem(
-                                    cover: cover,
-                                    manga: manga,
-                                    page: index,
-                                    onTap: () async {
-                                      await showModal(
-                                        context: context,
-                                        builder: (context) {
-                                          return Scaffold(
-                                            appBar: AppBar(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              leading: const CloseButton(),
-                                            ),
-                                            backgroundColor: Colors.transparent,
-                                            extendBody: true,
-                                            extendBodyBehindAppBar: true,
-                                            body: PageView.builder(
-                                              scrollBehavior:
-                                                  MouseTouchScrollBehavior(),
-                                              itemBuilder:
-                                                  (BuildContext context,
-                                                      int id) {
-                                                final item =
-                                                    covers.elementAt(id);
-                                                final url =
-                                                    manga.getUrlFromCover(item);
-                                                Widget image =
-                                                    ExtendedImage.network(
-                                                  url,
-                                                  fit: BoxFit.contain,
-                                                  mode:
-                                                      ExtendedImageMode.gesture,
-                                                  enableSlideOutPage: true,
-                                                  loadStateChanged:
-                                                      extendedImageLoadStateHandler,
-                                                );
+                              ),
+                            _ => const SizedBox.shrink(),
+                          },
+                          if (chapterProvider.isLoading)
+                            ...Styles.loadingOverlay
+                        ],
+                      );
+                    },
+                  ),
+                _ViewType.art => Consumer(
+                    builder: (context, ref, child) {
+                      final coverProvider =
+                          ref.watch(mangaCoversProvider(manga));
 
-                                                image = Container(
-                                                  padding:
-                                                      const EdgeInsets.all(5.0),
-                                                  color: Colors.transparent,
-                                                  child: GestureDetector(
-                                                    child: image,
-                                                    onTap: () {
-                                                      Navigator.pop(context);
+                      return Stack(
+                        children: [
+                          switch (coverProvider) {
+                            AsyncValue(:final error?, :final stackTrace?) =>
+                              () {
+                                final messenger = ScaffoldMessenger.of(context);
+                                Styles.showErrorSnackBar(messenger, '$error');
+                                logger.e(
+                                    "mangaCoversProvider(${manga.id}) failed",
+                                    error: error,
+                                    stackTrace: stackTrace);
+
+                                return Styles.errorColumn(error, stackTrace);
+                              }(),
+                            AsyncValue(valueOrNull: final covers?) =>
+                              NotificationListener<ScrollEndNotification>(
+                                onNotification: onScrollNotification,
+                                child: CustomScrollView(
+                                  slivers: [
+                                    SliverGrid.builder(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                                        maxCrossAxisExtent: 256,
+                                        mainAxisSpacing: 8,
+                                        crossAxisSpacing: 8,
+                                        childAspectRatio: 0.7,
+                                      ),
+                                      itemBuilder: (context, index) {
+                                        final cover = covers.elementAt(index);
+                                        return _CoverArtItem(
+                                          cover: cover,
+                                          manga: manga,
+                                          page: index,
+                                          onTap: () async {
+                                            await showModal(
+                                              context: context,
+                                              builder: (context) {
+                                                return Scaffold(
+                                                  appBar: AppBar(
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    leading:
+                                                        const CloseButton(),
+                                                  ),
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  extendBody: true,
+                                                  extendBodyBehindAppBar: true,
+                                                  body: PageView.builder(
+                                                    scrollBehavior:
+                                                        MouseTouchScrollBehavior(),
+                                                    itemBuilder:
+                                                        (BuildContext context,
+                                                            int id) {
+                                                      final item =
+                                                          covers.elementAt(id);
+                                                      final url =
+                                                          manga.getUrlFromCover(
+                                                              item);
+                                                      Widget image =
+                                                          ExtendedImage.network(
+                                                        url,
+                                                        fit: BoxFit.contain,
+                                                        mode: ExtendedImageMode
+                                                            .gesture,
+                                                        enableSlideOutPage:
+                                                            true,
+                                                        loadStateChanged:
+                                                            extendedImageLoadStateHandler,
+                                                      );
+
+                                                      image = Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5.0),
+                                                        color:
+                                                            Colors.transparent,
+                                                        child: GestureDetector(
+                                                          child: image,
+                                                          onTap: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                        ),
+                                                      );
+
+                                                      if (id == index) {
+                                                        return Hero(
+                                                          tag: url,
+                                                          child: image,
+                                                        );
+                                                      } else {
+                                                        return image;
+                                                      }
                                                     },
+                                                    itemCount: covers.length,
+                                                    controller: PageController(
+                                                      initialPage: index,
+                                                    ),
+                                                    scrollDirection:
+                                                        Axis.horizontal,
                                                   ),
                                                 );
-
-                                                if (id == index) {
-                                                  return Hero(
-                                                    tag: url,
-                                                    child: image,
-                                                  );
-                                                } else {
-                                                  return image;
-                                                }
                                               },
-                                              itemCount: covers.length,
-                                              controller: PageController(
-                                                initialPage: index,
-                                              ),
-                                              scrollDirection: Axis.horizontal,
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
-                                itemCount: covers.length,
+                                            );
+                                          },
+                                        );
+                                      },
+                                      itemCount: covers.length,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                      _ => const SizedBox.shrink(),
+                            _ => const SizedBox.shrink(),
+                          },
+                          if (coverProvider.isLoading) ...Styles.loadingOverlay
+                        ],
+                      );
                     },
-                  if (view.value == _ViewType.related)
-                    switch (relatedProvider) {
-                      AsyncValue(:final error?, :final stackTrace?) => () {
-                          final messenger = ScaffoldMessenger.of(context);
-                          Styles.showErrorSnackBar(messenger, '$error');
-                          logger.e(
-                              "_fetchRelatedMangaProvider(${manga.id}) failed",
-                              error: error,
-                              stackTrace: stackTrace);
+                  ),
+                _ViewType.related => Consumer(
+                    builder: (context, ref, child) {
+                      final relatedProvider =
+                          ref.watch(_fetchRelatedMangaProvider(manga));
 
-                          return Styles.errorColumn(error, stackTrace);
-                        }(),
-                      AsyncValue(valueOrNull: final related?) =>
-                        MangaListWidget(
-                          title: const Text(
-                            'Related Titles',
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          noController: true,
-                          children: [
-                            MangaListViewSliver(
-                              items: related,
-                              headers: manga.relatedMangas.fold({},
-                                  (previousValue, element) {
-                                previousValue?[element.id] =
-                                    element.related!.formatted;
-                                return previousValue;
-                              }),
-                            ),
-                          ],
-                        ),
-                      _ => const SizedBox.shrink(),
+                      return Stack(
+                        children: [
+                          switch (relatedProvider) {
+                            AsyncValue(:final error?, :final stackTrace?) =>
+                              () {
+                                final messenger = ScaffoldMessenger.of(context);
+                                Styles.showErrorSnackBar(messenger, '$error');
+                                logger.e(
+                                    "_fetchRelatedMangaProvider(${manga.id}) failed",
+                                    error: error,
+                                    stackTrace: stackTrace);
+
+                                return Styles.errorColumn(error, stackTrace);
+                              }(),
+                            AsyncValue(valueOrNull: final related?) =>
+                              MangaListWidget(
+                                title: const Text(
+                                  'Related Titles',
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                                noController: true,
+                                children: [
+                                  MangaListViewSliver(
+                                    items: related,
+                                    headers: manga.relatedMangas.fold({},
+                                        (previousValue, element) {
+                                      previousValue?[element.id] =
+                                          element.related!.formatted;
+                                      return previousValue;
+                                    }),
+                                  ),
+                                ],
+                              ),
+                            _ => const SizedBox.shrink(),
+                          },
+                          if (relatedProvider.isLoading)
+                            ...Styles.loadingOverlay
+                        ],
+                      );
                     },
-                  if (isLoading) ...Styles.loadingOverlay,
-                ],
-              );
-            }),
-          ),
+                  ),
+              }),
         ),
       ),
     );
