@@ -1210,7 +1210,7 @@ final readChaptersProvider =
 );
 
 typedef _$ReadChapters = AsyncNotifier<ReadChaptersMap>;
-String _$userLibraryHash() => r'315c0431811071b209ea28fae40059e6e093d7e3';
+String _$userLibraryHash() => r'58d3a7add927e3c970b317ca85b19a8090556ef2';
 
 /// See also [UserLibrary].
 @ProviderFor(UserLibrary)
@@ -1226,7 +1226,7 @@ final userLibraryProvider = AutoDisposeAsyncNotifierProvider<UserLibrary,
 
 typedef _$UserLibrary
     = AutoDisposeAsyncNotifier<Map<String, MangaReadingStatus>>;
-String _$userListsHash() => r'5addd53d5310bc02373461f125979f6d2ecb5b10';
+String _$userListsHash() => r'2ec431339aea3d37d2eac41114c7f471554a3fd1';
 
 /// See also [UserLists].
 @ProviderFor(UserLists)
@@ -2239,7 +2239,7 @@ final loggedUserProvider = AsyncNotifierProvider<LoggedUser, User?>.internal(
 );
 
 typedef _$LoggedUser = AsyncNotifier<User?>;
-String _$authControlHash() => r'0504721d8fc03a16d43b65a21800adf08662b60a';
+String _$authControlHash() => r'43f2fe0c7d47d46934f52612bd9bef69c438fb40';
 
 /// See also [AuthControl].
 @ProviderFor(AuthControl)

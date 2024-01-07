@@ -1980,7 +1980,7 @@ class ReadChapters extends _$ReadChapters {
 class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
   @override
   Future<Map<String, MangaReadingStatus>> build() async {
-    final loggedin = await ref.read(authControlProvider.future);
+    final loggedin = await ref.watch(authControlProvider.future);
     if (!loggedin) {
       return {};
     }
@@ -2028,7 +2028,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
   static const limit = MangaDexEndpoints.breakLimit;
 
   Future<List<CRef>> _fetch(int offset) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    final loggedin = await ref.watch(authControlProvider.future);
     if (!loggedin) {
       return [];
     }
@@ -2645,9 +2645,20 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
     state = await AsyncValue.guard(() async {
       await api.logout();
       await _setStaleTime();
-      ref.invalidate(loggedUserProvider);
       return await api.loggedIn();
     });
+
+    // Invalidate stuff
+    ref.invalidate(loggedUserProvider);
+    ref.invalidate(userLibraryProvider);
+    await api.invalidateCacheItem(CacheLists.library);
+    ref.invalidate(readChaptersProvider);
+    ref.invalidate(ratingsProvider);
+    ref.invalidate(userListsProvider);
+    ref.invalidate(readingStatusProvider);
+    ref.invalidate(followingStatusProvider);
+    ref.invalidate(latestChaptersFeedProvider);
+    await api.invalidateAll(LatestChaptersFeed.feedKey);
   }
 }
 

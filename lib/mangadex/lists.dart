@@ -12,8 +12,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum _ListViewType { self, followed }
 
-enum _ListActions { follow, delete, edit }
-
 class MangaDexListsView extends HookConsumerWidget {
   const MangaDexListsView({
     super.key,
@@ -146,11 +144,22 @@ class MangaDexListsView extends HookConsumerWidget {
                                     )),
                                 title: Text(item.attributes.name),
                                 subtitle: Text('${item.set.length} items'),
-                                trailing: PopupMenuButton<_ListActions>(
-                                  padding: EdgeInsets.zero,
-                                  onSelected: (value) async {
-                                    switch (value) {
-                                      case _ListActions.delete:
+                                trailing: MenuAnchor(
+                                  builder: (context, controller, child) =>
+                                      IconButton(
+                                    onPressed: () {
+                                      if (controller.isOpen) {
+                                        controller.close();
+                                      } else {
+                                        controller.open();
+                                      }
+                                    },
+                                    icon: const Icon(Icons.more_vert),
+                                  ),
+                                  menuChildren: [
+                                    // TODO follow
+                                    MenuItemButton(
+                                      onPressed: () async {
                                         final result =
                                             await showDeleteListDialog(
                                                 context, item.attributes.name);
@@ -183,31 +192,17 @@ class MangaDexListsView extends HookConsumerWidget {
                                             }
                                           });
                                         }
-                                        break;
-                                      case _ListActions.edit:
-                                        context.push('/list/edit/${item.id}',
-                                            extra: listref);
-                                        break;
-                                      default:
-                                        break;
-                                    }
-                                  },
-                                  itemBuilder: (context) => [
-                                    // const PopupMenuItem(
-                                    //   value: _ListActions.follow,
-                                    //   child: Text(
-                                    //     'Follow',
-                                    //   ),
-                                    // ),
-                                    const PopupMenuItem(
-                                      value: _ListActions.delete,
-                                      child: Text(
+                                      },
+                                      child: const Text(
                                         'Delete',
                                       ),
                                     ),
-                                    const PopupMenuItem(
-                                      value: _ListActions.edit,
-                                      child: Text(
+                                    MenuItemButton(
+                                      onPressed: () {
+                                        context.push('/list/edit/${item.id}',
+                                            extra: listref);
+                                      },
+                                      child: const Text(
                                         'Edit',
                                       ),
                                     ),

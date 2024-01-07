@@ -131,6 +131,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
     final theme = Theme.of(context);
     final view = useState(_ViewType.chapters);
+    final following = ref.watch(followingStatusProvider(manga)).valueOrNull;
+    final statusProvider = ref.watch(readingStatusProvider(manga));
+    final reading = statusProvider.valueOrNull;
 
     ref.watch(_fetchReadChaptersRedunProvider(manga));
 
@@ -242,387 +245,94 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     loadStateChanged: extendedImageLoadStateHandler,
                   ),
                 ),
-                actions: () {
-                  if (!loggedin) {
-                    return null;
-                  }
-
-                  final actions = <Widget>[];
-
-                  final following =
-                      ref.watch(followingStatusProvider(manga)).valueOrNull;
-                  final readProvider = ref.watch(readingStatusProvider(manga));
-                  final ratingProv = ref.watch(ratingsProvider);
-                  final userListsProv = ref.watch(userListsProvider);
-                  final reading = readProvider.valueOrNull;
-                  final ratings = ratingProv.valueOrNull;
-                  final userLists = userListsProv.valueOrNull;
-
-                  if (following == null || readProvider.isLoading) {
-                    actions.add(const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(),
-                      ),
-                    ));
-                  } else if (!following && reading == null) {
-                    actions.addAll([
-                      ElevatedButton(
-                        style: Styles.buttonStyle(),
-                        onPressed: () async {
-                          final result = await showDialog<
-                                  (MangaReadingStatus, bool)>(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return HookBuilder(
-                                  builder: (context) {
-                                    final nav = Navigator.of(context);
-                                    final nreading = useState(
-                                        MangaReadingStatus.plan_to_read);
-                                    final nfollowing = useState(true);
-
-                                    return AlertDialog(
-                                      title: const Text('Add to Library'),
-                                      content: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          DropdownMenu<MangaReadingStatus>(
-                                            initialSelection: nreading.value,
-                                            enableFilter: false,
-                                            enableSearch: false,
-                                            requestFocusOnTap: false,
-                                            inputDecorationTheme:
-                                                InputDecorationTheme(
-                                              enabledBorder:
-                                                  UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  width: 2.0,
-                                                  color: theme.colorScheme
-                                                      .inversePrimary,
-                                                ),
-                                              ),
-                                            ),
-                                            onSelected: (MangaReadingStatus?
-                                                status) async {
-                                              if (status != null) {
-                                                nreading.value = status;
-                                              }
-                                            },
-                                            dropdownMenuEntries: List<
-                                                DropdownMenuEntry<
-                                                    MangaReadingStatus>>.generate(
-                                              MangaReadingStatus.values.length -
-                                                  1,
-                                              (int index) => DropdownMenuEntry<
-                                                  MangaReadingStatus>(
-                                                value: MangaReadingStatus.values
-                                                    .elementAt(index + 1),
-                                                label: MangaReadingStatus.values
-                                                    .elementAt(index + 1)
-                                                    .label,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () async {
-                                              nfollowing.value =
-                                                  !nfollowing.value;
-                                            },
-                                            child: Icon(nfollowing.value
-                                                ? Icons.notification_add
-                                                : Icons
-                                                    .notifications_off_outlined),
-                                          ),
-                                        ],
-                                      ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text('Cancel'),
-                                          onPressed: () {
-                                            nav.pop(null);
-                                          },
-                                        ),
-                                        ElevatedButton(
-                                          child: const Text('Add'),
-                                          onPressed: () {
-                                            nav.pop((
-                                              nreading.value,
-                                              nfollowing.value
-                                            ));
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              });
-
-                          if (result != null) {
-                            ref
-                                .read(readingStatusProvider(manga).notifier)
-                                .set(result.$1);
-
-                            ref
-                                .read(followingStatusProvider(manga).notifier)
-                                .set(result.$2);
-                          }
-                        },
-                        child: const Text('Add to Library'),
-                      ),
-                    ]);
-                  } else {
-                    actions.addAll([
-                      Tooltip(
-                        message: following ? 'Unfollow Manga' : 'Follow Manga',
-                        child: ElevatedButton(
-                          style: Styles.buttonStyle(),
-                          onPressed: () async {
-                            bool set = !following;
-                            ref
-                                .read(followingStatusProvider(manga).notifier)
-                                .set(set);
-                          },
-                          child: Icon(following
-                              ? Icons.notifications_active
-                              : Icons.notifications_off_outlined),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      DropdownMenu<MangaReadingStatus>(
-                        initialSelection: reading,
-                        width: 180.0,
-                        enableFilter: false,
-                        enableSearch: false,
-                        requestFocusOnTap: false,
-                        inputDecorationTheme: InputDecorationTheme(
-                          filled: true,
-                          fillColor:
-                              theme.colorScheme.background.withAlpha(200),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 2.0,
-                              color: theme.colorScheme.inversePrimary,
+                actions: !loggedin
+                    ? null
+                    : [
+                        if (following == null || statusProvider.isLoading)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(),
                             ),
                           ),
-                        ),
-                        onSelected: (MangaReadingStatus? status) async {
-                          ref
-                              .read(readingStatusProvider(manga).notifier)
-                              .set(status);
-
-                          if (status == null ||
-                              status == MangaReadingStatus.remove) {
-                            ref
-                                .read(followingStatusProvider(manga).notifier)
-                                .set(false);
-                          }
-                        },
-                        dropdownMenuEntries: List<
-                            DropdownMenuEntry<MangaReadingStatus>>.generate(
-                          MangaReadingStatus.values.length,
-                          (int index) => DropdownMenuEntry<MangaReadingStatus>(
-                            value: MangaReadingStatus.values.elementAt(index),
-                            label: MangaReadingStatus.values
-                                .elementAt(index)
-                                .label,
-                          ),
-                        ),
-                      ),
-                    ]);
-                  }
-
-                  if (ratingProv.isLoading || ratings == null) {
-                    actions.add(const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(),
-                      ),
-                    ));
-                  } else {
-                    actions.addAll([
-                      PopupMenuButton<int>(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        shape: const RoundedRectangleBorder(),
-                        tooltip: 'Rating',
-                        icon: Container(
-                          padding: const EdgeInsets.all(6.0),
-                          decoration: BoxDecoration(
-                            color: ratings.containsKey(manga.id) &&
-                                    ratings[manga.id]!.rating > 0
-                                ? Colors.deepOrange
-                                : theme.colorScheme.surfaceVariant,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(6.0)),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.star_border),
-                              if (ratings.containsKey(manga.id) &&
-                                  ratings[manga.id]!.rating > 0) ...[
-                                const SizedBox(
-                                  width: 4.0,
-                                ),
-                                Text('${ratings[manga.id]!.rating}')
-                              ]
-                            ],
-                          ),
-                        ),
-                        onSelected: (value) {
-                          ref
-                              .read(ratingsProvider.notifier)
-                              .set(manga, value > 0 ? value : null);
-                        },
-                        itemBuilder: (context) {
-                          final items = List.generate(
-                            10,
-                            (index) => PopupMenuItem<int>(
-                              value: index + 1,
-                              child: Text(RatingLabel[index + 1]),
-                            ),
-                          ).reversed.toList();
-
-                          if (ratings.containsKey(manga.id) &&
-                              ratings[manga.id]!.rating > 0) {
-                            items.add(const PopupMenuItem<int>(
-                              value: 0,
-                              child: Text('Remove Rating'),
-                            ));
-                          }
-
-                          return items;
-                        },
-                      ),
-                    ]);
-                  }
-
-                  if (userListsProv.isLoading || userLists == null) {
-                    actions.add(const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(),
-                      ),
-                    ));
-                  } else {
-                    actions.addAll([
-                      PopupMenuButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        shape: const RoundedRectangleBorder(),
-                        tooltip: 'User Lists',
-                        icon: Container(
-                          padding: const EdgeInsets.all(6.0),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceVariant,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(6.0)),
-                          ),
-                          child: const Icon(Icons.playlist_add),
-                        ),
-                        itemBuilder: (context) {
-                          final items = List.generate(
-                            userLists.length,
-                            (index) => PopupMenuItem(
-                              // value: userLists.elementAt(index).id,
-                              child: StatefulBuilder(
-                                builder: (_, setState) => CheckboxListTile(
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                  title: Text(userLists
-                                      .elementAt(index)
-                                      .get<CustomList>()
-                                      .attributes
-                                      .name),
-                                  value: userLists
-                                      .elementAt(index)
-                                      .get<CustomList>()
-                                      .set
-                                      .contains(manga.id),
-                                  onChanged: (bool? value) async {
-                                    await ref
-                                        .read(userListsProvider.notifier)
-                                        .updateList(userLists.elementAt(index),
-                                            manga, value == true);
-
-                                    setState(() {});
-                                  },
-                                ),
-                              ),
-                            ),
-                          ).toList();
-
-                          items.add(PopupMenuItem(
-                            child: const Text('+ Create new list'),
-                            onTap: () async {
-                              final messenger = ScaffoldMessenger.of(context);
-
+                        if (following == false && reading == null) ...[
+                          ElevatedButton(
+                            style: Styles.buttonStyle(),
+                            onPressed: () async {
                               final result = await showDialog<
-                                      (String, CustomListVisibility)>(
+                                      (MangaReadingStatus, bool)>(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return HookBuilder(
                                       builder: (context) {
                                         final nav = Navigator.of(context);
-                                        final nameController =
-                                            useTextEditingController();
-                                        final nameIsEmpty =
-                                            useListenableSelector(
-                                                nameController,
-                                                () => nameController
-                                                    .text.isEmpty);
-                                        final nprivate = useState(
-                                            CustomListVisibility.private);
+                                        final nreading = useState(
+                                            MangaReadingStatus.plan_to_read);
+                                        final nfollowing = useState(true);
 
                                         return AlertDialog(
-                                          title: const Text('Create New List'),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
+                                          title: const Text('Add to Library'),
+                                          content: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
-                                              TextFormField(
-                                                controller: nameController,
-                                                decoration:
-                                                    const InputDecoration(
-                                                  filled: true,
-                                                  labelText: 'List Name',
+                                              DropdownMenu<MangaReadingStatus>(
+                                                initialSelection:
+                                                    nreading.value,
+                                                enableFilter: false,
+                                                enableSearch: false,
+                                                requestFocusOnTap: false,
+                                                inputDecorationTheme:
+                                                    InputDecorationTheme(
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      width: 2.0,
+                                                      color: theme.colorScheme
+                                                          .inversePrimary,
+                                                    ),
+                                                  ),
                                                 ),
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? value) {
-                                                  return (value == null ||
-                                                          value.isEmpty)
-                                                      ? 'List name cannot be empty.'
-                                                      : null;
+                                                onSelected: (MangaReadingStatus?
+                                                    status) async {
+                                                  if (status != null) {
+                                                    nreading.value = status;
+                                                  }
                                                 },
+                                                dropdownMenuEntries: List<
+                                                    DropdownMenuEntry<
+                                                        MangaReadingStatus>>.generate(
+                                                  MangaReadingStatus
+                                                          .values.length -
+                                                      1,
+                                                  (int index) =>
+                                                      DropdownMenuEntry<
+                                                          MangaReadingStatus>(
+                                                    value: MangaReadingStatus
+                                                        .values
+                                                        .elementAt(index + 1),
+                                                    label: MangaReadingStatus
+                                                        .values
+                                                        .elementAt(index + 1)
+                                                        .label,
+                                                  ),
+                                                ),
                                               ),
-                                              CheckboxListTile(
-                                                controlAffinity:
-                                                    ListTileControlAffinity
-                                                        .leading,
-                                                title:
-                                                    const Text('Private list'),
-                                                value: nprivate.value ==
-                                                    CustomListVisibility
-                                                        .private,
-                                                onChanged: (bool? value) async {
-                                                  nprivate.value =
-                                                      (value == true)
-                                                          ? CustomListVisibility
-                                                              .private
-                                                          : CustomListVisibility
-                                                              .public;
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  nfollowing.value =
+                                                      !nfollowing.value;
                                                 },
-                                              )
+                                                child: Icon(nfollowing.value
+                                                    ? Icons.notification_add
+                                                    : Icons
+                                                        .notifications_off_outlined),
+                                              ),
                                             ],
                                           ),
                                           actions: <Widget>[
@@ -633,18 +343,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                               },
                                             ),
                                             ElevatedButton(
-                                              onPressed: nameIsEmpty
-                                                  ? null
-                                                  : () {
-                                                      if (nameController
-                                                          .text.isNotEmpty) {
-                                                        nav.pop((
-                                                          nameController.text,
-                                                          nprivate.value
-                                                        ));
-                                                      }
-                                                    },
-                                              child: const Text('Create'),
+                                              child: const Text('Add'),
+                                              onPressed: () {
+                                                nav.pop((
+                                                  nreading.value,
+                                                  nfollowing.value
+                                                ));
+                                              },
                                             ),
                                           ],
                                         );
@@ -653,44 +358,374 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   });
 
                               if (result != null) {
-                                final success = await ref
-                                    .read(userListsProvider.notifier)
-                                    .newList(result.$1, result.$2, []);
+                                ref
+                                    .read(readingStatusProvider(manga).notifier)
+                                    .set(result.$1);
 
-                                if (success) {
-                                  messenger
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      const SnackBar(
-                                        content: Text('New list created.'),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                } else {
-                                  messenger
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Failed create list.'),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                }
+                                ref
+                                    .read(
+                                        followingStatusProvider(manga).notifier)
+                                    .set(result.$2);
                               }
                             },
-                          ));
+                            child: const Text('Add to Library'),
+                          ),
+                        ],
+                        if (following != null && reading != null) ...[
+                          Tooltip(
+                            message:
+                                following ? 'Unfollow Manga' : 'Follow Manga',
+                            child: ElevatedButton(
+                              style: Styles.buttonStyle(),
+                              onPressed: () async {
+                                bool set = !following;
+                                ref
+                                    .read(
+                                        followingStatusProvider(manga).notifier)
+                                    .set(set);
+                              },
+                              child: Icon(following
+                                  ? Icons.notifications_active
+                                  : Icons.notifications_off_outlined),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          DropdownMenu<MangaReadingStatus>(
+                            initialSelection: reading,
+                            width: 180.0,
+                            enableFilter: false,
+                            enableSearch: false,
+                            requestFocusOnTap: false,
+                            inputDecorationTheme: InputDecorationTheme(
+                              filled: true,
+                              fillColor:
+                                  theme.colorScheme.background.withAlpha(200),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 2.0,
+                                  color: theme.colorScheme.inversePrimary,
+                                ),
+                              ),
+                            ),
+                            onSelected: (MangaReadingStatus? status) async {
+                              ref
+                                  .read(readingStatusProvider(manga).notifier)
+                                  .set(status);
 
-                          return items;
-                        },
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                    ]);
-                  }
+                              if (status == null ||
+                                  status == MangaReadingStatus.remove) {
+                                ref
+                                    .read(
+                                        followingStatusProvider(manga).notifier)
+                                    .set(false);
+                              }
+                            },
+                            dropdownMenuEntries: List<
+                                DropdownMenuEntry<MangaReadingStatus>>.generate(
+                              MangaReadingStatus.values.length,
+                              (int index) =>
+                                  DropdownMenuEntry<MangaReadingStatus>(
+                                value:
+                                    MangaReadingStatus.values.elementAt(index),
+                                label: MangaReadingStatus.values
+                                    .elementAt(index)
+                                    .label,
+                              ),
+                            ),
+                          ),
+                        ],
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final ratingProv = ref.watch(ratingsProvider);
+                            final ratings = ratingProv.valueOrNull;
 
-                  return actions;
-                }(),
+                            if (ratingProv.isLoading || ratings == null) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
+
+                            return MenuAnchor(
+                              builder: (context, controller, child) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      if (controller.isOpen) {
+                                        controller.close();
+                                      } else {
+                                        controller.open();
+                                      }
+                                    },
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              menuChildren: [
+                                ...List.generate(
+                                  10,
+                                  (index) => MenuItemButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(ratingsProvider.notifier)
+                                          .set(manga, index + 1);
+                                    },
+                                    child: Text(RatingLabel[index + 1]),
+                                  ),
+                                ).reversed,
+                                if (ratings.containsKey(manga.id) &&
+                                    ratings[manga.id]!.rating > 0)
+                                  MenuItemButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(ratingsProvider.notifier)
+                                          .set(manga, null);
+                                    },
+                                    child: const Text('Remove Rating'),
+                                  )
+                              ],
+                              child: Container(
+                                padding: const EdgeInsets.all(6.0),
+                                decoration: BoxDecoration(
+                                  color: ratings.containsKey(manga.id) &&
+                                          ratings[manga.id]!.rating > 0
+                                      ? Colors.deepOrange
+                                      : theme.colorScheme.surfaceVariant,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(6.0)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.star_border),
+                                    if (ratings.containsKey(manga.id) &&
+                                        ratings[manga.id]!.rating > 0) ...[
+                                      const SizedBox(
+                                        width: 4.0,
+                                      ),
+                                      Text('${ratings[manga.id]!.rating}')
+                                    ]
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final userListsProv = ref.watch(userListsProvider);
+                            final userLists = userListsProv.valueOrNull;
+
+                            return MenuAnchor(
+                              builder: (context, controller, child) {
+                                // Let MenuAnchor build the spinner so that it doesn't
+                                // destroy the opened menu when updated
+                                if (userListsProv.isLoading ||
+                                    userLists == null) {
+                                  return const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      if (controller.isOpen) {
+                                        controller.close();
+                                      } else {
+                                        controller.open();
+                                      }
+                                    },
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              menuChildren: [
+                                if (userLists != null)
+                                  ...List.generate(
+                                    userLists.length,
+                                    (index) => CheckboxListTile(
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
+                                      title: Text(userLists
+                                          .elementAt(index)
+                                          .get<CustomList>()
+                                          .attributes
+                                          .name),
+                                      value: userLists
+                                          .elementAt(index)
+                                          .get<CustomList>()
+                                          .set
+                                          .contains(manga.id),
+                                      onChanged: (bool? value) async {
+                                        await ref
+                                            .read(userListsProvider.notifier)
+                                            .updateList(
+                                                userLists.elementAt(index),
+                                                manga,
+                                                value == true);
+                                      },
+                                    ),
+                                  ),
+                                MenuItemButton(
+                                  child: const Text('+ Create new list'),
+                                  onPressed: () async {
+                                    final messenger =
+                                        ScaffoldMessenger.of(context);
+
+                                    final result = await showDialog<
+                                            (String, CustomListVisibility)>(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return HookBuilder(
+                                            builder: (context) {
+                                              final nav = Navigator.of(context);
+                                              final nameController =
+                                                  useTextEditingController();
+                                              final nameIsEmpty =
+                                                  useListenableSelector(
+                                                      nameController,
+                                                      () => nameController
+                                                          .text.isEmpty);
+                                              final nprivate = useState(
+                                                  CustomListVisibility.private);
+
+                                              return AlertDialog(
+                                                title: const Text(
+                                                    'Create New List'),
+                                                content: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    TextFormField(
+                                                      controller:
+                                                          nameController,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        filled: true,
+                                                        labelText: 'List Name',
+                                                      ),
+                                                      autovalidateMode:
+                                                          AutovalidateMode
+                                                              .onUserInteraction,
+                                                      validator:
+                                                          (String? value) {
+                                                        return (value == null ||
+                                                                value.isEmpty)
+                                                            ? 'List name cannot be empty.'
+                                                            : null;
+                                                      },
+                                                    ),
+                                                    CheckboxListTile(
+                                                      controlAffinity:
+                                                          ListTileControlAffinity
+                                                              .leading,
+                                                      title: const Text(
+                                                          'Private list'),
+                                                      value: nprivate.value ==
+                                                          CustomListVisibility
+                                                              .private,
+                                                      onChanged:
+                                                          (bool? value) async {
+                                                        nprivate
+                                                            .value = (value ==
+                                                                true)
+                                                            ? CustomListVisibility
+                                                                .private
+                                                            : CustomListVisibility
+                                                                .public;
+                                                      },
+                                                    )
+                                                  ],
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('Cancel'),
+                                                    onPressed: () {
+                                                      nav.pop(null);
+                                                    },
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: nameIsEmpty
+                                                        ? null
+                                                        : () {
+                                                            if (nameController
+                                                                .text
+                                                                .isNotEmpty) {
+                                                              nav.pop((
+                                                                nameController
+                                                                    .text,
+                                                                nprivate.value
+                                                              ));
+                                                            }
+                                                          },
+                                                    child: const Text('Create'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        });
+
+                                    if (result != null) {
+                                      final success = await ref
+                                          .read(userListsProvider.notifier)
+                                          .newList(result.$1, result.$2, []);
+
+                                      if (success) {
+                                        messenger
+                                          ..removeCurrentSnackBar()
+                                          ..showSnackBar(
+                                            const SnackBar(
+                                              content:
+                                                  Text('New list created.'),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                      } else {
+                                        messenger
+                                          ..removeCurrentSnackBar()
+                                          ..showSnackBar(
+                                            const SnackBar(
+                                              content:
+                                                  Text('Failed create list.'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                      }
+                                    }
+                                  },
+                                )
+                              ],
+                              child: Container(
+                                padding: const EdgeInsets.all(6.0),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.surfaceVariant,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(6.0)),
+                                ),
+                                child: const Icon(Icons.playlist_add),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                      ],
               ),
               SliverToBoxAdapter(
                 child: Container(

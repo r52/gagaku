@@ -13,8 +13,6 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-enum LocalLibraryAction { open, settings }
-
 class LocalLibraryHome extends StatelessWidget {
   const LocalLibraryHome({super.key});
 
@@ -52,35 +50,31 @@ class LocalLibraryHome extends StatelessWidget {
         actions: [
           ButtonBar(
             children: [
-              PopupMenuButton<LocalLibraryAction>(
-                icon: const Icon(Icons.more_vert),
-                onSelected: (LocalLibraryAction result) async {
-                  switch (result) {
-                    case LocalLibraryAction.open:
+              MenuAnchor(
+                builder: (context, controller, child) => IconButton(
+                  onPressed: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  icon: const Icon(Icons.more_vert),
+                ),
+                menuChildren: [
+                  MenuItemButton(
+                    onPressed: () async {
                       await _readArchive(nav);
-                      break;
-                    case LocalLibraryAction.settings:
-                      nav.push(createLocalLibrarySettingsRoute());
-                      break;
-                    default:
-                      break;
-                  }
-                },
-                itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<LocalLibraryAction>>[
-                  const PopupMenuItem<LocalLibraryAction>(
-                    value: LocalLibraryAction.open,
-                    child: ListTile(
-                      leading: Icon(Icons.folder_open),
-                      title: Text('Read Archive'),
-                    ),
+                    },
+                    leadingIcon: const Icon(Icons.folder_open),
+                    child: const Text('Read Archive'),
                   ),
-                  const PopupMenuItem<LocalLibraryAction>(
-                    value: LocalLibraryAction.settings,
-                    child: ListTile(
-                      leading: Icon(Icons.settings),
-                      title: Text('Settings'),
-                    ),
+                  MenuItemButton(
+                    onPressed: () {
+                      nav.push(createLocalLibrarySettingsRoute());
+                    },
+                    leadingIcon: const Icon(Icons.settings),
+                    child: const Text('Settings'),
                   ),
                 ],
               ),
