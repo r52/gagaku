@@ -24,6 +24,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
+    final theme = Theme.of(context);
     final cfg = ref.watch(mdConfigProvider);
     final config = useState(cfg);
     final groupDataProvider =
@@ -33,7 +34,6 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
         title: const Text('MangaDex Settings'),
         actions: [
           ButtonBar(
@@ -68,32 +68,51 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               subtitle: const Text('Show only chapters from these languages.'),
               builder: (context) {
                 return Center(
-                  child: Wrap(
-                    spacing: spacing,
-                    runSpacing: spacing,
-                    children: [
-                      for (final lang in Languages.languages.values)
-                        FilterChip(
-                          label: Text(lang.name),
-                          selected:
-                              config.value.translatedLanguages.contains(lang),
-                          onSelected: (value) {
-                            if (value) {
-                              config.value = config.value.copyWith(
-                                  translatedLanguages: {
-                                    ...config.value.translatedLanguages,
-                                    lang
-                                  });
-                            } else {
-                              config.value = config.value.copyWith(
-                                  translatedLanguages: config
-                                      .value.translatedLanguages
-                                      .where((element) => element != lang)
-                                      .toSet());
-                            }
-                          },
-                        ),
-                    ],
+                  child: MenuAnchor(
+                    builder: (context, controller, child) =>
+                        ElevatedButton.icon(
+                      style: Styles.buttonStyle(
+                          backgroundColor: theme.colorScheme.tertiaryContainer),
+                      onPressed: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                      icon: const Icon(Icons.arrow_drop_down),
+                      label: const Text('Select Languages'),
+                    ),
+                    menuChildren: List.generate(
+                      Languages.languages.values.length,
+                      (index) => Builder(
+                        builder: (_) {
+                          final lang =
+                              Languages.languages.values.elementAt(index);
+                          return CheckboxListTile(
+                            controlAffinity: ListTileControlAffinity.leading,
+                            title: Text(lang.name),
+                            value:
+                                config.value.translatedLanguages.contains(lang),
+                            onChanged: (bool? value) async {
+                              if (value == true) {
+                                config.value = config.value.copyWith(
+                                    translatedLanguages: {
+                                      ...config.value.translatedLanguages,
+                                      lang
+                                    });
+                              } else {
+                                config.value = config.value.copyWith(
+                                    translatedLanguages: config
+                                        .value.translatedLanguages
+                                        .where((element) => element != lang)
+                                        .toSet());
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 );
               },
@@ -110,32 +129,50 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   'Only show titles originally published in these languages. If no languages are selected, no filter will be applied.'),
               builder: (context) {
                 return Center(
-                  child: Wrap(
-                    spacing: spacing,
-                    runSpacing: spacing,
-                    children: [
-                      for (final lang in Languages.languages.values)
-                        FilterChip(
-                          label: Text(lang.name),
-                          selected:
-                              config.value.originalLanguage.contains(lang),
-                          onSelected: (value) {
-                            if (value) {
-                              config.value = config.value.copyWith(
-                                  originalLanguage: {
-                                    ...config.value.originalLanguage,
-                                    lang
-                                  });
-                            } else {
-                              config.value = config.value.copyWith(
-                                  originalLanguage: config
-                                      .value.originalLanguage
-                                      .where((element) => element != lang)
-                                      .toSet());
-                            }
-                          },
-                        ),
-                    ],
+                  child: MenuAnchor(
+                    builder: (context, controller, child) =>
+                        ElevatedButton.icon(
+                      style: Styles.buttonStyle(
+                          backgroundColor: theme.colorScheme.tertiaryContainer),
+                      onPressed: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                      icon: const Icon(Icons.arrow_drop_down),
+                      label: const Text('Select Languages'),
+                    ),
+                    menuChildren: List.generate(
+                      Languages.languages.values.length,
+                      (index) => Builder(
+                        builder: (_) {
+                          final lang =
+                              Languages.languages.values.elementAt(index);
+                          return CheckboxListTile(
+                            controlAffinity: ListTileControlAffinity.leading,
+                            title: Text(lang.name),
+                            value: config.value.originalLanguage.contains(lang),
+                            onChanged: (bool? value) async {
+                              if (value == true) {
+                                config.value = config.value.copyWith(
+                                    originalLanguage: {
+                                      ...config.value.originalLanguage,
+                                      lang
+                                    });
+                              } else {
+                                config.value = config.value.copyWith(
+                                    originalLanguage: config
+                                        .value.originalLanguage
+                                        .where((element) => element != lang)
+                                        .toSet());
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 );
               },
@@ -150,31 +187,48 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               ),
               builder: (context) {
                 return Center(
-                  child: Wrap(
-                    spacing: spacing,
-                    runSpacing: spacing,
-                    children: [
-                      for (final content in ContentRating.values)
-                        FilterChip(
-                          label: Text(content.formatted),
-                          selected:
-                              config.value.contentRating.contains(content),
-                          onSelected: (value) {
-                            if (value) {
-                              config.value = config.value.copyWith(
-                                  contentRating: {
-                                    ...config.value.contentRating,
-                                    content
-                                  });
-                            } else {
-                              config.value = config.value.copyWith(
-                                  contentRating: config.value.contentRating
-                                      .where((element) => element != content)
-                                      .toSet());
-                            }
-                          },
-                        ),
-                    ],
+                  child: MenuAnchor(
+                    builder: (context, controller, child) =>
+                        ElevatedButton.icon(
+                      style: Styles.buttonStyle(
+                          backgroundColor: theme.colorScheme.tertiaryContainer),
+                      onPressed: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                      icon: const Icon(Icons.arrow_drop_down),
+                      label: const Text('Content Filter'),
+                    ),
+                    menuChildren: List.generate(
+                      ContentRating.values.length,
+                      (index) => Builder(
+                        builder: (_) {
+                          final content = ContentRating.values.elementAt(index);
+                          return CheckboxListTile(
+                            controlAffinity: ListTileControlAffinity.leading,
+                            title: Text(content.formatted),
+                            value: config.value.contentRating.contains(content),
+                            onChanged: (bool? value) async {
+                              if (value == true) {
+                                config.value = config.value.copyWith(
+                                    contentRating: {
+                                      ...config.value.contentRating,
+                                      content
+                                    });
+                              } else {
+                                config.value = config.value.copyWith(
+                                    contentRating: config.value.contentRating
+                                        .where((element) => element != content)
+                                        .toSet());
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 );
               },
