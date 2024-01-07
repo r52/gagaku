@@ -322,7 +322,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                     .elementAt(index + 1),
                                                 label: MangaReadingStatus.values
                                                     .elementAt(index + 1)
-                                                    .formatted,
+                                                    .label,
                                               ),
                                             ),
                                           ),
@@ -432,7 +432,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             value: MangaReadingStatus.values.elementAt(index),
                             label: MangaReadingStatus.values
                                 .elementAt(index)
-                                .formatted,
+                                .label,
                           ),
                         ),
                       ),
@@ -926,7 +926,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               children: [
                                 IconTextChip(
                                   text: Text(manga.attributes!
-                                      .publicationDemographic!.formatted),
+                                      .publicationDemographic!.label),
                                 )
                               ],
                             ),
@@ -1505,7 +1505,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     headers: manga.relatedMangas.fold({},
                                         (previousValue, element) {
                                       previousValue?[element.id] =
-                                          element.related!.formatted;
+                                          element.related!.label;
                                       return previousValue;
                                     }),
                                   ),

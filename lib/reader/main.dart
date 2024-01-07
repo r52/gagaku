@@ -550,7 +550,7 @@ class ReaderWidget extends HookConsumerWidget {
                         f.icon,
                         color: theme.iconTheme.color,
                       ),
-                      label: Text(f.formatted),
+                      label: Text(f.label),
                       selected: settings.format == f,
                       onSelected: (longstrip)
                           ? null
@@ -587,7 +587,7 @@ class ReaderWidget extends HookConsumerWidget {
                         dir.icon,
                         color: theme.iconTheme.color,
                       ),
-                      label: Text(dir.formatted),
+                      label: Text(dir.label),
                       selected: settings.direction == dir,
                       onSelected: (format == ReaderFormat.longstrip)
                           ? null

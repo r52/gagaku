@@ -165,7 +165,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                           label: MangaReadingStatus.values
                               .skip(1)
                               .elementAt(index)
-                              .formatted,
+                              .label,
                         ),
                       ),
                     ),

@@ -1227,7 +1227,7 @@ class MangaStatusChip extends StatelessWidget {
         size: 10,
       ),
       text: Text(
-        status.formatted,
+        status.label,
       ),
     );
   }
@@ -1257,7 +1257,7 @@ class ContentRatingChip extends StatelessWidget {
     return IconTextChip(
       color: iconColor,
       text: Text(
-        rating.formatted,
+        rating.label,
       ),
     );
   }

@@ -488,168 +488,6 @@ abstract class _MangaSearchParameters implements MangaSearchParameters {
       get copyWith => throw _privateConstructorUsedError;
 }
 
-/// @nodoc
-mixin _$Language {
-  String get name => throw _privateConstructorUsedError;
-  String get code => throw _privateConstructorUsedError;
-  String get flag => throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $LanguageCopyWith<Language> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $LanguageCopyWith<$Res> {
-  factory $LanguageCopyWith(Language value, $Res Function(Language) then) =
-      _$LanguageCopyWithImpl<$Res, Language>;
-  @useResult
-  $Res call({String name, String code, String flag});
-}
-
-/// @nodoc
-class _$LanguageCopyWithImpl<$Res, $Val extends Language>
-    implements $LanguageCopyWith<$Res> {
-  _$LanguageCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? code = null,
-    Object? flag = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      flag: null == flag
-          ? _value.flag
-          : flag // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$LanguageImplCopyWith<$Res>
-    implements $LanguageCopyWith<$Res> {
-  factory _$$LanguageImplCopyWith(
-          _$LanguageImpl value, $Res Function(_$LanguageImpl) then) =
-      __$$LanguageImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String name, String code, String flag});
-}
-
-/// @nodoc
-class __$$LanguageImplCopyWithImpl<$Res>
-    extends _$LanguageCopyWithImpl<$Res, _$LanguageImpl>
-    implements _$$LanguageImplCopyWith<$Res> {
-  __$$LanguageImplCopyWithImpl(
-      _$LanguageImpl _value, $Res Function(_$LanguageImpl) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? code = null,
-    Object? flag = null,
-  }) {
-    return _then(_$LanguageImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      flag: null == flag
-          ? _value.flag
-          : flag // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$LanguageImpl with DiagnosticableTreeMixin implements _Language {
-  const _$LanguageImpl(
-      {required this.name, required this.code, required this.flag});
-
-  @override
-  final String name;
-  @override
-  final String code;
-  @override
-  final String flag;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Language(name: $name, code: $code, flag: $flag)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Language'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('code', code))
-      ..add(DiagnosticsProperty('flag', flag));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$LanguageImpl &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.code, code) || other.code == code) &&
-            (identical(other.flag, flag) || other.flag == flag));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, name, code, flag);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$LanguageImplCopyWith<_$LanguageImpl> get copyWith =>
-      __$$LanguageImplCopyWithImpl<_$LanguageImpl>(this, _$identity);
-}
-
-abstract class _Language implements Language {
-  const factory _Language(
-      {required final String name,
-      required final String code,
-      required final String flag}) = _$LanguageImpl;
-
-  @override
-  String get name;
-  @override
-  String get code;
-  @override
-  String get flag;
-  @override
-  @JsonKey(ignore: true)
-  _$$LanguageImplCopyWith<_$LanguageImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
 ChapterList _$ChapterListFromJson(Map<String, dynamic> json) {
   return _ChapterList.fromJson(json);
 }
@@ -1073,8 +911,6 @@ abstract class $ChapterAttributesCopyWith<$Res> {
       @TimestampSerializer() DateTime createdAt,
       @TimestampSerializer() DateTime updatedAt,
       @TimestampSerializer() DateTime publishAt});
-
-  $LanguageCopyWith<$Res> get translatedLanguage;
 }
 
 /// @nodoc
@@ -1144,14 +980,6 @@ class _$ChapterAttributesCopyWithImpl<$Res, $Val extends ChapterAttributes>
               as DateTime,
     ) as $Val);
   }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $LanguageCopyWith<$Res> get translatedLanguage {
-    return $LanguageCopyWith<$Res>(_value.translatedLanguage, (value) {
-      return _then(_value.copyWith(translatedLanguage: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
@@ -1173,9 +1001,6 @@ abstract class _$$ChapterAttributesImplCopyWith<$Res>
       @TimestampSerializer() DateTime createdAt,
       @TimestampSerializer() DateTime updatedAt,
       @TimestampSerializer() DateTime publishAt});
-
-  @override
-  $LanguageCopyWith<$Res> get translatedLanguage;
 }
 
 /// @nodoc
@@ -5372,7 +5197,6 @@ abstract class $MangaAttributesCopyWith<$Res> {
       @TimestampSerializer() DateTime updatedAt});
 
   $MangaLinksCopyWith<$Res>? get links;
-  $LanguageCopyWith<$Res> get originalLanguage;
 }
 
 /// @nodoc
@@ -5479,14 +5303,6 @@ class _$MangaAttributesCopyWithImpl<$Res, $Val extends MangaAttributes>
       return _then(_value.copyWith(links: value) as $Val);
     });
   }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $LanguageCopyWith<$Res> get originalLanguage {
-    return $LanguageCopyWith<$Res>(_value.originalLanguage, (value) {
-      return _then(_value.copyWith(originalLanguage: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
@@ -5516,8 +5332,6 @@ abstract class _$$MangaAttributesImplCopyWith<$Res>
 
   @override
   $MangaLinksCopyWith<$Res>? get links;
-  @override
-  $LanguageCopyWith<$Res> get originalLanguage;
 }
 
 /// @nodoc

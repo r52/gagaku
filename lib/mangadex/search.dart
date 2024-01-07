@@ -96,7 +96,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
               FilterOrder.values.length,
               (int index) => DropdownMenuEntry<FilterOrder>(
                 value: FilterOrder.values.elementAt(index),
-                label: FilterOrder.values.elementAt(index).formatted,
+                label: FilterOrder.values.elementAt(index).label,
               ),
             ),
           ),
@@ -381,7 +381,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                     children: ContentRating.values
                         .map(
                           (e) => FilterChip(
-                            label: Text(e.formatted),
+                            label: Text(e.label),
                             selectedColor: selectedChipColor,
                             selected: fil.value.contentRating.contains(e),
                             onSelected: (bool value) {
@@ -413,7 +413,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                     ),
                     children: MangaDemographic.values
                         .map((e) => FilterChip(
-                              label: Text(e.formatted),
+                              label: Text(e.label),
                               selectedColor: selectedChipColor,
                               selected:
                                   fil.value.publicationDemographic.contains(e),
@@ -448,7 +448,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                         .skip(1)
                         .map(
                           (e) => FilterChip(
-                            label: Text(e.formatted),
+                            label: Text(e.label),
                             selectedColor: selectedChipColor,
                             selected: fil.value.status.contains(e),
                             onSelected: (bool value) {
@@ -473,7 +473,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                   for (final group in TagGroup.values) ...[
                     ..._buildSection(
                       header: Text(
-                        group.formatted,
+                        group.label,
                         style: headingStyle,
                       ),
                       children: tags

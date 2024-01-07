@@ -84,14 +84,20 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                       label: const Text('Select Languages'),
                     ),
                     menuChildren: List.generate(
-                      Languages.languages.values.length,
+                      Languages.languages.length,
                       (index) => Builder(
                         builder: (_) {
-                          final lang =
-                              Languages.languages.values.elementAt(index);
+                          final lang = Languages.languages.elementAt(index);
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(lang.name),
+                            title: Text(lang.label),
+                            secondary: Text(
+                              lang.flag,
+                              style: const TextStyle(
+                                fontFamily: 'Twemoji',
+                                fontSize: 15,
+                              ),
+                            ),
                             value:
                                 config.value.translatedLanguages.contains(lang),
                             onChanged: (bool? value) async {
@@ -145,14 +151,20 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                       label: const Text('Select Languages'),
                     ),
                     menuChildren: List.generate(
-                      Languages.languages.values.length,
+                      Languages.languages.length,
                       (index) => Builder(
                         builder: (_) {
-                          final lang =
-                              Languages.languages.values.elementAt(index);
+                          final lang = Languages.languages.elementAt(index);
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(lang.name),
+                            title: Text(lang.label),
+                            secondary: Text(
+                              lang.flag,
+                              style: const TextStyle(
+                                fontFamily: 'Twemoji',
+                                fontSize: 15,
+                              ),
+                            ),
                             value: config.value.originalLanguage.contains(lang),
                             onChanged: (bool? value) async {
                               if (value == true) {
@@ -209,7 +221,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           final content = ContentRating.values.elementAt(index);
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(content.formatted),
+                            title: Text(content.label),
                             value: config.value.contentRating.contains(content),
                             onChanged: (bool? value) async {
                               if (value == true) {

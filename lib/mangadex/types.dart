@@ -40,41 +40,32 @@ extension LocalizedStringExt on LocalizedString {
 enum ContentRating { safe, suggestive, erotica, pornographic }
 
 extension ContentRatingExt on ContentRating {
-  String get formatted => name.capitalize();
+  String get label => name.capitalize();
 }
 
 enum MangaDemographic { shounen, shoujo, josei, seinen }
 
 extension MangaDemographicExt on MangaDemographic {
-  String get formatted => name.capitalize();
+  String get label => name.capitalize();
 }
 
 enum MangaStatus { completed, ongoing, cancelled, hiatus }
 
 extension MangaStatusExt on MangaStatus {
-  String get formatted => name.capitalize();
+  String get label => name.capitalize();
 }
 
 enum MangaReadingStatus {
-  remove,
-  reading,
-  on_hold,
-  plan_to_read,
-  dropped,
-  re_reading,
-  completed
-}
+  remove('Remove'),
+  reading('Reading'),
+  on_hold('On Hold'),
+  plan_to_read('Plan to Read'),
+  dropped('Dropped'),
+  re_reading('Re-reading'),
+  completed('Completed');
 
-extension MangaReadingStatusExt on MangaReadingStatus {
-  String get formatted => const [
-        'Remove',
-        'Reading',
-        'On Hold',
-        'Plan to Read',
-        'Dropped',
-        'Re-reading',
-        'Completed'
-      ].elementAt(index);
+  const MangaReadingStatus(this.label);
+  final String label;
 }
 
 const RatingLabel = [
@@ -94,104 +85,56 @@ const RatingLabel = [
 enum TagGroup { content, format, genre, theme }
 
 extension TagGroupExt on TagGroup {
-  String get formatted => name.capitalize();
+  String get label => name.capitalize();
 }
 
 enum CoverArtQuality { best, medium, small }
 
 enum FilterOrder {
-  relevance_asc,
-  relevance_desc,
-  followedCount_asc,
-  followedCount_desc,
-  latestUploadedChapter_asc,
-  latestUploadedChapter_desc,
-  updatedAt_asc,
-  updatedAt_desc,
-  createdAt_asc,
-  createdAt_desc,
-  year_asc,
-  year_desc,
-  title_asc,
-  title_desc,
+  relevance_asc('Worst Match', MapEntry('order[relevance]', 'asc')),
+  relevance_desc('Best Match', MapEntry('order[relevance]', 'desc')),
+  followedCount_asc('Fewest Follows', MapEntry('order[followedCount]', 'asc')),
+  followedCount_desc('Most Follows', MapEntry('order[followedCount]', 'desc')),
+  latestUploadedChapter_asc(
+      'Oldest Upload', MapEntry('order[latestUploadedChapter]', 'asc')),
+  latestUploadedChapter_desc(
+      'Latest Upload', MapEntry('order[latestUploadedChapter]', 'desc')),
+  updatedAt_asc('Oldest Update', MapEntry('order[updatedAt]', 'asc')),
+  updatedAt_desc('Latest Update', MapEntry('order[updatedAt]', 'desc')),
+  createdAt_asc('Oldest Added', MapEntry('order[createdAt]', 'asc')),
+  createdAt_desc('Recently Added', MapEntry('order[createdAt]', 'desc')),
+  year_asc('Year Ascending', MapEntry('order[year]', 'asc')),
+  year_desc('Year Descending', MapEntry('order[year]', 'desc')),
+  title_asc('Title Ascending', MapEntry('order[title]', 'asc')),
+  title_desc('Title Descending', MapEntry('order[title]', 'desc'));
+
+  const FilterOrder(this.label, this.json);
+  final String label;
+  final MapEntry<String, dynamic> json;
 }
 
 enum CustomListVisibility { private, public }
 
-extension FilterOrderExt on FilterOrder {
-  String get formatted => const [
-        'Worst Match',
-        'Best Match',
-        'Fewest Follows',
-        'Most Follows',
-        'Oldest Upload',
-        'Latest Upload',
-        'Oldest Update',
-        'Latest Update',
-        'Oldest Added',
-        'Recently Added',
-        'Year Ascending',
-        'Year Descending',
-        'Title Ascending',
-        'Title Descending',
-      ].elementAt(index);
-
-  MapEntry<String, Object> get entry => const [
-        MapEntry('order[relevance]', 'asc'),
-        MapEntry('order[relevance]', 'desc'),
-        MapEntry('order[followedCount]', 'asc'),
-        MapEntry('order[followedCount]', 'desc'),
-        MapEntry('order[latestUploadedChapter]', 'asc'),
-        MapEntry('order[latestUploadedChapter]', 'desc'),
-        MapEntry('order[updatedAt]', 'asc'),
-        MapEntry('order[updatedAt]', 'desc'),
-        MapEntry('order[createdAt]', 'asc'),
-        MapEntry('order[createdAt]', 'desc'),
-        MapEntry('order[year]', 'asc'),
-        MapEntry('order[year]', 'desc'),
-        MapEntry('order[title]', 'asc'),
-        MapEntry('order[title]', 'desc'),
-      ].elementAt(index);
-}
-
 enum MangaRelations {
-  monochrome,
-  main_story,
-  adapted_from,
-  based_on,
-  prequel,
-  side_story,
-  doujinshi,
-  same_franchise,
-  shared_universe,
-  sequel,
-  spin_off,
-  alternate_story,
-  alternate_version,
-  preserialization,
-  colored,
-  serialization,
-}
+  monochrome('Monochrome'),
+  main_story('Main Story'),
+  adapted_from('Adapted from'),
+  based_on('Based on'),
+  prequel('Prequel'),
+  side_story('Side story'),
+  doujinshi('Doujinshi'),
+  same_franchise('Same franchise'),
+  shared_universe('Shared universe'),
+  sequel('Sequel'),
+  spin_off('Spinoff'),
+  alternate_story('Alternate story'),
+  alternate_version('Alternate version'),
+  preserialization('Pre-serialization'),
+  colored('Colored'),
+  serialization('Serialization');
 
-extension MangaRelationsExt on MangaRelations {
-  String get formatted => const [
-        'Monochrome',
-        'Main Story',
-        'Adapted from',
-        'Based on',
-        'Prequel',
-        'Side story',
-        'Doujinshi',
-        'Same franchise',
-        'Shared universe',
-        'Sequel',
-        'Spinoff',
-        'Alternate story',
-        'Alternate version',
-        'Pre-serialization',
-        'Colored',
-        'Serialization',
-      ].elementAt(index);
+  const MangaRelations(this.label);
+  final String label;
 }
 
 @freezed
@@ -234,7 +177,7 @@ class MangaFilters with _$MangaFilters {
       params['contentRating[]'] = contentRating.map((e) => e.name).toList();
     }
 
-    params.addEntries([order.entry]);
+    params.addEntries([order.json]);
 
     return params;
   }
@@ -268,77 +211,84 @@ class LanguageConverter implements JsonConverter<Language, dynamic> {
   dynamic toJson(Language lang) => lang.code;
 }
 
-@freezed
-class Language with _$Language {
-  const factory Language({
-    required String name,
-    required String code,
-    required String flag,
-  }) = _Language;
+enum Language {
+  en('English', 'en', '🇬🇧'),
+  ar('Arabic', 'ar', '🇸🇦'),
+  az('Azerbaijani', 'az', '🇦🇿'),
+  bn('Bengali', 'bn', '🇧🇩'),
+  bg('Bulgarian', 'bg', '🇧🇬'),
+  my('Burmese', 'my', '🇲🇲'),
+  ca('Catalan', 'ca', '🇦🇩'),
+  zh('Chinese (Simp.)', 'zh', '🇨🇳'),
+  zh_hk('Chinese (Trad.)', 'zh-hk', '🇭🇰'),
+  hr('Croatian', 'hr', '🇭🇷'),
+  cs('Czech', 'cs', '🇨🇿'),
+  da('Danish', 'da', '🇩🇰'),
+  nl('Dutch', 'nl', '🇳🇱'),
+  eo('Esperanto', 'eo', '🇺🇳'),
+  et('Estonian', 'et', '🇪🇪'),
+  tl('Filipino', 'tl', '🇵🇭'),
+  fi('Finnish', 'fi', '🇫🇮'),
+  fr('French', 'fr', '🇫🇷'),
+  ka('Georgian', 'ka', '🇬🇪'),
+  de('German', 'de', '🇩🇪'),
+  el('Greek', 'el', '🇬🇷'),
+  he('Hebrew', 'he', '🇮🇱'),
+  hi('Hindi', 'hi', '🇮🇳'),
+  hu('Hungarian', 'hu', '🇭🇺'),
+  id('Indonesian', 'id', '🇮🇩'),
+  it('Italian', 'it', '🇮🇹'),
+  ja('Japanese', 'ja', '🇯🇵'),
+  kk('Kazakh', 'kk', '🇰🇿'),
+  ko('Korean', 'ko', '🇰🇷'),
+  la('Latin', 'la', '🇻🇦'),
+  lt('Lithuanian', 'lt', '🇱🇹'),
+  ms('Malay', 'ms', '🇲🇾'),
+  mn('Mongolian', 'mn', '🇲🇳'),
+  ne('Nepali', 'ne', '🇳🇵'),
+  no('Norwegian', 'no', '🇳🇴'),
+  fa('Persian', 'fa', '🇮🇷'),
+  pl('Polish', 'pl', '🇵🇱'),
+  pt_br('Portuguese (BR)', 'pt-br', '🇧🇷'),
+  pt('Portuguese', 'pt', '🇵🇹'),
+  ro('Romanian', 'ro', '🇷🇴'),
+  ru('Russian', 'ru', '🇷🇺'),
+  sr('Serbian', 'sr', '🇷🇸'),
+  sk('Slovak', 'sk', '🇸🇰'),
+  es('Spanish', 'es', '🇪🇸'),
+  es_la('Spanish (LATAM)', 'es-la', '🇲🇽'),
+  sv('Swedish', 'sv', '🇸🇪'),
+  ta('Tamil', 'ta', '🇱🇰'),
+  th('Thai', 'th', '🇹🇭'),
+  tr('Turkish', 'tr', '🇹🇷'),
+  uk('Ukrainian', 'uk', '🇺🇦'),
+  vi('Vietnam', 'vi', '🇻🇳'),
+
+  // Non-standard
+  ja_ro('Japanese (Romanized)', 'ja-ro', 'jp', true),
+  ko_ro('Korean (Romanized)', 'ko-ro', 'ko', true),
+  zh_ro('Chinese (Romanized)', 'zh-ro', 'zh', true),
+  other('Other', 'NULL', '🇺🇳', true);
+
+  const Language(this.label, this.code, this.flag, [this.nonStandard = false]);
+  final String label;
+  final String code;
+  final String flag;
+  final bool nonStandard;
 }
 
 class Languages {
-  static const Map<String, Language> _languages = {
-    'en': Language(name: 'English', code: 'en', flag: '🇬🇧'),
-    'pt-br': Language(name: 'Portuguese (BR)', code: 'pt-br', flag: '🇧🇷'),
-    'pt': Language(name: 'Portuguese', code: 'pt', flag: '🇵🇹'),
-    'ru': Language(name: 'Russian', code: 'ru', flag: '🇷🇺'),
-    'fr': Language(name: 'French', code: 'fr', flag: '🇫🇷'),
-    'es-la': Language(name: 'Spanish (LATAM)', code: 'es-la', flag: '🇲🇽'),
-    'es': Language(name: 'Spanish', code: 'es', flag: '🇪🇸'),
-    'pl': Language(name: 'Polish', code: 'pl', flag: '🇵🇱'),
-    'tr': Language(name: 'Turkish', code: 'tr', flag: '🇹🇷'),
-    'it': Language(name: 'Italian', code: 'it', flag: '🇮🇹'),
-    'id': Language(name: 'Indonesian', code: 'id', flag: '🇮🇩'),
-    'vi': Language(name: 'Vietnam', code: 'vi', flag: '🇻🇳'),
-    'hu': Language(name: 'Hungarian', code: 'hu', flag: '🇭🇺'),
-    'zh': Language(name: 'Chinese (Simp.)', code: 'zh', flag: '🇨🇳'),
-    'zh-hk': Language(name: 'Chinese (Trad.)', code: 'zh-hk', flag: '🇭🇰'),
-    'ar': Language(name: 'Arabic', code: 'ar', flag: '🇸🇦'),
-    'de': Language(name: 'German', code: 'de', flag: '🇩🇪'),
-    'th': Language(name: 'Thai', code: 'th', flag: '🇹🇭'),
-    'ca': Language(name: 'Catalan', code: 'ca', flag: '🇦🇩'),
-    'bg': Language(name: 'Bulgarian', code: 'bg', flag: '🇧🇬'),
-    'fa': Language(name: 'Persian', code: 'fa', flag: '🇮🇷'),
-    'uk': Language(name: 'Ukrainian', code: 'uk', flag: '🇺🇦'),
-    'ro': Language(name: 'Romanian', code: 'ro', flag: '🇷🇴'),
-    'he': Language(name: 'Hebrew', code: 'he', flag: '🇮🇱'),
-    'mn': Language(name: 'Mongolian', code: 'mn', flag: '🇲🇳'),
-    'ms': Language(name: 'Malay', code: 'ms', flag: '🇲🇾'),
-    'tl': Language(name: 'Tagalog', code: 'tl', flag: '🇵🇭'),
-    'ja': Language(name: 'Japanese', code: 'ja', flag: '🇯🇵'),
-    'ko': Language(name: 'Korean', code: 'ko', flag: '🇰🇷'),
-    'hi': Language(name: 'Hindi', code: 'hi', flag: '🇮🇳'),
-    'my': Language(name: 'Burmese', code: 'my', flag: '🇲🇲'),
-    'cs': Language(name: 'Czech', code: 'cs', flag: '🇨🇿'),
-    'nl': Language(name: 'Dutch', code: 'nl', flag: '🇳🇱'),
-    'sv': Language(name: 'Swedish', code: 'sv', flag: '🇸🇪'),
-    'bn': Language(name: 'Bengali', code: 'bn', flag: '🇧🇩'),
-    'no': Language(name: 'Norwegian', code: 'no', flag: '🇳🇴'),
-    'lt': Language(name: 'Lithuanian', code: 'lt', flag: '🇱🇹'),
-    'el': Language(name: 'Greek', code: 'el', flag: '🇬🇷'),
-    'sr': Language(name: 'Serbo-Croatian', code: 'sr', flag: '🇭🇷'),
-    'da': Language(name: 'Danish', code: 'da', flag: '🇩🇰'),
-    'NULL': Language(name: 'Other', code: 'NULL', flag: '🇺🇳'),
-  };
-
-  // Non-standard entries
-  static const Map<String, Language> _extraLanguages = {
-    'ja-ro': Language(name: 'Japanese (Romanized)', code: 'ja-ro', flag: 'jp'),
-  };
-
-  static Map<String, Language> get languages => _languages;
+  static Iterable<Language> get languages =>
+      Language.values.where((element) => element.nonStandard == false);
 
   static Language get(String code) {
-    if (!_languages.containsKey(code) && !_extraLanguages.containsKey(code)) {
-      return _languages['NULL']!;
+    final langs = Language.values.where((element) => element.code == code);
+
+    if (langs.isEmpty) {
+      return Language.other;
     }
 
-    if (_extraLanguages.containsKey(code)) {
-      return _extraLanguages[code]!;
-    }
-
-    return _languages[code]!;
+    return langs.first;
   }
 }
 

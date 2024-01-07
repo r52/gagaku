@@ -1,42 +1,27 @@
 import 'package:flutter/material.dart';
 
 enum ReaderDirection {
-  leftToRight,
-  rightToLeft,
+  leftToRight('Left to Right', Icons.arrow_forward),
+  rightToLeft('Right to Left', Icons.arrow_back);
+
+  const ReaderDirection(this.label, this.icon);
+  final String label;
+  final IconData icon;
 }
 
 enum ReaderFormat {
-  single,
-  longstrip,
-}
+  single(
+    'Single',
+    Icons.note,
+  ),
+  longstrip(
+    'Long Strip',
+    Icons.view_stream,
+  );
 
-extension ReaderDirectionExt on ReaderDirection {
-  IconData get icon => const [
-        Icons.arrow_forward,
-        Icons.arrow_back,
-      ].elementAt(index);
-
-  String get formatted => const [
-        'Left to Right',
-        'Right to Left',
-      ].elementAt(index);
-
-  static ReaderDirection parse(int index) =>
-      ReaderDirection.values.elementAt(index);
-}
-
-extension ReaderFormatExt on ReaderFormat {
-  IconData get icon => const [
-        Icons.note,
-        Icons.view_stream,
-      ].elementAt(index);
-
-  String get formatted => const [
-        'Single',
-        'Long Strip',
-      ].elementAt(index);
-
-  static ReaderFormat parse(int index) => ReaderFormat.values.elementAt(index);
+  const ReaderFormat(this.label, this.icon);
+  final String label;
+  final IconData icon;
 }
 
 class ReaderPage {
