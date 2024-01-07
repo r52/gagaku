@@ -325,10 +325,14 @@ class MangaDexModel {
   }
 
   Exception createException(String msg, http.Response response) {
+    if (response.statusCode == 503) {
+      msg = 'MangaDex is down for maintanence';
+    }
+
     final message =
         "$msg\nServer returned ${response.statusCode}: ${response.reasonPhrase}";
 
-    if (response.statusCode == 500) {
+    if (response.statusCode >= 500) {
       logger.e(message);
       return Exception(message);
     }
@@ -1361,8 +1365,8 @@ class MangaDexModel {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(params));
 
-    if (response.statusCode >= 200 && response.statusCode <= 201) {
-      Map<String, dynamic> body = json.decode(response.body);
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      final Map<String, dynamic> body = json.decode(response.body);
 
       if (body['result'] == 'ok') {
         // Process new list
@@ -1408,7 +1412,7 @@ class MangaDexModel {
       body: json.encode(params),
     );
 
-    if (response.statusCode >= 200 && response.statusCode <= 201) {
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
       final Map<String, dynamic> body = json.decode(response.body);
 
       if (body['result'] == 'ok') {
