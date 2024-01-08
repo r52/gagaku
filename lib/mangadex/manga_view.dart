@@ -855,7 +855,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       for (final Map(entries: entry)
                           in manga.attributes!.altTitles)
                         ExpansionTile(
-                          title: Text(Languages.get(entry.first.key).name),
+                          title: Text(Languages.get(entry.first.key).label),
                           children: [
                             Container(
                               width: double.infinity,
@@ -876,7 +876,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       for (final MapEntry(key: lang, value: desc)
                           in manga.attributes!.description.entries)
                         ExpansionTile(
-                          title: Text(Languages.get(lang).name),
+                          title: Text(Languages.get(lang).label),
                           children: [
                             Container(
                               width: double.infinity,
