@@ -37,21 +37,30 @@ extension LocalizedStringExt on LocalizedString {
   }
 }
 
-enum ContentRating { safe, suggestive, erotica, pornographic }
+enum ContentRating {
+  safe,
+  suggestive,
+  erotica,
+  pornographic;
 
-extension ContentRatingExt on ContentRating {
   String get label => name.capitalize();
 }
 
-enum MangaDemographic { shounen, shoujo, josei, seinen }
+enum MangaDemographic {
+  shounen,
+  shoujo,
+  josei,
+  seinen;
 
-extension MangaDemographicExt on MangaDemographic {
   String get label => name.capitalize();
 }
 
-enum MangaStatus { completed, ongoing, cancelled, hiatus }
+enum MangaStatus {
+  completed,
+  ongoing,
+  cancelled,
+  hiatus;
 
-extension MangaStatusExt on MangaStatus {
   String get label => name.capitalize();
 }
 
@@ -82,9 +91,12 @@ const RatingLabel = [
   '(10) Masterpiece',
 ];
 
-enum TagGroup { content, format, genre, theme }
+enum TagGroup {
+  content,
+  format,
+  genre,
+  theme;
 
-extension TagGroupExt on TagGroup {
   String get label => name.capitalize();
 }
 
