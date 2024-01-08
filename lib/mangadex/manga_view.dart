@@ -222,16 +222,37 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   expandedTitleScale: 3.0,
-                  title: Text(
-                    manga.attributes!.title.get('en'),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      shadows: <Shadow>[
-                        Shadow(
-                          offset: Offset(1.0, 1.0),
-                          blurRadius: 1.0,
-                          color: Color.fromARGB(255, 0, 0, 0),
+                  title: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: manga.attributes!.originalLanguage.flag,
+                          style: const TextStyle(
+                            fontFamily: 'Twemoji',
+                            fontSize: 10,
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(0.5, 0.5),
+                                blurRadius: 1.0,
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const TextSpan(text: ' '),
+                        TextSpan(
+                          text: manga.attributes!.title.get('en'),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                blurRadius: 1.0,
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

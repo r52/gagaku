@@ -203,7 +203,7 @@ class ChapterFeedItem extends StatelessWidget {
       );
     }).toList();
 
-    final titleBtn = TextButton(
+    final titleBtn = TextButton.icon(
       style: TextButton.styleFrom(
         minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
@@ -214,7 +214,14 @@ class ChapterFeedItem extends StatelessWidget {
       onPressed: () async {
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
-      child: Text(
+      icon: Text(
+        state.manga.attributes!.originalLanguage.flag,
+        style: const TextStyle(
+          fontFamily: 'Twemoji',
+          fontSize: 18,
+        ),
+      ),
+      label: Text(
         state.manga.attributes!.title.get('en'),
         overflow: TextOverflow.ellipsis,
       ),
@@ -831,6 +838,13 @@ class _GridMangaItem extends HookWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: GridTileBar(
+              leading: Text(
+                manga.attributes!.originalLanguage.flag,
+                style: const TextStyle(
+                  fontFamily: 'Twemoji',
+                  fontSize: 18,
+                ),
+              ),
               title: Text(
                 manga.attributes!.title.get('en'),
                 softWrap: true,
@@ -870,7 +884,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextButton(
+            TextButton.icon(
               style: TextButton.styleFrom(
                   foregroundColor: theme.colorScheme.onSurface,
                   textStyle: const TextStyle(
@@ -878,7 +892,14 @@ class _GridMangaDetailedItem extends ConsumerWidget {
               onPressed: () async {
                 context.push('/title/${manga.id}', extra: manga);
               },
-              child: Text(
+              icon: Text(
+                manga.attributes!.originalLanguage.flag,
+                style: const TextStyle(
+                  fontFamily: 'Twemoji',
+                  fontSize: 18,
+                ),
+              ),
+              label: Text(
                 manga.attributes!.title.get('en'),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -1067,7 +1088,7 @@ class _ListMangaItem extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextButton(
+                  TextButton.icon(
                     style: TextButton.styleFrom(
                       foregroundColor: theme.colorScheme.onSurface,
                       textStyle: const TextStyle(
@@ -1078,7 +1099,14 @@ class _ListMangaItem extends ConsumerWidget {
                     onPressed: () async {
                       context.push('/title/${manga.id}', extra: manga);
                     },
-                    child: Text(manga.attributes!.title.get('en')),
+                    icon: Text(
+                      manga.attributes!.originalLanguage.flag,
+                      style: const TextStyle(
+                        fontFamily: 'Twemoji',
+                        fontSize: 18,
+                      ),
+                    ),
+                    label: Text(manga.attributes!.title.get('en')),
                   ),
                   const SizedBox(
                     height: 10,
