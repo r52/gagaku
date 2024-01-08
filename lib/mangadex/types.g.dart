@@ -12,10 +12,16 @@ _$MangaFiltersImpl _$$MangaFiltersImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
               .toSet() ??
           const {},
+      includedTagsMode:
+          $enumDecodeNullable(_$TagModeEnumMap, json['includedTagsMode']) ??
+              TagMode.and,
       excludedTags: (json['excludedTags'] as List<dynamic>?)
               ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
               .toSet() ??
           const {},
+      excludedTagsMode:
+          $enumDecodeNullable(_$TagModeEnumMap, json['excludedTagsMode']) ??
+              TagMode.or,
       status: (json['status'] as List<dynamic>?)
               ?.map((e) => $enumDecode(_$MangaStatusEnumMap, e))
               .toSet() ??
@@ -35,7 +41,9 @@ _$MangaFiltersImpl _$$MangaFiltersImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$MangaFiltersImplToJson(_$MangaFiltersImpl instance) =>
     <String, dynamic>{
       'includedTags': instance.includedTags.toList(),
+      'includedTagsMode': _$TagModeEnumMap[instance.includedTagsMode]!,
       'excludedTags': instance.excludedTags.toList(),
+      'excludedTagsMode': _$TagModeEnumMap[instance.excludedTagsMode]!,
       'status': instance.status.map((e) => _$MangaStatusEnumMap[e]!).toList(),
       'publicationDemographic': instance.publicationDemographic
           .map((e) => _$MangaDemographicEnumMap[e]!)
@@ -45,6 +53,11 @@ Map<String, dynamic> _$$MangaFiltersImplToJson(_$MangaFiltersImpl instance) =>
           .toList(),
       'order': _$FilterOrderEnumMap[instance.order]!,
     };
+
+const _$TagModeEnumMap = {
+  TagMode.and: 'and',
+  TagMode.or: 'or',
+};
 
 const _$MangaStatusEnumMap = {
   MangaStatus.completed: 'completed',

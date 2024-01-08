@@ -21,7 +21,9 @@ MangaFilters _$MangaFiltersFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$MangaFilters {
   Set<Tag> get includedTags => throw _privateConstructorUsedError;
+  TagMode get includedTagsMode => throw _privateConstructorUsedError;
   Set<Tag> get excludedTags => throw _privateConstructorUsedError;
+  TagMode get excludedTagsMode => throw _privateConstructorUsedError;
   Set<MangaStatus> get status => throw _privateConstructorUsedError;
   Set<MangaDemographic> get publicationDemographic =>
       throw _privateConstructorUsedError;
@@ -42,7 +44,9 @@ abstract class $MangaFiltersCopyWith<$Res> {
   @useResult
   $Res call(
       {Set<Tag> includedTags,
+      TagMode includedTagsMode,
       Set<Tag> excludedTags,
+      TagMode excludedTagsMode,
       Set<MangaStatus> status,
       Set<MangaDemographic> publicationDemographic,
       Set<ContentRating> contentRating,
@@ -63,7 +67,9 @@ class _$MangaFiltersCopyWithImpl<$Res, $Val extends MangaFilters>
   @override
   $Res call({
     Object? includedTags = null,
+    Object? includedTagsMode = null,
     Object? excludedTags = null,
+    Object? excludedTagsMode = null,
     Object? status = null,
     Object? publicationDemographic = null,
     Object? contentRating = null,
@@ -74,10 +80,18 @@ class _$MangaFiltersCopyWithImpl<$Res, $Val extends MangaFilters>
           ? _value.includedTags
           : includedTags // ignore: cast_nullable_to_non_nullable
               as Set<Tag>,
+      includedTagsMode: null == includedTagsMode
+          ? _value.includedTagsMode
+          : includedTagsMode // ignore: cast_nullable_to_non_nullable
+              as TagMode,
       excludedTags: null == excludedTags
           ? _value.excludedTags
           : excludedTags // ignore: cast_nullable_to_non_nullable
               as Set<Tag>,
+      excludedTagsMode: null == excludedTagsMode
+          ? _value.excludedTagsMode
+          : excludedTagsMode // ignore: cast_nullable_to_non_nullable
+              as TagMode,
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -108,7 +122,9 @@ abstract class _$$MangaFiltersImplCopyWith<$Res>
   @useResult
   $Res call(
       {Set<Tag> includedTags,
+      TagMode includedTagsMode,
       Set<Tag> excludedTags,
+      TagMode excludedTagsMode,
       Set<MangaStatus> status,
       Set<MangaDemographic> publicationDemographic,
       Set<ContentRating> contentRating,
@@ -127,7 +143,9 @@ class __$$MangaFiltersImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? includedTags = null,
+    Object? includedTagsMode = null,
     Object? excludedTags = null,
+    Object? excludedTagsMode = null,
     Object? status = null,
     Object? publicationDemographic = null,
     Object? contentRating = null,
@@ -138,10 +156,18 @@ class __$$MangaFiltersImplCopyWithImpl<$Res>
           ? _value._includedTags
           : includedTags // ignore: cast_nullable_to_non_nullable
               as Set<Tag>,
+      includedTagsMode: null == includedTagsMode
+          ? _value.includedTagsMode
+          : includedTagsMode // ignore: cast_nullable_to_non_nullable
+              as TagMode,
       excludedTags: null == excludedTags
           ? _value._excludedTags
           : excludedTags // ignore: cast_nullable_to_non_nullable
               as Set<Tag>,
+      excludedTagsMode: null == excludedTagsMode
+          ? _value.excludedTagsMode
+          : excludedTagsMode // ignore: cast_nullable_to_non_nullable
+              as TagMode,
       status: null == status
           ? _value._status
           : status // ignore: cast_nullable_to_non_nullable
@@ -167,7 +193,9 @@ class __$$MangaFiltersImplCopyWithImpl<$Res>
 class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
   const _$MangaFiltersImpl(
       {final Set<Tag> includedTags = const {},
+      this.includedTagsMode = TagMode.and,
       final Set<Tag> excludedTags = const {},
+      this.excludedTagsMode = TagMode.or,
       final Set<MangaStatus> status = const {},
       final Set<MangaDemographic> publicationDemographic = const {},
       final Set<ContentRating> contentRating = const {},
@@ -191,6 +219,9 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
     return EqualUnmodifiableSetView(_includedTags);
   }
 
+  @override
+  @JsonKey()
+  final TagMode includedTagsMode;
   final Set<Tag> _excludedTags;
   @override
   @JsonKey()
@@ -200,6 +231,9 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
     return EqualUnmodifiableSetView(_excludedTags);
   }
 
+  @override
+  @JsonKey()
+  final TagMode excludedTagsMode;
   final Set<MangaStatus> _status;
   @override
   @JsonKey()
@@ -234,7 +268,7 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'MangaFilters(includedTags: $includedTags, excludedTags: $excludedTags, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
+    return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
   }
 
   @override
@@ -243,7 +277,9 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
     properties
       ..add(DiagnosticsProperty('type', 'MangaFilters'))
       ..add(DiagnosticsProperty('includedTags', includedTags))
+      ..add(DiagnosticsProperty('includedTagsMode', includedTagsMode))
       ..add(DiagnosticsProperty('excludedTags', excludedTags))
+      ..add(DiagnosticsProperty('excludedTagsMode', excludedTagsMode))
       ..add(DiagnosticsProperty('status', status))
       ..add(
           DiagnosticsProperty('publicationDemographic', publicationDemographic))
@@ -258,8 +294,12 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
             other is _$MangaFiltersImpl &&
             const DeepCollectionEquality()
                 .equals(other._includedTags, _includedTags) &&
+            (identical(other.includedTagsMode, includedTagsMode) ||
+                other.includedTagsMode == includedTagsMode) &&
             const DeepCollectionEquality()
                 .equals(other._excludedTags, _excludedTags) &&
+            (identical(other.excludedTagsMode, excludedTagsMode) ||
+                other.excludedTagsMode == excludedTagsMode) &&
             const DeepCollectionEquality().equals(other._status, _status) &&
             const DeepCollectionEquality().equals(
                 other._publicationDemographic, _publicationDemographic) &&
@@ -273,7 +313,9 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(_includedTags),
+      includedTagsMode,
       const DeepCollectionEquality().hash(_excludedTags),
+      excludedTagsMode,
       const DeepCollectionEquality().hash(_status),
       const DeepCollectionEquality().hash(_publicationDemographic),
       const DeepCollectionEquality().hash(_contentRating),
@@ -296,7 +338,9 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
 abstract class _MangaFilters extends MangaFilters {
   const factory _MangaFilters(
       {final Set<Tag> includedTags,
+      final TagMode includedTagsMode,
       final Set<Tag> excludedTags,
+      final TagMode excludedTagsMode,
       final Set<MangaStatus> status,
       final Set<MangaDemographic> publicationDemographic,
       final Set<ContentRating> contentRating,
@@ -309,7 +353,11 @@ abstract class _MangaFilters extends MangaFilters {
   @override
   Set<Tag> get includedTags;
   @override
+  TagMode get includedTagsMode;
+  @override
   Set<Tag> get excludedTags;
+  @override
+  TagMode get excludedTagsMode;
   @override
   Set<MangaStatus> get status;
   @override

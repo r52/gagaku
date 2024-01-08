@@ -149,13 +149,23 @@ enum MangaRelations {
   final String label;
 }
 
+enum TagMode {
+  and,
+  or;
+
+  String get label => name.capitalize();
+  String get code => name.toUpperCase();
+}
+
 @freezed
 class MangaFilters with _$MangaFilters {
   const MangaFilters._();
 
   const factory MangaFilters({
     @Default({}) Set<Tag> includedTags,
+    @Default(TagMode.and) TagMode includedTagsMode,
     @Default({}) Set<Tag> excludedTags,
+    @Default(TagMode.or) TagMode excludedTagsMode,
     @Default({}) Set<MangaStatus> status,
     @Default({}) Set<MangaDemographic> publicationDemographic,
     @Default({}) Set<ContentRating> contentRating,
@@ -170,10 +180,12 @@ class MangaFilters with _$MangaFilters {
 
     if (includedTags.isNotEmpty) {
       params['includedTags[]'] = includedTags.map((e) => e.id).toList();
+      params['includedTagsMode'] = includedTagsMode.code;
     }
 
     if (excludedTags.isNotEmpty) {
       params['excludedTags[]'] = excludedTags.map((e) => e.id).toList();
+      params['excludedTagsMode'] = excludedTagsMode.code;
     }
 
     if (status.isNotEmpty) {

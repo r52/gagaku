@@ -445,7 +445,6 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                       style: headingStyle,
                     ),
                     children: MangaStatus.values
-                        .skip(1)
                         .map(
                           (e) => FilterChip(
                             label: Text(e.label),
@@ -468,6 +467,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                         )
                         .toList(),
                   ),
+                  const Divider(),
 
                   /// Tags
                   for (final group in TagGroup.values) ...[
@@ -533,7 +533,53 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                           )
                           .toList(),
                     ),
-                  ]
+                  ],
+
+                  // Modes
+                  ..._buildSection(
+                    header: const Text(
+                      'Other Options',
+                      style: headingStyle,
+                    ),
+                    children: [
+                      DropdownMenu<TagMode>(
+                        label: const Text('Inclusion Mode'),
+                        initialSelection: fil.value.includedTagsMode,
+                        requestFocusOnTap: false,
+                        enableSearch: false,
+                        enableFilter: false,
+                        dropdownMenuEntries: [
+                          for (final mode in TagMode.values)
+                            DropdownMenuEntry(value: mode, label: mode.label),
+                        ],
+                        onSelected: (value) {
+                          if (value != null) {
+                            fil.value = fil.value.copyWith(
+                              includedTagsMode: value,
+                            );
+                          }
+                        },
+                      ),
+                      DropdownMenu<TagMode>(
+                        label: const Text('Exclusion Mode'),
+                        initialSelection: fil.value.excludedTagsMode,
+                        requestFocusOnTap: false,
+                        enableSearch: false,
+                        enableFilter: false,
+                        dropdownMenuEntries: [
+                          for (final mode in TagMode.values)
+                            DropdownMenuEntry(value: mode, label: mode.label),
+                        ],
+                        onSelected: (value) {
+                          if (value != null) {
+                            fil.value = fil.value.copyWith(
+                              excludedTagsMode: value,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
             );
