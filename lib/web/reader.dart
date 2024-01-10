@@ -264,7 +264,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
         return ReaderWidget(
           pages: pages,
           title: name,
-          longstrip: false, // TODO detect longstrip
+          longstrip: false,
           link: link,
           onLinkPressed: onLinkPressed,
           backRoute: backRoute,

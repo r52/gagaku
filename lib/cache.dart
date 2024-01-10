@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:gagaku/log.dart';
@@ -134,11 +135,27 @@ class CacheManager {
   static const _preferredMaxDiskEntries = 5000;
 
   final LazyBox<CacheEntry> _box;
+  // ignore: unused_field
+  Timer? _pruneSchedule;
 
   /// Cache of API data
   final Map<String, CacheEntry> _cache = <String, CacheEntry>{};
 
-  CacheManager() : _box = Hive.lazyBox(gagakuCache);
+  CacheManager() : _box = Hive.lazyBox(gagakuCache) {
+    _pruneSchedule = Timer.periodic(const Duration(minutes: 1), (timer) async {
+      await _checkForPrune();
+    });
+  }
+
+  Future<void> _checkForPrune() async {
+    if (_cache.length > _preferredMaxEntries) {
+      _pruneExpiredMemory();
+    }
+
+    if (_box.length > _preferredMaxDiskEntries) {
+      _pruneExpiredDisk();
+    }
+  }
 
   /// Prunes all expired entries
   Future<void> _pruneExpiredMemory() async {
@@ -251,14 +268,6 @@ class CacheManager {
     logger.d(
         "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
 
-    if (_cache.length > _preferredMaxEntries) {
-      _pruneExpiredMemory();
-    }
-
-    if (_box.length > _preferredMaxDiskEntries) {
-      _pruneExpiredDisk();
-    }
-
     return _cache[key]!.get(unserializer);
   }
 
@@ -277,13 +286,5 @@ class CacheManager {
 
     logger.d(
         "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
-
-    if (_cache.length > _preferredMaxEntries) {
-      _pruneExpiredMemory();
-    }
-
-    if (_box.length > _preferredMaxDiskEntries) {
-      _pruneExpiredDisk();
-    }
   }
 }

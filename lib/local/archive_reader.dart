@@ -148,7 +148,7 @@ class ArchiveReaderWidget extends ConsumerWidget {
         return ReaderWidget(
           pages: pages,
           title: strtitle,
-          longstrip: false, // TODO detect longstrip
+          longstrip: false,
           link: link,
           onLinkPressed: onLinkPressed,
         );
