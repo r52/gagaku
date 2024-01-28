@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -13,7 +14,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart' as custom_tabs;
 
 part 'manga_view.g.dart';
 
@@ -1116,25 +1116,20 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 onPressed: () async {
                                   final route =
                                       GoRouterState.of(context).uri.toString();
-                                  final url = 'https://mangadex.org$route';
+                                  final url =
+                                      Uri.parse('https://mangadex.org$route');
 
                                   if (DeviceContext.isMobile()) {
-                                    try {
-                                      await custom_tabs.launch(
-                                        url,
-                                        customTabsOption:
-                                            const custom_tabs.CustomTabsOption(
-                                          extraCustomTabs: <String>[
-                                            'org.mozilla.firefox',
-                                            'com.microsoft.emmx',
-                                          ],
+                                    InAppBrowser().openUrlRequest(
+                                      urlRequest:
+                                          URLRequest(url: WebUri.uri(url)),
+                                      settings: InAppBrowserClassSettings(
+                                        browserSettings: InAppBrowserSettings(
+                                          hideToolbarTop: true,
                                         ),
-                                      );
-                                    } catch (e) {
-                                      // An exception is thrown if browser app is not installed on Android device.
-                                      debugPrint(e.toString());
-                                    }
-                                  } else if (!await launchUrl(Uri.parse(url))) {
+                                      ),
+                                    );
+                                  } else if (!await launchUrl(url)) {
                                     throw 'Could not launch $url';
                                   }
                                 },
