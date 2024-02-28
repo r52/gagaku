@@ -198,7 +198,7 @@ class _FetchChapterDataProviderElement
   String get chapterId => (origin as _FetchChapterDataProvider).chapterId;
 }
 
-String _$fetchChapterPagesHash() => r'9665945ce447041335c34c0942733edfb60b6f75';
+String _$fetchChapterPagesHash() => r'ef0ef651c755abf1da2f4848d0e44fb7dbf07989';
 
 /// See also [_fetchChapterPages].
 @ProviderFor(_fetchChapterPages)

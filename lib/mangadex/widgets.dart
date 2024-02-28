@@ -10,6 +10,7 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'types.dart';
@@ -105,57 +106,12 @@ class ChapterFeedWidget extends HookConsumerWidget {
                         ),
                       ),
                     Expanded(
-                      child: ListView.builder(
+                      child: SuperListView.builder(
                         controller: scrollController,
                         physics: const AlwaysScrollableScrollPhysics(),
                         restorationId: restorationId,
                         padding: const EdgeInsets.all(6),
                         itemCount: results.length,
-                        // itemExtentBuilder: (index, dimensions) {
-                        //   // Crude, hardcoded way to calculate item extent,
-                        //   // but immensely improves render performance
-                        //   // until flutter fixes this issue
-                        //   final buttonHeight = screenSizeSmall ? 113.0 : 70.0;
-                        //   const margins = 12.0 + 16.0;
-                        //   final textHeight = isMobile ? 32.0 : 21.0;
-                        //   final dividerHeight = screenSizeSmall ? 4.0 : 10.0;
-                        //   final imageHeight = screenSizeSmall ? 91.0 : 182.0;
-
-                        //   final numButtons =
-                        //       value.elementAt(index).chapters.length;
-                        //   double additionalChips = 0.0;
-
-                        //   for (final chap in value.elementAt(index).chapters) {
-                        //     final groups = chap.getGroups();
-                        //     var nameLength = groups.fold(
-                        //         0,
-                        //         (previousValue, element) =>
-                        //             previousValue +
-                        //             element.attributes.name.length);
-                        //     final hasPub = chap.attributes.externalUrl != null;
-                        //     nameLength += hasPub ? 18 : 0;
-
-                        //     final numLines = (nameLength / 25).ceil() - 1;
-
-                        //     additionalChips +=
-                        //         numLines > 0 ? numLines * 26.0 : 0.0;
-                        //   }
-
-                        //   final totalBtnHeight = (buttonHeight * numButtons) +
-                        //       (screenSizeSmall
-                        //           ? additionalChips
-                        //           : textHeight + dividerHeight);
-
-                        //   final finalBtnHeight =
-                        //       max(totalBtnHeight, imageHeight);
-
-                        //   final extent = margins +
-                        //       finalBtnHeight +
-                        //       (screenSizeSmall
-                        //           ? textHeight + dividerHeight
-                        //           : 0.0);
-                        //   return extent;
-                        // },
                         itemBuilder: (context, index) {
                           return ChapterFeedItem(
                               state: results.elementAt(index));

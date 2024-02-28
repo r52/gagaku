@@ -115,7 +115,8 @@ Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
 
   final pages = links
       .map((e) => ReaderPage(
-            provider: ExtendedNetworkImageProvider(e),
+            provider: ExtendedNetworkImageProvider(e,
+                cache: true, cacheMaxAge: const Duration(minutes: 5)),
           ))
       .toList();
 

@@ -88,7 +88,8 @@ Future<List<ReaderPage>> _fetchChapterPages(
   final pages = mpages.pages.map((pageUrl) {
     final url = mpages.baseUrl + pageUrl;
     return ReaderPage(
-      provider: ExtendedNetworkImageProvider(url),
+      provider: ExtendedNetworkImageProvider(url,
+          cache: true, cacheMaxAge: const Duration(minutes: 5)),
     );
   }).toList();
 

@@ -11,7 +11,7 @@ import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -39,36 +39,6 @@ class ReaderWidget extends HookConsumerWidget {
   // Backup route for BackButton if nav stack cannot pop
   final String? backRoute;
 
-  ItemPosition? _getListViewFirstShownPage(Iterable<ItemPosition> positions) {
-    if (positions.isNotEmpty) {
-      // Determine the first visible item by finding the item with the
-      // smallest trailing edge that is greater than 0.  i.e. the first
-      // item whose trailing edge in visible in the viewport.
-      return positions
-          .where((ItemPosition position) => position.itemTrailingEdge > 0)
-          .reduce((ItemPosition min, ItemPosition position) =>
-              position.itemTrailingEdge < min.itemTrailingEdge
-                  ? position
-                  : min);
-    }
-
-    return null;
-  }
-
-  ItemPosition? _getListViewLastShownPage(Iterable<ItemPosition> positions) {
-    if (positions.isNotEmpty) {
-      // Determine the last visible item by finding the item with the
-      // greatest leading edge that is less than 1.  i.e. the last
-      // item whose leading edge in visible in the viewport.
-      return positions
-          .where((ItemPosition position) => position.itemLeadingEdge < 1)
-          .reduce((ItemPosition max, ItemPosition position) =>
-              position.itemLeadingEdge > max.itemLeadingEdge ? position : max);
-    }
-
-    return null;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageCount = pages.length;
@@ -82,9 +52,8 @@ class ReaderWidget extends HookConsumerWidget {
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
     final currentPage = useValueNotifier(0);
-    final itemPositionsListener = useItemPositionsListener();
-    final itemScrollController = useItemScrollController();
-    final scrollOffsetController = useScrollOffsetController();
+    final listController = useListController();
+    final scrollController = useScrollController();
     final currentImageScale =
         useState<PhotoViewScaleState>(PhotoViewScaleState.initial);
     final subtext = useState<String?>(subtitle ?? pages.elementAt(0).sortKey);
@@ -133,25 +102,28 @@ class ReaderWidget extends HookConsumerWidget {
       currentImageScale.value = value;
     }
 
+    void setPageValue(int page) {
+      currentPage.value = page;
+      cachePages();
+      subtext.value = subtitle ?? pages.elementAt(currentPage.value).sortKey;
+    }
+
     void pageCallback() {
       if (pageController.page != null) {
-        currentPage.value = pageController.page!.toInt();
-
-        cachePages();
-
-        subtext.value = subtitle ?? pages.elementAt(currentPage.value).sortKey;
+        Future.delayed(Duration.zero, () {
+          setPageValue(pageController.page!.toInt());
+        });
       }
     }
 
     void listPosCb() {
-      final positions = itemPositionsListener.itemPositions.value;
+      if (listController.isAttached && listController.visibleRange != null) {
+        final positions = listController.visibleRange;
+        final min = positions!.$1;
 
-      final min = _getListViewFirstShownPage(positions);
-
-      if (min != null) {
-        currentPage.value = min.index;
-
-        cachePages();
+        Future.delayed(Duration.zero, () {
+          setPageValue(min);
+        });
       }
     }
 
@@ -175,19 +147,23 @@ class ReaderWidget extends HookConsumerWidget {
     }, [pageController, settings]);
 
     useEffect(() {
-      itemPositionsListener.itemPositions.addListener(listPosCb);
-      return () =>
-          itemPositionsListener.itemPositions.removeListener(listPosCb);
-    }, [settings]);
+      listController.addListener(listPosCb);
+      return () => listController.removeListener(listPosCb);
+    }, [listController, settings]);
 
     void jumpToPage(int page) {
       assert(page >= 0 && page < pageCount);
 
       switch (format) {
         case ReaderFormat.longstrip:
-          if (itemScrollController.isAttached) {
-            itemScrollController.jumpTo(index: page);
+          if (listController.isAttached) {
+            listController.jumpToItem(
+              index: page,
+              scrollController: scrollController,
+              alignment: 0,
+            );
           }
+
           break;
         default:
           if (pageController.hasClients) {
@@ -206,9 +182,14 @@ class ReaderWidget extends HookConsumerWidget {
 
       switch (format) {
         case ReaderFormat.longstrip:
-          if (itemScrollController.isAttached) {
-            itemScrollController.scrollTo(
-                index: page, duration: duration, curve: curve);
+          if (listController.isAttached) {
+            listController.animateToItem(
+              index: page,
+              scrollController: scrollController,
+              alignment: 0,
+              duration: (estimatedDistance) => duration,
+              curve: (estimatedDistance) => curve,
+            );
           }
           break;
         default:
@@ -282,25 +263,14 @@ class ReaderWidget extends HookConsumerWidget {
 
     KeyEventResult onTapTop(double offset) {
       if (format == ReaderFormat.longstrip) {
-        scrollOffsetController.animateScroll(
-            offset: -offset, duration: const Duration(milliseconds: 50));
+        scrollController.animateTo(scrollController.offset - offset,
+            duration: const Duration(milliseconds: 50),
+            curve: Curves.easeInOut);
 
         return KeyEventResult.handled;
       }
 
       switch (settings.direction) {
-        // case ReaderDirection.topToBottom:
-        //   final oldpos = viewController[currentPage.value].position;
-        //   viewController[currentPage.value].position =
-        //       viewController[currentPage.value].position + Offset(0.0, offset);
-
-        //   if (viewController[currentPage.value].position == oldpos) {
-        //     // At edge
-        //     if (currentPage.value > 0) {
-        //       jumpToPreviousPage();
-        //     }
-        //   }
-        //   break;
         case ReaderDirection.leftToRight:
         case ReaderDirection.rightToLeft:
           viewController[currentPage.value].position =
@@ -316,17 +286,21 @@ class ReaderWidget extends HookConsumerWidget {
 
     KeyEventResult onTapBottom(double offset) {
       if (format == ReaderFormat.longstrip) {
-        final positions = itemPositionsListener.itemPositions.value;
-        final max = _getListViewLastShownPage(positions);
+        if (listController.isAttached && listController.visibleRange != null) {
+          final positions = listController.visibleRange;
+          final max = positions!.$2;
 
-        if (max != null) {
-          if (max.index == pageCount - 1 && max.itemTrailingEdge == 1.0) {
+          if (max == pageCount - 1 &&
+              scrollController.position.atEdge &&
+              scrollController.position.pixels ==
+                  scrollController.position.maxScrollExtent) {
             if (context.canPop()) {
               context.pop();
             }
           } else {
-            scrollOffsetController.animateScroll(
-                offset: offset, duration: const Duration(milliseconds: 50));
+            scrollController.animateTo(scrollController.offset + offset,
+                duration: const Duration(milliseconds: 50),
+                curve: Curves.easeInOut);
           }
         }
 
@@ -334,22 +308,6 @@ class ReaderWidget extends HookConsumerWidget {
       }
 
       switch (settings.direction) {
-        // case ReaderDirection.topToBottom:
-        //   final oldpos = viewController[currentPage.value].position;
-        //   viewController[currentPage.value].position =
-        //       viewController[currentPage.value].position - Offset(0.0, offset);
-
-        //   if (viewController[currentPage.value].position == oldpos) {
-        //     // At edge
-        //     if (currentPage.value < pageCount - 1) {
-        //       jumpToNextPage();
-        //     } else {
-        //       if (context.canPop()) {
-        //         context.pop();
-        //       }
-        //     }
-        //   }
-        //   break;
         case ReaderDirection.leftToRight:
         case ReaderDirection.rightToLeft:
           viewController[currentPage.value].position =
@@ -721,10 +679,9 @@ class ReaderWidget extends HookConsumerWidget {
             }
 
             if (format == ReaderFormat.longstrip) {
-              return ScrollablePositionedList.builder(
-                itemScrollController: itemScrollController,
-                itemPositionsListener: itemPositionsListener,
-                scrollOffsetController: scrollOffsetController,
+              return SuperListView.builder(
+                listController: listController,
+                controller: scrollController,
                 itemCount: pageCount,
                 itemBuilder: (BuildContext context, int index) {
                   final page = pages.elementAt(index);

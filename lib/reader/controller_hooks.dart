@@ -4,99 +4,55 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
-ItemScrollController useItemScrollController({
+ListController useListController({
+  VoidCallback? onAttached,
+  VoidCallback? onDetached,
   List<Object?>? keys,
 }) {
   return use(
-    _ItemScrollControllerHook(
+    _ListControllerHook(
+      onAttached: onAttached,
+      onDetached: onDetached,
       keys: keys,
     ),
   );
 }
 
-class _ItemScrollControllerHook extends Hook<ItemScrollController> {
-  const _ItemScrollControllerHook({
+class _ListControllerHook extends Hook<ListController> {
+  const _ListControllerHook({
+    this.onAttached,
+    this.onDetached,
     List<Object?>? keys,
   }) : super(keys: keys);
 
+  /// Callback invoked when the controller is attached to a [SuperSliverList].
+  final VoidCallback? onAttached;
+
+  /// Callback invoked when the controller is detached from a [SuperSliverList].
+  final VoidCallback? onDetached;
+
   @override
-  HookState<ItemScrollController, Hook<ItemScrollController>> createState() =>
-      _ItemScrollControllerHookState();
+  HookState<ListController, Hook<ListController>> createState() =>
+      _ListControllerHookHookState();
 }
 
-class _ItemScrollControllerHookState
-    extends HookState<ItemScrollController, _ItemScrollControllerHook> {
-  late final controller = ItemScrollController();
-
-  @override
-  ItemScrollController build(BuildContext context) => controller;
-
-  @override
-  String get debugLabel => 'useItemScrollController';
-}
-
-ScrollOffsetController useScrollOffsetController({
-  List<Object?>? keys,
-}) {
-  return use(
-    _ScrollOffsetControllerHook(
-      keys: keys,
-    ),
+class _ListControllerHookHookState
+    extends HookState<ListController, _ListControllerHook> {
+  late final controller = ListController(
+    onAttached: hook.onAttached,
+    onDetached: hook.onDetached,
   );
-}
-
-class _ScrollOffsetControllerHook extends Hook<ScrollOffsetController> {
-  const _ScrollOffsetControllerHook({
-    List<Object?>? keys,
-  }) : super(keys: keys);
 
   @override
-  HookState<ScrollOffsetController, Hook<ScrollOffsetController>>
-      createState() => _ScrollOffsetControllerHookState();
-}
-
-class _ScrollOffsetControllerHookState
-    extends HookState<ScrollOffsetController, _ScrollOffsetControllerHook> {
-  late final controller = ScrollOffsetController();
+  ListController build(BuildContext context) => controller;
 
   @override
-  ScrollOffsetController build(BuildContext context) => controller;
+  void dispose() => controller.dispose();
 
   @override
-  String get debugLabel => 'useScrollOffsetController';
-}
-
-ItemPositionsListener useItemPositionsListener({
-  List<Object?>? keys,
-}) {
-  return use(
-    _ItemPositionsListenerHook(
-      keys: keys,
-    ),
-  );
-}
-
-class _ItemPositionsListenerHook extends Hook<ItemPositionsListener> {
-  const _ItemPositionsListenerHook({
-    List<Object?>? keys,
-  }) : super(keys: keys);
-
-  @override
-  HookState<ItemPositionsListener, Hook<ItemPositionsListener>> createState() =>
-      _ItemPositionsListenerHookState();
-}
-
-class _ItemPositionsListenerHookState
-    extends HookState<ItemPositionsListener, _ItemPositionsListenerHook> {
-  late final listener = ItemPositionsListener.create();
-
-  @override
-  ItemPositionsListener build(BuildContext context) => listener;
-
-  @override
-  String get debugLabel => 'useItemPositionsListener';
+  String get debugLabel => 'useListController';
 }
 
 ExtendedPageController useExtendedPageController({
