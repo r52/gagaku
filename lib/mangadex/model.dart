@@ -1593,7 +1593,7 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
 }
 
 @riverpod
-class GroupFeed extends _$GroupFeed {
+class GroupFeed extends _$GroupFeed with AutoDisposeExpiryMix {
   int _offset = 0;
   bool _atEnd = false;
   static const feedKey = 'GroupFeed';
@@ -1608,6 +1608,8 @@ class GroupFeed extends _$GroupFeed {
       offset: offset,
       entity: group,
     );
+
+    disposeAfter(const Duration(minutes: 5));
 
     return chapters.toList();
   }
@@ -2181,7 +2183,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
 }
 
 @riverpod
-class CustomListFeed extends _$CustomListFeed {
+class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix {
   int _offset = 0;
   bool _atEnd = false;
   static const feedKey = 'CustomListFeed';
@@ -2196,6 +2198,8 @@ class CustomListFeed extends _$CustomListFeed {
       offset: offset,
       entity: list,
     );
+
+    disposeAfter(const Duration(minutes: 5));
 
     return chapters.toList();
   }

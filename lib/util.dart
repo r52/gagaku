@@ -208,6 +208,8 @@ extension CacheForExtension on AutoDisposeRef<Object?> {
     final link = keepAlive();
 
     onCancel(() {
+      logger
+          .d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
       timer = Timer(duration, link.close);
     });
 
@@ -216,6 +218,7 @@ extension CacheForExtension on AutoDisposeRef<Object?> {
     });
 
     onDispose(() {
+      logger.d('${runtimeType.toString()}: disposed');
       timer?.cancel();
     });
   }

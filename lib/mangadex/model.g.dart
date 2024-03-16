@@ -271,7 +271,7 @@ final latestGlobalFeedProvider =
 );
 
 typedef _$LatestGlobalFeed = AutoDisposeAsyncNotifier<List<Chapter>>;
-String _$groupFeedHash() => r'b1b14a927127c4e165f55f26ed83046eb9cf8dd1';
+String _$groupFeedHash() => r'5560940b2112a70310488a070f2cd469a4eca24a';
 
 abstract class _$GroupFeed
     extends BuildlessAutoDisposeAsyncNotifier<List<Chapter>> {
@@ -1241,7 +1241,7 @@ final userListsProvider =
 );
 
 typedef _$UserLists = AutoDisposeAsyncNotifier<List<CRef>>;
-String _$customListFeedHash() => r'b6cda3660905de48a833c01e93ff952d86c87ca8';
+String _$customListFeedHash() => r'ebd57ae4e3c868180eef851163379101bb355a35';
 
 abstract class _$CustomListFeed
     extends BuildlessAutoDisposeAsyncNotifier<List<Chapter>> {
