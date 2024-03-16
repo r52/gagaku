@@ -2095,8 +2095,6 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
         } else {
           list.get<CustomList>().remove(manga.id);
         }
-
-        ref.invalidate(customListFeedProvider(list.get<CustomList>()));
       }
 
       return [...oldstate];
