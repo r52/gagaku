@@ -1226,7 +1226,7 @@ final userLibraryProvider = AutoDisposeAsyncNotifierProvider<UserLibrary,
 
 typedef _$UserLibrary
     = AutoDisposeAsyncNotifier<Map<String, MangaReadingStatus>>;
-String _$userListsHash() => r'2ec431339aea3d37d2eac41114c7f471554a3fd1';
+String _$userListsHash() => r'e463eaf2f8b42718a61c0df6e606fb3e730c4297';
 
 /// See also [UserLists].
 @ProviderFor(UserLists)
