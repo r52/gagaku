@@ -871,7 +871,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               ],
                           },
                           const SizedBox(width: 10),
-                          MangaStatusChip(status: manga.attributes!.status),
+                          MangaStatusChip(
+                            status: manga.attributes!.status,
+                            year: manga.attributes!.year,
+                            short: false,
+                          ),
                         ],
                       );
                     },

@@ -956,7 +956,10 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 ],
                             },
                             const SizedBox(width: 10),
-                            MangaStatusChip(status: manga.attributes!.status),
+                            MangaStatusChip(
+                              status: manga.attributes!.status,
+                              year: manga.attributes!.year,
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -1168,7 +1171,10 @@ class _ListMangaItem extends ConsumerWidget {
                           ],
                       },
                       const SizedBox(width: 10),
-                      MangaStatusChip(status: manga.attributes!.status),
+                      MangaStatusChip(
+                        status: manga.attributes!.status,
+                        year: manga.attributes!.year,
+                      ),
                     ],
                   ),
                 ],
@@ -1182,9 +1188,16 @@ class _ListMangaItem extends ConsumerWidget {
 }
 
 class MangaStatusChip extends StatelessWidget {
-  const MangaStatusChip({super.key, required this.status});
+  const MangaStatusChip({
+    super.key,
+    required this.status,
+    this.year,
+    this.short = true,
+  });
 
   final MangaStatus status;
+  final int? year;
+  final bool short;
 
   @override
   Widget build(BuildContext context) {
@@ -1204,6 +1217,12 @@ class MangaStatusChip extends StatelessWidget {
         break;
     }
 
+    String label = status.label;
+
+    if (year != null && !short) {
+      label = "$year, $label";
+    }
+
     return IconTextChip(
       icon: Icon(
         Icons.circle,
@@ -1211,7 +1230,7 @@ class MangaStatusChip extends StatelessWidget {
         size: 10,
       ),
       text: Text(
-        status.label,
+        label,
       ),
     );
   }
