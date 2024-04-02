@@ -1313,7 +1313,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     error: error,
                                     stackTrace: stackTrace);
 
-                                return Styles.errorColumn(error, stackTrace);
+                                return Styles.errorList(error, stackTrace);
                               }(),
                             AsyncValue(valueOrNull: final chapters?) =>
                               NotificationListener<ScrollEndNotification>(
@@ -1439,7 +1439,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     error: error,
                                     stackTrace: stackTrace);
 
-                                return Styles.errorColumn(error, stackTrace);
+                                return Styles.errorList(error, stackTrace);
                               }(),
                             AsyncValue(valueOrNull: final covers?) =>
                               NotificationListener<ScrollEndNotification>(
@@ -1564,7 +1564,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     error: error,
                                     stackTrace: stackTrace);
 
-                                return Styles.errorColumn(error, stackTrace);
+                                return Styles.errorList(error, stackTrace);
                               }(),
                             AsyncValue(valueOrNull: final related?) =>
                               MangaListWidget(
