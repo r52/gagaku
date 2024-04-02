@@ -21,6 +21,54 @@ int compareLibraryItems(LocalLibraryItem a, LocalLibraryItem b) {
   return compareNatural(a.name ?? a.path, b.name ?? b.path);
 }
 
+LocalLibraryItem? libraryItemBinarySearch(
+    List<LocalLibraryItem> list, int low, int high, LocalLibraryItem item) {
+  if (low > high) {
+    return null;
+  }
+
+  int middle = (low + high) >> 1;
+
+  final mid = list.elementAt(middle);
+  if (mid.type == item.type && mid.path == item.path) {
+    return mid;
+  }
+
+  if (compareLibraryItems(mid, item) > 0) {
+    return libraryItemBinarySearch(list, low, middle - 1, item);
+  }
+
+  return libraryItemBinarySearch(list, middle + 1, high, item);
+}
+
+LocalLibraryItem? findLibraryItem(LocalLibraryItem old, LocalLibraryItem curr) {
+  if (curr.type == old.type && curr.path == old.path) {
+    return curr;
+  }
+
+  final children = curr.children
+      .where((element) =>
+          old.type == element.type && old.isReadable == element.isReadable)
+      .toList();
+
+  if (children.isNotEmpty) {
+    final result = libraryItemBinarySearch(children, 0, children.length, old);
+
+    if (result != null) {
+      return result;
+    }
+
+    for (final e in children) {
+      final cres = findLibraryItem(old, e);
+      if (cres != null) {
+        return cres;
+      }
+    }
+  }
+
+  return null;
+}
+
 class LocalLibraryItem {
   LocalLibraryItem({
     required this.path,

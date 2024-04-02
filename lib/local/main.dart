@@ -91,7 +91,18 @@ class LocalLibraryHome extends StatelessWidget {
               useState<LocalLibraryItem?>(libraryProvider.valueOrNull);
 
           useEffect(() {
-            currentItem.value ??= libraryProvider.valueOrNull;
+            final newVal = libraryProvider.valueOrNull;
+            if (currentItem.value != null && newVal != null) {
+              final result = findLibraryItem(currentItem.value!, newVal);
+
+              if (result != null) {
+                currentItem.value = result;
+              } else {
+                currentItem.value = newVal;
+              }
+            }
+
+            currentItem.value ??= newVal;
             return null;
           }, [libraryProvider]);
 
