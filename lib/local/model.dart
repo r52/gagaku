@@ -34,7 +34,7 @@ LocalLibraryItem? libraryItemBinarySearch(
     return mid;
   }
 
-  if (compareLibraryItems(mid, item) > 0) {
+  if (compareLibraryItems(item, mid) > 0) {
     return libraryItemBinarySearch(list, low, middle - 1, item);
   }
 
