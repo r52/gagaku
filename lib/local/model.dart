@@ -35,10 +35,10 @@ LocalLibraryItem? libraryItemBinarySearch(
   }
 
   if (compareLibraryItems(item, mid) > 0) {
-    return libraryItemBinarySearch(list, low, middle - 1, item);
+    return libraryItemBinarySearch(list, middle + 1, high, item);
   }
 
-  return libraryItemBinarySearch(list, middle + 1, high, item);
+  return libraryItemBinarySearch(list, low, middle - 1, item);
 }
 
 LocalLibraryItem? findLibraryItem(LocalLibraryItem old, LocalLibraryItem curr) {
