@@ -180,7 +180,8 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(8),
-                                    color: theme.colorScheme.surfaceVariant,
+                                    color: theme
+                                        .colorScheme.surfaceContainerHighest,
                                     child: MarkdownBody(
                                       data: desc,
                                       onTapLink: (text, url, title) async {
@@ -209,7 +210,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(8),
-                              color: theme.colorScheme.background,
+                              color: theme.colorScheme.surface,
                               child: Wrap(
                                 spacing: 4.0,
                                 runSpacing: 4.0,

@@ -102,7 +102,7 @@ _$ChapterListImpl _$$ChapterListImplFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['total'] as int,
+      (json['total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$ChapterListImplToJson(_$ChapterListImpl instance) =>
@@ -138,7 +138,7 @@ _$ChapterAttributesImpl _$$ChapterAttributesImplFromJson(
           const LanguageConverter().fromJson(json['translatedLanguage']),
       uploader: json['uploader'] as String?,
       externalUrl: json['externalUrl'] as String?,
-      version: json['version'] as int,
+      version: (json['version'] as num).toInt(),
       createdAt: const TimestampSerializer().fromJson(json['createdAt']),
       updatedAt: const TimestampSerializer().fromJson(json['updatedAt']),
       publishAt: const TimestampSerializer().fromJson(json['publishAt']),
@@ -395,7 +395,7 @@ _$CoverListImpl _$$CoverListImplFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => CoverArt.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['total'] as int,
+      (json['total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$CoverListImplToJson(_$CoverListImpl instance) =>
@@ -409,7 +409,7 @@ _$MangaListImpl _$$MangaListImplFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => Manga.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['total'] as int,
+      (json['total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$MangaListImplToJson(_$MangaListImpl instance) =>
@@ -423,7 +423,7 @@ _$GroupListImpl _$$GroupListImplFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => Group.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['total'] as int,
+      (json['total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$GroupListImplToJson(_$GroupListImpl instance) =>
@@ -438,7 +438,7 @@ _$CreatorListListImpl _$$CreatorListListImplFromJson(
       (json['data'] as List<dynamic>)
           .map((e) => Author.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['total'] as int,
+      (json['total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$CreatorListListImplToJson(
@@ -482,12 +482,12 @@ _$MangaAttributesImpl _$$MangaAttributesImplFromJson(
       publicationDemographic: $enumDecodeNullable(
           _$MangaDemographicEnumMap, json['publicationDemographic']),
       status: $enumDecode(_$MangaStatusEnumMap, json['status']),
-      year: json['year'] as int?,
+      year: (json['year'] as num?)?.toInt(),
       contentRating: $enumDecode(_$ContentRatingEnumMap, json['contentRating']),
       tags: (json['tags'] as List<dynamic>)
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
-      version: json['version'] as int,
+      version: (json['version'] as num).toInt(),
       createdAt: const TimestampSerializer().fromJson(json['createdAt']),
       updatedAt: const TimestampSerializer().fromJson(json['updatedAt']),
     );
@@ -551,7 +551,7 @@ _$TagResponseImpl _$$TagResponseImplFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['total'] as int,
+      (json['total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$TagResponseImplToJson(_$TagResponseImpl instance) =>
@@ -584,7 +584,7 @@ _$MangaStatisticsImpl _$$MangaStatisticsImplFromJson(
               json['comments'] as Map<String, dynamic>),
       rating: StatisticsDetailsRating.fromJson(
           json['rating'] as Map<String, dynamic>),
-      follows: json['follows'] as int,
+      follows: (json['follows'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$MangaStatisticsImplToJson(
@@ -598,8 +598,8 @@ Map<String, dynamic> _$$MangaStatisticsImplToJson(
 _$StatisticsDetailsCommentsImpl _$$StatisticsDetailsCommentsImplFromJson(
         Map<String, dynamic> json) =>
     _$StatisticsDetailsCommentsImpl(
-      threadId: json['threadId'] as int,
-      repliesCount: json['repliesCount'] as int,
+      threadId: (json['threadId'] as num).toInt(),
+      repliesCount: (json['repliesCount'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$StatisticsDetailsCommentsImplToJson(
@@ -639,7 +639,7 @@ Map<String, dynamic> _$$SelfRatingResponseImplToJson(
 
 _$SelfRatingImpl _$$SelfRatingImplFromJson(Map<String, dynamic> json) =>
     _$SelfRatingImpl(
-      rating: json['rating'] as int,
+      rating: (json['rating'] as num).toInt(),
       createdAt: const TimestampSerializer().fromJson(json['createdAt']),
     );
 
@@ -654,7 +654,7 @@ _$CustomListListImpl _$$CustomListListImplFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => CustomList.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['total'] as int,
+      (json['total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$CustomListListImplToJson(
@@ -687,7 +687,7 @@ _$CustomListAttributesImpl _$$CustomListAttributesImplFromJson(
       name: json['name'] as String,
       visibility:
           $enumDecode(_$CustomListVisibilityEnumMap, json['visibility']),
-      version: json['version'] as int,
+      version: (json['version'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$CustomListAttributesImplToJson(
@@ -720,7 +720,7 @@ Map<String, dynamic> _$$ErrorResponseImplToJson(_$ErrorResponseImpl instance) =>
 _$MDErrorImpl _$$MDErrorImplFromJson(Map<String, dynamic> json) =>
     _$MDErrorImpl(
       id: json['id'] as String,
-      status: json['status'] as int,
+      status: (json['status'] as num).toInt(),
       title: json['title'] as String,
       detail: json['detail'] as String?,
       context: json['context'] as String?,

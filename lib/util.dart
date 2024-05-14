@@ -14,10 +14,10 @@ mixin ExpiringData {
   bool isExpired() => DateTime.now().compareTo(expiry) >= 0;
 }
 
-extension MaterialStateSet on Set<MaterialState> {
-  bool get isSelected => contains(MaterialState.selected);
-  bool get isHovered => contains(MaterialState.hovered);
-  bool get isDisabled => contains(MaterialState.disabled);
+extension WidgetStateSet on Set<WidgetState> {
+  bool get isSelected => contains(WidgetState.selected);
+  bool get isHovered => contains(WidgetState.hovered);
+  bool get isDisabled => contains(WidgetState.disabled);
 }
 
 extension IterableAsync<T> on Iterable<T> {

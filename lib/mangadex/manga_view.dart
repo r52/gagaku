@@ -432,7 +432,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             inputDecorationTheme: InputDecorationTheme(
                               filled: true,
                               fillColor:
-                                  theme.colorScheme.background.withAlpha(200),
+                                  theme.colorScheme.surface.withAlpha(200),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   width: 2.0,
@@ -528,7 +528,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   color: ratings.containsKey(manga.id) &&
                                           ratings[manga.id]!.rating > 0
                                       ? Colors.deepOrange
-                                      : theme.colorScheme.surfaceVariant,
+                                      : theme
+                                          .colorScheme.surfaceContainerHighest,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(6.0)),
                                 ),
@@ -744,7 +745,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(6.0),
                                 decoration: BoxDecoration(
-                                  color: theme.colorScheme.surfaceVariant,
+                                  color:
+                                      theme.colorScheme.surfaceContainerHighest,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(6.0)),
                                 ),
@@ -903,7 +905,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(8),
-                                color: theme.colorScheme.surfaceVariant,
+                                color:
+                                    theme.colorScheme.surfaceContainerHighest,
                                 child: Text(entry.first.value),
                               ),
                             ),
@@ -925,7 +928,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(8),
-                              color: theme.colorScheme.surfaceVariant,
+                              color: theme.colorScheme.surfaceContainerHighest,
                               child: MarkdownBody(
                                 data: desc,
                                 onTapLink: (text, url, title) async {
@@ -953,7 +956,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.background,
+                            color: theme.colorScheme.surface,
                             child: Wrap(
                               spacing: 4.0,
                               runSpacing: 4.0,
@@ -977,7 +980,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.background,
+                            color: theme.colorScheme.surface,
                             child: Wrap(
                               spacing: 4.0,
                               runSpacing: 4.0,
@@ -1000,7 +1003,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.background,
+                            color: theme.colorScheme.surface,
                             child: Row(
                               children: [
                                 IconTextChip(
@@ -1019,7 +1022,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.background,
+                            color: theme.colorScheme.surface,
                             child: Wrap(
                               spacing: 4.0,
                               runSpacing: 4.0,
@@ -1040,7 +1043,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.background,
+                            color: theme.colorScheme.surface,
                             child: Wrap(
                               spacing: 4.0,
                               runSpacing: 4.0,
@@ -1061,7 +1064,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.background,
+                            color: theme.colorScheme.surface,
                             child: Wrap(
                               spacing: 4.0,
                               runSpacing: 4.0,
@@ -1079,7 +1082,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
-                          color: theme.colorScheme.background,
+                          color: theme.colorScheme.surface,
                           child: Wrap(
                             spacing: 4.0,
                             runSpacing: 4.0,
@@ -1169,7 +1172,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.background,
+                            color: theme.colorScheme.surface,
                             child: Row(
                               children: [
                                 Text(lastvolchap),

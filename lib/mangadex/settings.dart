@@ -119,7 +119,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(6.0),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(6.0)),
                       ),
@@ -216,7 +216,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(6.0),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(6.0)),
                       ),
@@ -302,7 +302,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(6.0),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(6.0)),
                       ),

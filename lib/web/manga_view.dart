@@ -195,7 +195,7 @@ class WebMangaViewWidget extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(8),
-                  color: theme.colorScheme.surfaceVariant,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   child: MarkdownBody(
                     data: manga.description,
                     onTapLink: (text, url, title) async {
@@ -219,7 +219,7 @@ class WebMangaViewWidget extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.background,
+                    color: theme.colorScheme.surface,
                     child: Row(
                       children: [
                         IconTextChip(
@@ -235,7 +235,7 @@ class WebMangaViewWidget extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.background,
+                    color: theme.colorScheme.surface,
                     child: Row(
                       children: [
                         IconTextChip(
@@ -252,7 +252,7 @@ class WebMangaViewWidget extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.background,
+                    color: theme.colorScheme.surface,
                     child: Wrap(
                       spacing: 4.0,
                       runSpacing: 4.0,

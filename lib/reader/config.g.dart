@@ -16,7 +16,7 @@ _$ReaderConfigImpl _$$ReaderConfigImplFromJson(Map<String, dynamic> json) =>
       showProgressBar: json['showProgressBar'] as bool? ?? false,
       clickToTurn: json['clickToTurn'] as bool? ?? true,
       swipeGestures: json['swipeGestures'] as bool? ?? true,
-      precacheCount: json['precacheCount'] as int? ?? 3,
+      precacheCount: (json['precacheCount'] as num?)?.toInt() ?? 3,
     );
 
 Map<String, dynamic> _$$ReaderConfigImplToJson(_$ReaderConfigImpl instance) =>

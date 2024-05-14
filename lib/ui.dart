@@ -163,7 +163,7 @@ class TriStateChip extends StatelessWidget {
     }
   }
 
-  BorderSide? _getBorder(Set<MaterialState> states) {
+  BorderSide? _getBorder(Set<WidgetState> states) {
     if (selectedColor == null) {
       return null;
     }
@@ -200,7 +200,7 @@ class TriStateChip extends StatelessWidget {
       onPressed: _onPressed,
       labelStyle: labelStyle,
       selectedColor: selectedColor,
-      side: MaterialStateBorderSide.resolveWith(_getBorder),
+      side: WidgetStateBorderSide.resolveWith(_getBorder),
       shape: shape,
       clipBehavior: clipBehavior,
       focusNode: focusNode,

@@ -163,7 +163,7 @@ class ChapterFeedItem extends StatelessWidget {
       style: TextButton.styleFrom(
         minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
-        foregroundColor: theme.colorScheme.onBackground,
+        foregroundColor: theme.colorScheme.onSurface,
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
