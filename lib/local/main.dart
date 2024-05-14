@@ -48,7 +48,8 @@ class LocalLibraryHome extends StatelessWidget {
         flexibleSpace:
             Styles.titleFlexBar(context: context, title: 'Local Library'),
         actions: [
-          ButtonBar(
+          OverflowBar(
+            spacing: 8.0,
             children: [
               MenuAnchor(
                 builder: (context, controller, child) => IconButton(

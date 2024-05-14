@@ -148,69 +148,74 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                ButtonBar(
-                  children: <Widget>[
-                    TextButton(
-                      child: const Text('CANCEL'),
-                      onPressed: () {
-                        passwordController.clear();
-                        context.pop();
-                      },
-                    ),
-                    ElevatedButton(
-                      onPressed: (usernameIsEmpty ||
-                              passwordIsEmpty ||
-                              clientIdIsEmpty ||
-                              clientSecretIsEmpty)
-                          ? null
-                          : () async {
-                              final router = GoRouter.of(context);
-                              final messenger = ScaffoldMessenger.of(context);
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OverflowBar(
+                    alignment: MainAxisAlignment.end,
+                    spacing: 8.0,
+                    children: <Widget>[
+                      TextButton(
+                        child: const Text('CANCEL'),
+                        onPressed: () {
+                          passwordController.clear();
+                          context.pop();
+                        },
+                      ),
+                      ElevatedButton(
+                        onPressed: (usernameIsEmpty ||
+                                passwordIsEmpty ||
+                                clientIdIsEmpty ||
+                                clientSecretIsEmpty)
+                            ? null
+                            : () async {
+                                final router = GoRouter.of(context);
+                                final messenger = ScaffoldMessenger.of(context);
 
-                              if (usernameController.text.isNotEmpty &&
-                                  passwordController.text.isNotEmpty &&
-                                  clientIdController.text.isNotEmpty &&
-                                  clientSecretController.text.isNotEmpty) {
-                                final loginSuccess = ref
-                                    .read(authControlProvider.notifier)
-                                    .login(
-                                        usernameController.text,
-                                        passwordController.text,
-                                        clientIdController.text,
-                                        clientSecretController.text);
+                                if (usernameController.text.isNotEmpty &&
+                                    passwordController.text.isNotEmpty &&
+                                    clientIdController.text.isNotEmpty &&
+                                    clientSecretController.text.isNotEmpty) {
+                                  final loginSuccess = ref
+                                      .read(authControlProvider.notifier)
+                                      .login(
+                                          usernameController.text,
+                                          passwordController.text,
+                                          clientIdController.text,
+                                          clientSecretController.text);
 
-                                loginSuccess.then((success) {
-                                  if (success) {
-                                    router.pop();
-                                    passwordController.clear();
-                                  } else {
-                                    messenger
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Failed to login.'),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                  }
-                                });
+                                  loginSuccess.then((success) {
+                                    if (success) {
+                                      router.pop();
+                                      passwordController.clear();
+                                    } else {
+                                      messenger
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Failed to login.'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                    }
+                                  });
 
-                                pendingLogin.value = loginSuccess;
-                              } else {
-                                messenger
-                                  ..removeCurrentSnackBar()
-                                  ..showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Username/Password/Client ID/Client Secret cannot be empty.'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                              }
-                            },
-                      child: const Text('LOGIN'),
-                    ),
-                  ],
+                                  pendingLogin.value = loginSuccess;
+                                } else {
+                                  messenger
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Username/Password/Client ID/Client Secret cannot be empty.'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                }
+                              },
+                        child: const Text('LOGIN'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

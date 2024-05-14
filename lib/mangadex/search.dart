@@ -280,7 +280,8 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
         ),
         title: const Text('Search Filters'),
         actions: [
-          ButtonBar(
+          OverflowBar(
+            spacing: 8.0,
             children: [
               Tooltip(
                 message: 'Reset Filters',

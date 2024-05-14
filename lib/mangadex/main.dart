@@ -66,7 +66,8 @@ class MangaDexHome extends HookConsumerWidget {
           child: Styles.titleFlexBar(context: context, title: 'MangaDex'),
         ),
         actions: [
-          ButtonBar(
+          OverflowBar(
+            spacing: 8.0,
             children: [
               Tooltip(
                 message: 'Search Manga',

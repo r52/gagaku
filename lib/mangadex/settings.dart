@@ -36,7 +36,8 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
       appBar: AppBar(
         title: const Text('MangaDex Settings'),
         actions: [
-          ButtonBar(
+          OverflowBar(
+            spacing: 8.0,
             children: [
               Tooltip(
                 message: 'Save Settings',

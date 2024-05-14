@@ -25,7 +25,8 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
         leading: const BackButton(),
         title: const Text('Library Settings'),
         actions: [
-          ButtonBar(
+          OverflowBar(
+            spacing: 8.0,
             children: [
               Tooltip(
                 message: 'Save Settings',
