@@ -201,7 +201,7 @@ class _FetchCreatorFromIdProviderElement
 }
 
 String _$fetchCreatorTitlesHash() =>
-    r'2cb77495a1883f51da2fdd62f6b9efdd12f5cacc';
+    r'30b2ada9d357c41f5383faef4b85cf4b4999aa50';
 
 /// See also [_fetchCreatorTitles].
 @ProviderFor(_fetchCreatorTitles)
@@ -247,7 +247,7 @@ class _FetchCreatorTitlesFamily extends Family {
 
   /// Enables overriding the behavior of this provider, no matter the parameters.
   Override overrideWith(
-      FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create) {
+      FutureOr<List<Manga>> Function(_FetchCreatorTitlesRef ref) create) {
     return _$FetchCreatorTitlesFamilyOverride(this, create);
   }
 }
@@ -255,7 +255,7 @@ class _FetchCreatorTitlesFamily extends Family {
 class _$FetchCreatorTitlesFamilyOverride implements FamilyOverride {
   _$FetchCreatorTitlesFamilyOverride(this.overriddenFamily, this.create);
 
-  final FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create;
+  final FutureOr<List<Manga>> Function(_FetchCreatorTitlesRef ref) create;
 
   @override
   final _FetchCreatorTitlesFamily overriddenFamily;
@@ -270,7 +270,7 @@ class _$FetchCreatorTitlesFamilyOverride implements FamilyOverride {
 
 /// See also [_fetchCreatorTitles].
 class _FetchCreatorTitlesProvider
-    extends AutoDisposeFutureProvider<Iterable<Manga>> {
+    extends AutoDisposeFutureProvider<List<Manga>> {
   /// See also [_fetchCreatorTitles].
   _FetchCreatorTitlesProvider(
     CreatorType creator,
@@ -305,7 +305,7 @@ class _FetchCreatorTitlesProvider
 
   @override
   Override overrideWith(
-    FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create,
+    FutureOr<List<Manga>> Function(_FetchCreatorTitlesRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -327,12 +327,12 @@ class _FetchCreatorTitlesProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+  AutoDisposeFutureProviderElement<List<Manga>> createElement() {
     return _FetchCreatorTitlesProviderElement(this);
   }
 
   _FetchCreatorTitlesProvider _copyWith(
-    FutureOr<Iterable<Manga>> Function(_FetchCreatorTitlesRef ref) create,
+    FutureOr<List<Manga>> Function(_FetchCreatorTitlesRef ref) create,
   ) {
     return _FetchCreatorTitlesProvider._internal(
       (ref) => create(ref as _FetchCreatorTitlesRef),
@@ -359,13 +359,13 @@ class _FetchCreatorTitlesProvider
   }
 }
 
-mixin _FetchCreatorTitlesRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+mixin _FetchCreatorTitlesRef on AutoDisposeFutureProviderRef<List<Manga>> {
   /// The parameter `creator` of this provider.
   CreatorType get creator;
 }
 
 class _FetchCreatorTitlesProviderElement
-    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    extends AutoDisposeFutureProviderElement<List<Manga>>
     with _FetchCreatorTitlesRef {
   _FetchCreatorTitlesProviderElement(super.provider);
 

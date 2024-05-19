@@ -369,7 +369,7 @@ class _FetchReadChaptersRedunProviderElement
   Manga get manga => (origin as _FetchReadChaptersRedunProvider).manga;
 }
 
-String _$fetchRelatedMangaHash() => r'b72cd2374bf3c284544cd9bf67a0b46bcc25f98d';
+String _$fetchRelatedMangaHash() => r'c31e2c7d5a5dfce4488ea6213fa8a31bd5221dab';
 
 /// See also [_fetchRelatedManga].
 @ProviderFor(_fetchRelatedManga)
@@ -415,7 +415,7 @@ class _FetchRelatedMangaFamily extends Family {
 
   /// Enables overriding the behavior of this provider, no matter the parameters.
   Override overrideWith(
-      FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create) {
+      FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create) {
     return _$FetchRelatedMangaFamilyOverride(this, create);
   }
 }
@@ -423,7 +423,7 @@ class _FetchRelatedMangaFamily extends Family {
 class _$FetchRelatedMangaFamilyOverride implements FamilyOverride {
   _$FetchRelatedMangaFamilyOverride(this.overriddenFamily, this.create);
 
-  final FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create;
+  final FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create;
 
   @override
   final _FetchRelatedMangaFamily overriddenFamily;
@@ -438,7 +438,7 @@ class _$FetchRelatedMangaFamilyOverride implements FamilyOverride {
 
 /// See also [_fetchRelatedManga].
 class _FetchRelatedMangaProvider
-    extends AutoDisposeFutureProvider<Iterable<Manga>> {
+    extends AutoDisposeFutureProvider<List<Manga>> {
   /// See also [_fetchRelatedManga].
   _FetchRelatedMangaProvider(
     Manga manga,
@@ -473,7 +473,7 @@ class _FetchRelatedMangaProvider
 
   @override
   Override overrideWith(
-    FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create,
+    FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -495,12 +495,12 @@ class _FetchRelatedMangaProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+  AutoDisposeFutureProviderElement<List<Manga>> createElement() {
     return _FetchRelatedMangaProviderElement(this);
   }
 
   _FetchRelatedMangaProvider _copyWith(
-    FutureOr<Iterable<Manga>> Function(_FetchRelatedMangaRef ref) create,
+    FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create,
   ) {
     return _FetchRelatedMangaProvider._internal(
       (ref) => create(ref as _FetchRelatedMangaRef),
@@ -527,13 +527,13 @@ class _FetchRelatedMangaProvider
   }
 }
 
-mixin _FetchRelatedMangaRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+mixin _FetchRelatedMangaRef on AutoDisposeFutureProviderRef<List<Manga>> {
   /// The parameter `manga` of this provider.
   Manga get manga;
 }
 
 class _FetchRelatedMangaProviderElement
-    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    extends AutoDisposeFutureProviderElement<List<Manga>>
     with _FetchRelatedMangaRef {
   _FetchRelatedMangaProviderElement(super.provider);
 

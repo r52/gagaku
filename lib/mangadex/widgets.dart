@@ -112,9 +112,16 @@ class ChapterFeedWidget extends HookConsumerWidget {
                         restorationId: restorationId,
                         padding: const EdgeInsets.all(6),
                         itemCount: results.length,
+                        findChildIndexCallback: (key) {
+                          final valueKey = key as ValueKey<int>;
+                          final val =
+                              results.indexWhere((i) => i.id == valueKey.value);
+                          return val >= 0 ? val : null;
+                        },
                         itemBuilder: (context, index) {
+                          final elem = results.elementAt(index);
                           return ChapterFeedItem(
-                              state: results.elementAt(index));
+                              key: ValueKey(elem.id), state: elem);
                         },
                       ),
                     ),
@@ -623,7 +630,7 @@ class MangaListViewSliver extends ConsumerWidget {
     this.headers,
   });
 
-  final Iterable<Manga> items;
+  final List<Manga> items;
   final bool selectMode;
   final MangaButtonBuilderCallback? selectButton;
   final MangaSelectCallback? onSelected;
@@ -639,9 +646,15 @@ class MangaListViewSliver extends ConsumerWidget {
     switch (view) {
       case MangaListView.list:
         return SliverList.builder(
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<String>;
+            final val = items.indexWhere((i) => i.id == valueKey.value);
+            return val >= 0 ? val : null;
+          },
           itemBuilder: (BuildContext context, int index) {
             final manga = items.elementAt(index);
             return _ListMangaItem(
+              key: ValueKey(manga.id),
               manga: manga,
               header: headers?[manga.id],
             );
@@ -656,9 +669,15 @@ class MangaListViewSliver extends ConsumerWidget {
             crossAxisSpacing: 8,
             childAspectRatio: onMobilePortrait ? 1.0 : 3.0,
           ),
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<String>;
+            final val = items.indexWhere((i) => i.id == valueKey.value);
+            return val >= 0 ? val : null;
+          },
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
             return _GridMangaDetailedItem(
+              key: ValueKey(manga.id),
               manga: manga,
               header: headers?[manga.id],
             );
@@ -675,9 +694,15 @@ class MangaListViewSliver extends ConsumerWidget {
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
           ),
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<String>;
+            final val = items.indexWhere((i) => i.id == valueKey.value);
+            return val >= 0 ? val : null;
+          },
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
             return _GridMangaItem(
+              key: ValueKey(manga.id),
               manga: manga,
               selectMode: selectMode,
               selectButton: selectButton,

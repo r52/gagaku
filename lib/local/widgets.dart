@@ -57,9 +57,15 @@ class LibraryListWidget extends StatelessWidget {
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
           ),
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<int>;
+            final val = item.children.indexWhere((i) => i.id == valueKey.value);
+            return val >= 0 ? val : null;
+          },
           itemBuilder: (context, index) {
             final i = item.children.elementAt(index);
             return _GridLibraryItem(
+              key: ValueKey(i.id),
               item: i,
               onTap: onTap,
             );
@@ -72,7 +78,11 @@ class LibraryListWidget extends StatelessWidget {
 }
 
 class _GridLibraryItem extends HookWidget {
-  const _GridLibraryItem({required this.item, this.onTap});
+  const _GridLibraryItem({
+    super.key,
+    required this.item,
+    this.onTap,
+  });
 
   final LocalLibraryItem item;
   final LibraryItemTapCallback? onTap;

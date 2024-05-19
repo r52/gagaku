@@ -124,12 +124,19 @@ class MangaDexListsView extends HookConsumerWidget {
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.all(6),
                           itemCount: lists.length,
+                          findChildIndexCallback: (key) {
+                            final valueKey = key as ValueKey<String>;
+                            final val = lists.indexWhere((i) =>
+                                i.get<CustomList>().id == valueKey.value);
+                            return val >= 0 ? val : null;
+                          },
                           itemBuilder: (BuildContext context, int index) {
                             final messenger = ScaffoldMessenger.of(context);
                             final listref = lists.elementAt(index);
                             final item = listref.get<CustomList>();
 
                             return Card(
+                              key: ValueKey(item.id),
                               child: ListTile(
                                 leading: Tooltip(
                                     message: item.attributes.visibility.name

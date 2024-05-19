@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 enum ReaderDirection {
   leftToRight('Left to Right', Icons.arrow_forward),
@@ -29,6 +30,7 @@ class ReaderPage {
   final String? sortKey;
 
   bool cached = false;
+  final id = const Uuid().v4();
 
   ReaderPage({required this.provider, this.sortKey});
 }

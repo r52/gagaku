@@ -62,6 +62,8 @@ class ChapterEntry {
 
   final String name;
   final WebChapter chapter;
+
+  int get id => Object.hash(name, chapter);
 }
 
 class QueriedWebMangaViewWidget extends ConsumerWidget {
@@ -297,12 +299,19 @@ class WebMangaViewWidget extends StatelessWidget {
           ),
         ),
         SliverList.builder(
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<int>;
+            final val = chapterlist.indexWhere((i) => i.id == valueKey.value);
+            return val >= 0 ? val : null;
+          },
           itemBuilder: (BuildContext context, int index) {
             final e = chapterlist.elementAt(index);
 
             return Padding(
+              key: ValueKey(e.id),
               padding: const EdgeInsets.symmetric(vertical: 2.0),
               child: ChapterButtonWidget(
+                key: ValueKey(e.id),
                 data: e,
                 manga: manga,
                 info: info,

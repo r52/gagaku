@@ -91,7 +91,7 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(
 }
 
 @riverpod
-Future<Iterable<Manga>> _fetchGroupTitles(
+Future<List<Manga>> _fetchGroupTitles(
     _FetchGroupTitlesRef ref, Group group) async {
   final mangas = await ref.watch(groupTitlesProvider(group).future);
   await ref.watch(statisticsProvider.notifier).get(mangas);

@@ -2247,7 +2247,7 @@ class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix {
 }
 
 @riverpod
-Future<Iterable<Manga>> getMangaListByPage(
+Future<List<Manga>> getMangaListByPage(
     GetMangaListByPageRef ref, Iterable<String> list, int page) async {
   final start = page * MangaDexEndpoints.searchLimit;
   final end = min((page + 1) * MangaDexEndpoints.searchLimit, list.length);

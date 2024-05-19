@@ -86,6 +86,7 @@ class LocalLibraryItem {
   bool isReadable;
   LocalLibraryItem? parent;
   List<LocalLibraryItem> children = [];
+  int get id => Object.hash(path, type);
 }
 
 @Riverpod(keepAlive: true)

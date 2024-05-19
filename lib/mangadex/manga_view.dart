@@ -67,7 +67,7 @@ Future<void> _fetchReadChaptersRedun(
 }
 
 @riverpod
-Future<Iterable<Manga>> _fetchRelatedManga(
+Future<List<Manga>> _fetchRelatedManga(
     _FetchRelatedMangaRef ref, Manga manga) async {
   final related = manga.relatedMangas;
 
@@ -1324,6 +1324,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 child: CustomScrollView(
                                   slivers: [
                                     SliverList.builder(
+                                      findChildIndexCallback: (key) {
+                                        final valueKey =
+                                            key as ValueKey<String>;
+                                        final val = chapters.indexWhere(
+                                            (i) => i.id == valueKey.value);
+                                        return val >= 0 ? val : null;
+                                      },
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         var lastChapIsSame = false;
@@ -1332,6 +1339,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         final thischap =
                                             chapters.elementAt(index);
                                         final chapbtn = ChapterButtonWidget(
+                                          key: ValueKey(thischap.id),
                                           chapter: thischap,
                                           manga: manga,
                                           link: Text(
@@ -1393,6 +1401,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                           }
 
                                           return Padding(
+                                            key: ValueKey(thischap.id),
                                             padding: EdgeInsets.only(
                                                 top: (!lastChapIsSame &&
                                                         nextChapIsSame)
@@ -1407,6 +1416,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         }
 
                                         return Padding(
+                                          key: ValueKey(thischap.id),
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 2.0),
                                           child: chapbtn,
@@ -1457,9 +1467,17 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         crossAxisSpacing: 8,
                                         childAspectRatio: 0.7,
                                       ),
+                                      findChildIndexCallback: (key) {
+                                        final valueKey =
+                                            key as ValueKey<String>;
+                                        final val = covers.indexWhere(
+                                            (i) => i.id == valueKey.value);
+                                        return val >= 0 ? val : null;
+                                      },
                                       itemBuilder: (context, index) {
                                         final cover = covers.elementAt(index);
                                         return _CoverArtItem(
+                                          key: ValueKey(cover.id),
                                           cover: cover,
                                           manga: manga,
                                           page: index,
@@ -1481,6 +1499,18 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                   body: PageView.builder(
                                                     scrollBehavior:
                                                         MouseTouchScrollBehavior(),
+                                                    findChildIndexCallback:
+                                                        (key) {
+                                                      final valueKey = key
+                                                          as ValueKey<String>;
+                                                      final val = covers
+                                                          .indexWhere((i) =>
+                                                              i.id ==
+                                                              valueKey.value);
+                                                      return val >= 0
+                                                          ? val
+                                                          : null;
+                                                    },
                                                     itemBuilder:
                                                         (BuildContext context,
                                                             int id) {
@@ -1502,6 +1532,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                       );
 
                                                       image = Container(
+                                                        key: ValueKey(cover.id),
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(5.0),
@@ -1518,6 +1549,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                                                       if (id == index) {
                                                         return Hero(
+                                                          key: ValueKey(
+                                                              cover.id),
                                                           tag: url,
                                                           child: image,
                                                         );
@@ -1605,6 +1638,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
 class _CoverArtItem extends HookWidget {
   const _CoverArtItem({
+    super.key,
     required this.cover,
     required this.manga,
     required this.page,

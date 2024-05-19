@@ -372,7 +372,7 @@ class _FetchGroupFeedProviderElement
   Group get group => (origin as _FetchGroupFeedProvider).group;
 }
 
-String _$fetchGroupTitlesHash() => r'315c96e48d7e8ba1d1fcd5589ce8343ecfa16342';
+String _$fetchGroupTitlesHash() => r'bfb5727668119145d1f694d28e1c80a56ace5757';
 
 /// See also [_fetchGroupTitles].
 @ProviderFor(_fetchGroupTitles)
@@ -418,7 +418,7 @@ class _FetchGroupTitlesFamily extends Family {
 
   /// Enables overriding the behavior of this provider, no matter the parameters.
   Override overrideWith(
-      FutureOr<Iterable<Manga>> Function(_FetchGroupTitlesRef ref) create) {
+      FutureOr<List<Manga>> Function(_FetchGroupTitlesRef ref) create) {
     return _$FetchGroupTitlesFamilyOverride(this, create);
   }
 }
@@ -426,7 +426,7 @@ class _FetchGroupTitlesFamily extends Family {
 class _$FetchGroupTitlesFamilyOverride implements FamilyOverride {
   _$FetchGroupTitlesFamilyOverride(this.overriddenFamily, this.create);
 
-  final FutureOr<Iterable<Manga>> Function(_FetchGroupTitlesRef ref) create;
+  final FutureOr<List<Manga>> Function(_FetchGroupTitlesRef ref) create;
 
   @override
   final _FetchGroupTitlesFamily overriddenFamily;
@@ -440,8 +440,7 @@ class _$FetchGroupTitlesFamilyOverride implements FamilyOverride {
 }
 
 /// See also [_fetchGroupTitles].
-class _FetchGroupTitlesProvider
-    extends AutoDisposeFutureProvider<Iterable<Manga>> {
+class _FetchGroupTitlesProvider extends AutoDisposeFutureProvider<List<Manga>> {
   /// See also [_fetchGroupTitles].
   _FetchGroupTitlesProvider(
     Group group,
@@ -476,7 +475,7 @@ class _FetchGroupTitlesProvider
 
   @override
   Override overrideWith(
-    FutureOr<Iterable<Manga>> Function(_FetchGroupTitlesRef ref) create,
+    FutureOr<List<Manga>> Function(_FetchGroupTitlesRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -498,12 +497,12 @@ class _FetchGroupTitlesProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+  AutoDisposeFutureProviderElement<List<Manga>> createElement() {
     return _FetchGroupTitlesProviderElement(this);
   }
 
   _FetchGroupTitlesProvider _copyWith(
-    FutureOr<Iterable<Manga>> Function(_FetchGroupTitlesRef ref) create,
+    FutureOr<List<Manga>> Function(_FetchGroupTitlesRef ref) create,
   ) {
     return _FetchGroupTitlesProvider._internal(
       (ref) => create(ref as _FetchGroupTitlesRef),
@@ -530,13 +529,13 @@ class _FetchGroupTitlesProvider
   }
 }
 
-mixin _FetchGroupTitlesRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+mixin _FetchGroupTitlesRef on AutoDisposeFutureProviderRef<List<Manga>> {
   /// The parameter `group` of this provider.
   Group get group;
 }
 
 class _FetchGroupTitlesProviderElement
-    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    extends AutoDisposeFutureProviderElement<List<Manga>>
     with _FetchGroupTitlesRef {
   _FetchGroupTitlesProviderElement(super.provider);
 

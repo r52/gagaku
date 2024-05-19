@@ -44,7 +44,7 @@ Future<CreatorType> _fetchCreatorFromId(
 }
 
 @riverpod
-Future<Iterable<Manga>> _fetchCreatorTitles(
+Future<List<Manga>> _fetchCreatorTitles(
     _FetchCreatorTitlesRef ref, CreatorType creator) async {
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
   await ref.watch(statisticsProvider.notifier).get(mangas);

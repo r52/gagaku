@@ -978,11 +978,20 @@ class ChapterFeedItemData {
   String get mangaId => manga.id;
   String get coverArt =>
       manga.getFirstCoverUrl(quality: CoverArtQuality.medium);
+  late final id = generateKey();
 
   List<Chapter> chapters = [];
 
   void clear() {
     chapters.clear();
+  }
+
+  int generateKey() {
+    if (chapters.isNotEmpty) {
+      return Object.hash(runtimeType, mangaId, chapters.first.id);
+    }
+
+    return Object.hash(runtimeType, mangaId);
   }
 }
 

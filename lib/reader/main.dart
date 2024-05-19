@@ -28,7 +28,7 @@ class ReaderWidget extends HookConsumerWidget {
     this.backRoute,
   });
 
-  final Iterable<ReaderPage> pages;
+  final List<ReaderPage> pages;
   final String title;
   final String? subtitle;
   final bool longstrip;
@@ -683,10 +683,16 @@ class ReaderWidget extends HookConsumerWidget {
                 listController: listController,
                 controller: scrollController,
                 itemCount: pageCount,
+                findChildIndexCallback: (key) {
+                  final valueKey = key as ValueKey<String>;
+                  final val = pages.indexWhere((i) => i.id == valueKey.value);
+                  return val >= 0 ? val : null;
+                },
                 itemBuilder: (BuildContext context, int index) {
                   final page = pages.elementAt(index);
 
                   return PhotoView(
+                    key: ValueKey(page.id),
                     imageProvider: page.provider,
                     backgroundDecoration:
                         const BoxDecoration(color: Colors.black),
@@ -723,10 +729,16 @@ class ReaderWidget extends HookConsumerWidget {
                 currentImageScale.value =
                     scaleStateController[index].scaleState;
               },
+              findChildIndexCallback: (key) {
+                final valueKey = key as ValueKey<String>;
+                final val = pages.indexWhere((i) => i.id == valueKey.value);
+                return val >= 0 ? val : null;
+              },
               itemBuilder: (BuildContext context, int index) {
                 final page = pages.elementAt(index);
 
                 return PhotoView(
+                  key: ValueKey(page.id),
                   imageProvider: page.provider,
                   backgroundDecoration:
                       const BoxDecoration(color: Colors.black),

@@ -21,7 +21,7 @@ final mangadexProvider = Provider<MangaDexModel>.internal(
 
 typedef MangadexRef = ProviderRef<MangaDexModel>;
 String _$getMangaListByPageHash() =>
-    r'a0e31bd5226e46f7d9c3b9083875cf0aeecd6bcb';
+    r'd8d116228e735b7580866f3a6ede70a27554d612';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -91,7 +91,7 @@ class GetMangaListByPageFamily extends Family {
 
   /// Enables overriding the behavior of this provider, no matter the parameters.
   Override overrideWith(
-      FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create) {
+      FutureOr<List<Manga>> Function(GetMangaListByPageRef ref) create) {
     return _$GetMangaListByPageFamilyOverride(this, create);
   }
 }
@@ -99,7 +99,7 @@ class GetMangaListByPageFamily extends Family {
 class _$GetMangaListByPageFamilyOverride implements FamilyOverride {
   _$GetMangaListByPageFamilyOverride(this.overriddenFamily, this.create);
 
-  final FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create;
+  final FutureOr<List<Manga>> Function(GetMangaListByPageRef ref) create;
 
   @override
   final GetMangaListByPageFamily overriddenFamily;
@@ -114,7 +114,7 @@ class _$GetMangaListByPageFamilyOverride implements FamilyOverride {
 
 /// See also [getMangaListByPage].
 class GetMangaListByPageProvider
-    extends AutoDisposeFutureProvider<Iterable<Manga>> {
+    extends AutoDisposeFutureProvider<List<Manga>> {
   /// See also [getMangaListByPage].
   GetMangaListByPageProvider(
     Iterable<String> list,
@@ -154,7 +154,7 @@ class GetMangaListByPageProvider
 
   @override
   Override overrideWith(
-    FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create,
+    FutureOr<List<Manga>> Function(GetMangaListByPageRef ref) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -183,12 +183,12 @@ class GetMangaListByPageProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<Iterable<Manga>> createElement() {
+  AutoDisposeFutureProviderElement<List<Manga>> createElement() {
     return _GetMangaListByPageProviderElement(this);
   }
 
   GetMangaListByPageProvider _copyWith(
-    FutureOr<Iterable<Manga>> Function(GetMangaListByPageRef ref) create,
+    FutureOr<List<Manga>> Function(GetMangaListByPageRef ref) create,
   ) {
     return GetMangaListByPageProvider._internal(
       (ref) => create(ref as GetMangaListByPageRef),
@@ -219,7 +219,7 @@ class GetMangaListByPageProvider
   }
 }
 
-mixin GetMangaListByPageRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
+mixin GetMangaListByPageRef on AutoDisposeFutureProviderRef<List<Manga>> {
   /// The parameter `list` of this provider.
   Iterable<String> get list;
 
@@ -228,7 +228,7 @@ mixin GetMangaListByPageRef on AutoDisposeFutureProviderRef<Iterable<Manga>> {
 }
 
 class _GetMangaListByPageProviderElement
-    extends AutoDisposeFutureProviderElement<Iterable<Manga>>
+    extends AutoDisposeFutureProviderElement<List<Manga>>
     with GetMangaListByPageRef {
   _GetMangaListByPageProviderElement(super.provider);
 
