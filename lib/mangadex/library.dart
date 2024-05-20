@@ -129,47 +129,42 @@ class MangaDexLibraryView extends HookConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    DropdownMenu<MangaReadingStatus>(
-                      initialSelection: type,
-                      enableFilter: false,
-                      enableSearch: false,
-                      requestFocusOnTap: false,
-                      inputDecorationTheme: InputDecorationTheme(
-                        filled: true,
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2.0,
-                            color: theme.colorScheme.inversePrimary,
-                          ),
-                        ),
-                      ),
-                      onSelected: (MangaReadingStatus? status) async {
-                        if (status != null) {
-                          ref.read(libraryViewTypeProvider.notifier).state =
-                              status;
-                          currentPage.value = 0;
-                        }
-                      },
-                      dropdownMenuEntries:
-                          List<DropdownMenuEntry<MangaReadingStatus>>.generate(
-                        MangaReadingStatus.values.skip(1).length,
-                        (int index) => DropdownMenuEntry<MangaReadingStatus>(
-                          value: MangaReadingStatus.values
-                              .skip(1)
-                              .elementAt(index),
-                          label: MangaReadingStatus.values
-                              .skip(1)
-                              .elementAt(index)
-                              .label,
+                Align(
+                  alignment: const Alignment(-0.95, 0.0),
+                  child: DropdownMenu<MangaReadingStatus>(
+                    initialSelection: type,
+                    enableFilter: false,
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    inputDecorationTheme: InputDecorationTheme(
+                      filled: true,
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 2.0,
+                          color: theme.colorScheme.inversePrimary,
                         ),
                       ),
                     ),
-                  ],
+                    onSelected: (MangaReadingStatus? status) async {
+                      if (status != null) {
+                        ref.read(libraryViewTypeProvider.notifier).state =
+                            status;
+                        currentPage.value = 0;
+                      }
+                    },
+                    dropdownMenuEntries:
+                        List<DropdownMenuEntry<MangaReadingStatus>>.generate(
+                      MangaReadingStatus.values.skip(1).length,
+                      (int index) => DropdownMenuEntry<MangaReadingStatus>(
+                        value:
+                            MangaReadingStatus.values.skip(1).elementAt(index),
+                        label: MangaReadingStatus.values
+                            .skip(1)
+                            .elementAt(index)
+                            .label,
+                      ),
+                    ),
+                  ),
                 ),
                 Expanded(
                   child: child,

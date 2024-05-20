@@ -96,13 +96,12 @@ class ChapterFeedWidget extends HookConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 10.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              title!,
-                              style: const TextStyle(fontSize: 24),
-                            )
-                          ],
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            title!,
+                            style: const TextStyle(fontSize: 24),
+                          ),
                         ),
                       ),
                     Expanded(
@@ -315,7 +314,7 @@ class ChapterButtonWidget extends ConsumerWidget {
       groupChips.add(IconTextChip(
         icon: Icon(isOfficialPub ? Icons.add_circle : Icons.group,
             size: iconSize),
-        text: Text(g.attributes.name.crop()),
+        text: g.attributes.name.crop(),
         onPressed: () {
           context.push('/group/${g.id}', extra: g);
         },
@@ -326,7 +325,7 @@ class ChapterButtonWidget extends ConsumerWidget {
     if (groupChips.isEmpty) {
       groupChips.add(IconTextChip(
         icon: Icon(Icons.group, size: iconSize),
-        text: const Text('No Group'),
+        text: 'No Group',
       ));
       groupChips.add(rowPadding);
     }
@@ -336,12 +335,12 @@ class ChapterButtonWidget extends ConsumerWidget {
     if (isOfficialPub) {
       userChip = IconTextChip(
         icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
-        text: const Text('Official Publisher'),
+        text: 'Official Publisher',
       );
     } else {
       userChip = IconTextChip(
         icon: Icon(Icons.person, size: iconSize),
-        text: Text(chapter.getUploadUser().crop()),
+        text: chapter.getUploadUser().crop(),
       );
     }
 
@@ -355,7 +354,7 @@ class ChapterButtonWidget extends ConsumerWidget {
     if (isEndChapter) {
       endChip = const IconTextChip(
         color: Colors.blue,
-        text: Text('END'),
+        text: 'END',
       );
     }
 
@@ -436,24 +435,23 @@ class ChapterButtonWidget extends ConsumerWidget {
                 flagChip,
                 rowPadding,
                 if (openIcon != null) ...[openIcon, rowPadding],
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Text(
-                    title,
-                    overflow: TextOverflow.ellipsis,
-                    style: textstyle,
-                  ),
+                Text(
+                  title,
+                  overflow: TextOverflow.ellipsis,
+                  style: textstyle,
                 ),
                 rowPadding,
                 if (endChip != null) endChip,
+                if (!screenSizeSmall) const Spacer(),
                 if (!screenSizeSmall)
-                  Flexible(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                  Text.rich(
+                    overflow: TextOverflow.ellipsis,
+                    TextSpan(
                       children: [
-                        const Icon(Icons.schedule, size: 20),
-                        rowPadding,
-                        Text(pubtime)
+                        const WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: Icon(Icons.schedule, size: 20)),
+                        TextSpan(text: ' $pubtime'),
                       ],
                     ),
                   ),
@@ -479,25 +477,24 @@ class ChapterButtonWidget extends ConsumerWidget {
           if (screenSizeSmall)
             Padding(
               padding: vPadding,
-              child: Row(
-                children: [
-                  userChip,
-                ],
-              ),
+              child: userChip,
             ),
           if (screenSizeSmall)
             Padding(
               padding: vPadding,
-              child: Row(
-                children: [
-                  const Spacer(),
-                  const Icon(Icons.schedule, size: 15),
-                  rowPadding,
-                  Text(
-                    pubtime,
-                    overflow: TextOverflow.ellipsis,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text.rich(
+                  overflow: TextOverflow.ellipsis,
+                  TextSpan(
+                    children: [
+                      const WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: Icon(Icons.schedule, size: 15)),
+                      TextSpan(text: ' $pubtime'),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
         ],
@@ -775,17 +772,15 @@ class _GridMangaItem extends HookWidget {
       },
       child: GridTile(
         header: selectMode
-            ? Row(
-                children: [
-                  const Spacer(),
-                  FloatingActionButton(
-                    heroTag: manga.id,
-                    mini: true,
-                    shape: const CircleBorder(),
-                    onPressed: () => onSelected!(manga),
-                    child: selectButton!(manga),
-                  ),
-                ],
+            ? Align(
+                alignment: Alignment.topRight,
+                child: FloatingActionButton(
+                  heroTag: manga.id,
+                  mini: true,
+                  shape: const CircleBorder(),
+                  onPressed: () => onSelected!(manga),
+                  child: selectButton!(manga),
+                ),
               )
             : (header != null
                 ? SizedBox(
@@ -907,7 +902,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (header != null) ...[
-                          IconTextChip(text: Text(header!)),
+                          IconTextChip(text: header!),
                           const SizedBox(
                             height: 4,
                           ),
@@ -919,7 +914,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                               // ignore: unused_local_variable
                               AsyncValue(:final error?, :final stackTrace?) => [
                                   const IconTextChip(
-                                    text: Text(statsError),
+                                    text: statsError,
                                   )
                                 ],
                               AsyncValue(valueOrNull: final stats?) => () {
@@ -936,20 +931,18 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                             ),
                                           ],
                                         ),
-                                        text: Text(
-                                          stats[manga.id]
-                                                  ?.rating
-                                                  .bayesian
-                                                  .toStringAsFixed(2) ??
-                                              statsError,
-                                          style: const TextStyle(
-                                            color: Colors.amber,
-                                            shadows: [
-                                              Shadow(
-                                                offset: Offset(1.0, 1.0),
-                                              ),
-                                            ],
-                                          ),
+                                        text: stats[manga.id]
+                                                ?.rating
+                                                .bayesian
+                                                .toStringAsFixed(2) ??
+                                            statsError,
+                                        style: const TextStyle(
+                                          color: Colors.amber,
+                                          shadows: [
+                                            Shadow(
+                                              offset: Offset(1.0, 1.0),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       const SizedBox(
@@ -960,23 +953,23 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                           Icons.bookmark_outline,
                                           size: 18,
                                         ),
-                                        text: Text(
-                                          stats[manga.id]?.follows.toString() ??
-                                              statsError,
-                                        ),
+                                        text: stats[manga.id]
+                                                ?.follows
+                                                .toString() ??
+                                            statsError,
                                       ),
                                     ];
                                   }
 
                                   return [
                                     const IconTextChip(
-                                      text: Text(statsError),
+                                      text: statsError,
                                     )
                                   ];
                                 }(),
                               _ => [
                                   const IconTextChip(
-                                    text: CircularProgressIndicator(),
+                                    text: 'Loading...',
                                   )
                                 ],
                             },
@@ -1008,7 +1001,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                     tag.attributes.group != TagGroup.content)
                                 .map(
                                   (e) => IconTextChip(
-                                      text: Text(e.attributes.name.get('en'))),
+                                      text: e.attributes.name.get('en')),
                                 ),
                           ],
                         ),
@@ -1096,7 +1089,7 @@ class _ListMangaItem extends ConsumerWidget {
                     height: 10,
                   ),
                   if (header != null) ...[
-                    IconTextChip(text: Text(header!)),
+                    IconTextChip(text: header!),
                     const SizedBox(
                       height: 10,
                     ),
@@ -1120,7 +1113,7 @@ class _ListMangaItem extends ConsumerWidget {
                                     tag.attributes.group == TagGroup.theme))
                             .map(
                               (e) => IconTextChip(
-                                  text: Text(e.attributes.name.get('en'))),
+                                  text: e.attributes.name.get('en')),
                             ),
                     ],
                   ),
@@ -1134,7 +1127,7 @@ class _ListMangaItem extends ConsumerWidget {
                         // ignore: unused_local_variable
                         AsyncValue(:final error?, :final stackTrace?) => [
                             const IconTextChip(
-                              text: Text(statsError),
+                              text: statsError,
                             )
                           ],
                         AsyncValue(valueOrNull: final stats?) => () {
@@ -1151,20 +1144,18 @@ class _ListMangaItem extends ConsumerWidget {
                                       ),
                                     ],
                                   ),
-                                  text: Text(
-                                    stats[manga.id]
-                                            ?.rating
-                                            .bayesian
-                                            .toStringAsFixed(2) ??
-                                        statsError,
-                                    style: const TextStyle(
-                                      color: Colors.amber,
-                                      shadows: [
-                                        Shadow(
-                                          offset: Offset(1.0, 1.0),
-                                        ),
-                                      ],
-                                    ),
+                                  text: stats[manga.id]
+                                          ?.rating
+                                          .bayesian
+                                          .toStringAsFixed(2) ??
+                                      statsError,
+                                  style: const TextStyle(
+                                    color: Colors.amber,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(1.0, 1.0),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const SizedBox(
@@ -1175,23 +1166,21 @@ class _ListMangaItem extends ConsumerWidget {
                                     Icons.bookmark_outline,
                                     size: 18,
                                   ),
-                                  text: Text(
-                                    stats[manga.id]?.follows.toString() ??
-                                        statsError,
-                                  ),
+                                  text: stats[manga.id]?.follows.toString() ??
+                                      statsError,
                                 ),
                               ];
                             }
 
                             return [
                               const IconTextChip(
-                                text: Text(statsError),
+                                text: statsError,
                               )
                             ];
                           }(),
                         _ => [
                             const IconTextChip(
-                              text: CircularProgressIndicator(),
+                              text: 'Loading...',
                             )
                           ],
                       },
@@ -1254,9 +1243,7 @@ class MangaStatusChip extends StatelessWidget {
         color: iconColor,
         size: 10,
       ),
-      text: Text(
-        label,
-      ),
+      text: label,
     );
   }
 }
@@ -1284,9 +1271,7 @@ class ContentRatingChip extends StatelessWidget {
 
     return IconTextChip(
       color: iconColor,
-      text: Text(
-        rating.label,
-      ),
+      text: rating.label,
     );
   }
 }
@@ -1309,9 +1294,7 @@ class ContentChip extends StatelessWidget {
 
     return IconTextChip(
       color: iconColor,
-      text: Text(
-        content,
-      ),
+      text: content,
     );
   }
 }

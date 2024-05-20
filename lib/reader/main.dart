@@ -851,7 +851,7 @@ class ProgressIndicator extends AnimatedWidget {
         )),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [...(reverse ? sections.reversed : sections)],
+          children: reverse ? sections.reversed.toList() : sections,
         ));
   }
 }

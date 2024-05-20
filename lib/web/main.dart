@@ -227,13 +227,12 @@ class WebSourcesHome extends HookConsumerWidget {
                 const Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'History',
-                        style: TextStyle(fontSize: 24),
-                      )
-                    ],
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'History',
+                      style: TextStyle(fontSize: 24),
+                    ),
                   ),
                 ),
                 Expanded(

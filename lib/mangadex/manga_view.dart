@@ -527,23 +527,28 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 decoration: BoxDecoration(
                                   color: ratings.containsKey(manga.id) &&
                                           ratings[manga.id]!.rating > 0
-                                      ? Colors.deepOrange
+                                      ? Colors.deepOrange.shade800
                                       : theme
                                           .colorScheme.surfaceContainerHighest,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(6.0)),
                                 ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.star_border),
-                                    if (ratings.containsKey(manga.id) &&
-                                        ratings[manga.id]!.rating > 0) ...[
-                                      const SizedBox(
-                                        width: 4.0,
-                                      ),
-                                      Text('${ratings[manga.id]!.rating}')
-                                    ]
-                                  ],
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      const WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: Icon(
+                                            Icons.star_border,
+                                          )),
+                                      if (ratings.containsKey(manga.id) &&
+                                          ratings[manga.id]!.rating > 0)
+                                        TextSpan(
+                                            text:
+                                                ' ${ratings[manga.id]!.rating}')
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
@@ -782,7 +787,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 tag.attributes.group != TagGroup.content)
                             .map(
                               (e) => IconTextChip(
-                                  text: Text(e.attributes.name.get('en'))),
+                                  text: e.attributes.name.get('en')),
                             ),
                     ],
                   ),
@@ -805,7 +810,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   width: 10,
                                 ),
                                 const IconTextChip(
-                                  text: Text(statsError),
+                                  text: statsError,
                                 )
                               ],
                             AsyncValue(valueOrNull: final stats?) => () {
@@ -822,20 +827,18 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                      text: Text(
-                                        stats[manga.id]
-                                                ?.rating
-                                                .bayesian
-                                                .toStringAsFixed(2) ??
-                                            statsError,
-                                        style: const TextStyle(
-                                          color: Colors.amber,
-                                          shadows: [
-                                            Shadow(
-                                              offset: Offset(1.0, 1.0),
-                                            ),
-                                          ],
-                                        ),
+                                      text: stats[manga.id]
+                                              ?.rating
+                                              .bayesian
+                                              .toStringAsFixed(2) ??
+                                          statsError,
+                                      style: const TextStyle(
+                                        color: Colors.amber,
+                                        shadows: [
+                                          Shadow(
+                                            offset: Offset(1.0, 1.0),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     const SizedBox(
@@ -846,10 +849,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         Icons.bookmark_outline,
                                         size: 18,
                                       ),
-                                      text: Text(
-                                        stats[manga.id]?.follows.toString() ??
-                                            statsError,
-                                      ),
+                                      text:
+                                          stats[manga.id]?.follows.toString() ??
+                                              statsError,
                                     ),
                                   ];
                                 }
@@ -859,7 +861,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     width: 10,
                                   ),
                                   const IconTextChip(
-                                    text: Text(statsError),
+                                    text: statsError,
                                   )
                                 ];
                               }(),
@@ -868,7 +870,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   width: 10,
                                 ),
                                 const IconTextChip(
-                                  text: CircularProgressIndicator(),
+                                  text: 'Loading...',
                                 )
                               ],
                           },
@@ -950,52 +952,28 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   title: const Text('Info'),
                   children: [
                     if (manga.author != null)
-                      ExpansionTile(
-                        expandedAlignment: Alignment.centerLeft,
-                        title: const Text('Author'),
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.surface,
-                            child: Wrap(
-                              spacing: 4.0,
-                              runSpacing: 4.0,
-                              children: manga.author!
-                                  .map((e) => ButtonChip(
-                                        text: Text(e.attributes.name),
-                                        onPressed: () {
-                                          context.push('/author/${e.id}',
-                                              extra: e);
-                                        },
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
+                      MultiChildExpansionTile(
+                        title: 'Author',
+                        children: manga.author!
+                            .map((e) => ButtonChip(
+                                  text: Text(e.attributes.name),
+                                  onPressed: () {
+                                    context.push('/author/${e.id}', extra: e);
+                                  },
+                                ))
+                            .toList(),
                       ),
                     if (manga.artist != null)
-                      ExpansionTile(
-                        expandedAlignment: Alignment.centerLeft,
-                        title: const Text('Artist'),
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.surface,
-                            child: Wrap(
-                              spacing: 4.0,
-                              runSpacing: 4.0,
-                              children: manga.artist!
-                                  .map((e) => ButtonChip(
-                                        text: Text(e.attributes.name),
-                                        onPressed: () {
-                                          context.push('/author/${e.id}',
-                                              extra: e);
-                                        },
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
+                      MultiChildExpansionTile(
+                        title: 'Artist',
+                        children: manga.artist!
+                            .map((e) => ButtonChip(
+                                  text: Text(e.attributes.name),
+                                  onPressed: () {
+                                    context.push('/author/${e.id}', extra: e);
+                                  },
+                                ))
+                            .toList(),
                       ),
                     if (manga.attributes!.publicationDemographic != null)
                       ExpansionTile(
@@ -1004,165 +982,118 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             color: theme.colorScheme.surface,
-                            child: Row(
-                              children: [
-                                IconTextChip(
-                                  text: Text(manga.attributes!
-                                      .publicationDemographic!.label),
-                                )
-                              ],
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: IconTextChip(
+                                text: manga
+                                    .attributes!.publicationDemographic!.label,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     if (manga.attributes!.tags.isNotEmpty)
-                      ExpansionTile(
-                        expandedAlignment: Alignment.centerLeft,
-                        title: const Text('Genres'),
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.surface,
-                            child: Wrap(
-                              spacing: 4.0,
-                              runSpacing: 4.0,
-                              children: manga.attributes!.tags
-                                  .where((tag) =>
-                                      tag.attributes.group == TagGroup.genre)
-                                  .map((e) => IconTextChip(
-                                      text: Text(e.attributes.name.get('en'))))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
+                      MultiChildExpansionTile(
+                        title: 'Genres',
+                        children: manga.attributes!.tags
+                            .where(
+                                (tag) => tag.attributes.group == TagGroup.genre)
+                            .map((e) =>
+                                IconTextChip(text: e.attributes.name.get('en')))
+                            .toList(),
                       ),
                     if (manga.attributes!.tags.isNotEmpty)
-                      ExpansionTile(
-                        expandedAlignment: Alignment.centerLeft,
-                        title: const Text('Themes'),
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.surface,
-                            child: Wrap(
-                              spacing: 4.0,
-                              runSpacing: 4.0,
-                              children: manga.attributes!.tags
-                                  .where((tag) =>
-                                      tag.attributes.group == TagGroup.theme)
-                                  .map((e) => IconTextChip(
-                                      text: Text(e.attributes.name.get('en'))))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
+                      MultiChildExpansionTile(
+                        title: 'Themes',
+                        children: manga.attributes!.tags
+                            .where(
+                                (tag) => tag.attributes.group == TagGroup.theme)
+                            .map((e) =>
+                                IconTextChip(text: e.attributes.name.get('en')))
+                            .toList(),
                       ),
                     if (formatTags.isNotEmpty)
-                      ExpansionTile(
-                        expandedAlignment: Alignment.centerLeft,
-                        title: const Text('Format'),
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.surface,
-                            child: Wrap(
-                              spacing: 4.0,
-                              runSpacing: 4.0,
-                              children: formatTags
-                                  .map((e) => IconTextChip(
-                                      text: Text(e.attributes.name.get('en'))))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
+                      MultiChildExpansionTile(
+                        title: 'Format',
+                        children: formatTags
+                            .map((e) =>
+                                IconTextChip(text: e.attributes.name.get('en')))
+                            .toList(),
                       ),
-                    ExpansionTile(
-                      expandedAlignment: Alignment.centerLeft,
-                      title: const Text('Track'),
+                    MultiChildExpansionTile(
+                      title: 'Track',
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          color: theme.colorScheme.surface,
-                          child: Wrap(
-                            spacing: 4.0,
-                            runSpacing: 4.0,
-                            children: [
-                              if (manga.attributes!.links?.raw != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final url = manga.attributes!.links!.raw!;
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('Official Raw'),
-                                ),
-                              if (manga.attributes!.links?.mu != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final seriesnum = int.tryParse(
-                                        manga.attributes!.links!.mu!);
-                                    var url =
-                                        'https://www.mangaupdates.com/series/${manga.attributes!.links!.mu!}';
-
-                                    if (seriesnum != null) {
-                                      url =
-                                          'https://www.mangaupdates.com/series.html?id=${manga.attributes!.links!.mu!}';
-                                    }
-
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('MangaUpdates'),
-                                ),
-                              if (manga.attributes!.links?.al != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final url =
-                                        'https://anilist.co/manga/${manga.attributes!.links!.al!}';
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('AniList'),
-                                ),
-                              if (manga.attributes!.links?.mal != null)
-                                ButtonChip(
-                                  onPressed: () async {
-                                    final url =
-                                        'https://myanimelist.net/manga/${manga.attributes!.links!.mal!}';
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  text: const Text('MyAnimeList'),
-                                ),
-                              ButtonChip(
-                                onPressed: () async {
-                                  final route =
-                                      GoRouterState.of(context).uri.toString();
-                                  final url =
-                                      Uri.parse('https://mangadex.org$route');
-
-                                  if (DeviceContext.isMobile()) {
-                                    InAppBrowser().openUrlRequest(
-                                      urlRequest:
-                                          URLRequest(url: WebUri.uri(url)),
-                                      settings: InAppBrowserClassSettings(
-                                        browserSettings: InAppBrowserSettings(
-                                          hideToolbarTop: true,
-                                        ),
-                                      ),
-                                    );
-                                  } else if (!await launchUrl(url)) {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                text: const Text('Open on MangaDex'),
-                              ),
-                            ],
+                        if (manga.attributes!.links?.raw != null)
+                          ButtonChip(
+                            onPressed: () async {
+                              final url = manga.attributes!.links!.raw!;
+                              if (!await launchUrl(Uri.parse(url))) {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            text: const Text('Official Raw'),
                           ),
+                        if (manga.attributes!.links?.mu != null)
+                          ButtonChip(
+                            onPressed: () async {
+                              final seriesnum =
+                                  int.tryParse(manga.attributes!.links!.mu!);
+                              var url =
+                                  'https://www.mangaupdates.com/series/${manga.attributes!.links!.mu!}';
+
+                              if (seriesnum != null) {
+                                url =
+                                    'https://www.mangaupdates.com/series.html?id=${manga.attributes!.links!.mu!}';
+                              }
+
+                              if (!await launchUrl(Uri.parse(url))) {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            text: const Text('MangaUpdates'),
+                          ),
+                        if (manga.attributes!.links?.al != null)
+                          ButtonChip(
+                            onPressed: () async {
+                              final url =
+                                  'https://anilist.co/manga/${manga.attributes!.links!.al!}';
+                              if (!await launchUrl(Uri.parse(url))) {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            text: const Text('AniList'),
+                          ),
+                        if (manga.attributes!.links?.mal != null)
+                          ButtonChip(
+                            onPressed: () async {
+                              final url =
+                                  'https://myanimelist.net/manga/${manga.attributes!.links!.mal!}';
+                              if (!await launchUrl(Uri.parse(url))) {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            text: const Text('MyAnimeList'),
+                          ),
+                        ButtonChip(
+                          onPressed: () async {
+                            final route =
+                                GoRouterState.of(context).uri.toString();
+                            final url = Uri.parse('https://mangadex.org$route');
+
+                            if (DeviceContext.isMobile()) {
+                              InAppBrowser().openUrlRequest(
+                                urlRequest: URLRequest(url: WebUri.uri(url)),
+                                settings: InAppBrowserClassSettings(
+                                  browserSettings: InAppBrowserSettings(
+                                    hideToolbarTop: true,
+                                  ),
+                                ),
+                              );
+                            } else if (!await launchUrl(url)) {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          text: const Text('Open on MangaDex'),
                         ),
                       ],
                     ),
@@ -1173,10 +1104,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             color: theme.colorScheme.surface,
-                            child: Row(
-                              children: [
-                                Text(lastvolchap),
-                              ],
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(lastvolchap),
                             ),
                           ),
                         ],
@@ -1216,80 +1146,76 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     color: theme.cardColor,
-                    child: Row(
-                      children: [
-                        const Spacer(),
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final chapters = ref
-                                .watch(mangaChaptersProvider(manga))
-                                .valueOrNull;
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          final chapters = ref
+                              .watch(mangaChaptersProvider(manga))
+                              .valueOrNull;
 
-                            final allRead = chapters != null
-                                ? ref.watch(readChaptersProvider
-                                    .select((value) => switch (value) {
-                                          AsyncValue(
-                                            valueOrNull: final data?
-                                          ) =>
-                                            data[manga.id]?.containsAll(chapters
-                                                    .map((e) => e.id)) ==
-                                                true,
-                                          _ => false,
-                                        }))
-                                : false;
+                          final allRead = chapters != null
+                              ? ref.watch(readChaptersProvider
+                                  .select((value) => switch (value) {
+                                        AsyncValue(valueOrNull: final data?) =>
+                                          data[manga.id]?.containsAll(
+                                                  chapters.map((e) => e.id)) ==
+                                              true,
+                                        _ => false,
+                                      }))
+                              : false;
 
-                            final opt = allRead ? 'unread' : 'read';
+                          final opt = allRead ? 'unread' : 'read';
 
-                            return ElevatedButton(
-                              style: Styles.buttonStyle(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0)),
-                              onPressed: () async {
-                                final result = await showDialog<bool>(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    final nav = Navigator.of(context);
-                                    return AlertDialog(
-                                      title: Text('Mark all as $opt'),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                              'Are you sure you want to mark all visible chapters as $opt?'),
-                                        ],
-                                      ),
-                                      actions: <Widget>[
-                                        ElevatedButton(
-                                          child: const Text('No'),
-                                          onPressed: () {
-                                            nav.pop(false);
-                                          },
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            nav.pop(true);
-                                          },
-                                          child: const Text('Yes'),
-                                        ),
+                          return ElevatedButton(
+                            style: Styles.buttonStyle(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0)),
+                            onPressed: () async {
+                              final result = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  final nav = Navigator.of(context);
+                                  return AlertDialog(
+                                    title: Text('Mark all as $opt'),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            'Are you sure you want to mark all visible chapters as $opt?'),
                                       ],
-                                    );
-                                  },
-                                );
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: const Text('No'),
+                                        onPressed: () {
+                                          nav.pop(false);
+                                        },
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          nav.pop(true);
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
 
-                                if (chapters != null && result == true) {
-                                  ref.read(readChaptersProvider.notifier).set(
-                                      manga,
-                                      read: !allRead ? chapters : null,
-                                      unread: allRead ? chapters : null);
-                                }
-                              },
-                              child: Text('Mark all visible as $opt'),
-                            );
-                          },
-                        ),
-                      ],
+                              if (chapters != null && result == true) {
+                                ref.read(readChaptersProvider.notifier).set(
+                                    manga,
+                                    read: !allRead ? chapters : null,
+                                    unread: allRead ? chapters : null);
+                              }
+                            },
+                            child: Text('Mark all visible as $opt'),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

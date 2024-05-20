@@ -216,72 +216,44 @@ class WebMangaViewWidget extends StatelessWidget {
           child: ExpansionTile(
             title: const Text('Info'),
             children: [
-              ExpansionTile(
-                title: const Text('Author'),
+              MultiChildExpansionTile(
+                title: 'Author',
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.surface,
-                    child: Row(
-                      children: [
-                        IconTextChip(
-                          text: Text(manga.author),
-                        )
-                      ],
-                    ),
-                  ),
+                  IconTextChip(
+                    text: manga.author,
+                  )
                 ],
               ),
-              ExpansionTile(
-                title: const Text('Artist'),
+              MultiChildExpansionTile(
+                title: 'Artist',
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.surface,
-                    child: Row(
-                      children: [
-                        IconTextChip(
-                          text: Text(manga.artist),
-                        )
-                      ],
-                    ),
-                  ),
+                  IconTextChip(
+                    text: manga.artist,
+                  )
                 ],
               ),
-              ExpansionTile(
-                expandedAlignment: Alignment.centerLeft,
-                title: const Text('Links'),
+              MultiChildExpansionTile(
+                title: 'Links',
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.surface,
-                    child: Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: [
-                        ButtonChip(
-                          onPressed: () async {
-                            final route =
-                                GoRouterState.of(context).uri.toString();
-                            final url = Uri.parse('https://cubari.moe$route');
+                  ButtonChip(
+                    onPressed: () async {
+                      final route = GoRouterState.of(context).uri.toString();
+                      final url = Uri.parse('https://cubari.moe$route');
 
-                            if (DeviceContext.isMobile()) {
-                              InAppBrowser().openUrlRequest(
-                                urlRequest: URLRequest(url: WebUri.uri(url)),
-                                settings: InAppBrowserClassSettings(
-                                  browserSettings: InAppBrowserSettings(
-                                    hideToolbarTop: true,
-                                  ),
-                                ),
-                              );
-                            } else if (!await launchUrl(url)) {
-                              throw 'Could not launch $url';
-                            }
-                          },
-                          text: const Text('Open on cubari.moe'),
-                        ),
-                      ],
-                    ),
+                      if (DeviceContext.isMobile()) {
+                        InAppBrowser().openUrlRequest(
+                          urlRequest: URLRequest(url: WebUri.uri(url)),
+                          settings: InAppBrowserClassSettings(
+                            browserSettings: InAppBrowserSettings(
+                              hideToolbarTop: true,
+                            ),
+                          ),
+                        );
+                      } else if (!await launchUrl(url)) {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    text: const Text('Open on cubari.moe'),
                   ),
                 ],
               ),
@@ -363,12 +335,12 @@ class ChapterButtonWidget extends ConsumerWidget {
     String title = data.chapter.getTitle(name);
     String group = data.chapter.groups.entries.first.key;
 
-    Widget? timestamp;
+    String? timestamp;
 
     if (data.chapter.lastUpdated != null) {
-      timestamp = Text(timeago.format(data.chapter.lastUpdated!));
+      timestamp = timeago.format(data.chapter.lastUpdated!);
     } else if (data.chapter.releaseDate != null) {
-      timestamp = Text(timeago.format(data.chapter.releaseDate!));
+      timestamp = timeago.format(data.chapter.releaseDate!);
     }
 
     final border = Border(
@@ -433,25 +405,26 @@ class ChapterButtonWidget extends ConsumerWidget {
                 children: [
                   IconTextChip(
                     icon: const Icon(Icons.group, size: 20),
-                    text: Text(manga.groups != null &&
+                    text: manga.groups != null &&
                             manga.groups?.containsKey(group) == true
                         ? manga.groups![group]!
-                        : group),
+                        : group,
                   ),
                   const SizedBox(width: 10),
                   const Icon(Icons.schedule, size: 20),
-                  const SizedBox(width: 5),
-                  if (timestamp != null) timestamp
+                  if (timestamp != null) Text(' $timestamp'),
                 ],
               ),
             )
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.schedule, size: 15),
-                const SizedBox(width: 5),
-                if (timestamp != null) timestamp
-              ],
+          : Text.rich(
+              TextSpan(
+                children: [
+                  const WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Icon(Icons.schedule, size: 15)),
+                  if (timestamp != null) TextSpan(text: ' $timestamp'),
+                ],
+              ),
             ),
     );
   }

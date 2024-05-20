@@ -14,6 +14,37 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
+class MultiChildExpansionTile extends StatelessWidget {
+  const MultiChildExpansionTile({
+    super.key,
+    required this.title,
+    this.children = const <Widget>[],
+  });
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ExpansionTile(
+      expandedAlignment: Alignment.centerLeft,
+      title: Text(title),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: theme.colorScheme.surface,
+          child: Wrap(
+            spacing: 4.0,
+            runSpacing: 4.0,
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class ButtonChip extends StatelessWidget {
   const ButtonChip({
     super.key,
@@ -61,12 +92,14 @@ class IconTextChip extends HookWidget {
     super.key,
     this.icon,
     required this.text,
+    this.style,
     this.color,
     this.onPressed,
   });
 
   final Widget? icon;
-  final Widget text;
+  final String text;
+  final TextStyle? style;
   final Color? color;
   final VoidCallback? onPressed;
 
@@ -87,12 +120,16 @@ class IconTextChip extends HookWidget {
             hover.value ? BoxDecoration(color: hoverColor) : null,
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
         alignment: Alignment.center,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[icon!, const SizedBox(width: 5)],
-            text,
-          ],
+        child: Text.rich(
+          style: style,
+          TextSpan(
+            children: [
+              if (icon != null)
+                WidgetSpan(
+                    alignment: PlaceholderAlignment.middle, child: icon!),
+              TextSpan(text: '${icon != null ? ' ' : ''}$text'),
+            ],
+          ),
         ),
       ),
     );
