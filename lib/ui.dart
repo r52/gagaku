@@ -45,6 +45,24 @@ class MultiChildExpansionTile extends StatelessWidget {
   }
 }
 
+class CountryFlag extends StatelessWidget {
+  const CountryFlag({super.key, required this.flag, this.size = 18});
+
+  final String flag;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      flag,
+      style: TextStyle(
+        fontFamily: 'Twemoji',
+        fontSize: size,
+      ),
+    );
+  }
+}
+
 class ButtonChip extends StatelessWidget {
   const ButtonChip({
     super.key,

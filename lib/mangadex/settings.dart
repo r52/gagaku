@@ -88,12 +88,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
                             title: Text(lang.label),
-                            secondary: Text(
-                              lang.flag,
-                              style: const TextStyle(
-                                fontFamily: 'Twemoji',
-                                fontSize: 15,
-                              ),
+                            secondary: CountryFlag(
+                              flag: lang.flag,
+                              size: 15,
                             ),
                             value:
                                 config.value.translatedLanguages.contains(lang),
@@ -186,12 +183,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
                             title: Text(lang.label),
-                            secondary: Text(
-                              lang.flag,
-                              style: const TextStyle(
-                                fontFamily: 'Twemoji',
-                                fontSize: 15,
-                              ),
+                            secondary: CountryFlag(
+                              flag: lang.flag,
+                              size: 15,
                             ),
                             value: config.value.originalLanguage.contains(lang),
                             onChanged: (bool? value) async {

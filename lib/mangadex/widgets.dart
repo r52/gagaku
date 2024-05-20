@@ -24,6 +24,66 @@ enum MangaListView { grid, list, detailed }
 
 final _mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
 
+const _rowPadding = SizedBox(
+  width: 6.0,
+);
+
+const _endChip = IconTextChip(
+  color: Colors.blue,
+  text: 'END',
+);
+
+class MarkReadButton extends ConsumerWidget {
+  const MarkReadButton({super.key, required this.chapter, required this.manga});
+
+  final Chapter chapter;
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
+
+    if (!loggedin) {
+      return const SizedBox.shrink();
+    }
+
+    final theme = Theme.of(context);
+
+    bool? isRead =
+        ref.watch(readChaptersProvider.select((value) => switch (value) {
+              AsyncValue(valueOrNull: final data?) =>
+                data[manga.id]?.contains(chapter.id) == true,
+              _ => null,
+            }));
+
+    return switch (isRead) {
+      null => const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(),
+        ),
+      true || false => IconButton(
+          onPressed: () async {
+            bool set = !isRead;
+            ref.read(readChaptersProvider.notifier).set(manga,
+                read: set ? [chapter] : null, unread: !set ? [chapter] : null);
+          },
+          padding: const EdgeInsets.only(right: 10.0),
+          splashRadius: 15,
+          iconSize: 20,
+          tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
+          icon: Icon(isRead == true ? Icons.visibility_off : Icons.visibility,
+              color: (isRead == true
+                  ? theme.highlightColor
+                  : theme.primaryIconTheme.color)),
+          constraints: const BoxConstraints(
+              minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
+          visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
+        ),
+    };
+  }
+}
+
 class ChapterFeedWidget extends HookConsumerWidget {
   const ChapterFeedWidget({
     super.key,
@@ -78,10 +138,6 @@ class ChapterFeedWidget extends HookConsumerWidget {
             );
           }(),
         AsyncValue(valueOrNull: final results?) => () {
-            if (results.isEmpty) {
-              return Text(emptyText ?? 'No results!');
-            }
-
             return ScrollConfiguration(
               behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
                 PointerDeviceKind.touch,
@@ -90,43 +146,45 @@ class ChapterFeedWidget extends HookConsumerWidget {
               }),
               child: RefreshIndicator(
                 onRefresh: onRefresh,
-                child: Column(
-                  children: [
-                    if (title != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 10.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            title!,
-                            style: const TextStyle(fontSize: 24),
+                child: results.isEmpty
+                    ? Text(emptyText ?? 'No results!')
+                    : Column(
+                        children: [
+                          if (title != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 10.0),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  title!,
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                              ),
+                            ),
+                          Expanded(
+                            child: SuperListView.builder(
+                              controller: scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              restorationId: restorationId,
+                              padding: const EdgeInsets.all(6),
+                              itemCount: results.length,
+                              findChildIndexCallback: (key) {
+                                final valueKey = key as ValueKey<int>;
+                                final val = results
+                                    .indexWhere((i) => i.id == valueKey.value);
+                                return val >= 0 ? val : null;
+                              },
+                              itemBuilder: (context, index) {
+                                final elem = results.elementAt(index);
+                                return ChapterFeedItem(
+                                    key: ValueKey(elem.id), state: elem);
+                              },
+                            ),
                           ),
-                        ),
+                          if (isLoading) Styles.listSpinner,
+                        ],
                       ),
-                    Expanded(
-                      child: SuperListView.builder(
-                        controller: scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        restorationId: restorationId,
-                        padding: const EdgeInsets.all(6),
-                        itemCount: results.length,
-                        findChildIndexCallback: (key) {
-                          final valueKey = key as ValueKey<int>;
-                          final val =
-                              results.indexWhere((i) => i.id == valueKey.value);
-                          return val >= 0 ? val : null;
-                        },
-                        itemBuilder: (context, index) {
-                          final elem = results.elementAt(index);
-                          return ChapterFeedItem(
-                              key: ValueKey(elem.id), state: elem);
-                        },
-                      ),
-                    ),
-                    if (isLoading) Styles.listSpinner,
-                  ],
-                ),
               ),
             );
           }(),
@@ -152,6 +210,7 @@ class ChapterFeedItem extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: ChapterButtonWidget(
+          key: ValueKey(e.id),
           chapter: e,
           manga: state.manga,
           link: Text(
@@ -176,12 +235,8 @@ class ChapterFeedItem extends StatelessWidget {
       onPressed: () async {
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
-      icon: Text(
-        state.manga.attributes!.originalLanguage.flag,
-        style: const TextStyle(
-          fontFamily: 'Twemoji',
-          fontSize: 18,
-        ),
+      icon: CountryFlag(
+        flag: state.manga.attributes!.originalLanguage.flag,
       ),
       label: Text(
         state.manga.attributes!.title.get('en'),
@@ -254,7 +309,7 @@ class ChapterFeedItem extends StatelessWidget {
   }
 }
 
-class ChapterButtonWidget extends ConsumerWidget {
+class ChapterButtonWidget extends StatelessWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
@@ -269,43 +324,18 @@ class ChapterButtonWidget extends ConsumerWidget {
   final VoidCallback? onLinkPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final theme = Theme.of(context);
-    final tileColor = theme.colorScheme.primaryContainer;
     final iconSize = screenSizeSmall ? 15.0 : 20.0;
+
     final isEndChapter = manga.attributes!.lastChapter != null &&
         manga.attributes!.lastChapter?.isNotEmpty == true &&
         chapter.attributes.chapter == manga.attributes!.lastChapter;
-
     final isOfficialPub = chapter.attributes.externalUrl != null;
-
-    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
-    bool? isRead;
-
-    if (loggedin) {
-      isRead = ref.watch(readChaptersProvider.select((value) => switch (value) {
-            AsyncValue(valueOrNull: final data?) =>
-              data[manga.id]?.contains(chapter.id) == true,
-            _ => null,
-          }));
-    }
 
     String title = chapter.getTitle();
 
-    const rowPadding = SizedBox(
-      width: 6.0,
-    );
-
     final pubtime = timeago.format(chapter.attributes.publishAt);
-
-    final flagChip = Text(
-      chapter.attributes.translatedLanguage.flag,
-      style: TextStyle(
-        fontFamily: 'Twemoji',
-        fontSize: screenSizeSmall ? 15 : 18,
-      ),
-    );
 
     final groups = chapter.getGroups();
     final groupChips = <Widget>[];
@@ -319,7 +349,7 @@ class ChapterButtonWidget extends ConsumerWidget {
           context.push('/group/${g.id}', extra: g);
         },
       ));
-      groupChips.add(rowPadding);
+      groupChips.add(_rowPadding);
     }
 
     if (groupChips.isEmpty) {
@@ -327,7 +357,7 @@ class ChapterButtonWidget extends ConsumerWidget {
         icon: Icon(Icons.group, size: iconSize),
         text: 'No Group',
       ));
-      groupChips.add(rowPadding);
+      groupChips.add(_rowPadding);
     }
 
     Widget userChip;
@@ -350,70 +380,6 @@ class ChapterButtonWidget extends ConsumerWidget {
       openIcon = Icon(Icons.open_in_new, size: iconSize);
     }
 
-    Widget? endChip;
-    if (isEndChapter) {
-      endChip = const IconTextChip(
-        color: Colors.blue,
-        text: 'END',
-      );
-    }
-
-    // Logged in components
-    Widget? markReadBtn;
-    Border? border;
-    TextStyle? textstyle;
-
-    if (!loggedin) {
-      border = Border(
-        left: BorderSide(color: tileColor, width: 4.0),
-      );
-
-      textstyle = TextStyle(
-        color: theme.colorScheme.primary,
-      );
-    } else {
-      border = Border(
-        left: BorderSide(
-            color: isRead == true ? tileColor : Colors.blue, width: 4.0),
-      );
-
-      textstyle = TextStyle(
-          color: (isRead == true
-              ? theme.highlightColor
-              : theme.colorScheme.primary));
-
-      markReadBtn = switch (isRead) {
-        null => const SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(),
-          ),
-        true || false => IconButton(
-            onPressed: () async {
-              bool set = !isRead!;
-              ref.read(readChaptersProvider.notifier).set(manga,
-                  read: set ? [chapter] : null,
-                  unread: !set ? [chapter] : null);
-            },
-            padding: const EdgeInsets.all(0.0),
-            splashRadius: 15,
-            iconSize: 20,
-            tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
-            icon: Icon(isRead == true ? Icons.visibility_off : Icons.visibility,
-                color: (isRead == true
-                    ? theme.highlightColor
-                    : theme.primaryIconTheme.color)),
-            constraints: const BoxConstraints(
-                minWidth: 20.0,
-                minHeight: 20.0,
-                maxWidth: 30.0,
-                maxHeight: 30.0),
-            visualDensity:
-                const VisualDensity(horizontal: -4.0, vertical: -4.0),
-          ),
-      };
-    }
-
     final vPadding =
         EdgeInsets.symmetric(vertical: (screenSizeSmall ? 2.0 : 4.0));
 
@@ -426,22 +392,52 @@ class ChapterButtonWidget extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(
               children: [
-                if (markReadBtn != null) ...[
-                  markReadBtn,
-                  const SizedBox(
-                    width: 10,
-                  )
-                ],
-                flagChip,
-                rowPadding,
-                if (openIcon != null) ...[openIcon, rowPadding],
-                Text(
-                  title,
-                  overflow: TextOverflow.ellipsis,
-                  style: textstyle,
+                MarkReadButton(
+                  key: ValueKey(chapter.id),
+                  chapter: chapter,
+                  manga: manga,
                 ),
-                rowPadding,
-                if (endChip != null) endChip,
+                CountryFlag(
+                  flag: chapter.attributes.translatedLanguage.flag,
+                  size: screenSizeSmall ? 15 : 18,
+                ),
+                _rowPadding,
+                if (openIcon != null) ...[openIcon, _rowPadding],
+                Consumer(
+                  builder: (context, ref, child) {
+                    final theme = Theme.of(context);
+                    final loggedin =
+                        ref.watch(authControlProvider).valueOrNull ?? false;
+
+                    TextStyle textstyle;
+
+                    if (!loggedin) {
+                      textstyle = TextStyle(
+                        color: theme.colorScheme.primary,
+                      );
+                    } else {
+                      bool? isRead = ref.watch(readChaptersProvider
+                          .select((value) => switch (value) {
+                                AsyncValue(valueOrNull: final data?) =>
+                                  data[manga.id]?.contains(chapter.id) == true,
+                                _ => null,
+                              }));
+
+                      textstyle = TextStyle(
+                          color: (isRead == true
+                              ? theme.highlightColor
+                              : theme.colorScheme.primary));
+                    }
+
+                    return Text(
+                      title,
+                      overflow: TextOverflow.ellipsis,
+                      style: textstyle,
+                    );
+                  },
+                ),
+                _rowPadding,
+                if (isEndChapter) _endChip,
                 if (!screenSizeSmall) const Spacer(),
                 if (!screenSizeSmall)
                   Text.rich(
@@ -514,16 +510,42 @@ class ChapterButtonWidget extends ConsumerWidget {
           ),
         );
       },
-      child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(4)),
-        clipBehavior: Clip.hardEdge,
-        child: Container(
-          decoration: BoxDecoration(
-            color: tileColor,
-            border: border,
-          ),
-          child: tile,
-        ),
+      child: Consumer(
+        child: tile,
+        builder: (context, ref, child) {
+          final theme = Theme.of(context);
+          final tileColor = theme.colorScheme.primaryContainer;
+          final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
+
+          Border border;
+
+          if (!loggedin) {
+            border = Border(
+              left: BorderSide(color: tileColor, width: 4.0),
+            );
+          } else {
+            bool? isRead = ref
+                .watch(readChaptersProvider.select((value) => switch (value) {
+                      AsyncValue(valueOrNull: final data?) =>
+                        data[manga.id]?.contains(chapter.id) == true,
+                      _ => null,
+                    }));
+
+            border = Border(
+              left: BorderSide(
+                  color: isRead == true ? tileColor : Colors.blue, width: 4.0),
+            );
+          }
+
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(4)),
+              color: tileColor,
+              border: border,
+            ),
+            child: child,
+          );
+        },
       ),
     );
   }
@@ -814,12 +836,9 @@ class _GridMangaItem extends HookWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: GridTileBar(
-              leading: Text(
-                manga.attributes!.originalLanguage.flag,
-                style: const TextStyle(
-                  fontFamily: 'Twemoji',
-                  fontSize: 18,
-                ),
+              leading: CountryFlag(
+                flag: manga.attributes!.originalLanguage.flag,
+                size: 18,
               ),
               title: Text(
                 manga.attributes!.title.get('en'),
@@ -868,12 +887,9 @@ class _GridMangaDetailedItem extends ConsumerWidget {
               onPressed: () async {
                 context.push('/title/${manga.id}', extra: manga);
               },
-              icon: Text(
-                manga.attributes!.originalLanguage.flag,
-                style: const TextStyle(
-                  fontFamily: 'Twemoji',
-                  fontSize: 18,
-                ),
+              icon: CountryFlag(
+                flag: manga.attributes!.originalLanguage.flag,
+                size: 18,
               ),
               label: Text(
                 manga.attributes!.title.get('en'),
@@ -1076,12 +1092,9 @@ class _ListMangaItem extends ConsumerWidget {
                     onPressed: () async {
                       context.push('/title/${manga.id}', extra: manga);
                     },
-                    icon: Text(
-                      manga.attributes!.originalLanguage.flag,
-                      style: const TextStyle(
-                        fontFamily: 'Twemoji',
-                        fontSize: 18,
-                      ),
+                    icon: CountryFlag(
+                      flag: manga.attributes!.originalLanguage.flag,
+                      size: 18,
                     ),
                     label: Text(manga.attributes!.title.get('en')),
                   ),
