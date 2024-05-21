@@ -426,38 +426,41 @@ class ChapterButtonWidget extends StatelessWidget {
                 ),
                 _rowPadding,
                 if (isOfficialPub) ...[iconSet['open']!, _rowPadding],
-                Consumer(
-                  builder: (context, ref, child) {
-                    final theme = Theme.of(context);
-                    final loggedin =
-                        ref.watch(authControlProvider).valueOrNull ?? false;
+                Expanded(
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final theme = Theme.of(context);
+                      final loggedin =
+                          ref.watch(authControlProvider).valueOrNull ?? false;
 
-                    TextStyle textstyle;
+                      TextStyle textstyle;
 
-                    if (!loggedin) {
-                      textstyle = TextStyle(
-                        color: theme.colorScheme.primary,
+                      if (!loggedin) {
+                        textstyle = TextStyle(
+                          color: theme.colorScheme.primary,
+                        );
+                      } else {
+                        bool? isRead = ref.watch(readChaptersProvider
+                            .select((value) => switch (value) {
+                                  AsyncValue(valueOrNull: final data?) =>
+                                    data[manga.id]?.contains(chapter.id) ==
+                                        true,
+                                  _ => null,
+                                }));
+
+                        textstyle = TextStyle(
+                            color: (isRead == true
+                                ? theme.highlightColor
+                                : theme.colorScheme.primary));
+                      }
+
+                      return Text(
+                        title,
+                        overflow: TextOverflow.ellipsis,
+                        style: textstyle,
                       );
-                    } else {
-                      bool? isRead = ref.watch(readChaptersProvider
-                          .select((value) => switch (value) {
-                                AsyncValue(valueOrNull: final data?) =>
-                                  data[manga.id]?.contains(chapter.id) == true,
-                                _ => null,
-                              }));
-
-                      textstyle = TextStyle(
-                          color: (isRead == true
-                              ? theme.highlightColor
-                              : theme.colorScheme.primary));
-                    }
-
-                    return Text(
-                      title,
-                      overflow: TextOverflow.ellipsis,
-                      style: textstyle,
-                    );
-                  },
+                    },
+                  ),
                 ),
                 _rowPadding,
                 if (isEndChapter) _endChip,
