@@ -808,26 +808,11 @@ class ProgressIndicator extends AnimatedWidget {
       secColor = (currentPage.value >= index ? color : Colors.transparent);
     }
 
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.zero,
-        margin: EdgeInsets.zero,
-        color: Colors.transparent,
-        alignment: Alignment.bottomCenter,
-        child: Material(
-          color: secColor,
-          type: MaterialType.canvas,
-          child: SizedBox(
-            height: _barHeight,
-            child: Tooltip(
-              message: (index + 1).toString(),
-              child: InkWell(
-                onTap: () => onPageSelected(index),
-              ),
-            ),
-          ),
-        ),
-      ),
+    return _ProgressBarSection(
+      color: secColor,
+      height: _barHeight,
+      tooltip: (index + 1).toString(),
+      onTap: () => onPageSelected(index),
     );
   }
 
@@ -836,11 +821,11 @@ class ProgressIndicator extends AnimatedWidget {
     final sections = List<Widget>.generate(itemCount, _buildSection);
 
     return Container(
-        padding: EdgeInsets.zero,
-        margin: EdgeInsets.zero,
-        height: 30.0,
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
+      padding: EdgeInsets.zero,
+      margin: EdgeInsets.zero,
+      height: 30.0,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           stops: [0.0, 0.6],
@@ -848,10 +833,51 @@ class ProgressIndicator extends AnimatedWidget {
             Color.fromARGB(255, 0, 0, 0),
             Colors.transparent,
           ],
-        )),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: reverse ? sections.reversed.toList() : sections,
-        ));
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: reverse ? sections.reversed.toList() : sections,
+      ),
+    );
+  }
+}
+
+class _ProgressBarSection extends StatelessWidget {
+  const _ProgressBarSection({
+    required this.color,
+    required this.height,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final Color color;
+  final double height;
+  final String tooltip;
+  final GestureTapCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+        color: Colors.transparent,
+        alignment: Alignment.bottomCenter,
+        child: Material(
+          color: color,
+          type: MaterialType.canvas,
+          child: SizedBox(
+            height: height,
+            child: Tooltip(
+              message: tooltip,
+              child: InkWell(
+                onTap: onTap,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

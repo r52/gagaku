@@ -826,7 +826,7 @@ class __$$ChapterImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
-  const _$ChapterImpl(
+  _$ChapterImpl(
       {required this.id,
       required this.attributes,
       required final List<Relationship> relationships})
@@ -895,11 +895,11 @@ class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
 }
 
 abstract class _Chapter extends Chapter {
-  const factory _Chapter(
+  factory _Chapter(
       {required final String id,
       required final ChapterAttributes attributes,
       required final List<Relationship> relationships}) = _$ChapterImpl;
-  const _Chapter._() : super._();
+  _Chapter._() : super._();
 
   factory _Chapter.fromJson(Map<String, dynamic> json) = _$ChapterImpl.fromJson;
 

@@ -15,7 +15,7 @@ Future<List<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   final api = ref.watch(mangadexProvider);
   final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
-  final mangaids = chapters.map((e) => e.getManga().id).toSet();
+  final mangaids = chapters.map((e) => e.manga.id).toSet();
 
   final mangas =
       await api.fetchManga(ids: mangaids, limit: MangaDexEndpoints.breakLimit);

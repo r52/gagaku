@@ -17,7 +17,7 @@ Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
   final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
-  final mangaIds = chapters.map((e) => e.getManga().id).toSet();
+  final mangaIds = chapters.map((e) => e.manga.id).toSet();
 
   final mangas =
       await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
@@ -29,7 +29,7 @@ Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
 
   // Craft feed items
   final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
-    final mid = chapter.getManga().id;
+    final mid = chapter.manga.id;
     if (mangaMap.containsKey(mid)) {
       ChapterFeedItemData? item;
       if (list.isNotEmpty && list.last.mangaId == mid) {

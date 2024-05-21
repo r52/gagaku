@@ -335,9 +335,9 @@ class ChapterList with _$ChapterList {
 
 @freezed
 class Chapter with _$Chapter, MangaDexUUID {
-  const Chapter._();
+  Chapter._();
 
-  const factory Chapter({
+  factory Chapter({
     required String id,
     required ChapterAttributes attributes,
     required List<Relationship> relationships,
@@ -346,7 +346,12 @@ class Chapter with _$Chapter, MangaDexUUID {
   factory Chapter.fromJson(Map<String, dynamic> json) =>
       _$ChapterFromJson(json);
 
-  String getTitle() {
+  late final title = _getTitle();
+  late final groups = _getGroups();
+  late final manga = _getManga();
+  late final uploadUser = _getUploadUser();
+
+  String _getTitle() {
     String title = '';
 
     if (attributes.chapter != null && attributes.chapter!.isNotEmpty) {
@@ -369,12 +374,12 @@ class Chapter with _$Chapter, MangaDexUUID {
     return title;
   }
 
-  Iterable<Group> getGroups() {
+  List<Group> _getGroups() {
     final groups = relationships.whereType<Group>();
-    return groups;
+    return groups.toList();
   }
 
-  Manga getManga() {
+  Manga _getManga() {
     final mangas = relationships.whereType<Manga>();
 
     if (mangas.isNotEmpty) {
@@ -384,7 +389,7 @@ class Chapter with _$Chapter, MangaDexUUID {
     throw Exception('Chapter $id has no associated manga');
   }
 
-  String getUploadUser() {
+  String _getUploadUser() {
     final user = relationships.whereType<User>();
 
     if (user.isNotEmpty) {
@@ -597,13 +602,13 @@ mixin MangaOps {
   List<Relationship>? get relationships;
   MangaRelations? get related;
 
-  late final List<CreatorType>? author = getAuthor();
-  late final List<CreatorType>? artist = getArtist();
-  late final longStrip = isLongStrip();
-  late final covers = getAllCoverArt();
-  late final relatedMangas = getRelatedManga();
+  late final List<CreatorType>? author = _getAuthor();
+  late final List<CreatorType>? artist = _getArtist();
+  late final longStrip = _isLongStrip();
+  late final covers = _getAllCoverArt();
+  late final relatedMangas = _getRelatedManga();
 
-  List<CoverArtUrl> getAllCoverArt() {
+  List<CoverArtUrl> _getAllCoverArt() {
     final coverRelations = <CoverArtAttributes>[];
 
     if (relationships != null) {
@@ -652,7 +657,7 @@ mixin MangaOps {
         .quality(quality: quality);
   }
 
-  List<CreatorType>? getAuthor() {
+  List<CreatorType>? _getAuthor() {
     final authorRs = relationships?.whereType<Author>();
 
     if (authorRs != null && authorRs.isNotEmpty) {
@@ -662,7 +667,7 @@ mixin MangaOps {
     return null;
   }
 
-  List<CreatorType>? getArtist() {
+  List<CreatorType>? _getArtist() {
     final artistRs = relationships?.whereType<Artist>();
 
     if (artistRs != null && artistRs.isNotEmpty) {
@@ -672,7 +677,7 @@ mixin MangaOps {
     return null;
   }
 
-  bool isLongStrip() {
+  bool _isLongStrip() {
     if (attributes == null) {
       return false;
     }
@@ -686,7 +691,7 @@ mixin MangaOps {
     return lstag;
   }
 
-  List<Manga> getRelatedManga() {
+  List<Manga> _getRelatedManga() {
     final mangaRs = relationships?.whereType<Manga>();
 
     if (mangaRs != null && mangaRs.isNotEmpty) {

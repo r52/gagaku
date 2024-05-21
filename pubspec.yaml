@@ -43,7 +43,7 @@ dependencies:
   hive_flutter: ^1.1.0
   hooks_riverpod: ^3.0.0-dev.3
   http: ^1.2.0
-  json_annotation: ^4.8.1
+  json_annotation: ^4.9.0
   openid_client:
     git:
       url: https://github.com/r52/openid_client.git

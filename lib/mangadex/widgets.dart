@@ -33,6 +33,37 @@ const _endChip = IconTextChip(
   text: 'END',
 );
 
+const _groupIconB = Icon(Icons.group, size: 20.0);
+const _groupIconS = Icon(Icons.group, size: 15.0);
+const _circleIconB = Icon(Icons.add_circle, size: 20.0);
+const _circleIconS = Icon(Icons.add_circle, size: 15.0);
+const _personIconB = Icon(Icons.person, size: 20.0);
+const _personIconS = Icon(Icons.person, size: 15.0);
+const _checkIconB = Icon(Icons.check, color: Colors.amber, size: 20.0);
+const _checkIconS = Icon(Icons.check, color: Colors.amber, size: 15.0);
+const _openIconB = Icon(Icons.open_in_new, size: 20.0);
+const _openIconS = Icon(Icons.open_in_new, size: 15.0);
+const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
+const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
+
+const _iconSetB = {
+  'group': _groupIconB,
+  'circle': _circleIconB,
+  'person': _personIconB,
+  'check': _checkIconB,
+  'open': _openIconB,
+  'schedule': _scheduleIconB,
+};
+
+const _iconSetS = {
+  'group': _groupIconS,
+  'circle': _circleIconS,
+  'person': _personIconS,
+  'check': _checkIconS,
+  'open': _openIconS,
+  'schedule': _scheduleIconS,
+};
+
 class MarkReadButton extends ConsumerWidget {
   const MarkReadButton({super.key, required this.chapter, required this.manga});
 
@@ -326,24 +357,22 @@ class ChapterButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final iconSize = screenSizeSmall ? 15.0 : 20.0;
+    final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
 
     final isEndChapter = manga.attributes!.lastChapter != null &&
         manga.attributes!.lastChapter?.isNotEmpty == true &&
         chapter.attributes.chapter == manga.attributes!.lastChapter;
     final isOfficialPub = chapter.attributes.externalUrl != null;
 
-    String title = chapter.getTitle();
+    String title = chapter.title;
 
     final pubtime = timeago.format(chapter.attributes.publishAt);
 
-    final groups = chapter.getGroups();
     final groupChips = <Widget>[];
 
-    for (final g in groups) {
+    for (final g in chapter.groups) {
       groupChips.add(IconTextChip(
-        icon: Icon(isOfficialPub ? Icons.add_circle : Icons.group,
-            size: iconSize),
+        icon: isOfficialPub ? iconSet['circle'] : iconSet['group'],
         text: g.attributes.name.crop(),
         onPressed: () {
           context.push('/group/${g.id}', extra: g);
@@ -354,7 +383,7 @@ class ChapterButtonWidget extends StatelessWidget {
 
     if (groupChips.isEmpty) {
       groupChips.add(IconTextChip(
-        icon: Icon(Icons.group, size: iconSize),
+        icon: iconSet['group'],
         text: 'No Group',
       ));
       groupChips.add(_rowPadding);
@@ -364,20 +393,14 @@ class ChapterButtonWidget extends StatelessWidget {
 
     if (isOfficialPub) {
       userChip = IconTextChip(
-        icon: Icon(Icons.check, color: Colors.amber, size: iconSize),
+        icon: iconSet['check'],
         text: 'Official Publisher',
       );
     } else {
       userChip = IconTextChip(
-        icon: Icon(Icons.person, size: iconSize),
-        text: chapter.getUploadUser().crop(),
+        icon: iconSet['person'],
+        text: chapter.uploadUser.crop(),
       );
-    }
-
-    Widget? openIcon;
-
-    if (isOfficialPub) {
-      openIcon = Icon(Icons.open_in_new, size: iconSize);
     }
 
     final vPadding =
@@ -402,7 +425,7 @@ class ChapterButtonWidget extends StatelessWidget {
                   size: screenSizeSmall ? 15 : 18,
                 ),
                 _rowPadding,
-                if (openIcon != null) ...[openIcon, _rowPadding],
+                if (isOfficialPub) ...[iconSet['open']!, _rowPadding],
                 Consumer(
                   builder: (context, ref, child) {
                     final theme = Theme.of(context);
@@ -444,9 +467,9 @@ class ChapterButtonWidget extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     TextSpan(
                       children: [
-                        const WidgetSpan(
+                        WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
-                            child: Icon(Icons.schedule, size: 20)),
+                            child: iconSet['schedule']!),
                         TextSpan(text: ' $pubtime'),
                       ],
                     ),
@@ -484,9 +507,9 @@ class ChapterButtonWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   TextSpan(
                     children: [
-                      const WidgetSpan(
+                      WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
-                          child: Icon(Icons.schedule, size: 15)),
+                          child: iconSet['schedule']!),
                       TextSpan(text: ' $pubtime'),
                     ],
                   ),
