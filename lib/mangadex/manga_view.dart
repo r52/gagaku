@@ -220,7 +220,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
           return notification.depth == 1;
         },
         child: NestedScrollView(
-          scrollBehavior: MouseTouchScrollBehavior(),
+          scrollBehavior: const MouseTouchScrollBehavior(),
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
@@ -399,58 +399,54 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   text: statsError,
                                 )
                               ],
-                            AsyncValue(valueOrNull: final stats?) => () {
-                                if (stats.containsKey(manga.id)) {
-                                  return [
-                                    IconTextChip(
-                                      icon: const Icon(
-                                        Icons.star_border,
-                                        color: Colors.amber,
-                                        size: 18,
-                                        shadows: [
-                                          Shadow(
-                                            offset: Offset(1.0, 1.0),
-                                          ),
-                                        ],
+                            AsyncValue(valueOrNull: final stats?)
+                                when stats.containsKey(manga.id) =>
+                              [
+                                IconTextChip(
+                                  icon: const Icon(
+                                    Icons.star_border,
+                                    color: Colors.amber,
+                                    size: 18,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(1.0, 1.0),
                                       ),
-                                      text: stats[manga.id]
-                                              ?.rating
-                                              .bayesian
-                                              .toStringAsFixed(2) ??
-                                          statsError,
-                                      style: const TextStyle(
-                                        color: Colors.amber,
-                                        shadows: [
-                                          Shadow(
-                                            offset: Offset(1.0, 1.0),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                    IconTextChip(
-                                      icon: const Icon(
-                                        Icons.bookmark_outline,
-                                        size: 18,
-                                      ),
-                                      text:
-                                          stats[manga.id]?.follows.toString() ??
-                                              statsError,
-                                    ),
-                                  ];
-                                }
-
-                                return [
-                                  const SizedBox(
-                                    width: 10,
+                                    ],
                                   ),
-                                  const IconTextChip(
-                                    text: statsError,
-                                  )
-                                ];
-                              }(),
+                                  text: stats[manga.id]
+                                          ?.rating
+                                          .bayesian
+                                          .toStringAsFixed(2) ??
+                                      statsError,
+                                  style: const TextStyle(
+                                    color: Colors.amber,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(1.0, 1.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                IconTextChip(
+                                  icon: const Icon(
+                                    Icons.bookmark_outline,
+                                    size: 18,
+                                  ),
+                                  text: stats[manga.id]?.follows.toString() ??
+                                      statsError,
+                                ),
+                              ],
+                            AsyncValue(valueOrNull: final _?) => [
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                const IconTextChip(
+                                  text: statsError,
+                                )
+                              ],
                             _ => [
                                 const SizedBox(
                                   width: 10,
@@ -1010,7 +1006,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                   extendBodyBehindAppBar: true,
                                                   body: PageView.builder(
                                                     scrollBehavior:
-                                                        MouseTouchScrollBehavior(),
+                                                        const MouseTouchScrollBehavior(),
                                                     findChildIndexCallback:
                                                         (key) {
                                                       final valueKey = key

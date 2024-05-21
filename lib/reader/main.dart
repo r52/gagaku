@@ -721,7 +721,7 @@ class ReaderWidget extends HookConsumerWidget {
                       currentImageScale.value != PhotoViewScaleState.initial)
                   ? const NeverScrollableScrollPhysics()
                   : null,
-              scrollBehavior: MouseTouchScrollBehavior(),
+              scrollBehavior: const MouseTouchScrollBehavior(),
               controller: pageController,
               itemCount: pageCount,
               onPageChanged: (int index) {

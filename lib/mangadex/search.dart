@@ -172,36 +172,30 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                     child: Styles.errorColumn(error, stackTrace),
                   );
                 }(),
-              AsyncValue(valueOrNull: final results?) => () {
-                  if (results.isNotEmpty) {
-                    return MangaListViewSliver(
-                      items: results,
-                      selectMode: selectMode,
-                      selectButton: (manga) {
-                        if (selected.value.contains(manga.id)) {
-                          return const Icon(Icons.remove);
-                        }
+              AsyncValue(valueOrNull: final results?) when results.isNotEmpty =>
+                MangaListViewSliver(
+                  items: results,
+                  selectMode: selectMode,
+                  selectButton: (manga) {
+                    if (selected.value.contains(manga.id)) {
+                      return const Icon(Icons.remove);
+                    }
 
-                        return const Icon(Icons.add);
-                      },
-                      onSelected: (manga) {
-                        if (selected.value.contains(manga.id)) {
-                          selected.value = {
-                            ...selected.value..remove(manga.id)
-                          };
-                        } else {
-                          selected.value = {...selected.value..add(manga.id)};
-                        }
-                      },
-                    );
-                  }
-
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                      child: Text("No results!"),
-                    ),
-                  );
-                }(),
+                    return const Icon(Icons.add);
+                  },
+                  onSelected: (manga) {
+                    if (selected.value.contains(manga.id)) {
+                      selected.value = {...selected.value..remove(manga.id)};
+                    } else {
+                      selected.value = {...selected.value..add(manga.id)};
+                    }
+                  },
+                ),
+              AsyncValue(valueOrNull: final _?) => const SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("No results!"),
+                  ),
+                ),
               _ => const SliverToBoxAdapter(
                   child: Center(
                     child: CircularProgressIndicator(),
@@ -271,6 +265,41 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
 
     final selectedChipColor = theme.colorScheme.tertiaryContainer;
 
+    final selectedFilters = [
+      ...fil.value.includedTags.map(
+        (e) => InputChip(
+          label: Text(e.attributes.name.get('en')),
+          showCheckmark: true,
+          selected: true,
+          onDeleted: () {
+            fil.value = fil.value.copyWith(
+              includedTags: fil.value.includedTags
+                  .where((element) => element != e)
+                  .toSet(),
+            );
+          },
+          selectedColor: selectedChipColor,
+        ),
+      ),
+      ...fil.value.excludedTags.map(
+        (e) => InputChip(
+          label: Text(e.attributes.name.get('en')),
+          avatar: Icon(
+            Icons.remove,
+            color: theme.colorScheme.primary,
+          ),
+          onDeleted: () {
+            fil.value = fil.value.copyWith(
+              excludedTags: fil.value.excludedTags
+                  .where((element) => element != e)
+                  .toSet(),
+            );
+          },
+          side: BorderSide(color: selectedChipColor),
+        ),
+      )
+    ];
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -314,277 +343,231 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
         ],
       ),
       body: switch (tagsProvider) {
-        AsyncValue(valueOrNull: final tags?) => () {
-            final selectedFilters = [
-              ...fil.value.includedTags.map(
-                (e) => InputChip(
-                  label: Text(e.attributes.name.get('en')),
-                  showCheckmark: true,
-                  selected: true,
-                  onDeleted: () {
-                    fil.value = fil.value.copyWith(
-                      includedTags: fil.value.includedTags
-                          .where((element) => element != e)
-                          .toSet(),
-                    );
-                  },
-                  selectedColor: selectedChipColor,
+        AsyncValue(valueOrNull: final tags?) => SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    'Selected Tag Filters',
+                    style: headingStyle,
+                  ),
                 ),
-              ),
-              ...fil.value.excludedTags.map(
-                (e) => InputChip(
-                  label: Text(e.attributes.name.get('en')),
-                  avatar: Icon(
-                    Icons.remove,
-                    color: theme.colorScheme.primary,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Wrap(
+                    spacing: 4.0,
+                    runSpacing: 4.0,
+                    children: selectedFilters.isNotEmpty
+                        ? selectedFilters
+                        : [const InputChip(label: Text('None'))],
                   ),
-                  onDeleted: () {
-                    fil.value = fil.value.copyWith(
-                      excludedTags: fil.value.excludedTags
-                          .where((element) => element != e)
-                          .toSet(),
-                    );
-                  },
-                  side: BorderSide(color: selectedChipColor),
                 ),
-              )
-            ];
+                const Divider(),
 
-            return SafeArea(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
-                      'Selected Tag Filters',
-                      style: headingStyle,
-                    ),
+                /// ContentRating
+                ..._buildSection(
+                  header: const Text(
+                    'Content Rating',
+                    style: headingStyle,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: selectedFilters.isNotEmpty
-                          ? selectedFilters
-                          : [const InputChip(label: Text('None'))],
-                    ),
-                  ),
-                  const Divider(),
+                  children: ContentRating.values
+                      .map(
+                        (e) => FilterChip(
+                          label: Text(e.label),
+                          selectedColor: selectedChipColor,
+                          selected: fil.value.contentRating.contains(e),
+                          onSelected: (bool value) {
+                            if (value) {
+                              fil.value = fil.value.copyWith(
+                                contentRating: {...fil.value.contentRating, e},
+                              );
+                            } else {
+                              fil.value = fil.value.copyWith(
+                                contentRating: fil.value.contentRating
+                                    .where((element) => element != e)
+                                    .toSet(),
+                              );
+                            }
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
 
-                  /// ContentRating
-                  ..._buildSection(
-                    header: const Text(
-                      'Content Rating',
-                      style: headingStyle,
-                    ),
-                    children: ContentRating.values
-                        .map(
-                          (e) => FilterChip(
+                /// Demographic
+                ..._buildSection(
+                  header: const Text(
+                    'Demographic',
+                    style: headingStyle,
+                  ),
+                  children: MangaDemographic.values
+                      .map((e) => FilterChip(
                             label: Text(e.label),
                             selectedColor: selectedChipColor,
-                            selected: fil.value.contentRating.contains(e),
+                            selected:
+                                fil.value.publicationDemographic.contains(e),
                             onSelected: (bool value) {
                               if (value) {
                                 fil.value = fil.value.copyWith(
-                                  contentRating: {
-                                    ...fil.value.contentRating,
+                                  publicationDemographic: {
+                                    ...fil.value.publicationDemographic,
                                     e
                                   },
                                 );
                               } else {
                                 fil.value = fil.value.copyWith(
-                                  contentRating: fil.value.contentRating
+                                  publicationDemographic: fil
+                                      .value.publicationDemographic
                                       .where((element) => element != e)
                                       .toSet(),
                                 );
                               }
                             },
-                          ),
-                        )
-                        .toList(),
-                  ),
+                          ))
+                      .toList(),
+                ),
 
-                  /// Demographic
+                /// Pub status
+                ..._buildSection(
+                  header: const Text(
+                    'Publication Status',
+                    style: headingStyle,
+                  ),
+                  children: MangaStatus.values
+                      .map(
+                        (e) => FilterChip(
+                          label: Text(e.label),
+                          selectedColor: selectedChipColor,
+                          selected: fil.value.status.contains(e),
+                          onSelected: (bool value) {
+                            if (value) {
+                              fil.value = fil.value.copyWith(
+                                status: {...fil.value.status, e},
+                              );
+                            } else {
+                              fil.value = fil.value.copyWith(
+                                status: fil.value.status
+                                    .where((element) => element != e)
+                                    .toSet(),
+                              );
+                            }
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
+                const Divider(),
+
+                /// Tags
+                for (final group in TagGroup.values) ...[
                   ..._buildSection(
-                    header: const Text(
-                      'Demographic',
+                    header: Text(
+                      group.label,
                       style: headingStyle,
                     ),
-                    children: MangaDemographic.values
-                        .map((e) => FilterChip(
-                              label: Text(e.label),
-                              selectedColor: selectedChipColor,
-                              selected:
-                                  fil.value.publicationDemographic.contains(e),
-                              onSelected: (bool value) {
-                                if (value) {
+                    children: tags
+                        .where((element) => element.attributes.group == group)
+                        .map(
+                          (e) => TriStateChip(
+                            label: Text(e.attributes.name.get('en')),
+                            selectedColor: selectedChipColor,
+                            onChanged: (bool? value) {
+                              switch (value) {
+                                case null:
                                   fil.value = fil.value.copyWith(
-                                    publicationDemographic: {
-                                      ...fil.value.publicationDemographic,
-                                      e
-                                    },
-                                  );
-                                } else {
-                                  fil.value = fil.value.copyWith(
-                                    publicationDemographic: fil
-                                        .value.publicationDemographic
+                                    includedTags: fil.value.includedTags
+                                        .where((element) => element != e)
+                                        .toSet(),
+                                    excludedTags: fil.value.excludedTags
                                         .where((element) => element != e)
                                         .toSet(),
                                   );
-                                }
-                              },
-                            ))
-                        .toList(),
-                  ),
-
-                  /// Pub status
-                  ..._buildSection(
-                    header: const Text(
-                      'Publication Status',
-                      style: headingStyle,
-                    ),
-                    children: MangaStatus.values
-                        .map(
-                          (e) => FilterChip(
-                            label: Text(e.label),
-                            selectedColor: selectedChipColor,
-                            selected: fil.value.status.contains(e),
-                            onSelected: (bool value) {
-                              if (value) {
-                                fil.value = fil.value.copyWith(
-                                  status: {...fil.value.status, e},
-                                );
-                              } else {
-                                fil.value = fil.value.copyWith(
-                                  status: fil.value.status
-                                      .where((element) => element != e)
-                                      .toSet(),
-                                );
+                                  break;
+                                case true:
+                                  fil.value = fil.value.copyWith(
+                                    includedTags: {
+                                      ...fil.value.includedTags,
+                                      e
+                                    },
+                                    excludedTags: fil.value.excludedTags
+                                        .where((element) => element != e)
+                                        .toSet(),
+                                  );
+                                  break;
+                                case false:
+                                  fil.value = fil.value.copyWith(
+                                    includedTags: fil.value.includedTags
+                                        .where((element) => element != e)
+                                        .toSet(),
+                                    excludedTags: {
+                                      ...fil.value.excludedTags,
+                                      e
+                                    },
+                                  );
+                                  break;
                               }
                             },
+                            value: fil.value.includedTags.contains(e)
+                                ? true
+                                : (fil.value.excludedTags.contains(e)
+                                    ? false
+                                    : null),
                           ),
                         )
                         .toList(),
                   ),
-                  const Divider(),
+                ],
 
-                  /// Tags
-                  for (final group in TagGroup.values) ...[
-                    ..._buildSection(
-                      header: Text(
-                        group.label,
-                        style: headingStyle,
-                      ),
-                      children: tags
-                          .where((element) => element.attributes.group == group)
-                          .map(
-                            (e) => TriStateChip(
-                              label: Text(e.attributes.name.get('en')),
-                              selectedColor: selectedChipColor,
-                              onChanged: (bool? value) {
-                                switch (value) {
-                                  case null:
-                                    fil.value = fil.value.copyWith(
-                                      includedTags: fil.value.includedTags
-                                          .where((element) => element != e)
-                                          .toSet(),
-                                      excludedTags: fil.value.excludedTags
-                                          .where((element) => element != e)
-                                          .toSet(),
-                                    );
-                                    break;
-                                  case true:
-                                    fil.value = fil.value.copyWith(
-                                      includedTags: {
-                                        ...fil.value.includedTags,
-                                        e
-                                      },
-                                      excludedTags: fil.value.excludedTags
-                                          .where((element) => element != e)
-                                          .toSet(),
-                                    );
-                                    break;
-                                  case false:
-                                    fil.value = fil.value.copyWith(
-                                      includedTags: fil.value.includedTags
-                                          .where((element) => element != e)
-                                          .toSet(),
-                                      excludedTags: {
-                                        ...fil.value.excludedTags,
-                                        e
-                                      },
-                                    );
-                                    break;
-                                }
-                              },
-                              value: () {
-                                if (fil.value.includedTags.contains(e)) {
-                                  return true;
-                                }
-
-                                if (fil.value.excludedTags.contains(e)) {
-                                  return false;
-                                }
-
-                                return null;
-                              }(),
-                            ),
-                          )
-                          .toList(),
+                // Modes
+                ..._buildSection(
+                  header: const Text(
+                    'Other Options',
+                    style: headingStyle,
+                  ),
+                  children: [
+                    DropdownMenu<TagMode>(
+                      label: const Text('Inclusion Mode'),
+                      initialSelection: fil.value.includedTagsMode,
+                      requestFocusOnTap: false,
+                      enableSearch: false,
+                      enableFilter: false,
+                      dropdownMenuEntries: [
+                        for (final mode in TagMode.values)
+                          DropdownMenuEntry(value: mode, label: mode.label),
+                      ],
+                      onSelected: (value) {
+                        if (value != null) {
+                          fil.value = fil.value.copyWith(
+                            includedTagsMode: value,
+                          );
+                        }
+                      },
+                    ),
+                    DropdownMenu<TagMode>(
+                      label: const Text('Exclusion Mode'),
+                      initialSelection: fil.value.excludedTagsMode,
+                      requestFocusOnTap: false,
+                      enableSearch: false,
+                      enableFilter: false,
+                      dropdownMenuEntries: [
+                        for (final mode in TagMode.values)
+                          DropdownMenuEntry(value: mode, label: mode.label),
+                      ],
+                      onSelected: (value) {
+                        if (value != null) {
+                          fil.value = fil.value.copyWith(
+                            excludedTagsMode: value,
+                          );
+                        }
+                      },
                     ),
                   ],
-
-                  // Modes
-                  ..._buildSection(
-                    header: const Text(
-                      'Other Options',
-                      style: headingStyle,
-                    ),
-                    children: [
-                      DropdownMenu<TagMode>(
-                        label: const Text('Inclusion Mode'),
-                        initialSelection: fil.value.includedTagsMode,
-                        requestFocusOnTap: false,
-                        enableSearch: false,
-                        enableFilter: false,
-                        dropdownMenuEntries: [
-                          for (final mode in TagMode.values)
-                            DropdownMenuEntry(value: mode, label: mode.label),
-                        ],
-                        onSelected: (value) {
-                          if (value != null) {
-                            fil.value = fil.value.copyWith(
-                              includedTagsMode: value,
-                            );
-                          }
-                        },
-                      ),
-                      DropdownMenu<TagMode>(
-                        label: const Text('Exclusion Mode'),
-                        initialSelection: fil.value.excludedTagsMode,
-                        requestFocusOnTap: false,
-                        enableSearch: false,
-                        enableFilter: false,
-                        dropdownMenuEntries: [
-                          for (final mode in TagMode.values)
-                            DropdownMenuEntry(value: mode, label: mode.label),
-                        ],
-                        onSelected: (value) {
-                          if (value != null) {
-                            fil.value = fil.value.copyWith(
-                              excludedTagsMode: value,
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          }(),
+                ),
+              ],
+            ),
+          ),
         AsyncValue(:final error?, :final stackTrace?) => () {
             final messenger = ScaffoldMessenger.of(context);
             Styles.showErrorSnackBar(messenger, '$error');

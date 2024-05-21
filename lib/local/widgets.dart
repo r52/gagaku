@@ -26,7 +26,7 @@ class LibraryListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
-      scrollBehavior: MouseTouchScrollBehavior(),
+      scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
       slivers: [
         ...leading,

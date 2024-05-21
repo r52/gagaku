@@ -107,125 +107,125 @@ class MangaDexListsView extends HookConsumerWidget {
                       child: Styles.errorList(error, stackTrace),
                     );
                   }(),
-                AsyncValue(valueOrNull: final lists?) => () {
-                    if (lists.isEmpty) {
-                      return const Text('No lists!');
-                    }
+                AsyncValue(valueOrNull: final lists?) => RefreshIndicator(
+                    onRefresh: () {
+                      ref.read(userListsProvider.notifier).clear();
+                      return ref.refresh(userListsProvider.future);
+                    },
+                    child: ScrollConfiguration(
+                      behavior: const MouseTouchScrollBehavior(),
+                      child: lists.isEmpty
+                          ? const Text('No lists!')
+                          : ListView.builder(
+                              controller: controller,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(6),
+                              itemCount: lists.length,
+                              findChildIndexCallback: (key) {
+                                final valueKey = key as ValueKey<String>;
+                                final val = lists.indexWhere((i) =>
+                                    i.get<CustomList>().id == valueKey.value);
+                                return val >= 0 ? val : null;
+                              },
+                              itemBuilder: (BuildContext context, int index) {
+                                final messenger = ScaffoldMessenger.of(context);
+                                final listref = lists.elementAt(index);
+                                final item = listref.get<CustomList>();
 
-                    return RefreshIndicator(
-                      onRefresh: () {
-                        ref.read(userListsProvider.notifier).clear();
-                        return ref.refresh(userListsProvider.future);
-                      },
-                      child: ScrollConfiguration(
-                        behavior: MouseTouchScrollBehavior(),
-                        child: ListView.builder(
-                          controller: controller,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(6),
-                          itemCount: lists.length,
-                          findChildIndexCallback: (key) {
-                            final valueKey = key as ValueKey<String>;
-                            final val = lists.indexWhere((i) =>
-                                i.get<CustomList>().id == valueKey.value);
-                            return val >= 0 ? val : null;
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            final messenger = ScaffoldMessenger.of(context);
-                            final listref = lists.elementAt(index);
-                            final item = listref.get<CustomList>();
-
-                            return Card(
-                              key: ValueKey(item.id),
-                              child: ListTile(
-                                leading: Tooltip(
-                                    message: item.attributes.visibility.name
-                                        .capitalize(),
-                                    child: Icon(
-                                      Icons.circle,
-                                      size: 16.0,
-                                      color: item.attributes.visibility ==
-                                              CustomListVisibility.private
-                                          ? Colors.red
-                                          : Colors.green,
-                                    )),
-                                title: Text(item.attributes.name),
-                                subtitle: Text('${item.set.length} items'),
-                                trailing: MenuAnchor(
-                                  builder: (context, controller, child) =>
-                                      IconButton(
-                                    onPressed: () {
-                                      if (controller.isOpen) {
-                                        controller.close();
-                                      } else {
-                                        controller.open();
-                                      }
-                                    },
-                                    icon: const Icon(Icons.more_vert),
-                                  ),
-                                  menuChildren: [
-                                    // TODO follow
-                                    MenuItemButton(
-                                      onPressed: () async {
-                                        final result =
-                                            await showDeleteListDialog(
-                                                context, item.attributes.name);
-                                        if (result == true) {
-                                          ref
-                                              .read(userListsProvider.notifier)
-                                              .deleteList(listref)
-                                              .then((success) {
-                                            if (success == true) {
-                                              messenger
-                                                ..removeCurrentSnackBar()
-                                                ..showSnackBar(
-                                                  const SnackBar(
-                                                    content:
-                                                        Text('List deleted.'),
-                                                    backgroundColor:
-                                                        Colors.green,
-                                                  ),
-                                                );
-                                            } else {
-                                              messenger
-                                                ..removeCurrentSnackBar()
-                                                ..showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                        'Failed to delete list.'),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
+                                return Card(
+                                  key: ValueKey(item.id),
+                                  child: ListTile(
+                                    leading: Tooltip(
+                                        message: item.attributes.visibility.name
+                                            .capitalize(),
+                                        child: Icon(
+                                          Icons.circle,
+                                          size: 16.0,
+                                          color: item.attributes.visibility ==
+                                                  CustomListVisibility.private
+                                              ? Colors.red
+                                              : Colors.green,
+                                        )),
+                                    title: Text(item.attributes.name),
+                                    subtitle: Text('${item.set.length} items'),
+                                    trailing: MenuAnchor(
+                                      builder: (context, controller, child) =>
+                                          IconButton(
+                                        onPressed: () {
+                                          if (controller.isOpen) {
+                                            controller.close();
+                                          } else {
+                                            controller.open();
+                                          }
+                                        },
+                                        icon: const Icon(Icons.more_vert),
+                                      ),
+                                      menuChildren: [
+                                        // TODO follow
+                                        MenuItemButton(
+                                          onPressed: () async {
+                                            final result =
+                                                await showDeleteListDialog(
+                                                    context,
+                                                    item.attributes.name);
+                                            if (result == true) {
+                                              ref
+                                                  .read(userListsProvider
+                                                      .notifier)
+                                                  .deleteList(listref)
+                                                  .then((success) {
+                                                if (success == true) {
+                                                  messenger
+                                                    ..removeCurrentSnackBar()
+                                                    ..showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'List deleted.'),
+                                                        backgroundColor:
+                                                            Colors.green,
+                                                      ),
+                                                    );
+                                                } else {
+                                                  messenger
+                                                    ..removeCurrentSnackBar()
+                                                    ..showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Failed to delete list.'),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                    );
+                                                }
+                                              });
                                             }
-                                          });
-                                        }
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                      ),
+                                          },
+                                          child: const Text(
+                                            'Delete',
+                                          ),
+                                        ),
+                                        MenuItemButton(
+                                          onPressed: () {
+                                            context.push(
+                                                '/list/edit/${item.id}',
+                                                extra: listref);
+                                          },
+                                          child: const Text(
+                                            'Edit',
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    MenuItemButton(
-                                      onPressed: () {
-                                        context.push('/list/edit/${item.id}',
-                                            extra: listref);
-                                      },
-                                      child: const Text(
-                                        'Edit',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  context.push('/list/${item.id}',
-                                      extra: listref);
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  }(),
+                                    onTap: () {
+                                      context.push('/list/${item.id}',
+                                          extra: listref);
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ),
                 _ => const Stack(
                     children: Styles.loadingOverlay,
                   ),

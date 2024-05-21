@@ -146,7 +146,7 @@ class WebMangaViewWidget extends StatelessWidget {
         .sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
 
     return CustomScrollView(
-      scrollBehavior: MouseTouchScrollBehavior(),
+      scrollBehavior: const MouseTouchScrollBehavior(),
       slivers: <Widget>[
         SliverAppBar(
           pinned: true,

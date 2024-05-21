@@ -131,124 +131,123 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                 child: Styles.errorList(error, stackTrace),
               );
             }(),
-          AsyncValue(valueOrNull: final mangas?) => () {
-              if (mangas.isEmpty) {
-                return const Text('No manga!');
-              }
-
-              return RefreshIndicator(
-                onRefresh: () {
-                  ref.read(creatorTitlesProvider(creator).notifier).clear();
-                  return ref
-                      .refresh(_fetchCreatorTitlesProvider(creator).future);
-                },
-                child: MangaListWidget(
-                  leading: [
-                    SliverAppBar(
-                      pinned: true,
-                      snap: false,
-                      floating: false,
-                      leading: BackButton(
-                        onPressed: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go('/');
-                          }
-                        },
-                      ),
-                      flexibleSpace: GestureDetector(
-                        onTap: () {
-                          scrollController.animateTo(0.0,
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeInOut);
-                        },
-                        child: Styles.titleFlexBar(
-                            context: context, title: creator.attributes.name),
-                      ),
-                    ),
-                    if (creator.attributes.biography.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: ExpansionTile(
-                          title: const Text('Biography'),
-                          children: [
-                            for (final MapEntry(key: prop, value: desc)
-                                in creator.attributes.biography.entries)
-                              ExpansionTile(
-                                title: Text(prop),
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(8),
-                                    color: theme
-                                        .colorScheme.surfaceContainerHighest,
-                                    child: MarkdownBody(
-                                      data: desc,
-                                      onTapLink: (text, url, title) async {
-                                        if (url != null) {
-                                          if (!await launchUrl(
-                                              Uri.parse(url))) {
-                                            throw 'Could not launch $url';
-                                          }
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              )
-                          ],
+          AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
+              onRefresh: () {
+                ref.read(creatorTitlesProvider(creator).notifier).clear();
+                return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
+              },
+              child: mangas.isEmpty
+                  ? const Text('No manga!')
+                  : MangaListWidget(
+                      leading: [
+                        SliverAppBar(
+                          pinned: true,
+                          snap: false,
+                          floating: false,
+                          leading: BackButton(
+                            onPressed: () {
+                              if (context.canPop()) {
+                                context.pop();
+                              } else {
+                                context.go('/');
+                              }
+                            },
+                          ),
+                          flexibleSpace: GestureDetector(
+                            onTap: () {
+                              scrollController.animateTo(0.0,
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeInOut);
+                            },
+                            child: Styles.titleFlexBar(
+                                context: context,
+                                title: creator.attributes.name),
+                          ),
                         ),
-                      ),
-                    if (creator.attributes.twitter != null ||
-                        creator.attributes.pixiv != null ||
-                        creator.attributes.youtube != null ||
-                        creator.attributes.website != null)
-                      SliverToBoxAdapter(
-                        child: ExpansionTile(
-                          expandedAlignment: Alignment.centerLeft,
-                          title: const Text('Follow'),
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              color: theme.colorScheme.surface,
-                              child: Wrap(
-                                spacing: 4.0,
-                                runSpacing: 4.0,
-                                children: [
-                                  if (creator.attributes.twitter != null)
-                                    createLinkChip(
-                                        creator.attributes.twitter!, 'Twitter'),
-                                  if (creator.attributes.pixiv != null)
-                                    createLinkChip(
-                                        creator.attributes.pixiv!, 'Pixiv'),
-                                  if (creator.attributes.youtube != null)
-                                    createLinkChip(
-                                        creator.attributes.youtube!, 'Youtube'),
-                                  if (creator.attributes.website != null)
-                                    createLinkChip(
-                                        creator.attributes.website!, 'website'),
-                                ],
-                              ),
+                        if (creator.attributes.biography.isNotEmpty)
+                          SliverToBoxAdapter(
+                            child: ExpansionTile(
+                              title: const Text('Biography'),
+                              children: [
+                                for (final MapEntry(key: prop, value: desc)
+                                    in creator.attributes.biography.entries)
+                                  ExpansionTile(
+                                    title: Text(prop),
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(8),
+                                        color: theme.colorScheme
+                                            .surfaceContainerHighest,
+                                        child: MarkdownBody(
+                                          data: desc,
+                                          onTapLink: (text, url, title) async {
+                                            if (url != null) {
+                                              if (!await launchUrl(
+                                                  Uri.parse(url))) {
+                                                throw 'Could not launch $url';
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        if (creator.attributes.twitter != null ||
+                            creator.attributes.pixiv != null ||
+                            creator.attributes.youtube != null ||
+                            creator.attributes.website != null)
+                          SliverToBoxAdapter(
+                            child: ExpansionTile(
+                              expandedAlignment: Alignment.centerLeft,
+                              title: const Text('Follow'),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  color: theme.colorScheme.surface,
+                                  child: Wrap(
+                                    spacing: 4.0,
+                                    runSpacing: 4.0,
+                                    children: [
+                                      if (creator.attributes.twitter != null)
+                                        createLinkChip(
+                                            creator.attributes.twitter!,
+                                            'Twitter'),
+                                      if (creator.attributes.pixiv != null)
+                                        createLinkChip(
+                                            creator.attributes.pixiv!, 'Pixiv'),
+                                      if (creator.attributes.youtube != null)
+                                        createLinkChip(
+                                            creator.attributes.youtube!,
+                                            'Youtube'),
+                                      if (creator.attributes.website != null)
+                                        createLinkChip(
+                                            creator.attributes.website!,
+                                            'website'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                      title: const Text(
+                        'Works',
+                        style: TextStyle(fontSize: 24),
                       ),
-                  ],
-                  title: const Text(
-                    'Works',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: scrollController,
-                  onAtEdge: () => ref
-                      .read(creatorTitlesProvider(creator).notifier)
-                      .getMore(),
-                  children: [
-                    MangaListViewSliver(items: mangas),
-                  ],
-                ),
-              );
-            }(),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: scrollController,
+                      onAtEdge: () => ref
+                          .read(creatorTitlesProvider(creator).notifier)
+                          .getMore(),
+                      children: [
+                        MangaListViewSliver(items: mangas),
+                      ],
+                    ),
+            ),
           _ => const Stack(
               children: Styles.loadingOverlay,
             ),

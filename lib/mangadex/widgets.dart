@@ -1,6 +1,5 @@
 // ignore_for_file: unused_element
 import 'package:extended_image/extended_image.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
@@ -168,57 +167,51 @@ class ChapterFeedWidget extends HookConsumerWidget {
               child: Styles.errorList(error, stackTrace),
             );
           }(),
-        AsyncValue(valueOrNull: final results?) => () {
-            return ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                PointerDeviceKind.touch,
-                PointerDeviceKind.mouse,
-                PointerDeviceKind.trackpad,
-              }),
-              child: RefreshIndicator(
-                onRefresh: onRefresh,
-                child: results.isEmpty
-                    ? Text(emptyText ?? 'No results!')
-                    : Column(
-                        children: [
-                          if (title != null)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0, vertical: 10.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  title!,
-                                  style: const TextStyle(fontSize: 24),
-                                ),
+        AsyncValue(valueOrNull: final results?) => ScrollConfiguration(
+            behavior: const MouseTouchScrollBehavior(),
+            child: RefreshIndicator(
+              onRefresh: onRefresh,
+              child: results.isEmpty
+                  ? Text(emptyText ?? 'No results!')
+                  : Column(
+                      children: [
+                        if (title != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 10.0),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                title!,
+                                style: const TextStyle(fontSize: 24),
                               ),
                             ),
-                          Expanded(
-                            child: SuperListView.builder(
-                              controller: scrollController,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              restorationId: restorationId,
-                              padding: const EdgeInsets.all(6),
-                              itemCount: results.length,
-                              findChildIndexCallback: (key) {
-                                final valueKey = key as ValueKey<int>;
-                                final val = results
-                                    .indexWhere((i) => i.id == valueKey.value);
-                                return val >= 0 ? val : null;
-                              },
-                              itemBuilder: (context, index) {
-                                final elem = results.elementAt(index);
-                                return ChapterFeedItem(
-                                    key: ValueKey(elem.id), state: elem);
-                              },
-                            ),
                           ),
-                          if (isLoading) Styles.listSpinner,
-                        ],
-                      ),
-              ),
-            );
-          }(),
+                        Expanded(
+                          child: SuperListView.builder(
+                            controller: scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            restorationId: restorationId,
+                            padding: const EdgeInsets.all(6),
+                            itemCount: results.length,
+                            findChildIndexCallback: (key) {
+                              final valueKey = key as ValueKey<int>;
+                              final val = results
+                                  .indexWhere((i) => i.id == valueKey.value);
+                              return val >= 0 ? val : null;
+                            },
+                            itemBuilder: (context, index) {
+                              final elem = results.elementAt(index);
+                              return ChapterFeedItem(
+                                  key: ValueKey(elem.id), state: elem);
+                            },
+                          ),
+                        ),
+                        if (isLoading) Styles.listSpinner,
+                      ],
+                    ),
+            ),
+          ),
         _ => const Stack(
             children: Styles.loadingOverlay,
           ),
@@ -623,7 +616,7 @@ class MangaListWidget extends HookConsumerWidget {
 
     return CustomScrollView(
       controller: scrollController,
-      scrollBehavior: MouseTouchScrollBehavior(),
+      scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
       slivers: [
         ...leading,
@@ -959,56 +952,51 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                     text: statsError,
                                   )
                                 ],
-                              AsyncValue(valueOrNull: final stats?) => () {
-                                  if (stats.containsKey(manga.id)) {
-                                    return [
-                                      IconTextChip(
-                                        icon: const Icon(
-                                          Icons.star_border,
-                                          color: Colors.amber,
-                                          size: 18,
-                                          shadows: [
-                                            Shadow(
-                                              offset: Offset(1.0, 1.0),
-                                            ),
-                                          ],
+                              AsyncValue(valueOrNull: final stats?)
+                                  when stats.containsKey(manga.id) =>
+                                [
+                                  IconTextChip(
+                                    icon: const Icon(
+                                      Icons.star_border,
+                                      color: Colors.amber,
+                                      size: 18,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(1.0, 1.0),
                                         ),
-                                        text: stats[manga.id]
-                                                ?.rating
-                                                .bayesian
-                                                .toStringAsFixed(2) ??
-                                            statsError,
-                                        style: const TextStyle(
-                                          color: Colors.amber,
-                                          shadows: [
-                                            Shadow(
-                                              offset: Offset(1.0, 1.0),
-                                            ),
-                                          ],
+                                      ],
+                                    ),
+                                    text: stats[manga.id]
+                                            ?.rating
+                                            .bayesian
+                                            .toStringAsFixed(2) ??
+                                        statsError,
+                                    style: const TextStyle(
+                                      color: Colors.amber,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(1.0, 1.0),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 4,
-                                      ),
-                                      IconTextChip(
-                                        icon: const Icon(
-                                          Icons.bookmark_outline,
-                                          size: 18,
-                                        ),
-                                        text: stats[manga.id]
-                                                ?.follows
-                                                .toString() ??
-                                            statsError,
-                                      ),
-                                    ];
-                                  }
-
-                                  return [
-                                    const IconTextChip(
-                                      text: statsError,
-                                    )
-                                  ];
-                                }(),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  IconTextChip(
+                                    icon: const Icon(
+                                      Icons.bookmark_outline,
+                                      size: 18,
+                                    ),
+                                    text: stats[manga.id]?.follows.toString() ??
+                                        statsError,
+                                  ),
+                                ],
+                              AsyncValue(valueOrNull: final _?) => [
+                                  const IconTextChip(
+                                    text: statsError,
+                                  )
+                                ],
                               _ => [
                                   const IconTextChip(
                                     text: 'Loading...',
@@ -1169,54 +1157,51 @@ class _ListMangaItem extends ConsumerWidget {
                               text: statsError,
                             )
                           ],
-                        AsyncValue(valueOrNull: final stats?) => () {
-                            if (stats.containsKey(manga.id)) {
-                              return [
-                                IconTextChip(
-                                  icon: const Icon(
-                                    Icons.star_border,
-                                    color: Colors.amber,
-                                    size: 18,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(1.0, 1.0),
-                                      ),
-                                    ],
+                        AsyncValue(valueOrNull: final stats?)
+                            when stats.containsKey(manga.id) =>
+                          [
+                            IconTextChip(
+                              icon: const Icon(
+                                Icons.star_border,
+                                color: Colors.amber,
+                                size: 18,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(1.0, 1.0),
                                   ),
-                                  text: stats[manga.id]
-                                          ?.rating
-                                          .bayesian
-                                          .toStringAsFixed(2) ??
-                                      statsError,
-                                  style: const TextStyle(
-                                    color: Colors.amber,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(1.0, 1.0),
-                                      ),
-                                    ],
+                                ],
+                              ),
+                              text: stats[manga.id]
+                                      ?.rating
+                                      .bayesian
+                                      .toStringAsFixed(2) ??
+                                  statsError,
+                              style: const TextStyle(
+                                color: Colors.amber,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(1.0, 1.0),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                IconTextChip(
-                                  icon: const Icon(
-                                    Icons.bookmark_outline,
-                                    size: 18,
-                                  ),
-                                  text: stats[manga.id]?.follows.toString() ??
-                                      statsError,
-                                ),
-                              ];
-                            }
-
-                            return [
-                              const IconTextChip(
-                                text: statsError,
-                              )
-                            ];
-                          }(),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            IconTextChip(
+                              icon: const Icon(
+                                Icons.bookmark_outline,
+                                size: 18,
+                              ),
+                              text: stats[manga.id]?.follows.toString() ??
+                                  statsError,
+                            ),
+                          ],
+                        AsyncValue(valueOrNull: final _?) => [
+                            const IconTextChip(
+                              text: statsError,
+                            )
+                          ],
                         _ => [
                             const IconTextChip(
                               text: 'Loading...',

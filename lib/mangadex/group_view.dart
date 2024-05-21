@@ -174,7 +174,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
     final tab = switch (view.value) {
       _ViewType.info => CustomScrollView(
           controller: controllers[0],
-          scrollBehavior: MouseTouchScrollBehavior(),
+          scrollBehavior: const MouseTouchScrollBehavior(),
           slivers: <Widget>[
             if (group.attributes.description != null)
               SliverToBoxAdapter(
@@ -278,33 +278,29 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                         child: Styles.errorList(error, stackTrace),
                       );
                     }(),
-                  AsyncValue(valueOrNull: final mangas?) => () {
-                      if (mangas.isEmpty) {
-                        return const Text('No manga!');
-                      }
-
-                      return RefreshIndicator(
-                        onRefresh: () {
-                          ref.read(groupTitlesProvider(group).notifier).clear();
-                          return ref
-                              .refresh(_fetchGroupTitlesProvider(group).future);
-                        },
-                        child: MangaListWidget(
-                          title: const Text(
-                            'Group Titles',
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: controllers[2],
-                          onAtEdge: () => ref
-                              .read(groupTitlesProvider(group).notifier)
-                              .getMore(),
-                          children: [
-                            MangaListViewSliver(items: mangas),
-                          ],
-                        ),
-                      );
-                    }(),
+                  AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
+                      onRefresh: () {
+                        ref.read(groupTitlesProvider(group).notifier).clear();
+                        return ref
+                            .refresh(_fetchGroupTitlesProvider(group).future);
+                      },
+                      child: mangas.isEmpty
+                          ? const Text('No manga!')
+                          : MangaListWidget(
+                              title: const Text(
+                                'Group Titles',
+                                style: TextStyle(fontSize: 24),
+                              ),
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              controller: controllers[2],
+                              onAtEdge: () => ref
+                                  .read(groupTitlesProvider(group).notifier)
+                                  .getMore(),
+                              children: [
+                                MangaListViewSliver(items: mangas),
+                              ],
+                            ),
+                    ),
                   _ => const Stack(
                       children: Styles.loadingOverlay,
                     ),

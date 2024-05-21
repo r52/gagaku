@@ -58,27 +58,24 @@ class MangaDexMangaFeed extends ConsumerWidget {
                   child: Styles.errorList(error, stackTrace),
                 );
               }(),
-            AsyncValue(valueOrNull: final mangas?) => () {
-                if (mangas.isEmpty) {
-                  return const Text('Find some manga to follow!');
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () {
-                    ref.read(latestChaptersFeedProvider.notifier).clear();
-                    return ref.refresh(_fetchMangaFeedProvider.future);
-                  },
-                  child: MangaListWidget(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: controller,
-                    onAtEdge: () =>
-                        ref.read(latestChaptersFeedProvider.notifier).getMore(),
-                    children: [
-                      MangaListViewSliver(items: mangas),
-                    ],
-                  ),
-                );
-              }(),
+            AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
+                onRefresh: () {
+                  ref.read(latestChaptersFeedProvider.notifier).clear();
+                  return ref.refresh(_fetchMangaFeedProvider.future);
+                },
+                child: mangas.isEmpty
+                    ? const Text('Find some manga to follow!')
+                    : MangaListWidget(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: controller,
+                        onAtEdge: () => ref
+                            .read(latestChaptersFeedProvider.notifier)
+                            .getMore(),
+                        children: [
+                          MangaListViewSliver(items: mangas),
+                        ],
+                      ),
+              ),
             _ => const SizedBox.shrink(),
           },
           if (isLoading) ...Styles.loadingOverlay,

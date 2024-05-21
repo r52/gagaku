@@ -6,6 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
+  const MouseTouchScrollBehavior();
+
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
@@ -371,7 +373,7 @@ class Styles {
 
   static Widget errorList(Object err, StackTrace stack) => Center(
         child: ScrollConfiguration(
-          behavior: MouseTouchScrollBehavior(),
+          behavior: const MouseTouchScrollBehavior(),
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             children: [

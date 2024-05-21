@@ -187,95 +187,89 @@ class WebSourcesHome extends HookConsumerWidget {
       ),
       drawer: const MainDrawer(),
       body: switch (historyProvider) {
-        AsyncValue(valueOrNull: final history?) => () {
-            if (history.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Tooltip(
-                      message: 'Supported URLs:\ncubari.moe\nimgur.com',
-                      padding: EdgeInsets.all(6),
-                      triggerMode: TooltipTriggerMode.tap,
-                      child: Wrap(
-                        children: [
-                          Text('Supported URLs'),
-                          Icon(
-                            Icons.help,
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: openLinkDialog,
-                      icon: const Icon(
-                        Icons.link,
-                      ),
-                      label: const Text('Open Web Source'),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return Column(
+        AsyncValue(valueOrNull: final history?) when history.isEmpty => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'History',
-                      style: TextStyle(fontSize: 24),
-                    ),
+                const Tooltip(
+                  message: 'Supported URLs:\ncubari.moe\nimgur.com',
+                  padding: EdgeInsets.all(6),
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Wrap(
+                    children: [
+                      Text('Supported URLs'),
+                      Icon(
+                        Icons.help,
+                        size: 20,
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(6),
-                    itemCount: history.length,
-                    itemBuilder: (context, index) {
-                      final item = history.elementAt(index);
-                      return ListTile(
-                        leading: const Icon(Icons.link),
-                        trailing: IconButton(
-                          tooltip: 'Remove from History',
-                          icon: const Icon(Icons.clear),
-                          onPressed: () async {
-                            ref
-                                .read(webSourceHistoryProvider.notifier)
-                                .remove(item);
-                          },
-                        ),
-                        title: Text(item.title),
-                        textColor: Colors.blue,
-                        onTap: () {
-                          final messenger = ScaffoldMessenger.of(context);
-                          final parseResult = parseUrl(item.url);
-
-                          if (!parseResult) {
-                            messenger
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(const SnackBar(
-                                content: Text('Unsupported URL'),
-                                backgroundColor: Colors.red,
-                              ));
-                          }
-                        },
-                      );
-                    },
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton.icon(
+                  onPressed: openLinkDialog,
+                  icon: const Icon(
+                    Icons.link,
                   ),
+                  label: const Text('Open Web Source'),
                 ),
               ],
-            );
-          }(),
+            ),
+          ),
+        AsyncValue(valueOrNull: final history?) => Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'History',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(6),
+                  itemCount: history.length,
+                  itemBuilder: (context, index) {
+                    final item = history.elementAt(index);
+                    return ListTile(
+                      leading: const Icon(Icons.link),
+                      trailing: IconButton(
+                        tooltip: 'Remove from History',
+                        icon: const Icon(Icons.clear),
+                        onPressed: () async {
+                          ref
+                              .read(webSourceHistoryProvider.notifier)
+                              .remove(item);
+                        },
+                      ),
+                      title: Text(item.title),
+                      textColor: Colors.blue,
+                      onTap: () {
+                        final messenger = ScaffoldMessenger.of(context);
+                        final parseResult = parseUrl(item.url);
+
+                        if (!parseResult) {
+                          messenger
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(const SnackBar(
+                              content: Text('Unsupported URL'),
+                              backgroundColor: Colors.red,
+                            ));
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         AsyncValue(:final error?, :final stackTrace?) =>
           Styles.errorColumn(error, stackTrace),
         _ => const Center(
