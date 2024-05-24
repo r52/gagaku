@@ -112,7 +112,7 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
     Widget child;
 
     switch (dataProvider) {
-      case AsyncValue(valueOrNull: final data?):
+      case AsyncValue(value: final data?):
         return MangaDexReaderWidget(
           chapter: data.chapter,
           manga: data.manga,
@@ -204,7 +204,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(valueOrNull: final pages?):
+      case AsyncValue(value: final pages?):
         return ReaderWidget(
           pages: pages,
           title: title,

@@ -10,6 +10,7 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/legacy.dart';
 
 //part 'search.g.dart';
 
@@ -172,7 +173,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                     child: Styles.errorColumn(error, stackTrace),
                   );
                 }(),
-              AsyncValue(valueOrNull: final results?) when results.isNotEmpty =>
+              AsyncValue(value: final results?) when results.isNotEmpty =>
                 MangaListViewSliver(
                   items: results,
                   selectMode: selectMode,
@@ -191,7 +192,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                     }
                   },
                 ),
-              AsyncValue(valueOrNull: final _?) => const SliverToBoxAdapter(
+              AsyncValue(value: final _?) => const SliverToBoxAdapter(
                   child: Center(
                     child: Text("No results!"),
                   ),
@@ -343,7 +344,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
         ],
       ),
       body: switch (tagsProvider) {
-        AsyncValue(valueOrNull: final tags?) => SafeArea(
+        AsyncValue(value: final tags?) => SafeArea(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               children: [

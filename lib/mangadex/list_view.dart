@@ -96,7 +96,7 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
     Widget child;
 
     switch (listProvider) {
-      case AsyncValue(hasValue: true, valueOrNull: final list):
+      case AsyncValue(hasValue: true, value: final list):
         if (list != null) {
           return MangaDexListViewWidget(
             list: list,
@@ -135,7 +135,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final messenger = ScaffoldMessenger.of(context);
     final view = useState(_ViewType.titles);
-    final me = ref.watch(loggedUserProvider).valueOrNull;
+    final me = ref.watch(loggedUserProvider).value;
 
     final currentList = useState({...list.get<CustomList>().set});
     final resolved = list.get<CustomList>();
@@ -255,7 +255,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
 
                   final titlesProvider = ref.watch(getMangaListByPageProvider(
                       currentList.value, currentPage.value));
-                  final mangas = titlesProvider.valueOrNull;
+                  final mangas = titlesProvider.value;
 
                   final isLoading = titlesProvider.isLoading;
 

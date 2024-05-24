@@ -383,7 +383,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                 final children = <Widget>[];
 
                 switch (groupDataProvider) {
-                  case AsyncValue(valueOrNull: final groups?):
+                  case AsyncValue(value: final groups?):
                     for (final group in config.value.groupBlacklist) {
                       final groupInfo =
                           groups.firstWhere((element) => element.id == group);

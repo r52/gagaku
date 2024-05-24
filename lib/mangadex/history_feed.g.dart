@@ -6,22 +6,61 @@ part of 'history_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+typedef _FetchHistoryFeedRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
+
+@ProviderFor(_fetchHistoryFeed)
+const _fetchHistoryFeedProvider = _FetchHistoryFeedProvider._();
+
+final class _FetchHistoryFeedProvider extends $FunctionalProvider<
+        AsyncValue<List<ChapterFeedItemData>>,
+        FutureOr<List<ChapterFeedItemData>>>
+    with
+        $FutureModifier<List<ChapterFeedItemData>>,
+        $FutureProvider<List<ChapterFeedItemData>, _FetchHistoryFeedRef> {
+  const _FetchHistoryFeedProvider._(
+      {FutureOr<List<ChapterFeedItemData>> Function(
+        _FetchHistoryFeedRef ref,
+      )? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'_fetchHistoryFeedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<ChapterFeedItemData>> Function(
+    _FetchHistoryFeedRef ref,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchHistoryFeedHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ChapterFeedItemData>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchHistoryFeedProvider $copyWithCreate(
+    FutureOr<List<ChapterFeedItemData>> Function(
+      _FetchHistoryFeedRef ref,
+    ) create,
+  ) {
+    return _FetchHistoryFeedProvider._(create: create);
+  }
+
+  @override
+  FutureOr<List<ChapterFeedItemData>> create(_FetchHistoryFeedRef ref) {
+    final _$cb = _createCb ?? _fetchHistoryFeed;
+    return _$cb(ref);
+  }
+}
+
 String _$fetchHistoryFeedHash() => r'4de5f3fca8969972cca57aea860abc517991a72c';
 
-/// See also [_fetchHistoryFeed].
-@ProviderFor(_fetchHistoryFeed)
-final _fetchHistoryFeedProvider =
-    AutoDisposeFutureProvider<List<ChapterFeedItemData>>.internal(
-  _fetchHistoryFeed,
-  name: r'_fetchHistoryFeedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$fetchHistoryFeedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _FetchHistoryFeedRef
-    = AutoDisposeFutureProviderRef<List<ChapterFeedItemData>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

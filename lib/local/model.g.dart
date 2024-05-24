@@ -6,36 +6,127 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(LocalLibrary)
+const localLibraryProvider = LocalLibraryProvider._();
+
+final class LocalLibraryProvider
+    extends $AsyncNotifierProvider<LocalLibrary, LocalLibraryItem> {
+  const LocalLibraryProvider._(
+      {super.runNotifierBuildOverride, LocalLibrary Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'localLibraryProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final LocalLibrary Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$localLibraryHash();
+
+  @$internal
+  @override
+  LocalLibrary create() => _createCb?.call() ?? LocalLibrary();
+
+  @$internal
+  @override
+  LocalLibraryProvider $copyWithCreate(
+    LocalLibrary Function() create,
+  ) {
+    return LocalLibraryProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  LocalLibraryProvider $copyWithBuild(
+    FutureOr<LocalLibraryItem> Function(
+      Ref<AsyncValue<LocalLibraryItem>>,
+      LocalLibrary,
+    ) build,
+  ) {
+    return LocalLibraryProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<LocalLibrary, LocalLibraryItem> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
 String _$localLibraryHash() => r'72d7fe7f78b4d7c1c4e5a3ad08e03726a53c6ebd';
 
-/// See also [LocalLibrary].
-@ProviderFor(LocalLibrary)
-final localLibraryProvider =
-    AsyncNotifierProvider<LocalLibrary, LocalLibraryItem>.internal(
-  LocalLibrary.new,
-  name: r'localLibraryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$localLibraryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
+  FutureOr<LocalLibraryItem> build();
+  @$internal
+  @override
+  FutureOr<LocalLibraryItem> runBuild() => build();
+}
 
-typedef _$LocalLibrary = AsyncNotifier<LocalLibraryItem>;
+@ProviderFor(SupportedFormats)
+const supportedFormatsProvider = SupportedFormatsProvider._();
+
+final class SupportedFormatsProvider
+    extends $AsyncNotifierProvider<SupportedFormats, FormatInfo> {
+  const SupportedFormatsProvider._(
+      {super.runNotifierBuildOverride, SupportedFormats Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'supportedFormatsProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final SupportedFormats Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$supportedFormatsHash();
+
+  @$internal
+  @override
+  SupportedFormats create() => _createCb?.call() ?? SupportedFormats();
+
+  @$internal
+  @override
+  SupportedFormatsProvider $copyWithCreate(
+    SupportedFormats Function() create,
+  ) {
+    return SupportedFormatsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  SupportedFormatsProvider $copyWithBuild(
+    FutureOr<FormatInfo> Function(
+      Ref<AsyncValue<FormatInfo>>,
+      SupportedFormats,
+    ) build,
+  ) {
+    return SupportedFormatsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<SupportedFormats, FormatInfo> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
 String _$supportedFormatsHash() => r'3840c7ebd8357ef2b7163a74cb1335481d03be80';
 
-/// See also [SupportedFormats].
-@ProviderFor(SupportedFormats)
-final supportedFormatsProvider =
-    AsyncNotifierProvider<SupportedFormats, FormatInfo>.internal(
-  SupportedFormats.new,
-  name: r'supportedFormatsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$supportedFormatsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
+  FutureOr<FormatInfo> build();
+  @$internal
+  @override
+  FutureOr<FormatInfo> runBuild() => build();
+}
 
-typedef _$SupportedFormats = AsyncNotifier<FormatInfo>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

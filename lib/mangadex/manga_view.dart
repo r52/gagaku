@@ -108,7 +108,7 @@ class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
     Widget child;
 
     switch (mangaProvider) {
-      case AsyncValue(valueOrNull: final manga?):
+      case AsyncValue(value: final manga?):
         return MangaDexMangaViewWidget(
           manga: manga,
         );
@@ -138,13 +138,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
+    final loggedin = ref.watch(authControlProvider).value ?? false;
     final theme = Theme.of(context);
     final view = useState(_ViewType.chapters);
     final followProvider = ref.watch(followingStatusProvider(manga));
-    final following = followProvider.valueOrNull;
+    final following = followProvider.value;
     final statusProvider = ref.watch(readingStatusProvider(manga));
-    final reading = statusProvider.valueOrNull;
+    final reading = statusProvider.value;
 
     ref.watch(_fetchReadChaptersRedunProvider(manga));
 
@@ -399,7 +399,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   text: statsError,
                                 )
                               ],
-                            AsyncValue(valueOrNull: final stats?)
+                            AsyncValue(value: final stats?)
                                 when stats.containsKey(manga.id) =>
                               [
                                 IconTextChip(
@@ -439,7 +439,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                       statsError,
                                 ),
                               ],
-                            AsyncValue(valueOrNull: final _?) => [
+                            AsyncValue(value: final _?) => [
                                 const SizedBox(
                                   width: 10,
                                 ),
@@ -732,14 +732,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       alignment: Alignment.centerRight,
                       child: Consumer(
                         builder: (context, ref, child) {
-                          final chapters = ref
-                              .watch(mangaChaptersProvider(manga))
-                              .valueOrNull;
+                          final chapters =
+                              ref.watch(mangaChaptersProvider(manga)).value;
 
                           final allRead = chapters != null
                               ? ref.watch(readChaptersProvider
                                   .select((value) => switch (value) {
-                                        AsyncValue(valueOrNull: final data?) =>
+                                        AsyncValue(value: final data?) =>
                                           data[manga.id]?.containsAll(
                                                   chapters.map((e) => e.id)) ==
                                               true,
@@ -826,7 +825,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                                 return Styles.errorList(error, stackTrace);
                               }(),
-                            AsyncValue(valueOrNull: final chapters?) =>
+                            AsyncValue(value: final chapters?) =>
                               NotificationListener<ScrollEndNotification>(
                                 onNotification: onScrollNotification,
                                 child: CustomScrollView(
@@ -962,7 +961,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                                 return Styles.errorList(error, stackTrace);
                               }(),
-                            AsyncValue(valueOrNull: final covers?) =>
+                            AsyncValue(value: final covers?) =>
                               NotificationListener<ScrollEndNotification>(
                                 onNotification: onScrollNotification,
                                 child: CustomScrollView(
@@ -1110,7 +1109,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                                 return Styles.errorList(error, stackTrace);
                               }(),
-                            AsyncValue(valueOrNull: final related?) =>
+                            AsyncValue(value: final related?) =>
                               MangaListWidget(
                                 title: const Text(
                                   'Related Titles',
@@ -1290,7 +1289,7 @@ class _RatingMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final ratingProv = ref.watch(ratingsProvider);
-    final ratings = ratingProv.valueOrNull;
+    final ratings = ratingProv.value;
 
     if (ratingProv.isLoading || ratings == null) {
       return _loadingAction;
@@ -1368,7 +1367,7 @@ class _UserListsMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final userListsProv = ref.watch(userListsProvider);
-    final userLists = userListsProv.valueOrNull;
+    final userLists = userListsProv.value;
 
     return MenuAnchor(
       builder: (context, controller, child) {

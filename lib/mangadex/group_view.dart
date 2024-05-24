@@ -113,7 +113,7 @@ class QueriedMangaDexGroupViewWidget extends ConsumerWidget {
     Widget child;
 
     switch (groupProvider) {
-      case AsyncValue(valueOrNull: final group?):
+      case AsyncValue(value: final group?):
         return MangaDexGroupViewWidget(
           group: group,
         );
@@ -278,7 +278,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                         child: Styles.errorList(error, stackTrace),
                       );
                     }(),
-                  AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
+                  AsyncValue(value: final mangas?) => RefreshIndicator(
                       onRefresh: () {
                         ref.read(groupTitlesProvider(group).notifier).clear();
                         return ref

@@ -89,10 +89,10 @@ class LocalLibraryHome extends StatelessWidget {
           final settings = ref.watch(localConfigProvider);
           final libraryProvider = ref.watch(localLibraryProvider);
           final currentItem =
-              useState<LocalLibraryItem?>(libraryProvider.valueOrNull);
+              useState<LocalLibraryItem?>(libraryProvider.value);
 
           useEffect(() {
-            final newVal = libraryProvider.valueOrNull;
+            final newVal = libraryProvider.value;
             if (currentItem.value != null && newVal != null) {
               final result = findLibraryItem(currentItem.value!, newVal);
 
@@ -145,7 +145,7 @@ class LocalLibraryHome extends StatelessWidget {
           }
 
           switch (libraryProvider) {
-            case AsyncValue(valueOrNull: final top?):
+            case AsyncValue(value: final top?):
               Widget child;
 
               if (top.children.isEmpty) {

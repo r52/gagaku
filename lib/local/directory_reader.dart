@@ -102,7 +102,7 @@ class DirectoryReaderWidget extends ConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(valueOrNull: final pages?):
+      case AsyncValue(value: final pages?):
         if (pages.isEmpty) {
           return Scaffold(
             appBar: AppBar(

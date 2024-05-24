@@ -107,7 +107,7 @@ class MangaDexListsView extends HookConsumerWidget {
                       child: Styles.errorList(error, stackTrace),
                     );
                   }(),
-                AsyncValue(valueOrNull: final lists?) => RefreshIndicator(
+                AsyncValue(value: final lists?) => RefreshIndicator(
                     onRefresh: () {
                       ref.read(userListsProvider.notifier).clear();
                       return ref.refresh(userListsProvider.future);

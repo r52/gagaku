@@ -58,20 +58,74 @@ const _$ContentRatingEnumMap = {
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(MdConfig)
+const mdConfigProvider = MdConfigProvider._();
+
+final class MdConfigProvider
+    extends $NotifierProvider<MdConfig, MangaDexConfig> {
+  const MdConfigProvider._(
+      {super.runNotifierBuildOverride, MdConfig Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'mdConfigProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final MdConfig Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$mdConfigHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MangaDexConfig value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<MangaDexConfig>(value),
+    );
+  }
+
+  @$internal
+  @override
+  MdConfig create() => _createCb?.call() ?? MdConfig();
+
+  @$internal
+  @override
+  MdConfigProvider $copyWithCreate(
+    MdConfig Function() create,
+  ) {
+    return MdConfigProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  MdConfigProvider $copyWithBuild(
+    MangaDexConfig Function(
+      Ref<MangaDexConfig>,
+      MdConfig,
+    ) build,
+  ) {
+    return MdConfigProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<MdConfig, MangaDexConfig> $createElement(
+          $ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
 String _$mdConfigHash() => r'422f9d65f920b9d170177915dd44611f9081332b';
 
-/// See also [MdConfig].
-@ProviderFor(MdConfig)
-final mdConfigProvider =
-    AutoDisposeNotifierProvider<MdConfig, MangaDexConfig>.internal(
-  MdConfig.new,
-  name: r'mdConfigProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$mdConfigHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
+  MangaDexConfig build();
+  @$internal
+  @override
+  MangaDexConfig runBuild() => build();
+}
 
-typedef _$MdConfig = AutoDisposeNotifier<MangaDexConfig>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

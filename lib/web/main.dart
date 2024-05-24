@@ -187,7 +187,7 @@ class WebSourcesHome extends HookConsumerWidget {
       ),
       drawer: const MainDrawer(),
       body: switch (historyProvider) {
-        AsyncValue(valueOrNull: final history?) when history.isEmpty => Center(
+        AsyncValue(value: final history?) when history.isEmpty => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -218,7 +218,7 @@ class WebSourcesHome extends HookConsumerWidget {
               ],
             ),
           ),
-        AsyncValue(valueOrNull: final history?) => Column(
+        AsyncValue(value: final history?) => Column(
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),

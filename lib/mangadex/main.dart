@@ -110,7 +110,7 @@ class MangaDexHome extends HookConsumerWidget {
                   final auth = ref.watch(authControlProvider);
 
                   switch (auth) {
-                    case AsyncValue(valueOrNull: final loggedin?):
+                    case AsyncValue(value: final loggedin?):
                       // XXX: This changes when OAuth is released
                       Widget logbtn = Tooltip(
                         message: 'Login',

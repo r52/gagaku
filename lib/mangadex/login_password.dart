@@ -18,7 +18,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
     final auth = ref.watch(authControlProvider);
 
     switch (auth) {
-      case AsyncValue(valueOrNull: final loggedin?):
+      case AsyncValue(value: final loggedin?):
         if (loggedin) {
           return builder(context, ref);
         }

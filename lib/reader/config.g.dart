@@ -43,21 +43,74 @@ const _$ReaderDirectionEnumMap = {
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(ReaderSettings)
+const readerSettingsProvider = ReaderSettingsProvider._();
+
+final class ReaderSettingsProvider
+    extends $NotifierProvider<ReaderSettings, ReaderConfig> {
+  const ReaderSettingsProvider._(
+      {super.runNotifierBuildOverride, ReaderSettings Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'readerSettingsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final ReaderSettings Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$readerSettingsHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ReaderConfig value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<ReaderConfig>(value),
+    );
+  }
+
+  @$internal
+  @override
+  ReaderSettings create() => _createCb?.call() ?? ReaderSettings();
+
+  @$internal
+  @override
+  ReaderSettingsProvider $copyWithCreate(
+    ReaderSettings Function() create,
+  ) {
+    return ReaderSettingsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  ReaderSettingsProvider $copyWithBuild(
+    ReaderConfig Function(
+      Ref<ReaderConfig>,
+      ReaderSettings,
+    ) build,
+  ) {
+    return ReaderSettingsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<ReaderSettings, ReaderConfig> $createElement(
+          $ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
 String _$readerSettingsHash() => r'32da40797d96254b0532f7dd2f50636d78121465';
 
-/// See also [ReaderSettings].
-@ProviderFor(ReaderSettings)
-final readerSettingsProvider =
-    AutoDisposeNotifierProvider<ReaderSettings, ReaderConfig>.internal(
-  ReaderSettings.new,
-  name: r'readerSettingsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$readerSettingsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
+  ReaderConfig build();
+  @$internal
+  @override
+  ReaderConfig runBuild() => build();
+}
 
-typedef _$ReaderSettings = AutoDisposeNotifier<ReaderConfig>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

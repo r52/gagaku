@@ -31,21 +31,74 @@ const _$ThemeModeEnumMap = {
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(GagakuSettings)
+const gagakuSettingsProvider = GagakuSettingsProvider._();
+
+final class GagakuSettingsProvider
+    extends $NotifierProvider<GagakuSettings, GagakuConfig> {
+  const GagakuSettingsProvider._(
+      {super.runNotifierBuildOverride, GagakuSettings Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'gagakuSettingsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final GagakuSettings Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$gagakuSettingsHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GagakuConfig value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<GagakuConfig>(value),
+    );
+  }
+
+  @$internal
+  @override
+  GagakuSettings create() => _createCb?.call() ?? GagakuSettings();
+
+  @$internal
+  @override
+  GagakuSettingsProvider $copyWithCreate(
+    GagakuSettings Function() create,
+  ) {
+    return GagakuSettingsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  GagakuSettingsProvider $copyWithBuild(
+    GagakuConfig Function(
+      Ref<GagakuConfig>,
+      GagakuSettings,
+    ) build,
+  ) {
+    return GagakuSettingsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<GagakuSettings, GagakuConfig> $createElement(
+          $ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
 String _$gagakuSettingsHash() => r'9a86d3ab2de272269cf61bf2eb0c64e22ae2b701';
 
-/// See also [GagakuSettings].
-@ProviderFor(GagakuSettings)
-final gagakuSettingsProvider =
-    AutoDisposeNotifierProvider<GagakuSettings, GagakuConfig>.internal(
-  GagakuSettings.new,
-  name: r'gagakuSettingsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$gagakuSettingsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
+  GagakuConfig build();
+  @$internal
+  @override
+  GagakuConfig runBuild() => build();
+}
 
-typedef _$GagakuSettings = AutoDisposeNotifier<GagakuConfig>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

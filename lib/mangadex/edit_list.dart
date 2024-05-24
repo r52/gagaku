@@ -47,7 +47,7 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
     Widget child;
 
     switch (listProvider) {
-      case AsyncValue(hasValue: true, valueOrNull: final list):
+      case AsyncValue(hasValue: true, value: final list):
         if (list != null) {
           return MangaDexEditListScreen(
             list: list,
@@ -105,7 +105,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
     final titlesProvider = ref
         .watch(getMangaListByPageProvider(selected.value, currentPage.value));
-    final titles = titlesProvider.valueOrNull;
+    final titles = titlesProvider.value;
 
     final isLoading = titlesProvider.isLoading;
 

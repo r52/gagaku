@@ -6,7 +6,6 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/web/types.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -230,7 +229,7 @@ class WebSourceHistory extends _$WebSourceHistory {
       await future;
     }
 
-    final oldstate = state.valueOrNull ?? Queue<HistoryLink>();
+    final oldstate = state.value ?? Queue<HistoryLink>();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final cpy = Queue.of(oldstate);
@@ -260,7 +259,7 @@ class WebSourceHistory extends _$WebSourceHistory {
       await future;
     }
 
-    final oldstate = state.valueOrNull ?? Queue<HistoryLink>();
+    final oldstate = state.value ?? Queue<HistoryLink>();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final cpy = Queue.of(oldstate);
@@ -327,7 +326,7 @@ class WebReadMarkers extends _$WebReadMarkers {
       await future;
     }
 
-    final oldstate = state.valueOrNull ?? <String, Set<String>>{};
+    final oldstate = state.value ?? <String, Set<String>>{};
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final keyExists = oldstate.containsKey(manga);

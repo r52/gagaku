@@ -66,7 +66,7 @@ class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
     Widget child;
 
     switch (creatorProvider) {
-      case AsyncValue(valueOrNull: final creator?):
+      case AsyncValue(value: final creator?):
         return MangaDexCreatorViewWidget(
           creator: creator,
         );
@@ -131,7 +131,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                 child: Styles.errorList(error, stackTrace),
               );
             }(),
-          AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
+          AsyncValue(value: final mangas?) => RefreshIndicator(
               onRefresh: () {
                 ref.read(creatorTitlesProvider(creator).notifier).clear();
                 return ref.refresh(_fetchCreatorTitlesProvider(creator).future);

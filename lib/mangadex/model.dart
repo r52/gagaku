@@ -13,7 +13,6 @@ import 'package:gagaku/model.dart';
 import 'package:gagaku/types.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mutex/mutex.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
@@ -2146,7 +2145,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
       return [...set];
     });
 
-    return (state.valueOrNull ?? []).length != oldstate.length;
+    return (state.value ?? []).length != oldstate.length;
   }
 
   Future<bool> newList(String name, CustomListVisibility visibility,
@@ -2169,7 +2168,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
       return [...oldstate];
     });
 
-    return (state.valueOrNull ?? []).length != oldstate.length;
+    return (state.value ?? []).length != oldstate.length;
   }
 
   /// Clears the list and refetch from the beginning
@@ -2584,7 +2583,7 @@ class LoggedUser extends _$LoggedUser {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
   Future<void> invalidate() async {
     final prevState = await future;

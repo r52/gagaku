@@ -6,539 +6,383 @@ part of 'manga_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchMangaFromIdHash() => r'aa14b104bfae399f4c9480fded6d7263eec0320d';
+typedef _FetchMangaFromIdRef = Ref<AsyncValue<Manga>>;
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [_fetchMangaFromId].
 @ProviderFor(_fetchMangaFromId)
-const _fetchMangaFromIdProvider = _FetchMangaFromIdFamily();
+const _fetchMangaFromIdProvider = _FetchMangaFromIdFamily._();
 
-/// See also [_fetchMangaFromId].
-class _FetchMangaFromIdFamily extends Family {
-  /// See also [_fetchMangaFromId].
-  const _FetchMangaFromIdFamily();
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchMangaFromIdProvider';
-
-  /// See also [_fetchMangaFromId].
-  _FetchMangaFromIdProvider call(
-    String mangaId,
-  ) {
-    return _FetchMangaFromIdProvider(
-      mangaId,
-    );
-  }
-
-  @visibleForOverriding
-  @override
-  _FetchMangaFromIdProvider getProviderOverride(
-    covariant _FetchMangaFromIdProvider provider,
-  ) {
-    return call(
-      provider.mangaId,
-    );
-  }
-
-  /// Enables overriding the behavior of this provider, no matter the parameters.
-  Override overrideWith(
-      FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create) {
-    return _$FetchMangaFromIdFamilyOverride(this, create);
-  }
-}
-
-class _$FetchMangaFromIdFamilyOverride implements FamilyOverride {
-  _$FetchMangaFromIdFamilyOverride(this.overriddenFamily, this.create);
-
-  final FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create;
-
-  @override
-  final _FetchMangaFromIdFamily overriddenFamily;
-
-  @override
-  _FetchMangaFromIdProvider getProviderOverride(
-    covariant _FetchMangaFromIdProvider provider,
-  ) {
-    return provider._copyWith(create);
-  }
-}
-
-/// See also [_fetchMangaFromId].
-class _FetchMangaFromIdProvider extends AutoDisposeFutureProvider<Manga> {
-  /// See also [_fetchMangaFromId].
-  _FetchMangaFromIdProvider(
-    String mangaId,
-  ) : this._internal(
-          (ref) => _fetchMangaFromId(
-            ref as _FetchMangaFromIdRef,
-            mangaId,
-          ),
-          from: _fetchMangaFromIdProvider,
+final class _FetchMangaFromIdProvider
+    extends $FunctionalProvider<AsyncValue<Manga>, FutureOr<Manga>>
+    with $FutureModifier<Manga>, $FutureProvider<Manga, _FetchMangaFromIdRef> {
+  const _FetchMangaFromIdProvider._(
+      {required _FetchMangaFromIdFamily super.from,
+      required String super.argument,
+      FutureOr<Manga> Function(
+        _FetchMangaFromIdRef ref,
+        String mangaId,
+      )? create})
+      : _createCb = create,
+        super(
           name: r'_fetchMangaFromIdProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchMangaFromIdHash,
-          dependencies: _FetchMangaFromIdFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchMangaFromIdFamily._allTransitiveDependencies,
-          mangaId: mangaId,
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  _FetchMangaFromIdProvider._internal(
-    super.create, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.mangaId,
-  }) : super.internal();
-
-  final String mangaId;
+  final FutureOr<Manga> Function(
+    _FetchMangaFromIdRef ref,
+    String mangaId,
+  )? _createCb;
 
   @override
-  Override overrideWith(
-    FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create,
+  String debugGetCreateSourceHash() => _$fetchMangaFromIdHash();
+
+  @override
+  String toString() {
+    return r'_fetchMangaFromIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Manga> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchMangaFromIdProvider $copyWithCreate(
+    FutureOr<Manga> Function(
+      _FetchMangaFromIdRef ref,
+    ) create,
   ) {
-    return ProviderOverride(
-      origin: this,
-      override: _FetchMangaFromIdProvider._internal(
-        (ref) => create(ref as _FetchMangaFromIdRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        mangaId: mangaId,
-      ),
-    );
+    return _FetchMangaFromIdProvider._(
+        argument: argument as String,
+        from: from! as _FetchMangaFromIdFamily,
+        create: (
+          ref,
+          String mangaId,
+        ) =>
+            create(ref));
   }
 
   @override
-  (String,) get argument {
-    return (mangaId,);
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<Manga> createElement() {
-    return _FetchMangaFromIdProviderElement(this);
-  }
-
-  _FetchMangaFromIdProvider _copyWith(
-    FutureOr<Manga> Function(_FetchMangaFromIdRef ref) create,
-  ) {
-    return _FetchMangaFromIdProvider._internal(
-      (ref) => create(ref as _FetchMangaFromIdRef),
-      name: name,
-      dependencies: dependencies,
-      allTransitiveDependencies: allTransitiveDependencies,
-      debugGetCreateSourceHash: debugGetCreateSourceHash,
-      from: from,
-      mangaId: mangaId,
+  FutureOr<Manga> create(_FetchMangaFromIdRef ref) {
+    final _$cb = _createCb ?? _fetchMangaFromId;
+    final argument = this.argument as String;
+    return _$cb(
+      ref,
+      argument,
     );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is _FetchMangaFromIdProvider && other.mangaId == mangaId;
+    return other is _FetchMangaFromIdProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, mangaId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-mixin _FetchMangaFromIdRef on AutoDisposeFutureProviderRef<Manga> {
-  /// The parameter `mangaId` of this provider.
-  String get mangaId;
-}
+String _$fetchMangaFromIdHash() => r'aa14b104bfae399f4c9480fded6d7263eec0320d';
 
-class _FetchMangaFromIdProviderElement
-    extends AutoDisposeFutureProviderElement<Manga> with _FetchMangaFromIdRef {
-  _FetchMangaFromIdProviderElement(super.provider);
+final class _FetchMangaFromIdFamily extends Family {
+  const _FetchMangaFromIdFamily._()
+      : super(
+          name: r'_fetchMangaFromIdProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  _FetchMangaFromIdProvider call(
+    String mangaId,
+  ) =>
+      _FetchMangaFromIdProvider._(argument: mangaId, from: this);
 
   @override
-  String get mangaId => (origin as _FetchMangaFromIdProvider).mangaId;
+  String debugGetCreateSourceHash() => _$fetchMangaFromIdHash();
+
+  @override
+  String toString() => r'_fetchMangaFromIdProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<Manga> Function(
+      _FetchMangaFromIdRef ref,
+      String args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchMangaFromIdProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+typedef _FetchReadChaptersRedunRef = Ref<AsyncValue<void>>;
+
+@ProviderFor(_fetchReadChaptersRedun)
+const _fetchReadChaptersRedunProvider = _FetchReadChaptersRedunFamily._();
+
+final class _FetchReadChaptersRedunProvider
+    extends $FunctionalProvider<AsyncValue<void>, FutureOr<void>>
+    with
+        $FutureModifier<void>,
+        $FutureProvider<void, _FetchReadChaptersRedunRef> {
+  const _FetchReadChaptersRedunProvider._(
+      {required _FetchReadChaptersRedunFamily super.from,
+      required Manga super.argument,
+      FutureOr<void> Function(
+        _FetchReadChaptersRedunRef ref,
+        Manga manga,
+      )? create})
+      : _createCb = create,
+        super(
+          name: r'_fetchReadChaptersRedunProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<void> Function(
+    _FetchReadChaptersRedunRef ref,
+    Manga manga,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchReadChaptersRedunHash();
+
+  @override
+  String toString() {
+    return r'_fetchReadChaptersRedunProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<void> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchReadChaptersRedunProvider $copyWithCreate(
+    FutureOr<void> Function(
+      _FetchReadChaptersRedunRef ref,
+    ) create,
+  ) {
+    return _FetchReadChaptersRedunProvider._(
+        argument: argument as Manga,
+        from: from! as _FetchReadChaptersRedunFamily,
+        create: (
+          ref,
+          Manga manga,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<void> create(_FetchReadChaptersRedunRef ref) {
+    final _$cb = _createCb ?? _fetchReadChaptersRedun;
+    final argument = this.argument as Manga;
+    return _$cb(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchReadChaptersRedunProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$fetchReadChaptersRedunHash() =>
     r'ee6e26ca0ad2a94741b4f9afe8e5e7ec62fe52ef';
 
-/// See also [_fetchReadChaptersRedun].
-@ProviderFor(_fetchReadChaptersRedun)
-const _fetchReadChaptersRedunProvider = _FetchReadChaptersRedunFamily();
-
-/// See also [_fetchReadChaptersRedun].
-class _FetchReadChaptersRedunFamily extends Family {
-  /// See also [_fetchReadChaptersRedun].
-  const _FetchReadChaptersRedunFamily();
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchReadChaptersRedunProvider';
-
-  /// See also [_fetchReadChaptersRedun].
-  _FetchReadChaptersRedunProvider call(
-    Manga manga,
-  ) {
-    return _FetchReadChaptersRedunProvider(
-      manga,
-    );
-  }
-
-  @visibleForOverriding
-  @override
-  _FetchReadChaptersRedunProvider getProviderOverride(
-    covariant _FetchReadChaptersRedunProvider provider,
-  ) {
-    return call(
-      provider.manga,
-    );
-  }
-
-  /// Enables overriding the behavior of this provider, no matter the parameters.
-  Override overrideWith(
-      FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create) {
-    return _$FetchReadChaptersRedunFamilyOverride(this, create);
-  }
-}
-
-class _$FetchReadChaptersRedunFamilyOverride implements FamilyOverride {
-  _$FetchReadChaptersRedunFamilyOverride(this.overriddenFamily, this.create);
-
-  final FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create;
-
-  @override
-  final _FetchReadChaptersRedunFamily overriddenFamily;
-
-  @override
-  _FetchReadChaptersRedunProvider getProviderOverride(
-    covariant _FetchReadChaptersRedunProvider provider,
-  ) {
-    return provider._copyWith(create);
-  }
-}
-
-/// See also [_fetchReadChaptersRedun].
-class _FetchReadChaptersRedunProvider extends AutoDisposeFutureProvider<void> {
-  /// See also [_fetchReadChaptersRedun].
-  _FetchReadChaptersRedunProvider(
-    Manga manga,
-  ) : this._internal(
-          (ref) => _fetchReadChaptersRedun(
-            ref as _FetchReadChaptersRedunRef,
-            manga,
-          ),
-          from: _fetchReadChaptersRedunProvider,
+final class _FetchReadChaptersRedunFamily extends Family {
+  const _FetchReadChaptersRedunFamily._()
+      : super(
           name: r'_fetchReadChaptersRedunProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchReadChaptersRedunHash,
-          dependencies: _FetchReadChaptersRedunFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchReadChaptersRedunFamily._allTransitiveDependencies,
-          manga: manga,
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
         );
 
-  _FetchReadChaptersRedunProvider._internal(
-    super.create, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.manga,
-  }) : super.internal();
-
-  final Manga manga;
+  _FetchReadChaptersRedunProvider call(
+    Manga manga,
+  ) =>
+      _FetchReadChaptersRedunProvider._(argument: manga, from: this);
 
   @override
+  String debugGetCreateSourceHash() => _$fetchReadChaptersRedunHash();
+
+  @override
+  String toString() => r'_fetchReadChaptersRedunProvider';
+
+  /// {@macro riverpod.override_with}
   Override overrideWith(
-    FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create,
+    FutureOr<void> Function(
+      _FetchReadChaptersRedunRef ref,
+      Manga args,
+    ) create,
   ) {
-    return ProviderOverride(
-      origin: this,
-      override: _FetchReadChaptersRedunProvider._internal(
-        (ref) => create(ref as _FetchReadChaptersRedunRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        manga: manga,
-      ),
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchReadChaptersRedunProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
     );
   }
+}
+
+typedef _FetchRelatedMangaRef = Ref<AsyncValue<List<Manga>>>;
+
+@ProviderFor(_fetchRelatedManga)
+const _fetchRelatedMangaProvider = _FetchRelatedMangaFamily._();
+
+final class _FetchRelatedMangaProvider
+    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    with
+        $FutureModifier<List<Manga>>,
+        $FutureProvider<List<Manga>, _FetchRelatedMangaRef> {
+  const _FetchRelatedMangaProvider._(
+      {required _FetchRelatedMangaFamily super.from,
+      required Manga super.argument,
+      FutureOr<List<Manga>> Function(
+        _FetchRelatedMangaRef ref,
+        Manga manga,
+      )? create})
+      : _createCb = create,
+        super(
+          name: r'_fetchRelatedMangaProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<Manga>> Function(
+    _FetchRelatedMangaRef ref,
+    Manga manga,
+  )? _createCb;
 
   @override
-  (Manga,) get argument {
-    return (manga,);
-  }
+  String debugGetCreateSourceHash() => _$fetchRelatedMangaHash();
 
   @override
-  AutoDisposeFutureProviderElement<void> createElement() {
-    return _FetchReadChaptersRedunProviderElement(this);
+  String toString() {
+    return r'_fetchRelatedMangaProvider'
+        ''
+        '($argument)';
   }
 
-  _FetchReadChaptersRedunProvider _copyWith(
-    FutureOr<void> Function(_FetchReadChaptersRedunRef ref) create,
+  @$internal
+  @override
+  $FutureProviderElement<List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchRelatedMangaProvider $copyWithCreate(
+    FutureOr<List<Manga>> Function(
+      _FetchRelatedMangaRef ref,
+    ) create,
   ) {
-    return _FetchReadChaptersRedunProvider._internal(
-      (ref) => create(ref as _FetchReadChaptersRedunRef),
-      name: name,
-      dependencies: dependencies,
-      allTransitiveDependencies: allTransitiveDependencies,
-      debugGetCreateSourceHash: debugGetCreateSourceHash,
-      from: from,
-      manga: manga,
+    return _FetchRelatedMangaProvider._(
+        argument: argument as Manga,
+        from: from! as _FetchRelatedMangaFamily,
+        create: (
+          ref,
+          Manga manga,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<List<Manga>> create(_FetchRelatedMangaRef ref) {
+    final _$cb = _createCb ?? _fetchRelatedManga;
+    final argument = this.argument as Manga;
+    return _$cb(
+      ref,
+      argument,
     );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is _FetchReadChaptersRedunProvider && other.manga == manga;
+    return other is _FetchRelatedMangaProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, manga.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
-}
-
-mixin _FetchReadChaptersRedunRef on AutoDisposeFutureProviderRef<void> {
-  /// The parameter `manga` of this provider.
-  Manga get manga;
-}
-
-class _FetchReadChaptersRedunProviderElement
-    extends AutoDisposeFutureProviderElement<void>
-    with _FetchReadChaptersRedunRef {
-  _FetchReadChaptersRedunProviderElement(super.provider);
-
-  @override
-  Manga get manga => (origin as _FetchReadChaptersRedunProvider).manga;
 }
 
 String _$fetchRelatedMangaHash() => r'c31e2c7d5a5dfce4488ea6213fa8a31bd5221dab';
 
-/// See also [_fetchRelatedManga].
-@ProviderFor(_fetchRelatedManga)
-const _fetchRelatedMangaProvider = _FetchRelatedMangaFamily();
-
-/// See also [_fetchRelatedManga].
-class _FetchRelatedMangaFamily extends Family {
-  /// See also [_fetchRelatedManga].
-  const _FetchRelatedMangaFamily();
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchRelatedMangaProvider';
-
-  /// See also [_fetchRelatedManga].
-  _FetchRelatedMangaProvider call(
-    Manga manga,
-  ) {
-    return _FetchRelatedMangaProvider(
-      manga,
-    );
-  }
-
-  @visibleForOverriding
-  @override
-  _FetchRelatedMangaProvider getProviderOverride(
-    covariant _FetchRelatedMangaProvider provider,
-  ) {
-    return call(
-      provider.manga,
-    );
-  }
-
-  /// Enables overriding the behavior of this provider, no matter the parameters.
-  Override overrideWith(
-      FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create) {
-    return _$FetchRelatedMangaFamilyOverride(this, create);
-  }
-}
-
-class _$FetchRelatedMangaFamilyOverride implements FamilyOverride {
-  _$FetchRelatedMangaFamilyOverride(this.overriddenFamily, this.create);
-
-  final FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create;
-
-  @override
-  final _FetchRelatedMangaFamily overriddenFamily;
-
-  @override
-  _FetchRelatedMangaProvider getProviderOverride(
-    covariant _FetchRelatedMangaProvider provider,
-  ) {
-    return provider._copyWith(create);
-  }
-}
-
-/// See also [_fetchRelatedManga].
-class _FetchRelatedMangaProvider
-    extends AutoDisposeFutureProvider<List<Manga>> {
-  /// See also [_fetchRelatedManga].
-  _FetchRelatedMangaProvider(
-    Manga manga,
-  ) : this._internal(
-          (ref) => _fetchRelatedManga(
-            ref as _FetchRelatedMangaRef,
-            manga,
-          ),
-          from: _fetchRelatedMangaProvider,
+final class _FetchRelatedMangaFamily extends Family {
+  const _FetchRelatedMangaFamily._()
+      : super(
           name: r'_fetchRelatedMangaProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchRelatedMangaHash,
-          dependencies: _FetchRelatedMangaFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchRelatedMangaFamily._allTransitiveDependencies,
-          manga: manga,
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
         );
 
-  _FetchRelatedMangaProvider._internal(
-    super.create, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.manga,
-  }) : super.internal();
-
-  final Manga manga;
+  _FetchRelatedMangaProvider call(
+    Manga manga,
+  ) =>
+      _FetchRelatedMangaProvider._(argument: manga, from: this);
 
   @override
+  String debugGetCreateSourceHash() => _$fetchRelatedMangaHash();
+
+  @override
+  String toString() => r'_fetchRelatedMangaProvider';
+
+  /// {@macro riverpod.override_with}
   Override overrideWith(
-    FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create,
+    FutureOr<List<Manga>> Function(
+      _FetchRelatedMangaRef ref,
+      Manga args,
+    ) create,
   ) {
-    return ProviderOverride(
-      origin: this,
-      override: _FetchRelatedMangaProvider._internal(
-        (ref) => create(ref as _FetchRelatedMangaRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        manga: manga,
-      ),
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchRelatedMangaProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
     );
   }
-
-  @override
-  (Manga,) get argument {
-    return (manga,);
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<Manga>> createElement() {
-    return _FetchRelatedMangaProviderElement(this);
-  }
-
-  _FetchRelatedMangaProvider _copyWith(
-    FutureOr<List<Manga>> Function(_FetchRelatedMangaRef ref) create,
-  ) {
-    return _FetchRelatedMangaProvider._internal(
-      (ref) => create(ref as _FetchRelatedMangaRef),
-      name: name,
-      dependencies: dependencies,
-      allTransitiveDependencies: allTransitiveDependencies,
-      debugGetCreateSourceHash: debugGetCreateSourceHash,
-      from: from,
-      manga: manga,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is _FetchRelatedMangaProvider && other.manga == manga;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, manga.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin _FetchRelatedMangaRef on AutoDisposeFutureProviderRef<List<Manga>> {
-  /// The parameter `manga` of this provider.
-  Manga get manga;
-}
-
-class _FetchRelatedMangaProviderElement
-    extends AutoDisposeFutureProviderElement<List<Manga>>
-    with _FetchRelatedMangaRef {
-  _FetchRelatedMangaProviderElement(super.provider);
-
-  @override
-  Manga get manga => (origin as _FetchRelatedMangaProvider).manga;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

@@ -6,51 +6,188 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+typedef ProxyRef = Ref<ProxyHandler>;
+
+@ProviderFor(proxy)
+const proxyProvider = ProxyProvider._();
+
+final class ProxyProvider
+    extends $FunctionalProvider<ProxyHandler, ProxyHandler>
+    with $Provider<ProxyHandler, ProxyRef> {
+  const ProxyProvider._(
+      {ProxyHandler Function(
+        ProxyRef ref,
+      )? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'proxyProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final ProxyHandler Function(
+    ProxyRef ref,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$proxyHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ProxyHandler value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<ProxyHandler>(value),
+    );
+  }
+
+  @$internal
+  @override
+  $ProviderElement<ProxyHandler> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(this, pointer);
+
+  @override
+  ProxyProvider $copyWithCreate(
+    ProxyHandler Function(
+      ProxyRef ref,
+    ) create,
+  ) {
+    return ProxyProvider._(create: create);
+  }
+
+  @override
+  ProxyHandler create(ProxyRef ref) {
+    final _$cb = _createCb ?? proxy;
+    return _$cb(ref);
+  }
+}
+
 String _$proxyHash() => r'9c1283bf072913b04bc06342dad4b6ff01fd1e7e';
 
-/// See also [proxy].
-@ProviderFor(proxy)
-final proxyProvider = Provider<ProxyHandler>.internal(
-  proxy,
-  name: r'proxyProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$proxyHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef ProxyRef = ProviderRef<ProxyHandler>;
-String _$webSourceHistoryHash() => r'2a6d79dd62487489190d268d93bbe5d2550908a1';
-
-/// See also [WebSourceHistory].
 @ProviderFor(WebSourceHistory)
-final webSourceHistoryProvider =
-    AsyncNotifierProvider<WebSourceHistory, Queue<HistoryLink>>.internal(
-  WebSourceHistory.new,
-  name: r'webSourceHistoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$webSourceHistoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const webSourceHistoryProvider = WebSourceHistoryProvider._();
 
-typedef _$WebSourceHistory = AsyncNotifier<Queue<HistoryLink>>;
-String _$webReadMarkersHash() => r'a759ec66baab960073b26e268cfcc4f510644156';
+final class WebSourceHistoryProvider
+    extends $AsyncNotifierProvider<WebSourceHistory, Queue<HistoryLink>> {
+  const WebSourceHistoryProvider._(
+      {super.runNotifierBuildOverride, WebSourceHistory Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'webSourceHistoryProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
 
-/// See also [WebReadMarkers].
+  final WebSourceHistory Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$webSourceHistoryHash();
+
+  @$internal
+  @override
+  WebSourceHistory create() => _createCb?.call() ?? WebSourceHistory();
+
+  @$internal
+  @override
+  WebSourceHistoryProvider $copyWithCreate(
+    WebSourceHistory Function() create,
+  ) {
+    return WebSourceHistoryProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  WebSourceHistoryProvider $copyWithBuild(
+    FutureOr<Queue<HistoryLink>> Function(
+      Ref<AsyncValue<Queue<HistoryLink>>>,
+      WebSourceHistory,
+    ) build,
+  ) {
+    return WebSourceHistoryProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<WebSourceHistory, Queue<HistoryLink>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$webSourceHistoryHash() => r'f7c15902810d23b0cef4bb90af15db4bcf3b508f';
+
+abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
+  FutureOr<Queue<HistoryLink>> build();
+  @$internal
+  @override
+  FutureOr<Queue<HistoryLink>> runBuild() => build();
+}
+
 @ProviderFor(WebReadMarkers)
-final webReadMarkersProvider =
-    AsyncNotifierProvider<WebReadMarkers, Map<String, Set<String>>>.internal(
-  WebReadMarkers.new,
-  name: r'webReadMarkersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$webReadMarkersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const webReadMarkersProvider = WebReadMarkersProvider._();
 
-typedef _$WebReadMarkers = AsyncNotifier<Map<String, Set<String>>>;
+final class WebReadMarkersProvider
+    extends $AsyncNotifierProvider<WebReadMarkers, Map<String, Set<String>>> {
+  const WebReadMarkersProvider._(
+      {super.runNotifierBuildOverride, WebReadMarkers Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'webReadMarkersProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final WebReadMarkers Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$webReadMarkersHash();
+
+  @$internal
+  @override
+  WebReadMarkers create() => _createCb?.call() ?? WebReadMarkers();
+
+  @$internal
+  @override
+  WebReadMarkersProvider $copyWithCreate(
+    WebReadMarkers Function() create,
+  ) {
+    return WebReadMarkersProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  WebReadMarkersProvider $copyWithBuild(
+    FutureOr<Map<String, Set<String>>> Function(
+      Ref<AsyncValue<Map<String, Set<String>>>>,
+      WebReadMarkers,
+    ) build,
+  ) {
+    return WebReadMarkersProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<WebReadMarkers, Map<String, Set<String>>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$webReadMarkersHash() => r'2ac6716838cb01cf43b9a7db25e9a9e81233ee9a';
+
+abstract class _$WebReadMarkers
+    extends $AsyncNotifier<Map<String, Set<String>>> {
+  FutureOr<Map<String, Set<String>>> build();
+  @$internal
+  @override
+  FutureOr<Map<String, Set<String>>> runBuild() => build();
+}
+
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

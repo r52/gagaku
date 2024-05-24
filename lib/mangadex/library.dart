@@ -8,6 +8,7 @@ import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/legacy.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -50,7 +51,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
     Widget? paginator;
 
     switch (listProvider) {
-      case AsyncValue(valueOrNull: final list?):
+      case AsyncValue(value: final list?):
         final titlesProvider =
             ref.watch(getMangaListByPageProvider(list, currentPage.value));
 
@@ -65,7 +66,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
         );
 
         child = switch (titlesProvider) {
-          AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
+          AsyncValue(value: final mangas?) => RefreshIndicator(
               onRefresh: () {
                 ref.read(userLibraryProvider.notifier).clear();
                 final lt = ref.read(libraryViewTypeProvider);

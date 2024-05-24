@@ -6,368 +6,257 @@ part of 'reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchChapterDataHash() => r'77340a27fbc2d76f76dd9fe5919792f6454e6223';
+typedef _FetchChapterDataRef = Ref<AsyncValue<ReaderData>>;
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [_fetchChapterData].
 @ProviderFor(_fetchChapterData)
-const _fetchChapterDataProvider = _FetchChapterDataFamily();
+const _fetchChapterDataProvider = _FetchChapterDataFamily._();
 
-/// See also [_fetchChapterData].
-class _FetchChapterDataFamily extends Family {
-  /// See also [_fetchChapterData].
-  const _FetchChapterDataFamily();
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchChapterDataProvider';
-
-  /// See also [_fetchChapterData].
-  _FetchChapterDataProvider call(
-    String chapterId,
-  ) {
-    return _FetchChapterDataProvider(
-      chapterId,
-    );
-  }
-
-  @visibleForOverriding
-  @override
-  _FetchChapterDataProvider getProviderOverride(
-    covariant _FetchChapterDataProvider provider,
-  ) {
-    return call(
-      provider.chapterId,
-    );
-  }
-
-  /// Enables overriding the behavior of this provider, no matter the parameters.
-  Override overrideWith(
-      FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create) {
-    return _$FetchChapterDataFamilyOverride(this, create);
-  }
-}
-
-class _$FetchChapterDataFamilyOverride implements FamilyOverride {
-  _$FetchChapterDataFamilyOverride(this.overriddenFamily, this.create);
-
-  final FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create;
-
-  @override
-  final _FetchChapterDataFamily overriddenFamily;
-
-  @override
-  _FetchChapterDataProvider getProviderOverride(
-    covariant _FetchChapterDataProvider provider,
-  ) {
-    return provider._copyWith(create);
-  }
-}
-
-/// See also [_fetchChapterData].
-class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
-  /// See also [_fetchChapterData].
-  _FetchChapterDataProvider(
-    String chapterId,
-  ) : this._internal(
-          (ref) => _fetchChapterData(
-            ref as _FetchChapterDataRef,
-            chapterId,
-          ),
-          from: _fetchChapterDataProvider,
+final class _FetchChapterDataProvider
+    extends $FunctionalProvider<AsyncValue<ReaderData>, FutureOr<ReaderData>>
+    with
+        $FutureModifier<ReaderData>,
+        $FutureProvider<ReaderData, _FetchChapterDataRef> {
+  const _FetchChapterDataProvider._(
+      {required _FetchChapterDataFamily super.from,
+      required String super.argument,
+      FutureOr<ReaderData> Function(
+        _FetchChapterDataRef ref,
+        String chapterId,
+      )? create})
+      : _createCb = create,
+        super(
           name: r'_fetchChapterDataProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchChapterDataHash,
-          dependencies: _FetchChapterDataFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchChapterDataFamily._allTransitiveDependencies,
-          chapterId: chapterId,
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  _FetchChapterDataProvider._internal(
-    super.create, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.chapterId,
-  }) : super.internal();
-
-  final String chapterId;
+  final FutureOr<ReaderData> Function(
+    _FetchChapterDataRef ref,
+    String chapterId,
+  )? _createCb;
 
   @override
-  Override overrideWith(
-    FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create,
+  String debugGetCreateSourceHash() => _$fetchChapterDataHash();
+
+  @override
+  String toString() {
+    return r'_fetchChapterDataProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<ReaderData> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchChapterDataProvider $copyWithCreate(
+    FutureOr<ReaderData> Function(
+      _FetchChapterDataRef ref,
+    ) create,
   ) {
-    return ProviderOverride(
-      origin: this,
-      override: _FetchChapterDataProvider._internal(
-        (ref) => create(ref as _FetchChapterDataRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        chapterId: chapterId,
-      ),
-    );
+    return _FetchChapterDataProvider._(
+        argument: argument as String,
+        from: from! as _FetchChapterDataFamily,
+        create: (
+          ref,
+          String chapterId,
+        ) =>
+            create(ref));
   }
 
   @override
-  (String,) get argument {
-    return (chapterId,);
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<ReaderData> createElement() {
-    return _FetchChapterDataProviderElement(this);
-  }
-
-  _FetchChapterDataProvider _copyWith(
-    FutureOr<ReaderData> Function(_FetchChapterDataRef ref) create,
-  ) {
-    return _FetchChapterDataProvider._internal(
-      (ref) => create(ref as _FetchChapterDataRef),
-      name: name,
-      dependencies: dependencies,
-      allTransitiveDependencies: allTransitiveDependencies,
-      debugGetCreateSourceHash: debugGetCreateSourceHash,
-      from: from,
-      chapterId: chapterId,
+  FutureOr<ReaderData> create(_FetchChapterDataRef ref) {
+    final _$cb = _createCb ?? _fetchChapterData;
+    final argument = this.argument as String;
+    return _$cb(
+      ref,
+      argument,
     );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is _FetchChapterDataProvider && other.chapterId == chapterId;
+    return other is _FetchChapterDataProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, chapterId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-mixin _FetchChapterDataRef on AutoDisposeFutureProviderRef<ReaderData> {
-  /// The parameter `chapterId` of this provider.
-  String get chapterId;
-}
+String _$fetchChapterDataHash() => r'77340a27fbc2d76f76dd9fe5919792f6454e6223';
 
-class _FetchChapterDataProviderElement
-    extends AutoDisposeFutureProviderElement<ReaderData>
-    with _FetchChapterDataRef {
-  _FetchChapterDataProviderElement(super.provider);
+final class _FetchChapterDataFamily extends Family {
+  const _FetchChapterDataFamily._()
+      : super(
+          name: r'_fetchChapterDataProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  _FetchChapterDataProvider call(
+    String chapterId,
+  ) =>
+      _FetchChapterDataProvider._(argument: chapterId, from: this);
 
   @override
-  String get chapterId => (origin as _FetchChapterDataProvider).chapterId;
+  String debugGetCreateSourceHash() => _$fetchChapterDataHash();
+
+  @override
+  String toString() => r'_fetchChapterDataProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<ReaderData> Function(
+      _FetchChapterDataRef ref,
+      String args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchChapterDataProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+typedef _FetchChapterPagesRef = Ref<AsyncValue<List<ReaderPage>>>;
+
+@ProviderFor(_fetchChapterPages)
+const _fetchChapterPagesProvider = _FetchChapterPagesFamily._();
+
+final class _FetchChapterPagesProvider extends $FunctionalProvider<
+        AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
+    with
+        $FutureModifier<List<ReaderPage>>,
+        $FutureProvider<List<ReaderPage>, _FetchChapterPagesRef> {
+  const _FetchChapterPagesProvider._(
+      {required _FetchChapterPagesFamily super.from,
+      required Chapter super.argument,
+      FutureOr<List<ReaderPage>> Function(
+        _FetchChapterPagesRef ref,
+        Chapter chapter,
+      )? create})
+      : _createCb = create,
+        super(
+          name: r'_fetchChapterPagesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<ReaderPage>> Function(
+    _FetchChapterPagesRef ref,
+    Chapter chapter,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchChapterPagesHash();
+
+  @override
+  String toString() {
+    return r'_fetchChapterPagesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ReaderPage>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchChapterPagesProvider $copyWithCreate(
+    FutureOr<List<ReaderPage>> Function(
+      _FetchChapterPagesRef ref,
+    ) create,
+  ) {
+    return _FetchChapterPagesProvider._(
+        argument: argument as Chapter,
+        from: from! as _FetchChapterPagesFamily,
+        create: (
+          ref,
+          Chapter chapter,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<List<ReaderPage>> create(_FetchChapterPagesRef ref) {
+    final _$cb = _createCb ?? _fetchChapterPages;
+    final argument = this.argument as Chapter;
+    return _$cb(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchChapterPagesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$fetchChapterPagesHash() => r'ef0ef651c755abf1da2f4848d0e44fb7dbf07989';
 
-/// See also [_fetchChapterPages].
-@ProviderFor(_fetchChapterPages)
-const _fetchChapterPagesProvider = _FetchChapterPagesFamily();
-
-/// See also [_fetchChapterPages].
-class _FetchChapterPagesFamily extends Family {
-  /// See also [_fetchChapterPages].
-  const _FetchChapterPagesFamily();
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchChapterPagesProvider';
-
-  /// See also [_fetchChapterPages].
-  _FetchChapterPagesProvider call(
-    Chapter chapter,
-  ) {
-    return _FetchChapterPagesProvider(
-      chapter,
-    );
-  }
-
-  @visibleForOverriding
-  @override
-  _FetchChapterPagesProvider getProviderOverride(
-    covariant _FetchChapterPagesProvider provider,
-  ) {
-    return call(
-      provider.chapter,
-    );
-  }
-
-  /// Enables overriding the behavior of this provider, no matter the parameters.
-  Override overrideWith(
-      FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create) {
-    return _$FetchChapterPagesFamilyOverride(this, create);
-  }
-}
-
-class _$FetchChapterPagesFamilyOverride implements FamilyOverride {
-  _$FetchChapterPagesFamilyOverride(this.overriddenFamily, this.create);
-
-  final FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create;
-
-  @override
-  final _FetchChapterPagesFamily overriddenFamily;
-
-  @override
-  _FetchChapterPagesProvider getProviderOverride(
-    covariant _FetchChapterPagesProvider provider,
-  ) {
-    return provider._copyWith(create);
-  }
-}
-
-/// See also [_fetchChapterPages].
-class _FetchChapterPagesProvider
-    extends AutoDisposeFutureProvider<List<ReaderPage>> {
-  /// See also [_fetchChapterPages].
-  _FetchChapterPagesProvider(
-    Chapter chapter,
-  ) : this._internal(
-          (ref) => _fetchChapterPages(
-            ref as _FetchChapterPagesRef,
-            chapter,
-          ),
-          from: _fetchChapterPagesProvider,
+final class _FetchChapterPagesFamily extends Family {
+  const _FetchChapterPagesFamily._()
+      : super(
           name: r'_fetchChapterPagesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchChapterPagesHash,
-          dependencies: _FetchChapterPagesFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchChapterPagesFamily._allTransitiveDependencies,
-          chapter: chapter,
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
         );
 
-  _FetchChapterPagesProvider._internal(
-    super.create, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.chapter,
-  }) : super.internal();
-
-  final Chapter chapter;
+  _FetchChapterPagesProvider call(
+    Chapter chapter,
+  ) =>
+      _FetchChapterPagesProvider._(argument: chapter, from: this);
 
   @override
+  String debugGetCreateSourceHash() => _$fetchChapterPagesHash();
+
+  @override
+  String toString() => r'_fetchChapterPagesProvider';
+
+  /// {@macro riverpod.override_with}
   Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create,
+    FutureOr<List<ReaderPage>> Function(
+      _FetchChapterPagesRef ref,
+      Chapter args,
+    ) create,
   ) {
-    return ProviderOverride(
-      origin: this,
-      override: _FetchChapterPagesProvider._internal(
-        (ref) => create(ref as _FetchChapterPagesRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        chapter: chapter,
-      ),
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchChapterPagesProvider;
+
+        final argument = provider.argument as Chapter;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
     );
   }
-
-  @override
-  (Chapter,) get argument {
-    return (chapter,);
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<ReaderPage>> createElement() {
-    return _FetchChapterPagesProviderElement(this);
-  }
-
-  _FetchChapterPagesProvider _copyWith(
-    FutureOr<List<ReaderPage>> Function(_FetchChapterPagesRef ref) create,
-  ) {
-    return _FetchChapterPagesProvider._internal(
-      (ref) => create(ref as _FetchChapterPagesRef),
-      name: name,
-      dependencies: dependencies,
-      allTransitiveDependencies: allTransitiveDependencies,
-      debugGetCreateSourceHash: debugGetCreateSourceHash,
-      from: from,
-      chapter: chapter,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is _FetchChapterPagesProvider && other.chapter == chapter;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, chapter.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin _FetchChapterPagesRef on AutoDisposeFutureProviderRef<List<ReaderPage>> {
-  /// The parameter `chapter` of this provider.
-  Chapter get chapter;
-}
-
-class _FetchChapterPagesProviderElement
-    extends AutoDisposeFutureProviderElement<List<ReaderPage>>
-    with _FetchChapterPagesRef {
-  _FetchChapterPagesProviderElement(super.provider);
-
-  @override
-  Chapter get chapter => (origin as _FetchChapterPagesProvider).chapter;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

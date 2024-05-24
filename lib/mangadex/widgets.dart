@@ -9,6 +9,7 @@ import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/legacy.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -71,7 +72,7 @@ class MarkReadButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
+    final loggedin = ref.watch(authControlProvider).value ?? false;
 
     if (!loggedin) {
       return const SizedBox.shrink();
@@ -81,7 +82,7 @@ class MarkReadButton extends ConsumerWidget {
 
     bool? isRead =
         ref.watch(readChaptersProvider.select((value) => switch (value) {
-              AsyncValue(valueOrNull: final data?) =>
+              AsyncValue(value: final data?) =>
                 data[manga.id]?.contains(chapter.id) == true,
               _ => null,
             }));
@@ -126,7 +127,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
     this.restorationId,
   });
 
-  final AutoDisposeFutureProvider<List<ChapterFeedItemData>> provider;
+  final ProviderBase<AsyncValue<List<ChapterFeedItemData>>> provider;
   final String? title;
   final String? emptyText;
   final VoidCallback? onAtEdge;
@@ -167,7 +168,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
               child: Styles.errorList(error, stackTrace),
             );
           }(),
-        AsyncValue(valueOrNull: final results?) => ScrollConfiguration(
+        AsyncValue(value: final results?) => ScrollConfiguration(
             behavior: const MouseTouchScrollBehavior(),
             child: RefreshIndicator(
               onRefresh: onRefresh,
@@ -424,7 +425,7 @@ class ChapterButtonWidget extends StatelessWidget {
                     builder: (context, ref, child) {
                       final theme = Theme.of(context);
                       final loggedin =
-                          ref.watch(authControlProvider).valueOrNull ?? false;
+                          ref.watch(authControlProvider).value ?? false;
 
                       TextStyle textstyle;
 
@@ -435,7 +436,7 @@ class ChapterButtonWidget extends StatelessWidget {
                       } else {
                         bool? isRead = ref.watch(readChaptersProvider
                             .select((value) => switch (value) {
-                                  AsyncValue(valueOrNull: final data?) =>
+                                  AsyncValue(value: final data?) =>
                                     data[manga.id]?.contains(chapter.id) ==
                                         true,
                                   _ => null,
@@ -534,7 +535,7 @@ class ChapterButtonWidget extends StatelessWidget {
         builder: (context, ref, child) {
           final theme = Theme.of(context);
           final tileColor = theme.colorScheme.primaryContainer;
-          final loggedin = ref.watch(authControlProvider).valueOrNull ?? false;
+          final loggedin = ref.watch(authControlProvider).value ?? false;
 
           Border border;
 
@@ -545,7 +546,7 @@ class ChapterButtonWidget extends StatelessWidget {
           } else {
             bool? isRead = ref
                 .watch(readChaptersProvider.select((value) => switch (value) {
-                      AsyncValue(valueOrNull: final data?) =>
+                      AsyncValue(value: final data?) =>
                         data[manga.id]?.contains(chapter.id) == true,
                       _ => null,
                     }));
@@ -952,7 +953,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                     text: statsError,
                                   )
                                 ],
-                              AsyncValue(valueOrNull: final stats?)
+                              AsyncValue(value: final stats?)
                                   when stats.containsKey(manga.id) =>
                                 [
                                   IconTextChip(
@@ -992,7 +993,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                         statsError,
                                   ),
                                 ],
-                              AsyncValue(valueOrNull: final _?) => [
+                              AsyncValue(value: final _?) => [
                                   const IconTextChip(
                                     text: statsError,
                                   )
@@ -1157,7 +1158,7 @@ class _ListMangaItem extends ConsumerWidget {
                               text: statsError,
                             )
                           ],
-                        AsyncValue(valueOrNull: final stats?)
+                        AsyncValue(value: final stats?)
                             when stats.containsKey(manga.id) =>
                           [
                             IconTextChip(
@@ -1197,7 +1198,7 @@ class _ListMangaItem extends ConsumerWidget {
                                   statsError,
                             ),
                           ],
-                        AsyncValue(valueOrNull: final _?) => [
+                        AsyncValue(value: final _?) => [
                             const IconTextChip(
                               text: statsError,
                             )

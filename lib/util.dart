@@ -5,7 +5,6 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 mixin ExpiringData {
@@ -77,7 +76,7 @@ class DeviceContext {
   }
 }
 
-mixin AutoDisposeExpiryMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
+mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>, FutureOr<T>> {
   Timer? _staleTimer;
   DateTime? _expiry;
 
@@ -133,62 +132,8 @@ mixin AutoDisposeExpiryMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
   }
 }
 
-mixin ExpiryMix<T> on BuildlessAsyncNotifier<T> {
-  Timer? _staleTimer;
-  DateTime? _expiry;
-
-  void cancelStaleTime() {
-    _staleTimer?.cancel();
-  }
-
-  /// Invalidates the provider after [expiry]
-  void staleTime(Duration expiry) {
-    _staleTimer?.cancel();
-
-    _expiry = DateTime.now().add(expiry);
-
-    _staleTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      if (_expiry == null) {
-        timer.cancel();
-      }
-
-      if (_expiry != null && DateTime.now().compareTo(_expiry!) >= 0) {
-        logger.d('${runtimeType.toString()}: staleTime expiry');
-        ref.invalidateSelf();
-      }
-    });
-
-    ref.onDispose(() {
-      logger.d('${runtimeType.toString()}: disposed');
-      _staleTimer?.cancel();
-    });
-  }
-
-  /// Keeps the provider alive for [duration] after pause
-  void disposeAfter(Duration duration) {
-    _staleTimer?.cancel();
-
-    ref.onCancel(() {
-      _staleTimer = Timer(duration, () {
-        logger.d(
-            '${runtimeType.toString()}: disposeAfter ${duration.toString()}');
-        ref.invalidateSelf();
-      });
-    });
-
-    ref.onResume(() {
-      _staleTimer?.cancel();
-    });
-
-    ref.onDispose(() {
-      logger.d('${runtimeType.toString()}: disposed');
-      _staleTimer?.cancel();
-    });
-  }
-}
-
 // From riverpod doc https://riverpod.dev/docs/essentials/auto_dispose
-extension CacheForExtension on AutoDisposeRef<Object?> {
+extension CacheForExtension on Ref<Object?> {
   /// Keeps the provider alive for [duration].
   void cacheFor(Duration duration) {
     // Immediately prevent the state from getting destroyed.

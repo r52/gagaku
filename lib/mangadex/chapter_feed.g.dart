@@ -6,22 +6,61 @@ part of 'chapter_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+typedef _FetchChaptersRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
+
+@ProviderFor(_fetchChapters)
+const _fetchChaptersProvider = _FetchChaptersProvider._();
+
+final class _FetchChaptersProvider extends $FunctionalProvider<
+        AsyncValue<List<ChapterFeedItemData>>,
+        FutureOr<List<ChapterFeedItemData>>>
+    with
+        $FutureModifier<List<ChapterFeedItemData>>,
+        $FutureProvider<List<ChapterFeedItemData>, _FetchChaptersRef> {
+  const _FetchChaptersProvider._(
+      {FutureOr<List<ChapterFeedItemData>> Function(
+        _FetchChaptersRef ref,
+      )? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'_fetchChaptersProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<ChapterFeedItemData>> Function(
+    _FetchChaptersRef ref,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchChaptersHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ChapterFeedItemData>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchChaptersProvider $copyWithCreate(
+    FutureOr<List<ChapterFeedItemData>> Function(
+      _FetchChaptersRef ref,
+    ) create,
+  ) {
+    return _FetchChaptersProvider._(create: create);
+  }
+
+  @override
+  FutureOr<List<ChapterFeedItemData>> create(_FetchChaptersRef ref) {
+    final _$cb = _createCb ?? _fetchChapters;
+    return _$cb(ref);
+  }
+}
+
 String _$fetchChaptersHash() => r'84546f08ee99861c10b01eba7816feb5582adeb3';
 
-/// See also [_fetchChapters].
-@ProviderFor(_fetchChapters)
-final _fetchChaptersProvider =
-    AutoDisposeFutureProvider<List<ChapterFeedItemData>>.internal(
-  _fetchChapters,
-  name: r'_fetchChaptersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$fetchChaptersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _FetchChaptersRef
-    = AutoDisposeFutureProviderRef<List<ChapterFeedItemData>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, inference_failure_on_uninitialized_variable, inference_failure_on_function_return_type, inference_failure_on_untyped_parameter, deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

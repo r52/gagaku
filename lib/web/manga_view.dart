@@ -83,7 +83,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
     PreferredSizeWidget? appBar;
 
     switch (mangaProvider) {
-      case AsyncValue(valueOrNull: final manga?):
+      case AsyncValue(value: final manga?):
         child = RefreshIndicator(
           onRefresh: () async {
             await api.invalidateAll(info.getKey());
@@ -327,7 +327,7 @@ class ChapterButtonWidget extends ConsumerWidget {
 
     final isRead =
         ref.watch(webReadMarkersProvider.select((value) => switch (value) {
-              AsyncValue(valueOrNull: final data?) =>
+              AsyncValue(value: final data?) =>
                 data[key]?.contains(name) ?? false,
               _ => false,
             }));

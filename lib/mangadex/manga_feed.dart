@@ -58,7 +58,7 @@ class MangaDexMangaFeed extends ConsumerWidget {
                   child: Styles.errorList(error, stackTrace),
                 );
               }(),
-            AsyncValue(valueOrNull: final mangas?) => RefreshIndicator(
+            AsyncValue(value: final mangas?) => RefreshIndicator(
                 onRefresh: () {
                   ref.read(latestChaptersFeedProvider.notifier).clear();
                   return ref.refresh(_fetchMangaFeedProvider.future);

@@ -149,7 +149,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
     PreferredSizeWidget? appBar;
 
     switch (dataProvider) {
-      case AsyncValue(valueOrNull: final data?):
+      case AsyncValue(value: final data?):
         return WebSourceReaderWidget(
           source: data.source,
           manga: data.manga,
@@ -261,7 +261,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
           ),
           body: Styles.errorColumn(error, stackTrace),
         );
-      case AsyncValue(valueOrNull: final pages?):
+      case AsyncValue(value: final pages?):
         return ReaderWidget(
           pages: pages,
           title: name,
