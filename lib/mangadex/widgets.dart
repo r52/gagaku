@@ -557,7 +557,7 @@ class ChapterButtonWidget extends StatelessWidget {
             );
           }
 
-          return Container(
+          return Ink(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(4)),
               color: tileColor,

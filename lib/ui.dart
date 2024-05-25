@@ -2,7 +2,6 @@ import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -107,7 +106,7 @@ class ButtonChip extends StatelessWidget {
   }
 }
 
-class IconTextChip extends HookWidget {
+class IconTextChip extends StatelessWidget {
   const IconTextChip({
     super.key,
     this.icon,
@@ -126,43 +125,34 @@ class IconTextChip extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bgColor = color ?? theme.colorScheme.tertiaryContainer;
-    final hoverColor = theme.colorScheme.primary.withOpacity(0.08);
-    final hover = useState(false);
 
-    Widget chip = UnconstrainedBox(
-      child: Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        ),
-        foregroundDecoration:
-            hover.value ? BoxDecoration(color: hoverColor) : null,
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-        alignment: Alignment.center,
-        child: Text.rich(
-          style: style,
-          TextSpan(
-            children: [
-              if (icon != null)
-                WidgetSpan(
-                    alignment: PlaceholderAlignment.middle, child: icon!),
-              TextSpan(text: '${icon != null ? ' ' : ''}$text'),
-            ],
-          ),
+    Widget child = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      child: Text.rich(
+        style: style,
+        TextSpan(
+          children: [
+            if (icon != null)
+              WidgetSpan(alignment: PlaceholderAlignment.middle, child: icon!),
+            TextSpan(text: '${icon != null ? ' ' : ''}$text'),
+          ],
         ),
       ),
     );
 
     if (onPressed != null) {
-      chip = InkWell(
+      child = InkWell(
         onTap: onPressed,
-        onHover: (value) => hover.value = value,
-        child: chip,
+        hoverColor: theme.colorScheme.primary.withOpacity(0.08),
+        child: child,
       );
     }
 
-    return chip;
+    return Material(
+      borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+      color: color ?? theme.colorScheme.tertiaryContainer,
+      child: child,
+    );
   }
 }
 

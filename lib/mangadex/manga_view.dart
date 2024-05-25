@@ -340,8 +340,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             manga: manga,
                           ),
                         ],
+                        const SizedBox(
+                          width: 8,
+                        ),
                         _RatingMenu(
                           manga: manga,
+                        ),
+                        const SizedBox(
+                          width: 8,
                         ),
                         _UserListsMenu(
                           manga: manga,
@@ -478,20 +484,25 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ExpansionTile(
                           title: Text(Languages.get(entry.first.key).label),
                           children: [
-                            InkWell(
-                              onTap: () => Clipboard.setData(
-                                      ClipboardData(text: entry.first.value))
-                                  .then((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Copied to clipboard!')));
-                              }),
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Material(
                                 color:
                                     theme.colorScheme.surfaceContainerHighest,
-                                child: Text(entry.first.value),
+                                child: InkWell(
+                                  onTap: () => Clipboard.setData(ClipboardData(
+                                          text: entry.first.value))
+                                      .then((_) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Copied to clipboard!')));
+                                  }),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(entry.first.value),
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -1297,8 +1308,11 @@ class _RatingMenu extends ConsumerWidget {
 
     return MenuAnchor(
       builder: (context, controller, child) {
-        return Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+        return Material(
+          color: ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0
+              ? Colors.deepOrange.shade800
+              : theme.colorScheme.surfaceContainerHighest,
+          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
           child: InkWell(
             onTap: () {
               if (controller.isOpen) {
@@ -1329,14 +1343,8 @@ class _RatingMenu extends ConsumerWidget {
             child: const Text('Remove Rating'),
           )
       ],
-      child: Container(
+      child: Padding(
         padding: const EdgeInsets.all(6.0),
-        decoration: BoxDecoration(
-          color: ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0
-              ? Colors.deepOrange.shade800
-              : theme.colorScheme.surfaceContainerHighest,
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        ),
         child: Text.rich(
           TextSpan(
             children: [
@@ -1377,8 +1385,9 @@ class _UserListsMenu extends ConsumerWidget {
           return _loadingAction;
         }
 
-        return Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+        return Material(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
           child: InkWell(
             onTap: () {
               if (controller.isOpen) {
@@ -1512,13 +1521,9 @@ class _UserListsMenu extends ConsumerWidget {
           },
         )
       ],
-      child: Container(
-        padding: const EdgeInsets.all(6.0),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        ),
-        child: const Icon(Icons.playlist_add),
+      child: const Padding(
+        padding: EdgeInsets.all(6.0),
+        child: Icon(Icons.playlist_add),
       ),
     );
   }
