@@ -263,7 +263,6 @@ class WebMangaViewWidget extends StatelessWidget {
         SliverToBoxAdapter(
           child: Container(
             padding: const EdgeInsets.all(8),
-            color: theme.cardColor,
             child: const Text(
               'Chapters',
               style: TextStyle(fontSize: 24),

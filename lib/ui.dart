@@ -27,14 +27,12 @@ class MultiChildExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return ExpansionTile(
       expandedAlignment: Alignment.centerLeft,
       title: Text(title),
       children: [
         Container(
           padding: const EdgeInsets.all(8),
-          color: theme.colorScheme.surface,
           child: Wrap(
             spacing: 4.0,
             runSpacing: 4.0,
@@ -437,7 +435,7 @@ class Styles {
           Animation<double> secondaryAnimation,
           Widget child) =>
       SharedAxisTransition(
-        fillColor: Theme.of(context).cardColor,
+        fillColor: Theme.of(context).colorScheme.surface,
         animation: animation,
         secondaryAnimation: secondaryAnimation,
         transitionType: SharedAxisTransitionType.scaled,
@@ -450,7 +448,7 @@ class Styles {
           Animation<double> secondaryAnimation,
           Widget child) =>
       SharedAxisTransition(
-        fillColor: Theme.of(context).cardColor,
+        fillColor: Theme.of(context).colorScheme.surface,
         animation: animation,
         secondaryAnimation: secondaryAnimation,
         transitionType: SharedAxisTransitionType.horizontal,
@@ -470,7 +468,7 @@ class Styles {
       pageBuilder: builder,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return SharedAxisTransition(
-          fillColor: Theme.of(context).cardColor,
+          fillColor: Theme.of(context).colorScheme.surface,
           animation: animation,
           secondaryAnimation: secondaryAnimation,
           transitionType: transitionType,

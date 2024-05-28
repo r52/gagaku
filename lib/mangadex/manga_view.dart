@@ -360,7 +360,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               SliverToBoxAdapter(
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  color: theme.cardColor,
                   child: Wrap(
                     spacing: 4.0,
                     runSpacing: 4.0,
@@ -388,7 +387,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               SliverToBoxAdapter(
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  color: theme.cardColor,
                   child: Consumer(
                     builder: (context, ref, child) {
                       final statsProvider = ref.watch(statisticsProvider);
@@ -574,7 +572,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.surface,
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: IconTextChip(
@@ -696,7 +693,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            color: theme.colorScheme.surface,
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(lastvolchap),
@@ -710,7 +706,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               SliverToBoxAdapter(
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  color: theme.cardColor,
                   child: ToggleButtons(
                     isSelected: List<bool>.generate(
                         hasRelated
@@ -738,7 +733,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 SliverToBoxAdapter(
                   child: Container(
                     padding: const EdgeInsets.all(8),
-                    color: theme.cardColor,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Consumer(

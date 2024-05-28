@@ -72,7 +72,7 @@ class MangaDexHome extends HookConsumerWidget {
               Tooltip(
                 message: 'Search Manga',
                 child: OpenContainer(
-                  closedColor: theme.cardColor,
+                  closedColor: theme.colorScheme.surface,
                   closedShape: const CircleBorder(),
                   closedBuilder: (context, openContainer) {
                     return IconButton(
@@ -90,7 +90,7 @@ class MangaDexHome extends HookConsumerWidget {
               Tooltip(
                 message: 'MangaDex Settings',
                 child: OpenContainer<bool>(
-                  closedColor: theme.cardColor,
+                  closedColor: theme.colorScheme.surface,
                   closedShape: const CircleBorder(),
                   closedBuilder: (context, openContainer) {
                     return IconButton(
@@ -137,7 +137,7 @@ class MangaDexHome extends HookConsumerWidget {
 
                       return Ink(
                         decoration: ShapeDecoration(
-                          color: theme.cardColor,
+                          color: theme.colorScheme.surface,
                           shape: const CircleBorder(),
                         ),
                         child: logbtn,

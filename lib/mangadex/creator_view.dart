@@ -207,7 +207,6 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(8),
-                                  color: theme.colorScheme.surface,
                                   child: Wrap(
                                     spacing: 4.0,
                                     runSpacing: 4.0,

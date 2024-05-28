@@ -185,7 +185,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(8),
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       child: Text(group.attributes.description!),
                     ),
                   ],
@@ -201,7 +201,6 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      color: theme.colorScheme.surface,
                       child: Wrap(
                         spacing: 4.0,
                         runSpacing: 4.0,
