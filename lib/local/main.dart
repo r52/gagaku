@@ -10,7 +10,6 @@ import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class LocalLibraryHome extends StatelessWidget {
@@ -107,31 +106,29 @@ class LocalLibraryHome extends StatelessWidget {
             return null;
           }, [libraryProvider]);
 
-          if (DeviceContext.isMobile() || settings.libraryDirectory.isEmpty) {
+          if (settings.libraryDirectory.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (DeviceContext.isDesktop()) ...[
-                    const Text('No library directory set!'),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        nav.push(createLocalLibrarySettingsRoute());
-                      },
-                      icon: const Icon(Icons.library_add),
-                      label: const Text('Set Library Directory'),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Divider(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ],
+                  const Text('No library directory set!'),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      nav.push(createLocalLibrarySettingsRoute());
+                    },
+                    icon: const Icon(Icons.library_add),
+                    label: const Text('Set Library Directory'),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Divider(),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   ElevatedButton.icon(
                     onPressed: () async {
                       await _readArchive(nav);
