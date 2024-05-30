@@ -3,7 +3,6 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -666,20 +665,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           ),
                         ButtonChip(
                           onPressed: () async {
-                            final route =
+                            var route =
                                 GoRouterState.of(context).uri.toString();
+                            route =
+                                route.replaceFirst('https://mangadex.org', '');
                             final url = Uri.parse('https://mangadex.org$route');
 
-                            if (DeviceContext.isMobile()) {
-                              InAppBrowser().openUrlRequest(
-                                urlRequest: URLRequest(url: WebUri.uri(url)),
-                                settings: InAppBrowserClassSettings(
-                                  browserSettings: InAppBrowserSettings(
-                                    hideToolbarTop: true,
-                                  ),
-                                ),
-                              );
-                            } else if (!await launchUrl(url)) {
+                            if (!await launchUrl(url,
+                                mode: LaunchMode.inAppWebView)) {
                               throw 'Could not launch $url';
                             }
                           },

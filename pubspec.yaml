@@ -60,7 +60,6 @@ dependencies:
   number_paginator: ^0.4.0
   collection: ^1.18.0
   device_info_plus: ^10.0.1
-  flutter_inappwebview: ^6.0.0
   super_sliver_list: ^0.4.0
   uuid: ^4.4.0
 

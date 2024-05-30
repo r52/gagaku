@@ -1,6 +1,5 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
@@ -237,19 +236,12 @@ class WebMangaViewWidget extends StatelessWidget {
                 children: [
                   ButtonChip(
                     onPressed: () async {
-                      final route = GoRouterState.of(context).uri.toString();
+                      var route = GoRouterState.of(context).uri.toString();
+                      route = route.replaceFirst('https://cubari.moe', '');
                       final url = Uri.parse('https://cubari.moe$route');
 
-                      if (DeviceContext.isMobile()) {
-                        InAppBrowser().openUrlRequest(
-                          urlRequest: URLRequest(url: WebUri.uri(url)),
-                          settings: InAppBrowserClassSettings(
-                            browserSettings: InAppBrowserSettings(
-                              hideToolbarTop: true,
-                            ),
-                          ),
-                        );
-                      } else if (!await launchUrl(url)) {
+                      if (!await launchUrl(url,
+                          mode: LaunchMode.inAppWebView)) {
                         throw 'Could not launch $url';
                       }
                     },
