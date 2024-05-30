@@ -215,6 +215,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                           .deleteList(list)
                           .then((success) {
                         if (success == true) {
+                          if (!context.mounted) return;
                           context.pop();
                         } else {
                           messenger

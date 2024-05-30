@@ -163,6 +163,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
                       success.then((success) {
                         if (success) {
+                          if (!context.mounted) return;
                           context.pop(true);
                         } else {
                           messenger

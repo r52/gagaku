@@ -490,6 +490,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   onTap: () => Clipboard.setData(ClipboardData(
                                           text: entry.first.value))
                                       .then((_) {
+                                    if (!context.mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content:
