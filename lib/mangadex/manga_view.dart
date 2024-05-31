@@ -19,11 +19,11 @@ part 'manga_view.g.dart';
 
 enum _ViewType { chapters, art, related }
 
-const _loadingAction = Padding(
-  padding: EdgeInsets.symmetric(horizontal: 20),
-  child: SizedBox(
-    width: 20,
-    height: 20,
+const _loadingAction = SizedBox(
+  width: 36,
+  height: 36,
+  child: Padding(
+    padding: EdgeInsets.all(8.0),
     child: CircularProgressIndicator(),
   ),
 );
@@ -1290,27 +1290,27 @@ class _RatingMenu extends ConsumerWidget {
     final ratingProv = ref.watch(ratingsProvider);
     final ratings = ratingProv.value;
 
-    if (ratingProv.isLoading || ratings == null) {
-      return _loadingAction;
-    }
-
     return MenuAnchor(
       builder: (context, controller, child) {
         return Material(
-          color: ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0
+          color: (ratings != null &&
+                  ratings.containsKey(manga.id) &&
+                  ratings[manga.id]!.rating > 0)
               ? Colors.deepOrange.shade800
               : theme.colorScheme.surfaceContainerHighest,
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child: InkWell(
-            onTap: () {
-              if (controller.isOpen) {
-                controller.close();
-              } else {
-                controller.open();
-              }
-            },
-            child: child,
-          ),
+          child: (ratingProv.isLoading || ratings == null)
+              ? _loadingAction
+              : InkWell(
+                  onTap: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  child: child,
+                ),
         );
       },
       menuChildren: [
@@ -1323,7 +1323,9 @@ class _RatingMenu extends ConsumerWidget {
             child: Text(RatingLabel[index + 1]),
           ),
         ).reversed,
-        if (ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0)
+        if (ratings != null &&
+            ratings.containsKey(manga.id) &&
+            ratings[manga.id]!.rating > 0)
           MenuItemButton(
             onPressed: () {
               ref.read(ratingsProvider.notifier).set(manga, null);
@@ -1341,7 +1343,8 @@ class _RatingMenu extends ConsumerWidget {
                   child: Icon(
                     Icons.star_border,
                   )),
-              if (ratings.containsKey(manga.id) &&
+              if (ratings != null &&
+                  ratings.containsKey(manga.id) &&
                   ratings[manga.id]!.rating > 0)
                 TextSpan(text: ' ${ratings[manga.id]!.rating}')
             ],
@@ -1367,25 +1370,21 @@ class _UserListsMenu extends ConsumerWidget {
 
     return MenuAnchor(
       builder: (context, controller, child) {
-        // Let MenuAnchor build the spinner so that it doesn't
-        // destroy the opened menu when updated
-        if (userListsProv.isLoading || userLists == null) {
-          return _loadingAction;
-        }
-
         return Material(
           color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child: InkWell(
-            onTap: () {
-              if (controller.isOpen) {
-                controller.close();
-              } else {
-                controller.open();
-              }
-            },
-            child: child,
-          ),
+          child: (userListsProv.isLoading || userLists == null)
+              ? _loadingAction
+              : InkWell(
+                  onTap: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  child: child,
+                ),
         );
       },
       menuChildren: [
