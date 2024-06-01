@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:collection/collection.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -140,6 +141,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final loggedin = ref.watch(authControlProvider).value ?? false;
     final theme = Theme.of(context);
     final view = useState(_ViewType.chapters);
+    final sort = ref.watch(mangaChaptersListSortProvider);
     final followProvider = ref.watch(followingStatusProvider(manga));
     final following = followProvider.value;
     final statusProvider = ref.watch(readingStatusProvider(manga));
@@ -727,75 +729,94 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 SliverToBoxAdapter(
                   child: Container(
                     padding: const EdgeInsets.all(8),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Consumer(
-                        builder: (context, ref, child) {
-                          final chapters =
-                              ref.watch(mangaChaptersProvider(manga)).value;
+                    child: Row(
+                      children: [
+                        ElevatedButton(
+                          style: Styles.buttonStyle(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0)),
+                          onPressed: () {
+                            if (sort == ListSort.descending) {
+                              ref
+                                  .read(mangaChaptersListSortProvider.notifier)
+                                  .state = ListSort.ascending;
+                            } else {
+                              ref
+                                  .read(mangaChaptersListSortProvider.notifier)
+                                  .state = ListSort.descending;
+                            }
+                          },
+                          child: Text(sort.name.capitalize()),
+                        ),
+                        const Spacer(),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final chapters =
+                                ref.watch(mangaChaptersProvider(manga)).value;
 
-                          final allRead = chapters != null
-                              ? ref.watch(readChaptersProvider
-                                  .select((value) => switch (value) {
-                                        AsyncValue(value: final data?) =>
-                                          data[manga.id]?.containsAll(
-                                                  chapters.map((e) => e.id)) ==
-                                              true,
-                                        _ => false,
-                                      }))
-                              : false;
+                            final allRead = chapters != null
+                                ? ref.watch(readChaptersProvider
+                                    .select((value) => switch (value) {
+                                          AsyncValue(value: final data?) =>
+                                            data[manga.id]?.containsAll(chapters
+                                                    .map((e) => e.id)) ==
+                                                true,
+                                          _ => false,
+                                        }))
+                                : false;
 
-                          final opt = allRead ? 'unread' : 'read';
+                            final opt = allRead ? 'unread' : 'read';
 
-                          return ElevatedButton(
-                            style: Styles.buttonStyle(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0)),
-                            onPressed: () async {
-                              final result = await showDialog<bool>(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  final nav = Navigator.of(context);
-                                  return AlertDialog(
-                                    title: Text('Mark all as $opt'),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            'Are you sure you want to mark all visible chapters as $opt?'),
+                            return ElevatedButton(
+                              style: Styles.buttonStyle(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0)),
+                              onPressed: () async {
+                                final result = await showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    final nav = Navigator.of(context);
+                                    return AlertDialog(
+                                      title: Text('Mark all as $opt'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              'Are you sure you want to mark all visible chapters as $opt?'),
+                                        ],
+                                      ),
+                                      actions: <Widget>[
+                                        ElevatedButton(
+                                          child: const Text('No'),
+                                          onPressed: () {
+                                            nav.pop(false);
+                                          },
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            nav.pop(true);
+                                          },
+                                          child: const Text('Yes'),
+                                        ),
                                       ],
-                                    ),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        child: const Text('No'),
-                                        onPressed: () {
-                                          nav.pop(false);
-                                        },
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          nav.pop(true);
-                                        },
-                                        child: const Text('Yes'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                                    );
+                                  },
+                                );
 
-                              if (chapters != null && result == true) {
-                                ref.read(readChaptersProvider.notifier).set(
-                                    manga,
-                                    read: !allRead ? chapters : null,
-                                    unread: allRead ? chapters : null);
-                              }
-                            },
-                            child: Text('Mark all visible as $opt'),
-                          );
-                        },
-                      ),
+                                if (chapters != null && result == true) {
+                                  ref.read(readChaptersProvider.notifier).set(
+                                      manga,
+                                      read: !allRead ? chapters : null,
+                                      unread: allRead ? chapters : null);
+                                }
+                              },
+                              child: Text('Mark all visible as $opt'),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -829,107 +850,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 onNotification: onScrollNotification,
                                 child: CustomScrollView(
                                   slivers: [
-                                    SliverList.builder(
-                                      findChildIndexCallback: (key) {
-                                        final valueKey =
-                                            key as ValueKey<String>;
-                                        final val = chapters.indexWhere(
-                                            (i) => i.id == valueKey.value);
-                                        return val >= 0 ? val : null;
-                                      },
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        var lastChapIsSame = false;
-                                        var nextChapIsSame = false;
-
-                                        final thischap =
-                                            chapters.elementAt(index);
-                                        final chapbtn = ChapterButtonWidget(
-                                          key: ValueKey(thischap.id),
-                                          chapter: thischap,
-                                          manga: manga,
-                                          link: Text(
-                                            manga.attributes!.title.get('en'),
-                                            style:
-                                                const TextStyle(fontSize: 24),
-                                          ),
-                                        );
-
-                                        if (index > 0) {
-                                          lastChapIsSame = chapters
-                                                  .elementAt(index - 1)
-                                                  .attributes
-                                                  .chapter ==
-                                              thischap.attributes.chapter;
-                                        }
-
-                                        if (index < chapters.length - 1) {
-                                          nextChapIsSame = chapters
-                                                  .elementAt(index + 1)
-                                                  .attributes
-                                                  .chapter ==
-                                              thischap.attributes.chapter;
-                                        }
-
-                                        if (lastChapIsSame || nextChapIsSame) {
-                                          Widget child = Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.subdirectory_arrow_right,
-                                                size: 15.0,
-                                              ),
-                                              Flexible(
-                                                child: chapbtn,
-                                              ),
-                                            ],
-                                          );
-
-                                          if (!lastChapIsSame &&
-                                              nextChapIsSame) {
-                                            child = Wrap(
-                                              children: [
-                                                Text(
-                                                    "Chapter ${thischap.attributes.chapter}"),
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                      Icons
-                                                          .subdirectory_arrow_right,
-                                                      size: 15.0,
-                                                    ),
-                                                    Flexible(
-                                                      child: chapbtn,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            );
-                                          }
-
-                                          return Padding(
-                                            key: ValueKey(thischap.id),
-                                            padding: EdgeInsets.only(
-                                                top: (!lastChapIsSame &&
-                                                        nextChapIsSame)
-                                                    ? 6.0
-                                                    : 2.0,
-                                                bottom: (lastChapIsSame &&
-                                                        !nextChapIsSame)
-                                                    ? 6.0
-                                                    : 2.0),
-                                            child: child,
-                                          );
-                                        }
-
-                                        return Padding(
-                                          key: ValueKey(thischap.id),
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 2.0),
-                                          child: chapbtn,
-                                        );
-                                      },
-                                      itemCount: chapters.length,
-                                    )
+                                    _ChapterListSliver(
+                                      chapters: chapters,
+                                      manga: manga,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -1138,6 +1062,135 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               }),
         ),
       ),
+    );
+  }
+}
+
+class _ChapterListSliver extends StatefulWidget {
+  const _ChapterListSliver({
+    required this.chapters,
+    required this.manga,
+  });
+
+  final List<Chapter> chapters;
+  final Manga manga;
+
+  @override
+  State<StatefulWidget> createState() => _ChapterListSliverState();
+}
+
+class _ChapterListSliverState extends State<_ChapterListSliver> {
+  static const header = '_HEADER_';
+
+  late Map<String?, List<Chapter>> keysGrouped;
+  late List<String> keys;
+
+  @override
+  Widget build(BuildContext context) {
+    keysGrouped =
+        widget.chapters.groupListsBy((chapter) => chapter.attributes.volume);
+    keys = [];
+
+    for (final vol in keysGrouped.keys) {
+      if (vol == null) {
+        keys.add('${header}No Volume');
+      } else {
+        keys.add('${header}Volume $vol');
+      }
+
+      keys = keysGrouped[vol]!.foldIndexed(keys, (index, list, chapter) {
+        // If next chapter is the same number
+        // AND previous chapter isn't (or doesnt exist)
+        if (index < keysGrouped[vol]!.length - 1 &&
+            keysGrouped[vol]!.elementAt(index + 1).attributes.chapter ==
+                chapter.attributes.chapter &&
+            (index == 0 ||
+                (index > 0 &&
+                    keysGrouped[vol]!.elementAt(index - 1).attributes.chapter !=
+                        chapter.attributes.chapter))) {
+          list.add('${header}Chapter ${chapter.attributes.chapter}');
+        }
+
+        list.add(chapter.id);
+        return list;
+      });
+    }
+
+    return SliverList.builder(
+      findChildIndexCallback: (key) {
+        final valueKey = key as ValueKey<String>;
+        final val = keys.indexWhere((i) => i == valueKey.value);
+        return val >= 0 ? val : null;
+      },
+      itemBuilder: (BuildContext context, int index) {
+        var lastChapIsSame = false;
+        var nextChapIsSame = false;
+
+        final key = keys[index];
+
+        if (key.startsWith(header)) {
+          final text = key.replaceFirst(header, '');
+          return Padding(
+            key: ValueKey(key),
+            padding: const EdgeInsets.all(6.0),
+            child: Text(text,
+                style: TextStyle(
+                    fontWeight:
+                        text.contains('Volume') ? FontWeight.bold : null)),
+          );
+        }
+
+        final chapid = widget.chapters.indexWhere((c) => c.id == key);
+        final thischap = widget.chapters.elementAt(chapid);
+        final chapbtn = ChapterButtonWidget(
+          key: ValueKey(thischap.id),
+          chapter: thischap,
+          manga: widget.manga,
+          link: Text(
+            widget.manga.attributes!.title.get('en'),
+            style: const TextStyle(fontSize: 24),
+          ),
+        );
+
+        if (chapid > 0) {
+          lastChapIsSame =
+              widget.chapters.elementAt(chapid - 1).attributes.chapter ==
+                  thischap.attributes.chapter;
+        }
+
+        if (chapid < widget.chapters.length - 1) {
+          nextChapIsSame =
+              widget.chapters.elementAt(chapid + 1).attributes.chapter ==
+                  thischap.attributes.chapter;
+        }
+
+        if (lastChapIsSame || nextChapIsSame) {
+          return Padding(
+            key: ValueKey(thischap.id),
+            padding: EdgeInsets.only(
+                top: (!lastChapIsSame && nextChapIsSame) ? 6.0 : 2.0,
+                bottom: (lastChapIsSame && !nextChapIsSame) ? 6.0 : 2.0),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.subdirectory_arrow_right,
+                  size: 15.0,
+                ),
+                Flexible(
+                  child: chapbtn,
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Padding(
+          key: ValueKey(thischap.id),
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: chapbtn,
+        );
+      },
+      itemCount: keys.length,
     );
   }
 }

@@ -13,6 +13,7 @@ import 'package:gagaku/model.dart';
 import 'package:gagaku/types.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hooks_riverpod/legacy.dart';
 import 'package:mutex/mutex.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
@@ -365,7 +366,8 @@ class MangaDexModel {
     String orderKey = 'publishAt',
     String order = 'desc',
   }) async {
-    final key = '$feedKey(${entity != null ? '${entity.id},' : ''}$offset)';
+    final key =
+        '$feedKey(${entity != null ? '${entity.id},' : ''}$offset,$orderKey,$order)';
 
     if (await _cache.exists(key)) {
       return (await _cache.getSpecialList(key, Chapter.fromJson))
@@ -1769,6 +1771,9 @@ class CreatorTitles extends _$CreatorTitles {
   }
 }
 
+final mangaChaptersListSortProvider =
+    StateProvider((ref) => ListSort.descending);
+
 @riverpod
 class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix {
   int _offset = 0;
@@ -1778,6 +1783,7 @@ class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix {
 
   Future<List<Chapter>> _fetchMangaChapters(int offset) async {
     final api = ref.watch(mangadexProvider);
+    final sort = ref.watch(mangaChaptersListSortProvider);
     final chapters = await api.fetchFeed(
       path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
       feedKey: feedKey,
@@ -1785,6 +1791,7 @@ class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix {
       offset: offset,
       entity: manga,
       orderKey: 'chapter',
+      order: sort.order,
     );
 
     disposeAfter(const Duration(minutes: 5));

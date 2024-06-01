@@ -157,6 +157,14 @@ enum TagMode {
   String get code => name.toUpperCase();
 }
 
+enum ListSort {
+  descending('desc'),
+  ascending('asc');
+
+  const ListSort(this.order);
+  final String order;
+}
+
 @freezed
 class MangaFilters with _$MangaFilters {
   const MangaFilters._();

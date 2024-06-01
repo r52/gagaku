@@ -724,7 +724,7 @@ final class MangaChaptersProvider
   }
 }
 
-String _$mangaChaptersHash() => r'21cba142e506e729e048cbf8428dd6329349144a';
+String _$mangaChaptersHash() => r'b6dfa73b7294d0677f01860a42db02ee4e305b7d';
 
 final class MangaChaptersFamily extends Family {
   const MangaChaptersFamily._()
