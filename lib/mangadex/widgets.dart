@@ -221,13 +221,13 @@ class ChapterFeedWidget extends HookConsumerWidget {
   }
 }
 
-class ChapterFeedItem extends StatelessWidget {
+class ChapterFeedItem extends ConsumerWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final ChapterFeedItemData state;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
@@ -242,7 +242,9 @@ class ChapterFeedItem extends StatelessWidget {
             state.manga.attributes!.title.get('en'),
             style: const TextStyle(fontSize: 18),
           ),
-          onLinkPressed: () {
+          onLinkPressed: () async {
+            ref.read(readChaptersProvider.notifier).get([state.manga]);
+            ref.read(ratingsProvider.notifier).get([state.manga]);
             context.push('/title/${state.manga.id}', extra: state.manga);
           },
         ),
@@ -258,6 +260,8 @@ class ChapterFeedItem extends StatelessWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
+        ref.read(readChaptersProvider.notifier).get([state.manga]);
+        ref.read(ratingsProvider.notifier).get([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       icon: CountryFlag(
@@ -275,6 +279,8 @@ class ChapterFeedItem extends StatelessWidget {
         shape: const RoundedRectangleBorder(),
       ),
       onPressed: () async {
+        ref.read(readChaptersProvider.notifier).get([state.manga]);
+        ref.read(ratingsProvider.notifier).get([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       child: ExtendedImage.network(
@@ -755,7 +761,7 @@ class MangaListViewSliver extends ConsumerWidget {
   }
 }
 
-class _GridMangaItem extends HookWidget {
+class _GridMangaItem extends HookConsumerWidget {
   const _GridMangaItem({
     super.key,
     required this.manga,
@@ -772,7 +778,7 @@ class _GridMangaItem extends HookWidget {
   final String? header;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final aniController =
         useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient =
@@ -802,7 +808,9 @@ class _GridMangaItem extends HookWidget {
     );
 
     return InkWell(
-      onTap: () {
+      onTap: () async {
+        ref.read(readChaptersProvider.notifier).get([manga]);
+        ref.read(ratingsProvider.notifier).get([manga]);
         context.push('/title/${manga.id}', extra: manga);
       },
       onHover: (hovering) {
@@ -890,7 +898,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final statsProvider = ref.watch(statisticsProvider);
+    final statsProvider = ref.watch(mangaStatsProvider(manga));
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -905,6 +913,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                   textStyle: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               onPressed: () async {
+                ref.read(readChaptersProvider.notifier).get([manga]);
+                ref.read(ratingsProvider.notifier).get([manga]);
                 context.push('/title/${manga.id}', extra: manga);
               },
               icon: CountryFlag(
@@ -925,6 +935,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async {
+                      ref.read(readChaptersProvider.notifier).get([manga]);
+                      ref.read(ratingsProvider.notifier).get([manga]);
                       context.push('/title/${manga.id}', extra: manga);
                     },
                     child: ExtendedImage.network(
@@ -953,9 +965,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                     text: statsError,
                                   )
                                 ],
-                              AsyncValue(value: final stats?)
-                                  when stats.containsKey(manga.id) =>
-                                [
+                              AsyncValue(value: final stats?) => [
                                   IconTextChip(
                                     icon: const Icon(
                                       Icons.star_border,
@@ -967,11 +977,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
-                                    text: stats[manga.id]
-                                            ?.rating
-                                            .bayesian
-                                            .toStringAsFixed(2) ??
-                                        statsError,
+                                    text: stats.rating.bayesian
+                                        .toStringAsFixed(2),
                                     style: const TextStyle(
                                       color: Colors.amber,
                                       shadows: [
@@ -989,14 +996,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                       Icons.bookmark_outline,
                                       size: 18,
                                     ),
-                                    text: stats[manga.id]?.follows.toString() ??
-                                        statsError,
+                                    text: stats.follows.toString(),
                                   ),
-                                ],
-                              AsyncValue(value: final _?) => [
-                                  const IconTextChip(
-                                    text: statsError,
-                                  )
                                 ],
                               _ => [
                                   const IconTextChip(
@@ -1072,7 +1073,7 @@ class _ListMangaItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final statsProvider = ref.watch(statisticsProvider);
+    final statsProvider = ref.watch(mangaStatsProvider(manga));
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -1083,6 +1084,8 @@ class _ListMangaItem extends ConsumerWidget {
           children: [
             TextButton(
               onPressed: () async {
+                ref.read(readChaptersProvider.notifier).get([manga]);
+                ref.read(ratingsProvider.notifier).get([manga]);
                 context.push('/title/${manga.id}', extra: manga);
               },
               child: ExtendedImage.network(
@@ -1105,6 +1108,8 @@ class _ListMangaItem extends ConsumerWidget {
                       ),
                     ),
                     onPressed: () async {
+                      ref.read(readChaptersProvider.notifier).get([manga]);
+                      ref.read(ratingsProvider.notifier).get([manga]);
                       context.push('/title/${manga.id}', extra: manga);
                     },
                     icon: CountryFlag(
@@ -1158,9 +1163,7 @@ class _ListMangaItem extends ConsumerWidget {
                               text: statsError,
                             )
                           ],
-                        AsyncValue(value: final stats?)
-                            when stats.containsKey(manga.id) =>
-                          [
+                        AsyncValue(value: final stats?) => [
                             IconTextChip(
                               icon: const Icon(
                                 Icons.star_border,
@@ -1172,11 +1175,7 @@ class _ListMangaItem extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              text: stats[manga.id]
-                                      ?.rating
-                                      .bayesian
-                                      .toStringAsFixed(2) ??
-                                  statsError,
+                              text: stats.rating.bayesian.toStringAsFixed(2),
                               style: const TextStyle(
                                 color: Colors.amber,
                                 shadows: [
@@ -1194,14 +1193,8 @@ class _ListMangaItem extends ConsumerWidget {
                                 Icons.bookmark_outline,
                                 size: 18,
                               ),
-                              text: stats[manga.id]?.follows.toString() ??
-                                  statsError,
+                              text: stats.follows.toString(),
                             ),
-                          ],
-                        AsyncValue(value: final _?) => [
-                            const IconTextChip(
-                              text: statsError,
-                            )
                           ],
                         _ => [
                             const IconTextChip(

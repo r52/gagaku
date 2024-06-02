@@ -60,22 +60,6 @@ Future<Manga> _fetchMangaFromId(
 }
 
 @riverpod
-Future<void> _fetchReadChaptersRedun(
-    _FetchReadChaptersRedunRef ref, Manga manga) async {
-  final loggedin = await ref.watch(authControlProvider.future);
-
-  if (loggedin) {
-    // Redundant retrieve read chapters when opening the manga
-    // from places where it hasn't been retrieved yet
-    await ref.watch(readChaptersProvider.notifier).get([manga]);
-
-    await ref.watch(ratingsProvider.notifier).get([manga]);
-  }
-
-  await ref.watch(statisticsProvider.notifier).get([manga]);
-}
-
-@riverpod
 Future<List<Manga>> _fetchRelatedManga(
     _FetchRelatedMangaRef ref, Manga manga) async {
   final related = manga.relatedMangas;
@@ -141,13 +125,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final loggedin = ref.watch(authControlProvider).value ?? false;
     final theme = Theme.of(context);
     final view = useState(_ViewType.chapters);
-    final sort = ref.watch(mangaChaptersListSortProvider);
-    final followProvider = ref.watch(followingStatusProvider(manga));
-    final following = followProvider.value;
-    final statusProvider = ref.watch(readingStatusProvider(manga));
-    final reading = statusProvider.value;
-
-    ref.watch(_fetchReadChaptersRedunProvider(manga));
 
     final hasRelated = manga.relatedMangas.isNotEmpty;
 
@@ -197,13 +174,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          if (followProvider.hasError) {
-            ref.invalidate(followingStatusProvider(manga));
-          }
-
-          if (statusProvider.hasError) {
-            ref.invalidate(readingStatusProvider(manga));
-          }
+          ref.invalidate(followingStatusProvider(manga));
+          ref.invalidate(readingStatusProvider(manga));
 
           switch (view.value) {
             case _ViewType.chapters:
@@ -289,58 +261,105 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 actions: !loggedin
                     ? null
                     : [
-                        if (following == null || statusProvider.isLoading)
-                          _loadingAction,
-                        if (following == false && reading == null)
-                          ElevatedButton(
-                            style: Styles.buttonStyle(),
-                            onPressed: () async {
-                              final result =
-                                  await showDialog<(MangaReadingStatus, bool)>(
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final followProvider =
+                                ref.watch(followingStatusProvider(manga));
+                            final following = followProvider.value;
+                            final statusProvider =
+                                ref.watch(readingStatusProvider(manga));
+                            final reading = statusProvider.value;
+
+                            if (following == null || statusProvider.isLoading) {
+                              return _loadingAction;
+                            }
+
+                            if (following == false && reading == null) {
+                              return ElevatedButton(
+                                style: Styles.buttonStyle(),
+                                onPressed: () async {
+                                  final result = await showDialog<
+                                          (MangaReadingStatus, bool)>(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return _AddToLibraryDialog();
                                       });
 
-                              if (result != null) {
-                                ref
-                                    .read(readingStatusProvider(manga).notifier)
-                                    .set(result.$1);
+                                  if (result != null) {
+                                    ref
+                                        .read(readingStatusProvider(manga)
+                                            .notifier)
+                                        .set(result.$1);
 
-                                ref
-                                    .read(
-                                        followingStatusProvider(manga).notifier)
-                                    .set(result.$2);
-                              }
-                            },
-                            child: const Text('Add to Library'),
-                          ),
-                        if (following != null && reading != null) ...[
-                          Tooltip(
-                            message:
-                                following ? 'Unfollow Manga' : 'Follow Manga',
-                            child: ElevatedButton(
-                              style: Styles.buttonStyle(),
-                              onPressed: () async {
-                                bool set = !following;
-                                ref
-                                    .read(
-                                        followingStatusProvider(manga).notifier)
-                                    .set(set);
-                              },
-                              child: Icon(following
-                                  ? Icons.notifications_active
-                                  : Icons.notifications_off_outlined),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          _ReadingStatusDropdown(
-                            initial: reading,
-                            manga: manga,
-                          ),
-                        ],
+                                    ref
+                                        .read(followingStatusProvider(manga)
+                                            .notifier)
+                                        .set(result.$2);
+                                  }
+                                },
+                                child: const Text('Add to Library'),
+                              );
+                            }
+
+                            if (reading != null) {
+                              return Tooltip(
+                                message: following
+                                    ? 'Unfollow Manga'
+                                    : 'Follow Manga',
+                                child: ElevatedButton(
+                                  style: Styles.buttonStyle(),
+                                  onPressed: () async {
+                                    bool set = !following;
+                                    ref
+                                        .read(followingStatusProvider(manga)
+                                            .notifier)
+                                        .set(set);
+                                  },
+                                  child: Icon(following
+                                      ? Icons.notifications_active
+                                      : Icons.notifications_off_outlined),
+                                ),
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final readProvider =
+                                ref.watch(readingStatusProvider(manga));
+                            final reading = readProvider.value;
+
+                            if (reading != null) {
+                              return const SizedBox(
+                                width: 8,
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final readProvider =
+                                ref.watch(readingStatusProvider(manga));
+                            final reading = readProvider.value;
+
+                            if (readProvider.isLoading) {
+                              return _loadingAction;
+                            }
+
+                            if (reading != null) {
+                              return _ReadingStatusDropdown(
+                                initial: reading,
+                                manga: manga,
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                        ),
                         const SizedBox(
                           width: 8,
                         ),
@@ -390,7 +409,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   padding: const EdgeInsets.all(8),
                   child: Consumer(
                     builder: (context, ref, child) {
-                      final statsProvider = ref.watch(statisticsProvider);
+                      final statsProvider =
+                          ref.watch(mangaStatsProvider(manga));
                       return Wrap(
                         runSpacing: 4.0,
                         children: [
@@ -404,9 +424,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   text: statsError,
                                 )
                               ],
-                            AsyncValue(value: final stats?)
-                                when stats.containsKey(manga.id) =>
-                              [
+                            AsyncValue(value: final stats?) => [
                                 IconTextChip(
                                   icon: const Icon(
                                     Icons.star_border,
@@ -418,11 +436,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                       ),
                                     ],
                                   ),
-                                  text: stats[manga.id]
-                                          ?.rating
-                                          .bayesian
-                                          .toStringAsFixed(2) ??
-                                      statsError,
+                                  text:
+                                      stats.rating.bayesian.toStringAsFixed(2),
                                   style: const TextStyle(
                                     color: Colors.amber,
                                     shadows: [
@@ -440,17 +455,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     Icons.bookmark_outline,
                                     size: 18,
                                   ),
-                                  text: stats[manga.id]?.follows.toString() ??
-                                      statsError,
+                                  text: stats.follows.toString(),
                                 ),
-                              ],
-                            AsyncValue(value: final _?) => [
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                const IconTextChip(
-                                  text: statsError,
-                                )
                               ],
                             _ => [
                                 const SizedBox(
@@ -731,22 +737,30 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     padding: const EdgeInsets.all(8),
                     child: Row(
                       children: [
-                        ElevatedButton(
-                          style: Styles.buttonStyle(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0)),
-                          onPressed: () {
-                            if (sort == ListSort.descending) {
-                              ref
-                                  .read(mangaChaptersListSortProvider.notifier)
-                                  .state = ListSort.ascending;
-                            } else {
-                              ref
-                                  .read(mangaChaptersListSortProvider.notifier)
-                                  .state = ListSort.descending;
-                            }
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final sort =
+                                ref.watch(mangaChaptersListSortProvider);
+                            return ElevatedButton(
+                              style: Styles.buttonStyle(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0)),
+                              onPressed: () {
+                                if (sort == ListSort.descending) {
+                                  ref
+                                      .read(mangaChaptersListSortProvider
+                                          .notifier)
+                                      .state = ListSort.ascending;
+                                } else {
+                                  ref
+                                      .read(mangaChaptersListSortProvider
+                                          .notifier)
+                                      .state = ListSort.descending;
+                                }
+                              },
+                              child: Text(sort.name.capitalize()),
+                            );
                           },
-                          child: Text(sort.name.capitalize()),
                         ),
                         const Spacer(),
                         Consumer(
@@ -1066,7 +1080,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
   }
 }
 
-class _ChapterListSliver extends StatefulWidget {
+class _ChapterListSliver extends StatelessWidget {
   const _ChapterListSliver({
     required this.chapters,
     required this.manga,
@@ -1075,21 +1089,13 @@ class _ChapterListSliver extends StatefulWidget {
   final List<Chapter> chapters;
   final Manga manga;
 
-  @override
-  State<StatefulWidget> createState() => _ChapterListSliverState();
-}
-
-class _ChapterListSliverState extends State<_ChapterListSliver> {
   static const header = '_HEADER_';
-
-  late Map<String?, List<Chapter>> keysGrouped;
-  late List<String> keys;
 
   @override
   Widget build(BuildContext context) {
-    keysGrouped =
-        widget.chapters.groupListsBy((chapter) => chapter.attributes.volume);
-    keys = [];
+    final keysGrouped =
+        chapters.groupListsBy((chapter) => chapter.attributes.volume);
+    var keys = <String>[];
 
     for (final vol in keysGrouped.keys) {
       if (vol == null) {
@@ -1140,28 +1146,26 @@ class _ChapterListSliverState extends State<_ChapterListSliver> {
           );
         }
 
-        final chapid = widget.chapters.indexWhere((c) => c.id == key);
-        final thischap = widget.chapters.elementAt(chapid);
+        final chapid = chapters.indexWhere((c) => c.id == key);
+        final thischap = chapters.elementAt(chapid);
         final chapbtn = ChapterButtonWidget(
           key: ValueKey(thischap.id),
           chapter: thischap,
-          manga: widget.manga,
+          manga: manga,
           link: Text(
-            widget.manga.attributes!.title.get('en'),
+            manga.attributes!.title.get('en'),
             style: const TextStyle(fontSize: 24),
           ),
         );
 
         if (chapid > 0) {
-          lastChapIsSame =
-              widget.chapters.elementAt(chapid - 1).attributes.chapter ==
-                  thischap.attributes.chapter;
+          lastChapIsSame = chapters.elementAt(chapid - 1).attributes.chapter ==
+              thischap.attributes.chapter;
         }
 
-        if (chapid < widget.chapters.length - 1) {
-          nextChapIsSame =
-              widget.chapters.elementAt(chapid + 1).attributes.chapter ==
-                  thischap.attributes.chapter;
+        if (chapid < chapters.length - 1) {
+          nextChapIsSame = chapters.elementAt(chapid + 1).attributes.chapter ==
+              thischap.attributes.chapter;
         }
 
         if (lastChapIsSame || nextChapIsSame) {

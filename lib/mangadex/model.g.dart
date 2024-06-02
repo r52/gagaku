@@ -1871,6 +1871,159 @@ abstract class _$Statistics
   FutureOr<Map<String, MangaStatistics>> runBuild() => build();
 }
 
+@ProviderFor(MangaStats)
+const mangaStatsProvider = MangaStatsFamily._();
+
+final class MangaStatsProvider
+    extends $AsyncNotifierProvider<MangaStats, MangaStatistics> {
+  const MangaStatsProvider._(
+      {required MangaStatsFamily super.from,
+      required Manga super.argument,
+      super.runNotifierBuildOverride,
+      MangaStats Function()? create})
+      : _createCb = create,
+        super(
+          name: r'mangaStatsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final MangaStats Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaStatsHash();
+
+  @override
+  String toString() {
+    return r'mangaStatsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  MangaStats create() => _createCb?.call() ?? MangaStats();
+
+  @$internal
+  @override
+  MangaStatsProvider $copyWithCreate(
+    MangaStats Function() create,
+  ) {
+    return MangaStatsProvider._(
+        argument: argument as Manga,
+        from: from! as MangaStatsFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  MangaStatsProvider $copyWithBuild(
+    FutureOr<MangaStatistics> Function(
+      Ref<AsyncValue<MangaStatistics>>,
+      MangaStats,
+    ) build,
+  ) {
+    return MangaStatsProvider._(
+        argument: argument as Manga,
+        from: from! as MangaStatsFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<MangaStats, MangaStatistics> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+
+  @override
+  bool operator ==(Object other) {
+    return other is MangaStatsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$mangaStatsHash() => r'6496f85241bf53c018c3a0ce25027154ec9d16fd';
+
+final class MangaStatsFamily extends Family {
+  const MangaStatsFamily._()
+      : super(
+          name: r'mangaStatsProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  MangaStatsProvider call(
+    Manga manga,
+  ) =>
+      MangaStatsProvider._(argument: manga, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaStatsHash();
+
+  @override
+  String toString() => r'mangaStatsProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    MangaStats Function(
+      Manga args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaStatsProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<MangaStatistics> Function(Ref<AsyncValue<MangaStatistics>> ref,
+            MangaStats notifier, Manga argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaStatsProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+abstract class _$MangaStats extends $AsyncNotifier<MangaStatistics> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
+
+  FutureOr<MangaStatistics> build(
+    Manga manga,
+  );
+  @$internal
+  @override
+  FutureOr<MangaStatistics> runBuild() => build(
+        _$args,
+      );
+}
+
 @ProviderFor(Ratings)
 const ratingsProvider = RatingsProvider._();
 

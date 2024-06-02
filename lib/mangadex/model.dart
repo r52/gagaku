@@ -2379,6 +2379,26 @@ class Statistics extends _$Statistics {
   }
 }
 
+// For redundancy
+@riverpod
+class MangaStats extends _$MangaStats {
+  Future<MangaStatistics> _fetchStatistics() async {
+    await ref.watch(statisticsProvider.notifier).get([manga]);
+    final stats = await ref.watch(statisticsProvider.future);
+
+    if (stats.containsKey(manga.id)) {
+      return stats[manga.id]!;
+    }
+
+    throw Exception("Missing stats for manga id ${manga.id}");
+  }
+
+  @override
+  Future<MangaStatistics> build(Manga manga) async {
+    return _fetchStatistics();
+  }
+}
+
 @Riverpod(keepAlive: true)
 class Ratings extends _$Ratings {
   Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {

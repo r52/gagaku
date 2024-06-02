@@ -121,7 +121,9 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
             data.manga.attributes!.title.get('en'),
             style: const TextStyle(fontSize: 18),
           ),
-          onLinkPressed: () {
+          onLinkPressed: () async {
+            ref.read(readChaptersProvider.notifier).get([data.manga]);
+            ref.read(ratingsProvider.notifier).get([data.manga]);
             context.go('/title/${data.manga.id}', extra: data.manga);
           },
           backRoute: '/',
