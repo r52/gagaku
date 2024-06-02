@@ -2274,7 +2274,7 @@ Future<List<Manga>> getMangaListByPage(
   final mangas =
       await api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
 
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
   return mangas;
 }

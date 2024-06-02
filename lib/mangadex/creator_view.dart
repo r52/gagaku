@@ -47,7 +47,7 @@ Future<CreatorType> _fetchCreatorFromId(
 Future<List<Manga>> _fetchCreatorTitles(
     _FetchCreatorTitlesRef ref, CreatorType creator) async {
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 

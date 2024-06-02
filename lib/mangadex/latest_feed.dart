@@ -19,12 +19,12 @@ Future<List<ChapterFeedItemData>> _fetchGlobalChapters(
   final mangas =
       await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
   final loggedin = await ref.watch(authControlProvider.future);
 
   if (loggedin) {
-    await ref.watch(readChaptersProvider.notifier).get(mangas);
+    await ref.read(readChaptersProvider.notifier).get(mangas);
   }
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);

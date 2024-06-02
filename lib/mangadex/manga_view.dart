@@ -73,7 +73,7 @@ Future<List<Manga>> _fetchRelatedManga(
   final mangas =
       await api.fetchManga(ids: ids, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 

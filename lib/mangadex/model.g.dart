@@ -1389,7 +1389,7 @@ final class GetMangaListByPageProvider
 }
 
 String _$getMangaListByPageHash() =>
-    r'd8d116228e735b7580866f3a6ede70a27554d612';
+    r'287ea8f8be406e7ebefc2ac3b8d47e7e03270f35';
 
 final class GetMangaListByPageFamily extends Family {
   const GetMangaListByPageFamily._()

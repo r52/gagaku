@@ -60,7 +60,7 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchChaptersHash() => r'84546f08ee99861c10b01eba7816feb5582adeb3';
+String _$fetchChaptersHash() => r'f35efa2173b52d9fb12190a0d2ac590aa02554ea';
 
 // ignore_for_file: type=lint
 // ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

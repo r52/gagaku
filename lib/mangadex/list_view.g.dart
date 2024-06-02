@@ -90,7 +90,7 @@ final class _FetchListFeedProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchListFeedHash() => r'1a5d07ba6dbe0dd94ede517f80cba6a5387e8dd5';
+String _$fetchListFeedHash() => r'05633bbaa50ac827f1c362ef9d1c47a86b83940c';
 
 final class _FetchListFeedFamily extends Family {
   const _FetchListFeedFamily._()

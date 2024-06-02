@@ -47,22 +47,24 @@ const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
 
 const _iconSetB = {
-  'group': _groupIconB,
-  'circle': _circleIconB,
-  'person': _personIconB,
-  'check': _checkIconB,
-  'open': _openIconB,
-  'schedule': _scheduleIconB,
+  _IconSet.group: _groupIconB,
+  _IconSet.circle: _circleIconB,
+  _IconSet.person: _personIconB,
+  _IconSet.check: _checkIconB,
+  _IconSet.open: _openIconB,
+  _IconSet.schedule: _scheduleIconB,
 };
 
 const _iconSetS = {
-  'group': _groupIconS,
-  'circle': _circleIconS,
-  'person': _personIconS,
-  'check': _checkIconS,
-  'open': _openIconS,
-  'schedule': _scheduleIconS,
+  _IconSet.group: _groupIconS,
+  _IconSet.circle: _circleIconS,
+  _IconSet.person: _personIconS,
+  _IconSet.check: _checkIconS,
+  _IconSet.open: _openIconS,
+  _IconSet.schedule: _scheduleIconS,
 };
+
+enum _IconSet { group, circle, person, check, open, schedule }
 
 class MarkReadButton extends ConsumerWidget {
   const MarkReadButton({super.key, required this.chapter, required this.manga});
@@ -375,7 +377,8 @@ class ChapterButtonWidget extends StatelessWidget {
 
     for (final g in chapter.groups) {
       groupChips.add(IconTextChip(
-        icon: isOfficialPub ? iconSet['circle'] : iconSet['group'],
+        icon:
+            isOfficialPub ? iconSet[_IconSet.circle] : iconSet[_IconSet.group],
         text: g.attributes.name.crop(),
         onPressed: () {
           context.push('/group/${g.id}', extra: g);
@@ -386,7 +389,7 @@ class ChapterButtonWidget extends StatelessWidget {
 
     if (groupChips.isEmpty) {
       groupChips.add(IconTextChip(
-        icon: iconSet['group'],
+        icon: iconSet[_IconSet.group],
         text: 'No Group',
       ));
       groupChips.add(_rowPadding);
@@ -396,12 +399,12 @@ class ChapterButtonWidget extends StatelessWidget {
 
     if (isOfficialPub) {
       userChip = IconTextChip(
-        icon: iconSet['check'],
+        icon: iconSet[_IconSet.check],
         text: 'Official Publisher',
       );
     } else {
       userChip = IconTextChip(
-        icon: iconSet['person'],
+        icon: iconSet[_IconSet.person],
         text: chapter.uploadUser.crop(),
       );
     }
@@ -428,7 +431,7 @@ class ChapterButtonWidget extends StatelessWidget {
                   size: screenSizeSmall ? 15 : 18,
                 ),
                 _rowPadding,
-                if (isOfficialPub) ...[iconSet['open']!, _rowPadding],
+                if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
                 Expanded(
                   child: Consumer(
                     builder: (context, ref, child) {
@@ -475,7 +478,7 @@ class ChapterButtonWidget extends StatelessWidget {
                       children: [
                         WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
-                            child: iconSet['schedule']!),
+                            child: iconSet[_IconSet.schedule]!),
                         TextSpan(text: ' $pubtime'),
                       ],
                     ),
@@ -515,7 +518,7 @@ class ChapterButtonWidget extends StatelessWidget {
                     children: [
                       WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
-                          child: iconSet['schedule']!),
+                          child: iconSet[_IconSet.schedule]!),
                       TextSpan(text: ' $pubtime'),
                     ],
                   ),

@@ -59,10 +59,10 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(
   final mangas =
       await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
   if (loggedin) {
-    await ref.watch(readChaptersProvider.notifier).get(mangas);
+    await ref.read(readChaptersProvider.notifier).get(mangas);
   }
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
@@ -94,7 +94,7 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(
 Future<List<Manga>> _fetchGroupTitles(
     _FetchGroupTitlesRef ref, Group group) async {
   final mangas = await ref.watch(groupTitlesProvider(group).future);
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 
