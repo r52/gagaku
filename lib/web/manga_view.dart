@@ -101,7 +101,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
             await api.invalidateAll(info.getKey());
             return ref.refresh(_fetchWebMangaInfoProvider(info).future);
           },
-          child: Styles.errorList(error, stackTrace),
+          child: ErrorList(error: error, stackTrace: stackTrace),
         );
 
         appBar = AppBar(

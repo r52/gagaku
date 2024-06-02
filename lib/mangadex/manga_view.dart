@@ -102,7 +102,7 @@ class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
         logger.e("_fetchMangaFromIdProvider($mangaId) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = ErrorColumn(error: error, stackTrace: stackTrace);
         break;
       case _:
         child = Styles.listSpinner;
@@ -790,7 +790,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     error: error,
                                     stackTrace: stackTrace);
 
-                                return Styles.errorList(error, stackTrace);
+                                return ErrorList(
+                                    error: error, stackTrace: stackTrace);
                               }(),
                             AsyncValue(value: final chapters?) =>
                               NotificationListener<ScrollEndNotification>(
@@ -829,7 +830,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     error: error,
                                     stackTrace: stackTrace);
 
-                                return Styles.errorList(error, stackTrace);
+                                return ErrorList(
+                                    error: error, stackTrace: stackTrace);
                               }(),
                             AsyncValue(value: final covers?) =>
                               NotificationListener<ScrollEndNotification>(
@@ -977,7 +979,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     error: error,
                                     stackTrace: stackTrace);
 
-                                return Styles.errorList(error, stackTrace);
+                                return ErrorList(
+                                    error: error, stackTrace: stackTrace);
                               }(),
                             AsyncValue(value: final related?) =>
                               MangaListWidget(

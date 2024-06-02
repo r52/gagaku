@@ -314,6 +314,80 @@ class SettingCardWidget extends StatelessWidget {
   }
 }
 
+class TitleFlexBar extends StatelessWidget {
+  const TitleFlexBar({super.key, required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlexibleSpaceBar(
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          shadows: <Shadow>[
+            Shadow(
+              offset: Offset(1.5, 1.5),
+              blurRadius: 0.5,
+              color: Color.fromARGB(255, 0, 0, 0),
+            ),
+          ],
+        ),
+      ),
+      background: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primaryContainer,
+        ),
+      ),
+    );
+  }
+}
+
+class ErrorColumn extends StatelessWidget {
+  final Object error;
+  final StackTrace stackTrace;
+
+  const ErrorColumn({super.key, required this.error, required this.stackTrace});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          Text('$error'),
+          Text(stackTrace.toString()),
+        ],
+      ),
+    );
+  }
+}
+
+class ErrorList extends StatelessWidget {
+  final Object error;
+  final StackTrace stackTrace;
+
+  const ErrorList({super.key, required this.error, required this.stackTrace});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ScrollConfiguration(
+        behavior: const MouseTouchScrollBehavior(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Text('$error'),
+            Text(stackTrace.toString()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class Styles {
   static ButtonStyle buttonStyle({
     Color? backgroundColor,
@@ -348,54 +422,6 @@ class Styles {
       child: CircularProgressIndicator(),
     ),
   );
-
-  static Widget errorColumn(Object err, StackTrace stack) => Center(
-        child: Column(
-          children: [
-            Text('$err'),
-            Text(stack.toString()),
-          ],
-        ),
-      );
-
-  static Widget errorList(Object err, StackTrace stack) => Center(
-        child: ScrollConfiguration(
-          behavior: const MouseTouchScrollBehavior(),
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              Text('$err'),
-              Text(stack.toString()),
-            ],
-          ),
-        ),
-      );
-
-  static Widget titleFlexBar({
-    required BuildContext context,
-    required String title,
-  }) =>
-      FlexibleSpaceBar(
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            shadows: <Shadow>[
-              Shadow(
-                offset: Offset(2.0, 2.0),
-                blurRadius: 1.0,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
-            ],
-          ),
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-          ),
-        ),
-      );
 
   static void showErrorSnackBar(ScaffoldMessengerState state, String content) {
     Future.delayed(

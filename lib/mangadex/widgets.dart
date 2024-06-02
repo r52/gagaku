@@ -167,7 +167,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
 
             return RefreshIndicator(
               onRefresh: onRefresh,
-              child: Styles.errorList(error, stackTrace),
+              child: ErrorList(error: error, stackTrace: stackTrace),
             );
           }(),
         AsyncValue(value: final results?) => ScrollConfiguration(

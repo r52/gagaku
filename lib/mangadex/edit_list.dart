@@ -64,7 +64,7 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
         logger.e("_fetchListFromIdProvider($listId) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = ErrorColumn(error: error, stackTrace: stackTrace);
         break;
       case _:
         child = Styles.listSpinner;
@@ -121,9 +121,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
           },
         ),
         flexibleSpace: GestureDetector(
-          child: Styles.titleFlexBar(
-              context: context,
-              title: '${list != null ? 'Edit' : 'Create'} List'),
+          child:
+              TitleFlexBar(title: '${list != null ? 'Edit' : 'Create'} List'),
         ),
         actions: [
           TextButton(

@@ -166,7 +166,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
         logger.e("_fetchWebChapterInfoProvider($proxy/$code/$chapter) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = ErrorColumn(error: error, stackTrace: stackTrace);
         appBar = AppBar(
           leading: BackButton(
             onPressed: () {
@@ -259,7 +259,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
               },
             ),
           ),
-          body: Styles.errorColumn(error, stackTrace),
+          body: ErrorColumn(error: error, stackTrace: stackTrace),
         );
       case AsyncValue(value: final pages?):
         return ReaderWidget(

@@ -107,8 +107,7 @@ class WebSourcesHome extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace:
-            Styles.titleFlexBar(context: context, title: 'Web Sources'),
+        flexibleSpace: const TitleFlexBar(title: 'Web Sources'),
         actions: [
           IconButton(
             onPressed: openLinkDialog,
@@ -271,7 +270,7 @@ class WebSourcesHome extends HookConsumerWidget {
             ],
           ),
         AsyncValue(:final error?, :final stackTrace?) =>
-          Styles.errorColumn(error, stackTrace),
+          ErrorColumn(error: error, stackTrace: stackTrace),
         _ => const Center(
             child: CircularProgressIndicator(),
           ),

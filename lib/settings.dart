@@ -15,8 +15,7 @@ class SettingsHome extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace:
-            Styles.titleFlexBar(context: context, title: 'Gagaku Settings'),
+        flexibleSpace: const TitleFlexBar(title: 'Gagaku Settings'),
       ),
       drawer: const MainDrawer(),
       body: SafeArea(

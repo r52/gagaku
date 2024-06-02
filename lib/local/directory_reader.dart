@@ -100,7 +100,7 @@ class DirectoryReaderWidget extends ConsumerWidget {
           appBar: AppBar(
             leading: const BackButton(),
           ),
-          body: Styles.errorColumn(error, stackTrace),
+          body: ErrorColumn(error: error, stackTrace: stackTrace),
         );
       case AsyncValue(value: final pages?):
         if (pages.isEmpty) {

@@ -113,7 +113,7 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
         logger.e("_fetchListFromIdProvider($listId) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = ErrorColumn(error: error, stackTrace: stackTrace);
         break;
       case _:
         child = Styles.listSpinner;
@@ -182,8 +182,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut);
           },
-          child: Styles.titleFlexBar(
-              context: context, title: list.get<CustomList>().attributes.name),
+          child: TitleFlexBar(title: list.get<CustomList>().attributes.name),
         ),
         actions: (list.get<CustomList>().user != null &&
                 me != null &&
@@ -296,8 +295,9 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                                   getMangaListByPageProvider(
                                           currentList.value, currentPage.value)
                                       .future),
-                              child: Styles.errorList(titlesProvider.error!,
-                                  titlesProvider.stackTrace!),
+                              child: ErrorList(
+                                  error: titlesProvider.error!,
+                                  stackTrace: titlesProvider.stackTrace!),
                             ),
                         ],
                       ),

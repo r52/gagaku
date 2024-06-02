@@ -63,7 +63,7 @@ class MangaDexHome extends HookConsumerWidget {
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut);
           },
-          child: Styles.titleFlexBar(context: context, title: 'MangaDex'),
+          child: const TitleFlexBar(title: 'MangaDex'),
         ),
         actions: [
           OverflowBar(

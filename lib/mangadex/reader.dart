@@ -135,7 +135,7 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
         logger.e("_fetchChapterDataProvider($chapterId) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = ErrorColumn(error: error, stackTrace: stackTrace);
         break;
       case _:
         child = Styles.listSpinner;
@@ -205,7 +205,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           appBar: AppBar(
             leading: const BackButton(),
           ),
-          body: Styles.errorColumn(error, stackTrace),
+          body: ErrorColumn(error: error, stackTrace: stackTrace),
         );
       case AsyncValue(value: final pages?):
         return ReaderWidget(

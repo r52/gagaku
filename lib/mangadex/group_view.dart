@@ -123,7 +123,7 @@ class QueriedMangaDexGroupViewWidget extends ConsumerWidget {
         logger.e("_fetchGroupFromIdProvider($groupId) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = ErrorColumn(error: error, stackTrace: stackTrace);
         break;
       case _:
         child = Styles.listSpinner;
@@ -274,7 +274,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                           return ref
                               .refresh(_fetchGroupTitlesProvider(group).future);
                         },
-                        child: Styles.errorList(error, stackTrace),
+                        child: ErrorList(error: error, stackTrace: stackTrace),
                       );
                     }(),
                   AsyncValue(value: final mangas?) => RefreshIndicator(
@@ -328,8 +328,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut);
           },
-          child: Styles.titleFlexBar(
-              context: context, title: group.attributes.name),
+          child: TitleFlexBar(title: group.attributes.name),
         ),
         actions: [
           ElevatedButton.icon(

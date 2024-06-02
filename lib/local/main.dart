@@ -44,8 +44,7 @@ class LocalLibraryHome extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace:
-            Styles.titleFlexBar(context: context, title: 'Local Library'),
+        flexibleSpace: const TitleFlexBar(title: 'Local Library'),
         actions: [
           OverflowBar(
             spacing: 8.0,
@@ -206,7 +205,7 @@ class LocalLibraryHome extends StatelessWidget {
 
               return RefreshIndicator(
                 onRefresh: () => ref.refresh(localLibraryProvider.future),
-                child: Styles.errorList(error, stackTrace),
+                child: ErrorList(error: error, stackTrace: stackTrace),
               );
             case _:
               return Center(

@@ -170,7 +170,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                       error: error, stackTrace: stackTrace);
 
                   return SliverToBoxAdapter(
-                    child: Styles.errorColumn(error, stackTrace),
+                    child: ErrorColumn(error: error, stackTrace: stackTrace),
                   );
                 }(),
               AsyncValue(value: final results?) when results.isNotEmpty =>
@@ -575,7 +575,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
             logger.e("tagListProvider failed",
                 error: error, stackTrace: stackTrace);
 
-            return Styles.errorColumn(error, stackTrace);
+            return ErrorColumn(error: error, stackTrace: stackTrace);
           }(),
         _ => const Center(
             child: CircularProgressIndicator(),

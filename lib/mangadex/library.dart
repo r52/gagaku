@@ -98,7 +98,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                   return ref
                       .refresh(_getLibraryListByTypeProvider(type).future);
                 },
-                child: Styles.errorList(error, stackTrace),
+                child: ErrorList(error: error, stackTrace: stackTrace),
               );
             }(),
           _ => const SizedBox.shrink(),
@@ -115,7 +115,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
             ref.read(userLibraryProvider.notifier).clear();
             return ref.refresh(_getLibraryListByTypeProvider(type).future);
           },
-          child: Styles.errorList(error, stackTrace),
+          child: ErrorList(error: error, stackTrace: stackTrace),
         );
         break;
       case _:

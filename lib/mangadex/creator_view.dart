@@ -76,7 +76,7 @@ class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
         logger.e("_fetchCreatorFromIdProvider($creatorId) failed",
             error: error, stackTrace: stackTrace);
 
-        child = Styles.errorColumn(error, stackTrace);
+        child = ErrorColumn(error: error, stackTrace: stackTrace);
         break;
       case _:
         child = Styles.listSpinner;
@@ -128,7 +128,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                   return ref
                       .refresh(_fetchCreatorTitlesProvider(creator).future);
                 },
-                child: Styles.errorList(error, stackTrace),
+                child: ErrorList(error: error, stackTrace: stackTrace),
               );
             }(),
           AsyncValue(value: final mangas?) => RefreshIndicator(
@@ -159,9 +159,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                   duration: const Duration(milliseconds: 400),
                                   curve: Curves.easeInOut);
                             },
-                            child: Styles.titleFlexBar(
-                                context: context,
-                                title: creator.attributes.name),
+                            child: TitleFlexBar(title: creator.attributes.name),
                           ),
                         ),
                         if (creator.attributes.biography.isNotEmpty)
