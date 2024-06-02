@@ -235,6 +235,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         TextSpan(
                           text: manga.attributes!.title.get('en'),
                           style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             shadows: <Shadow>[

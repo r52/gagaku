@@ -166,6 +166,7 @@ class WebMangaViewWidget extends StatelessWidget {
             title: Text(
               manga.title,
               style: const TextStyle(
+                color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 shadows: <Shadow>[
