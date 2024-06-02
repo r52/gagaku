@@ -103,10 +103,9 @@ class MarkReadButton extends ConsumerWidget {
           splashRadius: 15,
           iconSize: 20,
           tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
-          icon: Icon(isRead == true ? Icons.visibility_off : Icons.visibility,
-              color: (isRead == true
-                  ? theme.highlightColor
-                  : theme.primaryIconTheme.color)),
+          icon: isRead == true
+              ? Icon(Icons.visibility_off, color: theme.highlightColor)
+              : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
           constraints: const BoxConstraints(
               minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
           visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
@@ -871,7 +870,8 @@ class _GridMangaItem extends HookConsumerWidget {
               title: Text(
                 manga.attributes!.title.get('en'),
                 softWrap: true,
-                style: const TextStyle(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   overflow: TextOverflow.fade,
                 ),
               ),

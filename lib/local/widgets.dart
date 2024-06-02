@@ -148,7 +148,8 @@ class _GridLibraryItem extends HookWidget {
                 title: Text(
                   item.name ?? item.path,
                   softWrap: true,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     overflow: TextOverflow.fade,
                   ),
                 ),

@@ -1271,7 +1271,8 @@ class _CoverArtItem extends HookWidget {
                         title: Text(
                           'Volume ${cover.attributes!.volume!}',
                           softWrap: true,
-                          style: const TextStyle(
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             overflow: TextOverflow.fade,
                           ),
                         ),
