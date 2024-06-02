@@ -141,7 +141,6 @@ class IconTextChip extends StatelessWidget {
     if (onPressed != null) {
       child = InkWell(
         onTap: onPressed,
-        hoverColor: theme.colorScheme.primary.withOpacity(0.08),
         child: child,
       );
     }

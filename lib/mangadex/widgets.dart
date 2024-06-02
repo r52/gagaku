@@ -80,12 +80,13 @@ class MarkReadButton extends ConsumerWidget {
 
     final theme = Theme.of(context);
 
-    bool? isRead =
-        ref.watch(readChaptersProvider.select((value) => switch (value) {
-              AsyncValue(value: final data?) =>
-                data[manga.id]?.contains(chapter.id) == true,
-              _ => null,
-            }));
+    bool? isRead = ref.watch(readChaptersProvider.select(
+      (value) => switch (value) {
+        AsyncValue(value: final data?) =>
+          data[manga.id]?.contains(chapter.id) == true,
+        _ => null,
+      },
+    ));
 
     return switch (isRead) {
       null => const SizedBox(
@@ -244,6 +245,7 @@ class ChapterFeedItem extends ConsumerWidget {
           onLinkPressed: () async {
             ref.read(readChaptersProvider.notifier).get([state.manga]);
             ref.read(ratingsProvider.notifier).get([state.manga]);
+            ref.read(statisticsProvider.notifier).get([state.manga]);
             context.push('/title/${state.manga.id}', extra: state.manga);
           },
         ),
@@ -261,6 +263,7 @@ class ChapterFeedItem extends ConsumerWidget {
       onPressed: () async {
         ref.read(readChaptersProvider.notifier).get([state.manga]);
         ref.read(ratingsProvider.notifier).get([state.manga]);
+        ref.read(statisticsProvider.notifier).get([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       icon: CountryFlag(
@@ -280,6 +283,7 @@ class ChapterFeedItem extends ConsumerWidget {
       onPressed: () async {
         ref.read(readChaptersProvider.notifier).get([state.manga]);
         ref.read(ratingsProvider.notifier).get([state.manga]);
+        ref.read(statisticsProvider.notifier).get([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       child: ExtendedImage.network(
@@ -439,13 +443,13 @@ class ChapterButtonWidget extends StatelessWidget {
                           color: theme.colorScheme.primary,
                         );
                       } else {
-                        bool? isRead = ref.watch(readChaptersProvider
-                            .select((value) => switch (value) {
-                                  AsyncValue(value: final data?) =>
-                                    data[manga.id]?.contains(chapter.id) ==
-                                        true,
-                                  _ => null,
-                                }));
+                        bool? isRead = ref.watch(readChaptersProvider.select(
+                          (value) => switch (value) {
+                            AsyncValue(value: final data?) =>
+                              data[manga.id]?.contains(chapter.id) == true,
+                            _ => null,
+                          },
+                        ));
 
                         textstyle = TextStyle(
                             color: (isRead == true
@@ -549,12 +553,13 @@ class ChapterButtonWidget extends StatelessWidget {
               left: BorderSide(color: tileColor, width: 4.0),
             );
           } else {
-            bool? isRead = ref
-                .watch(readChaptersProvider.select((value) => switch (value) {
-                      AsyncValue(value: final data?) =>
-                        data[manga.id]?.contains(chapter.id) == true,
-                      _ => null,
-                    }));
+            bool? isRead = ref.watch(readChaptersProvider.select(
+              (value) => switch (value) {
+                AsyncValue(value: final data?) =>
+                  data[manga.id]?.contains(chapter.id) == true,
+                _ => null,
+              },
+            ));
 
             border = Border(
               left: BorderSide(
@@ -810,6 +815,7 @@ class _GridMangaItem extends HookConsumerWidget {
       onTap: () async {
         ref.read(readChaptersProvider.notifier).get([manga]);
         ref.read(ratingsProvider.notifier).get([manga]);
+        ref.read(statisticsProvider.notifier).get([manga]);
         context.push('/title/${manga.id}', extra: manga);
       },
       onHover: (hovering) {
@@ -898,7 +904,6 @@ class _GridMangaDetailedItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final statsProvider = ref.watch(mangaStatsProvider(manga));
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -915,6 +920,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
               onPressed: () async {
                 ref.read(readChaptersProvider.notifier).get([manga]);
                 ref.read(ratingsProvider.notifier).get([manga]);
+                ref.read(statisticsProvider.notifier).get([manga]);
                 context.push('/title/${manga.id}', extra: manga);
               },
               icon: CountryFlag(
@@ -937,6 +943,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                     onPressed: () async {
                       ref.read(readChaptersProvider.notifier).get([manga]);
                       ref.read(ratingsProvider.notifier).get([manga]);
+                      ref.read(statisticsProvider.notifier).get([manga]);
                       context.push('/title/${manga.id}', extra: manga);
                     },
                     child: ExtendedImage.network(
@@ -955,62 +962,8 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                             height: 4,
                           ),
                         ],
-                        Wrap(
-                          runSpacing: 4.0,
-                          children: [
-                            ...switch (statsProvider) {
-                              // ignore: unused_local_variable
-                              AsyncValue(:final error?, :final stackTrace?) => [
-                                  const IconTextChip(
-                                    text: statsError,
-                                  )
-                                ],
-                              AsyncValue(value: final stats?) => [
-                                  IconTextChip(
-                                    icon: const Icon(
-                                      Icons.star_border,
-                                      color: Colors.amber,
-                                      size: 18,
-                                      shadows: [
-                                        Shadow(
-                                          offset: Offset(1.0, 1.0),
-                                        ),
-                                      ],
-                                    ),
-                                    text: stats.rating.bayesian
-                                        .toStringAsFixed(2),
-                                    style: const TextStyle(
-                                      color: Colors.amber,
-                                      shadows: [
-                                        Shadow(
-                                          offset: Offset(1.0, 1.0),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
-                                  IconTextChip(
-                                    icon: const Icon(
-                                      Icons.bookmark_outline,
-                                      size: 18,
-                                    ),
-                                    text: stats.follows.toString(),
-                                  ),
-                                ],
-                              _ => [
-                                  const IconTextChip(
-                                    text: 'Loading...',
-                                  )
-                                ],
-                            },
-                            const SizedBox(width: 10),
-                            MangaStatusChip(
-                              status: manga.attributes!.status,
-                              year: manga.attributes!.year,
-                            ),
-                          ],
+                        MangaStatisticsRow(
+                          manga: manga,
                         ),
                         const SizedBox(
                           height: 4.0,
@@ -1073,7 +1026,6 @@ class _ListMangaItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final statsProvider = ref.watch(mangaStatsProvider(manga));
 
     return Card(
       margin: const EdgeInsets.all(6),
@@ -1086,6 +1038,7 @@ class _ListMangaItem extends ConsumerWidget {
               onPressed: () async {
                 ref.read(readChaptersProvider.notifier).get([manga]);
                 ref.read(ratingsProvider.notifier).get([manga]);
+                ref.read(statisticsProvider.notifier).get([manga]);
                 context.push('/title/${manga.id}', extra: manga);
               },
               child: ExtendedImage.network(
@@ -1110,6 +1063,7 @@ class _ListMangaItem extends ConsumerWidget {
                     onPressed: () async {
                       ref.read(readChaptersProvider.notifier).get([manga]);
                       ref.read(ratingsProvider.notifier).get([manga]);
+                      ref.read(statisticsProvider.notifier).get([manga]);
                       context.push('/title/${manga.id}', extra: manga);
                     },
                     icon: CountryFlag(
@@ -1153,61 +1107,8 @@ class _ListMangaItem extends ConsumerWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  Wrap(
-                    runSpacing: 4.0,
-                    children: [
-                      ...switch (statsProvider) {
-                        // ignore: unused_local_variable
-                        AsyncValue(:final error?, :final stackTrace?) => [
-                            const IconTextChip(
-                              text: statsError,
-                            )
-                          ],
-                        AsyncValue(value: final stats?) => [
-                            IconTextChip(
-                              icon: const Icon(
-                                Icons.star_border,
-                                color: Colors.amber,
-                                size: 18,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(1.0, 1.0),
-                                  ),
-                                ],
-                              ),
-                              text: stats.rating.bayesian.toStringAsFixed(2),
-                              style: const TextStyle(
-                                color: Colors.amber,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(1.0, 1.0),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            IconTextChip(
-                              icon: const Icon(
-                                Icons.bookmark_outline,
-                                size: 18,
-                              ),
-                              text: stats.follows.toString(),
-                            ),
-                          ],
-                        _ => [
-                            const IconTextChip(
-                              text: 'Loading...',
-                            )
-                          ],
-                      },
-                      const SizedBox(width: 10),
-                      MangaStatusChip(
-                        status: manga.attributes!.status,
-                        year: manga.attributes!.year,
-                      ),
-                    ],
+                  MangaStatisticsRow(
+                    manga: manga,
                   ),
                 ],
               ),
@@ -1215,6 +1116,77 @@ class _ListMangaItem extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MangaStatisticsRow extends ConsumerWidget {
+  const MangaStatisticsRow({
+    super.key,
+    required this.manga,
+  });
+
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsProvider = ref.watch(statisticsProvider.select(
+      (map) => switch (map) {
+        AsyncValue(value: final stats?) when stats.containsKey(manga.id) =>
+          stats[manga.id],
+        _ => null,
+      },
+    ));
+
+    return Wrap(
+      runSpacing: 4.0,
+      children: [
+        ...switch (statsProvider) {
+          MangaStatistics(:final rating, :final follows) => [
+              IconTextChip(
+                icon: const Icon(
+                  Icons.star_border,
+                  color: Colors.amber,
+                  size: 18,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(1.0, 1.0),
+                    ),
+                  ],
+                ),
+                text: rating.bayesian.toStringAsFixed(2),
+                style: const TextStyle(
+                  color: Colors.amber,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(1.0, 1.0),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              IconTextChip(
+                icon: const Icon(
+                  Icons.bookmark_outline,
+                  size: 18,
+                ),
+                text: follows.toString(),
+              ),
+            ],
+          _ => [
+              const IconTextChip(
+                text: 'Loading...',
+              )
+            ],
+        },
+        const SizedBox(width: 10),
+        MangaStatusChip(
+          status: manga.attributes!.status,
+          year: manga.attributes!.year,
+        ),
+      ],
     );
   }
 }

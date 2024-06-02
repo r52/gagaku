@@ -407,75 +407,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               SliverToBoxAdapter(
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final statsProvider =
-                          ref.watch(mangaStatsProvider(manga));
-                      return Wrap(
-                        runSpacing: 4.0,
-                        children: [
-                          ...switch (statsProvider) {
-                            // ignore: unused_local_variable
-                            AsyncValue(:final error?, :final stackTrace?) => [
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                const IconTextChip(
-                                  text: statsError,
-                                )
-                              ],
-                            AsyncValue(value: final stats?) => [
-                                IconTextChip(
-                                  icon: const Icon(
-                                    Icons.star_border,
-                                    color: Colors.amber,
-                                    size: 18,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(1.0, 1.0),
-                                      ),
-                                    ],
-                                  ),
-                                  text:
-                                      stats.rating.bayesian.toStringAsFixed(2),
-                                  style: const TextStyle(
-                                    color: Colors.amber,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(1.0, 1.0),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                IconTextChip(
-                                  icon: const Icon(
-                                    Icons.bookmark_outline,
-                                    size: 18,
-                                  ),
-                                  text: stats.follows.toString(),
-                                ),
-                              ],
-                            _ => [
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                const IconTextChip(
-                                  text: 'Loading...',
-                                )
-                              ],
-                          },
-                          const SizedBox(width: 10),
-                          MangaStatusChip(
-                            status: manga.attributes!.status,
-                            year: manga.attributes!.year,
-                            short: false,
-                          ),
-                        ],
-                      );
-                    },
+                  child: MangaStatisticsRow(
+                    manga: manga,
                   ),
                 ),
               ),

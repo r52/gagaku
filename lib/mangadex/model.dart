@@ -1909,6 +1909,10 @@ class ReadChapters extends _$ReadChapters {
       return {};
     }
 
+    if (mangas.isEmpty) {
+      return {};
+    }
+
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchReadChapters(mangas);
     return map;
@@ -1931,6 +1935,12 @@ class ReadChapters extends _$ReadChapters {
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) =>
           !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
       final map = await _fetchReadChapters(mg);
       return {...oldstate, ...map};
     });
@@ -2356,6 +2366,10 @@ class MangaSearch extends _$MangaSearch {
 class Statistics extends _$Statistics {
   Future<Map<String, MangaStatistics>> _fetchStatistics(
       Iterable<Manga> mangas) async {
+    if (mangas.isEmpty) {
+      return {};
+    }
+
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchStatistics(mangas);
 
@@ -2373,29 +2387,15 @@ class Statistics extends _$Statistics {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
       final map = await _fetchStatistics(mg);
       return {...oldstate, ...map};
     });
-  }
-}
-
-// For redundancy
-@riverpod
-class MangaStats extends _$MangaStats {
-  Future<MangaStatistics> _fetchStatistics() async {
-    await ref.watch(statisticsProvider.notifier).get([manga]);
-    final stats = await ref.watch(statisticsProvider.future);
-
-    if (stats.containsKey(manga.id)) {
-      return stats[manga.id]!;
-    }
-
-    throw Exception("Missing stats for manga id ${manga.id}");
-  }
-
-  @override
-  Future<MangaStatistics> build(Manga manga) async {
-    return _fetchStatistics();
   }
 }
 
@@ -2404,6 +2404,10 @@ class Ratings extends _$Ratings {
   Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
+      return {};
+    }
+
+    if (mangas.isEmpty) {
       return {};
     }
 
@@ -2429,6 +2433,12 @@ class Ratings extends _$Ratings {
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) =>
           !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
       final map = await _fetchRatings(mg);
       return {...oldstate, ...map};
     });
