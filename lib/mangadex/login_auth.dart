@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -30,9 +29,11 @@ class MangaDexLoginWidget extends ConsumerWidget {
           ),
         );
       case AsyncValue(:final error?, :final stackTrace?):
-        logger.e("authControlProvider failed",
-            error: error, stackTrace: stackTrace);
-        return ErrorColumn(error: error, stackTrace: stackTrace);
+        return ErrorColumn(
+          error: error,
+          stackTrace: stackTrace,
+          message: "authControlProvider failed",
+        );
       case _:
         return const Center(
           child: CircularProgressIndicator(),

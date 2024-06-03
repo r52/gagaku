@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -163,16 +162,14 @@ class MangaDexSearchWidget extends HookConsumerWidget {
           ],
           children: [
             switch (searchProvider) {
-              AsyncValue(:final error?, :final stackTrace?) => () {
-                  final messenger = ScaffoldMessenger.of(context);
-                  Styles.showErrorSnackBar(messenger, '$error');
-                  logger.e("mangaSearchProvider(filter) failed",
-                      error: error, stackTrace: stackTrace);
-
-                  return SliverToBoxAdapter(
-                    child: ErrorColumn(error: error, stackTrace: stackTrace),
-                  );
-                }(),
+              AsyncValue(:final error?, :final stackTrace?) =>
+                SliverToBoxAdapter(
+                  child: ErrorColumn(
+                    error: error,
+                    stackTrace: stackTrace,
+                    message: "mangaSearchProvider() failed",
+                  ),
+                ),
               AsyncValue(value: final results?) when results.isNotEmpty =>
                 MangaListViewSliver(
                   items: results,
@@ -569,14 +566,11 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
               ],
             ),
           ),
-        AsyncValue(:final error?, :final stackTrace?) => () {
-            final messenger = ScaffoldMessenger.of(context);
-            Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("tagListProvider failed",
-                error: error, stackTrace: stackTrace);
-
-            return ErrorColumn(error: error, stackTrace: stackTrace);
-          }(),
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "tagListProvider failed",
+          ),
         _ => const Center(
             child: CircularProgressIndicator(),
           ),

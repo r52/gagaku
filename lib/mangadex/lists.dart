@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -96,17 +95,15 @@ class MangaDexListsView extends HookConsumerWidget {
             ),
             Expanded(
               child: switch (userListsProv) {
-                AsyncValue(:final error?, :final stackTrace?) => () {
-                    final messenger = ScaffoldMessenger.of(context);
-                    Styles.showErrorSnackBar(messenger, '$error');
-                    logger.e("userListsProvider failed",
-                        error: error, stackTrace: stackTrace);
-
-                    return RefreshIndicator(
-                      onRefresh: () => ref.refresh(userListsProvider.future),
-                      child: ErrorList(error: error, stackTrace: stackTrace),
-                    );
-                  }(),
+                AsyncValue(:final error?, :final stackTrace?) =>
+                  RefreshIndicator(
+                    onRefresh: () => ref.refresh(userListsProvider.future),
+                    child: ErrorList(
+                      error: error,
+                      stackTrace: stackTrace,
+                      message: "userListsProvider failed",
+                    ),
+                  ),
                 AsyncValue(value: final lists?) => RefreshIndicator(
                     onRefresh: () {
                       ref.read(userListsProvider.notifier).clear();

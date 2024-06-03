@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/util.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -349,11 +350,21 @@ class TitleFlexBar extends StatelessWidget {
 class ErrorColumn extends StatelessWidget {
   final Object error;
   final StackTrace stackTrace;
+  final String message;
 
-  const ErrorColumn({super.key, required this.error, required this.stackTrace});
+  const ErrorColumn({
+    super.key,
+    required this.error,
+    required this.stackTrace,
+    String? message,
+  }) : message = message ?? "Build error";
 
   @override
   Widget build(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+    Styles.showErrorSnackBar(messenger, '$error');
+    logger.e(message, error: error, stackTrace: stackTrace);
+
     return Center(
       child: Column(
         children: [
@@ -368,11 +379,21 @@ class ErrorColumn extends StatelessWidget {
 class ErrorList extends StatelessWidget {
   final Object error;
   final StackTrace stackTrace;
+  final String message;
 
-  const ErrorList({super.key, required this.error, required this.stackTrace});
+  const ErrorList(
+      {super.key,
+      required this.error,
+      required this.stackTrace,
+      String? message})
+      : message = message ?? "Build error";
 
   @override
   Widget build(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+    Styles.showErrorSnackBar(messenger, '$error');
+    logger.e(message, error: error, stackTrace: stackTrace);
+
     return Center(
       child: ScrollConfiguration(
         behavior: const MouseTouchScrollBehavior(),

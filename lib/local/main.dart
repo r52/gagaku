@@ -8,7 +8,6 @@ import 'package:gagaku/local/directory_reader.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -198,14 +197,13 @@ class LocalLibraryHome extends StatelessWidget {
                 child: child,
               );
             case AsyncValue(:final error?, :final stackTrace?):
-              final messenger = ScaffoldMessenger.of(context);
-              Styles.showErrorSnackBar(messenger, '$error');
-              logger.e("localLibraryProvider failed",
-                  error: error, stackTrace: stackTrace);
-
               return RefreshIndicator(
                 onRefresh: () => ref.refresh(localLibraryProvider.future),
-                child: ErrorList(error: error, stackTrace: stackTrace),
+                child: ErrorList(
+                  error: error,
+                  stackTrace: stackTrace,
+                  message: "localLibraryProvider failed",
+                ),
               );
             case _:
               return Center(

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -93,35 +92,23 @@ class QueriedMangaDexListViewWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final listProvider = ref.watch(listByIdProvider(listId));
 
-    Widget child;
-
-    switch (listProvider) {
-      case AsyncValue(hasValue: true, value: final list):
-        if (list != null) {
-          return MangaDexListViewWidget(
-            list: list,
-          );
-        }
-
-        child = Center(
-          child: Text('List with ID $listId does not exist!'),
-        );
-        break;
-      case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchListFromIdProvider($listId) failed",
-            error: error, stackTrace: stackTrace);
-
-        child = ErrorColumn(error: error, stackTrace: stackTrace);
-        break;
-      case _:
-        child = Styles.listSpinner;
-        break;
-    }
-
     return Scaffold(
-      body: child,
+      body: switch (listProvider) {
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchListFromIdProvider($listId) failed",
+          ),
+        AsyncValue(hasValue: true, value: final list) when list != null =>
+          MangaDexListViewWidget(
+            list: list,
+          ),
+        AsyncValue(hasValue: true, value: final list) when list == null =>
+          Center(
+            child: Text('List with ID $listId does not exist!'),
+          ),
+        _ => Styles.listSpinner,
+      },
     );
   }
 }
@@ -252,56 +239,54 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 key: const Key('/list?tab=titles'),
                 builder: (context, ref, child) {
                   final currentPage = useState(0);
-
                   final titlesProvider = ref.watch(getMangaListByPageProvider(
                       currentList.value, currentPage.value));
-                  final mangas = titlesProvider.value;
-
-                  final isLoading = titlesProvider.isLoading;
 
                   return Stack(
                     children: [
                       Column(
-                        children: [
-                          if (!titlesProvider.hasError) ...[
-                            Expanded(
-                              child: MangaListWidget(
-                                title: Text(
-                                  'Titles (${list.get<CustomList>().set.length})',
-                                  style: const TextStyle(fontSize: 24),
+                        children: switch (titlesProvider) {
+                          AsyncValue(:final error?, :final stackTrace?) => [
+                              RefreshIndicator(
+                                onRefresh: () => ref.refresh(
+                                    getMangaListByPageProvider(
+                                            currentList.value,
+                                            currentPage.value)
+                                        .future),
+                                child: ErrorList(
+                                    error: error, stackTrace: stackTrace),
+                              )
+                            ],
+                          AsyncValue(value: final mangas) => [
+                              Expanded(
+                                child: MangaListWidget(
+                                  title: Text(
+                                    'Titles (${list.get<CustomList>().set.length})',
+                                    style: const TextStyle(fontSize: 24),
+                                  ),
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  controller: controllers[0],
+                                  children: [
+                                    if (mangas != null)
+                                      MangaListViewSliver(items: mangas),
+                                  ],
                                 ),
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                controller: controllers[0],
-                                children: [
-                                  if (mangas != null)
-                                    MangaListViewSliver(items: mangas),
-                                ],
                               ),
-                            ),
-                            NumberPaginator(
-                              numberPages: max(
-                                  (list.get<CustomList>().set.length /
-                                          MangaDexEndpoints.searchLimit)
-                                      .ceil(),
-                                  1),
-                              onPageChange: (int index) {
-                                currentPage.value = index;
-                              },
-                            ),
-                          ],
-                          if (titlesProvider.hasError)
-                            RefreshIndicator(
-                              onRefresh: () => ref.refresh(
-                                  getMangaListByPageProvider(
-                                          currentList.value, currentPage.value)
-                                      .future),
-                              child: ErrorList(
-                                  error: titlesProvider.error!,
-                                  stackTrace: titlesProvider.stackTrace!),
-                            ),
-                        ],
+                              NumberPaginator(
+                                numberPages: max(
+                                    (list.get<CustomList>().set.length /
+                                            MangaDexEndpoints.searchLimit)
+                                        .ceil(),
+                                    1),
+                                onPageChange: (int index) {
+                                  currentPage.value = index;
+                                },
+                              ),
+                            ],
+                        },
                       ),
-                      if (isLoading) ...Styles.loadingOverlay
+                      if (titlesProvider.isLoading) ...Styles.loadingOverlay
                     ],
                   );
                 },

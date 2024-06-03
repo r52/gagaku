@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -89,28 +88,18 @@ class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mangaProvider = ref.watch(_fetchMangaFromIdProvider(mangaId));
 
-    Widget child;
-
-    switch (mangaProvider) {
-      case AsyncValue(value: final manga?):
-        return MangaDexMangaViewWidget(
-          manga: manga,
-        );
-      case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchMangaFromIdProvider($mangaId) failed",
-            error: error, stackTrace: stackTrace);
-
-        child = ErrorColumn(error: error, stackTrace: stackTrace);
-        break;
-      case _:
-        child = Styles.listSpinner;
-        break;
-    }
-
     return Scaffold(
-      body: child,
+      body: switch (mangaProvider) {
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchMangaFromIdProvider($mangaId) failed",
+          ),
+        AsyncValue(value: final manga?) => MangaDexMangaViewWidget(
+            manga: manga,
+          ),
+        _ => Styles.listSpinner,
+      },
     );
   }
 }
@@ -184,8 +173,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             case _ViewType.art:
               ref.read(mangaCoversProvider(manga).notifier).clear();
               return ref.refresh(mangaCoversProvider(manga).future);
-            default:
-              break;
+            case _ViewType.related:
+              return ref.refresh(_fetchRelatedMangaProvider(manga).future);
           }
         },
         notificationPredicate: (notification) {
@@ -783,17 +772,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           switch (chapterProvider) {
                             AsyncValue(:final error?, :final stackTrace?) =>
-                              () {
-                                final messenger = ScaffoldMessenger.of(context);
-                                Styles.showErrorSnackBar(messenger, '$error');
-                                logger.e(
+                              ErrorList(
+                                error: error,
+                                stackTrace: stackTrace,
+                                message:
                                     "mangaChaptersProvider(${manga.id}) failed",
-                                    error: error,
-                                    stackTrace: stackTrace);
-
-                                return ErrorList(
-                                    error: error, stackTrace: stackTrace);
-                              }(),
+                              ),
                             AsyncValue(value: final chapters?) =>
                               NotificationListener<ScrollEndNotification>(
                                 onNotification: onScrollNotification,
@@ -823,17 +807,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           switch (coverProvider) {
                             AsyncValue(:final error?, :final stackTrace?) =>
-                              () {
-                                final messenger = ScaffoldMessenger.of(context);
-                                Styles.showErrorSnackBar(messenger, '$error');
-                                logger.e(
+                              ErrorList(
+                                error: error,
+                                stackTrace: stackTrace,
+                                message:
                                     "mangaCoversProvider(${manga.id}) failed",
-                                    error: error,
-                                    stackTrace: stackTrace);
-
-                                return ErrorList(
-                                    error: error, stackTrace: stackTrace);
-                              }(),
+                              ),
                             AsyncValue(value: final covers?) =>
                               NotificationListener<ScrollEndNotification>(
                                 onNotification: onScrollNotification,
@@ -972,17 +951,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         children: [
                           switch (relatedProvider) {
                             AsyncValue(:final error?, :final stackTrace?) =>
-                              () {
-                                final messenger = ScaffoldMessenger.of(context);
-                                Styles.showErrorSnackBar(messenger, '$error');
-                                logger.e(
+                              ErrorList(
+                                error: error,
+                                stackTrace: stackTrace,
+                                message:
                                     "_fetchRelatedMangaProvider(${manga.id}) failed",
-                                    error: error,
-                                    stackTrace: stackTrace);
-
-                                return ErrorList(
-                                    error: error, stackTrace: stackTrace);
-                              }(),
+                              ),
                             AsyncValue(value: final related?) =>
                               MangaListWidget(
                                 title: const Text(

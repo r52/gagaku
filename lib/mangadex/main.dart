@@ -2,7 +2,6 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
@@ -142,11 +141,8 @@ class MangaDexHome extends HookConsumerWidget {
                         ),
                         child: logbtn,
                       );
+                    // ignore: unused_local_variable
                     case AsyncValue(:final error?, :final stackTrace?):
-                      final messenger = ScaffoldMessenger.of(context);
-                      Styles.showErrorSnackBar(messenger, '$error');
-                      logger.e("authControlProvider failed",
-                          error: error, stackTrace: stackTrace);
                       return const Icon(Icons.error);
                     case _:
                       return const Center(

@@ -1,7 +1,6 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
@@ -91,17 +90,16 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
           child: WebMangaViewWidget(manga: manga, info: info),
         );
       case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchWebMangaInfoProvider($proxy/$code) failed",
-            error: error, stackTrace: stackTrace);
-
         child = RefreshIndicator(
           onRefresh: () async {
             await api.invalidateAll(info.getKey());
             return ref.refresh(_fetchWebMangaInfoProvider(info).future);
           },
-          child: ErrorList(error: error, stackTrace: stackTrace),
+          child: ErrorList(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchWebMangaInfoProvider($proxy/$code) failed",
+          ),
         );
 
         appBar = AppBar(

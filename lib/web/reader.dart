@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
@@ -161,12 +160,11 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
           backRoute: GagakuRoute.web,
         );
       case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchWebChapterInfoProvider($proxy/$code/$chapter) failed",
-            error: error, stackTrace: stackTrace);
-
-        child = ErrorColumn(error: error, stackTrace: stackTrace);
+        child = ErrorColumn(
+          error: error,
+          stackTrace: stackTrace,
+          message: "_fetchWebChapterInfoProvider($proxy/$code/$chapter) failed",
+        );
         appBar = AppBar(
           leading: BackButton(
             onPressed: () {
@@ -242,11 +240,6 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
     switch (pageProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_getPagesProvider($source) failed",
-            error: error, stackTrace: stackTrace);
-
         return Scaffold(
           appBar: AppBar(
             leading: BackButton(
@@ -259,7 +252,11 @@ class WebSourceReaderWidget extends HookConsumerWidget {
               },
             ),
           ),
-          body: ErrorColumn(error: error, stackTrace: stackTrace),
+          body: ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_getPagesProvider($source) failed",
+          ),
         );
       case AsyncValue(value: final pages?):
         return ReaderWidget(

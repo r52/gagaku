@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/types.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
@@ -122,16 +121,15 @@ class ArchiveReaderWidget extends ConsumerWidget {
 
     switch (pageProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_getArchivePagesProvider($path) failed",
-            error: error, stackTrace: stackTrace);
-
         return Scaffold(
           appBar: AppBar(
             leading: const BackButton(),
           ),
-          body: ErrorColumn(error: error, stackTrace: stackTrace),
+          body: ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_getArchivePagesProvider($path) failed",
+          ),
         );
       case AsyncValue(value: final pages?):
         if (pages.isEmpty) {

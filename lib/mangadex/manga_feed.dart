@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -44,20 +43,17 @@ class MangaDexMangaFeed extends ConsumerWidget {
       child: Stack(
         children: [
           switch (feedProvider) {
-            AsyncValue(:final error?, :final stackTrace?) => () {
-                final messenger = ScaffoldMessenger.of(context);
-                Styles.showErrorSnackBar(messenger, '$error');
-                logger.e("_fetchMangaFeedProvider failed",
-                    error: error, stackTrace: stackTrace);
-
-                return RefreshIndicator(
-                  onRefresh: () {
-                    ref.read(latestChaptersFeedProvider.notifier).clear();
-                    return ref.refresh(_fetchMangaFeedProvider.future);
-                  },
-                  child: ErrorList(error: error, stackTrace: stackTrace),
-                );
-              }(),
+            AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+                onRefresh: () {
+                  ref.read(latestChaptersFeedProvider.notifier).clear();
+                  return ref.refresh(_fetchMangaFeedProvider.future);
+                },
+                child: ErrorList(
+                  error: error,
+                  stackTrace: stackTrace,
+                  message: "_fetchMangaFeedProvider failed",
+                ),
+              ),
             AsyncValue(value: final mangas?) => RefreshIndicator(
                 onRefresh: () {
                   ref.read(latestChaptersFeedProvider.notifier).clear();

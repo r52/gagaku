@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/reader/main.dart';
@@ -109,41 +108,31 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dataProvider = ref.watch(_fetchChapterDataProvider(chapterId));
 
-    Widget child;
-
-    switch (dataProvider) {
-      case AsyncValue(value: final data?):
-        return MangaDexReaderWidget(
-          chapter: data.chapter,
-          manga: data.manga,
-          title: data.title,
-          link: Text(
-            data.manga.attributes!.title.get('en'),
-            style: const TextStyle(fontSize: 18),
-          ),
-          onLinkPressed: () async {
-            ref.read(readChaptersProvider.notifier).get([data.manga]);
-            ref.read(ratingsProvider.notifier).get([data.manga]);
-            ref.read(statisticsProvider.notifier).get([data.manga]);
-            context.go('/title/${data.manga.id}', extra: data.manga);
-          },
-          backRoute: '/',
-        );
-      case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchChapterDataProvider($chapterId) failed",
-            error: error, stackTrace: stackTrace);
-
-        child = ErrorColumn(error: error, stackTrace: stackTrace);
-        break;
-      case _:
-        child = Styles.listSpinner;
-        break;
-    }
-
     return Scaffold(
-      body: child,
+      body: switch (dataProvider) {
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchChapterDataProvider($chapterId) failed",
+          ),
+        AsyncValue(value: final data?) => MangaDexReaderWidget(
+            chapter: data.chapter,
+            manga: data.manga,
+            title: data.title,
+            link: Text(
+              data.manga.attributes!.title.get('en'),
+              style: const TextStyle(fontSize: 18),
+            ),
+            onLinkPressed: () async {
+              ref.read(readChaptersProvider.notifier).get([data.manga]);
+              ref.read(ratingsProvider.notifier).get([data.manga]);
+              ref.read(statisticsProvider.notifier).get([data.manga]);
+              context.go('/title/${data.manga.id}', extra: data.manga);
+            },
+            backRoute: '/',
+          ),
+        _ => Styles.listSpinner,
+      },
     );
   }
 }
@@ -196,16 +185,15 @@ class MangaDexReaderWidget extends HookConsumerWidget {
 
     switch (pageProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchChapterPagesProvider(${chapter.id}) failed",
-            error: error, stackTrace: stackTrace);
-
         return Scaffold(
           appBar: AppBar(
             leading: const BackButton(),
           ),
-          body: ErrorColumn(error: error, stackTrace: stackTrace),
+          body: ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchChapterPagesProvider(${chapter.id}) failed",
+          ),
         );
       case AsyncValue(value: final pages?):
         return ReaderWidget(

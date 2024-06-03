@@ -2,7 +2,6 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/ui.dart';
@@ -159,17 +158,14 @@ class ChapterFeedWidget extends HookConsumerWidget {
 
     return Center(
       child: switch (resultProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => () {
-            final messenger = ScaffoldMessenger.of(context);
-            Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("${provider.toString()} failed",
-                error: error, stackTrace: stackTrace);
-
-            return RefreshIndicator(
-              onRefresh: onRefresh,
-              child: ErrorList(error: error, stackTrace: stackTrace),
-            );
-          }(),
+        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+            onRefresh: onRefresh,
+            child: ErrorList(
+              error: error,
+              stackTrace: stackTrace,
+              message: "${provider.toString()} failed",
+            ),
+          ),
         AsyncValue(value: final results?) => ScrollConfiguration(
             behavior: const MouseTouchScrollBehavior(),
             child: RefreshIndicator(

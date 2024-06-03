@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -63,28 +62,18 @@ class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final creatorProvider = ref.watch(_fetchCreatorFromIdProvider(creatorId));
 
-    Widget child;
-
-    switch (creatorProvider) {
-      case AsyncValue(value: final creator?):
-        return MangaDexCreatorViewWidget(
-          creator: creator,
-        );
-      case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchCreatorFromIdProvider($creatorId) failed",
-            error: error, stackTrace: stackTrace);
-
-        child = ErrorColumn(error: error, stackTrace: stackTrace);
-        break;
-      case _:
-        child = Styles.listSpinner;
-        break;
-    }
-
     return Scaffold(
-      body: child,
+      body: switch (creatorProvider) {
+        AsyncValue(value: final creator?) => MangaDexCreatorViewWidget(
+            creator: creator,
+          ),
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchCreatorFromIdProvider($creatorId) failed",
+          ),
+        _ => Styles.listSpinner,
+      },
     );
   }
 }
@@ -116,21 +105,17 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
         body: Stack(
       children: [
         switch (titleProvider) {
-          AsyncValue(:final error?, :final stackTrace?) => () {
-              final messenger = ScaffoldMessenger.of(context);
-              Styles.showErrorSnackBar(messenger, '$error');
-              logger.e("_fetchCreatorTitlesProvider(creator) failed",
-                  error: error, stackTrace: stackTrace);
-
-              return RefreshIndicator(
-                onRefresh: () {
-                  ref.read(creatorTitlesProvider(creator).notifier).clear();
-                  return ref
-                      .refresh(_fetchCreatorTitlesProvider(creator).future);
-                },
-                child: ErrorList(error: error, stackTrace: stackTrace),
-              );
-            }(),
+          AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+              onRefresh: () {
+                ref.read(creatorTitlesProvider(creator).notifier).clear();
+                return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
+              },
+              child: ErrorList(
+                error: error,
+                stackTrace: stackTrace,
+                message: "_fetchCreatorTitlesProvider(${creator.id}) failed",
+              ),
+            ),
           AsyncValue(value: final mangas?) => RefreshIndicator(
               onRefresh: () {
                 ref.read(creatorTitlesProvider(creator).notifier).clear();

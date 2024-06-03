@@ -1,7 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -110,28 +109,18 @@ class QueriedMangaDexGroupViewWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final groupProvider = ref.watch(_fetchGroupFromIdProvider(groupId));
 
-    Widget child;
-
-    switch (groupProvider) {
-      case AsyncValue(value: final group?):
-        return MangaDexGroupViewWidget(
-          group: group,
-        );
-      case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchGroupFromIdProvider($groupId) failed",
-            error: error, stackTrace: stackTrace);
-
-        child = ErrorColumn(error: error, stackTrace: stackTrace);
-        break;
-      case _:
-        child = Styles.listSpinner;
-        break;
-    }
-
     return Scaffold(
-      body: child,
+      body: switch (groupProvider) {
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchGroupFromIdProvider($groupId) failed",
+          ),
+        AsyncValue(value: final group?) => MangaDexGroupViewWidget(
+            group: group,
+          ),
+        _ => Styles.listSpinner,
+      },
     );
   }
 }
@@ -262,21 +251,20 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
             return Stack(
               children: [
                 switch (titleProvider) {
-                  AsyncValue(:final error?, :final stackTrace?) => () {
-                      final messenger = ScaffoldMessenger.of(context);
-                      Styles.showErrorSnackBar(messenger, '$error');
-                      logger.e("_fetchGroupTitlesProvider(group) failed",
-                          error: error, stackTrace: stackTrace);
-
-                      return RefreshIndicator(
-                        onRefresh: () {
-                          ref.read(groupTitlesProvider(group).notifier).clear();
-                          return ref
-                              .refresh(_fetchGroupTitlesProvider(group).future);
-                        },
-                        child: ErrorList(error: error, stackTrace: stackTrace),
-                      );
-                    }(),
+                  AsyncValue(:final error?, :final stackTrace?) =>
+                    RefreshIndicator(
+                      onRefresh: () {
+                        ref.read(groupTitlesProvider(group).notifier).clear();
+                        return ref
+                            .refresh(_fetchGroupTitlesProvider(group).future);
+                      },
+                      child: ErrorList(
+                        error: error,
+                        stackTrace: stackTrace,
+                        message:
+                            "_fetchGroupTitlesProvider(${group.id}) failed",
+                      ),
+                    ),
                   AsyncValue(value: final mangas?) => RefreshIndicator(
                       onRefresh: () {
                         ref.read(groupTitlesProvider(group).notifier).clear();
