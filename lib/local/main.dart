@@ -31,8 +31,8 @@ class LocalLibraryHome extends StatelessWidget {
     PlatformFile? result = await _pickMangaArchive();
 
     if (result != null) {
-      navigator
-          .push(createArchiveReaderRoute(result.path!, title: result.name));
+      navigator.push(
+          ArchiveReaderRouteBuilder(path: result.path!, title: result.name));
     }
   }
 
@@ -69,7 +69,7 @@ class LocalLibraryHome extends StatelessWidget {
                   ),
                   MenuItemButton(
                     onPressed: () {
-                      nav.push(createLocalLibrarySettingsRoute());
+                      nav.push(LocalLibrarySettingsRouteBuilder());
                     },
                     leadingIcon: const Icon(Icons.settings),
                     child: const Text('Settings'),
@@ -115,7 +115,7 @@ class LocalLibraryHome extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      nav.push(createLocalLibrarySettingsRoute());
+                      nav.push(LocalLibrarySettingsRouteBuilder());
                     },
                     icon: const Icon(Icons.library_add),
                     label: const Text('Set Library Directory'),
@@ -173,12 +173,12 @@ class LocalLibraryHome extends StatelessWidget {
                     if (item.isReadable) {
                       switch (item.type) {
                         case LibraryItemType.directory:
-                          nav.push(createDirectoryReaderRoute(item.path,
-                              title: item.name ?? item.path));
+                          nav.push(DirectoryReaderRouteBuilder(
+                              path: item.path, title: item.name ?? item.path));
                           break;
                         case LibraryItemType.archive:
-                          nav.push(createArchiveReaderRoute(item.path,
-                              title: item.name ?? item.path));
+                          nav.push(ArchiveReaderRouteBuilder(
+                              path: item.path, title: item.name ?? item.path));
                           break;
                         default:
                           break;

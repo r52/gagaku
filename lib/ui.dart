@@ -458,22 +458,19 @@ class Styles {
     );
   }
 
+  static final slideTween =
+      Tween(begin: const Offset(0.0, 1.0), end: Offset.zero)
+          .chain(CurveTween(curve: Curves.ease));
+
   static Widget slideTransitionBuilder(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-    const begin = Offset(0.0, 1.0);
-    const end = Offset.zero;
-    const curve = Curves.ease;
-
-    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-    return SlideTransition(
-      position: animation.drive(tween),
-      child: child,
-    );
-  }
+          BuildContext context,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+          Widget child) =>
+      SlideTransition(
+        position: animation.drive(slideTween),
+        child: child,
+      );
 
   static Widget scaledSharedAxisTransitionBuilder(
           BuildContext context,
@@ -501,28 +498,23 @@ class Styles {
         child: child,
       );
 
-  static Route<T> buildSlideTransitionRoute<T>(RoutePageBuilder builder) {
-    return PageRouteBuilder<T>(
-      pageBuilder: builder,
-      transitionsBuilder: slideTransitionBuilder,
-    );
-  }
+  static Widget fadeThroughTransitionBuilder(
+          BuildContext context,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+          Widget child) =>
+      FadeThroughTransition(
+        fillColor: Theme.of(context).colorScheme.surface,
+        animation: animation,
+        secondaryAnimation: secondaryAnimation,
+        child: child,
+      );
+}
 
-  static Route<T> buildSharedAxisTransitionRoute<T>(
-      RoutePageBuilder builder, SharedAxisTransitionType transitionType) {
-    return PageRouteBuilder<T>(
-      pageBuilder: builder,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return SharedAxisTransition(
-          fillColor: Theme.of(context).colorScheme.surface,
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          transitionType: transitionType,
-          child: child,
-        );
-      },
-    );
-  }
+class SlideTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
+  SlideTransitionRouteBuilder({
+    required super.pageBuilder,
+  }) : super(transitionsBuilder: Styles.slideTransitionBuilder);
 }
 
 Widget? extendedImageLoadStateHandler(ExtendedImageState state) {

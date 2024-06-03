@@ -190,7 +190,7 @@ class _AppState extends ConsumerState<App> {
               child: MangaDexGlobalFeed(
                 controller: _controllers[0],
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
             ),
           ),
           GoRoute(
@@ -205,7 +205,7 @@ class _AppState extends ConsumerState<App> {
                   );
                 },
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
             ),
           ),
           GoRoute(
@@ -220,7 +220,7 @@ class _AppState extends ConsumerState<App> {
                   );
                 },
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
             ),
           ),
           GoRoute(
@@ -235,7 +235,7 @@ class _AppState extends ConsumerState<App> {
                   );
                 },
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
             ),
           ),
           GoRoute(
@@ -245,7 +245,7 @@ class _AppState extends ConsumerState<App> {
               child: MangaDexHistoryFeed(
                 controller: _controllers[4],
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
             ),
           ),
         ],

@@ -136,9 +136,10 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                     ElevatedButton.icon(
                       onPressed: () async {
                         final result = await nav.push<MangaFilters>(
-                          Styles.buildSlideTransitionRoute(
-                            (context, animation, secondaryAnimation) =>
-                                _MangaDexFilterWidget(
+                          SlideTransitionRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    _MangaDexFilterWidget(
                               filter: filter.filter,
                             ),
                           ),

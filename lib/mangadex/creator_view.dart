@@ -90,17 +90,6 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
     final titleProvider = ref.watch(_fetchCreatorTitlesProvider(creator));
     final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
 
-    Widget createLinkChip(String url, String text) {
-      return ButtonChip(
-        onPressed: () async {
-          if (!await launchUrl(Uri.parse(url))) {
-            throw 'Could not launch $url';
-          }
-        },
-        text: Text(text),
-      );
-    }
-
     return Scaffold(
         body: Stack(
       children: [
@@ -195,20 +184,21 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                     runSpacing: 4.0,
                                     children: [
                                       if (creator.attributes.twitter != null)
-                                        createLinkChip(
-                                            creator.attributes.twitter!,
-                                            'Twitter'),
+                                        _LinkChip(
+                                            url: creator.attributes.twitter!,
+                                            text: 'Twitter'),
                                       if (creator.attributes.pixiv != null)
-                                        createLinkChip(
-                                            creator.attributes.pixiv!, 'Pixiv'),
+                                        _LinkChip(
+                                            url: creator.attributes.pixiv!,
+                                            text: 'Pixiv'),
                                       if (creator.attributes.youtube != null)
-                                        createLinkChip(
-                                            creator.attributes.youtube!,
-                                            'Youtube'),
+                                        _LinkChip(
+                                            url: creator.attributes.youtube!,
+                                            text: 'Youtube'),
                                       if (creator.attributes.website != null)
-                                        createLinkChip(
-                                            creator.attributes.website!,
-                                            'website'),
+                                        _LinkChip(
+                                            url: creator.attributes.website!,
+                                            text: 'Website'),
                                     ],
                                   ),
                                 ),
@@ -237,5 +227,24 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
         if (isLoading) ...Styles.loadingOverlay,
       ],
     ));
+  }
+}
+
+class _LinkChip extends StatelessWidget {
+  final String text;
+  final String url;
+
+  const _LinkChip({required this.text, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return ButtonChip(
+      onPressed: () async {
+        if (!await launchUrl(Uri.parse(url))) {
+          throw 'Could not launch $url';
+        }
+      },
+      text: Text(text),
+    );
   }
 }

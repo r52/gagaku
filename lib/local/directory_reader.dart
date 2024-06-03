@@ -11,20 +11,26 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'directory_reader.g.dart';
 
-Route createDirectoryReaderRoute(
-  String path, {
-  String? title,
-  Widget? link,
-  VoidCallback? onLinkPressed,
-}) {
-  return Styles.buildSlideTransitionRoute(
-    (context, animation, secondaryAnimation) => DirectoryReaderWidget(
-      path: path,
-      title: title,
-      link: link,
-      onLinkPressed: onLinkPressed,
-    ),
-  );
+class DirectoryReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
+  final String path;
+  final String? title;
+  final Widget? link;
+  final VoidCallback? onLinkPressed;
+
+  DirectoryReaderRouteBuilder({
+    required this.path,
+    this.title,
+    this.link,
+    this.onLinkPressed,
+  }) : super(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              DirectoryReaderWidget(
+            path: path,
+            title: title,
+            link: link,
+            onLinkPressed: onLinkPressed,
+          ),
+        );
 }
 
 @riverpod

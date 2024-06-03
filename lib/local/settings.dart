@@ -5,10 +5,12 @@ import 'package:gagaku/local/config.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-Route createLocalLibrarySettingsRoute() {
-  return Styles.buildSlideTransitionRoute(
-      (context, animation, secondaryAnimation) =>
-          const LocalLibrarySettingsWidget());
+class LocalLibrarySettingsRouteBuilder<T>
+    extends SlideTransitionRouteBuilder<T> {
+  LocalLibrarySettingsRouteBuilder()
+      : super(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const LocalLibrarySettingsWidget());
 }
 
 class LocalLibrarySettingsWidget extends HookConsumerWidget {

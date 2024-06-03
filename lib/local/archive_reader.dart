@@ -11,20 +11,26 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'archive_reader.g.dart';
 
-Route createArchiveReaderRoute(
-  String path, {
-  String? title,
-  Widget? link,
-  VoidCallback? onLinkPressed,
-}) {
-  return Styles.buildSlideTransitionRoute(
-    (context, animation, secondaryAnimation) => ArchiveReaderWidget(
-      path: path,
-      title: title,
-      link: link,
-      onLinkPressed: onLinkPressed,
-    ),
-  );
+class ArchiveReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
+  final String path;
+  final String? title;
+  final Widget? link;
+  final VoidCallback? onLinkPressed;
+
+  ArchiveReaderRouteBuilder({
+    required this.path,
+    this.title,
+    this.link,
+    this.onLinkPressed,
+  }) : super(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              ArchiveReaderWidget(
+            path: path,
+            title: title,
+            link: link,
+            onLinkPressed: onLinkPressed,
+          ),
+        );
 }
 
 class _ExtractInfo {
