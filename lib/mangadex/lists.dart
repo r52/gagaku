@@ -22,7 +22,6 @@ class MangaDexListsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
-    final theme = Theme.of(context);
     //final view = useState(_ListViewType.self);
     final userListsProv = ref.watch(userListsProvider);
 
@@ -105,7 +104,7 @@ class MangaDexListsView extends HookConsumerWidget {
                     ),
                   ),
                 AsyncValue(value: final lists?) => RefreshIndicator(
-                    onRefresh: () {
+                    onRefresh: () async {
                       ref.read(userListsProvider.notifier).clear();
                       return ref.refresh(userListsProvider.future);
                     },

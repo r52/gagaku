@@ -55,6 +55,11 @@ Future<Manga> _fetchMangaFromId(
   final api = ref.watch(mangadexProvider);
   final manga =
       await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
+
+  await ref.read(statisticsProvider.notifier).get(manga);
+  await ref.read(readChaptersProvider.notifier).get(manga);
+  await ref.read(ratingsProvider.notifier).get(manga);
+
   return manga.first;
 }
 

@@ -86,7 +86,7 @@ final class _FetchMangaFromIdProvider
   }
 }
 
-String _$fetchMangaFromIdHash() => r'aa14b104bfae399f4c9480fded6d7263eec0320d';
+String _$fetchMangaFromIdHash() => r'79d90b7cdd1dd49486089e586547e5a1b5d4caa5';
 
 final class _FetchMangaFromIdFamily extends Family {
   const _FetchMangaFromIdFamily._()
