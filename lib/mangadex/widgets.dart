@@ -365,8 +365,6 @@ class ChapterButtonWidget extends StatelessWidget {
         chapter.attributes.chapter == manga.attributes!.lastChapter;
     final isOfficialPub = chapter.attributes.externalUrl != null;
 
-    String title = chapter.title;
-
     final pubtime = timeago.format(chapter.attributes.publishAt);
 
     final groupChips = <Widget>[];
@@ -429,39 +427,9 @@ class ChapterButtonWidget extends StatelessWidget {
                 _rowPadding,
                 if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
                 Expanded(
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final theme = Theme.of(context);
-                      final loggedin =
-                          ref.watch(authControlProvider).value ?? false;
-
-                      TextStyle textstyle;
-
-                      if (!loggedin) {
-                        textstyle = TextStyle(
-                          color: theme.colorScheme.primary,
-                        );
-                      } else {
-                        bool? isRead = ref.watch(readChaptersProvider.select(
-                          (value) => switch (value) {
-                            AsyncValue(value: final data?) =>
-                              data[manga.id]?.contains(chapter.id) == true,
-                            _ => null,
-                          },
-                        ));
-
-                        textstyle = TextStyle(
-                            color: (isRead == true
-                                ? theme.highlightColor
-                                : theme.colorScheme.primary));
-                      }
-
-                      return Text(
-                        title,
-                        overflow: TextOverflow.ellipsis,
-                        style: textstyle,
-                      );
-                    },
+                  child: ChapterTitle(
+                    chapter: chapter,
+                    manga: manga,
                   ),
                 ),
                 _rowPadding,
@@ -530,7 +498,7 @@ class ChapterButtonWidget extends StatelessWidget {
         context.push(
           '/chapter/${chapter.id}',
           extra: ReaderData(
-            title: title,
+            title: chapter.title,
             chapter: chapter,
             manga: manga,
             link: link,
@@ -1115,6 +1083,46 @@ class _ListMangaItem extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ChapterTitle extends ConsumerWidget {
+  final Chapter chapter;
+  final Manga manga;
+
+  const ChapterTitle({super.key, required this.chapter, required this.manga});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final loggedin = ref.watch(authControlProvider).value ?? false;
+
+    TextStyle textstyle;
+
+    if (!loggedin) {
+      textstyle = TextStyle(
+        color: theme.colorScheme.primary,
+      );
+    } else {
+      bool? isRead = ref.watch(readChaptersProvider.select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) =>
+            data[manga.id]?.contains(chapter.id) == true,
+          _ => null,
+        },
+      ));
+
+      textstyle = TextStyle(
+          color: (isRead == true
+              ? theme.highlightColor
+              : theme.colorScheme.primary));
+    }
+
+    return Text(
+      chapter.title,
+      overflow: TextOverflow.ellipsis,
+      style: textstyle,
     );
   }
 }

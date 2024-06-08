@@ -363,7 +363,7 @@ class Chapter with _$Chapter, MangaDexUUID {
     String title = '';
 
     if (attributes.chapter != null && attributes.chapter!.isNotEmpty) {
-      title += 'Chapter ${attributes.chapter}';
+      title += 'Ch. ${attributes.chapter}';
     }
 
     if (attributes.title != null && attributes.title!.isNotEmpty) {
