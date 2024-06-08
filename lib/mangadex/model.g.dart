@@ -1081,7 +1081,7 @@ abstract class _$UserLibrary
 const userListsProvider = UserListsProvider._();
 
 final class UserListsProvider
-    extends $AsyncNotifierProvider<UserLists, List<CRef>> {
+    extends $AsyncNotifierProvider<UserLists, List<CustomList>> {
   const UserListsProvider._(
       {super.runNotifierBuildOverride, UserLists Function()? create})
       : _createCb = create,
@@ -1114,8 +1114,8 @@ final class UserListsProvider
   @$internal
   @override
   UserListsProvider $copyWithBuild(
-    FutureOr<List<CRef>> Function(
-      Ref<AsyncValue<List<CRef>>>,
+    FutureOr<List<CustomList>> Function(
+      Ref<AsyncValue<List<CustomList>>>,
       UserLists,
     ) build,
   ) {
@@ -1124,18 +1124,18 @@ final class UserListsProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<UserLists, List<CRef>> $createElement(
+  $AsyncNotifierProviderElement<UserLists, List<CustomList>> $createElement(
           $ProviderPointer pointer) =>
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$userListsHash() => r'7cbed0641729bd74cfd0824d7b9d1f36a149d476';
+String _$userListsHash() => r'3cbb7a0ce0818124c3342a6830cecb3ce473ee99';
 
-abstract class _$UserLists extends $AsyncNotifier<List<CRef>> {
-  FutureOr<List<CRef>> build();
+abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
+  FutureOr<List<CustomList>> build();
   @$internal
   @override
-  FutureOr<List<CRef>> runBuild() => build();
+  FutureOr<List<CustomList>> runBuild() => build();
 }
 
 @ProviderFor(CustomListFeed)
@@ -1443,73 +1443,74 @@ final class GetMangaListByPageFamily extends Family {
   }
 }
 
-@ProviderFor(ListById)
-const listByIdProvider = ListByIdFamily._();
+@ProviderFor(ListSource)
+const listSourceProvider = ListSourceFamily._();
 
-final class ListByIdProvider extends $AsyncNotifierProvider<ListById, CRef?> {
-  const ListByIdProvider._(
-      {required ListByIdFamily super.from,
+final class ListSourceProvider
+    extends $AsyncNotifierProvider<ListSource, CustomList?> {
+  const ListSourceProvider._(
+      {required ListSourceFamily super.from,
       required String super.argument,
       super.runNotifierBuildOverride,
-      ListById Function()? create})
+      ListSource Function()? create})
       : _createCb = create,
         super(
-          name: r'listByIdProvider',
+          name: r'listSourceProvider',
           isAutoDispose: true,
           dependencies: null,
           allTransitiveDependencies: null,
         );
 
-  final ListById Function()? _createCb;
+  final ListSource Function()? _createCb;
 
   @override
-  String debugGetCreateSourceHash() => _$listByIdHash();
+  String debugGetCreateSourceHash() => _$listSourceHash();
 
   @override
   String toString() {
-    return r'listByIdProvider'
+    return r'listSourceProvider'
         ''
         '($argument)';
   }
 
   @$internal
   @override
-  ListById create() => _createCb?.call() ?? ListById();
+  ListSource create() => _createCb?.call() ?? ListSource();
 
   @$internal
   @override
-  ListByIdProvider $copyWithCreate(
-    ListById Function() create,
+  ListSourceProvider $copyWithCreate(
+    ListSource Function() create,
   ) {
-    return ListByIdProvider._(
+    return ListSourceProvider._(
         argument: argument as String,
-        from: from! as ListByIdFamily,
+        from: from! as ListSourceFamily,
         create: create);
   }
 
   @$internal
   @override
-  ListByIdProvider $copyWithBuild(
-    FutureOr<CRef?> Function(
-      Ref<AsyncValue<CRef?>>,
-      ListById,
+  ListSourceProvider $copyWithBuild(
+    FutureOr<CustomList?> Function(
+      Ref<AsyncValue<CustomList?>>,
+      ListSource,
     ) build,
   ) {
-    return ListByIdProvider._(
+    return ListSourceProvider._(
         argument: argument as String,
-        from: from! as ListByIdFamily,
+        from: from! as ListSourceFamily,
         runNotifierBuildOverride: build);
   }
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<ListById, CRef?> $createElement(
+  $AsyncNotifierProviderElement<ListSource, CustomList?> $createElement(
           $ProviderPointer pointer) =>
       $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is ListByIdProvider && other.argument == argument;
+    return other is ListSourceProvider && other.argument == argument;
   }
 
   @override
@@ -1518,38 +1519,38 @@ final class ListByIdProvider extends $AsyncNotifierProvider<ListById, CRef?> {
   }
 }
 
-String _$listByIdHash() => r'1d2960e4ad6e1f5d8a329d1b6aa99b00fb75a726';
+String _$listSourceHash() => r'9f85bdb85e5530013d8842bb4095cf7fd5538c2c';
 
-final class ListByIdFamily extends Family {
-  const ListByIdFamily._()
+final class ListSourceFamily extends Family {
+  const ListSourceFamily._()
       : super(
-          name: r'listByIdProvider',
+          name: r'listSourceProvider',
           dependencies: null,
           allTransitiveDependencies: null,
           isAutoDispose: true,
         );
 
-  ListByIdProvider call(
+  ListSourceProvider call(
     String listId,
   ) =>
-      ListByIdProvider._(argument: listId, from: this);
+      ListSourceProvider._(argument: listId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$listByIdHash();
+  String debugGetCreateSourceHash() => _$listSourceHash();
 
   @override
-  String toString() => r'listByIdProvider';
+  String toString() => r'listSourceProvider';
 
   /// {@macro riverpod.override_with}
   Override overrideWith(
-    ListById Function(
+    ListSource Function(
       String args,
     ) create,
   ) {
     return $FamilyOverride(
       from: this,
       createElement: (pointer) {
-        final provider = pointer.origin as ListByIdProvider;
+        final provider = pointer.origin as ListSourceProvider;
 
         final argument = provider.argument as String;
 
@@ -1562,14 +1563,14 @@ final class ListByIdFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<CRef?> Function(
-            Ref<AsyncValue<CRef?>> ref, ListById notifier, String argument)
+    FutureOr<CustomList?> Function(Ref<AsyncValue<CustomList?>> ref,
+            ListSource notifier, String argument)
         build,
   ) {
     return $FamilyOverride(
       from: this,
       createElement: (pointer) {
-        final provider = pointer.origin as ListByIdProvider;
+        final provider = pointer.origin as ListSourceProvider;
 
         final argument = provider.argument as String;
 
@@ -1581,16 +1582,16 @@ final class ListByIdFamily extends Family {
   }
 }
 
-abstract class _$ListById extends $AsyncNotifier<CRef?> {
+abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
   late final _$args = ref.$arg as String;
   String get listId => _$args;
 
-  FutureOr<CRef?> build(
+  FutureOr<CustomList?> build(
     String listId,
   );
   @$internal
   @override
-  FutureOr<CRef?> runBuild() => build(
+  FutureOr<CustomList?> runBuild() => build(
         _$args,
       );
 }

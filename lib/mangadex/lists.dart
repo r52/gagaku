@@ -119,14 +119,13 @@ class MangaDexListsView extends HookConsumerWidget {
                               itemCount: lists.length,
                               findChildIndexCallback: (key) {
                                 final valueKey = key as ValueKey<String>;
-                                final val = lists.indexWhere((i) =>
-                                    i.get<CustomList>().id == valueKey.value);
+                                final val = lists
+                                    .indexWhere((i) => i.id == valueKey.value);
                                 return val >= 0 ? val : null;
                               },
                               itemBuilder: (BuildContext context, int index) {
                                 final messenger = ScaffoldMessenger.of(context);
-                                final listref = lists.elementAt(index);
-                                final item = listref.get<CustomList>();
+                                final item = lists.elementAt(index);
 
                                 return Card(
                                   key: ValueKey(item.id),
@@ -168,7 +167,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                               ref
                                                   .read(userListsProvider
                                                       .notifier)
-                                                  .deleteList(listref)
+                                                  .deleteList(item)
                                                   .then((success) {
                                                 if (success == true) {
                                                   messenger
@@ -204,7 +203,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                           onPressed: () {
                                             context.push(
                                                 '/list/edit/${item.id}',
-                                                extra: listref);
+                                                extra: item);
                                           },
                                           child: const Text(
                                             'Edit',
@@ -214,7 +213,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                     ),
                                     onTap: () {
                                       context.push('/list/${item.id}',
-                                          extra: listref);
+                                          extra: item);
                                     },
                                   ),
                                 );

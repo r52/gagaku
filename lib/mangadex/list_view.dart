@@ -6,7 +6,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/types.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
@@ -19,22 +18,13 @@ part 'list_view.g.dart';
 enum _ViewType { titles, feed }
 
 Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
-  final list = state.extra.asOrNull<CRef>();
-
-  Widget child;
-
-  if (list != null) {
-    child = MangaDexListViewWidget(
-      list: list,
-    );
-  } else {
-    child =
-        QueriedMangaDexListViewWidget(listId: state.pathParameters['listId']!);
-  }
+  final list = state.extra.asOrNull<CustomList>();
 
   return CustomTransitionPage<void>(
     key: state.pageKey,
-    child: child,
+    child: MangaDexListViewWidget(
+      listId: list != null ? list.id : state.pathParameters['listId']!,
+    ),
     transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
 }
@@ -83,58 +73,17 @@ Future<List<ChapterFeedItemData>> _fetchListFeed(
   return dlist;
 }
 
-class QueriedMangaDexListViewWidget extends ConsumerWidget {
-  const QueriedMangaDexListViewWidget({super.key, required this.listId});
+class MangaDexListViewWidget extends HookConsumerWidget {
+  const MangaDexListViewWidget({super.key, required this.listId});
 
   final String listId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final listProvider = ref.watch(listByIdProvider(listId));
-
-    return Scaffold(
-      body: switch (listProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchListFromIdProvider($listId) failed",
-          ),
-        AsyncValue(hasValue: true, value: final list) when list != null =>
-          MangaDexListViewWidget(
-            list: list,
-          ),
-        AsyncValue(hasValue: true, value: final list) when list == null =>
-          Center(
-            child: Text('List with ID $listId does not exist!'),
-          ),
-        _ => Styles.listSpinner,
-      },
-    );
-  }
-}
-
-class MangaDexListViewWidget extends HookConsumerWidget {
-  const MangaDexListViewWidget({super.key, required this.list});
-
-  final CRef list;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final messenger = ScaffoldMessenger.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).value;
-
-    final currentList = useState({...list.get<CustomList>().set});
-    final resolved = list.get<CustomList>();
-
-    void onListChange() {
-      currentList.value = {...list.get<CustomList>().set};
-    }
-
-    useEffect(() {
-      resolved.addListener(onListChange);
-      return () => resolved.removeListener(onListChange);
-    }, [list, list.ref]);
+    final listProvider = ref.watch(listSourceProvider(listId));
 
     const bottomNavigationBarItems = <Widget>[
       NavigationDestination(
@@ -152,192 +101,212 @@ class MangaDexListViewWidget extends HookConsumerWidget {
       useScrollController(),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            controllers[view.value.index].animateTo(0.0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut);
-          },
-          child: TitleFlexBar(title: list.get<CustomList>().attributes.name),
-        ),
-        actions: (list.get<CustomList>().user != null &&
-                me != null &&
-                list.get<CustomList>().user!.id == me.id)
-            ? [
-                ElevatedButton(
-                  style: Styles.buttonStyle(),
-                  onPressed: () {
-                    context
-                        .push('/list/edit/${list.get<CustomList>().id}',
-                            extra: list)
-                        .then((value) {
-                      onListChange();
-                    });
-                  },
-                  child: const Text('Edit'),
-                ),
-                const SizedBox(
-                  width: 4,
-                ),
-                ElevatedButton(
-                  style: Styles.buttonStyle(backgroundColor: Colors.red),
-                  onPressed: () async {
-                    final result = await showDeleteListDialog(
-                        context, list.get<CustomList>().attributes.name);
-                    if (result == true) {
-                      ref
-                          .read(userListsProvider.notifier)
-                          .deleteList(list)
-                          .then((success) {
-                        if (success == true) {
-                          if (!context.mounted) return;
-                          context.pop();
-                        } else {
-                          messenger
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              const SnackBar(
-                                content: Text('Failed to delete list.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                        }
-                      });
-                    }
-                  },
-                  child: const Text('Delete'),
-                ),
-                const SizedBox(
-                  width: 4,
-                ),
-              ]
-            : [],
-      ),
-      body: Center(
-        child: PageTransitionSwitcher(
-          transitionBuilder: (child, animation, secondaryAnimation) {
-            return SharedAxisTransition(
-              animation: animation,
-              secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.horizontal,
-              child: child,
-            );
-          },
-          child: switch (view.value) {
-            _ViewType.titles => HookConsumer(
-                key: const Key('/list?tab=titles'),
-                builder: (context, ref, child) {
-                  final currentPage = useState(0);
-                  final titlesProvider = ref.watch(getMangaListByPageProvider(
-                      currentList.value, currentPage.value));
-
-                  return Stack(
-                    children: [
-                      Column(
-                        children: switch (titlesProvider) {
-                          AsyncValue(:final error?, :final stackTrace?) => [
-                              RefreshIndicator(
-                                onRefresh: () => ref.refresh(
-                                    getMangaListByPageProvider(
-                                            currentList.value,
-                                            currentPage.value)
-                                        .future),
-                                child: ErrorList(
-                                    error: error, stackTrace: stackTrace),
-                              )
-                            ],
-                          AsyncValue(value: final mangas) => [
-                              Expanded(
-                                child: MangaListWidget(
-                                  title: Text(
-                                    'Titles (${list.get<CustomList>().set.length})',
-                                    style: const TextStyle(fontSize: 24),
+    switch (listProvider) {
+      case AsyncValue(:final error?, :final stackTrace?):
+        return Scaffold(
+          appBar: AppBar(),
+          body: RefreshIndicator(
+            onRefresh: () => ref.refresh(listSourceProvider(listId).future),
+            child: ErrorList(
+              error: error,
+              stackTrace: stackTrace,
+              message: "_fetchListFromIdProvider($listId) failed",
+            ),
+          ),
+        );
+      case AsyncValue(hasValue: true, value: final list) when list != null:
+        return Scaffold(
+          appBar: AppBar(
+            leading: BackButton(
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/');
+                }
+              },
+            ),
+            flexibleSpace: GestureDetector(
+              onTap: () {
+                controllers[view.value.index].animateTo(0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut);
+              },
+              child: TitleFlexBar(title: list.attributes.name),
+            ),
+            actions: (list.user != null && me != null && list.user!.id == me.id)
+                ? [
+                    ElevatedButton(
+                      style: Styles.buttonStyle(),
+                      onPressed: () {
+                        context.push('/list/edit/${list.id}', extra: list);
+                      },
+                      child: const Text('Edit'),
+                    ),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                    ElevatedButton(
+                      style: Styles.buttonStyle(backgroundColor: Colors.red),
+                      onPressed: () async {
+                        final result = await showDeleteListDialog(
+                            context, list.attributes.name);
+                        if (result == true) {
+                          ref
+                              .read(userListsProvider.notifier)
+                              .deleteList(list)
+                              .then((success) {
+                            if (success == true) {
+                              if (!context.mounted) return;
+                              context.pop();
+                            } else {
+                              messenger
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Failed to delete list.'),
+                                    backgroundColor: Colors.red,
                                   ),
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  controller: controllers[0],
-                                  children: [
-                                    if (mangas != null)
-                                      MangaListViewSliver(items: mangas),
-                                  ],
-                                ),
-                              ),
-                              NumberPaginator(
-                                numberPages: max(
-                                    (list.get<CustomList>().set.length /
-                                            MangaDexEndpoints.searchLimit)
-                                        .ceil(),
-                                    1),
-                                onPageChange: (int index) {
-                                  currentPage.value = index;
-                                },
-                              ),
-                            ],
-                        },
-                      ),
-                      if (titlesProvider.isLoading) ...Styles.loadingOverlay
-                    ],
-                  );
-                },
-              ),
-            _ViewType.feed => Consumer(
-                key: const Key('/list?tab=feed'),
-                builder: (context, ref, child) {
-                  return ChapterFeedWidget(
-                    provider: _fetchListFeedProvider(list.get<CustomList>()),
-                    title: 'List Feed',
-                    emptyText: 'No chapters!',
-                    onAtEdge: () => ref
-                        .read(customListFeedProvider(list.get<CustomList>())
-                            .notifier)
-                        .getMore(),
-                    onRefresh: () {
-                      ref
-                          .read(customListFeedProvider(list.get<CustomList>())
-                              .notifier)
-                          .clear();
-                      return ref.refresh(
-                          _fetchListFeedProvider(list.get<CustomList>())
-                              .future);
-                    },
-                    controller: controllers[1],
-                    restorationId: 'list_feed_offset',
-                  );
-                },
-              ),
-          },
-        ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        height: 60,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: bottomNavigationBarItems,
-        selectedIndex: view.value.index,
-        onDestinationSelected: (index) {
-          final currTab = view.value;
+                                );
+                            }
+                          });
+                        }
+                      },
+                      child: const Text('Delete'),
+                    ),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                  ]
+                : [],
+          ),
+          body: Center(
+            child: PageTransitionSwitcher(
+              transitionBuilder: (child, animation, secondaryAnimation) {
+                return SharedAxisTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.horizontal,
+                  child: child,
+                );
+              },
+              child: switch (view.value) {
+                _ViewType.titles => HookConsumer(
+                    key: const Key('/list?tab=titles'),
+                    builder: (context, ref, child) {
+                      final currentPage = useState(0);
+                      final titlesProvider = ref.watch(
+                          getMangaListByPageProvider(
+                              list.set, currentPage.value));
 
-          if (currTab == _ViewType.values[index]) {
-            // Scroll to top if on the same tab
-            controllers[index].animateTo(0.0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut);
-          } else {
-            // Switch tab
-            view.value = _ViewType.values[index];
-          }
-        },
-      ),
-    );
+                      return Stack(
+                        children: [
+                          Column(
+                            children: switch (titlesProvider) {
+                              AsyncValue(:final error?, :final stackTrace?) => [
+                                  RefreshIndicator(
+                                    onRefresh: () => ref.refresh(
+                                        getMangaListByPageProvider(
+                                                list.set, currentPage.value)
+                                            .future),
+                                    child: ErrorList(
+                                        error: error, stackTrace: stackTrace),
+                                  )
+                                ],
+                              AsyncValue(value: final mangas) => [
+                                  Expanded(
+                                    child: RefreshIndicator(
+                                      onRefresh: () => ref.refresh(
+                                          getMangaListByPageProvider(
+                                                  list.set, currentPage.value)
+                                              .future),
+                                      child: MangaListWidget(
+                                        title: Text(
+                                          'Titles (${list.set.length})',
+                                          style: const TextStyle(fontSize: 24),
+                                        ),
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        controller: controllers[0],
+                                        children: [
+                                          if (mangas != null)
+                                            MangaListViewSliver(items: mangas),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  NumberPaginator(
+                                    numberPages: max(
+                                        (list.set.length /
+                                                MangaDexEndpoints.searchLimit)
+                                            .ceil(),
+                                        1),
+                                    onPageChange: (int index) {
+                                      currentPage.value = index;
+                                    },
+                                  ),
+                                ],
+                            },
+                          ),
+                          if (titlesProvider.isLoading) ...Styles.loadingOverlay
+                        ],
+                      );
+                    },
+                  ),
+                _ViewType.feed => Consumer(
+                    key: const Key('/list?tab=feed'),
+                    builder: (context, ref, child) {
+                      return ChapterFeedWidget(
+                        provider: _fetchListFeedProvider(list),
+                        title: 'List Feed',
+                        emptyText: 'No chapters!',
+                        onAtEdge: () => ref
+                            .read(customListFeedProvider(list).notifier)
+                            .getMore(),
+                        onRefresh: () {
+                          ref
+                              .read(customListFeedProvider(list).notifier)
+                              .clear();
+                          return ref
+                              .refresh(_fetchListFeedProvider(list).future);
+                        },
+                        controller: controllers[1],
+                        restorationId: 'list_feed_offset',
+                      );
+                    },
+                  ),
+              },
+            ),
+          ),
+          bottomNavigationBar: NavigationBar(
+            height: 60,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            destinations: bottomNavigationBarItems,
+            selectedIndex: view.value.index,
+            onDestinationSelected: (index) {
+              final currTab = view.value;
+
+              if (currTab == _ViewType.values[index]) {
+                // Scroll to top if on the same tab
+                controllers[index].animateTo(0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut);
+              } else {
+                // Switch tab
+                view.value = _ViewType.values[index];
+              }
+            },
+          ),
+        );
+      case AsyncValue(hasValue: true, value: final list) when list == null:
+        return Scaffold(
+          appBar: AppBar(),
+          body: Center(
+            child: Text('List with ID $listId does not exist!'),
+          ),
+        );
+      case _:
+        return const Scaffold(body: Styles.listSpinner);
+    }
   }
 }

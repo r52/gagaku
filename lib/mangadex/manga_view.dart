@@ -1367,13 +1367,8 @@ class _UserListsMenu extends ConsumerWidget {
             userLists.length,
             (index) => CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
-              title: Text(
-                  userLists.elementAt(index).get<CustomList>().attributes.name),
-              value: userLists
-                  .elementAt(index)
-                  .get<CustomList>()
-                  .set
-                  .contains(manga.id),
+              title: Text(userLists.elementAt(index).attributes.name),
+              value: userLists.elementAt(index).set.contains(manga.id),
               onChanged: (bool? value) async {
                 await ref.read(userListsProvider.notifier).updateList(
                     userLists.elementAt(index), manga, value == true);

@@ -10,7 +10,6 @@ import 'package:gagaku/mangadex/cache.dart';
 import 'package:gagaku/mangadex/config.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/types.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/legacy.dart';
@@ -1200,14 +1199,14 @@ class MangaDexModel {
   }
 
   /// Fetches a [CustomList] by id
-  Future<CRef?> fetchListById(String listId) async {
+  Future<CustomList?> fetchListById(String listId) async {
     if (listId.isEmpty) {
       logger.w('Invalid listId $listId');
       return null;
     }
 
     if (await _cache.exists(listId)) {
-      return _cache.get(listId, CustomList.fromJson);
+      return _cache.get(listId, CustomList.fromJson).get<CustomList>();
     }
 
     final uri = MangaDexEndpoints.api.replace(
@@ -1220,8 +1219,10 @@ class MangaDexModel {
       final result = CustomList.fromJson(body['data']);
 
       // Cache the result
-      return _cache.put(listId, json.encode(result.toJson()), result, true,
-          unserializer: CustomList.fromJson);
+      return (await _cache.put(
+              listId, json.encode(result.toJson()), result, true,
+              unserializer: CustomList.fromJson))
+          .get<CustomList>();
     } else if (response.statusCode == 404) {
       // List not found
       return null;
@@ -1236,7 +1237,7 @@ class MangaDexModel {
   /// [offset] denotes the nth item to start fetching from.
   ///
   /// Do not use directly. Use [userListsProvider] instead
-  Future<Iterable<CRef>> fetchUserList(
+  Future<List<CustomList>> fetchUserList(
       {required int limit, int offset = 0}) async {
     if (!await loggedIn()) {
       throw StateError(
@@ -1261,10 +1262,10 @@ class MangaDexModel {
       // Cache entries
       await _cache.putAllAPIResolved(result.data);
 
-      final list = <CRef>[];
+      final list = <CustomList>[];
 
       for (final e in result.data) {
-        list.add(_cache.get(e.id, CustomList.fromJson));
+        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
       }
 
       return list;
@@ -1275,13 +1276,14 @@ class MangaDexModel {
   }
 
   /// Adds/removes a [Manga] from a [CustomList]
-  Future<bool> updateMangaInCustomList(CRef list, Manga manga, bool add) async {
+  Future<CustomList?> updateMangaInCustomList(
+      CustomList list, Manga manga, bool add) async {
     if (!await loggedIn()) {
       throw StateError(
           "updateMangaInCustomList() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final id = list.get<CustomList>().id;
+    final id = list.id;
 
     final uri = MangaDexEndpoints.api.replace(
         path: MangaDexEndpoints.updateMangaInList
@@ -1300,7 +1302,23 @@ class MangaDexModel {
       Map<String, dynamic> body = json.decode(response.body);
 
       if (body['result'] == 'ok') {
-        return true;
+        final relationships = [...list.relationships];
+
+        if (add) {
+          relationships.add(Manga(id: manga.id));
+        } else {
+          relationships.removeWhere((e) => e.id == manga.id);
+        }
+
+        final updated = list.copyWith(
+            attributes:
+                list.attributes.copyWith(version: list.attributes.version + 1),
+            relationships: relationships);
+
+        return (await _cache.put(
+                updated.id, json.encode(updated.toJson()), updated, true,
+                unserializer: CustomList.fromJson))
+            .get<CustomList>();
       }
     }
 
@@ -1309,17 +1327,17 @@ class MangaDexModel {
         "updateMangaInCustomList($id, ${manga.id}, $add) returned code ${response.statusCode}",
         error: response.body);
 
-    return false;
+    return null;
   }
 
   /// Deletes a [CustomList]
-  Future<bool> deleteList(CRef list) async {
+  Future<bool> deleteList(CustomList list) async {
     if (!await loggedIn()) {
       throw StateError(
           "deleteList() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final id = list.get<CustomList>().id;
+    final id = list.id;
 
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id));
@@ -1346,8 +1364,8 @@ class MangaDexModel {
   }
 
   /// Creates a new [CustomList]
-  Future<CRef?> createNewList(String name, CustomListVisibility visibility,
-      Iterable<String> mangaIds) async {
+  Future<CustomList?> createNewList(String name,
+      CustomListVisibility visibility, Iterable<String> mangaIds) async {
     if (!await loggedIn()) {
       throw StateError(
           "createNewList() called on invalid token/login. Shouldn't ever get here");
@@ -1374,8 +1392,10 @@ class MangaDexModel {
         final nlist = CustomList.fromJson(body['data']);
 
         // Cache the result
-        return _cache.put(nlist.id, json.encode(nlist.toJson()), nlist, true,
-            unserializer: CustomList.fromJson);
+        return (await _cache.put(
+                nlist.id, json.encode(nlist.toJson()), nlist, true,
+                unserializer: CustomList.fromJson))
+            .get<CustomList>();
       }
     }
 
@@ -1387,15 +1407,15 @@ class MangaDexModel {
     return null;
   }
 
-  /// Creates a new [CustomList]
-  Future<CRef> editList(CRef list, String name, CustomListVisibility visibility,
-      Iterable<String> mangaIds) async {
+  /// Edits an existing [CustomList]
+  Future<CustomList> editList(CustomList list, String name,
+      CustomListVisibility visibility, Iterable<String> mangaIds) async {
     if (!await loggedIn()) {
       throw StateError(
           "editList() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final id = list.get<CustomList>().id;
+    final id = list.id;
 
     final uri = MangaDexEndpoints.api
         .replace(path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id));
@@ -1404,7 +1424,7 @@ class MangaDexModel {
       'name': name,
       'visibility': visibility.name,
       'manga': mangaIds.toList(),
-      'version': list.get<CustomList>().attributes.version,
+      'version': list.attributes.version,
     };
 
     final response = await _client.put(
@@ -1421,8 +1441,10 @@ class MangaDexModel {
         final nlist = CustomList.fromJson(body['data']);
 
         // Cache the result
-        return _cache.put(nlist.id, json.encode(nlist.toJson()), nlist, true,
-            unserializer: CustomList.fromJson);
+        return (await _cache.put(
+                nlist.id, json.encode(nlist.toJson()), nlist, true,
+                unserializer: CustomList.fromJson))
+            .get<CustomList>();
       }
     }
 
@@ -2045,7 +2067,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
   bool _atEnd = false;
   static const limit = MangaDexEndpoints.breakLimit;
 
-  Future<List<CRef>> _fetch(int offset) async {
+  Future<List<CustomList>> _fetch(int offset) async {
     final loggedin = await ref.watch(authControlProvider.future);
     if (!loggedin) {
       return [];
@@ -2056,11 +2078,11 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
 
     disposeAfter(const Duration(minutes: 5));
 
-    return lists.toList();
+    return lists;
   }
 
   @override
-  Future<List<CRef>> build() async {
+  Future<List<CustomList>> build() async {
     return _fetch(0);
   }
 
@@ -2093,7 +2115,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
     }
   }
 
-  Future<void> updateList(CRef list, Manga manga, bool add) async {
+  Future<void> updateList(CustomList list, Manga manga, bool add) async {
     if (state.isLoading || state.isReloading) {
       return;
     }
@@ -2105,11 +2127,10 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
     state = await AsyncValue.guard(() async {
       final result = await api.updateMangaInCustomList(list, manga, add);
 
-      if (result) {
-        if (add) {
-          list.get<CustomList>().add(manga.id);
-        } else {
-          list.get<CustomList>().remove(manga.id);
+      if (result != null) {
+        final idx = oldstate.indexWhere((e) => e.id == result.id);
+        if (idx >= 0) {
+          oldstate[idx] = result;
         }
       }
 
@@ -2117,8 +2138,8 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
     });
   }
 
-  Future<bool> editList(CRef list, String name, CustomListVisibility visibility,
-      Iterable<String> mangaIds) async {
+  Future<bool> editList(CustomList list, String name,
+      CustomListVisibility visibility, Iterable<String> mangaIds) async {
     if (state.isLoading || state.isReloading) {
       return false;
     }
@@ -2128,11 +2149,11 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
     final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      // Should theoretically return the same ref so don't care about
-      // the result
       final result = await api.editList(list, name, visibility, mangaIds);
-
-      logger.d("state contains edited list?: ${oldstate.contains(result)}");
+      final idx = oldstate.indexWhere((e) => e.id == result.id);
+      if (idx >= 0) {
+        oldstate[idx] = result;
+      }
 
       return [...oldstate];
     });
@@ -2140,7 +2161,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
     return !state.hasError;
   }
 
-  Future<bool> deleteList(CRef list) async {
+  Future<bool> deleteList(CustomList list) async {
     if (state.isLoading || state.isReloading) {
       return false;
     }
@@ -2150,16 +2171,13 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
     final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      Iterable<CRef> set = oldstate;
-
       final result = await api.deleteList(list);
 
       if (result) {
-        set = oldstate.where((element) =>
-            element.get<CustomList>().id != list.get<CustomList>().id);
+        oldstate.removeWhere((e) => e.id == list.id);
       }
 
-      return [...set];
+      return [...oldstate];
     });
 
     return (state.value ?? []).length != oldstate.length;
@@ -2280,9 +2298,19 @@ Future<List<Manga>> getMangaListByPage(
 }
 
 @riverpod
-class ListById extends _$ListById {
+class ListSource extends _$ListSource {
   @override
-  Future<CRef?> build(String listId) async {
+  Future<CustomList?> build(String listId) async {
+    final loggedin = await ref.watch(authControlProvider.future);
+
+    if (loggedin) {
+      final userlists = await ref.watch(userListsProvider.future);
+      final found = userlists.indexWhere((e) => e.id == listId);
+      if (found >= 0) {
+        return userlists.elementAt(found);
+      }
+    }
+
     final api = ref.watch(mangadexProvider);
     final list = await api.fetchListById(listId);
     return list;
