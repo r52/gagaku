@@ -105,7 +105,7 @@ jobs:
 
   publish_release:
     name: Publish release
-    if: !cancelled() && github.event.inputs.doRelease == 'true' && github.event.inputs.tagName != '' && needs.build.result == 'success'
+    if: ${{ !cancelled() && github.event.inputs.doRelease == 'true' && github.event.inputs.tagName != '' && needs.build.result == 'success' }}
     needs: build
     runs-on: ubuntu-latest
     steps:
