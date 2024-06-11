@@ -1138,6 +1138,67 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
   FutureOr<List<CustomList>> runBuild() => build();
 }
 
+@ProviderFor(FollowedLists)
+const followedListsProvider = FollowedListsProvider._();
+
+final class FollowedListsProvider
+    extends $AsyncNotifierProvider<FollowedLists, List<CustomList>> {
+  const FollowedListsProvider._(
+      {super.runNotifierBuildOverride, FollowedLists Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'followedListsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FollowedLists Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$followedListsHash();
+
+  @$internal
+  @override
+  FollowedLists create() => _createCb?.call() ?? FollowedLists();
+
+  @$internal
+  @override
+  FollowedListsProvider $copyWithCreate(
+    FollowedLists Function() create,
+  ) {
+    return FollowedListsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  FollowedListsProvider $copyWithBuild(
+    FutureOr<List<CustomList>> Function(
+      Ref<AsyncValue<List<CustomList>>>,
+      FollowedLists,
+    ) build,
+  ) {
+    return FollowedListsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<FollowedLists, List<CustomList>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$followedListsHash() => r'f70af0efa0e9db5a79a85dd39f1c64e1bb688431';
+
+abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
+  FutureOr<List<CustomList>> build();
+  @$internal
+  @override
+  FutureOr<List<CustomList>> runBuild() => build();
+}
+
 @ProviderFor(CustomListFeed)
 const customListFeedProvider = CustomListFeedFamily._();
 
@@ -2415,7 +2476,7 @@ final class AuthControlProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$authControlHash() => r'1bc030c9c3686fc70ba45eae2f1fa38fa45a5fbe';
+String _$authControlHash() => r'15553d6b37c81a84a64601e9f345254049a7a952';
 
 abstract class _$AuthControl extends $AsyncNotifier<bool> {
   FutureOr<bool> build();

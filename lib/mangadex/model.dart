@@ -107,9 +107,9 @@ abstract class MangaDexEndpoints {
   static const listFeed = '/list/{id}/feed';
 
   /// Get logged User followed [CustomList] list
-  static const listFollows = '/user/follows/list';
+  static const followedList = '/user/follows/list';
 
-  /// (Future) Follow/unfollow CustomList
+  /// Follow/unfollow CustomList
   static const followList = '/list/{id}/follow';
 
   /// Logged in user details
@@ -1232,6 +1232,84 @@ class MangaDexModel {
     throw createException("fetchListById() failed.", response);
   }
 
+  /// Fetches logged user's followed [CustomList] list
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// Do not use directly. Use [followedListsProvider] instead
+  Future<List<CustomList>> fetchFollowedList(
+      {required int limit, int offset = 0}) async {
+    if (!await loggedIn()) {
+      throw StateError(
+          "fetchFollowedList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    // Download missing data
+    final queryParams = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+    };
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.followedList, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      final result = CustomListList.fromJson(body);
+
+      // Cache entries
+      await _cache.putAllAPIResolved(result.data);
+
+      final list = <CustomList>[];
+
+      for (final e in result.data) {
+        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
+      }
+
+      return list;
+    }
+
+    // Throw if failure
+    throw createException("fetchFollowedList() failed.", response);
+  }
+
+  /// Adds/removes a [CustomList] from user followed list
+  Future<bool> setFollowList(CustomList list, bool follow) async {
+    if (!await loggedIn()) {
+      throw StateError(
+          "setFollowList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final id = list.id;
+
+    final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.followList.replaceFirst('{id}', list.id));
+
+    http.Response? response;
+
+    if (follow) {
+      response = await _client.post(uri);
+    } else {
+      response = await _client.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        return true;
+      }
+    }
+
+    // Log the failure
+    logger.w("setFollowList($id, $follow) returned code ${response.statusCode}",
+        error: response.body);
+
+    return false;
+  }
+
   /// Fetches logged user's [CustomList] list
   ///
   /// [offset] denotes the nth item to start fetching from.
@@ -2215,6 +2293,95 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
 }
 
 @riverpod
+class FollowedLists extends _$FollowedLists with AutoDisposeExpiryMix {
+  int _offset = 0;
+  bool _atEnd = false;
+  static const limit = MangaDexEndpoints.breakLimit;
+
+  Future<List<CustomList>> _fetch(int offset) async {
+    final loggedin = await ref.watch(authControlProvider.future);
+    if (!loggedin) {
+      return [];
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final lists = await api.fetchFollowedList(limit: limit, offset: offset);
+
+    disposeAfter(const Duration(minutes: 5));
+
+    return lists;
+  }
+
+  @override
+  Future<List<CustomList>> build() async {
+    return _fetch(0);
+  }
+
+  Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    if (_atEnd) {
+      return;
+    }
+
+    final oldstate = await future;
+    // If there is more content, get more
+    if (oldstate.length == _offset + limit && !_atEnd) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final lists = await _fetch(_offset + limit);
+        _offset += limit;
+
+        if (lists.isEmpty) {
+          _atEnd = true;
+        }
+
+        return [...oldstate, ...lists];
+      });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      _atEnd = true;
+    }
+  }
+
+  Future<void> setFollow(CustomList list, bool follow) async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.setFollowList(list, follow);
+
+      if (result) {
+        if (follow) {
+          final idx = oldstate.indexWhere((e) => e.id == list.id);
+          if (idx == -1) {
+            oldstate.add(list);
+          }
+        } else {
+          oldstate.removeWhere((e) => e.id == list.id);
+        }
+      }
+
+      return [...oldstate];
+    });
+  }
+
+  /// Clears the list and refetch from the beginning
+  Future<void> clear() async {
+    _offset = 0;
+    _atEnd = false;
+    ref.invalidateSelf();
+  }
+}
+
+@riverpod
 class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix {
   int _offset = 0;
   bool _atEnd = false;
@@ -2716,15 +2883,16 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
 
     // Invalidate stuff
     ref.invalidate(loggedUserProvider);
-    ref.invalidate(userLibraryProvider);
     await api.invalidateCacheItem(CacheLists.library);
+    ref.invalidate(userLibraryProvider);
     ref.invalidate(readChaptersProvider);
     ref.invalidate(ratingsProvider);
     ref.invalidate(userListsProvider);
+    ref.invalidate(followedListsProvider);
     ref.invalidate(readingStatusProvider);
     ref.invalidate(followingStatusProvider);
-    ref.invalidate(latestChaptersFeedProvider);
     await api.invalidateAll(LatestChaptersFeed.feedKey);
+    ref.invalidate(latestChaptersFeedProvider);
   }
 }
 

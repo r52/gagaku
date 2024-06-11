@@ -22,15 +22,23 @@ class MangaDexListsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = controller ?? useScrollController();
-    //final view = useState(_ListViewType.self);
-    final userListsProv = ref.watch(userListsProvider);
+    final view = useState(_ListViewType.self);
+    final me = ref.watch(loggedUserProvider).value;
 
     useEffect(() {
       void controllerAtEdge() {
         if (scrollController.position.atEdge &&
             scrollController.position.pixels ==
                 scrollController.position.maxScrollExtent) {
-          ref.read(userListsProvider.notifier).getMore();
+          switch (view.value) {
+            case _ListViewType.self:
+              ref.read(userListsProvider.notifier).getMore();
+              break;
+            case _ListViewType.followed:
+              ref.read(followedListsProvider.notifier).getMore();
+            default:
+              break;
+          }
         }
       }
 
@@ -62,167 +70,387 @@ class MangaDexListsView extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     'My Lists',
                     style: TextStyle(fontSize: 24),
                   ),
-                  Spacer(),
-                  // ToggleButtons(
-                  //   isSelected: List<bool>.generate(
-                  //       2, (index) => view.value.index == index),
-                  //   onPressed: (index) {
-                  //     view.value = _ListViewType.values.elementAt(index);
-                  //   },
-                  //   borderRadius: const BorderRadius.all(Radius.circular(2.0)),
-                  //   children: const [
-                  //     Padding(
-                  //       padding: EdgeInsets.symmetric(horizontal: 5.0),
-                  //       child: Text('My Lists'),
-                  //     ),
-                  //     Padding(
-                  //       padding: EdgeInsets.symmetric(horizontal: 5.0),
-                  //       child: Text('Followed Lists'),
-                  //     ),
-                  //   ],
-                  // ),
+                  const Spacer(),
+                  ToggleButtons(
+                    isSelected: List<bool>.generate(
+                        2, (index) => view.value.index == index),
+                    onPressed: (index) {
+                      view.value = _ListViewType.values.elementAt(index);
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(2.0)),
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Text('My Lists'),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Text('Followed Lists'),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
             Expanded(
-              child: switch (userListsProv) {
-                AsyncValue(:final error?, :final stackTrace?) =>
-                  RefreshIndicator(
-                    onRefresh: () => ref.refresh(userListsProvider.future),
-                    child: ErrorList(
-                      error: error,
-                      stackTrace: stackTrace,
-                      message: "userListsProvider failed",
-                    ),
-                  ),
-                AsyncValue(value: final lists?) => RefreshIndicator(
-                    onRefresh: () async {
-                      ref.read(userListsProvider.notifier).clear();
-                      return ref.refresh(userListsProvider.future);
-                    },
-                    child: ScrollConfiguration(
-                      behavior: const MouseTouchScrollBehavior(),
-                      child: lists.isEmpty
-                          ? const Text('No lists!')
-                          : ListView.builder(
-                              controller: controller,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.all(6),
-                              itemCount: lists.length,
-                              findChildIndexCallback: (key) {
-                                final valueKey = key as ValueKey<String>;
-                                final val = lists
-                                    .indexWhere((i) => i.id == valueKey.value);
-                                return val >= 0 ? val : null;
-                              },
-                              itemBuilder: (BuildContext context, int index) {
-                                final messenger = ScaffoldMessenger.of(context);
-                                final item = lists.elementAt(index);
-
-                                return Card(
-                                  key: ValueKey(item.id),
-                                  child: ListTile(
-                                    leading: Tooltip(
-                                        message: item.attributes.visibility.name
-                                            .capitalize(),
-                                        child: Icon(
-                                          Icons.circle,
-                                          size: 16.0,
-                                          color: item.attributes.visibility ==
-                                                  CustomListVisibility.private
-                                              ? Colors.red
-                                              : Colors.green,
-                                        )),
-                                    title: Text(item.attributes.name),
-                                    subtitle: Text('${item.set.length} items'),
-                                    trailing: MenuAnchor(
-                                      builder: (context, controller, child) =>
-                                          IconButton(
-                                        onPressed: () {
-                                          if (controller.isOpen) {
-                                            controller.close();
-                                          } else {
-                                            controller.open();
-                                          }
-                                        },
-                                        icon: const Icon(Icons.more_vert),
-                                      ),
-                                      menuChildren: [
-                                        // TODO follow
-                                        MenuItemButton(
-                                          onPressed: () async {
-                                            final result =
-                                                await showDeleteListDialog(
-                                                    context,
-                                                    item.attributes.name);
-                                            if (result == true) {
-                                              ref
-                                                  .read(userListsProvider
-                                                      .notifier)
-                                                  .deleteList(item)
-                                                  .then((success) {
-                                                if (success == true) {
-                                                  messenger
-                                                    ..removeCurrentSnackBar()
-                                                    ..showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                            'List deleted.'),
-                                                        backgroundColor:
-                                                            Colors.green,
-                                                      ),
-                                                    );
-                                                } else {
-                                                  messenger
-                                                    ..removeCurrentSnackBar()
-                                                    ..showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                            'Failed to delete list.'),
-                                                        backgroundColor:
-                                                            Colors.red,
-                                                      ),
-                                                    );
-                                                }
-                                              });
-                                            }
-                                          },
-                                          child: const Text(
-                                            'Delete',
-                                          ),
-                                        ),
-                                        MenuItemButton(
-                                          onPressed: () {
-                                            context.push(
-                                                '/list/edit/${item.id}',
-                                                extra: item);
-                                          },
-                                          child: const Text(
-                                            'Edit',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      context.push('/list/${item.id}',
-                                          extra: item);
-                                    },
-                                  ),
-                                );
-                              },
+              child: switch (view.value) {
+                _ListViewType.self => Consumer(
+                    builder: (context, ref, child) {
+                      final userListsProv = ref.watch(userListsProvider);
+                      return switch (userListsProv) {
+                        AsyncValue(:final error?, :final stackTrace?) =>
+                          RefreshIndicator(
+                            onRefresh: () =>
+                                ref.refresh(userListsProvider.future),
+                            child: ErrorList(
+                              error: error,
+                              stackTrace: stackTrace,
+                              message: "userListsProvider failed",
                             ),
-                    ),
+                          ),
+                        AsyncValue(value: final lists?) => RefreshIndicator(
+                            onRefresh: () async {
+                              ref.read(userListsProvider.notifier).clear();
+                              return ref.refresh(userListsProvider.future);
+                            },
+                            child: ScrollConfiguration(
+                              behavior: const MouseTouchScrollBehavior(),
+                              child: lists.isEmpty
+                                  ? const Text('No lists!')
+                                  : ListView.builder(
+                                      controller: controller,
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      padding: const EdgeInsets.all(6),
+                                      itemCount: lists.length,
+                                      findChildIndexCallback: (key) {
+                                        final valueKey =
+                                            key as ValueKey<String>;
+                                        final val = lists.indexWhere(
+                                            (i) => i.id == valueKey.value);
+                                        return val >= 0 ? val : null;
+                                      },
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        final messenger =
+                                            ScaffoldMessenger.of(context);
+                                        final item = lists.elementAt(index);
+
+                                        return Card(
+                                          key: ValueKey(item.id),
+                                          child: ListTile(
+                                            leading: Tooltip(
+                                                message: item
+                                                    .attributes.visibility.name
+                                                    .capitalize(),
+                                                child: Icon(
+                                                  Icons.circle,
+                                                  size: 16.0,
+                                                  color: item.attributes
+                                                              .visibility ==
+                                                          CustomListVisibility
+                                                              .private
+                                                      ? Colors.red
+                                                      : Colors.green,
+                                                )),
+                                            title: Text(item.attributes.name),
+                                            subtitle: Text(
+                                                '${item.set.length} items'),
+                                            trailing: MenuAnchor(
+                                              builder: (context, controller,
+                                                      child) =>
+                                                  IconButton(
+                                                onPressed: () {
+                                                  if (controller.isOpen) {
+                                                    controller.close();
+                                                  } else {
+                                                    controller.open();
+                                                  }
+                                                },
+                                                icon:
+                                                    const Icon(Icons.more_vert),
+                                              ),
+                                              menuChildren: [
+                                                Consumer(
+                                                  builder:
+                                                      (context, refx, child) {
+                                                    final followedLists = refx
+                                                        .watch(
+                                                            followedListsProvider)
+                                                        .value;
+                                                    final idx = followedLists
+                                                        ?.indexWhere((e) =>
+                                                            e.id == item.id);
+
+                                                    if (idx == null) {
+                                                      return const SizedBox
+                                                          .shrink();
+                                                    }
+
+                                                    return MenuItemButton(
+                                                      onPressed: () => ref
+                                                          .read(
+                                                              followedListsProvider
+                                                                  .notifier)
+                                                          .setFollow(
+                                                              item, idx == -1),
+                                                      child: Text(idx == -1
+                                                          ? 'Follow'
+                                                          : 'Unfollow'),
+                                                    );
+                                                  },
+                                                ),
+                                                MenuItemButton(
+                                                  onPressed: () async {
+                                                    final result =
+                                                        await showDeleteListDialog(
+                                                            context,
+                                                            item.attributes
+                                                                .name);
+                                                    if (result == true) {
+                                                      ref
+                                                          .read(
+                                                              userListsProvider
+                                                                  .notifier)
+                                                          .deleteList(item)
+                                                          .then((success) {
+                                                        if (success == true) {
+                                                          messenger
+                                                            ..removeCurrentSnackBar()
+                                                            ..showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                    'List deleted.'),
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .green,
+                                                              ),
+                                                            );
+                                                        } else {
+                                                          messenger
+                                                            ..removeCurrentSnackBar()
+                                                            ..showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                    'Failed to delete list.'),
+                                                                backgroundColor:
+                                                                    Colors.red,
+                                                              ),
+                                                            );
+                                                        }
+                                                      });
+                                                    }
+                                                  },
+                                                  child: const Text(
+                                                    'Delete',
+                                                  ),
+                                                ),
+                                                MenuItemButton(
+                                                  onPressed: () {
+                                                    context.push(
+                                                        '/list/edit/${item.id}',
+                                                        extra: item);
+                                                  },
+                                                  child: const Text(
+                                                    'Edit',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            onTap: () {
+                                              context.push('/list/${item.id}',
+                                                  extra: item);
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ),
+                        _ => const Stack(
+                            children: Styles.loadingOverlay,
+                          ),
+                      };
+                    },
                   ),
-                _ => const Stack(
-                    children: Styles.loadingOverlay,
+                _ListViewType.followed => Consumer(
+                    builder: (context, ref, child) {
+                      final followedListsProv =
+                          ref.watch(followedListsProvider);
+                      return switch (followedListsProv) {
+                        AsyncValue(:final error?, :final stackTrace?) =>
+                          RefreshIndicator(
+                            onRefresh: () =>
+                                ref.refresh(userListsProvider.future),
+                            child: ErrorList(
+                              error: error,
+                              stackTrace: stackTrace,
+                              message: "followedListsProvider failed",
+                            ),
+                          ),
+                        AsyncValue(value: final lists?) => RefreshIndicator(
+                            onRefresh: () async {
+                              ref.read(followedListsProvider.notifier).clear();
+                              return ref.refresh(followedListsProvider.future);
+                            },
+                            child: ScrollConfiguration(
+                              behavior: const MouseTouchScrollBehavior(),
+                              child: lists.isEmpty
+                                  ? const Text('No lists!')
+                                  : ListView.builder(
+                                      controller: controller,
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      padding: const EdgeInsets.all(6),
+                                      itemCount: lists.length,
+                                      findChildIndexCallback: (key) {
+                                        final valueKey =
+                                            key as ValueKey<String>;
+                                        final val = lists.indexWhere(
+                                            (i) => i.id == valueKey.value);
+                                        return val >= 0 ? val : null;
+                                      },
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        final messenger =
+                                            ScaffoldMessenger.of(context);
+                                        final item = lists.elementAt(index);
+
+                                        return Card(
+                                          key: ValueKey(item.id),
+                                          child: ListTile(
+                                            leading: Tooltip(
+                                                message: item
+                                                    .attributes.visibility.name
+                                                    .capitalize(),
+                                                child: Icon(
+                                                  Icons.circle,
+                                                  size: 16.0,
+                                                  color: item.attributes
+                                                              .visibility ==
+                                                          CustomListVisibility
+                                                              .private
+                                                      ? Colors.red
+                                                      : Colors.green,
+                                                )),
+                                            title: Text(item.attributes.name),
+                                            subtitle: Text(
+                                                '${item.set.length} items'),
+                                            trailing: MenuAnchor(
+                                              builder: (context, controller,
+                                                      child) =>
+                                                  IconButton(
+                                                onPressed: () {
+                                                  if (controller.isOpen) {
+                                                    controller.close();
+                                                  } else {
+                                                    controller.open();
+                                                  }
+                                                },
+                                                icon:
+                                                    const Icon(Icons.more_vert),
+                                              ),
+                                              menuChildren: [
+                                                MenuItemButton(
+                                                  onPressed: () async {
+                                                    ref
+                                                        .read(
+                                                            followedListsProvider
+                                                                .notifier)
+                                                        .setFollow(item, false);
+                                                  },
+                                                  child: const Text(
+                                                    'Unfollow',
+                                                  ),
+                                                ),
+                                                if (item.user != null &&
+                                                    me != null &&
+                                                    item.user!.id == me.id)
+                                                  MenuItemButton(
+                                                    onPressed: () async {
+                                                      final result =
+                                                          await showDeleteListDialog(
+                                                              context,
+                                                              item.attributes
+                                                                  .name);
+                                                      if (result == true) {
+                                                        ref
+                                                            .read(
+                                                                userListsProvider
+                                                                    .notifier)
+                                                            .deleteList(item)
+                                                            .then((success) {
+                                                          if (success == true) {
+                                                            messenger
+                                                              ..removeCurrentSnackBar()
+                                                              ..showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Text(
+                                                                      'List deleted.'),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                ),
+                                                              );
+                                                          } else {
+                                                            messenger
+                                                              ..removeCurrentSnackBar()
+                                                              ..showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Text(
+                                                                      'Failed to delete list.'),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red,
+                                                                ),
+                                                              );
+                                                          }
+                                                        });
+                                                      }
+                                                    },
+                                                    child: const Text(
+                                                      'Delete',
+                                                    ),
+                                                  ),
+                                                if (item.user != null &&
+                                                    me != null &&
+                                                    item.user!.id == me.id)
+                                                  MenuItemButton(
+                                                    onPressed: () {
+                                                      context.push(
+                                                          '/list/edit/${item.id}',
+                                                          extra: item);
+                                                    },
+                                                    child: const Text(
+                                                      'Edit',
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                            onTap: () {
+                                              context.push('/list/${item.id}',
+                                                  extra: item);
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ),
+                        _ => const Stack(
+                            children: Styles.loadingOverlay,
+                          ),
+                      };
+                    },
                   ),
               },
             ),
