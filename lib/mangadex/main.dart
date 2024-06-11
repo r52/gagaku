@@ -111,35 +111,25 @@ class MangaDexHome extends HookConsumerWidget {
                   switch (auth) {
                     case AsyncValue(value: final loggedin?):
                       // XXX: This changes when OAuth is released
-                      Widget logbtn = Tooltip(
-                        message: 'Login',
-                        child: IconButton(
-                          color: theme.colorScheme.primary,
-                          icon: const Icon(Icons.login),
-                          onPressed: () {
-                            context.push(GagakuRoute.login);
-                          },
-                        ),
-                      );
-
-                      if (loggedin) {
-                        logbtn = Tooltip(
-                          message: 'Logout',
-                          child: IconButton(
-                            color: theme.colorScheme.primary,
-                            icon: const Icon(Icons.logout),
-                            onPressed: () =>
-                                ref.read(authControlProvider.notifier).logout(),
-                          ),
-                        );
-                      }
-
                       return Ink(
                         decoration: ShapeDecoration(
                           color: theme.colorScheme.surface,
                           shape: const CircleBorder(),
                         ),
-                        child: logbtn,
+                        child: Tooltip(
+                          message: loggedin ? 'Logout' : 'Login',
+                          child: IconButton(
+                            color: theme.colorScheme.primary,
+                            icon: loggedin
+                                ? const Icon(Icons.logout)
+                                : const Icon(Icons.login),
+                            onPressed: loggedin
+                                ? () => ref
+                                    .read(authControlProvider.notifier)
+                                    .logout()
+                                : () => context.push(GagakuRoute.login),
+                          ),
+                        ),
                       );
                     // ignore: unused_local_variable
                     case AsyncValue(:final error?, :final stackTrace?):
