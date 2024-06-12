@@ -76,6 +76,46 @@ class DeviceContext {
   }
 }
 
+/// XXX: this may break because its depending on an internal riverpod class
+mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
+  int offset = 0;
+  bool atEnd = false;
+  int get limit;
+
+  Future<List<T>> fetchData(int offset);
+  Future<void> clear();
+
+  Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    if (atEnd) {
+      return;
+    }
+
+    final oldstate = await future;
+
+    // If there is more content, get more
+    if (oldstate.length == offset + limit && !atEnd) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final result = await fetchData(offset + limit);
+        offset += limit;
+
+        if (result.isEmpty) {
+          atEnd = true;
+        }
+
+        return [...oldstate, ...result];
+      });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      atEnd = true;
+    }
+  }
+}
+
 mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>, FutureOr<T>> {
   Timer? _staleTimer;
   DateTime? _expiry;

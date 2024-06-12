@@ -1559,14 +1559,17 @@ class MangaDexModel {
 }
 
 @riverpod
-class LatestChaptersFeed extends _$LatestChaptersFeed {
-  int _offset = 0;
-  bool _atEnd = false;
+class LatestChaptersFeed extends _$LatestChaptersFeed
+    with ListBasedInfiniteScrollMix {
   static const feedKey = 'LatestChaptersFeed';
-  static const limit = MangaDexEndpoints.searchLimit;
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
 
   ///Fetch the latest chapters list based on offset
-  Future<List<Chapter>> _fetchLatestChapters(int offset) async {
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return [];
@@ -1585,58 +1588,32 @@ class LatestChaptersFeed extends _$LatestChaptersFeed {
 
   @override
   Future<List<Chapter>> build() async {
-    return _fetchLatestChapters(0);
-  }
-
-  /// Fetch more latest chapters if more data exists
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchLatestChapters(_offset + limit);
-        _offset += limit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
     await api.invalidateAll(feedKey);
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
 
 @riverpod
-class LatestGlobalFeed extends _$LatestGlobalFeed {
-  int _offset = 0;
-  bool _atEnd = false;
+class LatestGlobalFeed extends _$LatestGlobalFeed
+    with ListBasedInfiniteScrollMix {
   static const feedKey = 'LatestGlobalFeed';
-  static const limit = MangaDexEndpoints.searchLimit;
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
 
   ///Fetch the latest chapters list based on offset
-  Future<List<Chapter>> _fetchLatestChapters(int offset) async {
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
     final chapters = await api.fetchFeed(
       path: MangaDexEndpoints.chapter,
@@ -1650,57 +1627,31 @@ class LatestGlobalFeed extends _$LatestGlobalFeed {
 
   @override
   Future<List<Chapter>> build() async {
-    return _fetchLatestChapters(0);
-  }
-
-  /// Fetch more latest chapters if more data exists
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchLatestChapters(_offset + limit);
-        _offset += limit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
     await api.invalidateAll(feedKey);
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
 
 @riverpod
-class GroupFeed extends _$GroupFeed with AutoDisposeExpiryMix {
-  int _offset = 0;
-  bool _atEnd = false;
+class GroupFeed extends _$GroupFeed
+    with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const feedKey = 'GroupFeed';
-  static const limit = MangaDexEndpoints.searchLimit;
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Chapter>> _fetchChapters(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
     final chapters = await api.fetchFeed(
       path: MangaDexEndpoints.chapter,
@@ -1717,55 +1668,29 @@ class GroupFeed extends _$GroupFeed with AutoDisposeExpiryMix {
 
   @override
   Future<List<Chapter>> build(Group group) async {
-    return _fetchChapters(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchChapters(_offset + limit);
-        _offset += limit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
     await api.invalidateAll('$feedKey(${group.id}');
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
 
 @riverpod
-class GroupTitles extends _$GroupTitles {
-  int _offset = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.searchLimit;
+class GroupTitles extends _$GroupTitles with ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Manga>> _fetchManga(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
     final manga =
         await api.fetchManga(limit: limit, offset: offset, filterId: group);
@@ -1775,53 +1700,27 @@ class GroupTitles extends _$GroupTitles {
 
   @override
   Future<List<Manga>> build(Group group) async {
-    return _fetchManga(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final manga = await _fetchManga(_offset + limit);
-        _offset += limit;
-
-        if (manga.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...manga];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
 
 @riverpod
-class CreatorTitles extends _$CreatorTitles {
-  int _offset = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.searchLimit;
+class CreatorTitles extends _$CreatorTitles with ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Manga>> _fetchManga(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
     final manga =
         await api.fetchManga(limit: limit, offset: offset, filterId: creator);
@@ -1831,42 +1730,14 @@ class CreatorTitles extends _$CreatorTitles {
 
   @override
   Future<List<Manga>> build(CreatorType creator) async {
-    return _fetchManga(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final manga = await _fetchManga(_offset + limit);
-        _offset += limit;
-
-        if (manga.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...manga];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
@@ -1875,13 +1746,16 @@ final mangaChaptersListSortProvider =
     StateProvider((ref) => ListSort.descending);
 
 @riverpod
-class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix {
-  int _offset = 0;
-  bool _atEnd = false;
+class MangaChapters extends _$MangaChapters
+    with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const feedKey = 'MangaChapters';
-  static const limit = MangaDexEndpoints.chapterLimit;
+  static const _limit = MangaDexEndpoints.chapterLimit;
 
-  Future<List<Chapter>> _fetchMangaChapters(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
     final sort = ref.watch(mangaChaptersListSortProvider);
     final chapters = await api.fetchFeed(
@@ -1901,55 +1775,30 @@ class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix {
 
   @override
   Future<List<Chapter>> build(Manga manga) async {
-    return _fetchMangaChapters(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchMangaChapters(_offset + limit);
-        _offset += limit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
     await api.invalidateAll('$feedKey(${manga.id}');
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
 
 @riverpod
-class MangaCovers extends _$MangaCovers with AutoDisposeExpiryMix {
-  int _offset = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.searchLimit;
+class MangaCovers extends _$MangaCovers
+    with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<CoverArt>> _fetchCovers(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<CoverArt>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
     final covers = await api.getCoverList(manga, limit: limit, offset: offset);
 
@@ -1960,43 +1809,15 @@ class MangaCovers extends _$MangaCovers with AutoDisposeExpiryMix {
 
   @override
   Future<List<CoverArt>> build(Manga manga) async {
-    return _fetchCovers(0);
+    return fetchData(0);
   }
 
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final covers = await _fetchCovers(_offset + limit);
-        _offset += limit;
-
-        if (covers.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...covers];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
-  }
-
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
     await api.invalidateAll('CoverList(${manga.id}');
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
@@ -2140,12 +1961,15 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
 }
 
 @riverpod
-class UserLists extends _$UserLists with AutoDisposeExpiryMix {
-  int _offset = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.breakLimit;
+class UserLists extends _$UserLists
+    with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.breakLimit;
 
-  Future<List<CustomList>> _fetch(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<CustomList>> fetchData(int offset) async {
     final loggedin = await ref.watch(authControlProvider.future);
     if (!loggedin) {
       return [];
@@ -2161,36 +1985,7 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
 
   @override
   Future<List<CustomList>> build() async {
-    return _fetch(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final lists = await _fetch(_offset + limit);
-        _offset += limit;
-
-        if (lists.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...lists];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   Future<void> updateList(CustomList list, Manga manga, bool add) async {
@@ -2285,20 +2080,24 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix {
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
 
 @riverpod
-class FollowedLists extends _$FollowedLists with AutoDisposeExpiryMix {
-  int _offset = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.breakLimit;
+class FollowedLists extends _$FollowedLists
+    with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.breakLimit;
 
-  Future<List<CustomList>> _fetch(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<CustomList>> fetchData(int offset) async {
     final loggedin = await ref.watch(authControlProvider.future);
     if (!loggedin) {
       return [];
@@ -2314,36 +2113,7 @@ class FollowedLists extends _$FollowedLists with AutoDisposeExpiryMix {
 
   @override
   Future<List<CustomList>> build() async {
-    return _fetch(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final lists = await _fetch(_offset + limit);
-        _offset += limit;
-
-        if (lists.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...lists];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   Future<void> setFollow(CustomList list, bool follow) async {
@@ -2374,21 +2144,25 @@ class FollowedLists extends _$FollowedLists with AutoDisposeExpiryMix {
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
 
 @riverpod
-class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix {
-  int _offset = 0;
-  bool _atEnd = false;
+class CustomListFeed extends _$CustomListFeed
+    with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const feedKey = 'CustomListFeed';
-  static const limit = MangaDexEndpoints.searchLimit;
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Chapter>> _fetchChapters(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
     final chapters = await api.fetchFeed(
       path: MangaDexEndpoints.listFeed.replaceFirst('{id}', list.id),
@@ -2405,44 +2179,16 @@ class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix {
 
   @override
   Future<List<Chapter>> build(CustomList list) async {
-    return _fetchChapters(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchChapters(_offset + limit);
-        _offset += limit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
     await api.invalidateAll('$feedKey(${list.id}');
-    _offset = 0;
-    _atEnd = false;
+    offset = 0;
+    atEnd = false;
     ref.invalidateSelf();
   }
 }
@@ -2500,16 +2246,18 @@ class TagList extends _$TagList with AutoDisposeExpiryMix {
 }
 
 @riverpod
-class MangaSearch extends _$MangaSearch {
-  int _offset = 0;
-  bool _atEnd = false;
-  static const limit = MangaDexEndpoints.searchLimit;
+class MangaSearch extends _$MangaSearch with ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Manga>> _searchManga() async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
 
     final manga = await api.searchManga(params.query,
-        limit: limit, filter: params.filter, offset: _offset);
+        limit: limit, filter: params.filter, offset: offset);
 
     if (manga.isNotEmpty) {
       await ref.read(statisticsProvider.notifier).get(manga);
@@ -2520,40 +2268,18 @@ class MangaSearch extends _$MangaSearch {
 
   @override
   Future<List<Manga>> build(MangaSearchParameters params) async {
-    return _searchManga();
+    return fetchData(0);
   }
 
   bool isAtEnd() {
-    return _atEnd;
+    return atEnd;
   }
 
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = await future;
-    // If there is more content, get more
-    if (oldstate.length == _offset + limit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        _offset += limit;
-        final list = await _searchManga();
-
-        if (list.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...list];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  @override
+  Future<void> clear() async {
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
   }
 }
 

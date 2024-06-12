@@ -119,7 +119,7 @@ final class LatestChaptersFeedProvider
 }
 
 String _$latestChaptersFeedHash() =>
-    r'0074fd45b0038212acec33db7984c23151bffd23';
+    r'd38153bb3ac3cd3c011056adf6dee2c048631c51';
 
 abstract class _$LatestChaptersFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
@@ -180,7 +180,7 @@ final class LatestGlobalFeedProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$latestGlobalFeedHash() => r'022ff8d3ddd62b4d18c76da6224bead1f257912d';
+String _$latestGlobalFeedHash() => r'd3b2e35e78f62e0419c73e5c778d9b9f2817f520';
 
 abstract class _$LatestGlobalFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
@@ -265,7 +265,7 @@ final class GroupFeedProvider
   }
 }
 
-String _$groupFeedHash() => r'5560940b2112a70310488a070f2cd469a4eca24a';
+String _$groupFeedHash() => r'8977b28510c9fedc7852f90742f938a99fd95a5c';
 
 final class GroupFeedFamily extends Family {
   const GroupFeedFamily._()
@@ -418,7 +418,7 @@ final class GroupTitlesProvider
   }
 }
 
-String _$groupTitlesHash() => r'01622d91abc2d261539280a9b01e4ef097b63df4';
+String _$groupTitlesHash() => r'82b39c5d8b6e102f2a20956fbc8e950fbddebc99';
 
 final class GroupTitlesFamily extends Family {
   const GroupTitlesFamily._()
@@ -571,7 +571,7 @@ final class CreatorTitlesProvider
   }
 }
 
-String _$creatorTitlesHash() => r'fe1dd23482de894d2a74e6172ddd1973a95e36c7';
+String _$creatorTitlesHash() => r'8df6f7b9cba76dcf99c5903ec9fedac849f399fc';
 
 final class CreatorTitlesFamily extends Family {
   const CreatorTitlesFamily._()
@@ -724,7 +724,7 @@ final class MangaChaptersProvider
   }
 }
 
-String _$mangaChaptersHash() => r'b6dfa73b7294d0677f01860a42db02ee4e305b7d';
+String _$mangaChaptersHash() => r'7e0764096166884fe0543a6e3cd9ecf89fd466bd';
 
 final class MangaChaptersFamily extends Family {
   const MangaChaptersFamily._()
@@ -877,7 +877,7 @@ final class MangaCoversProvider
   }
 }
 
-String _$mangaCoversHash() => r'da067c46fb69802cba3e3d49e23d5e00fa16a690';
+String _$mangaCoversHash() => r'52d13fe80d7209c99ed2e6ca78224ea8b630a4b3';
 
 final class MangaCoversFamily extends Family {
   const MangaCoversFamily._()
@@ -1129,7 +1129,7 @@ final class UserListsProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$userListsHash() => r'3cbb7a0ce0818124c3342a6830cecb3ce473ee99';
+String _$userListsHash() => r'a33c55919ac41872a2612cc31080b6f8cee0e9f0';
 
 abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
   FutureOr<List<CustomList>> build();
@@ -1190,7 +1190,7 @@ final class FollowedListsProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$followedListsHash() => r'f70af0efa0e9db5a79a85dd39f1c64e1bb688431';
+String _$followedListsHash() => r'401eb505cfaa360f2a2b78d2ed0a7456d717a55f';
 
 abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
   FutureOr<List<CustomList>> build();
@@ -1275,7 +1275,7 @@ final class CustomListFeedProvider
   }
 }
 
-String _$customListFeedHash() => r'ebd57ae4e3c868180eef851163379101bb355a35';
+String _$customListFeedHash() => r'45f85793ba871c10c88e71cf8bd6d33d4fc1f69a';
 
 final class CustomListFeedFamily extends Family {
   const CustomListFeedFamily._()
@@ -1794,7 +1794,7 @@ final class MangaSearchProvider
   }
 }
 
-String _$mangaSearchHash() => r'159ceccb8f506d719f9cac380bf9e9c6fccfc8f4';
+String _$mangaSearchHash() => r'6665657a31d7f907fc6142523de5d0e7a5bb5f21';
 
 final class MangaSearchFamily extends Family {
   const MangaSearchFamily._()
