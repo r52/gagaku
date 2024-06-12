@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/ui.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef LibraryItemTapCallback = void Function(LocalLibraryItem);
 
@@ -30,25 +31,55 @@ class LibraryListWidget extends StatelessWidget {
       physics: physics,
       slivers: [
         ...leading,
-        SliverToBoxAdapter(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-            child: Row(
-              children: [
-                if (item.parent != null && onTap != null)
-                  BackButton(
-                    onPressed: () {
-                      onTap!(item.parent!);
-                    },
+        SliverAppBar(
+          pinned: true,
+          leading: (item.parent != null && onTap != null)
+              ? BackButton(
+                  onPressed: () {
+                    onTap!(item.parent!);
+                  },
+                )
+              : const SizedBox.shrink(),
+          title: title,
+          actions: [
+            Consumer(
+              builder: (context, ref, child) {
+                final theme = Theme.of(context);
+                final initial = ref.watch(librarySortTypeProvider);
+
+                return DropdownMenu<LibrarySort>(
+                  initialSelection: initial,
+                  width: 180.0,
+                  enableFilter: false,
+                  enableSearch: false,
+                  requestFocusOnTap: false,
+                  inputDecorationTheme: InputDecorationTheme(
+                    filled: true,
+                    fillColor: theme.colorScheme.surface.withAlpha(200),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 2.0,
+                        color: theme.colorScheme.inversePrimary,
+                      ),
+                    ),
                   ),
-                const SizedBox(
-                  width: 10,
-                ),
-                title,
-              ],
+                  onSelected: (LibrarySort? sort) async {
+                    if (sort != null) {
+                      ref.read(librarySortTypeProvider.notifier).state = sort;
+                    }
+                  },
+                  dropdownMenuEntries:
+                      List<DropdownMenuEntry<LibrarySort>>.generate(
+                    LibrarySort.values.length,
+                    (int index) => DropdownMenuEntry<LibrarySort>(
+                      value: LibrarySort.values.elementAt(index),
+                      label: LibrarySort.values.elementAt(index).label,
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
+          ],
         ),
         SliverGrid.builder(
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(

@@ -1,28 +1,82 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:gagaku/local/config.dart';
+import 'package:hooks_riverpod/legacy.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
 enum LibraryItemType { directory, archive }
 
-int compareLibraryItems(LocalLibraryItem a, LocalLibraryItem b) {
-  if (!a.isReadable && b.isReadable) {
-    return -1;
-  }
+typedef LibraryItemCompare = int Function(LocalLibraryItem, LocalLibraryItem);
 
-  if (a.isReadable && !b.isReadable) {
-    return 1;
-  }
+enum LibrarySort {
+  name_desc('Name descending'),
+  name_asc('Name ascending'),
+  modified_desc('Modified descending'),
+  modified_asc('Modified ascending');
 
-  return compareNatural(a.name ?? a.path, b.name ?? b.path);
+  const LibrarySort(this.label);
+  final String label;
 }
 
-LocalLibraryItem? libraryItemBinarySearch(
-    List<LocalLibraryItem> list, int low, int high, LocalLibraryItem item) {
+final librarySortTypeProvider = StateProvider((ref) => LibrarySort.name_desc);
+
+Map<LibrarySort, LibraryItemCompare> _libraryCompare = {
+  LibrarySort.name_desc: (LocalLibraryItem a, LocalLibraryItem b) {
+    if (!a.isReadable && b.isReadable) {
+      return -1;
+    }
+
+    if (a.isReadable && !b.isReadable) {
+      return 1;
+    }
+
+    return compareNatural(a.name?.toLowerCase() ?? a.path.toLowerCase(),
+        b.name?.toLowerCase() ?? b.path.toLowerCase());
+  },
+  LibrarySort.name_asc: (LocalLibraryItem a, LocalLibraryItem b) {
+    if (!a.isReadable && b.isReadable) {
+      return -1;
+    }
+
+    if (a.isReadable && !b.isReadable) {
+      return 1;
+    }
+
+    return compareNatural(b.name?.toLowerCase() ?? b.path.toLowerCase(),
+        a.name?.toLowerCase() ?? a.path.toLowerCase());
+  },
+  LibrarySort.modified_desc: (LocalLibraryItem a, LocalLibraryItem b) {
+    if (!a.isReadable && b.isReadable) {
+      return -1;
+    }
+
+    if (a.isReadable && !b.isReadable) {
+      return 1;
+    }
+
+    return a.modified.compareTo(b.modified);
+  },
+  LibrarySort.modified_asc: (LocalLibraryItem a, LocalLibraryItem b) {
+    if (!a.isReadable && b.isReadable) {
+      return -1;
+    }
+
+    if (a.isReadable && !b.isReadable) {
+      return 1;
+    }
+
+    return b.modified.compareTo(a.modified);
+  },
+};
+
+LocalLibraryItem? libraryItemBinarySearch(List<LocalLibraryItem> list, int low,
+    int high, LocalLibraryItem item, LibrarySort sort) {
   if (low > high) {
     return null;
   }
@@ -34,14 +88,15 @@ LocalLibraryItem? libraryItemBinarySearch(
     return mid;
   }
 
-  if (compareLibraryItems(item, mid) > 0) {
-    return libraryItemBinarySearch(list, middle + 1, high, item);
+  if (_libraryCompare[sort]!(item, mid) > 0) {
+    return libraryItemBinarySearch(list, middle + 1, high, item, sort);
   }
 
-  return libraryItemBinarySearch(list, low, middle - 1, item);
+  return libraryItemBinarySearch(list, low, middle - 1, item, sort);
 }
 
-LocalLibraryItem? findLibraryItem(LocalLibraryItem old, LocalLibraryItem curr) {
+LocalLibraryItem? findLibraryItem(
+    LocalLibraryItem old, LocalLibraryItem curr, LibrarySort sort) {
   if (curr.type == old.type && curr.path == old.path) {
     return curr;
   }
@@ -52,14 +107,15 @@ LocalLibraryItem? findLibraryItem(LocalLibraryItem old, LocalLibraryItem curr) {
       .toList();
 
   if (children.isNotEmpty) {
-    final result = libraryItemBinarySearch(children, 0, children.length, old);
+    final result =
+        libraryItemBinarySearch(children, 0, children.length - 1, old, sort);
 
     if (result != null) {
       return result;
     }
 
     for (final e in children) {
-      final cres = findLibraryItem(old, e);
+      final cres = findLibraryItem(old, e, sort);
       if (cres != null) {
         return cres;
       }
@@ -73,6 +129,7 @@ class LocalLibraryItem {
   LocalLibraryItem({
     required this.path,
     required this.type,
+    required this.modified,
     this.name,
     this.thumbnail,
     this.isReadable = false,
@@ -81,6 +138,7 @@ class LocalLibraryItem {
 
   final String path;
   final LibraryItemType type;
+  final DateTime modified;
   final String? name;
   String? thumbnail;
   bool isReadable;
@@ -94,6 +152,7 @@ class LocalLibrary extends _$LocalLibrary {
   Future<LocalLibraryItem?> _processDirectory(
       Directory dir, LocalLibraryItem? parent) async {
     final formats = await ref.watch(supportedFormatsProvider.future);
+    final sort = ref.watch(librarySortTypeProvider);
 
     final entities = await dir.list().toList();
     final files = entities.whereType<File>();
@@ -101,9 +160,12 @@ class LocalLibrary extends _$LocalLibrary {
         ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
         : dir.path;
 
+    final stats = dir.statSync();
+
     final res = LocalLibraryItem(
       path: dir.path,
       name: name,
+      modified: stats.modified,
       type: LibraryItemType.directory,
       parent: parent,
     );
@@ -137,7 +199,7 @@ class LocalLibrary extends _$LocalLibrary {
       }
     }
 
-    res.children.sort(compareLibraryItems);
+    res.children.sort(_libraryCompare[sort]);
 
     if (res.children.isNotEmpty) {
       return res;
@@ -156,6 +218,7 @@ class LocalLibrary extends _$LocalLibrary {
       return LocalLibraryItem(
           path: file.path,
           type: LibraryItemType.archive,
+          modified: await file.lastModified(),
           name: file.uri.pathSegments.last,
           isReadable: true,
           parent: parent);
@@ -166,9 +229,13 @@ class LocalLibrary extends _$LocalLibrary {
 
   Future<LocalLibraryItem> _scanLibrary() async {
     final cfg = ref.watch(localConfigProvider);
+    final sort = ref.watch(librarySortTypeProvider);
     if (cfg.libraryDirectory.isNotEmpty) {
       final top = LocalLibraryItem(
-          path: cfg.libraryDirectory, type: LibraryItemType.directory);
+        path: cfg.libraryDirectory,
+        type: LibraryItemType.directory,
+        modified: DateTime.now(),
+      );
 
       final dir = Directory(cfg.libraryDirectory);
       final entities = await dir.list().toList();
@@ -189,12 +256,16 @@ class LocalLibrary extends _$LocalLibrary {
         // otherwise skip
       }
 
-      top.children.sort(compareLibraryItems);
+      top.children.sort(_libraryCompare[sort]);
 
       return top;
     }
 
-    return LocalLibraryItem(path: '', type: LibraryItemType.directory);
+    return LocalLibraryItem(
+      path: '',
+      type: LibraryItemType.directory,
+      modified: DateTime.now(),
+    );
   }
 
   @override

@@ -85,13 +85,14 @@ class LocalLibraryHome extends StatelessWidget {
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
           final settings = ref.watch(localConfigProvider);
           final libraryProvider = ref.watch(localLibraryProvider);
+          final sort = ref.watch(librarySortTypeProvider);
           final currentItem =
               useState<LocalLibraryItem?>(libraryProvider.value);
 
           useEffect(() {
             final newVal = libraryProvider.value;
             if (currentItem.value != null && newVal != null) {
-              final result = findLibraryItem(currentItem.value!, newVal);
+              final result = findLibraryItem(currentItem.value!, newVal, sort);
 
               if (result != null) {
                 currentItem.value = result;

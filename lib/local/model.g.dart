@@ -58,7 +58,7 @@ final class LocalLibraryProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$localLibraryHash() => r'72d7fe7f78b4d7c1c4e5a3ad08e03726a53c6ebd';
+String _$localLibraryHash() => r'9f011f22650d03b07338a61270d62ee5f9cac2c3';
 
 abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
   FutureOr<LocalLibraryItem> build();
