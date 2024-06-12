@@ -55,8 +55,9 @@ class ReaderWidget extends HookConsumerWidget {
     final listController = useListController();
     final scrollController = useScrollController();
     final currentImageScale =
-        useState<PhotoViewScaleState>(PhotoViewScaleState.initial);
-    final subtext = useState<String?>(subtitle ?? pages.elementAt(0).sortKey);
+        useValueNotifier<PhotoViewScaleState>(PhotoViewScaleState.initial);
+    final subtext =
+        useValueNotifier<String?>(subtitle ?? pages.elementAt(0).sortKey);
     final format = longstrip ? ReaderFormat.longstrip : settings.format;
 
     void cachePage(ReaderPage page) {
@@ -395,7 +396,16 @@ class ReaderWidget extends HookConsumerWidget {
             title,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          subtitle: subtext.value != null ? Text(subtext.value!) : null,
+          subtitle: HookBuilder(
+            builder: (context) {
+              final value = useValueListenable(subtext);
+              if (value == null) {
+                return const SizedBox.shrink();
+              }
+
+              return Text(value);
+            },
+          ),
         ),
         actions: [
           Builder(
@@ -438,21 +448,22 @@ class ReaderWidget extends HookConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ValueListenableBuilder<int>(
-                    builder: (BuildContext context, int value, Widget? child) {
+                  HookBuilder(
+                    builder: (context) {
+                      final value = useValueListenable(currentPage);
                       return OutlinedButton(
                         onPressed:
                             (value > 0) ? () => jumpToPreviousPage() : null,
                         child: const Icon(Icons.arrow_back_ios_new),
                       );
                     },
-                    valueListenable: currentPage,
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  ValueListenableBuilder<int>(
-                    builder: (BuildContext context, int value, Widget? child) {
+                  HookBuilder(
+                    builder: (context) {
+                      final value = useValueListenable(currentPage);
                       return DropdownMenu<int>(
                         initialSelection: value,
                         width: 80.0,
@@ -475,13 +486,13 @@ class ReaderWidget extends HookConsumerWidget {
                         dropdownMenuEntries: pageDropdownItems,
                       );
                     },
-                    valueListenable: currentPage,
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  ValueListenableBuilder<int>(
-                    builder: (BuildContext context, int value, Widget? child) {
+                  HookBuilder(
+                    builder: (context) {
+                      final value = useValueListenable(currentPage);
                       return OutlinedButton(
                         onPressed: (value < pageCount - 1)
                             ? () => jumpToNextPage()
@@ -489,7 +500,6 @@ class ReaderWidget extends HookConsumerWidget {
                         child: const Icon(Icons.arrow_forward_ios),
                       );
                     },
-                    valueListenable: currentPage,
                   ),
                 ],
               ),
@@ -654,8 +664,8 @@ class ReaderWidget extends HookConsumerWidget {
         autofocus: true,
         focusNode: focusNode,
         onKeyEvent: handleKeyEvent,
-        child: Container(
-          child: (() {
+        child: Builder(
+          builder: (context) {
             if (pages.isEmpty && externalUrl != null) {
               return Center(
                 child: Column(
@@ -714,49 +724,55 @@ class ReaderWidget extends HookConsumerWidget {
               );
             }
 
-            return PageView.builder(
-              allowImplicitScrolling: true,
-              reverse: settings.direction == ReaderDirection.rightToLeft,
-              physics: (!settings.swipeGestures ||
-                      currentImageScale.value != PhotoViewScaleState.initial)
-                  ? const NeverScrollableScrollPhysics()
-                  : null,
-              scrollBehavior: const MouseTouchScrollBehavior(),
-              controller: pageController,
-              itemCount: pageCount,
-              onPageChanged: (int index) {
-                focusNode.requestFocus();
-                currentImageScale.value =
-                    scaleStateController[index].scaleState;
-              },
-              findChildIndexCallback: (key) {
-                final valueKey = key as ValueKey<String>;
-                final val = pages.indexWhere((i) => i.id == valueKey.value);
-                return val >= 0 ? val : null;
-              },
-              itemBuilder: (BuildContext context, int index) {
-                final page = pages.elementAt(index);
+            return HookBuilder(
+              builder: (context) {
+                final scaleValue = useValueListenable(currentImageScale);
+                return PageView.builder(
+                  allowImplicitScrolling: true,
+                  reverse: settings.direction == ReaderDirection.rightToLeft,
+                  physics: (!settings.swipeGestures ||
+                          scaleValue != PhotoViewScaleState.initial)
+                      ? const NeverScrollableScrollPhysics()
+                      : null,
+                  scrollBehavior: const MouseTouchScrollBehavior(),
+                  controller: pageController,
+                  itemCount: pageCount,
+                  onPageChanged: (int index) {
+                    focusNode.requestFocus();
+                    currentImageScale.value =
+                        scaleStateController[index].scaleState;
+                  },
+                  findChildIndexCallback: (key) {
+                    final valueKey = key as ValueKey<String>;
+                    final val = pages.indexWhere((i) => i.id == valueKey.value);
+                    return val >= 0 ? val : null;
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    final page = pages.elementAt(index);
 
-                return PhotoView(
-                  key: ValueKey(page.id),
-                  imageProvider: page.provider,
-                  backgroundDecoration:
-                      const BoxDecoration(color: Colors.black),
-                  enableRotation: false,
-                  scaleStateController: scaleStateController[index],
-                  controller: viewController[index],
-                  minScale: PhotoViewComputedScale.contained * 1.0,
-                  maxScale: PhotoViewComputedScale.covered * 5.0,
-                  initialScale: PhotoViewComputedScale.contained,
-                  basePosition: Alignment.topCenter,
-                  onTapUp: settings.clickToTurn ? handleImageViewOnTap : null,
-                  loadingBuilder: (context, event) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                    return PhotoView(
+                      key: ValueKey(page.id),
+                      imageProvider: page.provider,
+                      backgroundDecoration:
+                          const BoxDecoration(color: Colors.black),
+                      enableRotation: false,
+                      scaleStateController: scaleStateController[index],
+                      controller: viewController[index],
+                      minScale: PhotoViewComputedScale.contained * 1.0,
+                      maxScale: PhotoViewComputedScale.covered * 5.0,
+                      initialScale: PhotoViewComputedScale.contained,
+                      basePosition: Alignment.topCenter,
+                      onTapUp:
+                          settings.clickToTurn ? handleImageViewOnTap : null,
+                      loadingBuilder: (context, event) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
                 );
               },
             );
-          })(),
+          },
         ),
       ),
       // Can't use bottomSheet anymore due to Material 3 specs
