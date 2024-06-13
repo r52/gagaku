@@ -397,7 +397,7 @@ class ReaderWidget extends HookConsumerWidget {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: HookBuilder(
-            builder: (context) {
+            builder: (_) {
               final value = useValueListenable(subtext);
               if (value == null) {
                 return const SizedBox.shrink();
@@ -449,7 +449,7 @@ class ReaderWidget extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   HookBuilder(
-                    builder: (context) {
+                    builder: (_) {
                       final value = useValueListenable(currentPage);
                       return OutlinedButton(
                         onPressed:
@@ -462,7 +462,7 @@ class ReaderWidget extends HookConsumerWidget {
                     width: 10,
                   ),
                   HookBuilder(
-                    builder: (context) {
+                    builder: (_) {
                       final value = useValueListenable(currentPage);
                       return DropdownMenu<int>(
                         initialSelection: value,
@@ -491,7 +491,7 @@ class ReaderWidget extends HookConsumerWidget {
                     width: 10,
                   ),
                   HookBuilder(
-                    builder: (context) {
+                    builder: (_) {
                       final value = useValueListenable(currentPage);
                       return OutlinedButton(
                         onPressed: (value < pageCount - 1)
@@ -725,7 +725,7 @@ class ReaderWidget extends HookConsumerWidget {
             }
 
             return HookBuilder(
-              builder: (context) {
+              builder: (_) {
                 final scaleValue = useValueListenable(currentImageScale);
                 return PageView.builder(
                   allowImplicitScrolling: true,

@@ -1387,9 +1387,8 @@ class _UserListsMenu extends ConsumerWidget {
                     builder: (context) {
                       final nav = Navigator.of(context);
                       final nameController = useTextEditingController();
-                      final nameIsEmpty = useListenableSelector(
-                          nameController, () => nameController.text.isEmpty);
-                      final nprivate = useState(CustomListVisibility.private);
+                      final nprivate =
+                          useValueNotifier(CustomListVisibility.private);
 
                       return AlertDialog(
                         title: const Text('Create New List'),
@@ -1410,17 +1409,23 @@ class _UserListsMenu extends ConsumerWidget {
                                     : null;
                               },
                             ),
-                            CheckboxListTile(
-                              controlAffinity: ListTileControlAffinity.leading,
-                              title: const Text('Private list'),
-                              value: nprivate.value ==
-                                  CustomListVisibility.private,
-                              onChanged: (bool? value) async {
-                                nprivate.value = (value == true)
-                                    ? CustomListVisibility.private
-                                    : CustomListVisibility.public;
+                            HookBuilder(
+                              builder: (_) {
+                                final private = useValueListenable(nprivate);
+                                return CheckboxListTile(
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  title: const Text('Private list'),
+                                  value:
+                                      private == CustomListVisibility.private,
+                                  onChanged: (bool? value) async {
+                                    nprivate.value = (value == true)
+                                        ? CustomListVisibility.private
+                                        : CustomListVisibility.public;
+                                  },
+                                );
                               },
-                            )
+                            ),
                           ],
                         ),
                         actions: <Widget>[
@@ -1430,18 +1435,25 @@ class _UserListsMenu extends ConsumerWidget {
                               nav.pop(null);
                             },
                           ),
-                          ElevatedButton(
-                            onPressed: nameIsEmpty
-                                ? null
-                                : () {
-                                    if (nameController.text.isNotEmpty) {
-                                      nav.pop((
-                                        nameController.text,
-                                        nprivate.value
-                                      ));
-                                    }
-                                  },
-                            child: const Text('Create'),
+                          HookBuilder(
+                            builder: (_) {
+                              final nameIsEmpty = useListenableSelector(
+                                  nameController,
+                                  () => nameController.text.isEmpty);
+                              return ElevatedButton(
+                                onPressed: nameIsEmpty
+                                    ? null
+                                    : () {
+                                        if (nameController.text.isNotEmpty) {
+                                          nav.pop((
+                                            nameController.text,
+                                            nprivate.value
+                                          ));
+                                        }
+                                      },
+                                child: const Text('Create'),
+                              );
+                            },
                           ),
                         ],
                       );
@@ -1468,7 +1480,7 @@ class _UserListsMenu extends ConsumerWidget {
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     const SnackBar(
-                      content: Text('Failed create list.'),
+                      content: Text('Failed to create list.'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -1490,51 +1502,61 @@ class _AddToLibraryDialog extends HookWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
-    final nreading = useState(MangaReadingStatus.plan_to_read);
-    final nfollowing = useState(true);
+    final nreading = useValueNotifier(MangaReadingStatus.plan_to_read);
+    final nfollowing = useValueNotifier(true);
 
     return AlertDialog(
       title: const Text('Add to Library'),
       content: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          DropdownMenu<MangaReadingStatus>(
-            initialSelection: nreading.value,
-            enableFilter: false,
-            enableSearch: false,
-            requestFocusOnTap: false,
-            inputDecorationTheme: InputDecorationTheme(
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2.0,
-                  color: theme.colorScheme.inversePrimary,
+          HookBuilder(
+            builder: (_) {
+              final reading = useValueListenable(nreading);
+              return DropdownMenu<MangaReadingStatus>(
+                initialSelection: reading,
+                enableFilter: false,
+                enableSearch: false,
+                requestFocusOnTap: false,
+                inputDecorationTheme: InputDecorationTheme(
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 2.0,
+                      color: theme.colorScheme.inversePrimary,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            onSelected: (MangaReadingStatus? status) async {
-              if (status != null) {
-                nreading.value = status;
-              }
+                onSelected: (MangaReadingStatus? status) async {
+                  if (status != null) {
+                    nreading.value = status;
+                  }
+                },
+                dropdownMenuEntries:
+                    List<DropdownMenuEntry<MangaReadingStatus>>.generate(
+                  MangaReadingStatus.values.length - 1,
+                  (int index) => DropdownMenuEntry<MangaReadingStatus>(
+                    value: MangaReadingStatus.values.elementAt(index + 1),
+                    label: MangaReadingStatus.values.elementAt(index + 1).label,
+                  ),
+                ),
+              );
             },
-            dropdownMenuEntries:
-                List<DropdownMenuEntry<MangaReadingStatus>>.generate(
-              MangaReadingStatus.values.length - 1,
-              (int index) => DropdownMenuEntry<MangaReadingStatus>(
-                value: MangaReadingStatus.values.elementAt(index + 1),
-                label: MangaReadingStatus.values.elementAt(index + 1).label,
-              ),
-            ),
           ),
           const SizedBox(
             width: 10,
           ),
-          ElevatedButton(
-            onPressed: () async {
-              nfollowing.value = !nfollowing.value;
+          HookBuilder(
+            builder: (_) {
+              final following = useValueListenable(nfollowing);
+              return ElevatedButton(
+                onPressed: () async {
+                  nfollowing.value = !nfollowing.value;
+                },
+                child: Icon(following
+                    ? Icons.notification_add
+                    : Icons.notifications_off_outlined),
+              );
             },
-            child: Icon(nfollowing.value
-                ? Icons.notification_add
-                : Icons.notifications_off_outlined),
           ),
         ],
       ),

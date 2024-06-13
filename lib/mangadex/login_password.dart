@@ -61,14 +61,6 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final passwordController = useTextEditingController();
     final clientIdController = useTextEditingController(text: clientId);
     final clientSecretController = useTextEditingController(text: clientSecret);
-    final usernameIsEmpty = useListenableSelector(
-        usernameController, () => usernameController.text.isEmpty);
-    final passwordIsEmpty = useListenableSelector(
-        passwordController, () => passwordController.text.isEmpty);
-    final clientIdIsEmpty = useListenableSelector(
-        clientIdController, () => clientIdController.text.isEmpty);
-    final clientSecretIsEmpty = useListenableSelector(
-        clientSecretController, () => clientSecretController.text.isEmpty);
     final pendingLogin = useState<Future<bool>?>(null);
     final snapshot = useFuture(pendingLogin.value);
 
@@ -162,58 +154,78 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                           context.pop();
                         },
                       ),
-                      ElevatedButton(
-                        onPressed: (usernameIsEmpty ||
-                                passwordIsEmpty ||
-                                clientIdIsEmpty ||
-                                clientSecretIsEmpty)
-                            ? null
-                            : () async {
-                                final router = GoRouter.of(context);
-                                final messenger = ScaffoldMessenger.of(context);
+                      HookBuilder(
+                        builder: (context) {
+                          final usernameIsEmpty = useListenableSelector(
+                              usernameController,
+                              () => usernameController.text.isEmpty);
+                          final passwordIsEmpty = useListenableSelector(
+                              passwordController,
+                              () => passwordController.text.isEmpty);
+                          final clientIdIsEmpty = useListenableSelector(
+                              clientIdController,
+                              () => clientIdController.text.isEmpty);
+                          final clientSecretIsEmpty = useListenableSelector(
+                              clientSecretController,
+                              () => clientSecretController.text.isEmpty);
 
-                                if (usernameController.text.isNotEmpty &&
-                                    passwordController.text.isNotEmpty &&
-                                    clientIdController.text.isNotEmpty &&
-                                    clientSecretController.text.isNotEmpty) {
-                                  final loginSuccess = ref
-                                      .read(authControlProvider.notifier)
-                                      .login(
-                                          usernameController.text,
-                                          passwordController.text,
-                                          clientIdController.text,
-                                          clientSecretController.text);
+                          return ElevatedButton(
+                            onPressed: (usernameIsEmpty ||
+                                    passwordIsEmpty ||
+                                    clientIdIsEmpty ||
+                                    clientSecretIsEmpty)
+                                ? null
+                                : () async {
+                                    final router = GoRouter.of(context);
+                                    final messenger =
+                                        ScaffoldMessenger.of(context);
 
-                                  loginSuccess.then((success) {
-                                    if (success) {
-                                      router.pop();
-                                      passwordController.clear();
+                                    if (usernameController.text.isNotEmpty &&
+                                        passwordController.text.isNotEmpty &&
+                                        clientIdController.text.isNotEmpty &&
+                                        clientSecretController
+                                            .text.isNotEmpty) {
+                                      final loginSuccess = ref
+                                          .read(authControlProvider.notifier)
+                                          .login(
+                                              usernameController.text,
+                                              passwordController.text,
+                                              clientIdController.text,
+                                              clientSecretController.text);
+
+                                      loginSuccess.then((success) {
+                                        if (success) {
+                                          router.pop();
+                                          passwordController.clear();
+                                        } else {
+                                          messenger
+                                            ..removeCurrentSnackBar()
+                                            ..showSnackBar(
+                                              const SnackBar(
+                                                content:
+                                                    Text('Failed to login.'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                        }
+                                      });
+
+                                      pendingLogin.value = loginSuccess;
                                     } else {
                                       messenger
                                         ..removeCurrentSnackBar()
                                         ..showSnackBar(
                                           const SnackBar(
-                                            content: Text('Failed to login.'),
+                                            content: Text(
+                                                'Username/Password/Client ID/Client Secret cannot be empty.'),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
                                     }
-                                  });
-
-                                  pendingLogin.value = loginSuccess;
-                                } else {
-                                  messenger
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Username/Password/Client ID/Client Secret cannot be empty.'),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                }
-                              },
-                        child: const Text('LOGIN'),
+                                  },
+                            child: const Text('LOGIN'),
+                          );
+                        },
                       ),
                     ],
                   ),

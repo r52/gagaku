@@ -2053,7 +2053,7 @@ class UserLists extends _$UserLists
       return [...oldstate];
     });
 
-    return (state.value ?? []).length != oldstate.length;
+    return (state.value ?? []).indexWhere((e) => e.id == list.id) == -1;
   }
 
   Future<bool> newList(String name, CustomListVisibility visibility,

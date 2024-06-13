@@ -72,13 +72,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final listNameController =
         useTextEditingController(text: list?.attributes.name);
-    final listNameChanged = useListenableSelector(
-        listNameController,
-        () => list != null
-            ? listNameController.text != list!.attributes.name
-            : listNameController.text.isNotEmpty);
 
-    final visibility = useState(list != null
+    final visibility = useValueNotifier(list != null
         ? list!.attributes.visibility
         : CustomListVisibility.private);
 
@@ -117,62 +112,72 @@ class MangaDexEditListScreen extends HookConsumerWidget {
               context.pop();
             },
           ),
-          ElevatedButton(
-            style: Styles.buttonStyle(),
-            onPressed: listNameChanged ||
-                    (list != null && !setEquals(selected.value, list!.set)) ||
-                    (list != null &&
-                        visibility.value != list!.attributes.visibility)
-                ? () async {
-                    final messenger = ScaffoldMessenger.of(context);
+          HookBuilder(
+            builder: (context) {
+              final vis = useValueListenable(visibility);
+              final listNameChanged = useListenableSelector(
+                  listNameController,
+                  () => list != null
+                      ? listNameController.text != list!.attributes.name
+                      : listNameController.text.isNotEmpty);
 
-                    if (listNameController.text.isNotEmpty) {
-                      Future<bool> success;
+              return ElevatedButton(
+                style: Styles.buttonStyle(),
+                onPressed: listNameChanged ||
+                        (list != null &&
+                            !setEquals(selected.value, list!.set)) ||
+                        (list != null && vis != list!.attributes.visibility)
+                    ? () async {
+                        final messenger = ScaffoldMessenger.of(context);
 
-                      if (list != null) {
-                        success = ref.read(userListsProvider.notifier).editList(
-                            list!,
-                            listNameController.text,
-                            visibility.value,
-                            selected.value);
-                      } else {
-                        success = ref.read(userListsProvider.notifier).newList(
-                            listNameController.text,
-                            visibility.value,
-                            selected.value);
-                      }
+                        if (listNameController.text.isNotEmpty) {
+                          Future<bool> success;
 
-                      success.then((success) {
-                        if (success) {
-                          if (!context.mounted) return;
-                          context.pop(true);
+                          if (list != null) {
+                            success = ref
+                                .read(userListsProvider.notifier)
+                                .editList(list!, listNameController.text, vis,
+                                    selected.value);
+                          } else {
+                            success = ref
+                                .read(userListsProvider.notifier)
+                                .newList(listNameController.text, vis,
+                                    selected.value);
+                          }
+
+                          success.then((success) {
+                            if (success) {
+                              if (!context.mounted) return;
+                              context.pop(true);
+                            } else {
+                              messenger
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        'Failed to ${list != null ? 'edit' : 'create'} list.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                            }
+                          });
+
+                          pendingAction.value = success;
                         } else {
                           messenger
                             ..removeCurrentSnackBar()
                             ..showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Failed to ${list != null ? 'edit' : 'create'} list.'),
+                              const SnackBar(
+                                content: Text('List name cannot be empty.'),
                                 backgroundColor: Colors.red,
                               ),
                             );
                         }
-                      });
-
-                      pendingAction.value = success;
-                    } else {
-                      messenger
-                        ..removeCurrentSnackBar()
-                        ..showSnackBar(
-                          const SnackBar(
-                            content: Text('List name cannot be empty.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                    }
-                  }
-                : null,
-            child: Text(list != null ? 'Save' : 'Create'),
+                      }
+                    : null,
+                child: Text(list != null ? 'Save' : 'Create'),
+              );
+            },
           ),
         ],
       ),
