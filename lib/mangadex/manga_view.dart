@@ -142,8 +142,45 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
       }
     }
 
-    final formatTags = manga.attributes!.tags
-        .where((tag) => tag.attributes.group == TagGroup.format);
+    final mangaTagChips = useMemoized<Map<TagGroup, List<Widget>>>(() {
+      final map =
+          manga.attributes!.tags.groupListsBy((tag) => tag.attributes.group);
+      return map.map((group, list) {
+        if (group == TagGroup.content) {
+          return MapEntry(
+              group,
+              list
+                  .map((e) => ContentChip(
+                        key: ValueKey(e.id),
+                        content: e.attributes.name.get('en'),
+                      ))
+                  .toList());
+        }
+
+        return MapEntry(
+            group,
+            list
+                .map((e) => IconTextChip(
+                      key: ValueKey(e.id),
+                      text: e.attributes.name.get('en'),
+                    ))
+                .toList());
+      });
+    }, [manga]);
+
+    final contentTagChips = useMemoized(() {
+      return mangaTagChips[TagGroup.content]?.toList() ?? [];
+    }, [manga]);
+    final genreTagChips = useMemoized(() {
+      final tags = <Widget>[];
+      mangaTagChips.forEach((group, list) {
+        if (group != TagGroup.content) {
+          tags.addAll(list);
+        }
+      });
+
+      return tags;
+    }, [manga]);
 
     bool onScrollNotification(ScrollEndNotification notification) {
       if (notification.depth == 0 &&
@@ -382,19 +419,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       if (manga.attributes!.contentRating != ContentRating.safe)
                         ContentRatingChip(
                             rating: manga.attributes!.contentRating),
-                      ...manga.attributes!.tags
-                          .where(
-                              (tag) => tag.attributes.group == TagGroup.content)
-                          .map((e) => ContentChip(
-                              content: e.attributes.name.get('en'))),
-                      if (manga.attributes!.tags.isNotEmpty)
-                        ...manga.attributes!.tags
-                            .where((tag) =>
-                                tag.attributes.group != TagGroup.content)
-                            .map(
-                              (e) => IconTextChip(
-                                  text: e.attributes.name.get('en')),
-                            ),
+                      ...contentTagChips,
+                      ...genreTagChips,
                     ],
                   ),
                 ),
@@ -518,33 +544,20 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           ),
                         ],
                       ),
-                    if (manga.attributes!.tags.isNotEmpty)
+                    if (mangaTagChips[TagGroup.genre] != null)
                       MultiChildExpansionTile(
                         title: 'Genres',
-                        children: manga.attributes!.tags
-                            .where(
-                                (tag) => tag.attributes.group == TagGroup.genre)
-                            .map((e) =>
-                                IconTextChip(text: e.attributes.name.get('en')))
-                            .toList(),
+                        children: mangaTagChips[TagGroup.genre]!,
                       ),
-                    if (manga.attributes!.tags.isNotEmpty)
+                    if (mangaTagChips[TagGroup.theme] != null)
                       MultiChildExpansionTile(
                         title: 'Themes',
-                        children: manga.attributes!.tags
-                            .where(
-                                (tag) => tag.attributes.group == TagGroup.theme)
-                            .map((e) =>
-                                IconTextChip(text: e.attributes.name.get('en')))
-                            .toList(),
+                        children: mangaTagChips[TagGroup.theme]!,
                       ),
-                    if (formatTags.isNotEmpty)
+                    if (mangaTagChips[TagGroup.format] != null)
                       MultiChildExpansionTile(
                         title: 'Format',
-                        children: formatTags
-                            .map((e) =>
-                                IconTextChip(text: e.attributes.name.get('en')))
-                            .toList(),
+                        children: mangaTagChips[TagGroup.format]!,
                       ),
                     MultiChildExpansionTile(
                       title: 'Track',
@@ -996,7 +1009,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
   }
 }
 
-class _ChapterListSliver extends StatelessWidget {
+class _ChapterListSliver extends HookWidget {
   const _ChapterListSliver({
     required this.chapters,
     required this.manga,
@@ -1009,34 +1022,42 @@ class _ChapterListSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final keysGrouped =
-        chapters.groupListsBy((chapter) => chapter.attributes.volume);
-    var keys = <String>[];
+    final keys = useMemoized(() {
+      final keysGrouped =
+          chapters.groupListsBy((chapter) => chapter.attributes.volume);
 
-    for (final vol in keysGrouped.keys) {
-      if (vol == null) {
-        keys.add('${header}No Volume');
-      } else {
-        keys.add('${header}Volume $vol');
-      }
+      var keys = <String>[];
 
-      keys = keysGrouped[vol]!.foldIndexed(keys, (index, list, chapter) {
-        // If next chapter is the same number
-        // AND previous chapter isn't (or doesnt exist)
-        if (index < keysGrouped[vol]!.length - 1 &&
-            keysGrouped[vol]!.elementAt(index + 1).attributes.chapter ==
-                chapter.attributes.chapter &&
-            (index == 0 ||
-                (index > 0 &&
-                    keysGrouped[vol]!.elementAt(index - 1).attributes.chapter !=
-                        chapter.attributes.chapter))) {
-          list.add('${header}Chapter ${chapter.attributes.chapter}');
+      for (final vol in keysGrouped.keys) {
+        if (vol == null) {
+          keys.add('${header}No Volume');
+        } else {
+          keys.add('${header}Volume $vol');
         }
 
-        list.add(chapter.id);
-        return list;
-      });
-    }
+        keys = keysGrouped[vol]!.foldIndexed(keys, (index, list, chapter) {
+          // If next chapter is the same number
+          // AND previous chapter isn't (or doesnt exist)
+          if (index < keysGrouped[vol]!.length - 1 &&
+              keysGrouped[vol]!.elementAt(index + 1).attributes.chapter ==
+                  chapter.attributes.chapter &&
+              (index == 0 ||
+                  (index > 0 &&
+                      keysGrouped[vol]!
+                              .elementAt(index - 1)
+                              .attributes
+                              .chapter !=
+                          chapter.attributes.chapter))) {
+            list.add('${header}Chapter ${chapter.attributes.chapter}');
+          }
+
+          list.add(chapter.id);
+          return list;
+        });
+      }
+
+      return keys;
+    }, [chapters]);
 
     return SliverList.builder(
       findChildIndexCallback: (key) {

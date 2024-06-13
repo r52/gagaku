@@ -219,7 +219,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
   }
 }
 
-class ChapterFeedItem extends ConsumerWidget {
+class ChapterFeedItem extends HookConsumerWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final ChapterFeedItemData state;
@@ -229,26 +229,28 @@ class ChapterFeedItem extends ConsumerWidget {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
-    final chapterBtns = state.chapters.map((e) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0),
-        child: ChapterButtonWidget(
-          key: ValueKey(e.id),
-          chapter: e,
-          manga: state.manga,
-          link: Text(
-            state.manga.attributes!.title.get('en'),
-            style: const TextStyle(fontSize: 18),
+    final chapterBtns = useMemoized<List<Widget>>(() {
+      return state.chapters.map((e) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: ChapterButtonWidget(
+            key: ValueKey(e.id),
+            chapter: e,
+            manga: state.manga,
+            link: Text(
+              state.manga.attributes!.title.get('en'),
+              style: const TextStyle(fontSize: 18),
+            ),
+            onLinkPressed: () async {
+              ref.read(readChaptersProvider.notifier).get([state.manga]);
+              ref.read(ratingsProvider.notifier).get([state.manga]);
+              ref.read(statisticsProvider.notifier).get([state.manga]);
+              context.push('/title/${state.manga.id}', extra: state.manga);
+            },
           ),
-          onLinkPressed: () async {
-            ref.read(readChaptersProvider.notifier).get([state.manga]);
-            ref.read(ratingsProvider.notifier).get([state.manga]);
-            ref.read(statisticsProvider.notifier).get([state.manga]);
-            context.push('/title/${state.manga.id}', extra: state.manga);
-          },
-        ),
-      );
-    }).toList();
+        );
+      }).toList();
+    }, [state]);
 
     final titleBtn = TextButton.icon(
       style: TextButton.styleFrom(
@@ -341,7 +343,7 @@ class ChapterFeedItem extends ConsumerWidget {
   }
 }
 
-class ChapterButtonWidget extends StatelessWidget {
+class ChapterButtonWidget extends HookWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
@@ -367,27 +369,33 @@ class ChapterButtonWidget extends StatelessWidget {
 
     final pubtime = timeago.format(chapter.attributes.publishAt);
 
-    final groupChips = <Widget>[];
+    final groupChips = useMemoized(() {
+      final chips = <Widget>[];
 
-    for (final g in chapter.groups) {
-      groupChips.add(IconTextChip(
-        icon:
-            isOfficialPub ? iconSet[_IconSet.circle] : iconSet[_IconSet.group],
-        text: g.attributes.name.crop(),
-        onPressed: () {
-          context.push('/group/${g.id}', extra: g);
-        },
-      ));
-      groupChips.add(_rowPadding);
-    }
+      for (final g in chapter.groups) {
+        chips.add(IconTextChip(
+          key: ValueKey(g.id),
+          icon: isOfficialPub
+              ? iconSet[_IconSet.circle]
+              : iconSet[_IconSet.group],
+          text: g.attributes.name.crop(),
+          onPressed: () {
+            context.push('/group/${g.id}', extra: g);
+          },
+        ));
+        chips.add(_rowPadding);
+      }
 
-    if (groupChips.isEmpty) {
-      groupChips.add(IconTextChip(
-        icon: iconSet[_IconSet.group],
-        text: 'No Group',
-      ));
-      groupChips.add(_rowPadding);
-    }
+      if (chips.isEmpty) {
+        chips.add(IconTextChip(
+          icon: iconSet[_IconSet.group],
+          text: 'No Group',
+        ));
+        chips.add(_rowPadding);
+      }
+
+      return chips;
+    }, [chapter, iconSet, screenSizeSmall]);
 
     Widget userChip;
 
