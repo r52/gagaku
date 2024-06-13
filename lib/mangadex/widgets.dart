@@ -191,7 +191,6 @@ class ChapterFeedWidget extends HookConsumerWidget {
                             controller: scrollController,
                             physics: const AlwaysScrollableScrollPhysics(),
                             restorationId: restorationId,
-                            padding: const EdgeInsets.all(6),
                             itemCount: results.length,
                             findChildIndexCallback: (key) {
                               final valueKey = key as ValueKey<int>;
@@ -292,11 +291,11 @@ class ChapterFeedItem extends HookConsumerWidget {
         shape: BoxShape.rectangle,
         borderRadius: const BorderRadius.all(Radius.circular(4.0)),
         width: screenSizeSmall ? 64.0 : 128.0,
+        height: screenSizeSmall ? 91.0 : 182.0,
       ),
     );
 
     return Card(
-      margin: const EdgeInsets.all(6),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: screenSizeSmall
