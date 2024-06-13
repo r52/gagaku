@@ -26,74 +26,42 @@ enum LibrarySort {
 
 final librarySortTypeProvider = StateProvider((ref) => LibrarySort.name_desc);
 
+int? _standardLocalLibraryItemComp(LocalLibraryItem a, LocalLibraryItem b) {
+  if (a.type == b.type && a.path == b.path) {
+    return 0;
+  }
+
+  if (!a.isReadable && b.isReadable) {
+    return -1;
+  }
+
+  if (a.isReadable && !b.isReadable) {
+    return 1;
+  }
+
+  return null;
+}
+
 Map<LibrarySort, LibraryItemCompare> _libraryCompare = {
   LibrarySort.name_desc: (LocalLibraryItem a, LocalLibraryItem b) {
-    if (!a.isReadable && b.isReadable) {
-      return -1;
-    }
-
-    if (a.isReadable && !b.isReadable) {
-      return 1;
-    }
-
-    return compareNatural(a.name?.toLowerCase() ?? a.path.toLowerCase(),
-        b.name?.toLowerCase() ?? b.path.toLowerCase());
+    return _standardLocalLibraryItemComp(a, b) ??
+        compareNatural(a.name?.toLowerCase() ?? a.path.toLowerCase(),
+            b.name?.toLowerCase() ?? b.path.toLowerCase());
   },
   LibrarySort.name_asc: (LocalLibraryItem a, LocalLibraryItem b) {
-    if (!a.isReadable && b.isReadable) {
-      return -1;
-    }
-
-    if (a.isReadable && !b.isReadable) {
-      return 1;
-    }
-
-    return compareNatural(b.name?.toLowerCase() ?? b.path.toLowerCase(),
-        a.name?.toLowerCase() ?? a.path.toLowerCase());
+    return _standardLocalLibraryItemComp(a, b) ??
+        compareNatural(b.name?.toLowerCase() ?? b.path.toLowerCase(),
+            a.name?.toLowerCase() ?? a.path.toLowerCase());
   },
   LibrarySort.modified_desc: (LocalLibraryItem a, LocalLibraryItem b) {
-    if (!a.isReadable && b.isReadable) {
-      return -1;
-    }
-
-    if (a.isReadable && !b.isReadable) {
-      return 1;
-    }
-
-    return a.modified.compareTo(b.modified);
+    return _standardLocalLibraryItemComp(a, b) ??
+        a.modified.compareTo(b.modified);
   },
   LibrarySort.modified_asc: (LocalLibraryItem a, LocalLibraryItem b) {
-    if (!a.isReadable && b.isReadable) {
-      return -1;
-    }
-
-    if (a.isReadable && !b.isReadable) {
-      return 1;
-    }
-
-    return b.modified.compareTo(a.modified);
+    return _standardLocalLibraryItemComp(a, b) ??
+        b.modified.compareTo(a.modified);
   },
 };
-
-LocalLibraryItem? libraryItemBinarySearch(List<LocalLibraryItem> list, int low,
-    int high, LocalLibraryItem item, LibrarySort sort) {
-  if (low > high) {
-    return null;
-  }
-
-  int middle = (low + high) >> 1;
-
-  final mid = list.elementAt(middle);
-  if (mid.type == item.type && mid.path == item.path) {
-    return mid;
-  }
-
-  if (_libraryCompare[sort]!(item, mid) > 0) {
-    return libraryItemBinarySearch(list, middle + 1, high, item, sort);
-  }
-
-  return libraryItemBinarySearch(list, low, middle - 1, item, sort);
-}
 
 LocalLibraryItem? findLibraryItem(
     LocalLibraryItem old, LocalLibraryItem curr, LibrarySort sort) {
@@ -107,11 +75,10 @@ LocalLibraryItem? findLibraryItem(
       .toList();
 
   if (children.isNotEmpty) {
-    final result =
-        libraryItemBinarySearch(children, 0, children.length - 1, old, sort);
+    final result = children.binarySearch(old, _libraryCompare[sort]!);
 
-    if (result != null) {
-      return result;
+    if (result > -1) {
+      return children[result];
     }
 
     for (final e in children) {
