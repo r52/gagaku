@@ -90,9 +90,9 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
             file.name.endsWith(".jpeg") ||
             (info.formats.avif && file.name.endsWith(".avif")))) {
       pages.add(ReaderPage(
-          provider: MemoryImage(file.content as Uint8List),
-          sortKey: file.name));
-      await file.close();
+        provider: MemoryImage(file.content as Uint8List),
+        sortKey: file.name,
+      ));
     }
   }
 
