@@ -11,6 +11,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/legacy.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
 
 import 'types.dart';
 
@@ -1156,7 +1157,7 @@ class MangaStatisticsRow extends ConsumerWidget {
       runSpacing: 4.0,
       children: [
         ...switch (statsProvider) {
-          MangaStatistics(:final rating, :final follows) => [
+          MangaStatistics(:final rating, :final follows, :final comments) => [
               IconTextChip(
                 icon: const Icon(
                   Icons.star_border,
@@ -1187,6 +1188,26 @@ class MangaStatisticsRow extends ConsumerWidget {
                   size: 18,
                 ),
                 text: follows.toString(),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              IconTextChip(
+                icon: const Icon(
+                  Icons.comment,
+                  size: 18,
+                ),
+                text: comments != null ? '${comments.repliesCount}' : 'N/A',
+                onPressed: comments != null
+                    ? () async {
+                        final url =
+                            'https://forums.mangadex.org/threads/${comments.threadId}';
+
+                        if (!await launchUrl(Uri.parse(url))) {
+                          throw 'Could not launch $url';
+                        }
+                      }
+                    : null,
               ),
             ],
           _ => [
