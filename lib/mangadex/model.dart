@@ -2623,18 +2623,26 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
 }
 
 class RateLimitedClient extends http.BaseClient {
-  final http.Client baseClient = http.Client();
-  final userAgent = PackageInfo.fromPlatform()
+  final http.Client _baseClient = http.Client();
+  final _userAgent = PackageInfo.fromPlatform()
       .then((info) => '${info.appName}/${info.version}');
-  final _mutex = Mutex();
+
+  static const _rateLimit = Duration(milliseconds: 200); // 5 per second
+  final _pendingCalls = <int>[];
 
   RateLimitedClient();
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    return await _mutex.protect(() async {
-      request.headers[HttpHeaders.userAgentHeader] = await userAgent;
-      return baseClient.send(request);
+    final numPending = _pendingCalls.length;
+    _pendingCalls.add(request.hashCode);
+
+    final wait = _rateLimit * numPending;
+    await Future.delayed(wait);
+
+    request.headers[HttpHeaders.userAgentHeader] = await _userAgent;
+    return _baseClient.send(request).whenComplete(() {
+      _pendingCalls.remove(request.hashCode);
     });
   }
 }

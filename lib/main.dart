@@ -42,7 +42,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 class _HttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..maxConnectionsPerHost = 4;
+    return super.createHttpClient(context)..maxConnectionsPerHost = 5;
   }
 }
 
