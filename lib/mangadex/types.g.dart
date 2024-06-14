@@ -575,6 +575,21 @@ Map<String, dynamic> _$$MangaStatisticsResponseImplToJson(
       'statistics': instance.statistics,
     };
 
+_$ChapterStatisticsResponseImpl _$$ChapterStatisticsResponseImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ChapterStatisticsResponseImpl(
+      (json['statistics'] as Map<String, dynamic>).map(
+        (k, e) =>
+            MapEntry(k, ChapterStatistics.fromJson(e as Map<String, dynamic>)),
+      ),
+    );
+
+Map<String, dynamic> _$$ChapterStatisticsResponseImplToJson(
+        _$ChapterStatisticsResponseImpl instance) =>
+    <String, dynamic>{
+      'statistics': instance.statistics,
+    };
+
 _$MangaStatisticsImpl _$$MangaStatisticsImplFromJson(
         Map<String, dynamic> json) =>
     _$MangaStatisticsImpl(
@@ -593,6 +608,21 @@ Map<String, dynamic> _$$MangaStatisticsImplToJson(
       'comments': instance.comments,
       'rating': instance.rating,
       'follows': instance.follows,
+    };
+
+_$ChapterStatisticsImpl _$$ChapterStatisticsImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ChapterStatisticsImpl(
+      comments: json['comments'] == null
+          ? null
+          : StatisticsDetailsComments.fromJson(
+              json['comments'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$ChapterStatisticsImplToJson(
+        _$ChapterStatisticsImpl instance) =>
+    <String, dynamic>{
+      'comments': instance.comments,
     };
 
 _$StatisticsDetailsCommentsImpl _$$StatisticsDetailsCommentsImplFromJson(

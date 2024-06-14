@@ -76,6 +76,9 @@ abstract class MangaDexEndpoints {
   /// Gets statistics for given manga
   static const statistics = '/statistics/manga';
 
+  /// Gets statistics for given chapter
+  static const chapterStats = '/statistics/chapter';
+
   /// Gets self-ratings for given mangas
   static const getRating = '/rating';
 
@@ -973,6 +976,36 @@ class MangaDexModel {
     return {};
   }
 
+  /// Fetches statistics of given [chapters]
+  ///
+  /// Do not use directly. Prefer [chapterStatsProvider] for its caching and
+  /// state management.
+  Future<Map<String, ChapterStatistics>> fetchChapterStats(
+      Iterable<Chapter> chapters) async {
+    final fetch = chapters.map((e) => e.id);
+
+    if (fetch.isNotEmpty) {
+      final queryParams = {'chapter[]': fetch.toList()};
+
+      final uri = MangaDexEndpoints.api.replace(
+          path: MangaDexEndpoints.chapterStats, queryParameters: queryParams);
+
+      final response = await _client.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+        final resp = ChapterStatisticsResponse.fromJson(body);
+
+        return resp.statistics;
+      } else {
+        // Throw if failure
+        throw createException("fetchChapterStats() failed.", response);
+      }
+    }
+
+    return {};
+  }
+
   /// Retrieve cover art for a specific manga
   Future<Iterable<CoverArt>> getCoverList(
     Manga manga, {
@@ -1583,6 +1616,8 @@ class LatestChaptersFeed extends _$LatestChaptersFeed
       offset: offset,
     );
 
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
+
     return chapters.toList();
   }
 
@@ -1622,6 +1657,8 @@ class LatestGlobalFeed extends _$LatestGlobalFeed
       offset: offset,
     );
 
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
+
     return chapters.toList();
   }
 
@@ -1660,6 +1697,8 @@ class GroupFeed extends _$GroupFeed
       offset: offset,
       entity: group,
     );
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
 
     disposeAfter(const Duration(minutes: 5));
 
@@ -1767,6 +1806,8 @@ class MangaChapters extends _$MangaChapters
       orderKey: 'chapter',
       order: sort.order,
     );
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
 
     disposeAfter(const Duration(minutes: 5));
 
@@ -2172,6 +2213,8 @@ class CustomListFeed extends _$CustomListFeed
       entity: list,
     );
 
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
+
     disposeAfter(const Duration(minutes: 5));
 
     return chapters.toList();
@@ -2308,6 +2351,43 @@ class Statistics extends _$Statistics {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
+      final map = await _fetchStatistics(mg);
+      return {...oldstate, ...map};
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ChapterStats extends _$ChapterStats {
+  Future<Map<String, ChapterStatistics>> _fetchStatistics(
+      Iterable<Chapter> chapters) async {
+    if (chapters.isEmpty) {
+      return {};
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchChapterStats(chapters);
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, ChapterStatistics>> build() async {
+    return {};
+  }
+
+  /// Fetch statistics for the provided list of mangas
+  Future<void> get(Iterable<Chapter> chapters) async {
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final mg = chapters.where((c) => !oldstate.containsKey(c.id));
 
       if (mg.isEmpty) {
         // No change
@@ -2495,6 +2575,8 @@ class MangaDexHistory extends _$MangaDexHistory {
     final uuids = List<String>.from(content);
 
     final chapters = await api.fetchChapters(uuids);
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
 
     return Queue.of(chapters);
   }

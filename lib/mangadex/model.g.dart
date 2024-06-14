@@ -119,7 +119,7 @@ final class LatestChaptersFeedProvider
 }
 
 String _$latestChaptersFeedHash() =>
-    r'd38153bb3ac3cd3c011056adf6dee2c048631c51';
+    r'caa79e27227730166609d8902b84c77313fc138c';
 
 abstract class _$LatestChaptersFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
@@ -180,7 +180,7 @@ final class LatestGlobalFeedProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$latestGlobalFeedHash() => r'd3b2e35e78f62e0419c73e5c778d9b9f2817f520';
+String _$latestGlobalFeedHash() => r'a2980ea27c687eb7d0bbc45526f2626d4d6ae2c0';
 
 abstract class _$LatestGlobalFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
@@ -265,7 +265,7 @@ final class GroupFeedProvider
   }
 }
 
-String _$groupFeedHash() => r'8977b28510c9fedc7852f90742f938a99fd95a5c';
+String _$groupFeedHash() => r'bff829162cb0bf702a6e2450c78ebee5e2fb0626';
 
 final class GroupFeedFamily extends Family {
   const GroupFeedFamily._()
@@ -724,7 +724,7 @@ final class MangaChaptersProvider
   }
 }
 
-String _$mangaChaptersHash() => r'7e0764096166884fe0543a6e3cd9ecf89fd466bd';
+String _$mangaChaptersHash() => r'9a56c0f61d9458ee2c5f89bfab50162386041b30';
 
 final class MangaChaptersFamily extends Family {
   const MangaChaptersFamily._()
@@ -1275,7 +1275,7 @@ final class CustomListFeedProvider
   }
 }
 
-String _$customListFeedHash() => r'45f85793ba871c10c88e71cf8bd6d33d4fc1f69a';
+String _$customListFeedHash() => r'1a9d4a376d8682dd783b29c779cdc8155d900e6a';
 
 final class CustomListFeedFamily extends Family {
   const CustomListFeedFamily._()
@@ -1933,6 +1933,68 @@ abstract class _$Statistics
   FutureOr<Map<String, MangaStatistics>> runBuild() => build();
 }
 
+@ProviderFor(ChapterStats)
+const chapterStatsProvider = ChapterStatsProvider._();
+
+final class ChapterStatsProvider extends $AsyncNotifierProvider<ChapterStats,
+    Map<String, ChapterStatistics>> {
+  const ChapterStatsProvider._(
+      {super.runNotifierBuildOverride, ChapterStats Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          name: r'chapterStatsProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final ChapterStats Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$chapterStatsHash();
+
+  @$internal
+  @override
+  ChapterStats create() => _createCb?.call() ?? ChapterStats();
+
+  @$internal
+  @override
+  ChapterStatsProvider $copyWithCreate(
+    ChapterStats Function() create,
+  ) {
+    return ChapterStatsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  ChapterStatsProvider $copyWithBuild(
+    FutureOr<Map<String, ChapterStatistics>> Function(
+      Ref<AsyncValue<Map<String, ChapterStatistics>>>,
+      ChapterStats,
+    ) build,
+  ) {
+    return ChapterStatsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<ChapterStats, Map<String, ChapterStatistics>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$chapterStatsHash() => r'5feda95580c7bcd820271f414a9d27adeeff85fc';
+
+abstract class _$ChapterStats
+    extends $AsyncNotifier<Map<String, ChapterStatistics>> {
+  FutureOr<Map<String, ChapterStatistics>> build();
+  @$internal
+  @override
+  FutureOr<Map<String, ChapterStatistics>> runBuild() => build();
+}
+
 @ProviderFor(Ratings)
 const ratingsProvider = RatingsProvider._();
 
@@ -2354,7 +2416,7 @@ final class MangaDexHistoryProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$mangaDexHistoryHash() => r'721bf0e32dd60362d983be14996c01756687f48c';
+String _$mangaDexHistoryHash() => r'9247a4447ae06ae9da1a0b34220597f9a6c2119a';
 
 abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();

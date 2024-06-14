@@ -1245,6 +1245,8 @@ class _ReadingStatusDropdown extends ConsumerWidget {
       enableSearch: false,
       requestFocusOnTap: false,
       inputDecorationTheme: InputDecorationTheme(
+        isDense: true,
+        constraints: BoxConstraints.tight(const Size.fromHeight(36)),
         filled: true,
         fillColor: theme.colorScheme.surface.withAlpha(200),
         enabledBorder: UnderlineInputBorder(

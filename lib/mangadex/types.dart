@@ -791,6 +791,16 @@ class MangaStatisticsResponse with _$MangaStatisticsResponse {
 }
 
 @freezed
+class ChapterStatisticsResponse with _$ChapterStatisticsResponse {
+  const factory ChapterStatisticsResponse(
+    Map<String, ChapterStatistics> statistics,
+  ) = _ChapterStatisticsResponse;
+
+  factory ChapterStatisticsResponse.fromJson(Map<String, dynamic> json) =>
+      _$ChapterStatisticsResponseFromJson(json);
+}
+
+@freezed
 class MangaStatistics with _$MangaStatistics {
   const factory MangaStatistics({
     StatisticsDetailsComments? comments,
@@ -800,6 +810,16 @@ class MangaStatistics with _$MangaStatistics {
 
   factory MangaStatistics.fromJson(Map<String, dynamic> json) =>
       _$MangaStatisticsFromJson(json);
+}
+
+@freezed
+class ChapterStatistics with _$ChapterStatistics {
+  const factory ChapterStatistics({
+    StatisticsDetailsComments? comments,
+  }) = _ChapterStatistics;
+
+  factory ChapterStatistics.fromJson(Map<String, dynamic> json) =>
+      _$ChapterStatisticsFromJson(json);
 }
 
 @freezed

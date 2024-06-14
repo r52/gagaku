@@ -411,92 +411,109 @@ class ChapterButtonWidget extends HookWidget {
       );
     }
 
-    final vPadding =
-        EdgeInsets.symmetric(vertical: (screenSizeSmall ? 2.0 : 4.0));
+    final statsChip = Consumer(
+      builder: (context, ref, child) {
+        final stats = ref.watch(chapterStatsProvider.select(
+          (value) => switch (value) {
+            AsyncValue(value: final data?) when data.containsKey(chapter.id) =>
+              data[chapter.id],
+            _ => null,
+          },
+        ));
+
+        return IconTextChip(
+          icon: const Icon(
+            Icons.comment,
+            size: 18,
+          ),
+          text: (stats != null && stats.comments != null)
+              ? '${stats.comments?.repliesCount}'
+              : 'N/A',
+          onPressed: (stats != null && stats.comments != null)
+              ? () async {
+                  final url =
+                      'https://forums.mangadex.org/threads/${stats.comments!.threadId}';
+
+                  if (!await launchUrl(Uri.parse(url))) {
+                    throw 'Could not launch $url';
+                  }
+                }
+              : null,
+        );
+      },
+    );
 
     final tile = Padding(
-      padding: EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 6.0 : 10.0)),
+      padding: EdgeInsets.symmetric(
+          horizontal: (screenSizeSmall ? 6.0 : 10.0), vertical: 4.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Row(
-              children: [
-                MarkReadButton(
-                  key: ValueKey(chapter.id),
+          Row(
+            children: [
+              MarkReadButton(
+                key: ValueKey(chapter.id),
+                chapter: chapter,
+                manga: manga,
+              ),
+              CountryFlag(
+                flag: chapter.attributes.translatedLanguage.flag,
+                size: screenSizeSmall ? 15 : 18,
+              ),
+              _rowPadding,
+              if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
+              Expanded(
+                child: ChapterTitle(
                   chapter: chapter,
                   manga: manga,
                 ),
-                CountryFlag(
-                  flag: chapter.attributes.translatedLanguage.flag,
-                  size: screenSizeSmall ? 15 : 18,
-                ),
-                _rowPadding,
-                if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
-                Expanded(
-                  child: ChapterTitle(
-                    chapter: chapter,
-                    manga: manga,
-                  ),
-                ),
-                _rowPadding,
-                if (isEndChapter) _endChip,
-                if (!screenSizeSmall) const Spacer(),
-                if (!screenSizeSmall)
-                  Text.rich(
-                    overflow: TextOverflow.ellipsis,
-                    TextSpan(
-                      children: [
-                        WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: iconSet[_IconSet.schedule]!),
-                        TextSpan(text: ' $pubtime'),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: vPadding,
-            child: screenSizeSmall
-                ? Wrap(
-                    runSpacing: 2.0,
-                    crossAxisAlignment: WrapCrossAlignment.start,
-                    children: groupChips,
-                  )
-                : Row(
-                    children: [
-                      ...groupChips,
-                      const Spacer(),
-                      userChip,
-                    ],
-                  ),
-          ),
-          if (screenSizeSmall)
-            Padding(
-              padding: vPadding,
-              child: userChip,
-            ),
-          if (screenSizeSmall)
-            Padding(
-              padding: vPadding,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text.rich(
-                  overflow: TextOverflow.ellipsis,
-                  TextSpan(
-                    children: [
-                      WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: iconSet[_IconSet.schedule]!),
-                      TextSpan(text: ' $pubtime'),
-                    ],
-                  ),
+              ),
+              _rowPadding,
+              if (isEndChapter) _endChip,
+              const Spacer(),
+              Text.rich(
+                overflow: TextOverflow.ellipsis,
+                TextSpan(
+                  children: [
+                    WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: iconSet[_IconSet.schedule]!),
+                    TextSpan(text: ' $pubtime'),
+                  ],
                 ),
               ),
+            ],
+          ),
+          const SizedBox(
+            height: 4.0,
+          ),
+          screenSizeSmall
+              ? Wrap(
+                  runSpacing: 2.0,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  children: groupChips,
+                )
+              : Row(
+                  children: [
+                    ...groupChips,
+                    const Spacer(),
+                    userChip,
+                    if (!screenSizeSmall) _rowPadding,
+                    if (!screenSizeSmall) statsChip,
+                  ],
+                ),
+          if (screenSizeSmall) ...[
+            const SizedBox(
+              height: 4.0,
             ),
+            Row(
+              children: [
+                userChip,
+                const Spacer(),
+                statsChip,
+              ],
+            ),
+          ],
         ],
       ),
     );

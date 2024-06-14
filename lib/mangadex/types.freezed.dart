@@ -6429,6 +6429,170 @@ abstract class _MangaStatisticsResponse implements MangaStatisticsResponse {
       get copyWith => throw _privateConstructorUsedError;
 }
 
+ChapterStatisticsResponse _$ChapterStatisticsResponseFromJson(
+    Map<String, dynamic> json) {
+  return _ChapterStatisticsResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ChapterStatisticsResponse {
+  Map<String, ChapterStatistics> get statistics =>
+      throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ChapterStatisticsResponseCopyWith<ChapterStatisticsResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ChapterStatisticsResponseCopyWith<$Res> {
+  factory $ChapterStatisticsResponseCopyWith(ChapterStatisticsResponse value,
+          $Res Function(ChapterStatisticsResponse) then) =
+      _$ChapterStatisticsResponseCopyWithImpl<$Res, ChapterStatisticsResponse>;
+  @useResult
+  $Res call({Map<String, ChapterStatistics> statistics});
+}
+
+/// @nodoc
+class _$ChapterStatisticsResponseCopyWithImpl<$Res,
+        $Val extends ChapterStatisticsResponse>
+    implements $ChapterStatisticsResponseCopyWith<$Res> {
+  _$ChapterStatisticsResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? statistics = null,
+  }) {
+    return _then(_value.copyWith(
+      statistics: null == statistics
+          ? _value.statistics
+          : statistics // ignore: cast_nullable_to_non_nullable
+              as Map<String, ChapterStatistics>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ChapterStatisticsResponseImplCopyWith<$Res>
+    implements $ChapterStatisticsResponseCopyWith<$Res> {
+  factory _$$ChapterStatisticsResponseImplCopyWith(
+          _$ChapterStatisticsResponseImpl value,
+          $Res Function(_$ChapterStatisticsResponseImpl) then) =
+      __$$ChapterStatisticsResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({Map<String, ChapterStatistics> statistics});
+}
+
+/// @nodoc
+class __$$ChapterStatisticsResponseImplCopyWithImpl<$Res>
+    extends _$ChapterStatisticsResponseCopyWithImpl<$Res,
+        _$ChapterStatisticsResponseImpl>
+    implements _$$ChapterStatisticsResponseImplCopyWith<$Res> {
+  __$$ChapterStatisticsResponseImplCopyWithImpl(
+      _$ChapterStatisticsResponseImpl _value,
+      $Res Function(_$ChapterStatisticsResponseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? statistics = null,
+  }) {
+    return _then(_$ChapterStatisticsResponseImpl(
+      null == statistics
+          ? _value._statistics
+          : statistics // ignore: cast_nullable_to_non_nullable
+              as Map<String, ChapterStatistics>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ChapterStatisticsResponseImpl
+    with DiagnosticableTreeMixin
+    implements _ChapterStatisticsResponse {
+  const _$ChapterStatisticsResponseImpl(
+      final Map<String, ChapterStatistics> statistics)
+      : _statistics = statistics;
+
+  factory _$ChapterStatisticsResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterStatisticsResponseImplFromJson(json);
+
+  final Map<String, ChapterStatistics> _statistics;
+  @override
+  Map<String, ChapterStatistics> get statistics {
+    if (_statistics is EqualUnmodifiableMapView) return _statistics;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_statistics);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ChapterStatisticsResponse(statistics: $statistics)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ChapterStatisticsResponse'))
+      ..add(DiagnosticsProperty('statistics', statistics));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChapterStatisticsResponseImpl &&
+            const DeepCollectionEquality()
+                .equals(other._statistics, _statistics));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_statistics));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChapterStatisticsResponseImplCopyWith<_$ChapterStatisticsResponseImpl>
+      get copyWith => __$$ChapterStatisticsResponseImplCopyWithImpl<
+          _$ChapterStatisticsResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ChapterStatisticsResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ChapterStatisticsResponse implements ChapterStatisticsResponse {
+  const factory _ChapterStatisticsResponse(
+          final Map<String, ChapterStatistics> statistics) =
+      _$ChapterStatisticsResponseImpl;
+
+  factory _ChapterStatisticsResponse.fromJson(Map<String, dynamic> json) =
+      _$ChapterStatisticsResponseImpl.fromJson;
+
+  @override
+  Map<String, ChapterStatistics> get statistics;
+  @override
+  @JsonKey(ignore: true)
+  _$$ChapterStatisticsResponseImplCopyWith<_$ChapterStatisticsResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
 MangaStatistics _$MangaStatisticsFromJson(Map<String, dynamic> json) {
   return _MangaStatistics.fromJson(json);
 }
@@ -6646,6 +6810,172 @@ abstract class _MangaStatistics implements MangaStatistics {
   @override
   @JsonKey(ignore: true)
   _$$MangaStatisticsImplCopyWith<_$MangaStatisticsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ChapterStatistics _$ChapterStatisticsFromJson(Map<String, dynamic> json) {
+  return _ChapterStatistics.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ChapterStatistics {
+  StatisticsDetailsComments? get comments => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ChapterStatisticsCopyWith<ChapterStatistics> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ChapterStatisticsCopyWith<$Res> {
+  factory $ChapterStatisticsCopyWith(
+          ChapterStatistics value, $Res Function(ChapterStatistics) then) =
+      _$ChapterStatisticsCopyWithImpl<$Res, ChapterStatistics>;
+  @useResult
+  $Res call({StatisticsDetailsComments? comments});
+
+  $StatisticsDetailsCommentsCopyWith<$Res>? get comments;
+}
+
+/// @nodoc
+class _$ChapterStatisticsCopyWithImpl<$Res, $Val extends ChapterStatistics>
+    implements $ChapterStatisticsCopyWith<$Res> {
+  _$ChapterStatisticsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? comments = freezed,
+  }) {
+    return _then(_value.copyWith(
+      comments: freezed == comments
+          ? _value.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as StatisticsDetailsComments?,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $StatisticsDetailsCommentsCopyWith<$Res>? get comments {
+    if (_value.comments == null) {
+      return null;
+    }
+
+    return $StatisticsDetailsCommentsCopyWith<$Res>(_value.comments!, (value) {
+      return _then(_value.copyWith(comments: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$ChapterStatisticsImplCopyWith<$Res>
+    implements $ChapterStatisticsCopyWith<$Res> {
+  factory _$$ChapterStatisticsImplCopyWith(_$ChapterStatisticsImpl value,
+          $Res Function(_$ChapterStatisticsImpl) then) =
+      __$$ChapterStatisticsImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({StatisticsDetailsComments? comments});
+
+  @override
+  $StatisticsDetailsCommentsCopyWith<$Res>? get comments;
+}
+
+/// @nodoc
+class __$$ChapterStatisticsImplCopyWithImpl<$Res>
+    extends _$ChapterStatisticsCopyWithImpl<$Res, _$ChapterStatisticsImpl>
+    implements _$$ChapterStatisticsImplCopyWith<$Res> {
+  __$$ChapterStatisticsImplCopyWithImpl(_$ChapterStatisticsImpl _value,
+      $Res Function(_$ChapterStatisticsImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? comments = freezed,
+  }) {
+    return _then(_$ChapterStatisticsImpl(
+      comments: freezed == comments
+          ? _value.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as StatisticsDetailsComments?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ChapterStatisticsImpl
+    with DiagnosticableTreeMixin
+    implements _ChapterStatistics {
+  const _$ChapterStatisticsImpl({this.comments});
+
+  factory _$ChapterStatisticsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterStatisticsImplFromJson(json);
+
+  @override
+  final StatisticsDetailsComments? comments;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ChapterStatistics(comments: $comments)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ChapterStatistics'))
+      ..add(DiagnosticsProperty('comments', comments));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChapterStatisticsImpl &&
+            (identical(other.comments, comments) ||
+                other.comments == comments));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, comments);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChapterStatisticsImplCopyWith<_$ChapterStatisticsImpl> get copyWith =>
+      __$$ChapterStatisticsImplCopyWithImpl<_$ChapterStatisticsImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ChapterStatisticsImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ChapterStatistics implements ChapterStatistics {
+  const factory _ChapterStatistics(
+      {final StatisticsDetailsComments? comments}) = _$ChapterStatisticsImpl;
+
+  factory _ChapterStatistics.fromJson(Map<String, dynamic> json) =
+      _$ChapterStatisticsImpl.fromJson;
+
+  @override
+  StatisticsDetailsComments? get comments;
+  @override
+  @JsonKey(ignore: true)
+  _$$ChapterStatisticsImplCopyWith<_$ChapterStatisticsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

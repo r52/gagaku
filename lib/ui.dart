@@ -146,10 +146,13 @@ class IconTextChip extends StatelessWidget {
       );
     }
 
-    return Material(
-      borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-      color: color ?? theme.colorScheme.tertiaryContainer,
-      child: child,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 24.0),
+      child: Material(
+        borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+        color: color ?? theme.colorScheme.tertiaryContainer,
+        child: child,
+      ),
     );
   }
 }
