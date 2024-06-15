@@ -1777,7 +1777,6 @@ class CreatorTitles extends _$CreatorTitles with ListBasedInfiniteScrollMix {
   Future<void> clear() async {
     offset = 0;
     atEnd = false;
-    ref.invalidateSelf();
   }
 }
 
@@ -1826,7 +1825,6 @@ class MangaChapters extends _$MangaChapters
     await api.invalidateAll('$feedKey(${manga.id}');
     offset = 0;
     atEnd = false;
-    ref.invalidateSelf();
   }
 }
 
@@ -1859,7 +1857,6 @@ class MangaCovers extends _$MangaCovers
     await api.invalidateAll('CoverList(${manga.id}');
     offset = 0;
     atEnd = false;
-    ref.invalidateSelf();
   }
 }
 
@@ -2125,7 +2122,6 @@ class UserLists extends _$UserLists
   Future<void> clear() async {
     offset = 0;
     atEnd = false;
-    ref.invalidateSelf();
   }
 }
 
@@ -2189,7 +2185,6 @@ class FollowedLists extends _$FollowedLists
   Future<void> clear() async {
     offset = 0;
     atEnd = false;
-    ref.invalidateSelf();
   }
 }
 

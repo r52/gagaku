@@ -186,9 +186,9 @@ class WebMangaViewWidget extends StatelessWidget {
             ),
           ),
         ),
-        if (manga.description.isNotEmpty)
-          SliverToBoxAdapter(
-            child: ExpansionTile(
+        SliverList.list(children: [
+          if (manga.description.isNotEmpty)
+            ExpansionTile(
               expandedCrossAxisAlignment: CrossAxisAlignment.start,
               title: const Text('Synopsis'),
               children: [
@@ -209,9 +209,7 @@ class WebMangaViewWidget extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        SliverToBoxAdapter(
-          child: ExpansionTile(
+          ExpansionTile(
             title: const Text('Info'),
             children: [
               MultiChildExpansionTile(
@@ -250,16 +248,14 @@ class WebMangaViewWidget extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        SliverToBoxAdapter(
-          child: Container(
+          Container(
             padding: const EdgeInsets.all(8),
             child: const Text(
               'Chapters',
               style: TextStyle(fontSize: 24),
             ),
           ),
-        ),
+        ]),
         SliverList.separated(
           findChildIndexCallback: (key) {
             final valueKey = key as ValueKey<int>;

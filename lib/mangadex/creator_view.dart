@@ -136,9 +136,9 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                             child: TitleFlexBar(title: creator.attributes.name),
                           ),
                         ),
-                        if (creator.attributes.biography.isNotEmpty)
-                          SliverToBoxAdapter(
-                            child: ExpansionTile(
+                        SliverList.list(children: [
+                          if (creator.attributes.biography.isNotEmpty)
+                            ExpansionTile(
                               title: const Text('Biography'),
                               children: [
                                 for (final MapEntry(key: prop, value: desc)
@@ -167,13 +167,11 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                   )
                               ],
                             ),
-                          ),
-                        if (creator.attributes.twitter != null ||
-                            creator.attributes.pixiv != null ||
-                            creator.attributes.youtube != null ||
-                            creator.attributes.website != null)
-                          SliverToBoxAdapter(
-                            child: ExpansionTile(
+                          if (creator.attributes.twitter != null ||
+                              creator.attributes.pixiv != null ||
+                              creator.attributes.youtube != null ||
+                              creator.attributes.website != null)
+                            ExpansionTile(
                               expandedAlignment: Alignment.centerLeft,
                               title: const Text('Follow'),
                               children: [
@@ -204,7 +202,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                 ),
                               ],
                             ),
-                          ),
+                        ]),
                       ],
                       title: const Text(
                         'Works',

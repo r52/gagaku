@@ -571,7 +571,7 @@ final class CreatorTitlesProvider
   }
 }
 
-String _$creatorTitlesHash() => r'8df6f7b9cba76dcf99c5903ec9fedac849f399fc';
+String _$creatorTitlesHash() => r'1f1e50d06abe63f8af040675627d6f02d71c588c';
 
 final class CreatorTitlesFamily extends Family {
   const CreatorTitlesFamily._()
@@ -724,7 +724,7 @@ final class MangaChaptersProvider
   }
 }
 
-String _$mangaChaptersHash() => r'9a56c0f61d9458ee2c5f89bfab50162386041b30';
+String _$mangaChaptersHash() => r'7c998a5b1496d97e1de4086dead388d90338f649';
 
 final class MangaChaptersFamily extends Family {
   const MangaChaptersFamily._()
@@ -877,7 +877,7 @@ final class MangaCoversProvider
   }
 }
 
-String _$mangaCoversHash() => r'52d13fe80d7209c99ed2e6ca78224ea8b630a4b3';
+String _$mangaCoversHash() => r'cf841ca39bf9272b4ce4c45d68fdb83cfcf8c56c';
 
 final class MangaCoversFamily extends Family {
   const MangaCoversFamily._()
@@ -1129,7 +1129,7 @@ final class UserListsProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$userListsHash() => r'456b291e1ba901add7efe3ac58fc7becaf3de6c7';
+String _$userListsHash() => r'905a900594b91b998953be64e3978287932d413b';
 
 abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
   FutureOr<List<CustomList>> build();
@@ -1190,7 +1190,7 @@ final class FollowedListsProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$followedListsHash() => r'401eb505cfaa360f2a2b78d2ed0a7456d717a55f';
+String _$followedListsHash() => r'1065619118b8e74f6214367c8db1a64e747c3207';
 
 abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
   FutureOr<List<CustomList>> build();

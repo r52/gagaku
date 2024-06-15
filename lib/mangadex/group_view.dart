@@ -165,9 +165,9 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
           controller: controllers[0],
           scrollBehavior: const MouseTouchScrollBehavior(),
           slivers: <Widget>[
-            if (group.attributes.description != null)
-              SliverToBoxAdapter(
-                child: ExpansionTile(
+            SliverList.list(children: [
+              if (group.attributes.description != null)
+                ExpansionTile(
                   initiallyExpanded: true,
                   title: const Text('Group Description'),
                   children: [
@@ -179,11 +179,9 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                     ),
                   ],
                 ),
-              ),
-            if (group.attributes.website != null ||
-                group.attributes.discord != null)
-              SliverToBoxAdapter(
-                child: ExpansionTile(
+              if (group.attributes.website != null ||
+                  group.attributes.discord != null)
+                ExpansionTile(
                   initiallyExpanded: true,
                   expandedAlignment: Alignment.centerLeft,
                   title: const Text('Links'),
@@ -220,7 +218,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                     ),
                   ],
                 ),
-              ),
+            ]),
           ],
         ),
       _ViewType.feed => Consumer(
