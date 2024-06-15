@@ -386,11 +386,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
               ),
               SliverList.list(
                 children: [
-                  Container(
+                  Padding(
                     padding: const EdgeInsets.all(8),
                     child: MangaGenreRow(manga: manga),
                   ),
-                  Container(
+                  Padding(
                     padding: const EdgeInsets.all(8),
                     child: MangaStatisticsRow(
                       manga: manga,
@@ -493,7 +493,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ExpansionTile(
                           title: const Text('Demograhic'),
                           children: [
-                            Container(
+                            Padding(
                               padding: const EdgeInsets.all(8),
                               child: Align(
                                 alignment: Alignment.centerLeft,
@@ -596,7 +596,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ExpansionTile(
                           title: const Text('Final Volume/Chapter'),
                           children: [
-                            Container(
+                            Padding(
                               padding: const EdgeInsets.all(8),
                               child: Align(
                                 alignment: Alignment.centerLeft,
@@ -607,7 +607,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                     ],
                   ),
-                  Container(
+                  Padding(
                     padding: const EdgeInsets.all(8),
                     child: ToggleButtons(
                       isSelected: List<bool>.generate(
@@ -633,7 +633,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     ),
                   ),
                   if (view.value == _ViewType.chapters && loggedin)
-                    Container(
+                    Padding(
                       padding: const EdgeInsets.all(8),
                       child: Row(
                         children: [
@@ -827,8 +827,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                   appBar: AppBar(
                                                     backgroundColor:
                                                         Colors.transparent,
-                                                    leading:
-                                                        const CloseButton(),
+                                                    leading: CloseButton(
+                                                      style:
+                                                          IconButton.styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.black),
+                                                    ),
                                                   ),
                                                   backgroundColor:
                                                       Colors.transparent,
@@ -873,7 +877,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                         key: ValueKey(cover.id),
                                                         padding:
                                                             const EdgeInsets
-                                                                .all(5.0),
+                                                                .all(10.0),
                                                         color:
                                                             Colors.transparent,
                                                         child: GestureDetector(

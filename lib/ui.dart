@@ -32,7 +32,7 @@ class MultiChildExpansionTile extends StatelessWidget {
       expandedAlignment: Alignment.centerLeft,
       title: Text(title),
       children: [
-        Container(
+        Padding(
           padding: const EdgeInsets.all(8),
           child: Wrap(
             spacing: 4.0,
@@ -279,7 +279,7 @@ class SettingCardWidget extends StatelessWidget {
         title: title,
         subtitle: subtitle,
         children: [
-          Container(
+          ColoredBox(
             color: Theme.of(context).cardColor,
             child: Center(
               child: builder(context),
@@ -336,11 +336,8 @@ class TitleFlexBar extends StatelessWidget {
           ],
         ),
       ),
-      background: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
-        ),
-      ),
+      background:
+          ColoredBox(color: Theme.of(context).colorScheme.primaryContainer),
     );
   }
 }

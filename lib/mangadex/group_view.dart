@@ -186,7 +186,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                   expandedAlignment: Alignment.centerLeft,
                   title: const Text('Links'),
                   children: [
-                    Container(
+                    Padding(
                       padding: const EdgeInsets.all(8),
                       child: Wrap(
                         spacing: 4.0,

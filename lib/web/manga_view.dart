@@ -248,9 +248,9 @@ class WebMangaViewWidget extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.all(8),
+            child: Text(
               'Chapters',
               style: TextStyle(fontSize: 24),
             ),
