@@ -367,7 +367,10 @@ class ChapterButtonWidget extends HookWidget {
         chapter.attributes.chapter == manga.attributes!.lastChapter;
     final isOfficialPub = chapter.attributes.externalUrl != null;
 
-    final pubtime = timeago.format(chapter.attributes.publishAt);
+    final pubtime = timeago.format(
+      chapter.attributes.publishAt,
+      locale: screenSizeSmall ? 'en_short' : 'en',
+    );
 
     final groupChips = useMemoized(() {
       final chips = <Widget>[];
@@ -463,14 +466,18 @@ class ChapterButtonWidget extends HookWidget {
               _rowPadding,
               if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
               Expanded(
-                child: ChapterTitle(
-                  chapter: chapter,
-                  manga: manga,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: ChapterTitle(
+                        chapter: chapter,
+                        manga: manga,
+                      ),
+                    ),
+                    if (isEndChapter) ...[_rowPadding, _endChip, _rowPadding],
+                  ],
                 ),
               ),
-              _rowPadding,
-              if (isEndChapter) _endChip,
-              const Spacer(),
               Text.rich(
                 overflow: TextOverflow.ellipsis,
                 TextSpan(
