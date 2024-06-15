@@ -806,7 +806,7 @@ class ReaderWidget extends HookConsumerWidget {
   }
 }
 
-class ProgressIndicator extends AnimatedWidget {
+class ProgressIndicator extends HookWidget {
   const ProgressIndicator({
     super.key,
     required this.currentPage,
@@ -814,7 +814,7 @@ class ProgressIndicator extends AnimatedWidget {
     required this.onPageSelected,
     required this.reverse,
     this.color = Colors.white,
-  }) : super(listenable: currentPage);
+  });
 
   final ValueNotifier<int> currentPage;
   final int itemCount;
@@ -824,58 +824,56 @@ class ProgressIndicator extends AnimatedWidget {
 
   static const double _barHeight = 8.0;
 
-  Widget _buildSection(int index) {
-    var secColor = Colors.transparent;
-
-    if (index == 0) {
-      secColor = color;
-    } else {
-      secColor = (currentPage.value >= index ? color : Colors.transparent);
-    }
-
-    return _ProgressBarSection(
-      color: secColor,
-      height: _barHeight,
-      tooltip: (index + 1).toString(),
-      onTap: () => onPageSelected(index),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final sections = List<Widget>.generate(itemCount, _buildSection);
+    final sections = useMemoized(() {
+      return List<Widget>.generate(itemCount, (index) {
+        return _ProgressBarSection(
+          index: index,
+          currentPage: currentPage,
+          color: color,
+          height: _barHeight,
+          tooltip: (index + 1).toString(),
+          onTap: () => onPageSelected(index),
+        );
+      });
+    });
 
-    return Container(
-      padding: EdgeInsets.zero,
-      margin: EdgeInsets.zero,
-      height: 30.0,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-          stops: [0.0, 0.6],
-          colors: [
-            Color.fromARGB(255, 0, 0, 0),
-            Colors.transparent,
-          ],
+    return ConstrainedBox(
+      constraints: BoxConstraints.loose(const Size.fromHeight(30)),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            stops: [0.0, 0.6],
+            colors: [
+              Color.fromARGB(255, 0, 0, 0),
+              Colors.transparent,
+            ],
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: reverse ? sections.reversed.toList() : sections,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: reverse ? sections.reversed.toList() : sections,
+        ),
       ),
     );
   }
 }
 
-class _ProgressBarSection extends StatelessWidget {
+class _ProgressBarSection extends HookWidget {
   const _ProgressBarSection({
+    required this.index,
+    required this.currentPage,
     required this.color,
     required this.height,
     required this.tooltip,
     required this.onTap,
   });
 
+  final int index;
+  final ValueNotifier<int> currentPage;
   final Color color;
   final double height;
   final String tooltip;
@@ -883,19 +881,17 @@ class _ProgressBarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final page = useValueListenable(currentPage);
+
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.zero,
-        margin: EdgeInsets.zero,
-        color: Colors.transparent,
+      child: Align(
         alignment: Alignment.bottomCenter,
-        child: Material(
-          color: color,
-          type: MaterialType.canvas,
+        child: Tooltip(
+          message: tooltip,
           child: SizedBox(
             height: height,
-            child: Tooltip(
-              message: tooltip,
+            child: Material(
+              color: (index == 0 || page >= index) ? color : Colors.transparent,
               child: InkWell(
                 onTap: onTap,
               ),
