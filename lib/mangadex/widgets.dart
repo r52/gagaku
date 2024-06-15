@@ -400,19 +400,10 @@ class ChapterButtonWidget extends HookWidget {
       return chips;
     }, [chapter, iconSet, screenSizeSmall]);
 
-    Widget userChip;
-
-    if (isOfficialPub) {
-      userChip = IconTextChip(
-        icon: iconSet[_IconSet.check],
-        text: 'Official Publisher',
-      );
-    } else {
-      userChip = IconTextChip(
-        icon: iconSet[_IconSet.person],
-        text: chapter.uploadUser.crop(),
-      );
-    }
+    final userChip = IconTextChip(
+      icon: !isOfficialPub ? iconSet[_IconSet.person] : iconSet[_IconSet.check],
+      text: !isOfficialPub ? chapter.uploadUser.crop() : 'Official Publisher',
+    );
 
     final statsChip = Consumer(
       builder: (context, ref, child) {
@@ -492,7 +483,7 @@ class ChapterButtonWidget extends HookWidget {
             ],
           ),
           const SizedBox(
-            height: 4.0,
+            height: 2.0,
           ),
           screenSizeSmall
               ? Wrap(
