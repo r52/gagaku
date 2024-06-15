@@ -29,29 +29,6 @@ class MangaDexHome extends HookConsumerWidget {
       return null;
     }, [lifecycle]);
 
-    const bottomNavigationBarItems = <Widget>[
-      NavigationDestination(
-        icon: Icon(Icons.home),
-        label: 'Latest',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.menu_book),
-        label: 'My Feed',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.collections),
-        label: 'Library',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.list),
-        label: 'My Lists',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.history),
-        label: 'History',
-      )
-    ];
-
     final index = _calculateSelectedIndex(context);
 
     return Scaffold(
@@ -152,7 +129,28 @@ class MangaDexHome extends HookConsumerWidget {
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: bottomNavigationBarItems,
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home),
+            label: 'Latest',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.menu_book),
+            label: 'My Feed',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.collections),
+            label: 'Library',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.list),
+            label: 'My Lists',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.history),
+            label: 'History',
+          )
+        ],
         selectedIndex: index,
         onDestinationSelected: (index) {
           final currTab = _calculateSelectedIndex(context);

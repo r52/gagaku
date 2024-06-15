@@ -143,16 +143,16 @@ class ChapterFeedWidget extends HookConsumerWidget {
     final resultProvider = ref.watch(provider);
     final isLoading = resultProvider.isLoading && !resultProvider.isRefreshing;
 
-    useEffect(() {
-      void controllerAtEdge() {
-        if (onAtEdge != null &&
-            scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
-          onAtEdge!();
-        }
+    void controllerAtEdge() {
+      if (onAtEdge != null &&
+          scrollController.position.atEdge &&
+          scrollController.position.pixels ==
+              scrollController.position.maxScrollExtent) {
+        onAtEdge!();
       }
+    }
 
+    useEffect(() {
       scrollController.addListener(controllerAtEdge);
       return () => scrollController.removeListener(controllerAtEdge);
     }, [scrollController]);
@@ -596,17 +596,17 @@ class MangaListWidget extends HookConsumerWidget {
     final view =
         showToggle ? ref.watch(_mangaListViewProvider) : MangaListView.grid;
 
-    useEffect(() {
-      void controllerAtEdge() {
-        if (scrollController != null &&
-            onAtEdge != null &&
-            scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
-          onAtEdge!();
-        }
+    void controllerAtEdge() {
+      if (scrollController != null &&
+          onAtEdge != null &&
+          scrollController.position.atEdge &&
+          scrollController.position.pixels ==
+              scrollController.position.maxScrollExtent) {
+        onAtEdge!();
       }
+    }
 
+    useEffect(() {
       scrollController?.addListener(controllerAtEdge);
       return () => scrollController?.removeListener(controllerAtEdge);
     }, [scrollController]);

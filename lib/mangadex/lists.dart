@@ -25,23 +25,23 @@ class MangaDexListsView extends HookConsumerWidget {
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
 
-    useEffect(() {
-      void controllerAtEdge() {
-        if (scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
-          switch (view.value) {
-            case _ListViewType.self:
-              ref.read(userListsProvider.notifier).getMore();
-              break;
-            case _ListViewType.followed:
-              ref.read(followedListsProvider.notifier).getMore();
-            default:
-              break;
-          }
+    void controllerAtEdge() {
+      if (scrollController.position.atEdge &&
+          scrollController.position.pixels ==
+              scrollController.position.maxScrollExtent) {
+        switch (view.value) {
+          case _ListViewType.self:
+            ref.read(userListsProvider.notifier).getMore();
+            break;
+          case _ListViewType.followed:
+            ref.read(followedListsProvider.notifier).getMore();
+          default:
+            break;
         }
       }
+    }
 
+    useEffect(() {
       scrollController.addListener(controllerAtEdge);
       return () => scrollController.removeListener(controllerAtEdge);
     }, [scrollController]);
