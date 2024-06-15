@@ -218,6 +218,12 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                     ),
                   ],
                 ),
+              if (group.attributes.description == null &&
+                  group.attributes.website == null &&
+                  group.attributes.discord == null)
+                const Center(
+                  child: Text('Nothing here!'),
+                ),
             ]),
           ],
         ),
