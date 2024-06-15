@@ -54,6 +54,7 @@ class ReaderWidget extends HookConsumerWidget {
     final currentPage = useValueNotifier(0);
     final listController = useListController();
     final scrollController = useScrollController();
+    final pointerEvents = useValueNotifier<int>(0);
     final currentImageScale =
         useValueNotifier<PhotoViewScaleState>(PhotoViewScaleState.initial);
     final subtext =
@@ -727,48 +728,56 @@ class ReaderWidget extends HookConsumerWidget {
             return HookBuilder(
               builder: (_) {
                 final scaleValue = useValueListenable(currentImageScale);
-                return PageView.builder(
-                  allowImplicitScrolling: true,
-                  reverse: settings.direction == ReaderDirection.rightToLeft,
-                  physics: (!settings.swipeGestures ||
-                          scaleValue != PhotoViewScaleState.initial)
-                      ? const NeverScrollableScrollPhysics()
-                      : null,
-                  scrollBehavior: const MouseTouchScrollBehavior(),
-                  controller: pageController,
-                  itemCount: pageCount,
-                  onPageChanged: (int index) {
-                    focusNode.requestFocus();
-                    currentImageScale.value =
-                        scaleStateController[index].scaleState;
-                  },
-                  findChildIndexCallback: (key) {
-                    final valueKey = key as ValueKey<String>;
-                    final val = pages.indexWhere((i) => i.id == valueKey.value);
-                    return val >= 0 ? val : null;
-                  },
-                  itemBuilder: (BuildContext context, int index) {
-                    final page = pages.elementAt(index);
+                final pointerValue = useValueListenable(pointerEvents);
 
-                    return PhotoView(
-                      key: ValueKey(page.id),
-                      imageProvider: page.provider,
-                      backgroundDecoration:
-                          const BoxDecoration(color: Colors.black),
-                      enableRotation: false,
-                      scaleStateController: scaleStateController[index],
-                      controller: viewController[index],
-                      minScale: PhotoViewComputedScale.contained * 1.0,
-                      maxScale: PhotoViewComputedScale.covered * 5.0,
-                      initialScale: PhotoViewComputedScale.contained,
-                      basePosition: Alignment.topCenter,
-                      onTapUp:
-                          settings.clickToTurn ? handleImageViewOnTap : null,
-                      loadingBuilder: (context, event) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  },
+                return Listener(
+                  onPointerDown: (_) => pointerEvents.value++,
+                  onPointerUp: (_) => pointerEvents.value--,
+                  child: PageView.builder(
+                    allowImplicitScrolling: true,
+                    reverse: settings.direction == ReaderDirection.rightToLeft,
+                    physics: (!settings.swipeGestures ||
+                            scaleValue != PhotoViewScaleState.initial ||
+                            pointerValue == 2)
+                        ? const NeverScrollableScrollPhysics()
+                        : null,
+                    scrollBehavior: const MouseTouchScrollBehavior(),
+                    controller: pageController,
+                    itemCount: pageCount,
+                    onPageChanged: (int index) {
+                      focusNode.requestFocus();
+                      currentImageScale.value =
+                          scaleStateController[index].scaleState;
+                    },
+                    findChildIndexCallback: (key) {
+                      final valueKey = key as ValueKey<String>;
+                      final val =
+                          pages.indexWhere((i) => i.id == valueKey.value);
+                      return val >= 0 ? val : null;
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      final page = pages.elementAt(index);
+
+                      return PhotoView(
+                        key: ValueKey(page.id),
+                        imageProvider: page.provider,
+                        backgroundDecoration:
+                            const BoxDecoration(color: Colors.black),
+                        enableRotation: false,
+                        scaleStateController: scaleStateController[index],
+                        controller: viewController[index],
+                        minScale: PhotoViewComputedScale.contained * 1.0,
+                        maxScale: PhotoViewComputedScale.covered * 5.0,
+                        initialScale: PhotoViewComputedScale.contained,
+                        basePosition: Alignment.topCenter,
+                        onTapUp:
+                            settings.clickToTurn ? handleImageViewOnTap : null,
+                        loadingBuilder: (context, event) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             );
