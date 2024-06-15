@@ -417,7 +417,7 @@ class ChapterButtonWidget extends HookWidget {
 
         return IconTextChip(
           icon: const Icon(
-            Icons.comment,
+            Icons.chat_bubble_outline,
             size: 18,
           ),
           text: (stats != null && stats.comments != null)
@@ -876,7 +876,7 @@ class _GridMangaItem extends HookConsumerWidget {
   }
 }
 
-class _GridMangaDetailedItem extends HookConsumerWidget {
+class _GridMangaDetailedItem extends ConsumerWidget {
   const _GridMangaDetailedItem({
     super.key,
     required this.manga,
@@ -890,20 +890,6 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-
-    final contentTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group == TagGroup.content)
-          .map((e) => ContentChip(content: e.attributes.name.get('en')));
-    }, [manga]);
-
-    final genreTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group != TagGroup.content)
-          .map(
-            (e) => IconTextChip(text: e.attributes.name.get('en')),
-          );
-    }, [manga]);
 
     return Card(
       child: Padding(
@@ -967,18 +953,7 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
                         const SizedBox(
                           height: 4.0,
                         ),
-                        Wrap(
-                          spacing: 4.0,
-                          runSpacing: 4.0,
-                          children: [
-                            if (manga.attributes!.contentRating !=
-                                ContentRating.safe)
-                              ContentRatingChip(
-                                  rating: manga.attributes!.contentRating),
-                            ...contentTagChips,
-                            ...genreTagChips,
-                          ],
-                        ),
+                        MangaGenreRow(manga: manga),
                         if (manga.attributes!.description.isNotEmpty)
                           Expanded(
                             child: Padding(
@@ -1003,7 +978,7 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
   }
 }
 
-class _ListMangaItem extends HookConsumerWidget {
+class _ListMangaItem extends ConsumerWidget {
   const _ListMangaItem({
     super.key,
     required this.manga,
@@ -1016,20 +991,6 @@ class _ListMangaItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-
-    final contentTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group == TagGroup.content)
-          .map((e) => ContentChip(content: e.attributes.name.get('en')));
-    }, [manga]);
-
-    final genreTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group != TagGroup.content)
-          .map(
-            (e) => IconTextChip(text: e.attributes.name.get('en')),
-          );
-    }, [manga]);
 
     return Card(
       child: Padding(
@@ -1084,17 +1045,7 @@ class _ListMangaItem extends HookConsumerWidget {
                       height: 10,
                     ),
                   ],
-                  Wrap(
-                    spacing: 4.0,
-                    runSpacing: 4.0,
-                    children: [
-                      if (manga.attributes!.contentRating != ContentRating.safe)
-                        ContentRatingChip(
-                            rating: manga.attributes!.contentRating),
-                      ...contentTagChips,
-                      ...genreTagChips,
-                    ],
-                  ),
+                  MangaGenreRow(manga: manga),
                   const SizedBox(
                     height: 10,
                   ),
@@ -1151,13 +1102,52 @@ class ChapterTitle extends ConsumerWidget {
   }
 }
 
-class MangaStatisticsRow extends ConsumerWidget {
-  const MangaStatisticsRow({
+class MangaGenreRow extends HookWidget {
+  const MangaGenreRow({
     super.key,
     required this.manga,
   });
 
   final Manga manga;
+
+  @override
+  Widget build(BuildContext context) {
+    final contentTagChips = useMemoized(() {
+      return manga.attributes!.tags
+          .where((tag) => tag.attributes.group == TagGroup.content)
+          .map((e) => ContentChip(content: e.attributes.name.get('en')));
+    }, [manga]);
+
+    final genreTagChips = useMemoized(() {
+      return manga.attributes!.tags
+          .where((tag) => tag.attributes.group != TagGroup.content)
+          .map(
+            (e) => IconTextChip(text: e.attributes.name.get('en')),
+          );
+    }, [manga]);
+
+    return Wrap(
+      spacing: 4.0,
+      runSpacing: 4.0,
+      children: [
+        if (manga.attributes!.contentRating != ContentRating.safe)
+          ContentRatingChip(rating: manga.attributes!.contentRating),
+        ...contentTagChips,
+        ...genreTagChips,
+      ],
+    );
+  }
+}
+
+class MangaStatisticsRow extends ConsumerWidget {
+  const MangaStatisticsRow({
+    super.key,
+    required this.manga,
+    this.shortStatus = true,
+  });
+
+  final Manga manga;
+  final bool shortStatus;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1210,11 +1200,11 @@ class MangaStatisticsRow extends ConsumerWidget {
               ),
               IconTextChip(
                 icon: const Icon(
-                  Icons.comment,
+                  Icons.chat_bubble_outline,
                   size: 18,
                 ),
-                text: comments != null ? '${comments.repliesCount}' : 'N/A',
-                onPressed: comments != null
+                text: (comments != null) ? '${comments.repliesCount}' : 'N/A',
+                onPressed: (comments != null)
                     ? () async {
                         final url =
                             'https://forums.mangadex.org/threads/${comments.threadId}';
@@ -1236,6 +1226,7 @@ class MangaStatisticsRow extends ConsumerWidget {
         MangaStatusChip(
           status: manga.attributes!.status,
           year: manga.attributes!.year,
+          short: shortStatus,
         ),
       ],
     );
@@ -1256,35 +1247,18 @@ class MangaStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var iconColor = Colors.green;
-
-    switch (status) {
-      case MangaStatus.ongoing:
-        break;
-      case MangaStatus.completed:
-        iconColor = Colors.blue;
-        break;
-      case MangaStatus.hiatus:
-        iconColor = Colors.orange;
-        break;
-      case MangaStatus.cancelled:
-        iconColor = Colors.red;
-        break;
-    }
-
-    String label = status.label;
-
-    if (year != null && !short) {
-      label = "$year, $label";
-    }
-
     return IconTextChip(
       icon: Icon(
         Icons.circle,
-        color: iconColor,
+        color: switch (status) {
+          MangaStatus.completed => Colors.blue,
+          MangaStatus.cancelled => Colors.red,
+          MangaStatus.hiatus => Colors.orange,
+          _ => Colors.green,
+        },
         size: 10,
       ),
-      text: label,
+      text: (year != null && !short) ? "$year, ${status.label}" : status.label,
     );
   }
 }
@@ -1296,22 +1270,12 @@ class ContentRatingChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var iconColor = Colors.orange;
-
-    switch (rating) {
-      case ContentRating.suggestive:
-        break;
-      case ContentRating.safe:
-        iconColor = Colors.green;
-        break;
-      case ContentRating.erotica:
-      case ContentRating.pornographic:
-        iconColor = Colors.red;
-        break;
-    }
-
     return IconTextChip(
-      color: iconColor,
+      color: switch (rating) {
+        ContentRating.safe => Colors.green,
+        ContentRating.suggestive => Colors.orange,
+        ContentRating.erotica || ContentRating.pornographic => Colors.red,
+      },
       text: rating.label,
     );
   }
@@ -1324,17 +1288,11 @@ class ContentChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var iconColor = Colors.orange;
-
-    switch (content) {
-      case 'Gore':
-      case 'Sexual Violence':
-        iconColor = Colors.red;
-        break;
-    }
-
     return IconTextChip(
-      color: iconColor,
+      color: switch (content) {
+        'Gore' || 'Sexual Violence' => Colors.red,
+        _ => Colors.orange,
+      },
       text: content,
     );
   }

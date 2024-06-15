@@ -146,17 +146,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
       final map =
           manga.attributes!.tags.groupListsBy((tag) => tag.attributes.group);
       return map.map((group, list) {
-        if (group == TagGroup.content) {
-          return MapEntry(
-              group,
-              list
-                  .map((e) => ContentChip(
-                        key: ValueKey(e.id),
-                        content: e.attributes.name.get('en'),
-                      ))
-                  .toList());
-        }
-
         return MapEntry(
             group,
             list
@@ -166,20 +155,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     ))
                 .toList());
       });
-    }, [manga]);
-
-    final contentTagChips = useMemoized(() {
-      return mangaTagChips[TagGroup.content]?.toList() ?? [];
-    }, [manga]);
-    final genreTagChips = useMemoized(() {
-      final tags = <Widget>[];
-      mangaTagChips.forEach((group, list) {
-        if (group != TagGroup.content) {
-          tags.addAll(list);
-        }
-      });
-
-      return tags;
     }, [manga]);
 
     bool onScrollNotification(ScrollEndNotification notification) {
@@ -413,23 +388,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    child: Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: [
-                        if (manga.attributes!.contentRating !=
-                            ContentRating.safe)
-                          ContentRatingChip(
-                              rating: manga.attributes!.contentRating),
-                        ...contentTagChips,
-                        ...genreTagChips,
-                      ],
-                    ),
+                    child: MangaGenreRow(manga: manga),
                   ),
                   Container(
                     padding: const EdgeInsets.all(8),
                     child: MangaStatisticsRow(
                       manga: manga,
+                      shortStatus: false,
                     ),
                   ),
                   if (manga.attributes!.altTitles.isNotEmpty)

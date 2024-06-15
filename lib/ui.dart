@@ -88,7 +88,7 @@ class ButtonChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
     );
 
-    final btn = icon != null
+    return (icon != null)
         ? ElevatedButton.icon(
             style: style,
             onPressed: onPressed,
@@ -100,8 +100,6 @@ class ButtonChip extends StatelessWidget {
             onPressed: onPressed,
             child: text,
           );
-
-    return btn;
   }
 }
 
@@ -125,7 +123,7 @@ class IconTextChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    Widget child = Padding(
+    final child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       child: Text.rich(
         style: style,
@@ -139,19 +137,17 @@ class IconTextChip extends StatelessWidget {
       ),
     );
 
-    if (onPressed != null) {
-      child = InkWell(
-        onTap: onPressed,
-        child: child,
-      );
-    }
-
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 24.0),
       child: Material(
         borderRadius: const BorderRadius.all(Radius.circular(6.0)),
         color: color ?? theme.colorScheme.tertiaryContainer,
-        child: child,
+        child: (onPressed != null)
+            ? InkWell(
+                onTap: onPressed,
+                child: child,
+              )
+            : child,
       ),
     );
   }
