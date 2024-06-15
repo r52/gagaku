@@ -294,9 +294,8 @@ class SettingCardWidget extends StatelessWidget {
     }
 
     return Card(
-      margin: const EdgeInsets.all(6),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         child: Row(
           children: [
             Expanded(

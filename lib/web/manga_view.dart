@@ -260,27 +260,26 @@ class WebMangaViewWidget extends StatelessWidget {
             ),
           ),
         ),
-        SliverList.builder(
+        SliverList.separated(
           findChildIndexCallback: (key) {
             final valueKey = key as ValueKey<int>;
             final val = chapterlist.indexWhere((i) => i.id == valueKey.value);
             return val >= 0 ? val : null;
           },
+          separatorBuilder: (_, __) => const SizedBox(
+            height: 4.0,
+          ),
           itemBuilder: (BuildContext context, int index) {
             final e = chapterlist.elementAt(index);
 
-            return Padding(
+            return ChapterButtonWidget(
               key: ValueKey(e.id),
-              padding: const EdgeInsets.symmetric(vertical: 2.0),
-              child: ChapterButtonWidget(
-                key: ValueKey(e.id),
-                data: e,
-                manga: manga,
-                info: info,
-                link: Text(
-                  manga.title,
-                  style: const TextStyle(fontSize: 24),
-                ),
+              data: e,
+              manga: manga,
+              info: info,
+              link: Text(
+                manga.title,
+                style: const TextStyle(fontSize: 24),
               ),
             );
           },

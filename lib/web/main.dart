@@ -14,6 +14,7 @@ class WebSourcesHome extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final api = ref.watch(proxyProvider);
     final urlFieldController = useTextEditingController();
     final scrollController = useScrollController();
@@ -230,14 +231,19 @@ class WebSourcesHome extends HookConsumerWidget {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
+                child: ListView.separated(
                   controller: scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(6),
                   itemCount: history.length,
+                  separatorBuilder: (_, __) => const SizedBox(
+                    height: 4.0,
+                  ),
                   itemBuilder: (context, index) {
                     final item = history.elementAt(index);
                     return ListTile(
+                      key: ValueKey(item.hashCode),
+                      tileColor: theme.colorScheme.surfaceContainer,
                       leading: const Icon(Icons.link),
                       trailing: IconButton(
                         tooltip: 'Remove from History',

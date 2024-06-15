@@ -437,83 +437,77 @@ class ChapterButtonWidget extends HookWidget {
       },
     );
 
-    final tile = Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: (screenSizeSmall ? 6.0 : 10.0), vertical: 4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              MarkReadButton(
-                key: ValueKey(chapter.id),
-                chapter: chapter,
-                manga: manga,
-              ),
-              CountryFlag(
-                flag: chapter.attributes.translatedLanguage.flag,
-                size: screenSizeSmall ? 15 : 18,
-              ),
-              _rowPadding,
-              if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
-              Expanded(
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: ChapterTitle(
-                        chapter: chapter,
-                        manga: manga,
-                      ),
-                    ),
-                    if (isEndChapter) ...[_rowPadding, _endChip, _rowPadding],
-                  ],
-                ),
-              ),
-              Text.rich(
-                overflow: TextOverflow.ellipsis,
-                TextSpan(
-                  children: [
-                    WidgetSpan(
-                        alignment: PlaceholderAlignment.middle,
-                        child: iconSet[_IconSet.schedule]!),
-                    TextSpan(text: ' $pubtime'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 2.0,
-          ),
-          screenSizeSmall
-              ? Wrap(
-                  runSpacing: 2.0,
-                  crossAxisAlignment: WrapCrossAlignment.start,
-                  children: groupChips,
-                )
-              : Row(
-                  children: [
-                    ...groupChips,
-                    const Spacer(),
-                    userChip,
-                    if (!screenSizeSmall) _rowPadding,
-                    if (!screenSizeSmall) statsChip,
-                  ],
-                ),
-          if (screenSizeSmall) ...[
-            const SizedBox(
-              height: 4.0,
+    final tile = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            MarkReadButton(
+              key: ValueKey(chapter.id),
+              chapter: chapter,
+              manga: manga,
             ),
-            Row(
-              children: [
-                userChip,
-                const Spacer(),
-                statsChip,
-              ],
+            CountryFlag(
+              flag: chapter.attributes.translatedLanguage.flag,
+              size: screenSizeSmall ? 15 : 18,
+            ),
+            _rowPadding,
+            if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
+            Expanded(
+              child: Row(
+                children: [
+                  Flexible(
+                    child: ChapterTitle(
+                      chapter: chapter,
+                      manga: manga,
+                    ),
+                  ),
+                  if (isEndChapter) ...[_rowPadding, _endChip, _rowPadding],
+                ],
+              ),
+            ),
+            Text.rich(
+              overflow: TextOverflow.ellipsis,
+              TextSpan(
+                children: [
+                  WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: iconSet[_IconSet.schedule]!),
+                  TextSpan(text: ' $pubtime'),
+                ],
+              ),
             ),
           ],
+        ),
+        if (!screenSizeSmall) const SizedBox(height: 2.0),
+        screenSizeSmall
+            ? Wrap(
+                runSpacing: 2.0,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                children: groupChips,
+              )
+            : Row(
+                children: [
+                  ...groupChips,
+                  const Spacer(),
+                  userChip,
+                  if (!screenSizeSmall) _rowPadding,
+                  if (!screenSizeSmall) statsChip,
+                ],
+              ),
+        if (screenSizeSmall) ...[
+          const SizedBox(
+            height: 4.0,
+          ),
+          Row(
+            children: [
+              userChip,
+              const Spacer(),
+              statsChip,
+            ],
+          ),
         ],
-      ),
+      ],
     );
 
     return InkWell(
@@ -558,6 +552,8 @@ class ChapterButtonWidget extends HookWidget {
           }
 
           return Ink(
+            padding: EdgeInsets.symmetric(
+                horizontal: (screenSizeSmall ? 6.0 : 10.0), vertical: 4.0),
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(4)),
               color: tileColor,
@@ -880,7 +876,7 @@ class _GridMangaItem extends HookConsumerWidget {
   }
 }
 
-class _GridMangaDetailedItem extends ConsumerWidget {
+class _GridMangaDetailedItem extends HookConsumerWidget {
   const _GridMangaDetailedItem({
     super.key,
     required this.manga,
@@ -895,8 +891,21 @@ class _GridMangaDetailedItem extends ConsumerWidget {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
+    final contentTagChips = useMemoized(() {
+      return manga.attributes!.tags
+          .where((tag) => tag.attributes.group == TagGroup.content)
+          .map((e) => ContentChip(content: e.attributes.name.get('en')));
+    }, [manga]);
+
+    final genreTagChips = useMemoized(() {
+      return manga.attributes!.tags
+          .where((tag) => tag.attributes.group != TagGroup.content)
+          .map(
+            (e) => IconTextChip(text: e.attributes.name.get('en')),
+          );
+    }, [manga]);
+
     return Card(
-      margin: const EdgeInsets.all(6),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -966,24 +975,15 @@ class _GridMangaDetailedItem extends ConsumerWidget {
                                 ContentRating.safe)
                               ContentRatingChip(
                                   rating: manga.attributes!.contentRating),
-                            ...manga.attributes!.tags
-                                .where((tag) =>
-                                    tag.attributes.group == TagGroup.content)
-                                .map((e) => ContentChip(
-                                    content: e.attributes.name.get('en'))),
-                            ...manga.attributes!.tags
-                                .where((tag) =>
-                                    tag.attributes.group != TagGroup.content)
-                                .map(
-                                  (e) => IconTextChip(
-                                      text: e.attributes.name.get('en')),
-                                ),
+                            ...contentTagChips,
+                            ...genreTagChips,
                           ],
                         ),
                         if (manga.attributes!.description.isNotEmpty)
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.all(8),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
                               child: Text(
                                 manga.attributes!.description.get('en'),
                                 overflow: TextOverflow.clip,
@@ -1003,7 +1003,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
   }
 }
 
-class _ListMangaItem extends ConsumerWidget {
+class _ListMangaItem extends HookConsumerWidget {
   const _ListMangaItem({
     super.key,
     required this.manga,
@@ -1017,8 +1017,21 @@ class _ListMangaItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
+    final contentTagChips = useMemoized(() {
+      return manga.attributes!.tags
+          .where((tag) => tag.attributes.group == TagGroup.content)
+          .map((e) => ContentChip(content: e.attributes.name.get('en')));
+    }, [manga]);
+
+    final genreTagChips = useMemoized(() {
+      return manga.attributes!.tags
+          .where((tag) => tag.attributes.group != TagGroup.content)
+          .map(
+            (e) => IconTextChip(text: e.attributes.name.get('en')),
+          );
+    }, [manga]);
+
     return Card(
-      margin: const EdgeInsets.all(6),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -1078,20 +1091,8 @@ class _ListMangaItem extends ConsumerWidget {
                       if (manga.attributes!.contentRating != ContentRating.safe)
                         ContentRatingChip(
                             rating: manga.attributes!.contentRating),
-                      ...manga.attributes!.tags
-                          .where(
-                              (tag) => tag.attributes.group == TagGroup.content)
-                          .map((e) => ContentChip(
-                              content: e.attributes.name.get('en'))),
-                      if (manga.attributes!.tags.isNotEmpty)
-                        ...manga.attributes!.tags
-                            .where((tag) =>
-                                (tag.attributes.group == TagGroup.genre ||
-                                    tag.attributes.group == TagGroup.theme))
-                            .map(
-                              (e) => IconTextChip(
-                                  text: e.attributes.name.get('en')),
-                            ),
+                      ...contentTagChips,
+                      ...genreTagChips,
                     ],
                   ),
                   const SizedBox(

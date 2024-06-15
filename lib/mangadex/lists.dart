@@ -87,6 +87,10 @@ class MangaDexListsView extends HookConsumerWidget {
                       view.value = _ListViewType.values.elementAt(index);
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(2.0)),
+                    constraints: const BoxConstraints(
+                      minHeight: 40.0,
+                      minWidth: 60.0,
+                    ),
                     children: const [
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 5.0),

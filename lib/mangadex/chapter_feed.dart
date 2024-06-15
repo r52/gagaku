@@ -80,15 +80,13 @@ class MangaDexChapterFeed extends HookConsumerWidget {
                   view.value = _FeedViewType.values.elementAt(index);
                 },
                 borderRadius: const BorderRadius.all(Radius.circular(2.0)),
+                constraints: const BoxConstraints(
+                  minHeight: 40.0,
+                  minWidth: 80.0,
+                ),
                 children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    child: Text('By Chapter'),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    child: Text('By Manga'),
-                  ),
+                  Text('By Chapter'),
+                  Text('By Manga'),
                 ],
               ),
             ],

@@ -1059,12 +1059,15 @@ class _ChapterListSliver extends HookWidget {
       return keys;
     }, [chapters]);
 
-    return SliverList.builder(
+    return SliverList.separated(
       findChildIndexCallback: (key) {
         final valueKey = key as ValueKey<String>;
         final val = keys.indexWhere((i) => i == valueKey.value);
         return val >= 0 ? val : null;
       },
+      separatorBuilder: (_, index) => const SizedBox(
+        height: 4.0,
+      ),
       itemBuilder: (BuildContext context, int index) {
         var lastChapIsSame = false;
         var nextChapIsSame = false;
@@ -1106,30 +1109,21 @@ class _ChapterListSliver extends HookWidget {
         }
 
         if (lastChapIsSame || nextChapIsSame) {
-          return Padding(
+          return Row(
             key: ValueKey(thischap.id),
-            padding: EdgeInsets.only(
-                top: (!lastChapIsSame && nextChapIsSame) ? 6.0 : 2.0,
-                bottom: (lastChapIsSame && !nextChapIsSame) ? 6.0 : 2.0),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.subdirectory_arrow_right,
-                  size: 15.0,
-                ),
-                Flexible(
-                  child: chapbtn,
-                ),
-              ],
-            ),
+            children: [
+              const Icon(
+                Icons.subdirectory_arrow_right,
+                size: 15.0,
+              ),
+              Flexible(
+                child: chapbtn,
+              ),
+            ],
           );
         }
 
-        return Padding(
-          key: ValueKey(thischap.id),
-          padding: const EdgeInsets.symmetric(vertical: 2.0),
-          child: chapbtn,
-        );
+        return chapbtn;
       },
       itemCount: keys.length,
     );
