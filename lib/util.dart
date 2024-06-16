@@ -67,11 +67,11 @@ class DeviceContext {
 
   static bool screenWidthSmall(BuildContext context) {
     // Somewhat arbitrary measurement but w/e
-    return MediaQuery.of(context).size.width <= 600;
+    return MediaQuery.sizeOf(context).width <= 600;
   }
 
   static bool isPortraitMode(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     return size.height > size.width;
   }
 }

@@ -42,8 +42,6 @@ class ReaderWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageCount = pages.length;
-    final isPortrait = DeviceContext.isPortraitMode(context);
-    final mediaContext = MediaQuery.of(context);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
     final scaleStateController = List<PhotoViewScaleStateController>.generate(
@@ -693,10 +691,13 @@ class ReaderWidget extends HookConsumerWidget {
             }
 
             if (format == ReaderFormat.longstrip) {
+              final mediaSize = MediaQuery.sizeOf(context);
+              final isPortrait = DeviceContext.isPortraitMode(context);
+
               return SuperListView(
                 listController: listController,
                 controller: scrollController,
-                cacheExtent: mediaContext.size.height * pageCount,
+                cacheExtent: mediaSize.height * pageCount,
                 children: pages
                     .map(
                       (page) => Center(
@@ -704,9 +705,9 @@ class ReaderWidget extends HookConsumerWidget {
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
                               minWidth: isPortrait
-                                  ? mediaContext.size.width
-                                  : mediaContext.size.width * 0.4,
-                              maxWidth: mediaContext.size.width),
+                                  ? mediaSize.width
+                                  : mediaSize.width * 0.4,
+                              maxWidth: mediaSize.width),
                           child: KeepAliveImage(
                             image: page.provider,
                             fit: BoxFit.contain,
