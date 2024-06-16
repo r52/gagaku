@@ -180,15 +180,20 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(followingStatusProvider(manga));
-          ref.invalidate(readingStatusProvider(manga));
+          if (ref.read(followingStatusProvider(manga)).hasError) {
+            ref.invalidate(followingStatusProvider(manga));
+          }
+
+          if (ref.read(readingStatusProvider(manga)).hasError) {
+            ref.invalidate(readingStatusProvider(manga));
+          }
 
           switch (view.value) {
             case _ViewType.chapters:
-              ref.read(mangaChaptersProvider(manga).notifier).clear();
+              await ref.read(mangaChaptersProvider(manga).notifier).clear();
               return ref.refresh(mangaChaptersProvider(manga).future);
             case _ViewType.art:
-              ref.read(mangaCoversProvider(manga).notifier).clear();
+              await ref.read(mangaCoversProvider(manga).notifier).clear();
               return ref.refresh(mangaCoversProvider(manga).future);
             case _ViewType.related:
               return ref.refresh(_fetchRelatedMangaProvider(manga).future);
