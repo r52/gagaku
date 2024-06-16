@@ -725,15 +725,15 @@ class ReaderWidget extends HookConsumerWidget {
               );
             }
 
-            return HookBuilder(
-              builder: (_) {
-                final scaleValue = useValueListenable(currentImageScale);
-                final pointerValue = useValueListenable(pointerEvents);
+            return Listener(
+              onPointerDown: (_) => pointerEvents.value++,
+              onPointerUp: (_) => pointerEvents.value--,
+              child: HookBuilder(
+                builder: (_) {
+                  final scaleValue = useValueListenable(currentImageScale);
+                  final pointerValue = useValueListenable(pointerEvents);
 
-                return Listener(
-                  onPointerDown: (_) => pointerEvents.value++,
-                  onPointerUp: (_) => pointerEvents.value--,
-                  child: PageView.builder(
+                  return PageView.builder(
                     allowImplicitScrolling: true,
                     reverse: settings.direction == ReaderDirection.rightToLeft,
                     physics: (!settings.swipeGestures ||
@@ -777,9 +777,9 @@ class ReaderWidget extends HookConsumerWidget {
                         ),
                       );
                     },
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             );
           },
         ),
@@ -862,7 +862,7 @@ class ProgressIndicator extends HookWidget {
   }
 }
 
-class _ProgressBarSection extends HookWidget {
+class _ProgressBarSection extends StatelessWidget {
   const _ProgressBarSection({
     required this.index,
     required this.currentPage,
@@ -881,8 +881,6 @@ class _ProgressBarSection extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final page = useValueListenable(currentPage);
-
     return Expanded(
       child: Align(
         alignment: Alignment.bottomCenter,
@@ -890,11 +888,18 @@ class _ProgressBarSection extends HookWidget {
           message: tooltip,
           child: SizedBox(
             height: height,
-            child: Material(
-              color: (index == 0 || page >= index) ? color : Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-              ),
+            child: HookBuilder(
+              builder: (context) {
+                final page = useValueListenable(currentPage);
+                return Material(
+                  color: (index == 0 || page >= index)
+                      ? color
+                      : Colors.transparent,
+                  child: InkWell(
+                    onTap: onTap,
+                  ),
+                );
+              },
             ),
           ),
         ),
