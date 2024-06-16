@@ -42,6 +42,7 @@ class ReaderWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageCount = pages.length;
+    final isPortrait = DeviceContext.isPortraitMode(context);
     final mediaContext = MediaQuery.of(context);
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
@@ -67,8 +68,10 @@ class ReaderWidget extends HookConsumerWidget {
     }
 
     final precacheCount = useCallback(() {
-      return settings.precacheCount > 9 ? pageCount : settings.precacheCount;
-    }, [settings]);
+      return (settings.precacheCount > 9 || format == ReaderFormat.longstrip)
+          ? pageCount
+          : settings.precacheCount;
+    }, [settings, format]);
 
     void cachePages() {
       // Forward cache precacheCount() pages
@@ -690,38 +693,38 @@ class ReaderWidget extends HookConsumerWidget {
             }
 
             if (format == ReaderFormat.longstrip) {
-              return SuperListView.builder(
+              return SuperListView(
                 listController: listController,
                 controller: scrollController,
-                itemCount: pageCount,
-                findChildIndexCallback: (key) {
-                  final valueKey = key as ValueKey<String>;
-                  final val = pages.indexWhere((i) => i.id == valueKey.value);
-                  return val >= 0 ? val : null;
-                },
-                itemBuilder: (BuildContext context, int index) {
-                  final page = pages.elementAt(index);
+                cacheExtent: mediaContext.size.height * pageCount,
+                children: pages
+                    .map(
+                      (page) => Center(
+                        key: ValueKey(page.id),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minWidth: isPortrait
+                                  ? mediaContext.size.width
+                                  : mediaContext.size.width * 0.4,
+                              maxWidth: mediaContext.size.width),
+                          child: KeepAliveImage(
+                            image: page.provider,
+                            fit: BoxFit.contain,
+                            alignment: Alignment.topCenter,
+                            loadingBuilder: (context, child, event) {
+                              if (event == null) {
+                                return child;
+                              }
 
-                  return PhotoView(
-                    key: ValueKey(page.id),
-                    imageProvider: page.provider,
-                    backgroundDecoration:
-                        const BoxDecoration(color: Colors.black),
-                    enableRotation: false,
-                    disableGestures: true,
-                    customSize: mediaContext.size,
-                    minScale: PhotoViewComputedScale.contained * 1.0,
-                    maxScale: PhotoViewComputedScale.covered * 5.0,
-                    initialScale: DeviceContext.isPortraitMode(context)
-                        ? PhotoViewComputedScale.covered
-                        : PhotoViewComputedScale.covered * 0.5,
-                    basePosition: Alignment.topCenter,
-                    tightMode: true,
-                    loadingBuilder: (context, event) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                },
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               );
             }
 

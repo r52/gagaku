@@ -16,6 +16,67 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
+class KeepAliveImage extends Image {
+  const KeepAliveImage({
+    super.key,
+    required super.image,
+    super.frameBuilder,
+    super.loadingBuilder,
+    super.errorBuilder,
+    super.semanticLabel,
+    super.excludeFromSemantics = false,
+    super.width,
+    super.height,
+    super.color,
+    super.opacity,
+    super.colorBlendMode,
+    super.fit,
+    super.alignment = Alignment.center,
+    super.repeat = ImageRepeat.noRepeat,
+    super.centerSlice,
+    super.matchTextDirection = false,
+    super.gaplessPlayback = false,
+    super.isAntiAlias = false,
+    super.filterQuality = FilterQuality.medium,
+  });
+
+  @override
+  State<KeepAliveImage> createState() => _KeepAliveImageState();
+}
+
+class _KeepAliveImageState extends State<KeepAliveImage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    return Image(
+      image: widget.image,
+      frameBuilder: widget.frameBuilder,
+      loadingBuilder: widget.loadingBuilder,
+      errorBuilder: widget.errorBuilder,
+      semanticLabel: widget.semanticLabel,
+      excludeFromSemantics: widget.excludeFromSemantics,
+      width: widget.width,
+      height: widget.height,
+      color: widget.color,
+      opacity: widget.opacity,
+      colorBlendMode: widget.colorBlendMode,
+      fit: widget.fit,
+      alignment: widget.alignment,
+      repeat: widget.repeat,
+      centerSlice: widget.centerSlice,
+      matchTextDirection: widget.matchTextDirection,
+      gaplessPlayback: widget.gaplessPlayback,
+      isAntiAlias: widget.isAntiAlias,
+      filterQuality: widget.filterQuality,
+    );
+  }
+}
+
 class MultiChildExpansionTile extends StatelessWidget {
   const MultiChildExpansionTile({
     super.key,
