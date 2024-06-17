@@ -765,7 +765,6 @@ class ReaderWidget extends HookConsumerWidget {
                       return PhotoView(
                         key: ValueKey(page.id),
                         imageProvider: page.provider,
-                        wantKeepAlive: true,
                         backgroundDecoration:
                             const BoxDecoration(color: Colors.black),
                         enableRotation: false,
