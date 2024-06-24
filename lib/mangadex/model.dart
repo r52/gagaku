@@ -13,6 +13,7 @@ import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/legacy.dart';
+import 'package:http/retry.dart';
 import 'package:mutex/mutex.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
@@ -2700,7 +2701,12 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
 }
 
 class RateLimitedClient extends http.BaseClient {
-  final http.Client _baseClient = http.Client();
+  final http.Client _baseClient = RetryClient(
+    http.Client(),
+    when: (response) => false,
+    whenError: (error, stacktrace) =>
+        error is HttpException || error is http.ClientException,
+  );
   final _userAgent = PackageInfo.fromPlatform()
       .then((info) => '${info.appName}/${info.version}');
 
