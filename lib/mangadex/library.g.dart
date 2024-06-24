@@ -25,6 +25,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_getLibraryListByTypeProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -95,6 +96,7 @@ String _$getLibraryListByTypeHash() =>
 final class _GetLibraryListByTypeFamily extends Family {
   const _GetLibraryListByTypeFamily._()
       : super(
+          retry: null,
           name: r'_getLibraryListByTypeProvider',
           dependencies: null,
           allTransitiveDependencies: null,

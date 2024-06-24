@@ -22,6 +22,7 @@ final class MangadexProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'mangadexProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -77,6 +78,7 @@ final class LatestChaptersFeedProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'latestChaptersFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -139,6 +141,7 @@ final class LatestGlobalFeedProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'latestGlobalFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -201,6 +204,7 @@ final class GroupFeedProvider
       GroupFeed Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'groupFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -270,6 +274,7 @@ String _$groupFeedHash() => r'bff829162cb0bf702a6e2450c78ebee5e2fb0626';
 final class GroupFeedFamily extends Family {
   const GroupFeedFamily._()
       : super(
+          retry: null,
           name: r'groupFeedProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -354,6 +359,7 @@ final class GroupTitlesProvider
       GroupTitles Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'groupTitlesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -423,6 +429,7 @@ String _$groupTitlesHash() => r'82b39c5d8b6e102f2a20956fbc8e950fbddebc99';
 final class GroupTitlesFamily extends Family {
   const GroupTitlesFamily._()
       : super(
+          retry: null,
           name: r'groupTitlesProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -507,6 +514,7 @@ final class CreatorTitlesProvider
       CreatorTitles Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'creatorTitlesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -576,6 +584,7 @@ String _$creatorTitlesHash() => r'1f1e50d06abe63f8af040675627d6f02d71c588c';
 final class CreatorTitlesFamily extends Family {
   const CreatorTitlesFamily._()
       : super(
+          retry: null,
           name: r'creatorTitlesProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -660,6 +669,7 @@ final class MangaChaptersProvider
       MangaChapters Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'mangaChaptersProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -729,6 +739,7 @@ String _$mangaChaptersHash() => r'7c998a5b1496d97e1de4086dead388d90338f649';
 final class MangaChaptersFamily extends Family {
   const MangaChaptersFamily._()
       : super(
+          retry: null,
           name: r'mangaChaptersProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -813,6 +824,7 @@ final class MangaCoversProvider
       MangaCovers Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'mangaCoversProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -882,6 +894,7 @@ String _$mangaCoversHash() => r'cf841ca39bf9272b4ce4c45d68fdb83cfcf8c56c';
 final class MangaCoversFamily extends Family {
   const MangaCoversFamily._()
       : super(
+          retry: null,
           name: r'mangaCoversProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -965,6 +978,7 @@ final class ReadChaptersProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'readChaptersProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -1026,6 +1040,7 @@ final class UserLibraryProvider extends $AsyncNotifierProvider<UserLibrary,
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'userLibraryProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1088,6 +1103,7 @@ final class UserListsProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'userListsProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1149,6 +1165,7 @@ final class FollowedListsProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'followedListsProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1211,6 +1228,7 @@ final class CustomListFeedProvider
       CustomListFeed Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'customListFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1280,6 +1298,7 @@ String _$customListFeedHash() => r'1a9d4a376d8682dd783b29c779cdc8155d900e6a';
 final class CustomListFeedFamily extends Family {
   const CustomListFeedFamily._()
       : super(
+          retry: null,
           name: r'customListFeedProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -1376,6 +1395,7 @@ final class GetMangaListByPageProvider
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'getMangaListByPageProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1455,6 +1475,7 @@ String _$getMangaListByPageHash() =>
 final class GetMangaListByPageFamily extends Family {
   const GetMangaListByPageFamily._()
       : super(
+          retry: null,
           name: r'getMangaListByPageProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -1516,6 +1537,7 @@ final class ListSourceProvider
       ListSource Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'listSourceProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1585,6 +1607,7 @@ String _$listSourceHash() => r'9f85bdb85e5530013d8842bb4095cf7fd5538c2c';
 final class ListSourceFamily extends Family {
   const ListSourceFamily._()
       : super(
+          retry: null,
           name: r'listSourceProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -1668,6 +1691,7 @@ final class TagListProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'tagListProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1730,6 +1754,7 @@ final class MangaSearchProvider
       MangaSearch Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'mangaSearchProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -1799,6 +1824,7 @@ String _$mangaSearchHash() => r'6665657a31d7f907fc6142523de5d0e7a5bb5f21';
 final class MangaSearchFamily extends Family {
   const MangaSearchFamily._()
       : super(
+          retry: null,
           name: r'mangaSearchProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -1882,6 +1908,7 @@ final class StatisticsProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'statisticsProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -1944,6 +1971,7 @@ final class ChapterStatsProvider extends $AsyncNotifierProvider<ChapterStats,
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'chapterStatsProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -2006,6 +2034,7 @@ final class RatingsProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'ratingsProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -2068,6 +2097,7 @@ final class ReadingStatusProvider
       ReadingStatus Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'readingStatusProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -2137,6 +2167,7 @@ String _$readingStatusHash() => r'd2a8a5435a9d4e8818ebf814652f65efed49bf3d';
 final class ReadingStatusFamily extends Family {
   const ReadingStatusFamily._()
       : super(
+          retry: null,
           name: r'readingStatusProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -2223,6 +2254,7 @@ final class FollowingStatusProvider
       FollowingStatus Function()? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'followingStatusProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -2292,6 +2324,7 @@ String _$followingStatusHash() => r'a6108611a7a36518f2eef9b81a8861fdab800e2e';
 final class FollowingStatusFamily extends Family {
   const FollowingStatusFamily._()
       : super(
+          retry: null,
           name: r'followingStatusProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -2375,6 +2408,7 @@ final class MangaDexHistoryProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'mangaDexHistoryProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -2436,6 +2470,7 @@ final class LoggedUserProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'loggedUserProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -2497,6 +2532,7 @@ final class AuthControlProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'authControlProvider',
           isAutoDispose: false,
           dependencies: null,

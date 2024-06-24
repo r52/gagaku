@@ -25,6 +25,7 @@ final class _FetchWebMangaInfoProvider
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchWebMangaInfoProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -93,6 +94,7 @@ String _$fetchWebMangaInfoHash() => r'b46d2f19b9ddef34e34e104b971c7a92cf0bcd6c';
 final class _FetchWebMangaInfoFamily extends Family {
   const _FetchWebMangaInfoFamily._()
       : super(
+          retry: null,
           name: r'_fetchWebMangaInfoProvider',
           dependencies: null,
           allTransitiveDependencies: null,

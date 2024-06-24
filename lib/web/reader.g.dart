@@ -25,6 +25,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchWebChapterInfoProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -95,6 +96,7 @@ String _$fetchWebChapterInfoHash() =>
 final class _FetchWebChapterInfoFamily extends Family {
   const _FetchWebChapterInfoFamily._()
       : super(
+          retry: null,
           name: r'_fetchWebChapterInfoProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -153,6 +155,7 @@ final class _GetPagesProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_getPagesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -222,6 +225,7 @@ String _$getPagesHash() => r'18909fd7f1a89dad0ac031b2267e354363f82bb2';
 final class _GetPagesFamily extends Family {
   const _GetPagesFamily._()
       : super(
+          retry: null,
           name: r'_getPagesProvider',
           dependencies: null,
           allTransitiveDependencies: null,

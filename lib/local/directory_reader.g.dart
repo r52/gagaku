@@ -25,6 +25,7 @@ final class _GetDirectoryPagesProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_getDirectoryPagesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -94,6 +95,7 @@ String _$getDirectoryPagesHash() => r'9abbc559ffe1f52639956e7f09aecb4c4fa56913';
 final class _GetDirectoryPagesFamily extends Family {
   const _GetDirectoryPagesFamily._()
       : super(
+          retry: null,
           name: r'_getDirectoryPagesProvider',
           dependencies: null,
           allTransitiveDependencies: null,

@@ -25,6 +25,7 @@ final class _FetchCreatorFromIdProvider
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchCreatorFromIdProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -95,6 +96,7 @@ String _$fetchCreatorFromIdHash() =>
 final class _FetchCreatorFromIdFamily extends Family {
   const _FetchCreatorFromIdFamily._()
       : super(
+          retry: null,
           name: r'_fetchCreatorFromIdProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -153,6 +155,7 @@ final class _FetchCreatorTitlesProvider
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchCreatorTitlesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -223,6 +226,7 @@ String _$fetchCreatorTitlesHash() =>
 final class _FetchCreatorTitlesFamily extends Family {
   const _FetchCreatorTitlesFamily._()
       : super(
+          retry: null,
           name: r'_fetchCreatorTitlesProvider',
           dependencies: null,
           allTransitiveDependencies: null,

@@ -25,6 +25,7 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'_fetchHistoryFeedProvider',
           isAutoDispose: true,
           dependencies: null,

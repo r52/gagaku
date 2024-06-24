@@ -22,6 +22,7 @@ final class ProxyProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'proxyProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -77,6 +78,7 @@ final class WebSourceHistoryProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'webSourceHistoryProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -138,6 +140,7 @@ final class WebReadMarkersProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'webReadMarkersProvider',
           isAutoDispose: false,
           dependencies: null,

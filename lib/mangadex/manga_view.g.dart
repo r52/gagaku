@@ -23,6 +23,7 @@ final class _FetchMangaFromIdProvider
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchMangaFromIdProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -91,6 +92,7 @@ String _$fetchMangaFromIdHash() => r'79d90b7cdd1dd49486089e586547e5a1b5d4caa5';
 final class _FetchMangaFromIdFamily extends Family {
   const _FetchMangaFromIdFamily._()
       : super(
+          retry: null,
           name: r'_fetchMangaFromIdProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -149,6 +151,7 @@ final class _FetchRelatedMangaProvider
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchRelatedMangaProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -218,6 +221,7 @@ String _$fetchRelatedMangaHash() => r'c42adffa1cba17fc694f3c096f4e9d56b0784013';
 final class _FetchRelatedMangaFamily extends Family {
   const _FetchRelatedMangaFamily._()
       : super(
+          retry: null,
           name: r'_fetchRelatedMangaProvider',
           dependencies: null,
           allTransitiveDependencies: null,

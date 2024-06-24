@@ -32,6 +32,7 @@ final class LocalConfigProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'localConfigProvider',
           isAutoDispose: false,
           dependencies: null,

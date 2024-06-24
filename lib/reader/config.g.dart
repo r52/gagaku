@@ -54,6 +54,7 @@ final class ReaderSettingsProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'readerSettingsProvider',
           isAutoDispose: true,
           dependencies: null,

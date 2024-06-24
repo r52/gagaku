@@ -5,23 +5,23 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: eaa289c9bf5327b3afda8925d6d0cd60f0103f9303974b70d54f78d863a7a4b6
+      sha256: f256b0c0ba6c7577c15e2e4e114755640a875e885099367bf6e012b19314c834
       url: "https://pub.dev"
     source: hosted
-    version: "70.0.0"
+    version: "72.0.0"
   _macros:
     dependency: transitive
     description: dart
     source: sdk
-    version: "0.3.1"
+    version: "0.3.2"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: "54ed16638d20ec7554a01887dca2e2a10aeddd134217bd1e695afae693a3d482"
+      sha256: b652861553cd3990d8ed361f7979dc6d7053a9ac8843fa73820ab68ce5410139
       url: "https://pub.dev"
     source: hosted
-    version: "6.5.2"
+    version: "6.7.0"
   analyzer_plugin:
     dependency: transitive
     description:
@@ -399,10 +399,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_markdown
-      sha256: ff76a9300a06ad1f2b394e54c0b4beaaf6a95f95c98540c918b870221499bb10
+      sha256: "85cc6f7daeae537844c92e2d56e2aff61b00095f8f77913b529ea4be12fc45ea"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.2"
+    version: "0.7.2+1"
   flutter_native_splash:
     dependency: "direct dev"
     description:
@@ -424,7 +424,7 @@ packages:
     description:
       path: "packages/flutter_riverpod"
       ref: dev
-      resolved-ref: "946c1095be4281550099425463b6a9787baee988"
+      resolved-ref: "1a070bcdba5555ea7efef4890c777202f177c7a2"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -507,7 +507,7 @@ packages:
     description:
       path: "packages/hooks_riverpod"
       ref: dev
-      resolved-ref: "946c1095be4281550099425463b6a9787baee988"
+      resolved-ref: "1a070bcdba5555ea7efef4890c777202f177c7a2"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -667,10 +667,10 @@ packages:
     dependency: transitive
     description:
       name: macros
-      sha256: "6245feb91dfa3693100d2e680f6c5614405b1623b555b4b3cba3cb88a3beb5c2"
+      sha256: "0acaed5d6b7eab89f63350bccd82119e6c602df0f391260d0e32b5e23db79536"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2-main.3"
+    version: "0.1.2-main.4"
   markdown:
     dependency: transitive
     description:
@@ -788,10 +788,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_android
-      sha256: "9c96da072b421e98183f9ea7464898428e764bc0ce5567f27ec8693442e72514"
+      sha256: bca87b0165ffd7cdb9cad8edd22d18d2201e886d9a9f19b4fb3452ea7df3a72a
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.5"
+    version: "2.2.6"
   path_provider_foundation:
     dependency: transitive
     description:
@@ -901,7 +901,7 @@ packages:
     description:
       path: "packages/riverpod"
       ref: dev
-      resolved-ref: "946c1095be4281550099425463b6a9787baee988"
+      resolved-ref: "1a070bcdba5555ea7efef4890c777202f177c7a2"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -910,7 +910,7 @@ packages:
     description:
       path: "packages/riverpod_analyzer_utils"
       ref: dev
-      resolved-ref: "946c1095be4281550099425463b6a9787baee988"
+      resolved-ref: "1a070bcdba5555ea7efef4890c777202f177c7a2"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "1.0.0-dev.1"
@@ -919,7 +919,7 @@ packages:
     description:
       path: "packages/riverpod_annotation"
       ref: dev
-      resolved-ref: "946c1095be4281550099425463b6a9787baee988"
+      resolved-ref: "1a070bcdba5555ea7efef4890c777202f177c7a2"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -928,7 +928,7 @@ packages:
     description:
       path: "packages/riverpod_generator"
       ref: dev
-      resolved-ref: "946c1095be4281550099425463b6a9787baee988"
+      resolved-ref: "1a070bcdba5555ea7efef4890c777202f177c7a2"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.11"
@@ -937,7 +937,7 @@ packages:
     description:
       path: "packages/riverpod_lint"
       ref: dev
-      resolved-ref: "946c1095be4281550099425463b6a9787baee988"
+      resolved-ref: "1a070bcdba5555ea7efef4890c777202f177c7a2"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.4"

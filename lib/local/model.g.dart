@@ -17,6 +17,7 @@ final class LocalLibraryProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'localLibraryProvider',
           isAutoDispose: false,
           dependencies: null,
@@ -78,6 +79,7 @@ final class SupportedFormatsProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'supportedFormatsProvider',
           isAutoDispose: false,
           dependencies: null,

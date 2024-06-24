@@ -25,6 +25,7 @@ final class _FetchGroupDataProvider
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchGroupDataProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -93,6 +94,7 @@ String _$fetchGroupDataHash() => r'c9009d905ce312badc17d76d527a3c084ce2dee4';
 final class _FetchGroupDataFamily extends Family {
   const _FetchGroupDataFamily._()
       : super(
+          retry: null,
           name: r'_fetchGroupDataProvider',
           dependencies: null,
           allTransitiveDependencies: null,

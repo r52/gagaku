@@ -42,6 +42,7 @@ final class GagakuSettingsProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'gagakuSettingsProvider',
           isAutoDispose: true,
           dependencies: null,

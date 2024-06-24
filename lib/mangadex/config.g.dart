@@ -69,6 +69,7 @@ final class MdConfigProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'mdConfigProvider',
           isAutoDispose: true,
           dependencies: null,

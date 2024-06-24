@@ -26,6 +26,7 @@ final class _FetchListFeedProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_fetchListFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -95,6 +96,7 @@ String _$fetchListFeedHash() => r'05633bbaa50ac827f1c362ef9d1c47a86b83940c';
 final class _FetchListFeedFamily extends Family {
   const _FetchListFeedFamily._()
       : super(
+          retry: null,
           name: r'_fetchListFeedProvider',
           dependencies: null,
           allTransitiveDependencies: null,

@@ -25,6 +25,7 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'_fetchChaptersProvider',
           isAutoDispose: true,
           dependencies: null,

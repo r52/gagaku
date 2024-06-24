@@ -22,6 +22,7 @@ final class CacheProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'cacheProvider',
           isAutoDispose: false,
           dependencies: null,

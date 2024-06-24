@@ -25,6 +25,7 @@ final class _FetchGlobalChaptersProvider extends $FunctionalProvider<
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'_fetchGlobalChaptersProvider',
           isAutoDispose: true,
           dependencies: null,

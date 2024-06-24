@@ -24,6 +24,7 @@ final class _FetchMangaFeedProvider
         super(
           from: null,
           argument: null,
+          retry: null,
           name: r'_fetchMangaFeedProvider',
           isAutoDispose: true,
           dependencies: null,

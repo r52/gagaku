@@ -25,6 +25,7 @@ final class _GetArchivePagesProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
+          retry: null,
           name: r'_getArchivePagesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -94,6 +95,7 @@ String _$getArchivePagesHash() => r'8e067b0ef41b21e8601fde9ff2db2cb087b32036';
 final class _GetArchivePagesFamily extends Family {
   const _GetArchivePagesFamily._()
       : super(
+          retry: null,
           name: r'_getArchivePagesProvider',
           dependencies: null,
           allTransitiveDependencies: null,
