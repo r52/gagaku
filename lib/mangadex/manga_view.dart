@@ -586,10 +586,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               route = route.replaceFirst(
                                   'https://mangadex.org', '');
                               final url =
-                                  Uri.parse('https://mangadex.org$route');
+                                  Uri.parse('http://mangadex.org$route');
 
-                              if (!await launchUrl(url,
-                                  mode: LaunchMode.inAppWebView)) {
+                              if (!await launchUrl(url)) {
                                 throw 'Could not launch $url';
                               }
                             },

@@ -235,10 +235,9 @@ class WebMangaViewWidget extends StatelessWidget {
                     onPressed: () async {
                       var route = GoRouterState.of(context).uri.toString();
                       route = route.replaceFirst('https://cubari.moe', '');
-                      final url = Uri.parse('https://cubari.moe$route');
+                      final url = Uri.parse('http://cubari.moe$route');
 
-                      if (!await launchUrl(url,
-                          mode: LaunchMode.inAppWebView)) {
+                      if (!await launchUrl(url)) {
                         throw 'Could not launch $url';
                       }
                     },
