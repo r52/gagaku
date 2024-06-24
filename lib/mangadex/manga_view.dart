@@ -201,7 +201,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
         },
         notificationPredicate: (notification) {
           // Depth 1 is the top of the NestedScrollView
-          return notification.depth == 1;
+          if (notification is OverscrollNotification &&
+              notification.velocity == 0.0 &&
+              notification.overscroll < 0.0) {
+            return notification.depth == 1;
+          }
+
+          return notification.depth == 0;
         },
         child: NestedScrollView(
           scrollBehavior: const MouseTouchScrollBehavior(),
