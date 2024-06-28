@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:gagaku/local/config.dart';
 import 'package:hooks_riverpod/legacy.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
@@ -101,6 +102,7 @@ class LocalLibraryItem {
     this.thumbnail,
     this.isReadable = false,
     this.parent,
+    this.error,
   });
 
   final String path;
@@ -108,6 +110,7 @@ class LocalLibraryItem {
   final DateTime modified;
   final String? name;
   String? thumbnail;
+  String? error;
   bool isReadable;
   LocalLibraryItem? parent;
   List<LocalLibraryItem> children = [];
@@ -197,6 +200,18 @@ class LocalLibrary extends _$LocalLibrary {
   Future<LocalLibraryItem> _scanLibrary() async {
     final cfg = ref.watch(localConfigProvider);
     final sort = ref.watch(librarySortTypeProvider);
+
+    final perms = await Permission.manageExternalStorage.request();
+
+    if (perms.isDenied) {
+      return LocalLibraryItem(
+        path: '',
+        type: LibraryItemType.directory,
+        modified: DateTime.now(),
+        error: 'Permissions denied',
+      );
+    }
+
     if (cfg.libraryDirectory.isNotEmpty) {
       final top = LocalLibraryItem(
         path: cfg.libraryDirectory,
@@ -225,6 +240,10 @@ class LocalLibrary extends _$LocalLibrary {
 
       top.children.sort(_libraryCompare[sort]);
 
+      if (top.children.isEmpty) {
+        top.error = 'Library is empty!';
+      }
+
       return top;
     }
 
@@ -232,6 +251,7 @@ class LocalLibrary extends _$LocalLibrary {
       path: '',
       type: LibraryItemType.directory,
       modified: DateTime.now(),
+      error: 'Library directory not set!',
     );
   }
 

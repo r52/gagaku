@@ -144,12 +144,12 @@ class LocalLibraryHome extends StatelessWidget {
             case AsyncValue(value: final top?):
               Widget child;
 
-              if (top.children.isEmpty) {
+              if (top.error != null) {
                 child = Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Library is empty!'),
+                      Text(top.error!),
                       const SizedBox(
                         height: 10,
                       ),
