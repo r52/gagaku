@@ -771,6 +771,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               NotificationListener<ScrollEndNotification>(
                                 onNotification: onScrollNotification,
                                 child: CustomScrollView(
+                                  cacheExtent:
+                                      MediaQuery.sizeOf(context).height,
                                   slivers: [
                                     _ChapterListSliver(
                                       chapters: chapters,

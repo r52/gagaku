@@ -193,6 +193,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
                             physics: const AlwaysScrollableScrollPhysics(),
                             restorationId: restorationId,
                             itemCount: results.length,
+                            cacheExtent: MediaQuery.sizeOf(context).height,
                             findChildIndexCallback: (key) {
                               final valueKey = key as ValueKey<int>;
                               final val = results
@@ -615,6 +616,7 @@ class MangaListWidget extends HookConsumerWidget {
       controller: scrollController,
       scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
+      cacheExtent: MediaQuery.sizeOf(context).height,
       slivers: [
         ...leading,
         SliverToBoxAdapter(
