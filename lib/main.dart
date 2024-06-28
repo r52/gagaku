@@ -97,6 +97,7 @@ class _AppState extends ConsumerState<App> {
 
   late final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
+    restorationScopeId: 'root_route_restore',
     initialLocation: '/',
     debugLogDiagnostics: !kReleaseMode,
     onException: (_, GoRouterState state, GoRouter router) {
@@ -176,6 +177,7 @@ class _AppState extends ConsumerState<App> {
       // Main mangadex page
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
+        restorationScopeId: 'md_route_restore',
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return MangaDexHome(
             controllers: _controllers,
@@ -191,6 +193,7 @@ class _AppState extends ConsumerState<App> {
                 controller: _controllers[0],
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_main_restore',
             ),
           ),
           GoRoute(
@@ -206,6 +209,7 @@ class _AppState extends ConsumerState<App> {
                 },
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_chapterfeed_restore',
             ),
           ),
           GoRoute(
@@ -221,6 +225,7 @@ class _AppState extends ConsumerState<App> {
                 },
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_library_restore',
             ),
           ),
           GoRoute(
@@ -236,6 +241,7 @@ class _AppState extends ConsumerState<App> {
                 },
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_lists_restore',
             ),
           ),
           GoRoute(
@@ -246,6 +252,7 @@ class _AppState extends ConsumerState<App> {
                 controller: _controllers[4],
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_history_restore',
             ),
           ),
         ],
@@ -345,6 +352,7 @@ class _AppState extends ConsumerState<App> {
       themeMode: config.themeMode,
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
+      restorationScopeId: 'app_root_restore',
     );
   }
 }

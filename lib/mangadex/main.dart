@@ -32,6 +32,7 @@ class MangaDexHome extends HookConsumerWidget {
     final index = _calculateSelectedIndex(context);
 
     return Scaffold(
+      restorationId: 'md_home_restore',
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
