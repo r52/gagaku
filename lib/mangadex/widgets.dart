@@ -414,7 +414,7 @@ class ChapterButtonWidget extends HookWidget {
       }
 
       return chips;
-    }, [chapter, iconSet, screenSizeSmall]);
+    }, [chapter, iconSet]);
 
     final userChip = IconTextChip(
       icon: !isOfficialPub ? iconSet[_IconSet.person] : iconSet[_IconSet.check],
@@ -431,25 +431,7 @@ class ChapterButtonWidget extends HookWidget {
           },
         ));
 
-        return IconTextChip(
-          icon: const Icon(
-            Icons.chat_bubble_outline,
-            size: 18,
-          ),
-          text: (stats != null && stats.comments != null)
-              ? '${stats.comments?.repliesCount}'
-              : 'N/A',
-          onPressed: (stats != null && stats.comments != null)
-              ? () async {
-                  final url =
-                      'https://forums.mangadex.org/threads/${stats.comments!.threadId}';
-
-                  if (!await launchUrl(Uri.parse(url))) {
-                    throw 'Could not launch $url';
-                  }
-                }
-              : null,
-        );
+        return CommentChip(comments: stats?.comments);
       },
     );
 
@@ -1218,23 +1200,7 @@ class MangaStatisticsRow extends ConsumerWidget {
               const SizedBox(
                 width: 5,
               ),
-              IconTextChip(
-                icon: const Icon(
-                  Icons.chat_bubble_outline,
-                  size: 18,
-                ),
-                text: (comments != null) ? '${comments.repliesCount}' : 'N/A',
-                onPressed: (comments != null)
-                    ? () async {
-                        final url =
-                            'https://forums.mangadex.org/threads/${comments.threadId}';
-
-                        if (!await launchUrl(Uri.parse(url))) {
-                          throw 'Could not launch $url';
-                        }
-                      }
-                    : null,
-              ),
+              CommentChip(comments: comments),
             ],
           _ => [
               const IconTextChip(
@@ -1249,6 +1215,33 @@ class MangaStatisticsRow extends ConsumerWidget {
           short: shortStatus,
         ),
       ],
+    );
+  }
+}
+
+class CommentChip extends StatelessWidget {
+  final StatisticsDetailsComments? comments;
+
+  const CommentChip({super.key, this.comments});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconTextChip(
+      icon: const Icon(
+        Icons.chat_bubble_outline,
+        size: 18,
+      ),
+      text: (comments != null) ? '${comments!.repliesCount}' : 'N/A',
+      onPressed: (comments != null)
+          ? () async {
+              final url =
+                  'https://forums.mangadex.org/threads/${comments!.threadId}';
+
+              if (!await launchUrl(Uri.parse(url))) {
+                throw 'Could not launch $url';
+              }
+            }
+          : null,
     );
   }
 }
