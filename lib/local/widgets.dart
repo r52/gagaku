@@ -120,6 +120,7 @@ class _GridLibraryItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    useAutomaticKeepAlive();
     final aniController =
         useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient =

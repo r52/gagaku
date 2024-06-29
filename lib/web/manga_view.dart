@@ -1,5 +1,6 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
@@ -285,7 +286,7 @@ class WebMangaViewWidget extends StatelessWidget {
   }
 }
 
-class ChapterButtonWidget extends ConsumerWidget {
+class ChapterButtonWidget extends HookConsumerWidget {
   const ChapterButtonWidget({
     super.key,
     required this.data,
@@ -303,6 +304,7 @@ class ChapterButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useAutomaticKeepAlive();
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;

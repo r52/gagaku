@@ -1053,13 +1053,9 @@ class _ChapterListSliver extends HookWidget {
 
         if (key.startsWith(header)) {
           final text = key.replaceFirst(header, '');
-          return Padding(
+          return _ChapterListHeader(
             key: ValueKey(key),
-            padding: const EdgeInsets.all(6.0),
-            child: Text(text,
-                style: TextStyle(
-                    fontWeight:
-                        text.contains('Volume') ? FontWeight.bold : null)),
+            text: text,
           );
         }
 
@@ -1107,6 +1103,24 @@ class _ChapterListSliver extends HookWidget {
   }
 }
 
+class _ChapterListHeader extends HookWidget {
+  final String text;
+
+  const _ChapterListHeader({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    useAutomaticKeepAlive();
+    return Padding(
+      key: ValueKey(key),
+      padding: const EdgeInsets.all(6.0),
+      child: Text(text,
+          style: TextStyle(
+              fontWeight: text.contains('Volume') ? FontWeight.bold : null)),
+    );
+  }
+}
+
 class _CoverArtItem extends HookWidget {
   const _CoverArtItem({
     super.key,
@@ -1123,6 +1137,7 @@ class _CoverArtItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    useAutomaticKeepAlive();
     final aniController =
         useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient =

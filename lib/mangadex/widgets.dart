@@ -227,34 +227,41 @@ class ChapterFeedItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useAutomaticKeepAlive();
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
     final chapterBtns = useMemoized<List<Widget>>(() {
       return state.chapters.map((e) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2.0),
-          child: ChapterButtonWidget(
-            key: ValueKey(e.id),
-            chapter: e,
-            manga: state.manga,
-            link: Text(
-              state.manga.attributes!.title.get('en'),
-              style: const TextStyle(fontSize: 18),
-            ),
-            onLinkPressed: () async {
-              ref.read(readChaptersProvider.notifier).get([state.manga]);
-              ref.read(ratingsProvider.notifier).get([state.manga]);
-              ref.read(statisticsProvider.notifier).get([state.manga]);
-              context.push('/title/${state.manga.id}', extra: state.manga);
-            },
+        return ChapterButtonWidget(
+          key: ValueKey(e.id),
+          chapter: e,
+          manga: state.manga,
+          link: Text(
+            state.manga.attributes!.title.get('en'),
+            style: const TextStyle(fontSize: 18),
           ),
+          onLinkPressed: () async {
+            ref.read(readChaptersProvider.notifier).get([state.manga]);
+            ref.read(ratingsProvider.notifier).get([state.manga]);
+            ref.read(statisticsProvider.notifier).get([state.manga]);
+            context.push('/title/${state.manga.id}', extra: state.manga);
+          },
         );
       }).toList();
     }, [state]);
 
+    final listsliver = SliverList.separated(
+      itemBuilder: (context, index) => chapterBtns.elementAt(index),
+      separatorBuilder: (context, index) => const SizedBox(
+        height: 4,
+      ),
+      itemCount: chapterBtns.length,
+    );
+
     final titleBtn = TextButton.icon(
       style: TextButton.styleFrom(
+        alignment: Alignment.centerLeft,
         minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
         foregroundColor: theme.colorScheme.onSurface,
@@ -313,10 +320,12 @@ class ChapterFeedItem extends HookConsumerWidget {
                     children: [
                       coverBtn,
                       Expanded(
-                          child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: chapterBtns,
-                      )),
+                        child: CustomScrollView(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          slivers: [listsliver],
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -326,14 +335,19 @@ class ChapterFeedItem extends HookConsumerWidget {
                 children: [
                   coverBtn,
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        titleBtn,
-                        const Divider(
-                          height: 10.0,
+                    child: CustomScrollView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      slivers: [
+                        SliverList.list(
+                          children: [
+                            titleBtn,
+                            const Divider(
+                              height: 10.0,
+                            ),
+                          ],
                         ),
-                        ...chapterBtns,
+                        listsliver,
                       ],
                     ),
                   )
@@ -360,6 +374,7 @@ class ChapterButtonWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    useAutomaticKeepAlive();
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
 
@@ -771,6 +786,7 @@ class _GridMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useAutomaticKeepAlive();
     final aniController =
         useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient =
@@ -878,7 +894,7 @@ class _GridMangaItem extends HookConsumerWidget {
   }
 }
 
-class _GridMangaDetailedItem extends ConsumerWidget {
+class _GridMangaDetailedItem extends HookConsumerWidget {
   const _GridMangaDetailedItem({
     super.key,
     required this.manga,
@@ -890,6 +906,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useAutomaticKeepAlive();
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
@@ -980,7 +997,7 @@ class _GridMangaDetailedItem extends ConsumerWidget {
   }
 }
 
-class _ListMangaItem extends ConsumerWidget {
+class _ListMangaItem extends HookConsumerWidget {
   const _ListMangaItem({
     super.key,
     required this.manga,
@@ -992,6 +1009,7 @@ class _ListMangaItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useAutomaticKeepAlive();
     final theme = Theme.of(context);
 
     return Card(
