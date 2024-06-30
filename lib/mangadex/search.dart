@@ -49,7 +49,9 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     final searchProvider = ref.watch(mangaSearchProvider(filter));
     final isLoading = searchProvider.isLoading && searchProvider.isReloading;
 
-    final selected = useState<Set<String>>(selectedTitles ?? {});
+    final selected = useReducer(MangaSetAction.modifyMangaSet,
+        initialState: selectedTitles ?? <String>{},
+        initialAction: MangaSetAction(action: MangaSetActions.none));
 
     useEffect(() {
       controller.text = filter.query;
@@ -112,7 +114,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
               leading: BackButton(
                 onPressed: () {
                   if (context.canPop()) {
-                    context.pop(selectMode ? selected.value : null);
+                    context.pop(selectMode ? selected.state : null);
                   } else {
                     context.go('/');
                   }
@@ -179,17 +181,23 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                   items: results,
                   selectMode: selectMode,
                   selectButton: (manga) {
-                    if (selected.value.contains(manga.id)) {
+                    if (selected.state.contains(manga.id)) {
                       return const Icon(Icons.remove);
                     }
 
                     return const Icon(Icons.add);
                   },
                   onSelected: (manga) {
-                    if (selected.value.contains(manga.id)) {
-                      selected.value = {...selected.value..remove(manga.id)};
+                    if (selected.state.contains(manga.id)) {
+                      selected.dispatch(MangaSetAction(
+                        action: MangaSetActions.remove,
+                        element: manga.id,
+                      ));
                     } else {
-                      selected.value = {...selected.value..add(manga.id)};
+                      selected.dispatch(MangaSetAction(
+                        action: MangaSetActions.add,
+                        element: manga.id,
+                      ));
                     }
                   },
                 ),

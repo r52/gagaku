@@ -1056,3 +1056,32 @@ class ReadChapterSet with ExpiringData {
     updateExpiry();
   }
 }
+
+enum MangaSetActions { replace, add, remove, none }
+
+class MangaSetAction {
+  final MangaSetActions action;
+  final Set<String>? replacement;
+  final String? element;
+
+  MangaSetAction({required this.action, this.replacement, this.element})
+      : assert(action == MangaSetActions.none
+            ? (replacement == null || element == null)
+            : (replacement != null || element != null));
+
+  static Set<String> modifyMangaSet(Set<String> state, MangaSetAction action) {
+    switch (action.action) {
+      case MangaSetActions.replace:
+        return action.replacement!;
+      case MangaSetActions.add:
+        return {...state..add(action.element!)};
+      case MangaSetActions.remove:
+        return {...state..remove(action.element!)};
+      case MangaSetActions.none:
+      default:
+        break;
+    }
+
+    return state;
+  }
+}

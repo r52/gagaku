@@ -80,11 +80,13 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final pendingAction = useState<Future<bool>?>(null);
     final snapshot = useFuture(pendingAction.value);
 
-    final selected = useState<Set<String>>(list != null ? {...list!.set} : {});
+    final selected = useReducer(MangaSetAction.modifyMangaSet,
+        initialState: list != null ? {...list!.set} : <String>{},
+        initialAction: MangaSetAction(action: MangaSetActions.none));
     final currentPage = useState(0);
 
     final titlesProvider = ref
-        .watch(getMangaListByPageProvider(selected.value, currentPage.value));
+        .watch(getMangaListByPageProvider(selected.state, currentPage.value));
     final titles = titlesProvider.value;
 
     final isLoading = titlesProvider.isLoading;
@@ -100,10 +102,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
             }
           },
         ),
-        flexibleSpace: GestureDetector(
-          child:
-              TitleFlexBar(title: '${list != null ? 'Edit' : 'Create'} List'),
-        ),
+        flexibleSpace:
+            TitleFlexBar(title: '${list != null ? 'Edit' : 'Create'} List'),
         actions: [
           TextButton(
             style: Styles.buttonStyle(),
@@ -125,7 +125,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 style: Styles.buttonStyle(),
                 onPressed: listNameChanged ||
                         (list != null &&
-                            !setEquals(selected.value, list!.set)) ||
+                            !setEquals(selected.state, list!.set)) ||
                         (list != null && vis != list!.attributes.visibility)
                     ? () async {
                         final messenger = ScaffoldMessenger.of(context);
@@ -137,12 +137,12 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                             success = ref
                                 .read(userListsProvider.notifier)
                                 .editList(list!, listNameController.text, vis,
-                                    selected.value);
+                                    selected.state);
                           } else {
                             success = ref
                                 .read(userListsProvider.notifier)
                                 .newList(listNameController.text, vis,
-                                    selected.value);
+                                    selected.state);
                           }
 
                           success.then((success) {
@@ -238,10 +238,13 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   onPressed: () {
                     context
                         .push<Set<String>>('/search?selectMode=true',
-                            extra: selected.value)
+                            extra: selected.state)
                         .then((result) {
                       if (result != null) {
-                        selected.value = {...result};
+                        selected.dispatch(MangaSetAction(
+                          action: MangaSetActions.replace,
+                          replacement: result,
+                        ));
                       }
                     });
                   },
@@ -251,7 +254,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 Expanded(
                   child: MangaListWidget(
                     title: Text(
-                      'Titles ${list != null ? '(${list!.set.length} > ${selected.value.length})' : '(${selected.value.length})'}',
+                      'Titles ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
                       style: const TextStyle(fontSize: 24),
                     ),
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -265,9 +268,10 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                             return const Icon(Icons.remove);
                           },
                           onSelected: (manga) {
-                            selected.value = {
-                              ...selected.value..remove(manga.id)
-                            };
+                            selected.dispatch(MangaSetAction(
+                              action: MangaSetActions.remove,
+                              element: manga.id,
+                            ));
                           },
                         ),
                     ],
@@ -275,7 +279,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 ),
                 NumberPaginator(
                   numberPages: max(
-                      (selected.value.length / MangaDexEndpoints.searchLimit)
+                      (selected.state.length / MangaDexEndpoints.searchLimit)
                           .ceil(),
                       1),
                   onPageChange: (int index) {
