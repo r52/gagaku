@@ -40,7 +40,11 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final filter = ref.watch(_searchParamsProvider);
     final controller = useTextEditingController();
-    final debounce = useRef<Timer?>(null);
+    final searchText = useListenableSelector(controller, () => controller.text);
+    final debouncedInput = useDebounced(
+      searchText,
+      const Duration(milliseconds: 1000), // Set your desired timeout
+    );
 
     final searchProvider = ref.watch(mangaSearchProvider(filter));
     final isLoading = searchProvider.isLoading && searchProvider.isReloading;
@@ -48,21 +52,19 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     final selected = useState<Set<String>>(selectedTitles ?? {});
 
     useEffect(() {
-      return () => debounce.value?.cancel();
-    }, [debounce]);
-
-    useEffect(() {
       controller.text = filter.query;
       return null;
     }, []);
 
-    void onSearchChanged(String query) {
-      if (debounce.value?.isActive ?? false) debounce.value?.cancel();
-      debounce.value = Timer(const Duration(milliseconds: 1000), () {
-        ref.read(_searchParamsProvider.notifier).state =
-            filter.copyWith(query: query, filter: filter.filter);
-      });
-    }
+    useEffect(() {
+      if (debouncedInput != null) {
+        Future.delayed(Duration.zero, () {
+          ref.read(_searchParamsProvider.notifier).state =
+              filter.copyWith(query: debouncedInput, filter: filter.filter);
+        });
+      }
+      return null;
+    }, [debouncedInput]);
 
     return Scaffold(
         body: Stack(
@@ -107,13 +109,15 @@ class MangaDexSearchWidget extends HookConsumerWidget {
           showToggle: !selectMode,
           leading: [
             SliverAppBar(
-              leading: BackButton(onPressed: () {
-                if (context.canPop()) {
-                  context.pop(selectMode ? selected.value : null);
-                } else {
-                  context.go('/');
-                }
-              }),
+              leading: BackButton(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop(selectMode ? selected.value : null);
+                  } else {
+                    context.go('/');
+                  }
+                },
+              ),
               pinned: true,
               snap: false,
               floating: false,
@@ -126,7 +130,6 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                         textInputAction: TextInputAction.search,
                         autofocus: true,
                         controller: controller,
-                        onChanged: onSearchChanged,
                         decoration: const InputDecoration(
                           icon: Icon(Icons.search),
                           hintText: 'Search MangaDex...',
