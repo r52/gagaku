@@ -1143,7 +1143,7 @@ class MangaGenreRow extends HookWidget {
   }
 }
 
-class MangaStatisticsRow extends ConsumerWidget {
+class MangaStatisticsRow extends HookConsumerWidget {
   const MangaStatisticsRow({
     super.key,
     required this.manga,
@@ -1162,6 +1162,14 @@ class MangaStatisticsRow extends ConsumerWidget {
         _ => null,
       },
     ));
+
+    // Redundancy
+    useEffect(() {
+      Future.delayed(Duration.zero, () async {
+        await ref.read(statisticsProvider.notifier).get([manga]);
+      });
+      return null;
+    });
 
     return Wrap(
       runSpacing: 4.0,

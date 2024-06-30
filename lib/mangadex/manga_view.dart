@@ -78,6 +78,7 @@ Future<List<Manga>> _fetchRelatedManga(
       await api.fetchManga(ids: ids, limit: MangaDexEndpoints.breakLimit);
 
   await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.read(readChaptersProvider.notifier).get(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 
@@ -986,7 +987,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
   }
 }
 
-class _ChapterListSliver extends HookWidget {
+class _ChapterListSliver extends HookConsumerWidget {
   const _ChapterListSliver({
     required this.chapters,
     required this.manga,
@@ -998,7 +999,15 @@ class _ChapterListSliver extends HookWidget {
   static const header = '_HEADER_';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Redundancy
+    useEffect(() {
+      Future.delayed(Duration.zero, () async {
+        await ref.read(readChaptersProvider.notifier).get([manga]);
+      });
+      return null;
+    });
+
     final keys = useMemoized(() {
       final keysGrouped =
           chapters.groupListsBy((chapter) => chapter.attributes.volume);
@@ -1260,7 +1269,7 @@ class _ReadingStatusDropdown extends ConsumerWidget {
   }
 }
 
-class _RatingMenu extends ConsumerWidget {
+class _RatingMenu extends HookConsumerWidget {
   const _RatingMenu({
     required this.manga,
   });
@@ -1272,6 +1281,14 @@ class _RatingMenu extends ConsumerWidget {
     final theme = Theme.of(context);
     final ratingProv = ref.watch(ratingsProvider);
     final ratings = ratingProv.value;
+
+    // Redundancy
+    useEffect(() {
+      Future.delayed(Duration.zero, () async {
+        await ref.read(ratingsProvider.notifier).get([manga]);
+      });
+      return null;
+    });
 
     return MenuAnchor(
       builder: (context, controller, child) {

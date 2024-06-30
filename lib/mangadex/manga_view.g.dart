@@ -216,7 +216,7 @@ final class _FetchRelatedMangaProvider
   }
 }
 
-String _$fetchRelatedMangaHash() => r'c42adffa1cba17fc694f3c096f4e9d56b0784013';
+String _$fetchRelatedMangaHash() => r'de89eeee3bdb66f8f011bcf4315e59ce0c4f683c';
 
 final class _FetchRelatedMangaFamily extends Family {
   const _FetchRelatedMangaFamily._()
