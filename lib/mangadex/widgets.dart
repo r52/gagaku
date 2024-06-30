@@ -392,29 +392,31 @@ class ChapterButtonWidget extends HookWidget {
       final chips = <Widget>[];
 
       for (final g in chapter.groups) {
-        chips.add(IconTextChip(
+        chips.add(Flexible(
+            child: IconTextChip(
           key: ValueKey(g.id),
           icon: isOfficialPub
               ? iconSet[_IconSet.circle]
               : iconSet[_IconSet.group],
-          text: g.attributes.name.crop(),
+          text: g.attributes.name,
           onPressed: () {
             context.push('/group/${g.id}', extra: g);
           },
-        ));
+        )));
         chips.add(_rowPadding);
       }
 
       if (chips.isEmpty) {
-        chips.add(IconTextChip(
+        chips.add(Flexible(
+            child: IconTextChip(
           icon: iconSet[_IconSet.group],
           text: 'No Group',
-        ));
+        )));
         chips.add(_rowPadding);
       }
 
       return chips;
-    }, [chapter, iconSet]);
+    }, [chapter, screenSizeSmall]);
 
     final userChip = IconTextChip(
       icon: !isOfficialPub ? iconSet[_IconSet.person] : iconSet[_IconSet.check],
@@ -478,21 +480,21 @@ class ChapterButtonWidget extends HookWidget {
           ],
         ),
         if (!screenSizeSmall) const SizedBox(height: 2.0),
-        screenSizeSmall
-            ? Wrap(
-                runSpacing: 2.0,
-                crossAxisAlignment: WrapCrossAlignment.start,
-                children: groupChips,
-              )
-            : Row(
-                children: [
-                  ...groupChips,
-                  const Spacer(),
-                  userChip,
-                  if (!screenSizeSmall) _rowPadding,
-                  if (!screenSizeSmall) statsChip,
-                ],
-              ),
+        Row(
+          children: [
+            // Flex group chips
+            Expanded(
+                child: Row(
+              children: groupChips,
+            )),
+            // Fixed user/stat chip
+            if (!screenSizeSmall) ...[
+              userChip,
+              _rowPadding,
+              statsChip,
+            ]
+          ],
+        ),
         if (screenSizeSmall) ...[
           const SizedBox(
             height: 4.0,

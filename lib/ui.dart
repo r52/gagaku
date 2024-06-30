@@ -188,6 +188,7 @@ class IconTextChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       child: Text.rich(
         style: style,
+        overflow: TextOverflow.ellipsis,
         TextSpan(
           children: [
             if (icon != null)
