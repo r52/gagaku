@@ -80,7 +80,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final pendingAction = useState<Future<bool>?>(null);
     final snapshot = useFuture(pendingAction.value);
 
-    final selected = useReducer(MangaSetAction.modifyMangaSet,
+    final selected = useReducer(MangaSetAction.modify,
         initialState: list != null ? {...list!.set} : <String>{},
         initialAction: MangaSetAction(action: MangaSetActions.none));
     final currentPage = useState(0);

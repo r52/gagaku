@@ -165,6 +165,41 @@ enum ListSort {
   final String order;
 }
 
+class MangaFilterAction {
+  final Set<Tag>? includedTags;
+  final TagMode? includedTagsMode;
+  final Set<Tag>? excludedTags;
+  final TagMode? excludedTagsMode;
+  final Set<MangaStatus>? status;
+  final Set<MangaDemographic>? publicationDemographic;
+  final Set<ContentRating>? contentRating;
+
+  MangaFilterAction({
+    this.includedTags,
+    this.includedTagsMode,
+    this.excludedTags,
+    this.excludedTagsMode,
+    this.status,
+    this.publicationDemographic,
+    this.contentRating,
+  });
+
+  static MangaFilters action(MangaFilters state, MangaFilterAction action) {
+    MangaFilters updated = state.copyWith(
+      includedTags: action.includedTags ?? state.includedTags,
+      includedTagsMode: action.includedTagsMode ?? state.includedTagsMode,
+      excludedTags: action.excludedTags ?? state.excludedTags,
+      excludedTagsMode: action.excludedTagsMode ?? state.excludedTagsMode,
+      status: action.status ?? state.status,
+      publicationDemographic:
+          action.publicationDemographic ?? state.publicationDemographic,
+      contentRating: action.contentRating ?? state.contentRating,
+    );
+
+    return updated;
+  }
+}
+
 @freezed
 class MangaFilters with _$MangaFilters {
   const MangaFilters._();
@@ -1069,7 +1104,7 @@ class MangaSetAction {
             ? (replacement == null || element == null)
             : (replacement != null || element != null));
 
-  static Set<String> modifyMangaSet(Set<String> state, MangaSetAction action) {
+  static Set<String> modify(Set<String> state, MangaSetAction action) {
     switch (action.action) {
       case MangaSetActions.replace:
         return action.replacement!;

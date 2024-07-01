@@ -49,7 +49,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     final searchProvider = ref.watch(mangaSearchProvider(filter));
     final isLoading = searchProvider.isLoading && searchProvider.isReloading;
 
-    final selected = useReducer(MangaSetAction.modifyMangaSet,
+    final selected = useReducer(MangaSetAction.modify,
         initialState: selectedTitles ?? <String>{},
         initialAction: MangaSetAction(action: MangaSetActions.none));
 
@@ -265,7 +265,9 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
-    final fil = useState(filter);
+    final fil = useReducer(MangaFilterAction.action,
+        initialState: filter, initialAction: MangaFilterAction());
+
     final tagsProvider = ref.watch(tagListProvider);
 
     const headingStyle = TextStyle(
@@ -275,40 +277,42 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
 
     final selectedChipColor = theme.colorScheme.tertiaryContainer;
 
-    final selectedFilters = [
-      ...fil.value.includedTags.map(
-        (e) => InputChip(
-          label: Text(e.attributes.name.get('en')),
-          showCheckmark: true,
-          selected: true,
-          onDeleted: () {
-            fil.value = fil.value.copyWith(
-              includedTags: fil.value.includedTags
-                  .where((element) => element != e)
-                  .toSet(),
-            );
-          },
-          selectedColor: selectedChipColor,
-        ),
-      ),
-      ...fil.value.excludedTags.map(
-        (e) => InputChip(
-          label: Text(e.attributes.name.get('en')),
-          avatar: Icon(
-            Icons.remove,
-            color: theme.colorScheme.primary,
-          ),
-          onDeleted: () {
-            fil.value = fil.value.copyWith(
-              excludedTags: fil.value.excludedTags
-                  .where((element) => element != e)
-                  .toSet(),
-            );
-          },
-          side: BorderSide(color: selectedChipColor),
-        ),
-      )
-    ];
+    final selectedFilters = useMemoized(
+        () => [
+              ...fil.state.includedTags.map(
+                (e) => InputChip(
+                  label: Text(e.attributes.name.get('en')),
+                  showCheckmark: true,
+                  selected: true,
+                  onDeleted: () {
+                    fil.dispatch(MangaFilterAction(
+                      includedTags: fil.state.includedTags
+                          .where((element) => element != e)
+                          .toSet(),
+                    ));
+                  },
+                  selectedColor: selectedChipColor,
+                ),
+              ),
+              ...fil.state.excludedTags.map(
+                (e) => InputChip(
+                  label: Text(e.attributes.name.get('en')),
+                  avatar: Icon(
+                    Icons.remove,
+                    color: theme.colorScheme.primary,
+                  ),
+                  onDeleted: () {
+                    fil.dispatch(MangaFilterAction(
+                      excludedTags: fil.state.excludedTags
+                          .where((element) => element != e)
+                          .toSet(),
+                    ));
+                  },
+                  side: BorderSide(color: selectedChipColor),
+                ),
+              )
+            ],
+        [fil.state]);
 
     return Scaffold(
       appBar: AppBar(
@@ -326,13 +330,13 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 message: 'Reset Filters',
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    fil.value = fil.value.copyWith(
+                    fil.dispatch(MangaFilterAction(
                       includedTags: {},
                       excludedTags: {},
                       contentRating: {},
                       publicationDemographic: {},
                       status: {},
-                    );
+                    ));
                   },
                   icon: const Icon(Icons.clear_all),
                   label: const Text('Reset Filters'),
@@ -342,7 +346,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 message: 'Apply Filters',
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    nav.pop(fil.value);
+                    nav.pop(fil.state);
                   },
                   icon: const Icon(Icons.filter_list),
                   label: const Text('Apply Filters'),
@@ -387,18 +391,18 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                         (e) => FilterChip(
                           label: Text(e.label),
                           selectedColor: selectedChipColor,
-                          selected: fil.value.contentRating.contains(e),
+                          selected: fil.state.contentRating.contains(e),
                           onSelected: (bool value) {
                             if (value) {
-                              fil.value = fil.value.copyWith(
-                                contentRating: {...fil.value.contentRating, e},
-                              );
+                              fil.dispatch(MangaFilterAction(
+                                contentRating: {...fil.state.contentRating, e},
+                              ));
                             } else {
-                              fil.value = fil.value.copyWith(
-                                contentRating: fil.value.contentRating
+                              fil.dispatch(MangaFilterAction(
+                                contentRating: fil.state.contentRating
                                     .where((element) => element != e)
                                     .toSet(),
-                              );
+                              ));
                             }
                           },
                         ),
@@ -417,22 +421,22 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                             label: Text(e.label),
                             selectedColor: selectedChipColor,
                             selected:
-                                fil.value.publicationDemographic.contains(e),
+                                fil.state.publicationDemographic.contains(e),
                             onSelected: (bool value) {
                               if (value) {
-                                fil.value = fil.value.copyWith(
+                                fil.dispatch(MangaFilterAction(
                                   publicationDemographic: {
-                                    ...fil.value.publicationDemographic,
+                                    ...fil.state.publicationDemographic,
                                     e
                                   },
-                                );
+                                ));
                               } else {
-                                fil.value = fil.value.copyWith(
+                                fil.dispatch(MangaFilterAction(
                                   publicationDemographic: fil
-                                      .value.publicationDemographic
+                                      .state.publicationDemographic
                                       .where((element) => element != e)
                                       .toSet(),
-                                );
+                                ));
                               }
                             },
                           ))
@@ -450,18 +454,18 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                         (e) => FilterChip(
                           label: Text(e.label),
                           selectedColor: selectedChipColor,
-                          selected: fil.value.status.contains(e),
+                          selected: fil.state.status.contains(e),
                           onSelected: (bool value) {
                             if (value) {
-                              fil.value = fil.value.copyWith(
-                                status: {...fil.value.status, e},
-                              );
+                              fil.dispatch(MangaFilterAction(
+                                status: {...fil.state.status, e},
+                              ));
                             } else {
-                              fil.value = fil.value.copyWith(
-                                status: fil.value.status
+                              fil.dispatch(MangaFilterAction(
+                                status: fil.state.status
                                     .where((element) => element != e)
                                     .toSet(),
-                              );
+                              ));
                             }
                           },
                         ),
@@ -486,42 +490,42 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                             onChanged: (bool? value) {
                               switch (value) {
                                 case null:
-                                  fil.value = fil.value.copyWith(
-                                    includedTags: fil.value.includedTags
+                                  fil.dispatch(MangaFilterAction(
+                                    includedTags: fil.state.includedTags
                                         .where((element) => element != e)
                                         .toSet(),
-                                    excludedTags: fil.value.excludedTags
+                                    excludedTags: fil.state.excludedTags
                                         .where((element) => element != e)
                                         .toSet(),
-                                  );
+                                  ));
                                   break;
                                 case true:
-                                  fil.value = fil.value.copyWith(
+                                  fil.dispatch(MangaFilterAction(
                                     includedTags: {
-                                      ...fil.value.includedTags,
+                                      ...fil.state.includedTags,
                                       e
                                     },
-                                    excludedTags: fil.value.excludedTags
+                                    excludedTags: fil.state.excludedTags
                                         .where((element) => element != e)
                                         .toSet(),
-                                  );
+                                  ));
                                   break;
                                 case false:
-                                  fil.value = fil.value.copyWith(
-                                    includedTags: fil.value.includedTags
+                                  fil.dispatch(MangaFilterAction(
+                                    includedTags: fil.state.includedTags
                                         .where((element) => element != e)
                                         .toSet(),
                                     excludedTags: {
-                                      ...fil.value.excludedTags,
+                                      ...fil.state.excludedTags,
                                       e
                                     },
-                                  );
+                                  ));
                                   break;
                               }
                             },
-                            value: fil.value.includedTags.contains(e)
+                            value: fil.state.includedTags.contains(e)
                                 ? true
-                                : (fil.value.excludedTags.contains(e)
+                                : (fil.state.excludedTags.contains(e)
                                     ? false
                                     : null),
                           ),
@@ -539,7 +543,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                   children: [
                     DropdownMenu<TagMode>(
                       label: const Text('Inclusion Mode'),
-                      initialSelection: fil.value.includedTagsMode,
+                      initialSelection: fil.state.includedTagsMode,
                       requestFocusOnTap: false,
                       enableSearch: false,
                       enableFilter: false,
@@ -549,15 +553,15 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                       ],
                       onSelected: (value) {
                         if (value != null) {
-                          fil.value = fil.value.copyWith(
+                          fil.dispatch(MangaFilterAction(
                             includedTagsMode: value,
-                          );
+                          ));
                         }
                       },
                     ),
                     DropdownMenu<TagMode>(
                       label: const Text('Exclusion Mode'),
-                      initialSelection: fil.value.excludedTagsMode,
+                      initialSelection: fil.state.excludedTagsMode,
                       requestFocusOnTap: false,
                       enableSearch: false,
                       enableFilter: false,
@@ -567,9 +571,9 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                       ],
                       onSelected: (value) {
                         if (value != null) {
-                          fil.value = fil.value.copyWith(
+                          fil.dispatch(MangaFilterAction(
                             excludedTagsMode: value,
-                          );
+                          ));
                         }
                       },
                     ),
