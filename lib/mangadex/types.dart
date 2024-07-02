@@ -166,34 +166,25 @@ enum ListSort {
 }
 
 class MangaFilterAction {
-  final Set<Tag>? includedTags;
-  final TagMode? includedTagsMode;
-  final Set<Tag>? excludedTags;
-  final TagMode? excludedTagsMode;
-  final Set<MangaStatus>? status;
-  final Set<MangaDemographic>? publicationDemographic;
-  final Set<ContentRating>? contentRating;
-
-  MangaFilterAction({
-    this.includedTags,
-    this.includedTagsMode,
-    this.excludedTags,
-    this.excludedTagsMode,
-    this.status,
-    this.publicationDemographic,
-    this.contentRating,
-  });
-
-  static MangaFilters action(MangaFilters state, MangaFilterAction action) {
+  static MangaFilters action(
+    MangaFilters state, {
+    Set<Tag>? includedTags,
+    TagMode? includedTagsMode,
+    Set<Tag>? excludedTags,
+    TagMode? excludedTagsMode,
+    Set<MangaStatus>? status,
+    Set<MangaDemographic>? publicationDemographic,
+    Set<ContentRating>? contentRating,
+  }) {
     MangaFilters updated = state.copyWith(
-      includedTags: action.includedTags ?? state.includedTags,
-      includedTagsMode: action.includedTagsMode ?? state.includedTagsMode,
-      excludedTags: action.excludedTags ?? state.excludedTags,
-      excludedTagsMode: action.excludedTagsMode ?? state.excludedTagsMode,
-      status: action.status ?? state.status,
+      includedTags: includedTags ?? state.includedTags,
+      includedTagsMode: includedTagsMode ?? state.includedTagsMode,
+      excludedTags: excludedTags ?? state.excludedTags,
+      excludedTagsMode: excludedTagsMode ?? state.excludedTagsMode,
+      status: status ?? state.status,
       publicationDemographic:
-          action.publicationDemographic ?? state.publicationDemographic,
-      contentRating: action.contentRating ?? state.contentRating,
+          publicationDemographic ?? state.publicationDemographic,
+      contentRating: contentRating ?? state.contentRating,
     );
 
     return updated;
