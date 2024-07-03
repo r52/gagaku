@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -87,8 +86,7 @@ Future<List<ReaderPage>> _fetchChapterPages(
   final pages = mpages.pages.map((pageUrl) {
     final url = mpages.baseUrl + pageUrl;
     return ReaderPage(
-      provider: ExtendedNetworkImageProvider(url,
-          cache: true, cacheMaxAge: const Duration(minutes: 5)),
+      provider: NetworkImage(url),
     );
   }).toList();
 

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/model.dart';
@@ -114,8 +113,7 @@ Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
 
   final pages = links
       .map((e) => ReaderPage(
-            provider: ExtendedNetworkImageProvider(e,
-                cache: true, cacheMaxAge: const Duration(minutes: 5)),
+            provider: NetworkImage(e),
           ))
       .toList();
 

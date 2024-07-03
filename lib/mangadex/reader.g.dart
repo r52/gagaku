@@ -218,7 +218,7 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchChapterPagesHash() => r'ef0ef651c755abf1da2f4848d0e44fb7dbf07989';
+String _$fetchChapterPagesHash() => r'311ed9043598e22995b7b1f22c8beb97421fea35';
 
 final class _FetchChapterPagesFamily extends Family {
   const _FetchChapterPagesFamily._()

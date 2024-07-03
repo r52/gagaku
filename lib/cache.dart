@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/types.dart';
@@ -154,6 +155,9 @@ class CacheManager {
 
     if (_box.length > _preferredMaxDiskEntries) {
       _pruneExpiredDisk();
+
+      // Clear old disk cache
+      clearDiskCachedImages(duration: const Duration(days: 7));
     }
   }
 
