@@ -423,14 +423,14 @@ class Chapter with _$Chapter, MangaDexUUID {
     throw Exception('Chapter $id has no associated manga');
   }
 
-  String _getUploadUser() {
+  User? _getUploadUser() {
     final user = relationships.whereType<User>();
 
     if (user.isNotEmpty) {
-      return user.first.attributes?.username ?? '';
+      return user.first;
     }
 
-    return '';
+    return null;
   }
 }
 

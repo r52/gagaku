@@ -485,10 +485,7 @@ class Styles {
       Tween(begin: Alignment.center, end: Alignment.topCenter);
 
   static const List<Widget> loadingOverlay = [
-    Opacity(
-      opacity: 0.75,
-      child: ModalBarrier(dismissible: false, color: Colors.black),
-    ),
+    ModalBarrier(dismissible: false, color: Colors.black87),
     Center(
       child: CircularProgressIndicator(),
     ),

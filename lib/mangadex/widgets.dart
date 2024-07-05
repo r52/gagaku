@@ -383,57 +383,29 @@ class ChapterButtonWidget extends HookWidget {
         chapter.attributes.chapter == manga.attributes!.lastChapter;
     final isOfficialPub = chapter.attributes.externalUrl != null;
 
-    final pubtime = timeago.format(
-      chapter.attributes.publishAt,
-      locale: screenSizeSmall ? 'en_short' : 'en',
-    );
-
-    final groupChips = useMemoized(() {
-      final chips = <Widget>[];
-
-      for (final g in chapter.groups) {
-        chips.add(Flexible(
-            child: IconTextChip(
-          key: ValueKey(g.id),
-          icon: isOfficialPub
-              ? iconSet[_IconSet.circle]
-              : iconSet[_IconSet.group],
-          text: g.attributes.name,
-          onPressed: () {
-            context.push('/group/${g.id}', extra: g);
-          },
-        )));
-        chips.add(_rowPadding);
-      }
-
-      if (chips.isEmpty) {
-        chips.add(Flexible(
-            child: IconTextChip(
-          icon: iconSet[_IconSet.group],
-          text: 'No Group',
-        )));
-        chips.add(_rowPadding);
-      }
-
-      return chips;
-    }, [chapter, screenSizeSmall]);
-
+    final user = chapter.uploadUser;
     final userChip = IconTextChip(
+      key: ValueKey(user?.id),
       icon: !isOfficialPub ? iconSet[_IconSet.person] : iconSet[_IconSet.check],
-      text: !isOfficialPub ? chapter.uploadUser.crop() : 'Official Publisher',
+      text: !isOfficialPub
+          ? (user?.attributes?.username.crop() ?? '')
+          : 'Official Publisher',
     );
 
     final statsChip = Consumer(
       builder: (context, ref, child) {
-        final stats = ref.watch(chapterStatsProvider.select(
+        final comments = ref.watch(chapterStatsProvider.select(
           (value) => switch (value) {
             AsyncValue(value: final data?) when data.containsKey(chapter.id) =>
-              data[chapter.id],
+              data[chapter.id]?.comments,
             _ => null,
           },
         ));
 
-        return CommentChip(comments: stats?.comments);
+        return CommentChip(
+          key: ValueKey(chapter.id),
+          comments: comments,
+        );
       },
     );
 
@@ -458,6 +430,7 @@ class ChapterButtonWidget extends HookWidget {
                 children: [
                   Flexible(
                     child: ChapterTitle(
+                      key: ValueKey(chapter.id),
                       chapter: chapter,
                       manga: manga,
                     ),
@@ -466,27 +439,17 @@ class ChapterButtonWidget extends HookWidget {
                 ],
               ),
             ),
-            Text.rich(
-              overflow: TextOverflow.ellipsis,
-              TextSpan(
-                children: [
-                  WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: iconSet[_IconSet.schedule]!),
-                  TextSpan(text: ' $pubtime'),
-                ],
-              ),
-            ),
+            _PubTime(time: chapter.attributes.publishAt),
           ],
         ),
         if (!screenSizeSmall) const SizedBox(height: 2.0),
         Row(
           children: [
             // Flex group chips
-            Expanded(
-                child: Row(
-              children: groupChips,
-            )),
+            _GroupRow(
+              key: ValueKey(Object.hashAll(chapter.groups)),
+              chapter: chapter,
+            ),
             // Fixed user/stat chip
             if (!screenSizeSmall) ...[
               userChip,
@@ -951,12 +914,16 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
                           ),
                         ],
                         MangaStatisticsRow(
+                          key: ValueKey(manga.id),
                           manga: manga,
                         ),
                         const SizedBox(
                           height: 4.0,
                         ),
-                        MangaGenreRow(manga: manga),
+                        MangaGenreRow(
+                          key: ValueKey(manga.id),
+                          manga: manga,
+                        ),
                         if (manga.attributes!.description.isNotEmpty)
                           Expanded(
                             child: Padding(
@@ -1049,11 +1016,15 @@ class _ListMangaItem extends HookConsumerWidget {
                       height: 10,
                     ),
                   ],
-                  MangaGenreRow(manga: manga),
+                  MangaGenreRow(
+                    key: ValueKey(manga.id),
+                    manga: manga,
+                  ),
                   const SizedBox(
                     height: 10,
                   ),
                   MangaStatisticsRow(
+                    key: ValueKey(manga.id),
                     manga: manga,
                   ),
                 ],
@@ -1225,6 +1196,83 @@ class MangaStatisticsRow extends HookConsumerWidget {
           short: shortStatus,
         ),
       ],
+    );
+  }
+}
+
+class _GroupRow extends HookWidget {
+  final Chapter chapter;
+
+  const _GroupRow({super.key, required this.chapter});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
+    final isOfficialPub = chapter.attributes.externalUrl != null;
+
+    final groupChips = useMemoized(() {
+      final chips = <Widget>[];
+
+      for (final g in chapter.groups) {
+        chips.add(Flexible(
+            child: IconTextChip(
+          key: ValueKey(g.id),
+          icon: isOfficialPub
+              ? iconSet[_IconSet.circle]
+              : iconSet[_IconSet.group],
+          text: g.attributes.name,
+          onPressed: () {
+            context.push('/group/${g.id}', extra: g);
+          },
+        )));
+        chips.add(_rowPadding);
+      }
+
+      if (chips.isEmpty) {
+        chips.add(Flexible(
+            child: IconTextChip(
+          icon: iconSet[_IconSet.group],
+          text: 'No Group',
+        )));
+        chips.add(_rowPadding);
+      }
+
+      return chips;
+    }, [chapter, screenSizeSmall]);
+
+    return Expanded(
+      child: Row(
+        children: groupChips,
+      ),
+    );
+  }
+}
+
+class _PubTime extends StatelessWidget {
+  final DateTime time;
+
+  const _PubTime({super.key, required this.time});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
+
+    final pubtime = timeago.format(
+      time,
+      locale: screenSizeSmall ? 'en_short' : 'en',
+    );
+
+    return Text.rich(
+      TextSpan(
+        children: [
+          WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: iconSet[_IconSet.schedule]!),
+          TextSpan(text: ' $pubtime'),
+        ],
+      ),
     );
   }
 }

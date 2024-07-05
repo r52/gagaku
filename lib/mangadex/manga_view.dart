@@ -400,11 +400,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: MangaGenreRow(manga: manga),
+                    child: MangaGenreRow(
+                      key: ValueKey(manga.id),
+                      manga: manga,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
                     child: MangaStatisticsRow(
+                      key: ValueKey(manga.id),
                       manga: manga,
                       shortStatus: false,
                     ),
