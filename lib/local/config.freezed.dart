@@ -24,7 +24,7 @@ mixin _$LocalLibConfig {
   set libraryDirectory(String value) => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $LocalLibConfigCopyWith<LocalLibConfig> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -112,7 +112,7 @@ class _$LocalLibConfigImpl implements _LocalLibConfig {
     return 'LocalLibConfig(libraryDirectory: $libraryDirectory)';
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$LocalLibConfigImplCopyWith<_$LocalLibConfigImpl> get copyWith =>
@@ -137,7 +137,7 @@ abstract class _LocalLibConfig implements LocalLibConfig {
   String get libraryDirectory;
   set libraryDirectory(String value);
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$LocalLibConfigImplCopyWith<_$LocalLibConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

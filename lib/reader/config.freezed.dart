@@ -39,7 +39,7 @@ mixin _$ReaderConfig {
   int get precacheCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ReaderConfigCopyWith<ReaderConfig> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -239,12 +239,12 @@ class _$ReaderConfigImpl implements _ReaderConfig {
                 other.precacheCount == precacheCount));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, format, direction,
       showProgressBar, clickToTurn, swipeGestures, precacheCount);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ReaderConfigImplCopyWith<_$ReaderConfigImpl> get copyWith =>
@@ -295,7 +295,7 @@ abstract class _ReaderConfig implements ReaderConfig {
   /// The number of images/pages to preload
   int get precacheCount;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ReaderConfigImplCopyWith<_$ReaderConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

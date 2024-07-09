@@ -28,7 +28,7 @@ mixin _$GagakuConfig {
   Color get theme => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $GagakuConfigCopyWith<GagakuConfig> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -145,11 +145,11 @@ class _$GagakuConfigImpl implements _GagakuConfig {
             (identical(other.theme, theme) || other.theme == theme));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, themeMode, theme);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$GagakuConfigImplCopyWith<_$GagakuConfigImpl> get copyWith =>
@@ -181,7 +181,7 @@ abstract class _GagakuConfig implements GagakuConfig {
   @ColorConverter()
   Color get theme;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GagakuConfigImplCopyWith<_$GagakuConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

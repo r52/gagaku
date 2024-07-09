@@ -20,7 +20,7 @@ mixin _$ProxyInfo {
   String get code => throw _privateConstructorUsedError;
   String? get chapter => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ProxyInfoCopyWith<ProxyInfo> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -141,7 +141,7 @@ class _$ProxyInfoImpl extends _ProxyInfo {
   @override
   int get hashCode => Object.hash(runtimeType, proxy, code, chapter);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
@@ -162,7 +162,7 @@ abstract class _ProxyInfo extends ProxyInfo {
   @override
   String? get chapter;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -177,7 +177,7 @@ mixin _$HistoryLink {
   String get url => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $HistoryLinkCopyWith<HistoryLink> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -276,7 +276,7 @@ class _$HistoryLinkImpl extends _HistoryLink {
     return 'HistoryLink(title: $title, url: $url)';
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$HistoryLinkImplCopyWith<_$HistoryLinkImpl> get copyWith =>
@@ -304,7 +304,7 @@ abstract class _HistoryLink extends HistoryLink {
   @override
   String get url;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$HistoryLinkImplCopyWith<_$HistoryLinkImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -324,7 +324,7 @@ mixin _$WebManga {
   Map<String, WebChapter> get chapters => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WebMangaCopyWith<WebManga> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -534,7 +534,7 @@ class _$WebMangaImpl extends _WebManga {
             const DeepCollectionEquality().equals(other._chapters, _chapters));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -546,7 +546,7 @@ class _$WebMangaImpl extends _WebManga {
       const DeepCollectionEquality().hash(_groups),
       const DeepCollectionEquality().hash(_chapters));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WebMangaImplCopyWith<_$WebMangaImpl> get copyWith =>
@@ -589,7 +589,7 @@ abstract class _WebManga extends WebManga {
   @override
   Map<String, WebChapter> get chapters;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WebMangaImplCopyWith<_$WebMangaImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -609,7 +609,7 @@ mixin _$WebChapter {
   Map<String, dynamic> get groups => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WebChapterCopyWith<WebChapter> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -783,12 +783,12 @@ class _$WebChapterImpl extends _WebChapter {
             const DeepCollectionEquality().equals(other._groups, _groups));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, title, volume, lastUpdated,
       releaseDate, const DeepCollectionEquality().hash(_groups));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WebChapterImplCopyWith<_$WebChapterImpl> get copyWith =>
@@ -827,7 +827,7 @@ abstract class _WebChapter extends WebChapter {
   @override
   Map<String, dynamic> get groups;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WebChapterImplCopyWith<_$WebChapterImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -842,7 +842,7 @@ mixin _$ImgurPage {
   String get src => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ImgurPageCopyWith<ImgurPage> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -950,11 +950,11 @@ class _$ImgurPageImpl implements _ImgurPage {
             (identical(other.src, src) || other.src == src));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, description, src);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
@@ -981,7 +981,7 @@ abstract class _ImgurPage implements ImgurPage {
   @override
   String get src;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

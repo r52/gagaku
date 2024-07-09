@@ -31,7 +31,7 @@ mixin _$MangaFilters {
   FilterOrder get order => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaFiltersCopyWith<MangaFilters> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -308,7 +308,7 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
             (identical(other.order, order) || other.order == order));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -321,7 +321,7 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(_contentRating),
       order);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaFiltersImplCopyWith<_$MangaFiltersImpl> get copyWith =>
@@ -367,7 +367,7 @@ abstract class _MangaFilters extends MangaFilters {
   @override
   FilterOrder get order;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaFiltersImplCopyWith<_$MangaFiltersImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -377,7 +377,7 @@ mixin _$MangaSearchParameters {
   String get query => throw _privateConstructorUsedError;
   MangaFilters get filter => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaSearchParametersCopyWith<MangaSearchParameters> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -513,7 +513,7 @@ class _$MangaSearchParametersImpl
   @override
   int get hashCode => Object.hash(runtimeType, query, filter);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaSearchParametersImplCopyWith<_$MangaSearchParametersImpl>
@@ -531,7 +531,7 @@ abstract class _MangaSearchParameters implements MangaSearchParameters {
   @override
   MangaFilters get filter;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaSearchParametersImplCopyWith<_$MangaSearchParametersImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -546,7 +546,7 @@ mixin _$ChapterList {
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterListCopyWith<ChapterList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -669,12 +669,12 @@ class _$ChapterListImpl with DiagnosticableTreeMixin implements _ChapterList {
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
@@ -700,7 +700,7 @@ abstract class _ChapterList implements ChapterList {
   @override
   int get total;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -716,7 +716,7 @@ mixin _$Chapter {
   List<Relationship> get relationships => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterCopyWith<Chapter> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -875,12 +875,12 @@ class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
                 .equals(other._relationships, _relationships));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterImplCopyWith<_$ChapterImpl> get copyWith =>
@@ -910,7 +910,7 @@ abstract class _Chapter extends Chapter {
   @override
   List<Relationship> get relationships;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterImplCopyWith<_$ChapterImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -937,7 +937,7 @@ mixin _$ChapterAttributes {
   DateTime get publishAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterAttributesCopyWith<ChapterAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1208,7 +1208,7 @@ class _$ChapterAttributesImpl
                 other.publishAt == publishAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -1223,7 +1223,7 @@ class _$ChapterAttributesImpl
       updatedAt,
       publishAt);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
@@ -1280,7 +1280,7 @@ abstract class _ChapterAttributes implements ChapterAttributes {
   @TimestampSerializer()
   DateTime get publishAt;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1298,7 +1298,7 @@ mixin _$ScanlationGroupAttributes {
   String? get description => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ScanlationGroupAttributesCopyWith<ScanlationGroupAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1453,12 +1453,12 @@ class _$ScanlationGroupAttributesImpl
                 other.description == description));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, name, website, discord, description);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
@@ -1492,7 +1492,7 @@ abstract class _ScanlationGroupAttributes implements ScanlationGroupAttributes {
   @override
   String? get description;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -1509,7 +1509,7 @@ mixin _$CoverArtAttributes {
   String? get locale => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CoverArtAttributesCopyWith<CoverArtAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1661,12 +1661,12 @@ class _$CoverArtAttributesImpl
             (identical(other.locale, locale) || other.locale == locale));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, volume, fileName, description, locale);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
@@ -1700,7 +1700,7 @@ abstract class _CoverArtAttributes implements CoverArtAttributes {
   @override
   String? get locale;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1714,7 +1714,7 @@ mixin _$UserAttributes {
   String get username => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $UserAttributesCopyWith<UserAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1820,11 +1820,11 @@ class _$UserAttributesImpl
                 other.username == username));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, username);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
@@ -1849,7 +1849,7 @@ abstract class _UserAttributes implements UserAttributes {
   @override
   String get username;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1873,7 +1873,7 @@ mixin _$AuthorAttributes {
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $AuthorAttributesCopyWith<AuthorAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2130,7 +2130,7 @@ class _$AuthorAttributesImpl
                 other.updatedAt == updatedAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -2144,7 +2144,7 @@ class _$AuthorAttributesImpl
       createdAt,
       updatedAt);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
@@ -2196,7 +2196,7 @@ abstract class _AuthorAttributes implements AuthorAttributes {
   @TimestampSerializer()
   DateTime get updatedAt;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2303,7 +2303,7 @@ mixin _$Relationship {
   }) =>
       throw _privateConstructorUsedError;
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $RelationshipCopyWith<Relationship> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2471,12 +2471,12 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
             (identical(other.related, related) || other.related == related));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships), related);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaImplCopyWith<_$MangaImpl> get copyWith =>
@@ -2604,7 +2604,7 @@ abstract class Manga implements Relationship, MangaOps {
   List<Relationship>? get relationships;
   MangaRelations? get related;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaImplCopyWith<_$MangaImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2701,11 +2701,11 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
                 other.attributes == attributes));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>
@@ -2829,7 +2829,7 @@ abstract class User implements Relationship {
   String get id;
   UserAttributes? get attributes;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2924,11 +2924,11 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
                 other.attributes == attributes));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ArtistImplCopyWith<_$ArtistImpl> get copyWith =>
@@ -3052,7 +3052,7 @@ abstract class Artist implements Relationship, CreatorType {
   String get id;
   AuthorAttributes get attributes;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ArtistImplCopyWith<_$ArtistImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3147,11 +3147,11 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
                 other.attributes == attributes));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$AuthorImplCopyWith<_$AuthorImpl> get copyWith =>
@@ -3275,7 +3275,7 @@ abstract class Author implements Relationship, CreatorType {
   String get id;
   AuthorAttributes get attributes;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AuthorImplCopyWith<_$AuthorImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3349,11 +3349,11 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
             (identical(other.id, id) || other.id == id));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CreatorIDImplCopyWith<_$CreatorIDImpl> get copyWith =>
@@ -3475,7 +3475,7 @@ abstract class CreatorID implements Relationship {
   @override
   String get id;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CreatorIDImplCopyWith<_$CreatorIDImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3573,11 +3573,11 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
                 other.attributes == attributes));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CoverArtImplCopyWith<_$CoverArtImpl> get copyWith =>
@@ -3702,7 +3702,7 @@ abstract class CoverArt implements Relationship {
   String get id;
   CoverArtAttributes? get attributes;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoverArtImplCopyWith<_$CoverArtImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3797,11 +3797,11 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
                 other.attributes == attributes));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$GroupImplCopyWith<_$GroupImpl> get copyWith =>
@@ -3925,7 +3925,7 @@ abstract class Group implements Relationship {
   String get id;
   ScanlationGroupAttributes get attributes;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupImplCopyWith<_$GroupImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -3941,7 +3941,7 @@ mixin _$ChapterAPIData {
   List<String> get dataSaver => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterAPIDataCopyWith<ChapterAPIData> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4091,7 +4091,7 @@ class _$ChapterAPIDataImpl
                 .equals(other._dataSaver, _dataSaver));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -4099,7 +4099,7 @@ class _$ChapterAPIDataImpl
       const DeepCollectionEquality().hash(_data),
       const DeepCollectionEquality().hash(_dataSaver));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterAPIDataImplCopyWith<_$ChapterAPIDataImpl> get copyWith =>
@@ -4130,7 +4130,7 @@ abstract class _ChapterAPIData implements ChapterAPIData {
   @override
   List<String> get dataSaver;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterAPIDataImplCopyWith<_$ChapterAPIDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4145,7 +4145,7 @@ mixin _$ChapterAPI {
   ChapterAPIData get chapter => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterAPICopyWith<ChapterAPI> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4276,11 +4276,11 @@ class _$ChapterAPIImpl extends _ChapterAPI with DiagnosticableTreeMixin {
             (identical(other.chapter, chapter) || other.chapter == chapter));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, baseUrl, chapter);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterAPIImplCopyWith<_$ChapterAPIImpl> get copyWith =>
@@ -4308,7 +4308,7 @@ abstract class _ChapterAPI extends ChapterAPI {
   @override
   ChapterAPIData get chapter;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterAPIImplCopyWith<_$ChapterAPIImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4323,7 +4323,7 @@ mixin _$CoverList {
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CoverListCopyWith<CoverList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4445,12 +4445,12 @@ class _$CoverListImpl with DiagnosticableTreeMixin implements _CoverList {
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CoverListImplCopyWith<_$CoverListImpl> get copyWith =>
@@ -4476,7 +4476,7 @@ abstract class _CoverList implements CoverList {
   @override
   int get total;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoverListImplCopyWith<_$CoverListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4491,7 +4491,7 @@ mixin _$MangaList {
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaListCopyWith<MangaList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4613,12 +4613,12 @@ class _$MangaListImpl with DiagnosticableTreeMixin implements _MangaList {
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaListImplCopyWith<_$MangaListImpl> get copyWith =>
@@ -4644,7 +4644,7 @@ abstract class _MangaList implements MangaList {
   @override
   int get total;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaListImplCopyWith<_$MangaListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4659,7 +4659,7 @@ mixin _$GroupList {
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $GroupListCopyWith<GroupList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4781,12 +4781,12 @@ class _$GroupListImpl with DiagnosticableTreeMixin implements _GroupList {
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$GroupListImplCopyWith<_$GroupListImpl> get copyWith =>
@@ -4812,7 +4812,7 @@ abstract class _GroupList implements GroupList {
   @override
   int get total;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupListImplCopyWith<_$GroupListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4827,7 +4827,7 @@ mixin _$CreatorList {
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CreatorListCopyWith<CreatorList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -4953,12 +4953,12 @@ class _$CreatorListListImpl
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CreatorListListImplCopyWith<_$CreatorListListImpl> get copyWith =>
@@ -4985,7 +4985,7 @@ abstract class _CreatorListList implements CreatorList {
   @override
   int get total;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CreatorListListImplCopyWith<_$CreatorListListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -5002,7 +5002,7 @@ mixin _$MangaLinks {
   String? get mal => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaLinksCopyWith<MangaLinks> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -5147,11 +5147,11 @@ class _$MangaLinksImpl with DiagnosticableTreeMixin implements _MangaLinks {
             (identical(other.mal, mal) || other.mal == mal));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, raw, al, mu, mal);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaLinksImplCopyWith<_$MangaLinksImpl> get copyWith =>
@@ -5184,7 +5184,7 @@ abstract class _MangaLinks implements MangaLinks {
   @override
   String? get mal;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaLinksImplCopyWith<_$MangaLinksImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -5216,7 +5216,7 @@ mixin _$MangaAttributes {
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaAttributesCopyWith<MangaAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -5620,7 +5620,7 @@ class _$MangaAttributesImpl
                 other.updatedAt == updatedAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -5640,7 +5640,7 @@ class _$MangaAttributesImpl
       createdAt,
       updatedAt);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaAttributesImplCopyWith<_$MangaAttributesImpl> get copyWith =>
@@ -5711,7 +5711,7 @@ abstract class _MangaAttributes implements MangaAttributes {
   @TimestampSerializer()
   DateTime get updatedAt;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaAttributesImplCopyWith<_$MangaAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -5726,7 +5726,7 @@ mixin _$Tag {
   TagAttributes get attributes => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $TagCopyWith<Tag> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -5850,11 +5850,11 @@ class _$TagImpl with DiagnosticableTreeMixin implements _Tag {
                 other.attributes == attributes));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$TagImplCopyWith<_$TagImpl> get copyWith =>
@@ -5880,7 +5880,7 @@ abstract class _Tag implements Tag {
   @override
   TagAttributes get attributes;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TagImplCopyWith<_$TagImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -5896,7 +5896,7 @@ mixin _$TagAttributes {
   TagGroup get group => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $TagAttributesCopyWith<TagAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6053,7 +6053,7 @@ class _$TagAttributesImpl
             (identical(other.group, group) || other.group == group));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -6061,7 +6061,7 @@ class _$TagAttributesImpl
       const DeepCollectionEquality().hash(_description),
       group);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$TagAttributesImplCopyWith<_$TagAttributesImpl> get copyWith =>
@@ -6091,7 +6091,7 @@ abstract class _TagAttributes implements TagAttributes {
   @override
   TagGroup get group;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TagAttributesImplCopyWith<_$TagAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6106,7 +6106,7 @@ mixin _$TagResponse {
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $TagResponseCopyWith<TagResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6229,12 +6229,12 @@ class _$TagResponseImpl with DiagnosticableTreeMixin implements _TagResponse {
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$TagResponseImplCopyWith<_$TagResponseImpl> get copyWith =>
@@ -6260,7 +6260,7 @@ abstract class _TagResponse implements TagResponse {
   @override
   int get total;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TagResponseImplCopyWith<_$TagResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6276,7 +6276,7 @@ mixin _$MangaStatisticsResponse {
       throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaStatisticsResponseCopyWith<MangaStatisticsResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6393,12 +6393,12 @@ class _$MangaStatisticsResponseImpl
                 .equals(other._statistics, _statistics));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_statistics));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaStatisticsResponseImplCopyWith<_$MangaStatisticsResponseImpl>
@@ -6424,7 +6424,7 @@ abstract class _MangaStatisticsResponse implements MangaStatisticsResponse {
   @override
   Map<String, MangaStatistics> get statistics;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaStatisticsResponseImplCopyWith<_$MangaStatisticsResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -6440,7 +6440,7 @@ mixin _$ChapterStatisticsResponse {
       throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterStatisticsResponseCopyWith<ChapterStatisticsResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6557,12 +6557,12 @@ class _$ChapterStatisticsResponseImpl
                 .equals(other._statistics, _statistics));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_statistics));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterStatisticsResponseImplCopyWith<_$ChapterStatisticsResponseImpl>
@@ -6588,7 +6588,7 @@ abstract class _ChapterStatisticsResponse implements ChapterStatisticsResponse {
   @override
   Map<String, ChapterStatistics> get statistics;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterStatisticsResponseImplCopyWith<_$ChapterStatisticsResponseImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -6604,7 +6604,7 @@ mixin _$MangaStatistics {
   int get follows => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaStatisticsCopyWith<MangaStatistics> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6773,11 +6773,11 @@ class _$MangaStatisticsImpl
             (identical(other.follows, follows) || other.follows == follows));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, comments, rating, follows);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaStatisticsImplCopyWith<_$MangaStatisticsImpl> get copyWith =>
@@ -6808,7 +6808,7 @@ abstract class _MangaStatistics implements MangaStatistics {
   @override
   int get follows;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaStatisticsImplCopyWith<_$MangaStatisticsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6822,7 +6822,7 @@ mixin _$ChapterStatistics {
   StatisticsDetailsComments? get comments => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterStatisticsCopyWith<ChapterStatistics> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6945,11 +6945,11 @@ class _$ChapterStatisticsImpl
                 other.comments == comments));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, comments);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterStatisticsImplCopyWith<_$ChapterStatisticsImpl> get copyWith =>
@@ -6974,7 +6974,7 @@ abstract class _ChapterStatistics implements ChapterStatistics {
   @override
   StatisticsDetailsComments? get comments;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterStatisticsImplCopyWith<_$ChapterStatisticsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -6990,7 +6990,7 @@ mixin _$StatisticsDetailsComments {
   int get repliesCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $StatisticsDetailsCommentsCopyWith<StatisticsDetailsComments> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7116,11 +7116,11 @@ class _$StatisticsDetailsCommentsImpl
                 other.repliesCount == repliesCount));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, threadId, repliesCount);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$StatisticsDetailsCommentsImplCopyWith<_$StatisticsDetailsCommentsImpl>
@@ -7148,7 +7148,7 @@ abstract class _StatisticsDetailsComments implements StatisticsDetailsComments {
   @override
   int get repliesCount;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$StatisticsDetailsCommentsImplCopyWith<_$StatisticsDetailsCommentsImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -7164,7 +7164,7 @@ mixin _$StatisticsDetailsRating {
   double get bayesian => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $StatisticsDetailsRatingCopyWith<StatisticsDetailsRating> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7288,11 +7288,11 @@ class _$StatisticsDetailsRatingImpl
                 other.bayesian == bayesian));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, average, bayesian);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$StatisticsDetailsRatingImplCopyWith<_$StatisticsDetailsRatingImpl>
@@ -7320,7 +7320,7 @@ abstract class _StatisticsDetailsRating implements StatisticsDetailsRating {
   @override
   double get bayesian;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$StatisticsDetailsRatingImplCopyWith<_$StatisticsDetailsRatingImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -7334,7 +7334,7 @@ mixin _$SelfRatingResponse {
   Map<String, SelfRating> get ratings => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $SelfRatingResponseCopyWith<SelfRatingResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7445,12 +7445,12 @@ class _$SelfRatingResponseImpl
             const DeepCollectionEquality().equals(other._ratings, _ratings));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_ratings));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$SelfRatingResponseImplCopyWith<_$SelfRatingResponseImpl> get copyWith =>
@@ -7475,7 +7475,7 @@ abstract class _SelfRatingResponse implements SelfRatingResponse {
   @override
   Map<String, SelfRating> get ratings;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SelfRatingResponseImplCopyWith<_$SelfRatingResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7491,7 +7491,7 @@ mixin _$SelfRating {
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $SelfRatingCopyWith<SelfRating> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7612,11 +7612,11 @@ class _$SelfRatingImpl extends _SelfRating with DiagnosticableTreeMixin {
                 other.createdAt == createdAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, rating, createdAt);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$SelfRatingImplCopyWith<_$SelfRatingImpl> get copyWith =>
@@ -7646,7 +7646,7 @@ abstract class _SelfRating extends SelfRating {
   @TimestampSerializer()
   DateTime get createdAt;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SelfRatingImplCopyWith<_$SelfRatingImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7661,7 +7661,7 @@ mixin _$CustomListList {
   int get total => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CustomListListCopyWith<CustomListList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7787,12 +7787,12 @@ class _$CustomListListImpl
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CustomListListImplCopyWith<_$CustomListListImpl> get copyWith =>
@@ -7819,7 +7819,7 @@ abstract class _CustomListList implements CustomListList {
   @override
   int get total;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CustomListListImplCopyWith<_$CustomListListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7835,7 +7835,7 @@ mixin _$CustomList {
   List<Relationship> get relationships => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CustomListCopyWith<CustomList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -7997,12 +7997,12 @@ class _$CustomListImpl extends _CustomList with DiagnosticableTreeMixin {
                 .equals(other._relationships, _relationships));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
@@ -8033,7 +8033,7 @@ abstract class _CustomList extends CustomList {
   @override
   List<Relationship> get relationships;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -8049,7 +8049,7 @@ mixin _$CustomListAttributes {
   int get version => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CustomListAttributesCopyWith<CustomListAttributes> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -8185,11 +8185,11 @@ class _$CustomListAttributesImpl
             (identical(other.version, version) || other.version == version));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, name, visibility, version);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CustomListAttributesImplCopyWith<_$CustomListAttributesImpl>
@@ -8221,7 +8221,7 @@ abstract class _CustomListAttributes implements CustomListAttributes {
   @override
   int get version;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CustomListAttributesImplCopyWith<_$CustomListAttributesImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -8236,7 +8236,7 @@ mixin _$ErrorResponse {
   List<MDError> get errors => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ErrorResponseCopyWith<ErrorResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -8361,12 +8361,12 @@ class _$ErrorResponseImpl
             const DeepCollectionEquality().equals(other._errors, _errors));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, result, const DeepCollectionEquality().hash(_errors));
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ErrorResponseImplCopyWith<_$ErrorResponseImpl> get copyWith =>
@@ -8392,7 +8392,7 @@ abstract class _ErrorResponse implements ErrorResponse {
   @override
   List<MDError> get errors;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ErrorResponseImplCopyWith<_$ErrorResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -8410,7 +8410,7 @@ mixin _$MDError {
   String? get context => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MDErrorCopyWith<MDError> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -8573,12 +8573,12 @@ class _$MDErrorImpl with DiagnosticableTreeMixin implements _MDError {
             (identical(other.context, context) || other.context == context));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, id, status, title, detail, context);
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
@@ -8613,7 +8613,7 @@ abstract class _MDError implements MDError {
   @override
   String? get context;
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

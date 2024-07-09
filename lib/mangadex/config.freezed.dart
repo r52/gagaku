@@ -39,7 +39,7 @@ mixin _$MangaDexConfig {
   set groupBlacklist(Set<String> value) => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaDexConfigCopyWith<MangaDexConfig> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -200,7 +200,7 @@ class _$MangaDexConfigImpl implements _MangaDexConfig {
     return 'MangaDexConfig(translatedLanguages: $translatedLanguages, originalLanguage: $originalLanguage, contentRating: $contentRating, dataSaver: $dataSaver, groupBlacklist: $groupBlacklist)';
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
@@ -246,7 +246,7 @@ abstract class _MangaDexConfig implements MangaDexConfig {
   Set<String> get groupBlacklist;
   set groupBlacklist(Set<String> value);
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
