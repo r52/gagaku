@@ -39,6 +39,307 @@ class ReaderWidget extends HookConsumerWidget {
   // Backup route for BackButton if nav stack cannot pop
   final String? backRoute;
 
+  void cachePage(ReaderPage page, BuildContext context) {
+    precacheImage(page.provider, context);
+    page.cached = true;
+  }
+
+  void cachePages(
+      ValueNotifier<int> currentPage, int precacheCount, BuildContext context) {
+    final pageCount = pages.length;
+
+    // Forward cache precacheCount() pages
+    if (currentPage.value + 1 < pageCount &&
+        !pages.elementAt(currentPage.value + 1).cached) {
+      while (!pages.elementAt(currentPage.value + 1).cached) {
+        pages.skip(currentPage.value).take(precacheCount).forEach((element) {
+          if (!element.cached) {
+            cachePage(element, context);
+          }
+        });
+      }
+    }
+
+    // Try and back cache 3 pages
+    const backCacheAmount = 3;
+    var backCache = currentPage.value - backCacheAmount;
+    if (backCache < 0) {
+      backCache = 0;
+    }
+
+    pages.skip(backCache).take(backCacheAmount).forEach((element) {
+      if (!element.cached) {
+        cachePage(element, context);
+      }
+    });
+  }
+
+  void setPageValue({
+    required int page,
+    required ValueNotifier<int> currentPage,
+    required int precacheCount,
+    required ValueNotifier<String?> subtext,
+    required BuildContext context,
+  }) {
+    currentPage.value = page;
+    cachePages(currentPage, precacheCount, context);
+    subtext.value = subtitle ?? pages.elementAt(currentPage.value).sortKey;
+  }
+
+  void jumpToPage(
+    int page, {
+    required ReaderFormat format,
+    required PageController pageController,
+    required ListController listController,
+    required ScrollController scrollController,
+  }) {
+    final pageCount = pages.length;
+    if (page < 0 || page >= pageCount) return;
+    assert(page >= 0 && page < pageCount);
+
+    switch (format) {
+      case ReaderFormat.longstrip:
+        if (listController.isAttached) {
+          listController.jumpToItem(
+            index: page,
+            scrollController: scrollController,
+            alignment: 0,
+          );
+        }
+
+        break;
+      default:
+        if (pageController.hasClients) {
+          pageController.jumpToPage(page);
+        }
+        break;
+    }
+  }
+
+  void animateToPage(
+    int page, {
+    required Duration duration,
+    required Curve curve,
+    required ReaderFormat format,
+    required PageController pageController,
+    required ListController listController,
+    required ScrollController scrollController,
+  }) {
+    assert(page >= 0 && page < pages.length);
+
+    switch (format) {
+      case ReaderFormat.longstrip:
+        if (listController.isAttached) {
+          listController.animateToItem(
+            index: page,
+            scrollController: scrollController,
+            alignment: 0,
+            duration: (estimatedDistance) => duration,
+            curve: (estimatedDistance) => curve,
+          );
+        }
+        break;
+      default:
+        if (pageController.hasClients) {
+          pageController.animateToPage(page, duration: duration, curve: curve);
+        }
+        break;
+    }
+  }
+
+  void jumpToPreviousPage(
+    ValueNotifier<int> currentPage, {
+    required ReaderFormat format,
+    required PageController pageController,
+    required ListController listController,
+    required ScrollController scrollController,
+  }) {
+    jumpToPage(currentPage.value - 1,
+        format: format,
+        pageController: pageController,
+        listController: listController,
+        scrollController: scrollController);
+  }
+
+  void jumpToNextPage(
+    ValueNotifier<int> currentPage, {
+    required ReaderFormat format,
+    required PageController pageController,
+    required ListController listController,
+    required ScrollController scrollController,
+  }) {
+    jumpToPage(currentPage.value + 1,
+        format: format,
+        pageController: pageController,
+        listController: listController,
+        scrollController: scrollController);
+  }
+
+  KeyEventResult onTapLeft({
+    required ValueNotifier<int> currentPage,
+    required ReaderConfig settings,
+    required ReaderFormat format,
+    required PageController pageController,
+    required ListController listController,
+    required ScrollController scrollController,
+    required BuildContext context,
+  }) {
+    if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
+
+    switch (settings.direction) {
+      case ReaderDirection.leftToRight:
+        jumpToPreviousPage(
+          currentPage,
+          format: format,
+          pageController: pageController,
+          listController: listController,
+          scrollController: scrollController,
+        );
+        break;
+      case ReaderDirection.rightToLeft:
+        if (currentPage.value < pages.length - 1) {
+          jumpToNextPage(
+            currentPage,
+            format: format,
+            pageController: pageController,
+            listController: listController,
+            scrollController: scrollController,
+          );
+        } else {
+          if (context.canPop()) {
+            context.pop();
+          }
+        }
+        break;
+      default:
+        // Do nothing
+        break;
+    }
+
+    return KeyEventResult.handled;
+  }
+
+  KeyEventResult onTapRight({
+    required ValueNotifier<int> currentPage,
+    required ReaderConfig settings,
+    required ReaderFormat format,
+    required PageController pageController,
+    required ListController listController,
+    required ScrollController scrollController,
+    required BuildContext context,
+  }) {
+    if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
+
+    switch (settings.direction) {
+      case ReaderDirection.leftToRight:
+        if (currentPage.value < pages.length - 1) {
+          jumpToNextPage(
+            currentPage,
+            format: format,
+            pageController: pageController,
+            listController: listController,
+            scrollController: scrollController,
+          );
+        } else {
+          if (context.canPop()) {
+            context.pop();
+          }
+        }
+        break;
+      case ReaderDirection.rightToLeft:
+        jumpToPreviousPage(
+          currentPage,
+          format: format,
+          pageController: pageController,
+          listController: listController,
+          scrollController: scrollController,
+        );
+        break;
+      default:
+        // Do nothing
+        break;
+    }
+
+    return KeyEventResult.handled;
+  }
+
+  KeyEventResult onTapTop(
+    double offset, {
+    required ValueNotifier<int> currentPage,
+    required ReaderConfig settings,
+    required ReaderFormat format,
+    required List<PhotoViewController> viewController,
+    required ListController listController,
+    required ScrollController scrollController,
+    required BuildContext context,
+  }) {
+    if (format == ReaderFormat.longstrip) {
+      scrollController.animateTo(scrollController.offset - offset,
+          duration: const Duration(milliseconds: 50), curve: Curves.easeInOut);
+
+      return KeyEventResult.handled;
+    }
+
+    switch (settings.direction) {
+      case ReaderDirection.leftToRight:
+      case ReaderDirection.rightToLeft:
+        viewController[currentPage.value].position =
+            viewController[currentPage.value].position + Offset(0.0, offset);
+        break;
+      default:
+        // Do nothing
+        break;
+    }
+
+    return KeyEventResult.handled;
+  }
+
+  KeyEventResult onTapBottom(
+    double offset, {
+    required ValueNotifier<int> currentPage,
+    required ReaderConfig settings,
+    required ReaderFormat format,
+    required List<PhotoViewController> viewController,
+    required ListController listController,
+    required ScrollController scrollController,
+    required BuildContext context,
+  }) {
+    if (format == ReaderFormat.longstrip) {
+      if (listController.isAttached && listController.visibleRange != null) {
+        final positions = listController.visibleRange;
+        final max = positions!.$2;
+
+        if (max == pages.length - 1 &&
+            scrollController.position.atEdge &&
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
+          if (context.canPop()) {
+            context.pop();
+          }
+        } else {
+          scrollController.animateTo(scrollController.offset + offset,
+              duration: const Duration(milliseconds: 50),
+              curve: Curves.easeInOut);
+        }
+      }
+
+      return KeyEventResult.handled;
+    }
+
+    switch (settings.direction) {
+      case ReaderDirection.leftToRight:
+      case ReaderDirection.rightToLeft:
+        viewController[currentPage.value].position =
+            viewController[currentPage.value].position - Offset(0.0, offset);
+        break;
+      default:
+        // Do nothing
+        break;
+    }
+
+    return KeyEventResult.handled;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageCount = pages.length;
@@ -60,77 +361,17 @@ class ReaderWidget extends HookConsumerWidget {
         useValueNotifier<String?>(subtitle ?? pages.elementAt(0).sortKey);
     final format = longstrip ? ReaderFormat.longstrip : settings.format;
 
-    void cachePage(ReaderPage page) {
-      precacheImage(page.provider, context);
-      page.cached = true;
-    }
-
     final precacheCount = useCallback(() {
       return (settings.precacheCount > 9 || format == ReaderFormat.longstrip)
           ? pageCount
           : settings.precacheCount;
     }, [settings, format]);
 
-    void cachePages() {
-      // Forward cache precacheCount() pages
-      if (currentPage.value + 1 < pageCount &&
-          !pages.elementAt(currentPage.value + 1).cached) {
-        while (!pages.elementAt(currentPage.value + 1).cached) {
-          pages
-              .skip(currentPage.value)
-              .take(precacheCount())
-              .forEach((element) {
-            if (!element.cached) {
-              cachePage(element);
-            }
-          });
-        }
-      }
-
-      // Try and back cache 3 pages
-      const backCacheAmount = 3;
-      var backCache = currentPage.value - backCacheAmount;
-      if (backCache < 0) {
-        backCache = 0;
-      }
-
-      pages.skip(backCache).take(backCacheAmount).forEach((element) {
-        if (!element.cached) {
-          cachePage(element);
-        }
-      });
-    }
-
-    void scaleStateListener(PhotoViewScaleState value) {
-      currentImageScale.value = value;
-    }
-
-    void setPageValue(int page) {
-      currentPage.value = page;
-      cachePages();
-      subtext.value = subtitle ?? pages.elementAt(currentPage.value).sortKey;
-    }
-
-    void pageCallback() {
-      if (pageController.page != null) {
-        Future.delayed(Duration.zero, () {
-          setPageValue(pageController.page!.toInt());
-        });
-      }
-    }
-
-    void listPosCb() {
-      if (listController.isAttached && listController.visibleRange != null) {
-        final positions = listController.visibleRange;
-        final min = positions!.$1;
-
-        Future.delayed(Duration.zero, () {
-          setPageValue(min);
-        });
-      }
-    }
-
     useEffect(() {
+      void scaleStateListener(PhotoViewScaleState value) {
+        currentImageScale.value = value;
+      }
+
       final subs = <StreamSubscription<PhotoViewScaleState>>[];
 
       for (final c in scaleStateController) {
@@ -142,239 +383,52 @@ class ReaderWidget extends HookConsumerWidget {
           s.cancel();
         }
       };
-    }, []);
+    }, [scaleStateController]);
 
     useEffect(() {
+      void pageCallback() {
+        if (pageController.page != null) {
+          Future.delayed(Duration.zero, () {
+            if (context.mounted) {
+              setPageValue(
+                page: pageController.page!.toInt(),
+                currentPage: currentPage,
+                precacheCount: precacheCount(),
+                subtext: subtext,
+                context: context,
+              );
+            }
+          });
+        }
+      }
+
       pageController.addListener(pageCallback);
       return () => pageController.removeListener(pageCallback);
     }, [pageController, settings]);
 
     useEffect(() {
+      void listPosCb() {
+        if (listController.isAttached && listController.visibleRange != null) {
+          final positions = listController.visibleRange;
+          final min = positions!.$1;
+
+          Future.delayed(Duration.zero, () {
+            if (context.mounted) {
+              setPageValue(
+                page: min,
+                currentPage: currentPage,
+                precacheCount: precacheCount(),
+                subtext: subtext,
+                context: context,
+              );
+            }
+          });
+        }
+      }
+
       listController.addListener(listPosCb);
       return () => listController.removeListener(listPosCb);
     }, [listController, settings]);
-
-    void jumpToPage(int page) {
-      assert(page >= 0 && page < pageCount);
-
-      switch (format) {
-        case ReaderFormat.longstrip:
-          if (listController.isAttached) {
-            listController.jumpToItem(
-              index: page,
-              scrollController: scrollController,
-              alignment: 0,
-            );
-          }
-
-          break;
-        default:
-          if (pageController.hasClients) {
-            pageController.jumpToPage(page);
-          }
-          break;
-      }
-    }
-
-    void animateToPage(
-      int page, {
-      required Duration duration,
-      required Curve curve,
-    }) {
-      assert(page >= 0 && page < pageCount);
-
-      switch (format) {
-        case ReaderFormat.longstrip:
-          if (listController.isAttached) {
-            listController.animateToItem(
-              index: page,
-              scrollController: scrollController,
-              alignment: 0,
-              duration: (estimatedDistance) => duration,
-              curve: (estimatedDistance) => curve,
-            );
-          }
-          break;
-        default:
-          if (pageController.hasClients) {
-            pageController.animateToPage(page,
-                duration: duration, curve: curve);
-          }
-          break;
-      }
-    }
-
-    void jumpToPreviousPage() {
-      if (currentPage.value > 0) {
-        jumpToPage(currentPage.value - 1);
-      }
-    }
-
-    void jumpToNextPage() {
-      if (currentPage.value < pageCount - 1) {
-        jumpToPage(currentPage.value + 1);
-      }
-    }
-
-    KeyEventResult onTapLeft() {
-      if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
-
-      switch (settings.direction) {
-        case ReaderDirection.leftToRight:
-          jumpToPreviousPage();
-          break;
-        case ReaderDirection.rightToLeft:
-          if (currentPage.value < pageCount - 1) {
-            jumpToNextPage();
-          } else {
-            if (context.canPop()) {
-              context.pop();
-            }
-          }
-          break;
-        default:
-          // Do nothing
-          break;
-      }
-
-      return KeyEventResult.handled;
-    }
-
-    KeyEventResult onTapRight() {
-      if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
-
-      switch (settings.direction) {
-        case ReaderDirection.leftToRight:
-          if (currentPage.value < pageCount - 1) {
-            jumpToNextPage();
-          } else {
-            if (context.canPop()) {
-              context.pop();
-            }
-          }
-          break;
-        case ReaderDirection.rightToLeft:
-          jumpToPreviousPage();
-          break;
-        default:
-          // Do nothing
-          break;
-      }
-
-      return KeyEventResult.handled;
-    }
-
-    KeyEventResult onTapTop(double offset) {
-      if (format == ReaderFormat.longstrip) {
-        scrollController.animateTo(scrollController.offset - offset,
-            duration: const Duration(milliseconds: 50),
-            curve: Curves.easeInOut);
-
-        return KeyEventResult.handled;
-      }
-
-      switch (settings.direction) {
-        case ReaderDirection.leftToRight:
-        case ReaderDirection.rightToLeft:
-          viewController[currentPage.value].position =
-              viewController[currentPage.value].position + Offset(0.0, offset);
-          break;
-        default:
-          // Do nothing
-          break;
-      }
-
-      return KeyEventResult.handled;
-    }
-
-    KeyEventResult onTapBottom(double offset) {
-      if (format == ReaderFormat.longstrip) {
-        if (listController.isAttached && listController.visibleRange != null) {
-          final positions = listController.visibleRange;
-          final max = positions!.$2;
-
-          if (max == pageCount - 1 &&
-              scrollController.position.atEdge &&
-              scrollController.position.pixels ==
-                  scrollController.position.maxScrollExtent) {
-            if (context.canPop()) {
-              context.pop();
-            }
-          } else {
-            scrollController.animateTo(scrollController.offset + offset,
-                duration: const Duration(milliseconds: 50),
-                curve: Curves.easeInOut);
-          }
-        }
-
-        return KeyEventResult.handled;
-      }
-
-      switch (settings.direction) {
-        case ReaderDirection.leftToRight:
-        case ReaderDirection.rightToLeft:
-          viewController[currentPage.value].position =
-              viewController[currentPage.value].position - Offset(0.0, offset);
-          break;
-        default:
-          // Do nothing
-          break;
-      }
-
-      return KeyEventResult.handled;
-    }
-
-    KeyEventResult handleKeyEvent(FocusNode node, KeyEvent event) {
-      if (event is KeyDownEvent) {
-        switch (event.physicalKey) {
-          case PhysicalKeyboardKey.arrowLeft:
-            return onTapLeft();
-          case PhysicalKeyboardKey.arrowRight:
-            return onTapRight();
-          case PhysicalKeyboardKey.arrowUp:
-            return onTapTop(250);
-          case PhysicalKeyboardKey.arrowDown:
-            return onTapBottom(250);
-          case PhysicalKeyboardKey.pageUp:
-            return onTapTop(1000);
-          case PhysicalKeyboardKey.pageDown:
-            return onTapBottom(1000);
-          default:
-            return KeyEventResult.ignored;
-        }
-      } else if (event is KeyRepeatEvent) {
-        switch (event.physicalKey) {
-          case PhysicalKeyboardKey.arrowUp:
-            return onTapTop(250);
-          case PhysicalKeyboardKey.arrowDown:
-            return onTapBottom(250);
-          case PhysicalKeyboardKey.pageUp:
-            return onTapTop(1000);
-          case PhysicalKeyboardKey.pageDown:
-            return onTapBottom(1000);
-          default:
-            return KeyEventResult.ignored;
-        }
-      }
-
-      return KeyEventResult.ignored;
-    }
-
-    void handleImageViewOnTap(BuildContext context, TapUpDetails details,
-        PhotoViewControllerValue value) {
-      focusNode.requestFocus();
-
-      final taploc = details.localPosition.dx;
-      final viewport = context.size!.width;
-
-      final tapmargin = viewport / 2.5;
-
-      if (taploc < tapmargin) {
-        onTapLeft();
-      } else if (taploc > viewport - tapmargin) {
-        onTapRight();
-      }
-    }
 
     final pageDropdownItems = List<DropdownMenuEntry<int>>.generate(
         pageCount,
@@ -454,8 +508,15 @@ class ReaderWidget extends HookConsumerWidget {
                     builder: (_) {
                       final value = useValueListenable(currentPage);
                       return OutlinedButton(
-                        onPressed:
-                            (value > 0) ? () => jumpToPreviousPage() : null,
+                        onPressed: (value > 0)
+                            ? () => jumpToPreviousPage(
+                                  currentPage,
+                                  format: format,
+                                  pageController: pageController,
+                                  listController: listController,
+                                  scrollController: scrollController,
+                                )
+                            : null,
                         child: const Icon(Icons.arrow_back_ios_new),
                       );
                     },
@@ -482,7 +543,13 @@ class ReaderWidget extends HookConsumerWidget {
                         ),
                         onSelected: (int? index) {
                           if (index != null) {
-                            jumpToPage(index);
+                            jumpToPage(
+                              index,
+                              format: format,
+                              pageController: pageController,
+                              listController: listController,
+                              scrollController: scrollController,
+                            );
                           }
                         },
                         dropdownMenuEntries: pageDropdownItems,
@@ -497,7 +564,13 @@ class ReaderWidget extends HookConsumerWidget {
                       final value = useValueListenable(currentPage);
                       return OutlinedButton(
                         onPressed: (value < pageCount - 1)
-                            ? () => jumpToNextPage()
+                            ? () => jumpToNextPage(
+                                  currentPage,
+                                  format: format,
+                                  pageController: pageController,
+                                  listController: listController,
+                                  scrollController: scrollController,
+                                )
                             : null,
                         child: const Icon(Icons.arrow_forward_ios),
                       );
@@ -665,7 +738,129 @@ class ReaderWidget extends HookConsumerWidget {
       body: Focus(
         autofocus: true,
         focusNode: focusNode,
-        onKeyEvent: handleKeyEvent,
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent) {
+            switch (event.physicalKey) {
+              case PhysicalKeyboardKey.arrowLeft:
+                return onTapLeft(
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  pageController: pageController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.arrowRight:
+                return onTapRight(
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  pageController: pageController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.arrowUp:
+                return onTapTop(
+                  250,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.arrowDown:
+                return onTapBottom(
+                  250,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.pageUp:
+                return onTapTop(
+                  1000,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.pageDown:
+                return onTapBottom(
+                  1000,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              default:
+                return KeyEventResult.ignored;
+            }
+          } else if (event is KeyRepeatEvent) {
+            switch (event.physicalKey) {
+              case PhysicalKeyboardKey.arrowUp:
+                return onTapTop(
+                  250,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.arrowDown:
+                return onTapBottom(
+                  250,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.pageUp:
+                return onTapTop(
+                  1000,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              case PhysicalKeyboardKey.pageDown:
+                return onTapBottom(
+                  1000,
+                  currentPage: currentPage,
+                  settings: settings,
+                  format: format,
+                  viewController: viewController,
+                  listController: listController,
+                  scrollController: scrollController,
+                  context: context,
+                );
+              default:
+                return KeyEventResult.ignored;
+            }
+          }
+
+          return KeyEventResult.ignored;
+        },
         child: Builder(
           builder: (context) {
             if (pages.isEmpty && externalUrl != null) {
@@ -774,8 +969,38 @@ class ReaderWidget extends HookConsumerWidget {
                         maxScale: PhotoViewComputedScale.covered * 5.0,
                         initialScale: PhotoViewComputedScale.contained,
                         basePosition: Alignment.topCenter,
-                        onTapUp:
-                            settings.clickToTurn ? handleImageViewOnTap : null,
+                        onTapUp: settings.clickToTurn
+                            ? (context, details, value) {
+                                focusNode.requestFocus();
+
+                                final taploc = details.localPosition.dx;
+                                final viewport = context.size!.width;
+
+                                final tapmargin = viewport / 2.5;
+
+                                if (taploc < tapmargin) {
+                                  onTapLeft(
+                                    currentPage: currentPage,
+                                    settings: settings,
+                                    format: format,
+                                    pageController: pageController,
+                                    listController: listController,
+                                    scrollController: scrollController,
+                                    context: context,
+                                  );
+                                } else if (taploc > viewport - tapmargin) {
+                                  onTapRight(
+                                    currentPage: currentPage,
+                                    settings: settings,
+                                    format: format,
+                                    pageController: pageController,
+                                    listController: listController,
+                                    scrollController: scrollController,
+                                    context: context,
+                                  );
+                                }
+                              }
+                            : null,
                         loadingBuilder: (context, event) => const Center(
                           child: CircularProgressIndicator(),
                         ),
@@ -803,6 +1028,10 @@ class ReaderWidget extends HookConsumerWidget {
                 index,
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
+                format: format,
+                pageController: pageController,
+                listController: listController,
+                scrollController: scrollController,
               ),
             )
           : null,
