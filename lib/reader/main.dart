@@ -1115,12 +1115,12 @@ class _ProgressBarSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Align(
-        alignment: Alignment.bottomCenter,
         child: Tooltip(
           message: tooltip,
-          child: SizedBox(
-            height: height,
+        child: InkWell(
+          onTap: onTap,
+          child: Align(
+            alignment: Alignment.bottomCenter,
             child: HookBuilder(
               builder: (context) {
                 final page = useValueListenable(currentPage);
@@ -1128,8 +1128,9 @@ class _ProgressBarSection extends StatelessWidget {
                   color: (index == 0 || page >= index)
                       ? color
                       : Colors.transparent,
-                  child: InkWell(
-                    onTap: onTap,
+                  child: SizedBox(
+                    height: height,
+                    width: double.infinity,
                   ),
                 );
               },
