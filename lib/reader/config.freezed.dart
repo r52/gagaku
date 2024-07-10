@@ -38,7 +38,11 @@ mixin _$ReaderConfig {
   /// The number of images/pages to preload
   int get precacheCount => throw _privateConstructorUsedError;
 
+  /// Serializes this ReaderConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ReaderConfigCopyWith<ReaderConfig> get copyWith =>
       throw _privateConstructorUsedError;
@@ -69,6 +73,8 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -133,6 +139,8 @@ class __$$ReaderConfigImplCopyWithImpl<$Res>
       _$ReaderConfigImpl _value, $Res Function(_$ReaderConfigImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -244,6 +252,8 @@ class _$ReaderConfigImpl implements _ReaderConfig {
   int get hashCode => Object.hash(runtimeType, format, direction,
       showProgressBar, clickToTurn, swipeGestures, precacheCount);
 
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -270,30 +280,32 @@ abstract class _ReaderConfig implements ReaderConfig {
   factory _ReaderConfig.fromJson(Map<String, dynamic> json) =
       _$ReaderConfigImpl.fromJson;
 
-  @override
-
   /// Reader format
-  ReaderFormat get format;
   @override
+  ReaderFormat get format;
 
   /// Reader direction
-  ReaderDirection get direction;
   @override
+  ReaderDirection get direction;
 
   /// Displays progress bar if true (default false)
-  bool get showProgressBar;
   @override
+  bool get showProgressBar;
 
   /// Enable click/tap to turn page gesture
-  bool get clickToTurn;
   @override
+  bool get clickToTurn;
 
   /// Enable swipe gestures
-  bool get swipeGestures;
   @override
+  bool get swipeGestures;
 
   /// The number of images/pages to preload
+  @override
   int get precacheCount;
+
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ReaderConfigImplCopyWith<_$ReaderConfigImpl> get copyWith =>

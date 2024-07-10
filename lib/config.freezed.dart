@@ -27,7 +27,11 @@ mixin _$GagakuConfig {
   @ColorConverter()
   Color get theme => throw _privateConstructorUsedError;
 
+  /// Serializes this GagakuConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of GagakuConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $GagakuConfigCopyWith<GagakuConfig> get copyWith =>
       throw _privateConstructorUsedError;
@@ -52,6 +56,8 @@ class _$GagakuConfigCopyWithImpl<$Res, $Val extends GagakuConfig>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of GagakuConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -90,6 +96,8 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
       _$GagakuConfigImpl _value, $Res Function(_$GagakuConfigImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of GagakuConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -149,6 +157,8 @@ class _$GagakuConfigImpl implements _GagakuConfig {
   @override
   int get hashCode => Object.hash(runtimeType, themeMode, theme);
 
+  /// Create a copy of GagakuConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -171,15 +181,17 @@ abstract class _GagakuConfig implements GagakuConfig {
   factory _GagakuConfig.fromJson(Map<String, dynamic> json) =
       _$GagakuConfigImpl.fromJson;
 
-  @override
-
   /// Theme mode
-  ThemeMode get themeMode;
   @override
+  ThemeMode get themeMode;
 
   /// Theme color
+  @override
   @ColorConverter()
   Color get theme;
+
+  /// Create a copy of GagakuConfig
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GagakuConfigImplCopyWith<_$GagakuConfigImpl> get copyWith =>

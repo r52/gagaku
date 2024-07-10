@@ -30,7 +30,11 @@ mixin _$MangaFilters {
   Set<ContentRating> get contentRating => throw _privateConstructorUsedError;
   FilterOrder get order => throw _privateConstructorUsedError;
 
+  /// Serializes this MangaFilters to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MangaFilters
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaFiltersCopyWith<MangaFilters> get copyWith =>
       throw _privateConstructorUsedError;
@@ -63,6 +67,8 @@ class _$MangaFiltersCopyWithImpl<$Res, $Val extends MangaFilters>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaFilters
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -139,6 +145,8 @@ class __$$MangaFiltersImplCopyWithImpl<$Res>
       _$MangaFiltersImpl _value, $Res Function(_$MangaFiltersImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaFilters
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -321,6 +329,8 @@ class _$MangaFiltersImpl extends _MangaFilters with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(_contentRating),
       order);
 
+  /// Create a copy of MangaFilters
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -366,6 +376,9 @@ abstract class _MangaFilters extends MangaFilters {
   Set<ContentRating> get contentRating;
   @override
   FilterOrder get order;
+
+  /// Create a copy of MangaFilters
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaFiltersImplCopyWith<_$MangaFiltersImpl> get copyWith =>
@@ -377,6 +390,8 @@ mixin _$MangaSearchParameters {
   String get query => throw _privateConstructorUsedError;
   MangaFilters get filter => throw _privateConstructorUsedError;
 
+  /// Create a copy of MangaSearchParameters
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaSearchParametersCopyWith<MangaSearchParameters> get copyWith =>
       throw _privateConstructorUsedError;
@@ -404,6 +419,8 @@ class _$MangaSearchParametersCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaSearchParameters
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -422,6 +439,8 @@ class _$MangaSearchParametersCopyWithImpl<$Res,
     ) as $Val);
   }
 
+  /// Create a copy of MangaSearchParameters
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $MangaFiltersCopyWith<$Res> get filter {
@@ -455,6 +474,8 @@ class __$$MangaSearchParametersImplCopyWithImpl<$Res>
       $Res Function(_$MangaSearchParametersImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaSearchParameters
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -513,6 +534,8 @@ class _$MangaSearchParametersImpl
   @override
   int get hashCode => Object.hash(runtimeType, query, filter);
 
+  /// Create a copy of MangaSearchParameters
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -530,6 +553,9 @@ abstract class _MangaSearchParameters implements MangaSearchParameters {
   String get query;
   @override
   MangaFilters get filter;
+
+  /// Create a copy of MangaSearchParameters
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaSearchParametersImplCopyWith<_$MangaSearchParametersImpl>
@@ -545,7 +571,11 @@ mixin _$ChapterList {
   List<Chapter> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
+  /// Serializes this ChapterList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterListCopyWith<ChapterList> get copyWith =>
       throw _privateConstructorUsedError;
@@ -570,6 +600,8 @@ class _$ChapterListCopyWithImpl<$Res, $Val extends ChapterList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -608,6 +640,8 @@ class __$$ChapterListImplCopyWithImpl<$Res>
       _$ChapterListImpl _value, $Res Function(_$ChapterListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -674,6 +708,8 @@ class _$ChapterListImpl with DiagnosticableTreeMixin implements _ChapterList {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -699,6 +735,9 @@ abstract class _ChapterList implements ChapterList {
   List<Chapter> get data;
   @override
   int get total;
+
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
@@ -715,7 +754,11 @@ mixin _$Chapter {
   ChapterAttributes get attributes => throw _privateConstructorUsedError;
   List<Relationship> get relationships => throw _privateConstructorUsedError;
 
+  /// Serializes this Chapter to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Chapter
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterCopyWith<Chapter> get copyWith => throw _privateConstructorUsedError;
 }
@@ -743,6 +786,8 @@ class _$ChapterCopyWithImpl<$Res, $Val extends Chapter>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Chapter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -766,6 +811,8 @@ class _$ChapterCopyWithImpl<$Res, $Val extends Chapter>
     ) as $Val);
   }
 
+  /// Create a copy of Chapter
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $ChapterAttributesCopyWith<$Res> get attributes {
@@ -799,6 +846,8 @@ class __$$ChapterImplCopyWithImpl<$Res>
       _$ChapterImpl _value, $Res Function(_$ChapterImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Chapter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -880,6 +929,8 @@ class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships));
 
+  /// Create a copy of Chapter
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -909,6 +960,9 @@ abstract class _Chapter extends Chapter {
   ChapterAttributes get attributes;
   @override
   List<Relationship> get relationships;
+
+  /// Create a copy of Chapter
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterImplCopyWith<_$ChapterImpl> get copyWith =>
@@ -936,7 +990,11 @@ mixin _$ChapterAttributes {
   @TimestampSerializer()
   DateTime get publishAt => throw _privateConstructorUsedError;
 
+  /// Serializes this ChapterAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChapterAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterAttributesCopyWith<ChapterAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -971,6 +1029,8 @@ class _$ChapterAttributesCopyWithImpl<$Res, $Val extends ChapterAttributes>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ChapterAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1059,6 +1119,8 @@ class __$$ChapterAttributesImplCopyWithImpl<$Res>
       $Res Function(_$ChapterAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ChapterAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1223,6 +1285,8 @@ class _$ChapterAttributesImpl
       updatedAt,
       publishAt);
 
+  /// Create a copy of ChapterAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -1279,6 +1343,9 @@ abstract class _ChapterAttributes implements ChapterAttributes {
   @override
   @TimestampSerializer()
   DateTime get publishAt;
+
+  /// Create a copy of ChapterAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
@@ -1297,7 +1364,11 @@ mixin _$ScanlationGroupAttributes {
   String? get discord => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
 
+  /// Serializes this ScanlationGroupAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ScanlationGroupAttributesCopyWith<ScanlationGroupAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -1324,6 +1395,8 @@ class _$ScanlationGroupAttributesCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1376,6 +1449,8 @@ class __$$ScanlationGroupAttributesImplCopyWithImpl<$Res>
       $Res Function(_$ScanlationGroupAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1458,6 +1533,8 @@ class _$ScanlationGroupAttributesImpl
   int get hashCode =>
       Object.hash(runtimeType, name, website, discord, description);
 
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -1491,6 +1568,9 @@ abstract class _ScanlationGroupAttributes implements ScanlationGroupAttributes {
   String? get discord;
   @override
   String? get description;
+
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
@@ -1508,7 +1588,11 @@ mixin _$CoverArtAttributes {
   String? get description => throw _privateConstructorUsedError;
   String? get locale => throw _privateConstructorUsedError;
 
+  /// Serializes this CoverArtAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $CoverArtAttributesCopyWith<CoverArtAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -1534,6 +1618,8 @@ class _$CoverArtAttributesCopyWithImpl<$Res, $Val extends CoverArtAttributes>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1583,6 +1669,8 @@ class __$$CoverArtAttributesImplCopyWithImpl<$Res>
       $Res Function(_$CoverArtAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1666,6 +1754,8 @@ class _$CoverArtAttributesImpl
   int get hashCode =>
       Object.hash(runtimeType, volume, fileName, description, locale);
 
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -1699,6 +1789,9 @@ abstract class _CoverArtAttributes implements CoverArtAttributes {
   String? get description;
   @override
   String? get locale;
+
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
@@ -1713,7 +1806,11 @@ UserAttributes _$UserAttributesFromJson(Map<String, dynamic> json) {
 mixin _$UserAttributes {
   String get username => throw _privateConstructorUsedError;
 
+  /// Serializes this UserAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $UserAttributesCopyWith<UserAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -1738,6 +1835,8 @@ class _$UserAttributesCopyWithImpl<$Res, $Val extends UserAttributes>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1771,6 +1870,8 @@ class __$$UserAttributesImplCopyWithImpl<$Res>
       _$UserAttributesImpl _value, $Res Function(_$UserAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1824,6 +1925,8 @@ class _$UserAttributesImpl
   @override
   int get hashCode => Object.hash(runtimeType, username);
 
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -1848,6 +1951,9 @@ abstract class _UserAttributes implements UserAttributes {
 
   @override
   String get username;
+
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
@@ -1872,7 +1978,11 @@ mixin _$AuthorAttributes {
   @TimestampSerializer()
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
+  /// Serializes this AuthorAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $AuthorAttributesCopyWith<AuthorAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -1906,6 +2016,8 @@ class _$AuthorAttributesCopyWithImpl<$Res, $Val extends AuthorAttributes>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1988,6 +2100,8 @@ class __$$AuthorAttributesImplCopyWithImpl<$Res>
       $Res Function(_$AuthorAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2144,6 +2258,8 @@ class _$AuthorAttributesImpl
       createdAt,
       updatedAt);
 
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -2195,6 +2311,9 @@ abstract class _AuthorAttributes implements AuthorAttributes {
   @override
   @TimestampSerializer()
   DateTime get updatedAt;
+
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
@@ -2302,7 +2421,12 @@ mixin _$Relationship {
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
+
+  /// Serializes this Relationship to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $RelationshipCopyWith<Relationship> get copyWith =>
       throw _privateConstructorUsedError;
@@ -2327,6 +2451,8 @@ class _$RelationshipCopyWithImpl<$Res, $Val extends Relationship>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2366,6 +2492,8 @@ class __$$MangaImplCopyWithImpl<$Res>
       _$MangaImpl _value, $Res Function(_$MangaImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2394,6 +2522,8 @@ class __$$MangaImplCopyWithImpl<$Res>
     ));
   }
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $MangaAttributesCopyWith<$Res>? get attributes {
@@ -2476,6 +2606,8 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships), related);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -2603,6 +2735,9 @@ abstract class Manga implements Relationship, MangaOps {
   MangaAttributes? get attributes;
   List<Relationship>? get relationships;
   MangaRelations? get related;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaImplCopyWith<_$MangaImpl> get copyWith =>
@@ -2629,6 +2764,8 @@ class __$$UserImplCopyWithImpl<$Res>
   __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2647,6 +2784,8 @@ class __$$UserImplCopyWithImpl<$Res>
     ));
   }
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $UserAttributesCopyWith<$Res>? get attributes {
@@ -2705,6 +2844,8 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -2828,6 +2969,9 @@ abstract class User implements Relationship {
   @override
   String get id;
   UserAttributes? get attributes;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>
@@ -2855,6 +2999,8 @@ class __$$ArtistImplCopyWithImpl<$Res>
       _$ArtistImpl _value, $Res Function(_$ArtistImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -2873,6 +3019,8 @@ class __$$ArtistImplCopyWithImpl<$Res>
     ));
   }
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $AuthorAttributesCopyWith<$Res> get attributes {
@@ -2928,6 +3076,8 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -3051,6 +3201,9 @@ abstract class Artist implements Relationship, CreatorType {
   @override
   String get id;
   AuthorAttributes get attributes;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ArtistImplCopyWith<_$ArtistImpl> get copyWith =>
@@ -3078,6 +3231,8 @@ class __$$AuthorImplCopyWithImpl<$Res>
       _$AuthorImpl _value, $Res Function(_$AuthorImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3096,6 +3251,8 @@ class __$$AuthorImplCopyWithImpl<$Res>
     ));
   }
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $AuthorAttributesCopyWith<$Res> get attributes {
@@ -3151,6 +3308,8 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -3274,6 +3433,9 @@ abstract class Author implements Relationship, CreatorType {
   @override
   String get id;
   AuthorAttributes get attributes;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AuthorImplCopyWith<_$AuthorImpl> get copyWith =>
@@ -3299,6 +3461,8 @@ class __$$CreatorIDImplCopyWithImpl<$Res>
       _$CreatorIDImpl _value, $Res Function(_$CreatorIDImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3353,6 +3517,8 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   int get hashCode => Object.hash(runtimeType, id);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -3474,6 +3640,9 @@ abstract class CreatorID implements Relationship {
 
   @override
   String get id;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CreatorIDImplCopyWith<_$CreatorIDImpl> get copyWith =>
@@ -3501,6 +3670,8 @@ class __$$CoverArtImplCopyWithImpl<$Res>
       _$CoverArtImpl _value, $Res Function(_$CoverArtImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3519,6 +3690,8 @@ class __$$CoverArtImplCopyWithImpl<$Res>
     ));
   }
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $CoverArtAttributesCopyWith<$Res>? get attributes {
@@ -3577,6 +3750,8 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -3701,6 +3876,9 @@ abstract class CoverArt implements Relationship {
   @override
   String get id;
   CoverArtAttributes? get attributes;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoverArtImplCopyWith<_$CoverArtImpl> get copyWith =>
@@ -3728,6 +3906,8 @@ class __$$GroupImplCopyWithImpl<$Res>
       _$GroupImpl _value, $Res Function(_$GroupImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -3746,6 +3926,8 @@ class __$$GroupImplCopyWithImpl<$Res>
     ));
   }
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $ScanlationGroupAttributesCopyWith<$Res> get attributes {
@@ -3801,6 +3983,8 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -3924,6 +4108,9 @@ abstract class Group implements Relationship {
   @override
   String get id;
   ScanlationGroupAttributes get attributes;
+
+  /// Create a copy of Relationship
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupImplCopyWith<_$GroupImpl> get copyWith =>
@@ -3940,7 +4127,11 @@ mixin _$ChapterAPIData {
   List<String> get data => throw _privateConstructorUsedError;
   List<String> get dataSaver => throw _privateConstructorUsedError;
 
+  /// Serializes this ChapterAPIData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChapterAPIData
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterAPIDataCopyWith<ChapterAPIData> get copyWith =>
       throw _privateConstructorUsedError;
@@ -3965,6 +4156,8 @@ class _$ChapterAPIDataCopyWithImpl<$Res, $Val extends ChapterAPIData>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ChapterAPIData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4008,6 +4201,8 @@ class __$$ChapterAPIDataImplCopyWithImpl<$Res>
       _$ChapterAPIDataImpl _value, $Res Function(_$ChapterAPIDataImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ChapterAPIData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4099,6 +4294,8 @@ class _$ChapterAPIDataImpl
       const DeepCollectionEquality().hash(_data),
       const DeepCollectionEquality().hash(_dataSaver));
 
+  /// Create a copy of ChapterAPIData
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -4129,6 +4326,9 @@ abstract class _ChapterAPIData implements ChapterAPIData {
   List<String> get data;
   @override
   List<String> get dataSaver;
+
+  /// Create a copy of ChapterAPIData
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterAPIDataImplCopyWith<_$ChapterAPIDataImpl> get copyWith =>
@@ -4144,7 +4344,11 @@ mixin _$ChapterAPI {
   String get baseUrl => throw _privateConstructorUsedError;
   ChapterAPIData get chapter => throw _privateConstructorUsedError;
 
+  /// Serializes this ChapterAPI to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChapterAPI
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterAPICopyWith<ChapterAPI> get copyWith =>
       throw _privateConstructorUsedError;
@@ -4171,6 +4375,8 @@ class _$ChapterAPICopyWithImpl<$Res, $Val extends ChapterAPI>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ChapterAPI
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4189,6 +4395,8 @@ class _$ChapterAPICopyWithImpl<$Res, $Val extends ChapterAPI>
     ) as $Val);
   }
 
+  /// Create a copy of ChapterAPI
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $ChapterAPIDataCopyWith<$Res> get chapter {
@@ -4220,6 +4428,8 @@ class __$$ChapterAPIImplCopyWithImpl<$Res>
       _$ChapterAPIImpl _value, $Res Function(_$ChapterAPIImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ChapterAPI
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4280,6 +4490,8 @@ class _$ChapterAPIImpl extends _ChapterAPI with DiagnosticableTreeMixin {
   @override
   int get hashCode => Object.hash(runtimeType, baseUrl, chapter);
 
+  /// Create a copy of ChapterAPI
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -4307,6 +4519,9 @@ abstract class _ChapterAPI extends ChapterAPI {
   String get baseUrl;
   @override
   ChapterAPIData get chapter;
+
+  /// Create a copy of ChapterAPI
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterAPIImplCopyWith<_$ChapterAPIImpl> get copyWith =>
@@ -4322,7 +4537,11 @@ mixin _$CoverList {
   List<CoverArt> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
+  /// Serializes this CoverList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CoverList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $CoverListCopyWith<CoverList> get copyWith =>
       throw _privateConstructorUsedError;
@@ -4346,6 +4565,8 @@ class _$CoverListCopyWithImpl<$Res, $Val extends CoverList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of CoverList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4384,6 +4605,8 @@ class __$$CoverListImplCopyWithImpl<$Res>
       _$CoverListImpl _value, $Res Function(_$CoverListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of CoverList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4450,6 +4673,8 @@ class _$CoverListImpl with DiagnosticableTreeMixin implements _CoverList {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
+  /// Create a copy of CoverList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -4475,6 +4700,9 @@ abstract class _CoverList implements CoverList {
   List<CoverArt> get data;
   @override
   int get total;
+
+  /// Create a copy of CoverList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoverListImplCopyWith<_$CoverListImpl> get copyWith =>
@@ -4490,7 +4718,11 @@ mixin _$MangaList {
   List<Manga> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
+  /// Serializes this MangaList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MangaList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaListCopyWith<MangaList> get copyWith =>
       throw _privateConstructorUsedError;
@@ -4514,6 +4746,8 @@ class _$MangaListCopyWithImpl<$Res, $Val extends MangaList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4552,6 +4786,8 @@ class __$$MangaListImplCopyWithImpl<$Res>
       _$MangaListImpl _value, $Res Function(_$MangaListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4618,6 +4854,8 @@ class _$MangaListImpl with DiagnosticableTreeMixin implements _MangaList {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
+  /// Create a copy of MangaList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -4643,6 +4881,9 @@ abstract class _MangaList implements MangaList {
   List<Manga> get data;
   @override
   int get total;
+
+  /// Create a copy of MangaList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaListImplCopyWith<_$MangaListImpl> get copyWith =>
@@ -4658,7 +4899,11 @@ mixin _$GroupList {
   List<Group> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
+  /// Serializes this GroupList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of GroupList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $GroupListCopyWith<GroupList> get copyWith =>
       throw _privateConstructorUsedError;
@@ -4682,6 +4927,8 @@ class _$GroupListCopyWithImpl<$Res, $Val extends GroupList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of GroupList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4720,6 +4967,8 @@ class __$$GroupListImplCopyWithImpl<$Res>
       _$GroupListImpl _value, $Res Function(_$GroupListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of GroupList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4786,6 +5035,8 @@ class _$GroupListImpl with DiagnosticableTreeMixin implements _GroupList {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
+  /// Create a copy of GroupList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -4811,6 +5062,9 @@ abstract class _GroupList implements GroupList {
   List<Group> get data;
   @override
   int get total;
+
+  /// Create a copy of GroupList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupListImplCopyWith<_$GroupListImpl> get copyWith =>
@@ -4826,7 +5080,11 @@ mixin _$CreatorList {
   List<Author> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
+  /// Serializes this CreatorList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CreatorList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $CreatorListCopyWith<CreatorList> get copyWith =>
       throw _privateConstructorUsedError;
@@ -4851,6 +5109,8 @@ class _$CreatorListCopyWithImpl<$Res, $Val extends CreatorList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of CreatorList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4889,6 +5149,8 @@ class __$$CreatorListListImplCopyWithImpl<$Res>
       _$CreatorListListImpl _value, $Res Function(_$CreatorListListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of CreatorList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -4958,6 +5220,8 @@ class _$CreatorListListImpl
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
+  /// Create a copy of CreatorList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -4984,6 +5248,9 @@ abstract class _CreatorListList implements CreatorList {
   List<Author> get data;
   @override
   int get total;
+
+  /// Create a copy of CreatorList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CreatorListListImplCopyWith<_$CreatorListListImpl> get copyWith =>
@@ -5001,7 +5268,11 @@ mixin _$MangaLinks {
   String? get mu => throw _privateConstructorUsedError;
   String? get mal => throw _privateConstructorUsedError;
 
+  /// Serializes this MangaLinks to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MangaLinks
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaLinksCopyWith<MangaLinks> get copyWith =>
       throw _privateConstructorUsedError;
@@ -5026,6 +5297,8 @@ class _$MangaLinksCopyWithImpl<$Res, $Val extends MangaLinks>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaLinks
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -5074,6 +5347,8 @@ class __$$MangaLinksImplCopyWithImpl<$Res>
       _$MangaLinksImpl _value, $Res Function(_$MangaLinksImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaLinks
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -5151,6 +5426,8 @@ class _$MangaLinksImpl with DiagnosticableTreeMixin implements _MangaLinks {
   @override
   int get hashCode => Object.hash(runtimeType, raw, al, mu, mal);
 
+  /// Create a copy of MangaLinks
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -5183,6 +5460,9 @@ abstract class _MangaLinks implements MangaLinks {
   String? get mu;
   @override
   String? get mal;
+
+  /// Create a copy of MangaLinks
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaLinksImplCopyWith<_$MangaLinksImpl> get copyWith =>
@@ -5215,7 +5495,11 @@ mixin _$MangaAttributes {
   @TimestampSerializer()
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
+  /// Serializes this MangaAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MangaAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaAttributesCopyWith<MangaAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -5257,6 +5541,8 @@ class _$MangaAttributesCopyWithImpl<$Res, $Val extends MangaAttributes>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -5340,6 +5626,8 @@ class _$MangaAttributesCopyWithImpl<$Res, $Val extends MangaAttributes>
     ) as $Val);
   }
 
+  /// Create a copy of MangaAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $MangaLinksCopyWith<$Res>? get links {
@@ -5390,6 +5678,8 @@ class __$$MangaAttributesImplCopyWithImpl<$Res>
       _$MangaAttributesImpl _value, $Res Function(_$MangaAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -5640,6 +5930,8 @@ class _$MangaAttributesImpl
       createdAt,
       updatedAt);
 
+  /// Create a copy of MangaAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -5710,6 +6002,9 @@ abstract class _MangaAttributes implements MangaAttributes {
   @override
   @TimestampSerializer()
   DateTime get updatedAt;
+
+  /// Create a copy of MangaAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaAttributesImplCopyWith<_$MangaAttributesImpl> get copyWith =>
@@ -5725,7 +6020,11 @@ mixin _$Tag {
   String get id => throw _privateConstructorUsedError;
   TagAttributes get attributes => throw _privateConstructorUsedError;
 
+  /// Serializes this Tag to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Tag
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $TagCopyWith<Tag> get copyWith => throw _privateConstructorUsedError;
 }
@@ -5749,6 +6048,8 @@ class _$TagCopyWithImpl<$Res, $Val extends Tag> implements $TagCopyWith<$Res> {
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Tag
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -5767,6 +6068,8 @@ class _$TagCopyWithImpl<$Res, $Val extends Tag> implements $TagCopyWith<$Res> {
     ) as $Val);
   }
 
+  /// Create a copy of Tag
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $TagAttributesCopyWith<$Res> get attributes {
@@ -5794,6 +6097,8 @@ class __$$TagImplCopyWithImpl<$Res> extends _$TagCopyWithImpl<$Res, _$TagImpl>
   __$$TagImplCopyWithImpl(_$TagImpl _value, $Res Function(_$TagImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Tag
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -5854,6 +6159,8 @@ class _$TagImpl with DiagnosticableTreeMixin implements _Tag {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
+  /// Create a copy of Tag
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -5879,6 +6186,9 @@ abstract class _Tag implements Tag {
   String get id;
   @override
   TagAttributes get attributes;
+
+  /// Create a copy of Tag
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TagImplCopyWith<_$TagImpl> get copyWith =>
@@ -5895,7 +6205,11 @@ mixin _$TagAttributes {
   Map<String, String> get description => throw _privateConstructorUsedError;
   TagGroup get group => throw _privateConstructorUsedError;
 
+  /// Serializes this TagAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of TagAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $TagAttributesCopyWith<TagAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -5923,6 +6237,8 @@ class _$TagAttributesCopyWithImpl<$Res, $Val extends TagAttributes>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of TagAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -5969,6 +6285,8 @@ class __$$TagAttributesImplCopyWithImpl<$Res>
       _$TagAttributesImpl _value, $Res Function(_$TagAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of TagAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6061,6 +6379,8 @@ class _$TagAttributesImpl
       const DeepCollectionEquality().hash(_description),
       group);
 
+  /// Create a copy of TagAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -6090,6 +6410,9 @@ abstract class _TagAttributes implements TagAttributes {
   Map<String, String> get description;
   @override
   TagGroup get group;
+
+  /// Create a copy of TagAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TagAttributesImplCopyWith<_$TagAttributesImpl> get copyWith =>
@@ -6105,7 +6428,11 @@ mixin _$TagResponse {
   List<Tag> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
+  /// Serializes this TagResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of TagResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $TagResponseCopyWith<TagResponse> get copyWith =>
       throw _privateConstructorUsedError;
@@ -6130,6 +6457,8 @@ class _$TagResponseCopyWithImpl<$Res, $Val extends TagResponse>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of TagResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6168,6 +6497,8 @@ class __$$TagResponseImplCopyWithImpl<$Res>
       _$TagResponseImpl _value, $Res Function(_$TagResponseImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of TagResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6234,6 +6565,8 @@ class _$TagResponseImpl with DiagnosticableTreeMixin implements _TagResponse {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
+  /// Create a copy of TagResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -6259,6 +6592,9 @@ abstract class _TagResponse implements TagResponse {
   List<Tag> get data;
   @override
   int get total;
+
+  /// Create a copy of TagResponse
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TagResponseImplCopyWith<_$TagResponseImpl> get copyWith =>
@@ -6275,7 +6611,11 @@ mixin _$MangaStatisticsResponse {
   Map<String, MangaStatistics> get statistics =>
       throw _privateConstructorUsedError;
 
+  /// Serializes this MangaStatisticsResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MangaStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaStatisticsResponseCopyWith<MangaStatisticsResponse> get copyWith =>
       throw _privateConstructorUsedError;
@@ -6301,6 +6641,8 @@ class _$MangaStatisticsResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6337,6 +6679,8 @@ class __$$MangaStatisticsResponseImplCopyWithImpl<$Res>
       $Res Function(_$MangaStatisticsResponseImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6398,6 +6742,8 @@ class _$MangaStatisticsResponseImpl
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_statistics));
 
+  /// Create a copy of MangaStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -6423,6 +6769,9 @@ abstract class _MangaStatisticsResponse implements MangaStatisticsResponse {
 
   @override
   Map<String, MangaStatistics> get statistics;
+
+  /// Create a copy of MangaStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaStatisticsResponseImplCopyWith<_$MangaStatisticsResponseImpl>
@@ -6439,7 +6788,11 @@ mixin _$ChapterStatisticsResponse {
   Map<String, ChapterStatistics> get statistics =>
       throw _privateConstructorUsedError;
 
+  /// Serializes this ChapterStatisticsResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChapterStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterStatisticsResponseCopyWith<ChapterStatisticsResponse> get copyWith =>
       throw _privateConstructorUsedError;
@@ -6465,6 +6818,8 @@ class _$ChapterStatisticsResponseCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ChapterStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6501,6 +6856,8 @@ class __$$ChapterStatisticsResponseImplCopyWithImpl<$Res>
       $Res Function(_$ChapterStatisticsResponseImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ChapterStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6562,6 +6919,8 @@ class _$ChapterStatisticsResponseImpl
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_statistics));
 
+  /// Create a copy of ChapterStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -6587,6 +6946,9 @@ abstract class _ChapterStatisticsResponse implements ChapterStatisticsResponse {
 
   @override
   Map<String, ChapterStatistics> get statistics;
+
+  /// Create a copy of ChapterStatisticsResponse
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterStatisticsResponseImplCopyWith<_$ChapterStatisticsResponseImpl>
@@ -6603,7 +6965,11 @@ mixin _$MangaStatistics {
   StatisticsDetailsRating get rating => throw _privateConstructorUsedError;
   int get follows => throw _privateConstructorUsedError;
 
+  /// Serializes this MangaStatistics to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MangaStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaStatisticsCopyWith<MangaStatistics> get copyWith =>
       throw _privateConstructorUsedError;
@@ -6634,6 +7000,8 @@ class _$MangaStatisticsCopyWithImpl<$Res, $Val extends MangaStatistics>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6657,6 +7025,8 @@ class _$MangaStatisticsCopyWithImpl<$Res, $Val extends MangaStatistics>
     ) as $Val);
   }
 
+  /// Create a copy of MangaStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $StatisticsDetailsCommentsCopyWith<$Res>? get comments {
@@ -6669,6 +7039,8 @@ class _$MangaStatisticsCopyWithImpl<$Res, $Val extends MangaStatistics>
     });
   }
 
+  /// Create a copy of MangaStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $StatisticsDetailsRatingCopyWith<$Res> get rating {
@@ -6705,6 +7077,8 @@ class __$$MangaStatisticsImplCopyWithImpl<$Res>
       _$MangaStatisticsImpl _value, $Res Function(_$MangaStatisticsImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6777,6 +7151,8 @@ class _$MangaStatisticsImpl
   @override
   int get hashCode => Object.hash(runtimeType, comments, rating, follows);
 
+  /// Create a copy of MangaStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -6807,6 +7183,9 @@ abstract class _MangaStatistics implements MangaStatistics {
   StatisticsDetailsRating get rating;
   @override
   int get follows;
+
+  /// Create a copy of MangaStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaStatisticsImplCopyWith<_$MangaStatisticsImpl> get copyWith =>
@@ -6821,7 +7200,11 @@ ChapterStatistics _$ChapterStatisticsFromJson(Map<String, dynamic> json) {
 mixin _$ChapterStatistics {
   StatisticsDetailsComments? get comments => throw _privateConstructorUsedError;
 
+  /// Serializes this ChapterStatistics to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChapterStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ChapterStatisticsCopyWith<ChapterStatistics> get copyWith =>
       throw _privateConstructorUsedError;
@@ -6848,6 +7231,8 @@ class _$ChapterStatisticsCopyWithImpl<$Res, $Val extends ChapterStatistics>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ChapterStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6861,6 +7246,8 @@ class _$ChapterStatisticsCopyWithImpl<$Res, $Val extends ChapterStatistics>
     ) as $Val);
   }
 
+  /// Create a copy of ChapterStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $StatisticsDetailsCommentsCopyWith<$Res>? get comments {
@@ -6896,6 +7283,8 @@ class __$$ChapterStatisticsImplCopyWithImpl<$Res>
       $Res Function(_$ChapterStatisticsImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ChapterStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -6949,6 +7338,8 @@ class _$ChapterStatisticsImpl
   @override
   int get hashCode => Object.hash(runtimeType, comments);
 
+  /// Create a copy of ChapterStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -6973,6 +7364,9 @@ abstract class _ChapterStatistics implements ChapterStatistics {
 
   @override
   StatisticsDetailsComments? get comments;
+
+  /// Create a copy of ChapterStatistics
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterStatisticsImplCopyWith<_$ChapterStatisticsImpl> get copyWith =>
@@ -6989,7 +7383,11 @@ mixin _$StatisticsDetailsComments {
   int get threadId => throw _privateConstructorUsedError;
   int get repliesCount => throw _privateConstructorUsedError;
 
+  /// Serializes this StatisticsDetailsComments to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of StatisticsDetailsComments
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $StatisticsDetailsCommentsCopyWith<StatisticsDetailsComments> get copyWith =>
       throw _privateConstructorUsedError;
@@ -7015,6 +7413,8 @@ class _$StatisticsDetailsCommentsCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of StatisticsDetailsComments
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7056,6 +7456,8 @@ class __$$StatisticsDetailsCommentsImplCopyWithImpl<$Res>
       $Res Function(_$StatisticsDetailsCommentsImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of StatisticsDetailsComments
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7120,6 +7522,8 @@ class _$StatisticsDetailsCommentsImpl
   @override
   int get hashCode => Object.hash(runtimeType, threadId, repliesCount);
 
+  /// Create a copy of StatisticsDetailsComments
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -7147,6 +7551,9 @@ abstract class _StatisticsDetailsComments implements StatisticsDetailsComments {
   int get threadId;
   @override
   int get repliesCount;
+
+  /// Create a copy of StatisticsDetailsComments
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$StatisticsDetailsCommentsImplCopyWith<_$StatisticsDetailsCommentsImpl>
@@ -7163,7 +7570,11 @@ mixin _$StatisticsDetailsRating {
   double? get average => throw _privateConstructorUsedError;
   double get bayesian => throw _privateConstructorUsedError;
 
+  /// Serializes this StatisticsDetailsRating to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of StatisticsDetailsRating
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $StatisticsDetailsRatingCopyWith<StatisticsDetailsRating> get copyWith =>
       throw _privateConstructorUsedError;
@@ -7189,6 +7600,8 @@ class _$StatisticsDetailsRatingCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of StatisticsDetailsRating
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7230,6 +7643,8 @@ class __$$StatisticsDetailsRatingImplCopyWithImpl<$Res>
       $Res Function(_$StatisticsDetailsRatingImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of StatisticsDetailsRating
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7292,6 +7707,8 @@ class _$StatisticsDetailsRatingImpl
   @override
   int get hashCode => Object.hash(runtimeType, average, bayesian);
 
+  /// Create a copy of StatisticsDetailsRating
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -7319,6 +7736,9 @@ abstract class _StatisticsDetailsRating implements StatisticsDetailsRating {
   double? get average;
   @override
   double get bayesian;
+
+  /// Create a copy of StatisticsDetailsRating
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$StatisticsDetailsRatingImplCopyWith<_$StatisticsDetailsRatingImpl>
@@ -7333,7 +7753,11 @@ SelfRatingResponse _$SelfRatingResponseFromJson(Map<String, dynamic> json) {
 mixin _$SelfRatingResponse {
   Map<String, SelfRating> get ratings => throw _privateConstructorUsedError;
 
+  /// Serializes this SelfRatingResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of SelfRatingResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $SelfRatingResponseCopyWith<SelfRatingResponse> get copyWith =>
       throw _privateConstructorUsedError;
@@ -7358,6 +7782,8 @@ class _$SelfRatingResponseCopyWithImpl<$Res, $Val extends SelfRatingResponse>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of SelfRatingResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7391,6 +7817,8 @@ class __$$SelfRatingResponseImplCopyWithImpl<$Res>
       $Res Function(_$SelfRatingResponseImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of SelfRatingResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7450,6 +7878,8 @@ class _$SelfRatingResponseImpl
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_ratings));
 
+  /// Create a copy of SelfRatingResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -7474,6 +7904,9 @@ abstract class _SelfRatingResponse implements SelfRatingResponse {
 
   @override
   Map<String, SelfRating> get ratings;
+
+  /// Create a copy of SelfRatingResponse
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SelfRatingResponseImplCopyWith<_$SelfRatingResponseImpl> get copyWith =>
@@ -7490,7 +7923,11 @@ mixin _$SelfRating {
   @TimestampSerializer()
   DateTime get createdAt => throw _privateConstructorUsedError;
 
+  /// Serializes this SelfRating to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of SelfRating
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $SelfRatingCopyWith<SelfRating> get copyWith =>
       throw _privateConstructorUsedError;
@@ -7515,6 +7952,8 @@ class _$SelfRatingCopyWithImpl<$Res, $Val extends SelfRating>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of SelfRating
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7553,6 +7992,8 @@ class __$$SelfRatingImplCopyWithImpl<$Res>
       _$SelfRatingImpl _value, $Res Function(_$SelfRatingImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of SelfRating
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7616,6 +8057,8 @@ class _$SelfRatingImpl extends _SelfRating with DiagnosticableTreeMixin {
   @override
   int get hashCode => Object.hash(runtimeType, rating, createdAt);
 
+  /// Create a copy of SelfRating
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -7645,6 +8088,9 @@ abstract class _SelfRating extends SelfRating {
   @override
   @TimestampSerializer()
   DateTime get createdAt;
+
+  /// Create a copy of SelfRating
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SelfRatingImplCopyWith<_$SelfRatingImpl> get copyWith =>
@@ -7660,7 +8106,11 @@ mixin _$CustomListList {
   List<CustomList> get data => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
+  /// Serializes this CustomListList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CustomListList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $CustomListListCopyWith<CustomListList> get copyWith =>
       throw _privateConstructorUsedError;
@@ -7685,6 +8135,8 @@ class _$CustomListListCopyWithImpl<$Res, $Val extends CustomListList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of CustomListList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7723,6 +8175,8 @@ class __$$CustomListListImplCopyWithImpl<$Res>
       _$CustomListListImpl _value, $Res Function(_$CustomListListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of CustomListList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7792,6 +8246,8 @@ class _$CustomListListImpl
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), total);
 
+  /// Create a copy of CustomListList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -7818,6 +8274,9 @@ abstract class _CustomListList implements CustomListList {
   List<CustomList> get data;
   @override
   int get total;
+
+  /// Create a copy of CustomListList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CustomListListImplCopyWith<_$CustomListListImpl> get copyWith =>
@@ -7834,7 +8293,11 @@ mixin _$CustomList {
   CustomListAttributes get attributes => throw _privateConstructorUsedError;
   List<Relationship> get relationships => throw _privateConstructorUsedError;
 
+  /// Serializes this CustomList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CustomList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $CustomListCopyWith<CustomList> get copyWith =>
       throw _privateConstructorUsedError;
@@ -7864,6 +8327,8 @@ class _$CustomListCopyWithImpl<$Res, $Val extends CustomList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of CustomList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -7887,6 +8352,8 @@ class _$CustomListCopyWithImpl<$Res, $Val extends CustomList>
     ) as $Val);
   }
 
+  /// Create a copy of CustomList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $CustomListAttributesCopyWith<$Res> get attributes {
@@ -7921,6 +8388,8 @@ class __$$CustomListImplCopyWithImpl<$Res>
       _$CustomListImpl _value, $Res Function(_$CustomListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of CustomList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -8002,6 +8471,8 @@ class _$CustomListImpl extends _CustomList with DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships));
 
+  /// Create a copy of CustomList
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -8032,6 +8503,9 @@ abstract class _CustomList extends CustomList {
   CustomListAttributes get attributes;
   @override
   List<Relationship> get relationships;
+
+  /// Create a copy of CustomList
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
@@ -8048,7 +8522,11 @@ mixin _$CustomListAttributes {
   CustomListVisibility get visibility => throw _privateConstructorUsedError;
   int get version => throw _privateConstructorUsedError;
 
+  /// Serializes this CustomListAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CustomListAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $CustomListAttributesCopyWith<CustomListAttributes> get copyWith =>
       throw _privateConstructorUsedError;
@@ -8074,6 +8552,8 @@ class _$CustomListAttributesCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of CustomListAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -8117,6 +8597,8 @@ class __$$CustomListAttributesImplCopyWithImpl<$Res>
       $Res Function(_$CustomListAttributesImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of CustomListAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -8189,6 +8671,8 @@ class _$CustomListAttributesImpl
   @override
   int get hashCode => Object.hash(runtimeType, name, visibility, version);
 
+  /// Create a copy of CustomListAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -8220,6 +8704,9 @@ abstract class _CustomListAttributes implements CustomListAttributes {
   CustomListVisibility get visibility;
   @override
   int get version;
+
+  /// Create a copy of CustomListAttributes
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CustomListAttributesImplCopyWith<_$CustomListAttributesImpl>
@@ -8235,7 +8722,11 @@ mixin _$ErrorResponse {
   String get result => throw _privateConstructorUsedError;
   List<MDError> get errors => throw _privateConstructorUsedError;
 
+  /// Serializes this ErrorResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ErrorResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ErrorResponseCopyWith<ErrorResponse> get copyWith =>
       throw _privateConstructorUsedError;
@@ -8260,6 +8751,8 @@ class _$ErrorResponseCopyWithImpl<$Res, $Val extends ErrorResponse>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ErrorResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -8298,6 +8791,8 @@ class __$$ErrorResponseImplCopyWithImpl<$Res>
       _$ErrorResponseImpl _value, $Res Function(_$ErrorResponseImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ErrorResponse
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -8366,6 +8861,8 @@ class _$ErrorResponseImpl
   int get hashCode => Object.hash(
       runtimeType, result, const DeepCollectionEquality().hash(_errors));
 
+  /// Create a copy of ErrorResponse
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -8391,6 +8888,9 @@ abstract class _ErrorResponse implements ErrorResponse {
   String get result;
   @override
   List<MDError> get errors;
+
+  /// Create a copy of ErrorResponse
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ErrorResponseImplCopyWith<_$ErrorResponseImpl> get copyWith =>
@@ -8409,7 +8909,11 @@ mixin _$MDError {
   String? get detail => throw _privateConstructorUsedError;
   String? get context => throw _privateConstructorUsedError;
 
+  /// Serializes this MDError to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MDError
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MDErrorCopyWith<MDError> get copyWith => throw _privateConstructorUsedError;
 }
@@ -8433,6 +8937,8 @@ class _$MDErrorCopyWithImpl<$Res, $Val extends MDError>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MDError
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -8486,6 +8992,8 @@ class __$$MDErrorImplCopyWithImpl<$Res>
       _$MDErrorImpl _value, $Res Function(_$MDErrorImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MDError
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -8578,6 +9086,8 @@ class _$MDErrorImpl with DiagnosticableTreeMixin implements _MDError {
   int get hashCode =>
       Object.hash(runtimeType, id, status, title, detail, context);
 
+  /// Create a copy of MDError
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -8612,6 +9122,9 @@ abstract class _MDError implements MDError {
   String? get detail;
   @override
   String? get context;
+
+  /// Create a copy of MDError
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>

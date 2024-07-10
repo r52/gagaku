@@ -20,6 +20,8 @@ mixin _$ProxyInfo {
   String get code => throw _privateConstructorUsedError;
   String? get chapter => throw _privateConstructorUsedError;
 
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ProxyInfoCopyWith<ProxyInfo> get copyWith =>
       throw _privateConstructorUsedError;
@@ -43,6 +45,8 @@ class _$ProxyInfoCopyWithImpl<$Res, $Val extends ProxyInfo>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -86,6 +90,8 @@ class __$$ProxyInfoImplCopyWithImpl<$Res>
       _$ProxyInfoImpl _value, $Res Function(_$ProxyInfoImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -141,6 +147,8 @@ class _$ProxyInfoImpl extends _ProxyInfo {
   @override
   int get hashCode => Object.hash(runtimeType, proxy, code, chapter);
 
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -161,6 +169,9 @@ abstract class _ProxyInfo extends ProxyInfo {
   String get code;
   @override
   String? get chapter;
+
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
@@ -176,7 +187,11 @@ mixin _$HistoryLink {
   String get title => throw _privateConstructorUsedError;
   String get url => throw _privateConstructorUsedError;
 
+  /// Serializes this HistoryLink to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $HistoryLinkCopyWith<HistoryLink> get copyWith =>
       throw _privateConstructorUsedError;
@@ -201,6 +216,8 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -239,6 +256,8 @@ class __$$HistoryLinkImplCopyWithImpl<$Res>
       _$HistoryLinkImpl _value, $Res Function(_$HistoryLinkImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -276,6 +295,8 @@ class _$HistoryLinkImpl extends _HistoryLink {
     return 'HistoryLink(title: $title, url: $url)';
   }
 
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -303,6 +324,9 @@ abstract class _HistoryLink extends HistoryLink {
   String get title;
   @override
   String get url;
+
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$HistoryLinkImplCopyWith<_$HistoryLinkImpl> get copyWith =>
@@ -323,7 +347,11 @@ mixin _$WebManga {
   Map<String, String>? get groups => throw _privateConstructorUsedError;
   Map<String, WebChapter> get chapters => throw _privateConstructorUsedError;
 
+  /// Serializes this WebManga to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $WebMangaCopyWith<WebManga> get copyWith =>
       throw _privateConstructorUsedError;
@@ -354,6 +382,8 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -424,6 +454,8 @@ class __$$WebMangaImplCopyWithImpl<$Res>
       _$WebMangaImpl _value, $Res Function(_$WebMangaImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -546,6 +578,8 @@ class _$WebMangaImpl extends _WebManga {
       const DeepCollectionEquality().hash(_groups),
       const DeepCollectionEquality().hash(_chapters));
 
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -588,6 +622,9 @@ abstract class _WebManga extends WebManga {
   Map<String, String>? get groups;
   @override
   Map<String, WebChapter> get chapters;
+
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WebMangaImplCopyWith<_$WebMangaImpl> get copyWith =>
@@ -608,7 +645,11 @@ mixin _$WebChapter {
   DateTime? get releaseDate => throw _privateConstructorUsedError;
   Map<String, dynamic> get groups => throw _privateConstructorUsedError;
 
+  /// Serializes this WebChapter to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $WebChapterCopyWith<WebChapter> get copyWith =>
       throw _privateConstructorUsedError;
@@ -638,6 +679,8 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -696,6 +739,8 @@ class __$$WebChapterImplCopyWithImpl<$Res>
       _$WebChapterImpl _value, $Res Function(_$WebChapterImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -788,6 +833,8 @@ class _$WebChapterImpl extends _WebChapter {
   int get hashCode => Object.hash(runtimeType, title, volume, lastUpdated,
       releaseDate, const DeepCollectionEquality().hash(_groups));
 
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -826,6 +873,9 @@ abstract class _WebChapter extends WebChapter {
   DateTime? get releaseDate;
   @override
   Map<String, dynamic> get groups;
+
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WebChapterImplCopyWith<_$WebChapterImpl> get copyWith =>
@@ -841,7 +891,11 @@ mixin _$ImgurPage {
   String get description => throw _privateConstructorUsedError;
   String get src => throw _privateConstructorUsedError;
 
+  /// Serializes this ImgurPage to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $ImgurPageCopyWith<ImgurPage> get copyWith =>
       throw _privateConstructorUsedError;
@@ -865,6 +919,8 @@ class _$ImgurPageCopyWithImpl<$Res, $Val extends ImgurPage>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -903,6 +959,8 @@ class __$$ImgurPageImplCopyWithImpl<$Res>
       _$ImgurPageImpl _value, $Res Function(_$ImgurPageImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -954,6 +1012,8 @@ class _$ImgurPageImpl implements _ImgurPage {
   @override
   int get hashCode => Object.hash(runtimeType, description, src);
 
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -980,6 +1040,9 @@ abstract class _ImgurPage implements ImgurPage {
   String get description;
   @override
   String get src;
+
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>

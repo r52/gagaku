@@ -23,7 +23,11 @@ mixin _$LocalLibConfig {
   String get libraryDirectory => throw _privateConstructorUsedError;
   set libraryDirectory(String value) => throw _privateConstructorUsedError;
 
+  /// Serializes this LocalLibConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of LocalLibConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $LocalLibConfigCopyWith<LocalLibConfig> get copyWith =>
       throw _privateConstructorUsedError;
@@ -48,6 +52,8 @@ class _$LocalLibConfigCopyWithImpl<$Res, $Val extends LocalLibConfig>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of LocalLibConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -81,6 +87,8 @@ class __$$LocalLibConfigImplCopyWithImpl<$Res>
       _$LocalLibConfigImpl _value, $Res Function(_$LocalLibConfigImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of LocalLibConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -112,6 +120,8 @@ class _$LocalLibConfigImpl implements _LocalLibConfig {
     return 'LocalLibConfig(libraryDirectory: $libraryDirectory)';
   }
 
+  /// Create a copy of LocalLibConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -136,6 +146,9 @@ abstract class _LocalLibConfig implements LocalLibConfig {
   @override
   String get libraryDirectory;
   set libraryDirectory(String value);
+
+  /// Create a copy of LocalLibConfig
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$LocalLibConfigImplCopyWith<_$LocalLibConfigImpl> get copyWith =>

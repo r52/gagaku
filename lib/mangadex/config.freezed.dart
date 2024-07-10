@@ -38,7 +38,11 @@ mixin _$MangaDexConfig {
   Set<String> get groupBlacklist => throw _privateConstructorUsedError;
   set groupBlacklist(Set<String> value) => throw _privateConstructorUsedError;
 
+  /// Serializes this MangaDexConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaDexConfigCopyWith<MangaDexConfig> get copyWith =>
       throw _privateConstructorUsedError;
@@ -68,6 +72,8 @@ class _$MangaDexConfigCopyWithImpl<$Res, $Val extends MangaDexConfig>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -126,6 +132,8 @@ class __$$MangaDexConfigImplCopyWithImpl<$Res>
       _$MangaDexConfigImpl _value, $Res Function(_$MangaDexConfigImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -200,6 +208,8 @@ class _$MangaDexConfigImpl implements _MangaDexConfig {
     return 'MangaDexConfig(translatedLanguages: $translatedLanguages, originalLanguage: $originalLanguage, contentRating: $contentRating, dataSaver: $dataSaver, groupBlacklist: $groupBlacklist)';
   }
 
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -245,6 +255,9 @@ abstract class _MangaDexConfig implements MangaDexConfig {
   @override
   Set<String> get groupBlacklist;
   set groupBlacklist(Set<String> value);
+
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
