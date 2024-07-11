@@ -11,9 +11,19 @@ import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:url_launcher/url_launcher.dart';
+
+enum LongStripScale {
+  small(0.4),
+  large(0.8),
+  full(1.0);
+
+  const LongStripScale(this.scale);
+  final double scale;
+}
 
 class ReaderWidget extends HookConsumerWidget {
   const ReaderWidget({
@@ -38,6 +48,17 @@ class ReaderWidget extends HookConsumerWidget {
 
   // Backup route for BackButton if nav stack cannot pop
   final String? backRoute;
+
+  LongStripScale toggleLongStripScale(LongStripScale current) {
+    switch (current) {
+      case LongStripScale.small:
+        return LongStripScale.large;
+      case LongStripScale.large:
+        return LongStripScale.full;
+      case LongStripScale.full:
+        return LongStripScale.small;
+    }
+  }
 
   void cachePage(ReaderPage page, BuildContext context) {
     precacheImage(page.provider, context);
@@ -354,36 +375,18 @@ class ReaderWidget extends HookConsumerWidget {
     final currentPage = useValueNotifier(0);
     final listController = useListController();
     final scrollController = useScrollController();
-    final pointerEvents = useValueNotifier<int>(0);
-    final currentImageScale =
-        useValueNotifier<PhotoViewScaleState>(PhotoViewScaleState.initial);
     final subtext =
         useValueNotifier<String?>(subtitle ?? pages.elementAt(0).sortKey);
     final format = longstrip ? ReaderFormat.longstrip : settings.format;
+    final isPortrait = DeviceContext.isPortraitMode(context);
+    final longStripScale = useValueNotifier(
+        isPortrait ? LongStripScale.full : LongStripScale.small);
 
     final precacheCount = useCallback(() {
       return (settings.precacheCount > 9 || format == ReaderFormat.longstrip)
           ? pageCount
           : settings.precacheCount;
     }, [settings, format]);
-
-    useEffect(() {
-      void scaleStateListener(PhotoViewScaleState value) {
-        currentImageScale.value = value;
-      }
-
-      final subs = <StreamSubscription<PhotoViewScaleState>>[];
-
-      for (final c in scaleStateController) {
-        subs.add(c.outputScaleStateStream.listen(scaleStateListener));
-      }
-
-      return () {
-        for (final s in subs) {
-          s.cancel();
-        }
-      };
-    }, [scaleStateController]);
 
     useEffect(() {
       void pageCallback() {
@@ -612,7 +615,10 @@ class ReaderWidget extends HookConsumerWidget {
                 avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
                 label: const Text('Toggle Page Size'),
                 onPressed: (format == ReaderFormat.longstrip)
-                    ? null
+                    ? () {
+                        longStripScale.value =
+                            toggleLongStripScale(longStripScale.value);
+                      }
                     : () {
                         scaleStateController[currentPage.value].scaleState =
                             defaultScaleStateCycle(
@@ -887,7 +893,6 @@ class ReaderWidget extends HookConsumerWidget {
 
             if (format == ReaderFormat.longstrip) {
               final mediaSize = MediaQuery.sizeOf(context);
-              final isPortrait = DeviceContext.isPortraitMode(context);
 
               return SuperListView(
                 listController: listController,
@@ -897,26 +902,29 @@ class ReaderWidget extends HookConsumerWidget {
                     .map(
                       (page) => Center(
                         key: ValueKey(page.id),
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                              minWidth: isPortrait
-                                  ? mediaSize.width
-                                  : mediaSize.width * 0.4,
-                              maxWidth: mediaSize.width),
-                          child: KeepAliveImage(
-                            image: page.provider,
-                            fit: BoxFit.contain,
-                            alignment: Alignment.topCenter,
-                            loadingBuilder: (context, child, event) {
-                              if (event == null) {
-                                return child;
-                              }
+                        child: HookBuilder(
+                          builder: (context) {
+                            final scale = useValueListenable(longStripScale);
+                            final width = mediaSize.width * scale.scale;
+                            return ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minWidth: width, maxWidth: width),
+                              child: KeepAliveImage(
+                                image: page.provider,
+                                fit: BoxFit.contain,
+                                alignment: Alignment.topCenter,
+                                loadingBuilder: (context, child, event) {
+                                  if (event == null) {
+                                    return child;
+                                  }
 
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            },
-                          ),
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                },
+                              ),
+                            );
+                          },
                         ),
                       ),
                     )
@@ -924,91 +932,67 @@ class ReaderWidget extends HookConsumerWidget {
               );
             }
 
-            return Listener(
-              onPointerDown: (_) => pointerEvents.value++,
-              onPointerUp: (_) => pointerEvents.value--,
-              child: HookBuilder(
-                builder: (_) {
-                  final scaleValue = useValueListenable(currentImageScale);
-                  final pointerValue = useValueListenable(pointerEvents);
-
-                  return PageView.builder(
-                    allowImplicitScrolling: true,
-                    reverse: settings.direction == ReaderDirection.rightToLeft,
-                    physics: (!settings.swipeGestures ||
-                            scaleValue != PhotoViewScaleState.initial ||
-                            pointerValue == 2)
-                        ? const NeverScrollableScrollPhysics()
-                        : null,
-                    scrollBehavior: const MouseTouchScrollBehavior(),
-                    controller: pageController,
-                    itemCount: pageCount,
-                    onPageChanged: (int index) {
-                      focusNode.requestFocus();
-                      currentImageScale.value =
-                          scaleStateController[index].scaleState;
-                    },
-                    findChildIndexCallback: (key) {
-                      final valueKey = key as ValueKey<String>;
-                      final val =
-                          pages.indexWhere((i) => i.id == valueKey.value);
-                      return val >= 0 ? val : null;
-                    },
-                    itemBuilder: (BuildContext context, int index) {
-                      final page = pages.elementAt(index);
-
-                      return PhotoView(
-                        key: ValueKey(page.id),
-                        imageProvider: page.provider,
-                        backgroundDecoration:
-                            const BoxDecoration(color: Colors.black),
-                        enableRotation: false,
-                        scaleStateController: scaleStateController[index],
-                        controller: viewController[index],
-                        minScale: PhotoViewComputedScale.contained * 1.0,
-                        maxScale: PhotoViewComputedScale.covered * 5.0,
-                        initialScale: PhotoViewComputedScale.contained,
-                        basePosition: Alignment.topCenter,
-                        onTapUp: settings.clickToTurn
-                            ? (context, details, value) {
-                                focusNode.requestFocus();
-
-                                final taploc = details.localPosition.dx;
-                                final viewport = context.size!.width;
-
-                                final tapmargin = viewport / 2.5;
-
-                                if (taploc < tapmargin) {
-                                  onTapLeft(
-                                    currentPage: currentPage,
-                                    settings: settings,
-                                    format: format,
-                                    pageController: pageController,
-                                    listController: listController,
-                                    scrollController: scrollController,
-                                    context: context,
-                                  );
-                                } else if (taploc > viewport - tapmargin) {
-                                  onTapRight(
-                                    currentPage: currentPage,
-                                    settings: settings,
-                                    format: format,
-                                    pageController: pageController,
-                                    listController: listController,
-                                    scrollController: scrollController,
-                                    context: context,
-                                  );
-                                }
-                              }
-                            : null,
-                        loadingBuilder: (context, event) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    },
-                  );
-                },
+            return PhotoViewGallery.builder(
+              allowImplicitScrolling: true,
+              reverse: settings.direction == ReaderDirection.rightToLeft,
+              scrollPhysics: !settings.swipeGestures
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
+              backgroundDecoration: const BoxDecoration(color: Colors.black),
+              pageController: pageController,
+              onPageChanged: (int index) {
+                focusNode.requestFocus();
+              },
+              loadingBuilder: (context, event) => const Center(
+                child: CircularProgressIndicator(),
               ),
+              itemCount: pageCount,
+              wantKeepAlive: true,
+              builder: (context, index) {
+                final page = pages.elementAt(index);
+                return PhotoViewGalleryPageOptions(
+                  heroAttributes: PhotoViewHeroAttributes(tag: page.id),
+                  imageProvider: page.provider,
+                  controller: viewController[index],
+                  scaleStateController: scaleStateController[index],
+                  minScale: PhotoViewComputedScale.contained * 1.0,
+                  maxScale: PhotoViewComputedScale.covered * 5.0,
+                  initialScale: PhotoViewComputedScale.contained,
+                  basePosition: Alignment.topCenter,
+                  onTapUp: settings.clickToTurn
+                      ? (context, details, value) {
+                          focusNode.requestFocus();
+
+                          final taploc = details.localPosition.dx;
+                          final viewport = context.size!.width;
+
+                          final tapmargin = viewport / 2.5;
+
+                          if (taploc < tapmargin) {
+                            onTapLeft(
+                              currentPage: currentPage,
+                              settings: settings,
+                              format: format,
+                              pageController: pageController,
+                              listController: listController,
+                              scrollController: scrollController,
+                              context: context,
+                            );
+                          } else if (taploc > viewport - tapmargin) {
+                            onTapRight(
+                              currentPage: currentPage,
+                              settings: settings,
+                              format: format,
+                              pageController: pageController,
+                              listController: listController,
+                              scrollController: scrollController,
+                              context: context,
+                            );
+                          }
+                        }
+                      : null,
+                );
+              },
             );
           },
         ),
@@ -1115,8 +1099,8 @@ class _ProgressBarSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: Tooltip(
-          message: tooltip,
+      child: Tooltip(
+        message: tooltip,
         child: InkWell(
           onTap: onTap,
           child: Align(
