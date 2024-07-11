@@ -14,7 +14,7 @@ Gagaku is licensed under the MIT license.
 
 - MangaDex client
 - CBZ/CBT file support
-- Local directory catalog/scanning (desktop only)
+- Local directory catalog/scanning
 - cubari.moe links
 - Deep link support
   - Android only, supports mangadex.org/cubari.moe links
