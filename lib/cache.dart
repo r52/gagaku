@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/types.dart';
@@ -158,6 +159,11 @@ class CacheManager {
 
       // Clear old disk cache
       clearDiskCachedImages(duration: const Duration(days: 7));
+    }
+
+    final imageCache = PaintingBinding.instance.imageCache;
+    if (imageCache.currentSize >= imageCache.maximumSize) {
+      PaintingBinding.instance.imageCache.clear();
     }
   }
 
