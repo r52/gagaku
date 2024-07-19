@@ -163,7 +163,7 @@ class CacheManager {
 
     final imageCache = PaintingBinding.instance.imageCache;
     if (imageCache.currentSize >= imageCache.maximumSize) {
-      PaintingBinding.instance.imageCache.clear();
+      imageCache.clear();
     }
   }
 

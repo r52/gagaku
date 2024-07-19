@@ -103,6 +103,7 @@ class LocalLibraryItem {
     this.isReadable = false,
     this.parent,
     this.error,
+    this.sort,
   });
 
   final String path;
@@ -113,8 +114,14 @@ class LocalLibraryItem {
   String? error;
   bool isReadable;
   LocalLibraryItem? parent;
+  LibrarySort? sort;
   List<LocalLibraryItem> children = [];
   int get id => Object.hash(path, type);
+
+  void setSortType(LibrarySort type) {
+    sort = type;
+    children.sort(_libraryCompare[sort]);
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -122,7 +129,7 @@ class LocalLibrary extends _$LocalLibrary {
   Future<LocalLibraryItem?> _processDirectory(
       Directory dir, LocalLibraryItem? parent) async {
     final formats = await ref.watch(supportedFormatsProvider.future);
-    final sort = ref.watch(librarySortTypeProvider);
+    final currentSort = ref.read(librarySortTypeProvider);
 
     final entities = await dir.list().toList();
     final files = entities.whereType<File>();
@@ -169,7 +176,7 @@ class LocalLibrary extends _$LocalLibrary {
       }
     }
 
-    res.children.sort(_libraryCompare[sort]);
+    res.setSortType(currentSort);
 
     if (res.children.isNotEmpty) {
       return res;
@@ -186,12 +193,13 @@ class LocalLibrary extends _$LocalLibrary {
         file.path.endsWith('.tar')) {
       // TODO thumbnail for archives?
       return LocalLibraryItem(
-          path: file.path,
-          type: LibraryItemType.archive,
-          modified: await file.lastModified(),
-          name: file.uri.pathSegments.last,
-          isReadable: true,
-          parent: parent);
+        path: file.path,
+        type: LibraryItemType.archive,
+        modified: await file.lastModified(),
+        name: file.uri.pathSegments.last,
+        isReadable: true,
+        parent: parent,
+      );
     }
 
     return null;
@@ -199,7 +207,7 @@ class LocalLibrary extends _$LocalLibrary {
 
   Future<LocalLibraryItem> _scanLibrary() async {
     final cfg = ref.watch(localConfigProvider);
-    final sort = ref.watch(librarySortTypeProvider);
+    final currentSort = ref.read(librarySortTypeProvider);
 
     final perms = await Permission.manageExternalStorage.request();
 
@@ -238,7 +246,7 @@ class LocalLibrary extends _$LocalLibrary {
         // otherwise skip
       }
 
-      top.children.sort(_libraryCompare[sort]);
+      top.setSortType(currentSort);
 
       if (top.children.isEmpty) {
         top.error = 'Library is empty!';
