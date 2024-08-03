@@ -1,7 +1,28 @@
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
+
+class WebReaderData {
+  const WebReaderData({
+    required this.source,
+    this.title,
+    this.manga,
+    this.link,
+    this.info,
+    this.readKey,
+    this.onLinkPressed,
+  });
+
+  final dynamic source;
+  final String? title;
+  final WebManga? manga;
+  final Widget? link;
+  final ProxyInfo? info;
+  final String? readKey;
+  final VoidCallback? onLinkPressed;
+}
 
 @freezed
 class ProxyInfo with _$ProxyInfo {

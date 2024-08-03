@@ -6,7 +6,6 @@ import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:gagaku/web/model.dart';
-import 'package:gagaku/web/reader.dart';
 import 'package:gagaku/web/types.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

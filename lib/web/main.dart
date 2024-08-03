@@ -4,114 +4,47 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/web/model.dart';
-import 'package:gagaku/web/reader.dart';
-import 'package:gagaku/web/types.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebSourcesHome extends HookConsumerWidget {
   const WebSourcesHome({super.key});
 
+  Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          return _OpenLinkDialog();
+        });
+
+    if (result != null && context.mounted) {
+      final parseResult = api.handleUrl(url: result, context: context);
+
+      if (!parseResult) {
+        messenger
+          ..removeCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+            content: Text('Unsupported URL'),
+            backgroundColor: Colors.red,
+          ));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final api = ref.watch(proxyProvider);
-    final urlFieldController = useTextEditingController();
+
     final scrollController = useScrollController();
     final historyProvider = ref.watch(webSourceHistoryProvider);
-
-    bool parseUrl(String url) {
-      if (url.startsWith('https://imgur.com/a/')) {
-        final src = url.substring(20);
-        final code = '/read/api/imgur/chapter/$src';
-        GoRouter.of(context)
-            .push('/read/imgur/$src/1/1/', extra: WebReaderData(source: code));
-        ref
-            .read(webSourceHistoryProvider.notifier)
-            .add(HistoryLink(title: url, url: url));
-        return true;
-      }
-
-      if (url.startsWith('https://cubari.moe/read/')) {
-        final info = api.parseUrl(url);
-
-        if (info == null) {
-          return false;
-        }
-
-        if (info.chapter != null) {
-          GoRouter.of(context)
-              .push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
-        } else {
-          GoRouter.of(context).push('/read/${info.proxy}/${info.code}');
-        }
-
-        return true;
-      }
-
-      return false;
-    }
-
-    Future<void> openLinkDialog() async {
-      final messenger = ScaffoldMessenger.of(context);
-      final result = await showDialog<String>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Open URL'),
-              content: TextField(
-                controller: urlFieldController,
-                decoration: const InputDecoration(
-                    hintText: 'cubari.moe, imgur.com etc.'),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Paste from Clipboard'),
-                  onPressed: () async {
-                    var result = await Clipboard.getData('text/plain');
-                    if (result != null) {
-                      urlFieldController.text = result.text!;
-                    }
-                  },
-                ),
-                TextButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    urlFieldController.clear();
-                  },
-                ),
-                ElevatedButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop(urlFieldController.text);
-                    urlFieldController.clear();
-                  },
-                ),
-              ],
-            );
-          });
-
-      if (result != null) {
-        final parseResult = parseUrl(result);
-
-        if (!parseResult) {
-          messenger
-            ..removeCurrentSnackBar()
-            ..showSnackBar(const SnackBar(
-              content: Text('Unsupported URL'),
-              backgroundColor: Colors.red,
-            ));
-        }
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: const TitleFlexBar(title: 'Web Sources'),
         actions: [
           IconButton(
-            onPressed: openLinkDialog,
+            onPressed: () => openLinkDialog(context, api),
             icon: const Icon(Icons.open_in_browser),
             tooltip: 'Open Link',
           ),
@@ -209,7 +142,7 @@ class WebSourcesHome extends HookConsumerWidget {
                   height: 10,
                 ),
                 ElevatedButton.icon(
-                  onPressed: openLinkDialog,
+                  onPressed: () => openLinkDialog(context, api),
                   icon: const Icon(
                     Icons.link,
                   ),
@@ -258,7 +191,8 @@ class WebSourcesHome extends HookConsumerWidget {
                       textColor: Colors.blue,
                       onTap: () {
                         final messenger = ScaffoldMessenger.of(context);
-                        final parseResult = parseUrl(item.url);
+                        final parseResult =
+                            api.handleUrl(url: item.url, context: context);
 
                         if (!parseResult) {
                           messenger
@@ -281,6 +215,47 @@ class WebSourcesHome extends HookConsumerWidget {
             child: CircularProgressIndicator(),
           ),
       },
+    );
+  }
+}
+
+class _OpenLinkDialog extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    final urlFieldController = useTextEditingController();
+
+    return AlertDialog(
+      title: const Text('Open URL'),
+      content: TextField(
+        controller: urlFieldController,
+        decoration:
+            const InputDecoration(hintText: 'cubari.moe, imgur.com etc.'),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Paste from Clipboard'),
+          onPressed: () async {
+            var result = await Clipboard.getData('text/plain');
+            if (result != null) {
+              urlFieldController.text = result.text!;
+            }
+          },
+        ),
+        TextButton(
+          child: const Text('CANCEL'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            urlFieldController.clear();
+          },
+        ),
+        ElevatedButton(
+          child: const Text('OK'),
+          onPressed: () {
+            Navigator.of(context).pop(urlFieldController.text);
+            urlFieldController.clear();
+          },
+        ),
+      ],
     );
   }
 }

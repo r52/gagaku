@@ -1,10 +1,12 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/web/types.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -33,6 +35,38 @@ class ProxyHandler {
 
   Future<void> invalidateAll(String startsWith) async {
     await _cache.invalidateAll(startsWith);
+  }
+
+  bool handleUrl({required String url, required BuildContext context}) {
+    if (url.startsWith('https://imgur.com/a/')) {
+      final src = url.substring(20);
+      final code = '/read/api/imgur/chapter/$src';
+      GoRouter.of(context)
+          .push('/read/imgur/$src/1/1/', extra: WebReaderData(source: code));
+      ref
+          .read(webSourceHistoryProvider.notifier)
+          .add(HistoryLink(title: url, url: url));
+      return true;
+    }
+
+    if (url.startsWith('https://cubari.moe/read/')) {
+      final info = parseUrl(url);
+
+      if (info == null) {
+        return false;
+      }
+
+      if (info.chapter != null) {
+        GoRouter.of(context)
+            .push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
+      } else {
+        GoRouter.of(context).push('/read/${info.proxy}/${info.code}');
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
   ProxyInfo? parseUrl(String url) {

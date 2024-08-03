@@ -15,26 +15,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader.g.dart';
 
-class WebReaderData {
-  const WebReaderData({
-    required this.source,
-    this.title,
-    this.manga,
-    this.link,
-    this.info,
-    this.readKey,
-    this.onLinkPressed,
-  });
-
-  final dynamic source;
-  final String? title;
-  final WebManga? manga;
-  final Widget? link;
-  final ProxyInfo? info;
-  final String? readKey;
-  final VoidCallback? onLinkPressed;
-}
-
 Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
   final data = state.extra.asOrNull<WebReaderData>();
 
