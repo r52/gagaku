@@ -283,6 +283,16 @@ class _AppState extends ConsumerState<App> {
           ),
         ],
       ),
+      GoRoute(
+        path: '/ml/:url(.*)',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildRedirectedWebMangaViewPage,
+      ),
+      GoRoute(
+        path: '/mk/:url(.*)',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildRedirectedWebMangaViewPage,
+      ),
       // Settings route
       GoRoute(
         path: GagakuRoute.config,

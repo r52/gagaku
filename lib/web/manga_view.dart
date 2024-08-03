@@ -40,6 +40,17 @@ Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
   );
 }
 
+Page<dynamic> buildRedirectedWebMangaViewPage(
+    BuildContext context, GoRouterState state) {
+  final url = state.uri.toString();
+
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: RedirectedWebMangaViewWidget(url: url),
+    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
+  );
+}
+
 @riverpod
 Future<WebManga> _fetchWebMangaInfo(
     _FetchWebMangaInfoRef ref, ProxyInfo info) async {
@@ -55,6 +66,19 @@ Future<WebManga> _fetchWebMangaInfo(
   throw Exception('Invalid WebManga link. Data not found.');
 }
 
+@riverpod
+Future<ProxyInfo> _fetchWebMangaRedirect(
+    _FetchWebMangaRedirectRef ref, String url) async {
+  final api = ref.watch(proxyProvider);
+  final proxy = await api.parseUrl(url);
+
+  if (proxy != null) {
+    return proxy;
+  }
+
+  throw Exception('Invalid url $url. Data not found.');
+}
+
 class ChapterEntry {
   const ChapterEntry(this.name, this.chapter);
 
@@ -65,17 +89,22 @@ class ChapterEntry {
 }
 
 class QueriedWebMangaViewWidget extends ConsumerWidget {
-  const QueriedWebMangaViewWidget(
-      {super.key, required this.proxy, required this.code});
+  const QueriedWebMangaViewWidget({
+    super.key,
+    this.proxy,
+    this.code,
+    this.info,
+  }) : assert((proxy != null && code != null) || info != null);
 
-  final String proxy;
-  final String code;
+  final String? proxy;
+  final String? code;
+  final ProxyInfo? info;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
-    final info = ProxyInfo(proxy: proxy, code: code);
-    final mangaProvider = ref.watch(_fetchWebMangaInfoProvider(info));
+    final inf = info ?? ProxyInfo(proxy: proxy!, code: code!);
+    final mangaProvider = ref.watch(_fetchWebMangaInfoProvider(inf));
 
     Widget child;
     PreferredSizeWidget? appBar;
@@ -84,21 +113,72 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
       case AsyncValue(value: final manga?):
         child = RefreshIndicator(
           onRefresh: () async {
-            await api.invalidateAll(info.getKey());
-            return ref.refresh(_fetchWebMangaInfoProvider(info).future);
+            await api.invalidateAll(inf.getKey());
+            return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
           },
-          child: WebMangaViewWidget(manga: manga, info: info),
+          child: WebMangaViewWidget(manga: manga, info: inf),
         );
       case AsyncValue(:final error?, :final stackTrace?):
         child = RefreshIndicator(
           onRefresh: () async {
-            await api.invalidateAll(info.getKey());
-            return ref.refresh(_fetchWebMangaInfoProvider(info).future);
+            await api.invalidateAll(inf.getKey());
+            return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
           },
           child: ErrorList(
             error: error,
             stackTrace: stackTrace,
             message: "_fetchWebMangaInfoProvider($proxy/$code) failed",
+          ),
+        );
+
+        appBar = AppBar(
+          leading: BackButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(GagakuRoute.web);
+              }
+            },
+          ),
+        );
+        break;
+      case _:
+        child = Styles.listSpinner;
+        break;
+    }
+
+    return Scaffold(
+      appBar: appBar,
+      body: child,
+    );
+  }
+}
+
+class RedirectedWebMangaViewWidget extends ConsumerWidget {
+  const RedirectedWebMangaViewWidget({super.key, required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final infoProvider = ref.watch(_fetchWebMangaRedirectProvider(url));
+
+    Widget child;
+    PreferredSizeWidget? appBar;
+
+    switch (infoProvider) {
+      case AsyncValue(value: final info?):
+        return QueriedWebMangaViewWidget(info: info);
+      case AsyncValue(:final error?, :final stackTrace?):
+        child = RefreshIndicator(
+          onRefresh: () async {
+            return ref.refresh(_fetchWebMangaRedirectProvider(url).future);
+          },
+          child: ErrorList(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchWebMangaRedirectProvider($url) failed",
           ),
         );
 
