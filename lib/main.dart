@@ -65,7 +65,7 @@ void main() async {
     filter: kReleaseMode ? ProductionFilter() : null,
     printer: PrettyPrinter(
       colors: false,
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTime,
       excludeBox: {
         Level.trace: true,
         Level.debug: true,

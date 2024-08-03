@@ -191,7 +191,10 @@ class MangaDexHome extends HookConsumerWidget {
   }
 
   static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.toString();
+    String location = GoRouterState.of(context).uri.toString();
+    location = location.startsWith("https://mangadex.org")
+        ? location.substring(20)
+        : location;
 
     switch (location) {
       case GagakuRoute.chapterfeed:
