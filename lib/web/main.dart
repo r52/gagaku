@@ -18,7 +18,7 @@ class WebSourcesHome extends HookConsumerWidget {
         });
 
     if (result != null && context.mounted) {
-      final parseResult = api.handleUrl(url: result, context: context);
+      final parseResult = await api.handleUrl(url: result, context: context);
 
       if (!parseResult) {
         messenger
@@ -189,10 +189,10 @@ class WebSourcesHome extends HookConsumerWidget {
                       ),
                       title: Text(item.title),
                       textColor: Colors.blue,
-                      onTap: () {
+                      onTap: () async {
                         final messenger = ScaffoldMessenger.of(context);
-                        final parseResult =
-                            api.handleUrl(url: item.url, context: context);
+                        final parseResult = await api.handleUrl(
+                            url: item.url, context: context);
 
                         if (!parseResult) {
                           messenger

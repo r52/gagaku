@@ -37,7 +37,8 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
-  bool handleUrl({required String url, required BuildContext context}) {
+  Future<bool> handleUrl(
+      {required String url, required BuildContext context}) async {
     if (url.startsWith('https://imgur.com/a/')) {
       final src = url.substring(20);
       final code = '/read/api/imgur/chapter/$src';
@@ -49,13 +50,14 @@ class ProxyHandler {
       return true;
     }
 
-    if (url.startsWith('https://cubari.moe/read/')) {
-      final info = parseUrl(url);
+    if (url.startsWith('https://cubari.moe/')) {
+      final info = await parseUrl(url);
 
       if (info == null) {
         return false;
       }
 
+      if (!context.mounted) return false;
       if (info.chapter != null) {
         GoRouter.of(context)
             .push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
@@ -69,8 +71,13 @@ class ProxyHandler {
     return false;
   }
 
-  ProxyInfo? parseUrl(String url) {
-    var src = url.substring(24);
+  Future<ProxyInfo?> parseUrl(String url) async {
+    var src = url.startsWith('https://cubari.moe/') ? url.substring(18) : url;
+
+    if (!src.startsWith('/')) {
+      return null;
+    }
+
     var proxy = src.split('/');
     proxy.removeWhere((element) => element.isEmpty);
 
@@ -78,21 +85,39 @@ class ProxyHandler {
       return null;
     }
 
-    if (proxy.length >= 3) {
-      return ProxyInfo(proxy: proxy[0], code: proxy[1], chapter: proxy[2]);
-    }
+    switch (proxy[0]) {
+      case 'read':
+        if (proxy.length >= 4) {
+          return ProxyInfo(proxy: proxy[1], code: proxy[2], chapter: proxy[3]);
+        }
 
-    return ProxyInfo(proxy: proxy[0], code: proxy[1]);
+        return ProxyInfo(proxy: proxy[1], code: proxy[2]);
+      default:
+        logger.d('ProxyHandler: retrieving url $url');
+        final response = await _client.send(
+            (http.Request('GET', Uri.parse(url))..followRedirects = false));
+
+        if (response.statusCode != 302 ||
+            !response.headers.containsKey('location')) {
+          return null;
+        }
+
+        final location = response.headers['location']!;
+
+        if (!location.startsWith('/read/')) {
+          return null;
+        }
+
+        logger.d('ProxyHandler: location $location');
+
+        return parseUrl(location);
+    }
   }
 
   Future<ProxyData> handleProxy(ProxyInfo info) async {
     ProxyData p = ProxyData();
 
     switch (info.proxy) {
-      // case 'gist':
-      //   final manga = await _getMangaFromGist(info.code);
-      //   p.manga = manga;
-      //   break;
       case 'imgur':
         final code = '/read/api/imgur/chapter/${info.code}';
         p.code = code;
@@ -134,61 +159,6 @@ class ProxyHandler {
     throw Exception(
         "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
-
-  // Future<WebManga> _getMangaFromGist(ProxyInfo info) async {
-  //   var url = '';
-
-  //   if (info.code.length > 5) {
-  //     // Pretty bad way of determining whether its an old git.io link but w/e
-  //     Codec<String, String> b64 = utf8.fuse(base64Url);
-  //     String link = b64.decode(base64.normalize(info.code));
-  //     final schema = link.split('/');
-  //     var baseUrl = 'https://raw.githubusercontent.com/';
-
-  //     if (schema.isEmpty || schema.length < 3) {
-  //       throw Exception("Bad url/gist code ${info.code}");
-  //     }
-
-  //     switch (schema[0]) {
-  //       case 'raw':
-  //         baseUrl = 'https://raw.githubusercontent.com/';
-  //         break;
-  //       case 'gist':
-  //         baseUrl = 'https://gist.githubusercontent.com/';
-  //         break;
-  //       default:
-  //         throw Exception("Unknown schema ${schema[0]}");
-  //     }
-
-  //     url = '$baseUrl${link.substring(link.indexOf('/') + 1)}';
-  //   } else {
-  //     url = 'https://git.io/${info.code}';
-  //   }
-
-  //   if (url.isNotEmpty) {
-  //     final key = info.getKey();
-
-  //     if (await _cache.exists(key)) {
-  //       logger.d('CacheManager: retrieving entry $key');
-  //       return _cache.get<WebManga>(key, WebManga.fromJson);
-  //     }
-
-  //     final response = await _client.get(Uri.parse(url));
-
-  //     if (response.statusCode == 200) {
-  //       final body = json.decode(response.body);
-  //       final manga = WebManga.fromJson(body);
-
-  //       logger.d('CacheManager: caching entry $key');
-  //       _cache.put(key, body, true, const Duration(days: 1));
-
-  //       return manga;
-  //     }
-  //   }
-
-  //   // Throw if failure
-  //   throw Exception("Failed to download manga data");
-  // }
 
   Future<List<String>> getChapter(String code) async {
     final url = "https://cubari.moe$code";
