@@ -20,9 +20,11 @@ abstract class GagakuRoute {
 
   static const local = '/local';
 
+  static const proxyHome = '/proxy';
+  static const proxySaved = '/proxy/saved';
   static const web = '/read';
-  static const webManga = ':proxy/:code';
-  static const webMangaFull = ':proxy/:code/:chapter/:page';
+  static const webManga = '/read/:proxy/:code';
+  static const webMangaFull = '/read/:proxy/:code/:chapter/:page';
 
   static const config = '/config';
 }

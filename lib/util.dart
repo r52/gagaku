@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+String cleanBaseDomains(String url) {
+  url = url.startsWith('https://mangadex.org/') ? url.substring(20) : url;
+  url = url.startsWith('https://cubari.moe/') ? url.substring(18) : url;
+  return url;
+}
+
 mixin ExpiringData {
   DateTime get expiry;
 

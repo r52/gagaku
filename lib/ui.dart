@@ -532,7 +532,6 @@ class Styles {
           Animation<double> secondaryAnimation,
           Widget child) =>
       SharedAxisTransition(
-        fillColor: Theme.of(context).colorScheme.surface,
         animation: animation,
         secondaryAnimation: secondaryAnimation,
         transitionType: SharedAxisTransitionType.scaled,
@@ -545,7 +544,6 @@ class Styles {
           Animation<double> secondaryAnimation,
           Widget child) =>
       SharedAxisTransition(
-        fillColor: Theme.of(context).colorScheme.surface,
         animation: animation,
         secondaryAnimation: secondaryAnimation,
         transitionType: SharedAxisTransitionType.horizontal,
@@ -558,7 +556,6 @@ class Styles {
           Animation<double> secondaryAnimation,
           Widget child) =>
       FadeThroughTransition(
-        fillColor: Theme.of(context).colorScheme.surface,
         animation: animation,
         secondaryAnimation: secondaryAnimation,
         child: child,

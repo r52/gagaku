@@ -21,6 +21,7 @@ class MangaDexListsView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final scrollController = controller ?? useScrollController();
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
@@ -151,6 +152,11 @@ class MangaDexListsView extends HookConsumerWidget {
 
                                         return Card(
                                           key: ValueKey(item.id),
+                                          color: index.isOdd
+                                              ? theme
+                                                  .colorScheme.surfaceContainer
+                                              : theme.colorScheme
+                                                  .surfaceContainerHighest,
                                           child: ListTile(
                                             leading: Tooltip(
                                                 message: item

@@ -58,8 +58,6 @@ Future<WebManga> _fetchWebMangaInfo(
   final proxy = await api.handleProxy(info);
 
   if (proxy.manga != null) {
-    ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(
-        title: '${info.proxy}: ${proxy.manga?.title}', url: info.getURL()));
     return proxy.manga!;
   }
 
@@ -137,7 +135,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                context.go(GagakuRoute.web);
+                context.go(GagakuRoute.proxyHome);
               }
             },
           ),
@@ -188,7 +186,7 @@ class RedirectedWebMangaViewWidget extends ConsumerWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                context.go(GagakuRoute.web);
+                context.go(GagakuRoute.proxyHome);
               }
             },
           ),
@@ -206,7 +204,7 @@ class RedirectedWebMangaViewWidget extends ConsumerWidget {
   }
 }
 
-class WebMangaViewWidget extends StatelessWidget {
+class WebMangaViewWidget extends HookConsumerWidget {
   const WebMangaViewWidget(
       {super.key, required this.manga, required this.info});
 
@@ -214,13 +212,22 @@ class WebMangaViewWidget extends StatelessWidget {
   final ProxyInfo info;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final link =
+        HistoryLink(title: '${info.proxy}: ${manga.title}', url: info.getURL());
     final chapterlist = manga.chapters.entries
         .map((e) => ChapterEntry(e.key, e.value))
         .toList();
     chapterlist
         .sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
+
+    useEffect(() {
+      Future.delayed(Duration.zero, () {
+        ref.read(webSourceHistoryProvider.notifier).add(link);
+      });
+      return null;
+    }, []);
 
     return CustomScrollView(
       scrollBehavior: const MouseTouchScrollBehavior(),
@@ -235,7 +242,7 @@ class WebMangaViewWidget extends StatelessWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                context.go(GagakuRoute.web);
+                context.go(GagakuRoute.proxyHome);
               }
             },
           ),
@@ -265,6 +272,54 @@ class WebMangaViewWidget extends StatelessWidget {
               loadStateChanged: extendedImageLoadStateHandler,
             ),
           ),
+          actions: [
+            Consumer(
+              builder: (context, ref, child) {
+                final favorited = ref.watch(webSourceFavoritesProvider.select(
+                  (value) => switch (value) {
+                    AsyncValue(value: final data?) =>
+                      data.indexWhere((e) => e.url == info.getURL()) > -1,
+                    _ => null,
+                  },
+                ));
+
+                if (favorited == null) {
+                  return const SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                return IconButton.filledTonal(
+                  tooltip:
+                      favorited ? 'Remove from Favorites' : 'Add to Favorites',
+                  style: IconButton.styleFrom(
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(6.0),
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+                    if (favorited) {
+                      ref
+                          .read(webSourceFavoritesProvider.notifier)
+                          .remove(link);
+                    } else {
+                      ref.read(webSourceFavoritesProvider.notifier).add(link);
+                    }
+                  },
+                  icon:
+                      Icon(favorited ? Icons.favorite : Icons.favorite_border),
+                );
+              },
+            ),
+            const SizedBox(width: 10),
+          ],
         ),
         SliverList.list(children: [
           if (manga.description.isNotEmpty)
@@ -313,8 +368,8 @@ class WebMangaViewWidget extends StatelessWidget {
                 children: [
                   ButtonChip(
                     onPressed: () async {
-                      var route = GoRouterState.of(context).uri.toString();
-                      route = route.replaceFirst('https://cubari.moe', '');
+                      final route = cleanBaseDomains(
+                          GoRouterState.of(context).uri.toString());
                       final url = Uri.parse('http://cubari.moe$route');
 
                       if (!await launchUrl(url)) {

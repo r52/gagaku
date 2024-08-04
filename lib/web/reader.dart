@@ -135,7 +135,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
           info: data.info,
           readKey: data.readKey,
           onLinkPressed: data.onLinkPressed,
-          backRoute: GagakuRoute.web,
+          backRoute: GagakuRoute.proxyHome,
         );
       case AsyncValue(:final error?, :final stackTrace?):
         child = ErrorColumn(
@@ -149,7 +149,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                context.go(GagakuRoute.web);
+                context.go(GagakuRoute.proxyHome);
               }
             },
           ),
@@ -225,7 +225,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
                 if (context.canPop()) {
                   context.pop();
                 } else {
-                  context.go(backRoute ?? GagakuRoute.web);
+                  context.go(backRoute ?? GagakuRoute.proxyHome);
                 }
               },
             ),

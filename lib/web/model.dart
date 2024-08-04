@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util.dart';
 import 'package:gagaku/web/types.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -72,7 +73,7 @@ class ProxyHandler {
   }
 
   Future<ProxyInfo?> parseUrl(String url) async {
-    var src = url.startsWith('https://cubari.moe/') ? url.substring(18) : url;
+    var src = cleanBaseDomains(url);
 
     if (!src.startsWith('/')) {
       return null;
@@ -183,6 +184,119 @@ class ProxyHandler {
 
     throw Exception(
         "Failed to download chapter data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
+  }
+}
+
+@Riverpod(keepAlive: true)
+class WebSourceFavorites extends _$WebSourceFavorites {
+  Future<List<HistoryLink>> _fetch() async {
+    final box = Hive.box(gagakuBox);
+    final str = box.get('web_favorites');
+
+    if (str == null || (str as String).isEmpty) {
+      return <HistoryLink>[];
+    }
+
+    final content = json.decode(str) as List<dynamic>;
+    final links = content.map((e) => HistoryLink.fromJson(e));
+
+    return links.toList();
+  }
+
+  @override
+  FutureOr<List<HistoryLink>> build() async {
+    return _fetch();
+  }
+
+  Future<void> clear() async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final empty = <HistoryLink>[];
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_favorites', json.encode(empty));
+
+      return empty;
+    });
+  }
+
+  Future<void> add(HistoryLink link) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.value ?? <HistoryLink>[];
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      while (oldstate.contains(link)) {
+        oldstate.remove(link);
+      }
+
+      final udp = [link, ...oldstate];
+
+      final links = udp.map((e) => e.toJson()).toList();
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_favorites', json.encode(links));
+
+      return udp;
+    });
+  }
+
+  Future<void> remove(HistoryLink link) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.value ?? <HistoryLink>[];
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final udp = [...oldstate];
+
+      while (udp.contains(link)) {
+        udp.remove(link);
+      }
+
+      final links = udp.map((e) => e.toJson()).toList();
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_favorites', json.encode(links));
+
+      return udp;
+    });
+  }
+
+  Future<void> updateList(int oldIndex, int newIndex) async {
+    // If state is loading, wait for it first
+    if (state.isLoading || state.isReloading) {
+      await future;
+    }
+
+    final oldstate = state.value ?? <HistoryLink>[];
+    state = await AsyncValue.guard(() async {
+      if (oldIndex < newIndex) {
+        // removing the item at oldIndex will shorten the list by 1.
+        newIndex -= 1;
+      }
+
+      final element = oldstate.removeAt(oldIndex);
+      oldstate.insert(newIndex, element);
+
+      final udp = [...oldstate];
+      final map = udp.map((e) => e.toJson()).toList();
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_favorites', json.encode(map));
+
+      return udp;
+    });
   }
 }
 

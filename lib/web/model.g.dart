@@ -67,6 +67,69 @@ final class ProxyProvider
 
 String _$proxyHash() => r'9c1283bf072913b04bc06342dad4b6ff01fd1e7e';
 
+@ProviderFor(WebSourceFavorites)
+const webSourceFavoritesProvider = WebSourceFavoritesProvider._();
+
+final class WebSourceFavoritesProvider
+    extends $AsyncNotifierProvider<WebSourceFavorites, List<HistoryLink>> {
+  const WebSourceFavoritesProvider._(
+      {super.runNotifierBuildOverride, WebSourceFavorites Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'webSourceFavoritesProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final WebSourceFavorites Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$webSourceFavoritesHash();
+
+  @$internal
+  @override
+  WebSourceFavorites create() => _createCb?.call() ?? WebSourceFavorites();
+
+  @$internal
+  @override
+  WebSourceFavoritesProvider $copyWithCreate(
+    WebSourceFavorites Function() create,
+  ) {
+    return WebSourceFavoritesProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  WebSourceFavoritesProvider $copyWithBuild(
+    FutureOr<List<HistoryLink>> Function(
+      Ref<AsyncValue<List<HistoryLink>>>,
+      WebSourceFavorites,
+    ) build,
+  ) {
+    return WebSourceFavoritesProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<WebSourceFavorites, List<HistoryLink>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$webSourceFavoritesHash() =>
+    r'676dc5470821e369246f3bd1a3cab44b4b0a205e';
+
+abstract class _$WebSourceFavorites extends $AsyncNotifier<List<HistoryLink>> {
+  FutureOr<List<HistoryLink>> build();
+  @$internal
+  @override
+  FutureOr<List<HistoryLink>> runBuild() => build();
+}
+
 @ProviderFor(WebSourceHistory)
 const webSourceHistoryProvider = WebSourceHistoryProvider._();
 

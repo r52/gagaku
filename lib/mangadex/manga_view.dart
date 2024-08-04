@@ -592,10 +592,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             ),
                           ButtonChip(
                             onPressed: () async {
-                              var route =
-                                  GoRouterState.of(context).uri.toString();
-                              route = route.replaceFirst(
-                                  'https://mangadex.org', '');
+                              final route = cleanBaseDomains(
+                                  GoRouterState.of(context).uri.toString());
                               final url =
                                   Uri.parse('http://mangadex.org$route');
 

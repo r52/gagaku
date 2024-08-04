@@ -7,6 +7,7 @@ import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -191,10 +192,7 @@ class MangaDexHome extends HookConsumerWidget {
   }
 
   static int _calculateSelectedIndex(BuildContext context) {
-    String location = GoRouterState.of(context).uri.toString();
-    location = location.startsWith("https://mangadex.org")
-        ? location.substring(20)
-        : location;
+    final location = cleanBaseDomains(GoRouterState.of(context).uri.toString());
 
     switch (location) {
       case GagakuRoute.chapterfeed:

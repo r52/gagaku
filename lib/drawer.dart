@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -11,7 +12,7 @@ class MainDrawer extends ConsumerWidget {
   const MainDrawer({super.key});
 
   static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.toString();
+    final location = cleanBaseDomains(GoRouterState.of(context).uri.toString());
 
     if (location.startsWith(GagakuRoute.web)) {
       return 2;
@@ -20,6 +21,9 @@ class MainDrawer extends ConsumerWidget {
     switch (location) {
       case GagakuRoute.local:
         return 1;
+      case GagakuRoute.proxyHome:
+      case GagakuRoute.proxySaved:
+        return 2;
       case GagakuRoute.config:
         return 3;
       case '/':
@@ -41,7 +45,7 @@ class MainDrawer extends ConsumerWidget {
         GoRouter.of(context).go(GagakuRoute.local);
         break;
       case 2:
-        GoRouter.of(context).go(GagakuRoute.web);
+        GoRouter.of(context).go(GagakuRoute.proxyHome);
         break;
       case 3:
         GoRouter.of(context).go(GagakuRoute.config);
