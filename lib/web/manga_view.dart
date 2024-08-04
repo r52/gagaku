@@ -298,12 +298,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   tooltip:
                       favorited ? 'Remove from Favorites' : 'Add to Favorites',
                   style: IconButton.styleFrom(
+                    backgroundColor: theme.colorScheme.surface.withAlpha(200),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(6.0),
                       ),
                     ),
                   ),
+                  color: favorited ? theme.colorScheme.primary : null,
                   onPressed: () async {
                     if (favorited) {
                       ref

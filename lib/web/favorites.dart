@@ -73,6 +73,7 @@ class WebSourceFavorites extends HookConsumerWidget {
                             icon: Icon(favorited
                                 ? Icons.favorite
                                 : Icons.favorite_border),
+                            color: favorited ? theme.colorScheme.primary : null,
                             onPressed: () async {
                               if (favorited) {
                                 ref

@@ -321,23 +321,31 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             }
 
                             if (reading != null) {
-                              return Tooltip(
-                                message: following
+                              return IconButton.filledTonal(
+                                tooltip: following
                                     ? 'Unfollow Manga'
                                     : 'Follow Manga',
-                                child: ElevatedButton(
-                                  style: Styles.buttonStyle(),
-                                  onPressed: () async {
-                                    bool set = !following;
-                                    ref
-                                        .read(followingStatusProvider(manga)
-                                            .notifier)
-                                        .set(set);
-                                  },
-                                  child: Icon(following
-                                      ? Icons.notifications_active
-                                      : Icons.notifications_off_outlined),
+                                style: IconButton.styleFrom(
+                                  backgroundColor:
+                                      theme.colorScheme.surface.withAlpha(200),
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(6.0),
+                                    ),
+                                  ),
                                 ),
+                                color: theme.colorScheme.primary,
+                                highlightColor: Colors.orange,
+                                onPressed: () async {
+                                  bool set = !following;
+                                  ref
+                                      .read(followingStatusProvider(manga)
+                                          .notifier)
+                                      .set(set);
+                                },
+                                icon: Icon(following
+                                    ? Icons.notifications_active
+                                    : Icons.notifications_off_outlined),
                               );
                             }
 
