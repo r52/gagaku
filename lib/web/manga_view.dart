@@ -321,75 +321,146 @@ class WebMangaViewWidget extends HookConsumerWidget {
             const SizedBox(width: 10),
           ],
         ),
-        SliverList.list(children: [
-          if (manga.description.isNotEmpty)
+        SliverList.list(
+          children: [
+            if (manga.description.isNotEmpty)
+              ExpansionTile(
+                expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                title: const Text('Synopsis'),
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(8),
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    child: MarkdownBody(
+                      data: manga.description,
+                      onTapLink: (text, url, title) async {
+                        if (url != null) {
+                          if (!await launchUrl(Uri.parse(url))) {
+                            throw 'Could not launch $url';
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ExpansionTile(
-              expandedCrossAxisAlignment: CrossAxisAlignment.start,
-              title: const Text('Synopsis'),
+              title: const Text('Info'),
               children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8),
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: MarkdownBody(
-                    data: manga.description,
-                    onTapLink: (text, url, title) async {
-                      if (url != null) {
-                        if (!await launchUrl(Uri.parse(url))) {
+                MultiChildExpansionTile(
+                  title: 'Author',
+                  children: [
+                    IconTextChip(
+                      text: manga.author,
+                    )
+                  ],
+                ),
+                MultiChildExpansionTile(
+                  title: 'Artist',
+                  children: [
+                    IconTextChip(
+                      text: manga.artist,
+                    )
+                  ],
+                ),
+                MultiChildExpansionTile(
+                  title: 'Links',
+                  children: [
+                    ButtonChip(
+                      onPressed: () async {
+                        final route = cleanBaseDomains(
+                            GoRouterState.of(context).uri.toString());
+                        final url = Uri.parse('http://cubari.moe$route');
+
+                        if (!await launchUrl(url)) {
                           throw 'Could not launch $url';
                         }
-                      }
-                    },
-                  ),
+                      },
+                      text: const Text('Open on cubari.moe'),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ExpansionTile(
-            title: const Text('Info'),
-            children: [
-              MultiChildExpansionTile(
-                title: 'Author',
-                children: [
-                  IconTextChip(
-                    text: manga.author,
-                  )
-                ],
+            const Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Chapters',
+                style: TextStyle(fontSize: 24),
               ),
-              MultiChildExpansionTile(
-                title: 'Artist',
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
                 children: [
-                  IconTextChip(
-                    text: manga.artist,
-                  )
-                ],
-              ),
-              MultiChildExpansionTile(
-                title: 'Links',
-                children: [
-                  ButtonChip(
-                    onPressed: () async {
-                      final route = cleanBaseDomains(
-                          GoRouterState.of(context).uri.toString());
-                      final url = Uri.parse('http://cubari.moe$route');
+                  const Spacer(),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final key = info.getKey();
+                      final names = chapterlist.map((e) => e.name);
+                      final allRead = ref.watch(webReadMarkersProvider
+                          .select((value) => switch (value) {
+                                AsyncValue(value: final data?) =>
+                                  data[key]?.containsAll(names) ?? false,
+                                _ => false,
+                              }));
 
-                      if (!await launchUrl(url)) {
-                        throw 'Could not launch $url';
-                      }
+                      final opt = allRead ? 'unread' : 'read';
+
+                      return ElevatedButton(
+                        style: Styles.buttonStyle(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0)),
+                        onPressed: () async {
+                          final result = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              final nav = Navigator.of(context);
+                              return AlertDialog(
+                                title: Text('Mark all as $opt'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        'Are you sure you want to mark all chapters as $opt?'),
+                                  ],
+                                ),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                    child: const Text('No'),
+                                    onPressed: () {
+                                      nav.pop(false);
+                                    },
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      nav.pop(true);
+                                    },
+                                    child: const Text('Yes'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (result == true) {
+                            ref.read(webReadMarkersProvider.notifier).setBulk(
+                                key,
+                                read: !allRead ? names : null,
+                                unread: allRead ? names : null);
+                          }
+                        },
+                        child: Text('Mark all chapters as $opt'),
+                      );
                     },
-                    text: const Text('Open on cubari.moe'),
                   ),
                 ],
               ),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              'Chapters',
-              style: TextStyle(fontSize: 24),
             ),
-          ),
-        ]),
+          ],
+        ),
         SliverList.separated(
           findChildIndexCallback: (key) {
             final valueKey = key as ValueKey<int>;

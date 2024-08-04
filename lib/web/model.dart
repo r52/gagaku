@@ -209,10 +209,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 
   Future<void> clear() async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
+    await future;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -226,12 +223,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 
   Future<void> add(HistoryLink link) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.value ?? <HistoryLink>[];
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       while (oldstate.contains(link)) {
@@ -250,12 +242,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 
   Future<void> remove(HistoryLink link) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.value ?? <HistoryLink>[];
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final udp = [...oldstate];
@@ -274,12 +261,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 
   Future<void> updateList(int oldIndex, int newIndex) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.value ?? <HistoryLink>[];
+    final oldstate = await future;
     state = await AsyncValue.guard(() async {
       if (oldIndex < newIndex) {
         // removing the item at oldIndex will shorten the list by 1.
@@ -324,10 +306,7 @@ class WebSourceHistory extends _$WebSourceHistory {
   }
 
   Future<void> clear() async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
+    await future;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -342,12 +321,7 @@ class WebSourceHistory extends _$WebSourceHistory {
   }
 
   Future<void> add(HistoryLink link) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.value ?? Queue<HistoryLink>();
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final cpy = Queue.of(oldstate);
@@ -372,12 +346,7 @@ class WebSourceHistory extends _$WebSourceHistory {
   }
 
   Future<void> remove(HistoryLink link) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.value ?? Queue<HistoryLink>();
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final cpy = Queue.of(oldstate);
@@ -422,10 +391,7 @@ class WebReadMarkers extends _$WebReadMarkers {
   }
 
   Future<void> clear() async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
+    await future;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -439,12 +405,7 @@ class WebReadMarkers extends _$WebReadMarkers {
   }
 
   Future<void> set(String manga, String chapter, bool setRead) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.value ?? <String, Set<String>>{};
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final keyExists = oldstate.containsKey(manga);
@@ -466,6 +427,49 @@ class WebReadMarkers extends _$WebReadMarkers {
       } else {
         if (setRead) {
           oldstate[manga] = {chapter};
+        }
+      }
+
+      final converted =
+          oldstate.map((key, value) => MapEntry(key, value.toList()));
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_read_history', json.encode(converted));
+
+      return {...oldstate};
+    });
+  }
+
+  Future<void> setBulk(
+    String manga, {
+    Iterable<String>? read,
+    Iterable<String>? unread,
+  }) async {
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final keyExists = oldstate.containsKey(manga);
+
+      // Refresh
+      if (keyExists) {
+        if (read != null) {
+          oldstate[manga]?.addAll(read);
+        }
+
+        if (unread != null) {
+          oldstate[manga]?.removeAll(unread);
+        }
+
+        if (oldstate[manga]!.isEmpty) {
+          oldstate.remove(manga);
+        }
+      } else {
+        if (read != null) {
+          oldstate[manga] = {...read};
+        }
+
+        if (unread != null) {
+          oldstate[manga] = {};
         }
       }
 
