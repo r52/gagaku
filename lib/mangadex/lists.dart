@@ -81,27 +81,25 @@ class MangaDexListsView extends HookConsumerWidget {
                     style: TextStyle(fontSize: 24),
                   ),
                   const Spacer(),
-                  ToggleButtons(
-                    isSelected: List<bool>.generate(
-                        2, (index) => view.value.index == index),
-                    onPressed: (index) {
-                      view.value = _ListViewType.values.elementAt(index);
-                    },
-                    borderRadius: const BorderRadius.all(Radius.circular(2.0)),
-                    constraints: const BoxConstraints(
-                      minHeight: 40.0,
-                      minWidth: 60.0,
-                    ),
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Text('My Lists'),
+                  SegmentedButton<_ListViewType>(
+                    style: SegmentedButton.styleFrom(
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(4.0)))),
+                    segments: const <ButtonSegment<_ListViewType>>[
+                      ButtonSegment<_ListViewType>(
+                        value: _ListViewType.self,
+                        label: Text('My Lists'),
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Text('Followed Lists'),
+                      ButtonSegment<_ListViewType>(
+                        value: _ListViewType.followed,
+                        label: Text('Followed Lists'),
                       ),
                     ],
+                    selected: <_ListViewType>{view.value},
+                    onSelectionChanged: (Set<_ListViewType> newSelection) {
+                      view.value = newSelection.first;
+                    },
                   ),
                 ],
               ),

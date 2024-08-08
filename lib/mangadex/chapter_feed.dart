@@ -73,21 +73,24 @@ class MangaDexChapterFeed extends HookConsumerWidget {
                 style: TextStyle(fontSize: 24),
               ),
               const Spacer(),
-              ToggleButtons(
-                isSelected: List<bool>.generate(
-                    2, (index) => view.value.index == index),
-                onPressed: (index) {
-                  view.value = _FeedViewType.values.elementAt(index);
-                },
-                borderRadius: const BorderRadius.all(Radius.circular(2.0)),
-                constraints: const BoxConstraints(
-                  minHeight: 40.0,
-                  minWidth: 80.0,
-                ),
-                children: const [
-                  Text('By Chapter'),
-                  Text('By Manga'),
+              SegmentedButton<_FeedViewType>(
+                style: SegmentedButton.styleFrom(
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(4.0)))),
+                segments: const <ButtonSegment<_FeedViewType>>[
+                  ButtonSegment<_FeedViewType>(
+                    value: _FeedViewType.chapters,
+                    label: Text('By Chapter'),
+                  ),
+                  ButtonSegment<_FeedViewType>(
+                    value: _FeedViewType.manga,
+                    label: Text('By Manga'),
+                  ),
                 ],
+                selected: <_FeedViewType>{view.value},
+                onSelectionChanged: (Set<_FeedViewType> newSelection) {
+                  view.value = newSelection.first;
+                },
               ),
             ],
           ),

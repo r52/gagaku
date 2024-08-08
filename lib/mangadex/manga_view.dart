@@ -119,9 +119,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loggedin = ref.watch(authControlProvider).value ?? false;
     final theme = Theme.of(context);
-    final view = useState(_ViewType.chapters);
 
     final hasRelated = manga.relatedMangas.isNotEmpty;
+    final tabController = useTabController(
+        initialLength:
+            hasRelated ? _ViewType.values.length : _ViewType.values.length - 1);
+    final tabview =
+        useListenableSelector(tabController, () => tabController.index);
 
     String? lastvolchap;
 
@@ -164,7 +168,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
           notification.metrics.axisDirection == AxisDirection.down &&
           notification.metrics.atEdge &&
           notification.metrics.pixels == notification.metrics.maxScrollExtent) {
-        switch (view.value) {
+        switch (_ViewType.values.elementAt(tabview)) {
           case _ViewType.chapters:
             ref.read(mangaChaptersProvider(manga).notifier).getMore();
             break;
@@ -189,7 +193,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
             ref.invalidate(readingStatusProvider(manga));
           }
 
-          switch (view.value) {
+          switch (_ViewType.values.elementAt(tabview)) {
             case _ViewType.chapters:
               await ref.read(mangaChaptersProvider(manga).notifier).clear();
               return ref.refresh(mangaChaptersProvider(manga).future);
@@ -392,14 +396,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.all(8),
                     child: MangaGenreRow(
-                      key: ValueKey(manga.id),
+                      key: ValueKey('MangaGenreRow(${manga.id})'),
                       manga: manga,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
                     child: MangaStatisticsRow(
-                      key: ValueKey(manga.id),
+                      key: ValueKey('MangaStatisticsRow(${manga.id})'),
                       manga: manga,
                       shortStatus: false,
                     ),
@@ -611,32 +615,24 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: ToggleButtons(
-                      isSelected: List<bool>.generate(
-                          hasRelated
-                              ? _ViewType.values.length
-                              : _ViewType.values.length - 1,
-                          (index) => view.value.index == index),
-                      onPressed: (index) {
-                        view.value = _ViewType.values.elementAt(index);
-                      },
-                      textStyle: const TextStyle(fontSize: 24),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(2.0)),
-                      children: [
-                        ...(hasRelated
-                                ? _ViewType.values
-                                : _ViewType.values.take(2))
-                            .map((e) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5.0),
-                                child: Text(e.name.capitalize())))
-                      ],
-                    ),
+                  TabBar(
+                    controller: tabController,
+                    tabs: [
+                      const Tab(
+                        text: 'Chapters',
+                      ),
+                      const Tab(
+                        text: 'Art',
+                      ),
+                      if (hasRelated)
+                        const Tab(
+                          text: 'Related',
+                        ),
+                    ],
                   ),
-                  if (view.value == _ViewType.chapters && loggedin)
+                  if (_ViewType.values.elementAt(tabview) ==
+                          _ViewType.chapters &&
+                      loggedin)
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: Row(
@@ -745,7 +741,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
           body: SafeArea(
               top: false,
               bottom: false,
-              child: switch (view.value) {
+              child: switch (_ViewType.values.elementAt(tabview)) {
                 _ViewType.chapters => Consumer(
                     builder: (context, ref, child) {
                       final chapterProvider =

@@ -590,24 +590,32 @@ class MangaListWidget extends HookConsumerWidget {
                 if (title != null) title!,
                 const Spacer(),
                 if (showToggle)
-                  ToggleButtons(
-                    isSelected: List<bool>.generate(MangaListView.values.length,
-                        (index) => view.index == index),
-                    onPressed: (index) {
-                      ref.read(_mangaListViewProvider.notifier).state =
-                          MangaListView.values.elementAt(index);
-                    },
-                    children: const [
-                      Icon(
-                        Icons.grid_view,
+                  SegmentedButton<MangaListView>(
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                        shape: const RoundedRectangleBorder()),
+                    segments: const <ButtonSegment<MangaListView>>[
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.grid,
+                        icon: Icon(Icons.grid_view),
+                        tooltip: 'Grid view',
                       ),
-                      Icon(
-                        Icons.table_rows,
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.list,
+                        icon: Icon(Icons.table_rows),
+                        tooltip: 'List view',
                       ),
-                      Icon(
-                        Icons.view_list,
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.detailed,
+                        icon: Icon(Icons.view_list),
+                        tooltip: 'Detailed view',
                       ),
                     ],
+                    selected: <MangaListView>{view},
+                    onSelectionChanged: (Set<MangaListView> newSelection) {
+                      ref.read(_mangaListViewProvider.notifier).state =
+                          newSelection.first;
+                    },
                   ),
               ],
             ),
@@ -914,14 +922,14 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
                           ),
                         ],
                         MangaStatisticsRow(
-                          key: ValueKey(manga.id),
+                          key: ValueKey('MangaStatisticsRow(${manga.id})'),
                           manga: manga,
                         ),
                         const SizedBox(
                           height: 4.0,
                         ),
                         MangaGenreRow(
-                          key: ValueKey(manga.id),
+                          key: ValueKey('MangaGenreRow(${manga.id})'),
                           manga: manga,
                         ),
                         if (manga.attributes!.description.isNotEmpty)
@@ -1017,14 +1025,14 @@ class _ListMangaItem extends HookConsumerWidget {
                     ),
                   ],
                   MangaGenreRow(
-                    key: ValueKey(manga.id),
+                    key: ValueKey('MangaGenreRow(${manga.id})'),
                     manga: manga,
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   MangaStatisticsRow(
-                    key: ValueKey(manga.id),
+                    key: ValueKey('MangaStatisticsRow(${manga.id})'),
                     manga: manga,
                   ),
                 ],
