@@ -77,6 +77,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
                 style: SegmentedButton.styleFrom(
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(4.0)))),
+                showSelectedIcon: false,
                 segments: const <ButtonSegment<_FeedViewType>>[
                   ButtonSegment<_FeedViewType>(
                     value: _FeedViewType.chapters,

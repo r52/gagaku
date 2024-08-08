@@ -330,10 +330,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                                 if (reading != null) {
                                   return IconButton.filledTonal(
+                                    padding: EdgeInsets.zero,
                                     tooltip: following
                                         ? 'Unfollow Manga'
                                         : 'Follow Manga',
                                     style: IconButton.styleFrom(
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      padding: EdgeInsets.zero,
                                       backgroundColor: theme.colorScheme.surface
                                           .withAlpha(200),
                                       shape: const RoundedRectangleBorder(
@@ -1224,7 +1228,7 @@ class _ReadingStatusDropdown extends ConsumerWidget {
 
     return DropdownMenu<MangaReadingStatus>(
       initialSelection: initial,
-      width: 180.0,
+      width: 175.0,
       enableFilter: false,
       enableSearch: false,
       requestFocusOnTap: false,

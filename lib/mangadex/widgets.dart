@@ -597,17 +597,17 @@ class MangaListWidget extends HookConsumerWidget {
                     segments: const <ButtonSegment<MangaListView>>[
                       ButtonSegment<MangaListView>(
                         value: MangaListView.grid,
-                        icon: Icon(Icons.grid_view),
+                        icon: Icon(Icons.grid_view, size: 24),
                         tooltip: 'Grid view',
                       ),
                       ButtonSegment<MangaListView>(
                         value: MangaListView.list,
-                        icon: Icon(Icons.table_rows),
+                        icon: Icon(Icons.table_rows, size: 24),
                         tooltip: 'List view',
                       ),
                       ButtonSegment<MangaListView>(
                         value: MangaListView.detailed,
-                        icon: Icon(Icons.view_list),
+                        icon: Icon(Icons.view_list, size: 24),
                         tooltip: 'Detailed view',
                       ),
                     ],

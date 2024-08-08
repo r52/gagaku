@@ -86,6 +86,7 @@ class MangaDexListsView extends HookConsumerWidget {
                         shape: const RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(4.0)))),
+                    showSelectedIcon: false,
                     segments: const <ButtonSegment<_ListViewType>>[
                       ButtonSegment<_ListViewType>(
                         value: _ListViewType.self,
