@@ -273,54 +273,64 @@ class WebMangaViewWidget extends HookConsumerWidget {
             ),
           ),
           actions: [
-            Consumer(
-              builder: (context, ref, child) {
-                final favorited = ref.watch(webSourceFavoritesProvider.select(
-                  (value) => switch (value) {
-                    AsyncValue(value: final data?) =>
-                      data.indexWhere((e) => e.url == info.getURL()) > -1,
-                    _ => null,
-                  },
-                ));
+            OverflowBar(
+              spacing: 8.0,
+              children: [
+                Consumer(
+                  builder: (context, ref, child) {
+                    final favorited =
+                        ref.watch(webSourceFavoritesProvider.select(
+                      (value) => switch (value) {
+                        AsyncValue(value: final data?) =>
+                          data.indexWhere((e) => e.url == info.getURL()) > -1,
+                        _ => null,
+                      },
+                    ));
 
-                if (favorited == null) {
-                  return const SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-
-                return IconButton.filledTonal(
-                  tooltip:
-                      favorited ? 'Remove from Favorites' : 'Add to Favorites',
-                  style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.surface.withAlpha(200),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(6.0),
-                      ),
-                    ),
-                  ),
-                  color: favorited ? theme.colorScheme.primary : null,
-                  onPressed: () async {
-                    if (favorited) {
-                      ref
-                          .read(webSourceFavoritesProvider.notifier)
-                          .remove(link);
-                    } else {
-                      ref.read(webSourceFavoritesProvider.notifier).add(link);
+                    if (favorited == null) {
+                      return const SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
                     }
+
+                    return IconButton.filledTonal(
+                      tooltip: favorited
+                          ? 'Remove from Favorites'
+                          : 'Add to Favorites',
+                      style: IconButton.styleFrom(
+                        backgroundColor:
+                            theme.colorScheme.surface.withAlpha(200),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(6.0),
+                          ),
+                        ),
+                      ),
+                      color: favorited ? theme.colorScheme.primary : null,
+                      onPressed: () async {
+                        if (favorited) {
+                          ref
+                              .read(webSourceFavoritesProvider.notifier)
+                              .remove(link);
+                        } else {
+                          ref
+                              .read(webSourceFavoritesProvider.notifier)
+                              .add(link);
+                        }
+                      },
+                      icon: Icon(
+                          favorited ? Icons.favorite : Icons.favorite_border),
+                    );
                   },
-                  icon:
-                      Icon(favorited ? Icons.favorite : Icons.favorite_border),
-                );
-              },
+                ),
+                const SizedBox(width: 2),
+              ],
             ),
-            const SizedBox(width: 10),
           ],
         ),
         SliverList.list(

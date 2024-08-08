@@ -280,127 +280,110 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                 actions: !loggedin
                     ? null
                     : [
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final followProvider =
-                                ref.watch(followingStatusProvider(manga));
-                            final following = followProvider.value;
-                            final statusProvider =
-                                ref.watch(readingStatusProvider(manga));
-                            final reading = statusProvider.value;
+                        OverflowBar(
+                          spacing: 8.0,
+                          children: [
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final followProvider =
+                                    ref.watch(followingStatusProvider(manga));
+                                final following = followProvider.value;
+                                final statusProvider =
+                                    ref.watch(readingStatusProvider(manga));
+                                final reading = statusProvider.value;
 
-                            if (following == null || statusProvider.isLoading) {
-                              return _loadingAction;
-                            }
+                                if (following == null ||
+                                    statusProvider.isLoading) {
+                                  return _loadingAction;
+                                }
 
-                            if (following == false && reading == null) {
-                              return ElevatedButton(
-                                style: Styles.buttonStyle(),
-                                onPressed: () async {
-                                  final result = await showDialog<
-                                          (MangaReadingStatus, bool)>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return _AddToLibraryDialog();
-                                      });
+                                if (following == false && reading == null) {
+                                  return ElevatedButton(
+                                    style: Styles.buttonStyle(),
+                                    onPressed: () async {
+                                      final result = await showDialog<
+                                              (MangaReadingStatus, bool)>(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return _AddToLibraryDialog();
+                                          });
 
-                                  if (result != null) {
-                                    ref
-                                        .read(readingStatusProvider(manga)
-                                            .notifier)
-                                        .set(result.$1);
+                                      if (result != null) {
+                                        ref
+                                            .read(readingStatusProvider(manga)
+                                                .notifier)
+                                            .set(result.$1);
 
-                                    ref
-                                        .read(followingStatusProvider(manga)
-                                            .notifier)
-                                        .set(result.$2);
-                                  }
-                                },
-                                child: const Text('Add to Library'),
-                              );
-                            }
+                                        ref
+                                            .read(followingStatusProvider(manga)
+                                                .notifier)
+                                            .set(result.$2);
+                                      }
+                                    },
+                                    child: const Text('Add to Library'),
+                                  );
+                                }
 
-                            if (reading != null) {
-                              return IconButton.filledTonal(
-                                tooltip: following
-                                    ? 'Unfollow Manga'
-                                    : 'Follow Manga',
-                                style: IconButton.styleFrom(
-                                  backgroundColor:
-                                      theme.colorScheme.surface.withAlpha(200),
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(6.0),
+                                if (reading != null) {
+                                  return IconButton.filledTonal(
+                                    tooltip: following
+                                        ? 'Unfollow Manga'
+                                        : 'Follow Manga',
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: theme.colorScheme.surface
+                                          .withAlpha(200),
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(6.0),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                color: theme.colorScheme.primary,
-                                highlightColor: Colors.orange,
-                                onPressed: () async {
-                                  bool set = !following;
-                                  ref
-                                      .read(followingStatusProvider(manga)
-                                          .notifier)
-                                      .set(set);
-                                },
-                                icon: Icon(following
-                                    ? Icons.notifications_active
-                                    : Icons.notifications_off_outlined),
-                              );
-                            }
+                                    color: theme.colorScheme.primary,
+                                    highlightColor: Colors.orange,
+                                    onPressed: () async {
+                                      bool set = !following;
+                                      ref
+                                          .read(followingStatusProvider(manga)
+                                              .notifier)
+                                          .set(set);
+                                    },
+                                    icon: Icon(following
+                                        ? Icons.notifications_active
+                                        : Icons.notifications_off_outlined),
+                                  );
+                                }
 
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final readProvider =
-                                ref.watch(readingStatusProvider(manga));
-                            final reading = readProvider.value;
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final readProvider =
+                                    ref.watch(readingStatusProvider(manga));
+                                final reading = readProvider.value;
 
-                            if (reading != null) {
-                              return const SizedBox(
-                                width: 8,
-                              );
-                            }
+                                if (readProvider.isLoading) {
+                                  return _loadingAction;
+                                }
 
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final readProvider =
-                                ref.watch(readingStatusProvider(manga));
-                            final reading = readProvider.value;
+                                if (reading != null) {
+                                  return _ReadingStatusDropdown(
+                                    initial: reading,
+                                    manga: manga,
+                                  );
+                                }
 
-                            if (readProvider.isLoading) {
-                              return _loadingAction;
-                            }
-
-                            if (reading != null) {
-                              return _ReadingStatusDropdown(
-                                initial: reading,
-                                manga: manga,
-                              );
-                            }
-
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        _RatingMenu(
-                          manga: manga,
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        _UserListsMenu(
-                          manga: manga,
-                        ),
-                        const SizedBox(
-                          width: 10,
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            _RatingMenu(
+                              manga: manga,
+                            ),
+                            _UserListsMenu(
+                              manga: manga,
+                            ),
+                            const SizedBox(width: 2),
+                          ],
                         ),
                       ],
               ),

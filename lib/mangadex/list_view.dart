@@ -134,72 +134,74 @@ class MangaDexListViewWidget extends HookConsumerWidget {
               child: TitleFlexBar(title: list.attributes.name),
             ),
             actions: [
-              Consumer(
-                builder: (context, ref, child) {
-                  final followedLists = ref.watch(followedListsProvider).value;
-                  final idx = followedLists?.indexWhere((e) => e.id == list.id);
+              OverflowBar(
+                spacing: 8.0,
+                children: [
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final followedLists =
+                          ref.watch(followedListsProvider).value;
+                      final idx =
+                          followedLists?.indexWhere((e) => e.id == list.id);
 
-                  if (idx == null) {
-                    return const SizedBox.shrink();
-                  }
+                      if (idx == null) {
+                        return const SizedBox.shrink();
+                      }
 
-                  return ElevatedButton.icon(
-                    style: Styles.buttonStyle(
-                        backgroundColor: Colors.deepOrange.shade800),
-                    onPressed: () => ref
-                        .read(followedListsProvider.notifier)
-                        .setFollow(list, idx == -1),
-                    icon: const Icon(Icons.bookmark_border),
-                    label: Text(idx == -1 ? 'Follow' : 'Unfollow'),
-                  );
-                },
+                      return ElevatedButton.icon(
+                        style: Styles.buttonStyle(
+                            backgroundColor: Colors.deepOrange.shade800),
+                        onPressed: () => ref
+                            .read(followedListsProvider.notifier)
+                            .setFollow(list, idx == -1),
+                        icon: const Icon(Icons.bookmark_border),
+                        label: Text(idx == -1 ? 'Follow' : 'Unfollow'),
+                      );
+                    },
+                  ),
+                  if (list.user != null && me != null && list.user!.id == me.id)
+                    ElevatedButton(
+                      style: Styles.buttonStyle(),
+                      onPressed: () {
+                        context.push('/list/edit/${list.id}', extra: list);
+                      },
+                      child: const Text('Edit'),
+                    ),
+                  const SizedBox.shrink(),
+                  // if (list.user != null && me != null && list.user!.id == me.id)
+                  //   ElevatedButton(
+                  //     style: Styles.buttonStyle(backgroundColor: Colors.red),
+                  //     onPressed: () async {
+                  //       final result = await showDeleteListDialog(
+                  //           context, list.attributes.name);
+                  //       if (result == true) {
+                  //         ref
+                  //             .read(userListsProvider.notifier)
+                  //             .deleteList(list)
+                  //             .then((success) {
+                  //           if (success == true) {
+                  //             if (!context.mounted) return;
+                  //             context.pop();
+                  //           } else {
+                  //             messenger
+                  //               ..removeCurrentSnackBar()
+                  //               ..showSnackBar(
+                  //                 const SnackBar(
+                  //                   content: Text('Failed to delete list.'),
+                  //                   backgroundColor: Colors.red,
+                  //                 ),
+                  //               );
+                  //           }
+                  //         });
+                  //       }
+                  //     },
+                  //     child: const Text('Delete'),
+                  //   ),
+                  // const SizedBox(
+                  //   width: 4,
+                  // ),
+                ],
               ),
-              const SizedBox(
-                width: 4,
-              ),
-              if (list.user != null && me != null && list.user!.id == me.id)
-                ElevatedButton(
-                  style: Styles.buttonStyle(),
-                  onPressed: () {
-                    context.push('/list/edit/${list.id}', extra: list);
-                  },
-                  child: const Text('Edit'),
-                ),
-              const SizedBox(
-                width: 4,
-              ),
-              // if (list.user != null && me != null && list.user!.id == me.id)
-              //   ElevatedButton(
-              //     style: Styles.buttonStyle(backgroundColor: Colors.red),
-              //     onPressed: () async {
-              //       final result = await showDeleteListDialog(
-              //           context, list.attributes.name);
-              //       if (result == true) {
-              //         ref
-              //             .read(userListsProvider.notifier)
-              //             .deleteList(list)
-              //             .then((success) {
-              //           if (success == true) {
-              //             if (!context.mounted) return;
-              //             context.pop();
-              //           } else {
-              //             messenger
-              //               ..removeCurrentSnackBar()
-              //               ..showSnackBar(
-              //                 const SnackBar(
-              //                   content: Text('Failed to delete list.'),
-              //                   backgroundColor: Colors.red,
-              //                 ),
-              //               );
-              //           }
-              //         });
-              //       }
-              //     },
-              //     child: const Text('Delete'),
-              //   ),
-              // const SizedBox(
-              //   width: 4,
-              // ),
             ],
           ),
           body: Center(

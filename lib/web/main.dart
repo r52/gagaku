@@ -32,44 +32,49 @@ class WebSourceHome extends HookConsumerWidget {
           child: const TitleFlexBar(title: 'Web Sources'),
         ),
         actions: [
-          IconButton(
-            onPressed: () => openLinkDialog(context, api),
-            icon: const Icon(Icons.open_in_browser),
-            tooltip: 'Open Link',
-          ),
-          IconButton(
-            onPressed: () async {
-              final result = await showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Reset all Read Markers'),
-                    content: const Text(
-                        'Are you sure you want to reset all read markers?'),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('No'),
-                        onPressed: () {
-                          Navigator.of(context).pop(false);
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Yes'),
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        },
-                      ),
-                    ],
+          OverflowBar(
+            spacing: 0.0,
+            children: [
+              IconButton(
+                onPressed: () => openLinkDialog(context, api),
+                icon: const Icon(Icons.open_in_browser),
+                tooltip: 'Open Link',
+              ),
+              IconButton(
+                onPressed: () async {
+                  final result = await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Reset all Read Markers'),
+                        content: const Text(
+                            'Are you sure you want to reset all read markers?'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('No'),
+                            onPressed: () {
+                              Navigator.of(context).pop(false);
+                            },
+                          ),
+                          ElevatedButton(
+                            child: const Text('Yes'),
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   );
-                },
-              );
 
-              if (result == true) {
-                ref.read(webReadMarkersProvider.notifier).clear();
-              }
-            },
-            icon: const Icon(Icons.restart_alt),
-            tooltip: 'Reset Read Markers',
+                  if (result == true) {
+                    ref.read(webReadMarkersProvider.notifier).clear();
+                  }
+                },
+                icon: const Icon(Icons.restart_alt),
+                tooltip: 'Reset Read Markers',
+              ),
+            ],
           ),
         ],
       ),

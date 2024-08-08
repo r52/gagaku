@@ -105,79 +105,85 @@ class MangaDexEditListScreen extends HookConsumerWidget {
         flexibleSpace:
             TitleFlexBar(title: '${list != null ? 'Edit' : 'Create'} List'),
         actions: [
-          TextButton(
-            style: Styles.buttonStyle(),
-            child: const Text('Cancel'),
-            onPressed: () {
-              context.pop();
-            },
-          ),
-          HookBuilder(
-            builder: (context) {
-              final vis = useValueListenable(visibility);
-              final listNameChanged = useListenableSelector(
-                  listNameController,
-                  () => list != null
-                      ? listNameController.text != list!.attributes.name
-                      : listNameController.text.isNotEmpty);
-
-              return ElevatedButton(
+          OverflowBar(
+            spacing: 8.0,
+            children: [
+              TextButton(
                 style: Styles.buttonStyle(),
-                onPressed: listNameChanged ||
-                        (list != null &&
-                            !setEquals(selected.state, list!.set)) ||
-                        (list != null && vis != list!.attributes.visibility)
-                    ? () async {
-                        final messenger = ScaffoldMessenger.of(context);
+                child: const Text('Cancel'),
+                onPressed: () {
+                  context.pop();
+                },
+              ),
+              HookBuilder(
+                builder: (context) {
+                  final vis = useValueListenable(visibility);
+                  final listNameChanged = useListenableSelector(
+                      listNameController,
+                      () => list != null
+                          ? listNameController.text != list!.attributes.name
+                          : listNameController.text.isNotEmpty);
 
-                        if (listNameController.text.isNotEmpty) {
-                          Future<bool> success;
+                  return ElevatedButton(
+                    style: Styles.buttonStyle(),
+                    onPressed: listNameChanged ||
+                            (list != null &&
+                                !setEquals(selected.state, list!.set)) ||
+                            (list != null && vis != list!.attributes.visibility)
+                        ? () async {
+                            final messenger = ScaffoldMessenger.of(context);
 
-                          if (list != null) {
-                            success = ref
-                                .read(userListsProvider.notifier)
-                                .editList(list!, listNameController.text, vis,
-                                    selected.state);
-                          } else {
-                            success = ref
-                                .read(userListsProvider.notifier)
-                                .newList(listNameController.text, vis,
-                                    selected.state);
-                          }
+                            if (listNameController.text.isNotEmpty) {
+                              Future<bool> success;
 
-                          success.then((success) {
-                            if (success) {
-                              if (!context.mounted) return;
-                              context.pop(true);
+                              if (list != null) {
+                                success = ref
+                                    .read(userListsProvider.notifier)
+                                    .editList(list!, listNameController.text,
+                                        vis, selected.state);
+                              } else {
+                                success = ref
+                                    .read(userListsProvider.notifier)
+                                    .newList(listNameController.text, vis,
+                                        selected.state);
+                              }
+
+                              success.then((success) {
+                                if (success) {
+                                  if (!context.mounted) return;
+                                  context.pop(true);
+                                } else {
+                                  messenger
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Failed to ${list != null ? 'edit' : 'create'} list.'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                }
+                              });
+
+                              pendingAction.value = success;
                             } else {
                               messenger
                                 ..removeCurrentSnackBar()
                                 ..showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        'Failed to ${list != null ? 'edit' : 'create'} list.'),
+                                  const SnackBar(
+                                    content: Text('List name cannot be empty.'),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
                             }
-                          });
-
-                          pendingAction.value = success;
-                        } else {
-                          messenger
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              const SnackBar(
-                                content: Text('List name cannot be empty.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                        }
-                      }
-                    : null,
-                child: Text(list != null ? 'Save' : 'Create'),
-              );
-            },
+                          }
+                        : null,
+                    child: Text(list != null ? 'Save' : 'Create'),
+                  );
+                },
+              ),
+              const SizedBox.shrink(),
+            ],
           ),
         ],
       ),
