@@ -105,7 +105,8 @@ class MangaDexListViewWidget extends HookConsumerWidget {
         return Scaffold(
           appBar: AppBar(),
           body: RefreshIndicator(
-            onRefresh: () => ref.refresh(listSourceProvider(listId).future),
+            onRefresh: () async =>
+                ref.refresh(listSourceProvider(listId).future),
             child: ErrorList(
               error: error,
               stackTrace: stackTrace,
@@ -229,7 +230,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                             children: switch (titlesProvider) {
                               AsyncValue(:final error?, :final stackTrace?) => [
                                   RefreshIndicator(
-                                    onRefresh: () => ref.refresh(
+                                    onRefresh: () async => ref.refresh(
                                         getMangaListByPageProvider(
                                                 list.set, currentPage.value)
                                             .future),
@@ -240,7 +241,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                               AsyncValue(value: final mangas) => [
                                   Expanded(
                                     child: RefreshIndicator(
-                                      onRefresh: () => ref.refresh(
+                                      onRefresh: () async => ref.refresh(
                                           getMangaListByPageProvider(
                                                   list.set, currentPage.value)
                                               .future),
@@ -287,7 +288,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                         onAtEdge: () => ref
                             .read(customListFeedProvider(list).notifier)
                             .getMore(),
-                        onRefresh: () {
+                        onRefresh: () async {
                           ref
                               .read(customListFeedProvider(list).notifier)
                               .clear();

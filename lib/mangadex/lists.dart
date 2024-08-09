@@ -113,7 +113,7 @@ class MangaDexListsView extends HookConsumerWidget {
                       return switch (userListsProv) {
                         AsyncValue(:final error?, :final stackTrace?) =>
                           RefreshIndicator(
-                            onRefresh: () =>
+                            onRefresh: () async =>
                                 ref.refresh(userListsProvider.future),
                             child: ErrorList(
                               error: error,
@@ -298,7 +298,7 @@ class MangaDexListsView extends HookConsumerWidget {
                       return switch (followedListsProv) {
                         AsyncValue(:final error?, :final stackTrace?) =>
                           RefreshIndicator(
-                            onRefresh: () =>
+                            onRefresh: () async =>
                                 ref.refresh(userListsProvider.future),
                             child: ErrorList(
                               error: error,

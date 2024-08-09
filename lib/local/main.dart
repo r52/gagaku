@@ -203,12 +203,12 @@ class LocalLibraryHome extends StatelessWidget {
               }
 
               return RefreshIndicator(
-                onRefresh: () => ref.refresh(localLibraryProvider.future),
+                onRefresh: () async => ref.refresh(localLibraryProvider.future),
                 child: child,
               );
             case AsyncValue(:final error?, :final stackTrace?):
               return RefreshIndicator(
-                onRefresh: () => ref.refresh(localLibraryProvider.future),
+                onRefresh: () async => ref.refresh(localLibraryProvider.future),
                 child: ErrorList(
                   error: error,
                   stackTrace: stackTrace,

@@ -59,7 +59,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
           Expanded(
             child: switch (titlesProvider) {
               AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                  onRefresh: () {
+                  onRefresh: () async {
                     ref.read(userLibraryProvider.notifier).clear();
                     return ref
                         .refresh(_getLibraryListByTypeProvider(type).future);
@@ -72,7 +72,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                   ),
                 ),
               AsyncValue(value: final mangas) => RefreshIndicator(
-                  onRefresh: () {
+                  onRefresh: () async {
                     ref.read(userLibraryProvider.notifier).clear();
                     final lt = ref.read(libraryViewTypeProvider);
                     return ref
@@ -105,7 +105,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
         children = [
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () {
+              onRefresh: () async {
                 ref.read(userLibraryProvider.notifier).clear();
                 return ref.refresh(_getLibraryListByTypeProvider(type).future);
               },

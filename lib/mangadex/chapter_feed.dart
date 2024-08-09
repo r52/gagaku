@@ -103,7 +103,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
                 emptyText: 'Find some manga to follow!',
                 onAtEdge: () =>
                     ref.read(latestChaptersFeedProvider.notifier).getMore(),
-                onRefresh: () {
+                onRefresh: () async {
                   ref.read(latestChaptersFeedProvider.notifier).clear();
                   return ref.refresh(_fetchChaptersProvider.future);
                 },

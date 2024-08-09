@@ -44,7 +44,7 @@ class MangaDexMangaFeed extends ConsumerWidget {
         children: [
           switch (feedProvider) {
             AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                onRefresh: () {
+                onRefresh: () async {
                   ref.read(latestChaptersFeedProvider.notifier).clear();
                   return ref.refresh(_fetchMangaFeedProvider.future);
                 },
@@ -55,7 +55,7 @@ class MangaDexMangaFeed extends ConsumerWidget {
                 ),
               ),
             AsyncValue(value: final mangas?) => RefreshIndicator(
-                onRefresh: () {
+                onRefresh: () async {
                   ref.read(latestChaptersFeedProvider.notifier).clear();
                   return ref.refresh(_fetchMangaFeedProvider.future);
                 },

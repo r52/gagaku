@@ -66,7 +66,7 @@ class MangaDexGlobalFeed extends ConsumerWidget {
       provider: _fetchGlobalChaptersProvider,
       title: 'Latest Uploads',
       onAtEdge: () => ref.read(latestGlobalFeedProvider.notifier).getMore(),
-      onRefresh: () {
+      onRefresh: () async {
         ref.read(latestGlobalFeedProvider.notifier).clear();
         return ref.refresh(_fetchGlobalChaptersProvider.future);
       },

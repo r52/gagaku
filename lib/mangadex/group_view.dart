@@ -236,7 +236,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               emptyText: 'No chapters!',
               onAtEdge: () =>
                   ref.read(groupFeedProvider(group).notifier).getMore(),
-              onRefresh: () {
+              onRefresh: () async {
                 ref.read(groupFeedProvider(group).notifier).clear();
                 return ref.refresh(_fetchGroupFeedProvider(group).future);
               },
@@ -257,7 +257,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 switch (titleProvider) {
                   AsyncValue(:final error?, :final stackTrace?) =>
                     RefreshIndicator(
-                      onRefresh: () {
+                      onRefresh: () async {
                         ref.read(groupTitlesProvider(group).notifier).clear();
                         return ref
                             .refresh(_fetchGroupTitlesProvider(group).future);
@@ -270,7 +270,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                       ),
                     ),
                   AsyncValue(value: final mangas?) => RefreshIndicator(
-                      onRefresh: () {
+                      onRefresh: () async {
                         ref.read(groupTitlesProvider(group).notifier).clear();
                         return ref
                             .refresh(_fetchGroupTitlesProvider(group).future);

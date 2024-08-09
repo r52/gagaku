@@ -170,9 +170,8 @@ class RedirectedWebMangaViewWidget extends ConsumerWidget {
         return QueriedWebMangaViewWidget(info: info);
       case AsyncValue(:final error?, :final stackTrace?):
         child = RefreshIndicator(
-          onRefresh: () async {
-            return ref.refresh(_fetchWebMangaRedirectProvider(url).future);
-          },
+          onRefresh: () async =>
+              ref.refresh(_fetchWebMangaRedirectProvider(url).future),
           child: ErrorList(
             error: error,
             stackTrace: stackTrace,

@@ -95,7 +95,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
       children: [
         switch (titleProvider) {
           AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-              onRefresh: () {
+              onRefresh: () async {
                 ref.read(creatorTitlesProvider(creator).notifier).clear();
                 return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
               },
@@ -106,7 +106,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
               ),
             ),
           AsyncValue(value: final mangas?) => RefreshIndicator(
-              onRefresh: () {
+              onRefresh: () async {
                 ref.read(creatorTitlesProvider(creator).notifier).clear();
                 return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
               },
