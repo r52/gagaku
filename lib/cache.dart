@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
@@ -16,8 +15,7 @@ part 'cache.g.dart';
 /// Mainly to stop gagaku from querying the API for the same stuff
 /// too often.
 
-typedef UnserializeCallback<T extends Object> = T Function(
-    Map<String, dynamic> json);
+typedef UnserializeCallback<T extends Object> = T Function(Map<String, dynamic> json);
 
 @Riverpod(keepAlive: true)
 CacheManager cache(CacheRef ref) {
@@ -156,9 +154,6 @@ class CacheManager {
 
     if (_box.length > _preferredMaxDiskEntries) {
       _pruneExpiredDisk();
-
-      // Clear old disk cache
-      clearDiskCachedImages(duration: const Duration(days: 7));
     }
 
     final imageCache = PaintingBinding.instance.imageCache;
@@ -251,8 +246,7 @@ class CacheManager {
   }
 
   /// Returns a single entry from the cache. Assumes the entry [exists].
-  CRef get(String key, [UnserializeCallback? unserializer]) =>
-      _cache[key]!.get(unserializer);
+  CRef get(String key, [UnserializeCallback? unserializer]) => _cache[key]!.get(unserializer);
 
   /// Inserts a single entry into the cache if it doesn't [exists]
   /// If [overwrite] is true, then the entry is inserted regardless, overwriting
@@ -265,8 +259,7 @@ class CacheManager {
     Duration expiry = const Duration(minutes: 15),
     UnserializeCallback? unserializer,
   }) async {
-    final entry = CacheEntry(data,
-        duration: expiry, reference: reference, unserializer: unserializer);
+    final entry = CacheEntry(data, duration: expiry, reference: reference, unserializer: unserializer);
     if (!await exists(key)) {
       _cache.putIfAbsent(key, () => entry);
       await _box.put(key, entry);
@@ -275,8 +268,7 @@ class CacheManager {
       await _box.put(key, entry);
     }
 
-    logger.d(
-        "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
+    logger.d("CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
 
     return _cache[key]!.get(unserializer);
   }
@@ -294,7 +286,6 @@ class CacheManager {
 
     await _box.putAll(map);
 
-    logger.d(
-        "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
+    logger.d("CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
   }
 }

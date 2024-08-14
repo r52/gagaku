@@ -1,5 +1,4 @@
 import 'package:animations/animations.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
@@ -12,7 +11,7 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad
+        PointerDeviceKind.trackpad,
       };
 }
 
@@ -44,8 +43,7 @@ class KeepAliveImage extends Image {
   State<KeepAliveImage> createState() => _KeepAliveImageState();
 }
 
-class _KeepAliveImageState extends State<KeepAliveImage>
-    with AutomaticKeepAliveClientMixin {
+class _KeepAliveImageState extends State<KeepAliveImage> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -144,8 +142,7 @@ class ButtonChip extends StatelessWidget {
 
     final style = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
-      textStyle:
-          theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
+      textStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
     );
 
@@ -191,8 +188,7 @@ class IconTextChip extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         TextSpan(
           children: [
-            if (icon != null)
-              WidgetSpan(alignment: PlaceholderAlignment.middle, child: icon!),
+            if (icon != null) WidgetSpan(alignment: PlaceholderAlignment.middle, child: icon!),
             TextSpan(text: '${icon != null ? ' ' : ''}$text'),
           ],
         ),
@@ -325,8 +321,12 @@ class TriStateChip extends StatelessWidget {
 }
 
 class SettingCardWidget extends StatelessWidget {
-  const SettingCardWidget(
-      {super.key, required this.title, this.subtitle, required this.builder});
+  const SettingCardWidget({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.builder,
+  });
 
   final Widget title;
   final Widget? subtitle;
@@ -398,8 +398,7 @@ class TitleFlexBar extends StatelessWidget {
           ],
         ),
       ),
-      background:
-          ColoredBox(color: Theme.of(context).colorScheme.primaryContainer),
+      background: ColoredBox(color: Theme.of(context).colorScheme.primaryContainer),
     );
   }
 }
@@ -438,11 +437,7 @@ class ErrorList extends StatelessWidget {
   final StackTrace stackTrace;
   final String message;
 
-  const ErrorList(
-      {super.key,
-      required this.error,
-      required this.stackTrace,
-      String? message})
+  const ErrorList({super.key, required this.error, required this.stackTrace, String? message})
       : message = message ?? "Build error";
 
   @override
@@ -481,8 +476,7 @@ class Styles {
         ),
       );
 
-  static final coverArtGradientTween =
-      Tween(begin: Alignment.center, end: Alignment.topCenter);
+  static final coverArtGradientTween = Tween(begin: Alignment.center, end: Alignment.topCenter);
 
   static const List<Widget> loadingOverlay = [
     ModalBarrier(dismissible: false, color: Colors.black87),
@@ -513,24 +507,17 @@ class Styles {
   }
 
   static final slideTween =
-      Tween(begin: const Offset(0.0, 1.0), end: Offset.zero)
-          .chain(CurveTween(curve: Curves.ease));
+      Tween(begin: const Offset(0.0, 1.0), end: Offset.zero).chain(CurveTween(curve: Curves.ease));
 
   static Widget slideTransitionBuilder(
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child) =>
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
       SlideTransition(
         position: animation.drive(slideTween),
         child: child,
       );
 
   static Widget scaledSharedAxisTransitionBuilder(
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child) =>
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
       SharedAxisTransition(
         animation: animation,
         secondaryAnimation: secondaryAnimation,
@@ -539,10 +526,7 @@ class Styles {
       );
 
   static Widget horizontalSharedAxisTransitionBuilder(
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child) =>
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
       SharedAxisTransition(
         animation: animation,
         secondaryAnimation: secondaryAnimation,
@@ -551,10 +535,7 @@ class Styles {
       );
 
   static Widget fadeThroughTransitionBuilder(
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child) =>
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
       FadeThroughTransition(
         animation: animation,
         secondaryAnimation: secondaryAnimation,
@@ -568,29 +549,50 @@ class SlideTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
   }) : super(transitionsBuilder: Styles.slideTransitionBuilder);
 }
 
-Widget? extendedImageLoadStateHandler(ExtendedImageState state) {
-  switch (state.extendedImageLoadState) {
-    case LoadState.loading:
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    case LoadState.completed:
-      return null;
-    case LoadState.failed:
-      return GestureDetector(
-        child: const Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            Icon(Icons.error),
-            Text(
-              "Image load failed",
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        // onTap: () {
-        //   state.reLoadImage();
-        // },
-      );
+class TransparentOverlay<T> extends ModalRoute<T> {
+  TransparentOverlay({
+    required this.builder,
+  }) : super();
+
+  final WidgetBuilder builder;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  bool get opaque => false;
+
+  @override
+  bool get barrierDismissible => true;
+
+  @override
+  Color get barrierColor => Colors.black.withOpacity(0.5);
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return builder(context);
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return FadeTransition(
+      opacity: animation,
+      child: child,
+    );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:extended_image/extended_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -24,13 +24,15 @@ Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
     child = WebMangaViewWidget(
       manga: manga,
       info: ProxyInfo(
-          proxy: state.pathParameters['proxy']!,
-          code: state.pathParameters['code']!),
+        proxy: state.pathParameters['proxy']!,
+        code: state.pathParameters['code']!,
+      ),
     );
   } else {
     child = QueriedWebMangaViewWidget(
-        proxy: state.pathParameters['proxy']!,
-        code: state.pathParameters['code']!);
+      proxy: state.pathParameters['proxy']!,
+      code: state.pathParameters['code']!,
+    );
   }
 
   return CustomTransitionPage<void>(
@@ -40,8 +42,7 @@ Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
   );
 }
 
-Page<dynamic> buildRedirectedWebMangaViewPage(
-    BuildContext context, GoRouterState state) {
+Page<dynamic> buildRedirectedWebMangaViewPage(BuildContext context, GoRouterState state) {
   final url = state.uri.toString();
 
   return CustomTransitionPage<void>(
@@ -52,8 +53,7 @@ Page<dynamic> buildRedirectedWebMangaViewPage(
 }
 
 @riverpod
-Future<WebManga> _fetchWebMangaInfo(
-    _FetchWebMangaInfoRef ref, ProxyInfo info) async {
+Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, ProxyInfo info) async {
   final api = ref.watch(proxyProvider);
   final proxy = await api.handleProxy(info);
 
@@ -65,8 +65,7 @@ Future<WebManga> _fetchWebMangaInfo(
 }
 
 @riverpod
-Future<ProxyInfo> _fetchWebMangaRedirect(
-    _FetchWebMangaRedirectRef ref, String url) async {
+Future<ProxyInfo> _fetchWebMangaRedirect(_FetchWebMangaRedirectRef ref, String url) async {
   final api = ref.watch(proxyProvider);
   final proxy = await api.parseUrl(url);
 
@@ -170,8 +169,7 @@ class RedirectedWebMangaViewWidget extends ConsumerWidget {
         return QueriedWebMangaViewWidget(info: info);
       case AsyncValue(:final error?, :final stackTrace?):
         child = RefreshIndicator(
-          onRefresh: () async =>
-              ref.refresh(_fetchWebMangaRedirectProvider(url).future),
+          onRefresh: () async => ref.refresh(_fetchWebMangaRedirectProvider(url).future),
           child: ErrorList(
             error: error,
             stackTrace: stackTrace,
@@ -204,8 +202,7 @@ class RedirectedWebMangaViewWidget extends ConsumerWidget {
 }
 
 class WebMangaViewWidget extends HookConsumerWidget {
-  const WebMangaViewWidget(
-      {super.key, required this.manga, required this.info});
+  const WebMangaViewWidget({super.key, required this.manga, required this.info});
 
   final WebManga manga;
   final ProxyInfo info;
@@ -213,13 +210,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final link =
-        HistoryLink(title: '${info.proxy}: ${manga.title}', url: info.getURL());
-    final chapterlist = manga.chapters.entries
-        .map((e) => ChapterEntry(e.key, e.value))
-        .toList();
-    chapterlist
-        .sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
+    final link = HistoryLink(title: '${info.proxy}: ${manga.title}', url: info.getURL());
+    final chapterlist = manga.chapters.entries.map((e) => ChapterEntry(e.key, e.value)).toList();
+    chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
@@ -262,13 +255,13 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 ],
               ),
             ),
-            background: ExtendedImage.network(
-              manga.cover,
-              cache: true,
+            background: CachedNetworkImage(
+              imageUrl: manga.cover,
               colorBlendMode: BlendMode.modulate,
               color: Colors.grey,
               fit: BoxFit.cover,
-              loadStateChanged: extendedImageLoadStateHandler,
+              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
           ),
           actions: [
@@ -277,11 +270,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
               children: [
                 Consumer(
                   builder: (context, ref, child) {
-                    final favorited =
-                        ref.watch(webSourceFavoritesProvider.select(
+                    final favorited = ref.watch(webSourceFavoritesProvider.select(
                       (value) => switch (value) {
-                        AsyncValue(value: final data?) =>
-                          data.indexWhere((e) => e.url == info.getURL()) > -1,
+                        AsyncValue(value: final data?) => data.indexWhere((e) => e.url == info.getURL()) > -1,
                         _ => null,
                       },
                     ));
@@ -298,12 +289,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     }
 
                     return IconButton.filledTonal(
-                      tooltip: favorited
-                          ? 'Remove from Favorites'
-                          : 'Add to Favorites',
+                      tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
                       style: IconButton.styleFrom(
-                        backgroundColor:
-                            theme.colorScheme.surface.withAlpha(200),
+                        backgroundColor: theme.colorScheme.surface.withAlpha(200),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.0),
@@ -313,17 +301,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       color: favorited ? theme.colorScheme.primary : null,
                       onPressed: () async {
                         if (favorited) {
-                          ref
-                              .read(webSourceFavoritesProvider.notifier)
-                              .remove(link);
+                          ref.read(webSourceFavoritesProvider.notifier).remove(link);
                         } else {
-                          ref
-                              .read(webSourceFavoritesProvider.notifier)
-                              .add(link);
+                          ref.read(webSourceFavoritesProvider.notifier).add(link);
                         }
                       },
-                      icon: Icon(
-                          favorited ? Icons.favorite : Icons.favorite_border),
+                      icon: Icon(favorited ? Icons.favorite : Icons.favorite_border),
                     );
                   },
                 ),
@@ -380,8 +363,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   children: [
                     ButtonChip(
                       onPressed: () async {
-                        final route = cleanBaseDomains(
-                            GoRouterState.of(context).uri.toString());
+                        final route = cleanBaseDomains(GoRouterState.of(context).uri.toString());
                         final url = Uri.parse('http://cubari.moe$route');
 
                         if (!await launchUrl(url)) {
@@ -410,19 +392,15 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     builder: (context, ref, child) {
                       final key = info.getKey();
                       final names = chapterlist.map((e) => e.name);
-                      final allRead = ref.watch(webReadMarkersProvider
-                          .select((value) => switch (value) {
-                                AsyncValue(value: final data?) =>
-                                  data[key]?.containsAll(names) ?? false,
-                                _ => false,
-                              }));
+                      final allRead = ref.watch(webReadMarkersProvider.select((value) => switch (value) {
+                            AsyncValue(value: final data?) => data[key]?.containsAll(names) ?? false,
+                            _ => false,
+                          }));
 
                       final opt = allRead ? 'unread' : 'read';
 
                       return ElevatedButton(
-                        style: Styles.buttonStyle(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0)),
+                        style: Styles.buttonStyle(padding: const EdgeInsets.symmetric(horizontal: 8.0)),
                         onPressed: () async {
                           final result = await showDialog<bool>(
                             context: context,
@@ -434,8 +412,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                        'Are you sure you want to mark all chapters as $opt?'),
+                                    Text('Are you sure you want to mark all chapters as $opt?'),
                                   ],
                                 ),
                                 actions: <Widget>[
@@ -457,10 +434,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           );
 
                           if (result == true) {
-                            ref.read(webReadMarkersProvider.notifier).setBulk(
-                                key,
-                                read: !allRead ? names : null,
-                                unread: allRead ? names : null);
+                            ref
+                                .read(webReadMarkersProvider.notifier)
+                                .setBulk(key, read: !allRead ? names : null, unread: allRead ? names : null);
                           }
                         },
                         child: Text('Mark all chapters as $opt'),
@@ -527,12 +503,10 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final name = data.name;
     final key = info.getKey();
 
-    final isRead =
-        ref.watch(webReadMarkersProvider.select((value) => switch (value) {
-              AsyncValue(value: final data?) =>
-                data[key]?.contains(name) ?? false,
-              _ => false,
-            }));
+    final isRead = ref.watch(webReadMarkersProvider.select((value) => switch (value) {
+          AsyncValue(value: final data?) => data[key]?.contains(name) ?? false,
+          _ => false,
+        }));
 
     String title = data.chapter.getTitle(name);
     String group = data.chapter.groups.entries.first.key;
@@ -546,14 +520,10 @@ class ChapterButtonWidget extends HookConsumerWidget {
     }
 
     final border = Border(
-      left: BorderSide(
-          color: isRead == true ? tileColor : Colors.blue, width: 4.0),
+      left: BorderSide(color: isRead == true ? tileColor : Colors.blue, width: 4.0),
     );
 
-    final textstyle = TextStyle(
-        color: (isRead == true
-            ? theme.highlightColor
-            : theme.colorScheme.primary));
+    final textstyle = TextStyle(color: (isRead == true ? theme.highlightColor : theme.colorScheme.primary));
 
     final markReadBtn = IconButton(
       onPressed: () async {
@@ -566,11 +536,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
       iconSize: 20,
       tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
       icon: Icon(isRead == true ? Icons.visibility_off : Icons.visibility,
-          color: (isRead == true
-              ? theme.highlightColor
-              : theme.primaryIconTheme.color)),
-      constraints: const BoxConstraints(
-          minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
+          color: (isRead == true ? theme.highlightColor : theme.primaryIconTheme.color)),
+      constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
       visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
     );
 
@@ -590,8 +557,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       tileColor: theme.colorScheme.primaryContainer,
       dense: true,
       minVerticalPadding: 0.0,
-      contentPadding:
-          EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
+      contentPadding: EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
       minLeadingWidth: 0.0,
       leading: markReadBtn,
       shape: border,
@@ -607,8 +573,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
                 children: [
                   IconTextChip(
                     icon: const Icon(Icons.group, size: 20),
-                    text: manga.groups != null &&
-                            manga.groups?.containsKey(group) == true
+                    text: manga.groups != null && manga.groups?.containsKey(group) == true
                         ? manga.groups![group]!
                         : group,
                   ),
@@ -621,9 +586,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
           : Text.rich(
               TextSpan(
                 children: [
-                  const WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Icon(Icons.schedule, size: 15)),
+                  const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.schedule, size: 15)),
                   if (timestamp != null) TextSpan(text: ' $timestamp'),
                 ],
               ),

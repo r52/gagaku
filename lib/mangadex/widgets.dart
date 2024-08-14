@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element
-import 'package:extended_image/extended_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -84,8 +84,7 @@ class MarkReadButton extends ConsumerWidget {
 
     bool? isRead = ref.watch(readChaptersProvider.select(
       (value) => switch (value) {
-        AsyncValue(value: final data?) =>
-          data[manga.id]?.contains(chapter.id) == true,
+        AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
         _ => null,
       },
     ));
@@ -99,8 +98,9 @@ class MarkReadButton extends ConsumerWidget {
       true || false => IconButton(
           onPressed: () async {
             bool set = !isRead;
-            ref.read(readChaptersProvider.notifier).set(manga,
-                read: set ? [chapter] : null, unread: !set ? [chapter] : null);
+            ref
+                .read(readChaptersProvider.notifier)
+                .set(manga, read: set ? [chapter] : null, unread: !set ? [chapter] : null);
           },
           padding: const EdgeInsets.only(right: 10.0),
           splashRadius: 15,
@@ -109,8 +109,7 @@ class MarkReadButton extends ConsumerWidget {
           icon: isRead == true
               ? Icon(Icons.visibility_off, color: theme.highlightColor)
               : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
-          constraints: const BoxConstraints(
-              minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
+          constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
           visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
         ),
     };
@@ -147,8 +146,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
       void controllerAtEdge() {
         if (onAtEdge != null &&
             scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
+            scrollController.position.pixels == scrollController.position.maxScrollExtent) {
           onAtEdge!();
         }
       }
@@ -177,8 +175,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
                       children: [
                         if (title != null)
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 10.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
@@ -196,14 +193,12 @@ class ChapterFeedWidget extends HookConsumerWidget {
                             cacheExtent: MediaQuery.sizeOf(context).height,
                             findChildIndexCallback: (key) {
                               final valueKey = key as ValueKey<int>;
-                              final val = results
-                                  .indexWhere((i) => i.id == valueKey.value);
+                              final val = results.indexWhere((i) => i.id == valueKey.value);
                               return val >= 0 ? val : null;
                             },
                             itemBuilder: (context, index) {
                               final elem = results.elementAt(index);
-                              return ChapterFeedItem(
-                                  key: ValueKey(elem.id), state: elem);
+                              return ChapterFeedItem(key: ValueKey(elem.id), state: elem);
                             },
                           ),
                         ),
@@ -294,13 +289,20 @@ class ChapterFeedItem extends HookConsumerWidget {
         ref.read(statisticsProvider.notifier).get([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
-      child: ExtendedImage.network(
-        state.coverArt,
-        loadStateChanged: extendedImageLoadStateHandler,
-        shape: BoxShape.rectangle,
-        borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+      child: CachedNetworkImage(
+        imageUrl: state.coverArt,
+        imageBuilder: (context, imageProvider) => Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: imageProvider,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          ),
+        ),
         width: screenSizeSmall ? 64.0 : 128.0,
         height: screenSizeSmall ? 91.0 : 182.0,
+        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
 
@@ -387,17 +389,14 @@ class ChapterButtonWidget extends HookWidget {
     final userChip = IconTextChip(
       key: ValueKey(user?.id),
       icon: !isOfficialPub ? iconSet[_IconSet.person] : iconSet[_IconSet.check],
-      text: !isOfficialPub
-          ? (user?.attributes?.username.crop() ?? '')
-          : 'Official Publisher',
+      text: !isOfficialPub ? (user?.attributes?.username.crop() ?? '') : 'Official Publisher',
     );
 
     final statsChip = Consumer(
       builder: (context, ref, child) {
         final comments = ref.watch(chapterStatsProvider.select(
           (value) => switch (value) {
-            AsyncValue(value: final data?) when data.containsKey(chapter.id) =>
-              data[chapter.id]?.comments,
+            AsyncValue(value: final data?) when data.containsKey(chapter.id) => data[chapter.id]?.comments,
             _ => null,
           },
         ));
@@ -502,21 +501,18 @@ class ChapterButtonWidget extends HookWidget {
           } else {
             bool? isRead = ref.watch(readChaptersProvider.select(
               (value) => switch (value) {
-                AsyncValue(value: final data?) =>
-                  data[manga.id]?.contains(chapter.id) == true,
+                AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
                 _ => null,
               },
             ));
 
             border = Border(
-              left: BorderSide(
-                  color: isRead == true ? tileColor : Colors.blue, width: 4.0),
+              left: BorderSide(color: isRead == true ? tileColor : Colors.blue, width: 4.0),
             );
           }
 
           return Ink(
-            padding: EdgeInsets.symmetric(
-                horizontal: (screenSizeSmall ? 6.0 : 10.0), vertical: 4.0),
+            padding: EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 6.0 : 10.0), vertical: 4.0),
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(4)),
               color: tileColor,
@@ -554,18 +550,15 @@ class MangaListWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController =
-        controller ?? (noController ? null : useScrollController());
-    final view =
-        showToggle ? ref.watch(_mangaListViewProvider) : MangaListView.grid;
+    final scrollController = controller ?? (noController ? null : useScrollController());
+    final view = showToggle ? ref.watch(_mangaListViewProvider) : MangaListView.grid;
 
     useEffect(() {
       void controllerAtEdge() {
         if (scrollController != null &&
             onAtEdge != null &&
             scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
+            scrollController.position.pixels == scrollController.position.maxScrollExtent) {
           onAtEdge!();
         }
       }
@@ -583,8 +576,7 @@ class MangaListWidget extends HookConsumerWidget {
         ...leading,
         SliverToBoxAdapter(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
             child: Row(
               children: [
                 if (title != null) title!,
@@ -592,8 +584,7 @@ class MangaListWidget extends HookConsumerWidget {
                 if (showToggle)
                   SegmentedButton<MangaListView>(
                     showSelectedIcon: false,
-                    style: SegmentedButton.styleFrom(
-                        shape: const RoundedRectangleBorder()),
+                    style: SegmentedButton.styleFrom(shape: const RoundedRectangleBorder()),
                     segments: const <ButtonSegment<MangaListView>>[
                       ButtonSegment<MangaListView>(
                         value: MangaListView.grid,
@@ -613,8 +604,7 @@ class MangaListWidget extends HookConsumerWidget {
                     ],
                     selected: <MangaListView>{view},
                     onSelectionChanged: (Set<MangaListView> newSelection) {
-                      ref.read(_mangaListViewProvider.notifier).state =
-                          newSelection.first;
+                      ref.read(_mangaListViewProvider.notifier).state = newSelection.first;
                     },
                   ),
               ],
@@ -645,10 +635,8 @@ class MangaListViewSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final view =
-        selectMode ? MangaListView.grid : ref.watch(_mangaListViewProvider);
-    final onMobilePortrait =
-        DeviceContext.isPortraitMode(context) && DeviceContext.isMobile();
+    final view = selectMode ? MangaListView.grid : ref.watch(_mangaListViewProvider);
+    final onMobilePortrait = DeviceContext.isPortraitMode(context) && DeviceContext.isMobile();
 
     switch (view) {
       case MangaListView.list:
@@ -742,10 +730,8 @@ class _GridMangaItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
-    final aniController =
-        useAnimationController(duration: const Duration(milliseconds: 100));
-    final gradient =
-        useAnimation(aniController.drive(Styles.coverArtGradientTween));
+    final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
+    final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
 
     final Widget image = Material(
       shape: const RoundedRectangleBorder(
@@ -761,11 +747,11 @@ class _GridMangaItem extends HookConsumerWidget {
           ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
         },
         blendMode: BlendMode.dstIn,
-        child: ExtendedImage.network(
-          manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-          cache: true,
-          loadStateChanged: extendedImageLoadStateHandler,
+        child: CachedNetworkImage(
+          imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
           width: 256.0,
+          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
       ),
     );
@@ -802,8 +788,7 @@ class _GridMangaItem extends HookConsumerWidget {
                     child: Material(
                       color: Colors.transparent,
                       shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(4)),
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: GridTileBar(
@@ -874,8 +859,7 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
             TextButton.icon(
               style: TextButton.styleFrom(
                   foregroundColor: theme.colorScheme.onSurface,
-                  textStyle: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 ref.read(readChaptersProvider.notifier).get([manga]);
                 ref.read(ratingsProvider.notifier).get([manga]);
@@ -905,11 +889,12 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
                       ref.read(statisticsProvider.notifier).get([manga]);
                       context.push('/title/${manga.id}', extra: manga);
                     },
-                    child: ExtendedImage.network(
-                        manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-                        cache: true,
-                        loadStateChanged: extendedImageLoadStateHandler,
-                        width: screenSizeSmall ? 80.0 : 128.0),
+                    child: CachedNetworkImage(
+                      imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+                      width: screenSizeSmall ? 80.0 : 128.0,
+                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                    ),
                   ),
                   Expanded(
                     child: Column(
@@ -935,8 +920,7 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
                         if (manga.attributes!.description.isNotEmpty)
                           Expanded(
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
                               child: Text(
                                 manga.attributes!.description.get('en'),
                                 overflow: TextOverflow.clip,
@@ -984,11 +968,11 @@ class _ListMangaItem extends HookConsumerWidget {
                 ref.read(statisticsProvider.notifier).get([manga]);
                 context.push('/title/${manga.id}', extra: manga);
               },
-              child: ExtendedImage.network(
-                manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-                cache: true,
-                loadStateChanged: extendedImageLoadStateHandler,
+              child: CachedNetworkImage(
+                imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                 width: 80.0,
+                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),
             Expanded(
@@ -1065,16 +1049,12 @@ class ChapterTitle extends ConsumerWidget {
     } else {
       bool? isRead = ref.watch(readChaptersProvider.select(
         (value) => switch (value) {
-          AsyncValue(value: final data?) =>
-            data[manga.id]?.contains(chapter.id) == true,
+          AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
           _ => null,
         },
       ));
 
-      textstyle = TextStyle(
-          color: (isRead == true
-              ? theme.highlightColor
-              : theme.colorScheme.primary));
+      textstyle = TextStyle(color: (isRead == true ? theme.highlightColor : theme.colorScheme.primary));
     }
 
     return Text(
@@ -1102,9 +1082,7 @@ class MangaGenreRow extends HookWidget {
     }, [manga]);
 
     final genreTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group != TagGroup.content)
-          .map(
+      return manga.attributes!.tags.where((tag) => tag.attributes.group != TagGroup.content).map(
             (e) => IconTextChip(text: e.attributes.name.get('en')),
           );
     }, [manga]);
@@ -1136,8 +1114,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statsProvider = ref.watch(statisticsProvider.select(
       (map) => switch (map) {
-        AsyncValue(value: final stats?) when stats.containsKey(manga.id) =>
-          stats[manga.id],
+        AsyncValue(value: final stats?) when stats.containsKey(manga.id) => stats[manga.id],
         _ => null,
       },
     ));
@@ -1226,9 +1203,7 @@ class _GroupRow extends HookWidget {
         chips.add(Flexible(
             child: IconTextChip(
           key: ValueKey(g.id),
-          icon: isOfficialPub
-              ? iconSet[_IconSet.circle]
-              : iconSet[_IconSet.group],
+          icon: isOfficialPub ? iconSet[_IconSet.circle] : iconSet[_IconSet.group],
           text: g.attributes.name,
           onPressed: () {
             context.push('/group/${g.id}', extra: g);
@@ -1275,9 +1250,7 @@ class _PubTime extends StatelessWidget {
     return Text.rich(
       TextSpan(
         children: [
-          WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: iconSet[_IconSet.schedule]!),
+          WidgetSpan(alignment: PlaceholderAlignment.middle, child: iconSet[_IconSet.schedule]!),
           TextSpan(text: ' $pubtime'),
         ],
       ),
@@ -1300,8 +1273,7 @@ class CommentChip extends StatelessWidget {
       text: (comments != null) ? '${comments!.repliesCount}' : 'N/A',
       onPressed: (comments != null)
           ? () async {
-              final url =
-                  'https://forums.mangadex.org/threads/${comments!.threadId}';
+              final url = 'https://forums.mangadex.org/threads/${comments!.threadId}';
 
               if (!await launchUrl(Uri.parse(url))) {
                 throw 'Could not launch $url';
@@ -1377,9 +1349,7 @@ class ContentChip extends StatelessWidget {
   }
 }
 
-Future<bool?> showDeleteListDialog(
-        BuildContext context, String listName) async =>
-    await showDialog<bool>(
+Future<bool?> showDeleteListDialog(BuildContext context, String listName) async => await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         final nav = Navigator.of(context);
@@ -1389,8 +1359,7 @@ Future<bool?> showDeleteListDialog(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                  'Are you sure you want to permanently delete \'$listName\'?'),
+              Text('Are you sure you want to permanently delete \'$listName\'?'),
               const Text('NOTE: THIS ACTION IS IRREVERSIBLE'),
             ],
           ),
