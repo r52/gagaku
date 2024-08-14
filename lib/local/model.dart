@@ -46,34 +46,27 @@ int? _standardLocalLibraryItemComp(LocalLibraryItem a, LocalLibraryItem b) {
 Map<LibrarySort, LibraryItemCompare> _libraryCompare = {
   LibrarySort.name_desc: (LocalLibraryItem a, LocalLibraryItem b) {
     return _standardLocalLibraryItemComp(a, b) ??
-        compareNatural(a.name?.toLowerCase() ?? a.path.toLowerCase(),
-            b.name?.toLowerCase() ?? b.path.toLowerCase());
+        compareNatural(a.name?.toLowerCase() ?? a.path.toLowerCase(), b.name?.toLowerCase() ?? b.path.toLowerCase());
   },
   LibrarySort.name_asc: (LocalLibraryItem a, LocalLibraryItem b) {
     return _standardLocalLibraryItemComp(a, b) ??
-        compareNatural(b.name?.toLowerCase() ?? b.path.toLowerCase(),
-            a.name?.toLowerCase() ?? a.path.toLowerCase());
+        compareNatural(b.name?.toLowerCase() ?? b.path.toLowerCase(), a.name?.toLowerCase() ?? a.path.toLowerCase());
   },
   LibrarySort.modified_desc: (LocalLibraryItem a, LocalLibraryItem b) {
-    return _standardLocalLibraryItemComp(a, b) ??
-        a.modified.compareTo(b.modified);
+    return _standardLocalLibraryItemComp(a, b) ?? a.modified.compareTo(b.modified);
   },
   LibrarySort.modified_asc: (LocalLibraryItem a, LocalLibraryItem b) {
-    return _standardLocalLibraryItemComp(a, b) ??
-        b.modified.compareTo(a.modified);
+    return _standardLocalLibraryItemComp(a, b) ?? b.modified.compareTo(a.modified);
   },
 };
 
-LocalLibraryItem? findLibraryItem(
-    LocalLibraryItem old, LocalLibraryItem curr, LibrarySort sort) {
+LocalLibraryItem? findLibraryItem(LocalLibraryItem old, LocalLibraryItem curr, LibrarySort sort) {
   if (curr.type == old.type && curr.path == old.path) {
     return curr;
   }
 
-  final children = curr.children
-      .where((element) =>
-          old.type == element.type && old.isReadable == element.isReadable)
-      .toList();
+  final children =
+      curr.children.where((element) => old.type == element.type && old.isReadable == element.isReadable).toList();
 
   if (children.isNotEmpty) {
     final result = children.binarySearch(old, _libraryCompare[sort]!);
@@ -126,8 +119,7 @@ class LocalLibraryItem {
 
 @Riverpod(keepAlive: true)
 class LocalLibrary extends _$LocalLibrary {
-  Future<LocalLibraryItem?> _processDirectory(
-      Directory dir, LocalLibraryItem? parent) async {
+  Future<LocalLibraryItem?> _processDirectory(Directory dir, LocalLibraryItem? parent) async {
     final formats = await ref.watch(supportedFormatsProvider.future);
     final currentSort = ref.read(librarySortTypeProvider);
 
@@ -185,8 +177,7 @@ class LocalLibrary extends _$LocalLibrary {
     return null;
   }
 
-  Future<LocalLibraryItem?> _processFile(
-      File file, LocalLibraryItem? parent) async {
+  Future<LocalLibraryItem?> _processFile(File file, LocalLibraryItem? parent) async {
     if (file.path.endsWith('.cbz') ||
         file.path.endsWith('.zip') ||
         file.path.endsWith('.cbt') ||
@@ -221,6 +212,7 @@ class LocalLibrary extends _$LocalLibrary {
     }
 
     if (cfg.libraryDirectory.isNotEmpty) {
+      ref.state = const AsyncLoading(progress: 0);
       final top = LocalLibraryItem(
         path: cfg.libraryDirectory,
         type: LibraryItemType.directory,
@@ -230,7 +222,7 @@ class LocalLibrary extends _$LocalLibrary {
       final dir = Directory(cfg.libraryDirectory);
       final entities = await dir.list().toList();
 
-      for (final e in entities) {
+      for (final (idx, e) in entities.indexed) {
         if (e is File) {
           final p = await _processFile(e, top);
           if (p != null) {
@@ -244,9 +236,12 @@ class LocalLibrary extends _$LocalLibrary {
         }
 
         // otherwise skip
+        ref.state = AsyncLoading(progress: idx / entities.length);
       }
 
       top.setSortType(currentSort);
+
+      ref.state = const AsyncLoading(progress: 1);
 
       if (top.children.isEmpty) {
         top.error = 'Library is empty!';

@@ -31,8 +31,7 @@ class LocalLibraryHome extends StatelessWidget {
     PlatformFile? result = await _pickMangaArchive();
 
     if (result != null) {
-      navigator.push(
-          ArchiveReaderRouteBuilder(path: result.path!, title: result.name));
+      navigator.push(ArchiveReaderRouteBuilder(path: result.path!, title: result.name));
     }
   }
 
@@ -86,8 +85,7 @@ class LocalLibraryHome extends StatelessWidget {
           final settings = ref.watch(localConfigProvider);
           final libraryProvider = ref.watch(localLibraryProvider);
           final sort = ref.watch(librarySortTypeProvider);
-          final currentItem =
-              useState<LocalLibraryItem?>(libraryProvider.value);
+          final currentItem = useState<LocalLibraryItem?>(libraryProvider.value);
 
           useEffect(() {
             final newVal = libraryProvider.value;
@@ -106,9 +104,7 @@ class LocalLibraryHome extends StatelessWidget {
           }, [libraryProvider]);
 
           useEffect(() {
-            if (currentItem.value != null &&
-                currentItem.value?.sort != null &&
-                currentItem.value?.sort != sort) {
+            if (currentItem.value != null && currentItem.value?.sort != null && currentItem.value?.sort != sort) {
               currentItem.value?.setSortType(sort);
             }
             return null;
@@ -183,12 +179,10 @@ class LocalLibraryHome extends StatelessWidget {
                     if (item.isReadable) {
                       switch (item.type) {
                         case LibraryItemType.directory:
-                          nav.push(DirectoryReaderRouteBuilder(
-                              path: item.path, title: item.name ?? item.path));
+                          nav.push(DirectoryReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
                           break;
                         case LibraryItemType.archive:
-                          nav.push(ArchiveReaderRouteBuilder(
-                              path: item.path, title: item.name ?? item.path));
+                          nav.push(ArchiveReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
                           break;
                         default:
                           break;
@@ -215,7 +209,7 @@ class LocalLibraryHome extends StatelessWidget {
                   message: "localLibraryProvider failed",
                 ),
               );
-            case _:
+            case AsyncValue(:final progress):
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -232,7 +226,17 @@ class LocalLibraryHome extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    const CircularProgressIndicator()
+                    const CircularProgressIndicator(),
+                    if (progress != null)
+                      Text(
+                        '${(progress * 100).floor()}%',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 18,
+                          decoration: TextDecoration.none,
+                        ),
+                      )
                   ],
                 ),
               );
