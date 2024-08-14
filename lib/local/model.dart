@@ -212,7 +212,7 @@ class LocalLibrary extends _$LocalLibrary {
     }
 
     if (cfg.libraryDirectory.isNotEmpty) {
-      ref.state = const AsyncLoading(progress: 0);
+      state = const AsyncValue.loading(progress: 0);
       final top = LocalLibraryItem(
         path: cfg.libraryDirectory,
         type: LibraryItemType.directory,
@@ -236,12 +236,12 @@ class LocalLibrary extends _$LocalLibrary {
         }
 
         // otherwise skip
-        ref.state = AsyncLoading(progress: idx / entities.length);
+        state = AsyncValue.loading(progress: (idx + 1) / entities.length);
       }
 
       top.setSortType(currentSort);
 
-      ref.state = const AsyncLoading(progress: 1);
+      state = const AsyncValue.loading(progress: 1);
 
       if (top.children.isEmpty) {
         top.error = 'Library is empty!';
