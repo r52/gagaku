@@ -344,194 +344,88 @@ class Languages {
   }
 }
 
-mixin MangaDexUUID {
+abstract class MangaDexUUID {
   String get id;
 
   Map<String, dynamic> toJson();
 }
 
-@freezed
-class Chapter with _$Chapter, MangaDexUUID {
-  Chapter._();
-
-  factory Chapter({
-    required String id,
-    required ChapterAttributes attributes,
-    required List<Relationship> relationships,
-  }) = _Chapter;
-
-  factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
-
-  late final title = _getTitle();
-  late final groups = _getGroups();
-  late final manga = _getManga();
-  late final uploadUser = _getUploadUser();
-
-  String _getTitle() {
-    String title = '';
-
-    if (attributes.chapter != null && attributes.chapter!.isNotEmpty) {
-      title += 'Ch. ${attributes.chapter}';
-    }
-
-    if (attributes.title != null && attributes.title!.isNotEmpty) {
-      if (title.isNotEmpty) {
-        title += ' - ';
-      }
-
-      title += '${attributes.title}';
-    }
-
-    if (title.isEmpty) {
-      // Probably a oneshot?
-      title = 'Oneshot';
-    }
-
-    return title;
-  }
-
-  List<Group> _getGroups() {
-    final groups = relationships.whereType<Group>();
-    return groups.toList();
-  }
-
-  Manga _getManga() {
-    final mangas = relationships.whereType<Manga>();
-
-    if (mangas.isNotEmpty) {
-      return mangas.first;
-    }
-
-    throw Exception('Chapter $id has no associated manga');
-  }
-
-  User? _getUploadUser() {
-    final user = relationships.whereType<User>();
-
-    if (user.isNotEmpty) {
-      return user.first;
-    }
-
-    return null;
-  }
-}
-
-@freezed
-class ChapterAttributes with _$ChapterAttributes {
-  const factory ChapterAttributes({
-    String? title,
-    String? volume,
-    String? chapter,
-    @LanguageConverter() required Language translatedLanguage,
-    String? uploader,
-    String? externalUrl,
-    required int version,
-    @TimestampSerializer() required DateTime createdAt,
-    @TimestampSerializer() required DateTime updatedAt,
-    @TimestampSerializer() required DateTime publishAt,
-  }) = _ChapterAttributes;
-
-  factory ChapterAttributes.fromJson(Map<String, dynamic> json) => _$ChapterAttributesFromJson(json);
-}
-
-@freezed
-class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
-  const factory ScanlationGroupAttributes({
-    required String name,
-    String? website,
-    String? discord,
-    String? description,
-  }) = _ScanlationGroupAttributes;
-
-  factory ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) => _$ScanlationGroupAttributesFromJson(json);
-}
-
-@freezed
-class CoverArtAttributes with _$CoverArtAttributes {
-  const factory CoverArtAttributes({
-    String? volume,
-    required String fileName,
-    String? description,
-    String? locale,
-  }) = _CoverArtAttributes;
-
-  factory CoverArtAttributes.fromJson(Map<String, dynamic> json) => _$CoverArtAttributesFromJson(json);
-}
-
-@freezed
-class UserAttributes with _$UserAttributes {
-  const factory UserAttributes({
-    required String username,
-  }) = _UserAttributes;
-
-  factory UserAttributes.fromJson(Map<String, dynamic> json) => _$UserAttributesFromJson(json);
-}
-
-@freezed
-class AuthorAttributes with _$AuthorAttributes {
-  const factory AuthorAttributes({
-    required String name,
-    String? imageUrl,
-    required LocalizedString biography,
-    String? twitter,
-    String? pixiv,
-    String? youtube,
-    String? website,
-    @TimestampSerializer() required DateTime createdAt,
-    @TimestampSerializer() required DateTime updatedAt,
-  }) = _AuthorAttributes;
-
-  factory AuthorAttributes.fromJson(Map<String, dynamic> json) => _$AuthorAttributesFromJson(json);
-}
-
-abstract class CreatorType with MangaDexUUID {
+abstract class CreatorType implements MangaDexUUID {
   AuthorAttributes get attributes;
 }
 
 @Freezed(unionKey: 'type')
-class Relationship with _$Relationship, MangaDexUUID {
+class MangaDexEntity with _$MangaDexEntity implements MangaDexUUID {
+  @With<ChapterOps>()
+  factory MangaDexEntity.chapter({
+    required String id,
+    required ChapterAttributes attributes,
+    required List<MangaDexEntity> relationships,
+  }) = Chapter;
+
   @With<MangaOps>()
-  factory Relationship.manga({
+  factory MangaDexEntity.manga({
     required String id,
     MangaAttributes? attributes,
-    List<Relationship>? relationships,
+    List<MangaDexEntity>? relationships,
     MangaRelations? related,
   }) = Manga;
 
-  const factory Relationship.user({
+  const factory MangaDexEntity.user({
     required String id,
     UserAttributes? attributes,
   }) = User;
 
   @Implements<CreatorType>()
-  const factory Relationship.artist({
+  const factory MangaDexEntity.artist({
     required String id,
     required AuthorAttributes attributes,
   }) = Artist;
 
   @Implements<CreatorType>()
-  const factory Relationship.author({
+  const factory MangaDexEntity.author({
     required String id,
     required AuthorAttributes attributes,
   }) = Author;
 
-  const factory Relationship.creator({
+  const factory MangaDexEntity.creator({
     required String id,
   }) = CreatorID;
 
   @FreezedUnionValue('cover_art')
-  const factory Relationship.cover({
+  const factory MangaDexEntity.cover({
     required String id,
     CoverArtAttributes? attributes,
   }) = CoverArt;
 
   @FreezedUnionValue('scanlation_group')
-  const factory Relationship.group({
+  const factory MangaDexEntity.group({
     required String id,
     required ScanlationGroupAttributes attributes,
   }) = Group;
 
-  factory Relationship.fromJson(Map<String, dynamic> json) => _$RelationshipFromJson(json);
+  @FreezedUnionValue('custom_list')
+  @With<CustomListOps>()
+  factory MangaDexEntity.customList({
+    required String id,
+    required CustomListAttributes attributes,
+    required List<MangaDexEntity> relationships,
+  }) = CustomList;
+
+  const factory MangaDexEntity.error({
+    required String id,
+    required int status,
+    required String title,
+    String? detail,
+    String? context,
+  }) = MDError;
+
+  const factory MangaDexEntity.tag({
+    required String id,
+    required TagAttributes attributes,
+  }) = Tag;
+
+  factory MangaDexEntity.fromJson(Map<String, dynamic> json) => _$MangaDexEntityFromJson(json);
 }
 
 @freezed
@@ -609,10 +503,69 @@ class CreatorList with _$CreatorList {
   factory CreatorList.fromJson(Map<String, dynamic> json) => _$CreatorListFromJson(json);
 }
 
+mixin ChapterOps {
+  String get id;
+  ChapterAttributes get attributes;
+  List<MangaDexEntity> get relationships;
+
+  late final title = _getTitle();
+  late final groups = _getGroups();
+  late final manga = _getManga();
+  late final uploadUser = _getUploadUser();
+
+  String _getTitle() {
+    String title = '';
+
+    if (attributes.chapter != null && attributes.chapter!.isNotEmpty) {
+      title += 'Ch. ${attributes.chapter}';
+    }
+
+    if (attributes.title != null && attributes.title!.isNotEmpty) {
+      if (title.isNotEmpty) {
+        title += ' - ';
+      }
+
+      title += '${attributes.title}';
+    }
+
+    if (title.isEmpty) {
+      // Probably a oneshot?
+      title = 'Oneshot';
+    }
+
+    return title;
+  }
+
+  List<Group> _getGroups() {
+    final groups = relationships.whereType<Group>();
+    return groups.toList();
+  }
+
+  Manga _getManga() {
+    final mangas = relationships.whereType<Manga>();
+
+    if (mangas.isNotEmpty) {
+      return mangas.first;
+    }
+
+    throw Exception('Chapter $id has no associated manga');
+  }
+
+  User? _getUploadUser() {
+    final user = relationships.whereType<User>();
+
+    if (user.isNotEmpty) {
+      return user.first;
+    }
+
+    return null;
+  }
+}
+
 mixin MangaOps {
   String get id;
   MangaAttributes? get attributes;
-  List<Relationship>? get relationships;
+  List<MangaDexEntity>? get relationships;
   MangaRelations? get related;
 
   late final List<CreatorType>? author = _getAuthor();
@@ -711,6 +664,35 @@ mixin MangaOps {
   }
 }
 
+mixin CustomListOps {
+  String get id;
+  CustomListAttributes get attributes;
+  List<MangaDexEntity> get relationships;
+
+  late final set = _convertIDs();
+  late final user = _getUser();
+
+  Set<String> _convertIDs() {
+    final rs = relationships.whereType<Manga>();
+
+    if (rs.isNotEmpty) {
+      return rs.map((e) => e.id).toSet();
+    }
+
+    return {};
+  }
+
+  User? _getUser() {
+    final user = relationships.whereType<User>();
+
+    if (user.isNotEmpty) {
+      return user.first;
+    }
+
+    return null;
+  }
+}
+
 @freezed
 class MangaLinks with _$MangaLinks {
   const factory MangaLinks({
@@ -747,13 +729,71 @@ class MangaAttributes with _$MangaAttributes {
 }
 
 @freezed
-class Tag with _$Tag, MangaDexUUID {
-  const factory Tag({
-    required String id,
-    required TagAttributes attributes,
-  }) = _Tag;
+class ChapterAttributes with _$ChapterAttributes {
+  const factory ChapterAttributes({
+    String? title,
+    String? volume,
+    String? chapter,
+    @LanguageConverter() required Language translatedLanguage,
+    String? uploader,
+    String? externalUrl,
+    required int version,
+    @TimestampSerializer() required DateTime createdAt,
+    @TimestampSerializer() required DateTime updatedAt,
+    @TimestampSerializer() required DateTime publishAt,
+  }) = _ChapterAttributes;
 
-  factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
+  factory ChapterAttributes.fromJson(Map<String, dynamic> json) => _$ChapterAttributesFromJson(json);
+}
+
+@freezed
+class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
+  const factory ScanlationGroupAttributes({
+    required String name,
+    String? website,
+    String? discord,
+    String? description,
+  }) = _ScanlationGroupAttributes;
+
+  factory ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) => _$ScanlationGroupAttributesFromJson(json);
+}
+
+@freezed
+class CoverArtAttributes with _$CoverArtAttributes {
+  const factory CoverArtAttributes({
+    String? volume,
+    required String fileName,
+    String? description,
+    String? locale,
+  }) = _CoverArtAttributes;
+
+  factory CoverArtAttributes.fromJson(Map<String, dynamic> json) => _$CoverArtAttributesFromJson(json);
+}
+
+@freezed
+class UserAttributes with _$UserAttributes {
+  const factory UserAttributes({
+    required String username,
+  }) = _UserAttributes;
+
+  factory UserAttributes.fromJson(Map<String, dynamic> json) => _$UserAttributesFromJson(json);
+}
+
+@freezed
+class AuthorAttributes with _$AuthorAttributes {
+  const factory AuthorAttributes({
+    required String name,
+    String? imageUrl,
+    required LocalizedString biography,
+    String? twitter,
+    String? pixiv,
+    String? youtube,
+    String? website,
+    @TimestampSerializer() required DateTime createdAt,
+    @TimestampSerializer() required DateTime updatedAt,
+  }) = _AuthorAttributes;
+
+  factory AuthorAttributes.fromJson(Map<String, dynamic> json) => _$AuthorAttributesFromJson(json);
 }
 
 @freezed
@@ -870,42 +910,6 @@ class CustomListList with _$CustomListList {
 }
 
 @freezed
-class CustomList with _$CustomList, MangaDexUUID {
-  CustomList._();
-
-  factory CustomList({
-    required String id,
-    required CustomListAttributes attributes,
-    required List<Relationship> relationships,
-  }) = _CustomList;
-
-  late final set = _convertIDs();
-  late final user = _getUser();
-
-  factory CustomList.fromJson(Map<String, dynamic> json) => _$CustomListFromJson(json);
-
-  Set<String> _convertIDs() {
-    final rs = relationships.whereType<Manga>();
-
-    if (rs.isNotEmpty) {
-      return rs.map((e) => e.id).toSet();
-    }
-
-    return {};
-  }
-
-  User? _getUser() {
-    final user = relationships.whereType<User>();
-
-    if (user.isNotEmpty) {
-      return user.first;
-    }
-
-    return null;
-  }
-}
-
-@freezed
 class CustomListAttributes with _$CustomListAttributes {
   const factory CustomListAttributes({
     required String name,
@@ -924,19 +928,6 @@ class ErrorResponse with _$ErrorResponse {
   ) = _ErrorResponse;
 
   factory ErrorResponse.fromJson(Map<String, dynamic> json) => _$ErrorResponseFromJson(json);
-}
-
-@freezed
-class MDError with _$MDError {
-  const factory MDError({
-    required String id,
-    required int status,
-    required String title,
-    String? detail,
-    String? context,
-  }) = _MDError;
-
-  factory MDError.fromJson(Map<String, dynamic> json) => _$MDErrorFromJson(json);
 }
 
 class MangaDexException implements Exception {

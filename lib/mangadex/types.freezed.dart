@@ -562,86 +562,206 @@ abstract class _MangaSearchParameters implements MangaSearchParameters {
       get copyWith => throw _privateConstructorUsedError;
 }
 
-Chapter _$ChapterFromJson(Map<String, dynamic> json) {
-  return _Chapter.fromJson(json);
+MangaDexEntity _$MangaDexEntityFromJson(Map<String, dynamic> json) {
+  switch (json['type']) {
+    case 'chapter':
+      return Chapter.fromJson(json);
+    case 'manga':
+      return Manga.fromJson(json);
+    case 'user':
+      return User.fromJson(json);
+    case 'artist':
+      return Artist.fromJson(json);
+    case 'author':
+      return Author.fromJson(json);
+    case 'creator':
+      return CreatorID.fromJson(json);
+    case 'cover_art':
+      return CoverArt.fromJson(json);
+    case 'scanlation_group':
+      return Group.fromJson(json);
+    case 'custom_list':
+      return CustomList.fromJson(json);
+    case 'error':
+      return MDError.fromJson(json);
+    case 'tag':
+      return Tag.fromJson(json);
+
+    default:
+      throw CheckedFromJsonException(json, 'type', 'MangaDexEntity',
+          'Invalid union type "${json['type']}"!');
+  }
 }
 
 /// @nodoc
-mixin _$Chapter {
+mixin _$MangaDexEntity {
   String get id => throw _privateConstructorUsedError;
-  ChapterAttributes get attributes => throw _privateConstructorUsedError;
-  List<Relationship> get relationships => throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
+    required TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)
+        manga,
+    required TResult Function(String id, UserAttributes? attributes) user,
+    required TResult Function(String id, AuthorAttributes attributes) artist,
+    required TResult Function(String id, AuthorAttributes attributes) author,
+    required TResult Function(String id) creator,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
+    required TResult Function(String id, ScanlationGroupAttributes attributes)
+        group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult? Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult? Function(String id, UserAttributes? attributes)? user,
+    TResult? Function(String id, AuthorAttributes attributes)? artist,
+    TResult? Function(String id, AuthorAttributes attributes)? author,
+    TResult? Function(String id)? creator,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult Function(String id, UserAttributes? attributes)? user,
+    TResult Function(String id, AuthorAttributes attributes)? artist,
+    TResult Function(String id, AuthorAttributes attributes)? author,
+    TResult Function(String id)? creator,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
+    required TResult Function(Manga value) manga,
+    required TResult Function(User value) user,
+    required TResult Function(Artist value) artist,
+    required TResult Function(Author value) author,
+    required TResult Function(CreatorID value) creator,
+    required TResult Function(CoverArt value) cover,
+    required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
+    TResult? Function(Manga value)? manga,
+    TResult? Function(User value)? user,
+    TResult? Function(Artist value)? artist,
+    TResult? Function(Author value)? author,
+    TResult? Function(CreatorID value)? creator,
+    TResult? Function(CoverArt value)? cover,
+    TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
+    TResult Function(Manga value)? manga,
+    TResult Function(User value)? user,
+    TResult Function(Artist value)? artist,
+    TResult Function(Author value)? author,
+    TResult Function(CreatorID value)? creator,
+    TResult Function(CoverArt value)? cover,
+    TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
 
-  /// Serializes this Chapter to a JSON map.
+  /// Serializes this MangaDexEntity to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of Chapter
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ChapterCopyWith<Chapter> get copyWith => throw _privateConstructorUsedError;
+  $MangaDexEntityCopyWith<MangaDexEntity> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $ChapterCopyWith<$Res> {
-  factory $ChapterCopyWith(Chapter value, $Res Function(Chapter) then) =
-      _$ChapterCopyWithImpl<$Res, Chapter>;
+abstract class $MangaDexEntityCopyWith<$Res> {
+  factory $MangaDexEntityCopyWith(
+          MangaDexEntity value, $Res Function(MangaDexEntity) then) =
+      _$MangaDexEntityCopyWithImpl<$Res, MangaDexEntity>;
   @useResult
-  $Res call(
-      {String id,
-      ChapterAttributes attributes,
-      List<Relationship> relationships});
-
-  $ChapterAttributesCopyWith<$Res> get attributes;
+  $Res call({String id});
 }
 
 /// @nodoc
-class _$ChapterCopyWithImpl<$Res, $Val extends Chapter>
-    implements $ChapterCopyWith<$Res> {
-  _$ChapterCopyWithImpl(this._value, this._then);
+class _$MangaDexEntityCopyWithImpl<$Res, $Val extends MangaDexEntity>
+    implements $MangaDexEntityCopyWith<$Res> {
+  _$MangaDexEntityCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Chapter
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = null,
-    Object? attributes = null,
-    Object? relationships = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      attributes: null == attributes
-          ? _value.attributes
-          : attributes // ignore: cast_nullable_to_non_nullable
-              as ChapterAttributes,
-      relationships: null == relationships
-          ? _value.relationships
-          : relationships // ignore: cast_nullable_to_non_nullable
-              as List<Relationship>,
     ) as $Val);
-  }
-
-  /// Create a copy of Chapter
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $ChapterAttributesCopyWith<$Res> get attributes {
-    return $ChapterAttributesCopyWith<$Res>(_value.attributes, (value) {
-      return _then(_value.copyWith(attributes: value) as $Val);
-    });
   }
 }
 
 /// @nodoc
-abstract class _$$ChapterImplCopyWith<$Res> implements $ChapterCopyWith<$Res> {
+abstract class _$$ChapterImplCopyWith<$Res>
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$ChapterImplCopyWith(
           _$ChapterImpl value, $Res Function(_$ChapterImpl) then) =
       __$$ChapterImplCopyWithImpl<$Res>;
@@ -650,21 +770,20 @@ abstract class _$$ChapterImplCopyWith<$Res> implements $ChapterCopyWith<$Res> {
   $Res call(
       {String id,
       ChapterAttributes attributes,
-      List<Relationship> relationships});
+      List<MangaDexEntity> relationships});
 
-  @override
   $ChapterAttributesCopyWith<$Res> get attributes;
 }
 
 /// @nodoc
 class __$$ChapterImplCopyWithImpl<$Res>
-    extends _$ChapterCopyWithImpl<$Res, _$ChapterImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$ChapterImpl>
     implements _$$ChapterImplCopyWith<$Res> {
   __$$ChapterImplCopyWithImpl(
       _$ChapterImpl _value, $Res Function(_$ChapterImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Chapter
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -685,20 +804,33 @@ class __$$ChapterImplCopyWithImpl<$Res>
       relationships: null == relationships
           ? _value._relationships
           : relationships // ignore: cast_nullable_to_non_nullable
-              as List<Relationship>,
+              as List<MangaDexEntity>,
     ));
+  }
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ChapterAttributesCopyWith<$Res> get attributes {
+    return $ChapterAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value));
+    });
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
+class _$ChapterImpl
+    with DiagnosticableTreeMixin, ChapterOps
+    implements Chapter {
   _$ChapterImpl(
       {required this.id,
       required this.attributes,
-      required final List<Relationship> relationships})
+      required final List<MangaDexEntity> relationships,
+      final String? $type})
       : _relationships = relationships,
-        super._();
+        $type = $type ?? 'chapter';
 
   factory _$ChapterImpl.fromJson(Map<String, dynamic> json) =>
       _$$ChapterImplFromJson(json);
@@ -707,24 +839,27 @@ class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
   final String id;
   @override
   final ChapterAttributes attributes;
-  final List<Relationship> _relationships;
+  final List<MangaDexEntity> _relationships;
   @override
-  List<Relationship> get relationships {
+  List<MangaDexEntity> get relationships {
     if (_relationships is EqualUnmodifiableListView) return _relationships;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_relationships);
   }
 
+  @JsonKey(name: 'type')
+  final String $type;
+
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Chapter(id: $id, attributes: $attributes, relationships: $relationships)';
+    return 'MangaDexEntity.chapter(id: $id, attributes: $attributes, relationships: $relationships)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Chapter'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.chapter'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes))
       ..add(DiagnosticsProperty('relationships', relationships));
@@ -747,13 +882,154 @@ class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships));
 
-  /// Create a copy of Chapter
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ChapterImplCopyWith<_$ChapterImpl> get copyWith =>
       __$$ChapterImplCopyWithImpl<_$ChapterImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
+    required TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)
+        manga,
+    required TResult Function(String id, UserAttributes? attributes) user,
+    required TResult Function(String id, AuthorAttributes attributes) artist,
+    required TResult Function(String id, AuthorAttributes attributes) author,
+    required TResult Function(String id) creator,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
+    required TResult Function(String id, ScanlationGroupAttributes attributes)
+        group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
+  }) {
+    return chapter(id, attributes, relationships);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult? Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult? Function(String id, UserAttributes? attributes)? user,
+    TResult? Function(String id, AuthorAttributes attributes)? artist,
+    TResult? Function(String id, AuthorAttributes attributes)? author,
+    TResult? Function(String id)? creator,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
+  }) {
+    return chapter?.call(id, attributes, relationships);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult Function(String id, UserAttributes? attributes)? user,
+    TResult Function(String id, AuthorAttributes attributes)? artist,
+    TResult Function(String id, AuthorAttributes attributes)? author,
+    TResult Function(String id)? creator,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
+    required TResult orElse(),
+  }) {
+    if (chapter != null) {
+      return chapter(id, attributes, relationships);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
+    required TResult Function(Manga value) manga,
+    required TResult Function(User value) user,
+    required TResult Function(Artist value) artist,
+    required TResult Function(Author value) author,
+    required TResult Function(CreatorID value) creator,
+    required TResult Function(CoverArt value) cover,
+    required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
+  }) {
+    return chapter(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
+    TResult? Function(Manga value)? manga,
+    TResult? Function(User value)? user,
+    TResult? Function(Artist value)? artist,
+    TResult? Function(Author value)? author,
+    TResult? Function(CreatorID value)? creator,
+    TResult? Function(CoverArt value)? cover,
+    TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
+  }) {
+    return chapter?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
+    TResult Function(Manga value)? manga,
+    TResult Function(User value)? user,
+    TResult Function(Artist value)? artist,
+    TResult Function(Author value)? author,
+    TResult Function(CreatorID value)? creator,
+    TResult Function(CoverArt value)? cover,
+    TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
+    required TResult orElse(),
+  }) {
+    if (chapter != null) {
+      return chapter(this);
+    }
+    return orElse();
+  }
 
   @override
   Map<String, dynamic> toJson() {
@@ -763,23 +1039,20 @@ class _$ChapterImpl extends _Chapter with DiagnosticableTreeMixin {
   }
 }
 
-abstract class _Chapter extends Chapter {
-  factory _Chapter(
+abstract class Chapter implements MangaDexEntity, ChapterOps {
+  factory Chapter(
       {required final String id,
       required final ChapterAttributes attributes,
-      required final List<Relationship> relationships}) = _$ChapterImpl;
-  _Chapter._() : super._();
+      required final List<MangaDexEntity> relationships}) = _$ChapterImpl;
 
-  factory _Chapter.fromJson(Map<String, dynamic> json) = _$ChapterImpl.fromJson;
+  factory Chapter.fromJson(Map<String, dynamic> json) = _$ChapterImpl.fromJson;
 
   @override
   String get id;
-  @override
   ChapterAttributes get attributes;
-  @override
-  List<Relationship> get relationships;
+  List<MangaDexEntity> get relationships;
 
-  /// Create a copy of Chapter
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -787,1507 +1060,9 @@ abstract class _Chapter extends Chapter {
       throw _privateConstructorUsedError;
 }
 
-ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) {
-  return _ChapterAttributes.fromJson(json);
-}
-
-/// @nodoc
-mixin _$ChapterAttributes {
-  String? get title => throw _privateConstructorUsedError;
-  String? get volume => throw _privateConstructorUsedError;
-  String? get chapter => throw _privateConstructorUsedError;
-  @LanguageConverter()
-  Language get translatedLanguage => throw _privateConstructorUsedError;
-  String? get uploader => throw _privateConstructorUsedError;
-  String? get externalUrl => throw _privateConstructorUsedError;
-  int get version => throw _privateConstructorUsedError;
-  @TimestampSerializer()
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  @TimestampSerializer()
-  DateTime get updatedAt => throw _privateConstructorUsedError;
-  @TimestampSerializer()
-  DateTime get publishAt => throw _privateConstructorUsedError;
-
-  /// Serializes this ChapterAttributes to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ChapterAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ChapterAttributesCopyWith<ChapterAttributes> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ChapterAttributesCopyWith<$Res> {
-  factory $ChapterAttributesCopyWith(
-          ChapterAttributes value, $Res Function(ChapterAttributes) then) =
-      _$ChapterAttributesCopyWithImpl<$Res, ChapterAttributes>;
-  @useResult
-  $Res call(
-      {String? title,
-      String? volume,
-      String? chapter,
-      @LanguageConverter() Language translatedLanguage,
-      String? uploader,
-      String? externalUrl,
-      int version,
-      @TimestampSerializer() DateTime createdAt,
-      @TimestampSerializer() DateTime updatedAt,
-      @TimestampSerializer() DateTime publishAt});
-}
-
-/// @nodoc
-class _$ChapterAttributesCopyWithImpl<$Res, $Val extends ChapterAttributes>
-    implements $ChapterAttributesCopyWith<$Res> {
-  _$ChapterAttributesCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ChapterAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? title = freezed,
-    Object? volume = freezed,
-    Object? chapter = freezed,
-    Object? translatedLanguage = null,
-    Object? uploader = freezed,
-    Object? externalUrl = freezed,
-    Object? version = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-    Object? publishAt = null,
-  }) {
-    return _then(_value.copyWith(
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as String?,
-      chapter: freezed == chapter
-          ? _value.chapter
-          : chapter // ignore: cast_nullable_to_non_nullable
-              as String?,
-      translatedLanguage: null == translatedLanguage
-          ? _value.translatedLanguage
-          : translatedLanguage // ignore: cast_nullable_to_non_nullable
-              as Language,
-      uploader: freezed == uploader
-          ? _value.uploader
-          : uploader // ignore: cast_nullable_to_non_nullable
-              as String?,
-      externalUrl: freezed == externalUrl
-          ? _value.externalUrl
-          : externalUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as int,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      publishAt: null == publishAt
-          ? _value.publishAt
-          : publishAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$ChapterAttributesImplCopyWith<$Res>
-    implements $ChapterAttributesCopyWith<$Res> {
-  factory _$$ChapterAttributesImplCopyWith(_$ChapterAttributesImpl value,
-          $Res Function(_$ChapterAttributesImpl) then) =
-      __$$ChapterAttributesImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String? title,
-      String? volume,
-      String? chapter,
-      @LanguageConverter() Language translatedLanguage,
-      String? uploader,
-      String? externalUrl,
-      int version,
-      @TimestampSerializer() DateTime createdAt,
-      @TimestampSerializer() DateTime updatedAt,
-      @TimestampSerializer() DateTime publishAt});
-}
-
-/// @nodoc
-class __$$ChapterAttributesImplCopyWithImpl<$Res>
-    extends _$ChapterAttributesCopyWithImpl<$Res, _$ChapterAttributesImpl>
-    implements _$$ChapterAttributesImplCopyWith<$Res> {
-  __$$ChapterAttributesImplCopyWithImpl(_$ChapterAttributesImpl _value,
-      $Res Function(_$ChapterAttributesImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ChapterAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? title = freezed,
-    Object? volume = freezed,
-    Object? chapter = freezed,
-    Object? translatedLanguage = null,
-    Object? uploader = freezed,
-    Object? externalUrl = freezed,
-    Object? version = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-    Object? publishAt = null,
-  }) {
-    return _then(_$ChapterAttributesImpl(
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as String?,
-      chapter: freezed == chapter
-          ? _value.chapter
-          : chapter // ignore: cast_nullable_to_non_nullable
-              as String?,
-      translatedLanguage: null == translatedLanguage
-          ? _value.translatedLanguage
-          : translatedLanguage // ignore: cast_nullable_to_non_nullable
-              as Language,
-      uploader: freezed == uploader
-          ? _value.uploader
-          : uploader // ignore: cast_nullable_to_non_nullable
-              as String?,
-      externalUrl: freezed == externalUrl
-          ? _value.externalUrl
-          : externalUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as int,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      publishAt: null == publishAt
-          ? _value.publishAt
-          : publishAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ChapterAttributesImpl
-    with DiagnosticableTreeMixin
-    implements _ChapterAttributes {
-  const _$ChapterAttributesImpl(
-      {this.title,
-      this.volume,
-      this.chapter,
-      @LanguageConverter() required this.translatedLanguage,
-      this.uploader,
-      this.externalUrl,
-      required this.version,
-      @TimestampSerializer() required this.createdAt,
-      @TimestampSerializer() required this.updatedAt,
-      @TimestampSerializer() required this.publishAt});
-
-  factory _$ChapterAttributesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ChapterAttributesImplFromJson(json);
-
-  @override
-  final String? title;
-  @override
-  final String? volume;
-  @override
-  final String? chapter;
-  @override
-  @LanguageConverter()
-  final Language translatedLanguage;
-  @override
-  final String? uploader;
-  @override
-  final String? externalUrl;
-  @override
-  final int version;
-  @override
-  @TimestampSerializer()
-  final DateTime createdAt;
-  @override
-  @TimestampSerializer()
-  final DateTime updatedAt;
-  @override
-  @TimestampSerializer()
-  final DateTime publishAt;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ChapterAttributes(title: $title, volume: $volume, chapter: $chapter, translatedLanguage: $translatedLanguage, uploader: $uploader, externalUrl: $externalUrl, version: $version, createdAt: $createdAt, updatedAt: $updatedAt, publishAt: $publishAt)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'ChapterAttributes'))
-      ..add(DiagnosticsProperty('title', title))
-      ..add(DiagnosticsProperty('volume', volume))
-      ..add(DiagnosticsProperty('chapter', chapter))
-      ..add(DiagnosticsProperty('translatedLanguage', translatedLanguage))
-      ..add(DiagnosticsProperty('uploader', uploader))
-      ..add(DiagnosticsProperty('externalUrl', externalUrl))
-      ..add(DiagnosticsProperty('version', version))
-      ..add(DiagnosticsProperty('createdAt', createdAt))
-      ..add(DiagnosticsProperty('updatedAt', updatedAt))
-      ..add(DiagnosticsProperty('publishAt', publishAt));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ChapterAttributesImpl &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.volume, volume) || other.volume == volume) &&
-            (identical(other.chapter, chapter) || other.chapter == chapter) &&
-            (identical(other.translatedLanguage, translatedLanguage) ||
-                other.translatedLanguage == translatedLanguage) &&
-            (identical(other.uploader, uploader) ||
-                other.uploader == uploader) &&
-            (identical(other.externalUrl, externalUrl) ||
-                other.externalUrl == externalUrl) &&
-            (identical(other.version, version) || other.version == version) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt) &&
-            (identical(other.publishAt, publishAt) ||
-                other.publishAt == publishAt));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      title,
-      volume,
-      chapter,
-      translatedLanguage,
-      uploader,
-      externalUrl,
-      version,
-      createdAt,
-      updatedAt,
-      publishAt);
-
-  /// Create a copy of ChapterAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
-      __$$ChapterAttributesImplCopyWithImpl<_$ChapterAttributesImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ChapterAttributesImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _ChapterAttributes implements ChapterAttributes {
-  const factory _ChapterAttributes(
-          {final String? title,
-          final String? volume,
-          final String? chapter,
-          @LanguageConverter() required final Language translatedLanguage,
-          final String? uploader,
-          final String? externalUrl,
-          required final int version,
-          @TimestampSerializer() required final DateTime createdAt,
-          @TimestampSerializer() required final DateTime updatedAt,
-          @TimestampSerializer() required final DateTime publishAt}) =
-      _$ChapterAttributesImpl;
-
-  factory _ChapterAttributes.fromJson(Map<String, dynamic> json) =
-      _$ChapterAttributesImpl.fromJson;
-
-  @override
-  String? get title;
-  @override
-  String? get volume;
-  @override
-  String? get chapter;
-  @override
-  @LanguageConverter()
-  Language get translatedLanguage;
-  @override
-  String? get uploader;
-  @override
-  String? get externalUrl;
-  @override
-  int get version;
-  @override
-  @TimestampSerializer()
-  DateTime get createdAt;
-  @override
-  @TimestampSerializer()
-  DateTime get updatedAt;
-  @override
-  @TimestampSerializer()
-  DateTime get publishAt;
-
-  /// Create a copy of ChapterAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-ScanlationGroupAttributes _$ScanlationGroupAttributesFromJson(
-    Map<String, dynamic> json) {
-  return _ScanlationGroupAttributes.fromJson(json);
-}
-
-/// @nodoc
-mixin _$ScanlationGroupAttributes {
-  String get name => throw _privateConstructorUsedError;
-  String? get website => throw _privateConstructorUsedError;
-  String? get discord => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-
-  /// Serializes this ScanlationGroupAttributes to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ScanlationGroupAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ScanlationGroupAttributesCopyWith<ScanlationGroupAttributes> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ScanlationGroupAttributesCopyWith<$Res> {
-  factory $ScanlationGroupAttributesCopyWith(ScanlationGroupAttributes value,
-          $Res Function(ScanlationGroupAttributes) then) =
-      _$ScanlationGroupAttributesCopyWithImpl<$Res, ScanlationGroupAttributes>;
-  @useResult
-  $Res call(
-      {String name, String? website, String? discord, String? description});
-}
-
-/// @nodoc
-class _$ScanlationGroupAttributesCopyWithImpl<$Res,
-        $Val extends ScanlationGroupAttributes>
-    implements $ScanlationGroupAttributesCopyWith<$Res> {
-  _$ScanlationGroupAttributesCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ScanlationGroupAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? website = freezed,
-    Object? discord = freezed,
-    Object? description = freezed,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      website: freezed == website
-          ? _value.website
-          : website // ignore: cast_nullable_to_non_nullable
-              as String?,
-      discord: freezed == discord
-          ? _value.discord
-          : discord // ignore: cast_nullable_to_non_nullable
-              as String?,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$ScanlationGroupAttributesImplCopyWith<$Res>
-    implements $ScanlationGroupAttributesCopyWith<$Res> {
-  factory _$$ScanlationGroupAttributesImplCopyWith(
-          _$ScanlationGroupAttributesImpl value,
-          $Res Function(_$ScanlationGroupAttributesImpl) then) =
-      __$$ScanlationGroupAttributesImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String name, String? website, String? discord, String? description});
-}
-
-/// @nodoc
-class __$$ScanlationGroupAttributesImplCopyWithImpl<$Res>
-    extends _$ScanlationGroupAttributesCopyWithImpl<$Res,
-        _$ScanlationGroupAttributesImpl>
-    implements _$$ScanlationGroupAttributesImplCopyWith<$Res> {
-  __$$ScanlationGroupAttributesImplCopyWithImpl(
-      _$ScanlationGroupAttributesImpl _value,
-      $Res Function(_$ScanlationGroupAttributesImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ScanlationGroupAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? website = freezed,
-    Object? discord = freezed,
-    Object? description = freezed,
-  }) {
-    return _then(_$ScanlationGroupAttributesImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      website: freezed == website
-          ? _value.website
-          : website // ignore: cast_nullable_to_non_nullable
-              as String?,
-      discord: freezed == discord
-          ? _value.discord
-          : discord // ignore: cast_nullable_to_non_nullable
-              as String?,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ScanlationGroupAttributesImpl
-    with DiagnosticableTreeMixin
-    implements _ScanlationGroupAttributes {
-  const _$ScanlationGroupAttributesImpl(
-      {required this.name, this.website, this.discord, this.description});
-
-  factory _$ScanlationGroupAttributesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ScanlationGroupAttributesImplFromJson(json);
-
-  @override
-  final String name;
-  @override
-  final String? website;
-  @override
-  final String? discord;
-  @override
-  final String? description;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ScanlationGroupAttributes(name: $name, website: $website, discord: $discord, description: $description)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'ScanlationGroupAttributes'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('website', website))
-      ..add(DiagnosticsProperty('discord', discord))
-      ..add(DiagnosticsProperty('description', description));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ScanlationGroupAttributesImpl &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.website, website) || other.website == website) &&
-            (identical(other.discord, discord) || other.discord == discord) &&
-            (identical(other.description, description) ||
-                other.description == description));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, website, discord, description);
-
-  /// Create a copy of ScanlationGroupAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
-      get copyWith => __$$ScanlationGroupAttributesImplCopyWithImpl<
-          _$ScanlationGroupAttributesImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ScanlationGroupAttributesImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _ScanlationGroupAttributes implements ScanlationGroupAttributes {
-  const factory _ScanlationGroupAttributes(
-      {required final String name,
-      final String? website,
-      final String? discord,
-      final String? description}) = _$ScanlationGroupAttributesImpl;
-
-  factory _ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) =
-      _$ScanlationGroupAttributesImpl.fromJson;
-
-  @override
-  String get name;
-  @override
-  String? get website;
-  @override
-  String? get discord;
-  @override
-  String? get description;
-
-  /// Create a copy of ScanlationGroupAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
-CoverArtAttributes _$CoverArtAttributesFromJson(Map<String, dynamic> json) {
-  return _CoverArtAttributes.fromJson(json);
-}
-
-/// @nodoc
-mixin _$CoverArtAttributes {
-  String? get volume => throw _privateConstructorUsedError;
-  String get fileName => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-  String? get locale => throw _privateConstructorUsedError;
-
-  /// Serializes this CoverArtAttributes to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CoverArtAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CoverArtAttributesCopyWith<CoverArtAttributes> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $CoverArtAttributesCopyWith<$Res> {
-  factory $CoverArtAttributesCopyWith(
-          CoverArtAttributes value, $Res Function(CoverArtAttributes) then) =
-      _$CoverArtAttributesCopyWithImpl<$Res, CoverArtAttributes>;
-  @useResult
-  $Res call(
-      {String? volume, String fileName, String? description, String? locale});
-}
-
-/// @nodoc
-class _$CoverArtAttributesCopyWithImpl<$Res, $Val extends CoverArtAttributes>
-    implements $CoverArtAttributesCopyWith<$Res> {
-  _$CoverArtAttributesCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of CoverArtAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? volume = freezed,
-    Object? fileName = null,
-    Object? description = freezed,
-    Object? locale = freezed,
-  }) {
-    return _then(_value.copyWith(
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as String?,
-      fileName: null == fileName
-          ? _value.fileName
-          : fileName // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      locale: freezed == locale
-          ? _value.locale
-          : locale // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$CoverArtAttributesImplCopyWith<$Res>
-    implements $CoverArtAttributesCopyWith<$Res> {
-  factory _$$CoverArtAttributesImplCopyWith(_$CoverArtAttributesImpl value,
-          $Res Function(_$CoverArtAttributesImpl) then) =
-      __$$CoverArtAttributesImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String? volume, String fileName, String? description, String? locale});
-}
-
-/// @nodoc
-class __$$CoverArtAttributesImplCopyWithImpl<$Res>
-    extends _$CoverArtAttributesCopyWithImpl<$Res, _$CoverArtAttributesImpl>
-    implements _$$CoverArtAttributesImplCopyWith<$Res> {
-  __$$CoverArtAttributesImplCopyWithImpl(_$CoverArtAttributesImpl _value,
-      $Res Function(_$CoverArtAttributesImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of CoverArtAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? volume = freezed,
-    Object? fileName = null,
-    Object? description = freezed,
-    Object? locale = freezed,
-  }) {
-    return _then(_$CoverArtAttributesImpl(
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as String?,
-      fileName: null == fileName
-          ? _value.fileName
-          : fileName // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      locale: freezed == locale
-          ? _value.locale
-          : locale // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$CoverArtAttributesImpl
-    with DiagnosticableTreeMixin
-    implements _CoverArtAttributes {
-  const _$CoverArtAttributesImpl(
-      {this.volume, required this.fileName, this.description, this.locale});
-
-  factory _$CoverArtAttributesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CoverArtAttributesImplFromJson(json);
-
-  @override
-  final String? volume;
-  @override
-  final String fileName;
-  @override
-  final String? description;
-  @override
-  final String? locale;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CoverArtAttributes(volume: $volume, fileName: $fileName, description: $description, locale: $locale)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'CoverArtAttributes'))
-      ..add(DiagnosticsProperty('volume', volume))
-      ..add(DiagnosticsProperty('fileName', fileName))
-      ..add(DiagnosticsProperty('description', description))
-      ..add(DiagnosticsProperty('locale', locale));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CoverArtAttributesImpl &&
-            (identical(other.volume, volume) || other.volume == volume) &&
-            (identical(other.fileName, fileName) ||
-                other.fileName == fileName) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
-            (identical(other.locale, locale) || other.locale == locale));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, volume, fileName, description, locale);
-
-  /// Create a copy of CoverArtAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
-      __$$CoverArtAttributesImplCopyWithImpl<_$CoverArtAttributesImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$CoverArtAttributesImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _CoverArtAttributes implements CoverArtAttributes {
-  const factory _CoverArtAttributes(
-      {final String? volume,
-      required final String fileName,
-      final String? description,
-      final String? locale}) = _$CoverArtAttributesImpl;
-
-  factory _CoverArtAttributes.fromJson(Map<String, dynamic> json) =
-      _$CoverArtAttributesImpl.fromJson;
-
-  @override
-  String? get volume;
-  @override
-  String get fileName;
-  @override
-  String? get description;
-  @override
-  String? get locale;
-
-  /// Create a copy of CoverArtAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-UserAttributes _$UserAttributesFromJson(Map<String, dynamic> json) {
-  return _UserAttributes.fromJson(json);
-}
-
-/// @nodoc
-mixin _$UserAttributes {
-  String get username => throw _privateConstructorUsedError;
-
-  /// Serializes this UserAttributes to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UserAttributesCopyWith<UserAttributes> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $UserAttributesCopyWith<$Res> {
-  factory $UserAttributesCopyWith(
-          UserAttributes value, $Res Function(UserAttributes) then) =
-      _$UserAttributesCopyWithImpl<$Res, UserAttributes>;
-  @useResult
-  $Res call({String username});
-}
-
-/// @nodoc
-class _$UserAttributesCopyWithImpl<$Res, $Val extends UserAttributes>
-    implements $UserAttributesCopyWith<$Res> {
-  _$UserAttributesCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of UserAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? username = null,
-  }) {
-    return _then(_value.copyWith(
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$UserAttributesImplCopyWith<$Res>
-    implements $UserAttributesCopyWith<$Res> {
-  factory _$$UserAttributesImplCopyWith(_$UserAttributesImpl value,
-          $Res Function(_$UserAttributesImpl) then) =
-      __$$UserAttributesImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String username});
-}
-
-/// @nodoc
-class __$$UserAttributesImplCopyWithImpl<$Res>
-    extends _$UserAttributesCopyWithImpl<$Res, _$UserAttributesImpl>
-    implements _$$UserAttributesImplCopyWith<$Res> {
-  __$$UserAttributesImplCopyWithImpl(
-      _$UserAttributesImpl _value, $Res Function(_$UserAttributesImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of UserAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? username = null,
-  }) {
-    return _then(_$UserAttributesImpl(
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$UserAttributesImpl
-    with DiagnosticableTreeMixin
-    implements _UserAttributes {
-  const _$UserAttributesImpl({required this.username});
-
-  factory _$UserAttributesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserAttributesImplFromJson(json);
-
-  @override
-  final String username;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'UserAttributes(username: $username)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'UserAttributes'))
-      ..add(DiagnosticsProperty('username', username));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$UserAttributesImpl &&
-            (identical(other.username, username) ||
-                other.username == username));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, username);
-
-  /// Create a copy of UserAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
-      __$$UserAttributesImplCopyWithImpl<_$UserAttributesImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UserAttributesImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _UserAttributes implements UserAttributes {
-  const factory _UserAttributes({required final String username}) =
-      _$UserAttributesImpl;
-
-  factory _UserAttributes.fromJson(Map<String, dynamic> json) =
-      _$UserAttributesImpl.fromJson;
-
-  @override
-  String get username;
-
-  /// Create a copy of UserAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-AuthorAttributes _$AuthorAttributesFromJson(Map<String, dynamic> json) {
-  return _AuthorAttributes.fromJson(json);
-}
-
-/// @nodoc
-mixin _$AuthorAttributes {
-  String get name => throw _privateConstructorUsedError;
-  String? get imageUrl => throw _privateConstructorUsedError;
-  Map<String, String> get biography => throw _privateConstructorUsedError;
-  String? get twitter => throw _privateConstructorUsedError;
-  String? get pixiv => throw _privateConstructorUsedError;
-  String? get youtube => throw _privateConstructorUsedError;
-  String? get website => throw _privateConstructorUsedError;
-  @TimestampSerializer()
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  @TimestampSerializer()
-  DateTime get updatedAt => throw _privateConstructorUsedError;
-
-  /// Serializes this AuthorAttributes to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AuthorAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $AuthorAttributesCopyWith<AuthorAttributes> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $AuthorAttributesCopyWith<$Res> {
-  factory $AuthorAttributesCopyWith(
-          AuthorAttributes value, $Res Function(AuthorAttributes) then) =
-      _$AuthorAttributesCopyWithImpl<$Res, AuthorAttributes>;
-  @useResult
-  $Res call(
-      {String name,
-      String? imageUrl,
-      Map<String, String> biography,
-      String? twitter,
-      String? pixiv,
-      String? youtube,
-      String? website,
-      @TimestampSerializer() DateTime createdAt,
-      @TimestampSerializer() DateTime updatedAt});
-}
-
-/// @nodoc
-class _$AuthorAttributesCopyWithImpl<$Res, $Val extends AuthorAttributes>
-    implements $AuthorAttributesCopyWith<$Res> {
-  _$AuthorAttributesCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of AuthorAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? imageUrl = freezed,
-    Object? biography = null,
-    Object? twitter = freezed,
-    Object? pixiv = freezed,
-    Object? youtube = freezed,
-    Object? website = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      imageUrl: freezed == imageUrl
-          ? _value.imageUrl
-          : imageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      biography: null == biography
-          ? _value.biography
-          : biography // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
-      twitter: freezed == twitter
-          ? _value.twitter
-          : twitter // ignore: cast_nullable_to_non_nullable
-              as String?,
-      pixiv: freezed == pixiv
-          ? _value.pixiv
-          : pixiv // ignore: cast_nullable_to_non_nullable
-              as String?,
-      youtube: freezed == youtube
-          ? _value.youtube
-          : youtube // ignore: cast_nullable_to_non_nullable
-              as String?,
-      website: freezed == website
-          ? _value.website
-          : website // ignore: cast_nullable_to_non_nullable
-              as String?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$AuthorAttributesImplCopyWith<$Res>
-    implements $AuthorAttributesCopyWith<$Res> {
-  factory _$$AuthorAttributesImplCopyWith(_$AuthorAttributesImpl value,
-          $Res Function(_$AuthorAttributesImpl) then) =
-      __$$AuthorAttributesImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String name,
-      String? imageUrl,
-      Map<String, String> biography,
-      String? twitter,
-      String? pixiv,
-      String? youtube,
-      String? website,
-      @TimestampSerializer() DateTime createdAt,
-      @TimestampSerializer() DateTime updatedAt});
-}
-
-/// @nodoc
-class __$$AuthorAttributesImplCopyWithImpl<$Res>
-    extends _$AuthorAttributesCopyWithImpl<$Res, _$AuthorAttributesImpl>
-    implements _$$AuthorAttributesImplCopyWith<$Res> {
-  __$$AuthorAttributesImplCopyWithImpl(_$AuthorAttributesImpl _value,
-      $Res Function(_$AuthorAttributesImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of AuthorAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? imageUrl = freezed,
-    Object? biography = null,
-    Object? twitter = freezed,
-    Object? pixiv = freezed,
-    Object? youtube = freezed,
-    Object? website = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_$AuthorAttributesImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      imageUrl: freezed == imageUrl
-          ? _value.imageUrl
-          : imageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      biography: null == biography
-          ? _value._biography
-          : biography // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
-      twitter: freezed == twitter
-          ? _value.twitter
-          : twitter // ignore: cast_nullable_to_non_nullable
-              as String?,
-      pixiv: freezed == pixiv
-          ? _value.pixiv
-          : pixiv // ignore: cast_nullable_to_non_nullable
-              as String?,
-      youtube: freezed == youtube
-          ? _value.youtube
-          : youtube // ignore: cast_nullable_to_non_nullable
-              as String?,
-      website: freezed == website
-          ? _value.website
-          : website // ignore: cast_nullable_to_non_nullable
-              as String?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$AuthorAttributesImpl
-    with DiagnosticableTreeMixin
-    implements _AuthorAttributes {
-  const _$AuthorAttributesImpl(
-      {required this.name,
-      this.imageUrl,
-      required final Map<String, String> biography,
-      this.twitter,
-      this.pixiv,
-      this.youtube,
-      this.website,
-      @TimestampSerializer() required this.createdAt,
-      @TimestampSerializer() required this.updatedAt})
-      : _biography = biography;
-
-  factory _$AuthorAttributesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AuthorAttributesImplFromJson(json);
-
-  @override
-  final String name;
-  @override
-  final String? imageUrl;
-  final Map<String, String> _biography;
-  @override
-  Map<String, String> get biography {
-    if (_biography is EqualUnmodifiableMapView) return _biography;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_biography);
-  }
-
-  @override
-  final String? twitter;
-  @override
-  final String? pixiv;
-  @override
-  final String? youtube;
-  @override
-  final String? website;
-  @override
-  @TimestampSerializer()
-  final DateTime createdAt;
-  @override
-  @TimestampSerializer()
-  final DateTime updatedAt;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AuthorAttributes(name: $name, imageUrl: $imageUrl, biography: $biography, twitter: $twitter, pixiv: $pixiv, youtube: $youtube, website: $website, createdAt: $createdAt, updatedAt: $updatedAt)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'AuthorAttributes'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('imageUrl', imageUrl))
-      ..add(DiagnosticsProperty('biography', biography))
-      ..add(DiagnosticsProperty('twitter', twitter))
-      ..add(DiagnosticsProperty('pixiv', pixiv))
-      ..add(DiagnosticsProperty('youtube', youtube))
-      ..add(DiagnosticsProperty('website', website))
-      ..add(DiagnosticsProperty('createdAt', createdAt))
-      ..add(DiagnosticsProperty('updatedAt', updatedAt));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$AuthorAttributesImpl &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.imageUrl, imageUrl) ||
-                other.imageUrl == imageUrl) &&
-            const DeepCollectionEquality()
-                .equals(other._biography, _biography) &&
-            (identical(other.twitter, twitter) || other.twitter == twitter) &&
-            (identical(other.pixiv, pixiv) || other.pixiv == pixiv) &&
-            (identical(other.youtube, youtube) || other.youtube == youtube) &&
-            (identical(other.website, website) || other.website == website) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      imageUrl,
-      const DeepCollectionEquality().hash(_biography),
-      twitter,
-      pixiv,
-      youtube,
-      website,
-      createdAt,
-      updatedAt);
-
-  /// Create a copy of AuthorAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
-      __$$AuthorAttributesImplCopyWithImpl<_$AuthorAttributesImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$AuthorAttributesImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _AuthorAttributes implements AuthorAttributes {
-  const factory _AuthorAttributes(
-          {required final String name,
-          final String? imageUrl,
-          required final Map<String, String> biography,
-          final String? twitter,
-          final String? pixiv,
-          final String? youtube,
-          final String? website,
-          @TimestampSerializer() required final DateTime createdAt,
-          @TimestampSerializer() required final DateTime updatedAt}) =
-      _$AuthorAttributesImpl;
-
-  factory _AuthorAttributes.fromJson(Map<String, dynamic> json) =
-      _$AuthorAttributesImpl.fromJson;
-
-  @override
-  String get name;
-  @override
-  String? get imageUrl;
-  @override
-  Map<String, String> get biography;
-  @override
-  String? get twitter;
-  @override
-  String? get pixiv;
-  @override
-  String? get youtube;
-  @override
-  String? get website;
-  @override
-  @TimestampSerializer()
-  DateTime get createdAt;
-  @override
-  @TimestampSerializer()
-  DateTime get updatedAt;
-
-  /// Create a copy of AuthorAttributes
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-Relationship _$RelationshipFromJson(Map<String, dynamic> json) {
-  switch (json['type']) {
-    case 'manga':
-      return Manga.fromJson(json);
-    case 'user':
-      return User.fromJson(json);
-    case 'artist':
-      return Artist.fromJson(json);
-    case 'author':
-      return Author.fromJson(json);
-    case 'creator':
-      return CreatorID.fromJson(json);
-    case 'cover_art':
-      return CoverArt.fromJson(json);
-    case 'scanlation_group':
-      return Group.fromJson(json);
-
-    default:
-      throw CheckedFromJsonException(json, 'type', 'Relationship',
-          'Invalid union type "${json['type']}"!');
-  }
-}
-
-/// @nodoc
-mixin _$Relationship {
-  String get id => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
-        manga,
-    required TResult Function(String id, UserAttributes? attributes) user,
-    required TResult Function(String id, AuthorAttributes attributes) artist,
-    required TResult Function(String id, AuthorAttributes attributes) author,
-    required TResult Function(String id) creator,
-    required TResult Function(String id, CoverArtAttributes? attributes) cover,
-    required TResult Function(String id, ScanlationGroupAttributes attributes)
-        group,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
-        manga,
-    TResult? Function(String id, UserAttributes? attributes)? user,
-    TResult? Function(String id, AuthorAttributes attributes)? artist,
-    TResult? Function(String id, AuthorAttributes attributes)? author,
-    TResult? Function(String id)? creator,
-    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
-    TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
-        manga,
-    TResult Function(String id, UserAttributes? attributes)? user,
-    TResult Function(String id, AuthorAttributes attributes)? artist,
-    TResult Function(String id, AuthorAttributes attributes)? author,
-    TResult Function(String id)? creator,
-    TResult Function(String id, CoverArtAttributes? attributes)? cover,
-    TResult Function(String id, ScanlationGroupAttributes attributes)? group,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(Manga value) manga,
-    required TResult Function(User value) user,
-    required TResult Function(Artist value) artist,
-    required TResult Function(Author value) author,
-    required TResult Function(CreatorID value) creator,
-    required TResult Function(CoverArt value) cover,
-    required TResult Function(Group value) group,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(Manga value)? manga,
-    TResult? Function(User value)? user,
-    TResult? Function(Artist value)? artist,
-    TResult? Function(Author value)? author,
-    TResult? Function(CreatorID value)? creator,
-    TResult? Function(CoverArt value)? cover,
-    TResult? Function(Group value)? group,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(Manga value)? manga,
-    TResult Function(User value)? user,
-    TResult Function(Artist value)? artist,
-    TResult Function(Author value)? author,
-    TResult Function(CreatorID value)? creator,
-    TResult Function(CoverArt value)? cover,
-    TResult Function(Group value)? group,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-
-  /// Serializes this Relationship to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of Relationship
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $RelationshipCopyWith<Relationship> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $RelationshipCopyWith<$Res> {
-  factory $RelationshipCopyWith(
-          Relationship value, $Res Function(Relationship) then) =
-      _$RelationshipCopyWithImpl<$Res, Relationship>;
-  @useResult
-  $Res call({String id});
-}
-
-/// @nodoc
-class _$RelationshipCopyWithImpl<$Res, $Val extends Relationship>
-    implements $RelationshipCopyWith<$Res> {
-  _$RelationshipCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of Relationship
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
-}
-
 /// @nodoc
 abstract class _$$MangaImplCopyWith<$Res>
-    implements $RelationshipCopyWith<$Res> {
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$MangaImplCopyWith(
           _$MangaImpl value, $Res Function(_$MangaImpl) then) =
       __$$MangaImplCopyWithImpl<$Res>;
@@ -2296,7 +1071,7 @@ abstract class _$$MangaImplCopyWith<$Res>
   $Res call(
       {String id,
       MangaAttributes? attributes,
-      List<Relationship>? relationships,
+      List<MangaDexEntity>? relationships,
       MangaRelations? related});
 
   $MangaAttributesCopyWith<$Res>? get attributes;
@@ -2304,13 +1079,13 @@ abstract class _$$MangaImplCopyWith<$Res>
 
 /// @nodoc
 class __$$MangaImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$MangaImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$MangaImpl>
     implements _$$MangaImplCopyWith<$Res> {
   __$$MangaImplCopyWithImpl(
       _$MangaImpl _value, $Res Function(_$MangaImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -2332,7 +1107,7 @@ class __$$MangaImplCopyWithImpl<$Res>
       relationships: freezed == relationships
           ? _value._relationships
           : relationships // ignore: cast_nullable_to_non_nullable
-              as List<Relationship>?,
+              as List<MangaDexEntity>?,
       related: freezed == related
           ? _value.related
           : related // ignore: cast_nullable_to_non_nullable
@@ -2340,7 +1115,7 @@ class __$$MangaImplCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -2361,7 +1136,7 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   _$MangaImpl(
       {required this.id,
       this.attributes,
-      final List<Relationship>? relationships,
+      final List<MangaDexEntity>? relationships,
       this.related,
       final String? $type})
       : _relationships = relationships,
@@ -2374,9 +1149,9 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   final String id;
   @override
   final MangaAttributes? attributes;
-  final List<Relationship>? _relationships;
+  final List<MangaDexEntity>? _relationships;
   @override
-  List<Relationship>? get relationships {
+  List<MangaDexEntity>? get relationships {
     final value = _relationships;
     if (value == null) return null;
     if (_relationships is EqualUnmodifiableListView) return _relationships;
@@ -2392,14 +1167,14 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.manga(id: $id, attributes: $attributes, relationships: $relationships, related: $related)';
+    return 'MangaDexEntity.manga(id: $id, attributes: $attributes, relationships: $relationships, related: $related)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Relationship.manga'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.manga'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes))
       ..add(DiagnosticsProperty('relationships', relationships))
@@ -2424,7 +1199,7 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   int get hashCode => Object.hash(runtimeType, id, attributes,
       const DeepCollectionEquality().hash(_relationships), related);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
@@ -2435,8 +1210,11 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
     required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
+            List<MangaDexEntity>? relationships, MangaRelations? related)
         manga,
     required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
@@ -2445,6 +1223,13 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
     required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
   }) {
     return manga(id, attributes, relationships, related);
   }
@@ -2452,8 +1237,11 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
@@ -2461,6 +1249,13 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
   }) {
     return manga?.call(id, attributes, relationships, related);
   }
@@ -2468,8 +1263,11 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
@@ -2477,6 +1275,13 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
     TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
     required TResult orElse(),
   }) {
     if (manga != null) {
@@ -2488,6 +1293,7 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
     required TResult Function(Manga value) manga,
     required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
@@ -2495,6 +1301,9 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
   }) {
     return manga(this);
   }
@@ -2502,6 +1311,7 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
     TResult? Function(Manga value)? manga,
     TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
@@ -2509,6 +1319,9 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
   }) {
     return manga?.call(this);
   }
@@ -2516,6 +1329,7 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
     TResult Function(Manga value)? manga,
     TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
@@ -2523,6 +1337,9 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
     required TResult orElse(),
   }) {
     if (manga != null) {
@@ -2539,11 +1356,11 @@ class _$MangaImpl with DiagnosticableTreeMixin, MangaOps implements Manga {
   }
 }
 
-abstract class Manga implements Relationship, MangaOps {
+abstract class Manga implements MangaDexEntity, MangaOps {
   factory Manga(
       {required final String id,
       final MangaAttributes? attributes,
-      final List<Relationship>? relationships,
+      final List<MangaDexEntity>? relationships,
       final MangaRelations? related}) = _$MangaImpl;
 
   factory Manga.fromJson(Map<String, dynamic> json) = _$MangaImpl.fromJson;
@@ -2551,10 +1368,10 @@ abstract class Manga implements Relationship, MangaOps {
   @override
   String get id;
   MangaAttributes? get attributes;
-  List<Relationship>? get relationships;
+  List<MangaDexEntity>? get relationships;
   MangaRelations? get related;
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2564,7 +1381,7 @@ abstract class Manga implements Relationship, MangaOps {
 
 /// @nodoc
 abstract class _$$UserImplCopyWith<$Res>
-    implements $RelationshipCopyWith<$Res> {
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$UserImplCopyWith(
           _$UserImpl value, $Res Function(_$UserImpl) then) =
       __$$UserImplCopyWithImpl<$Res>;
@@ -2577,12 +1394,12 @@ abstract class _$$UserImplCopyWith<$Res>
 
 /// @nodoc
 class __$$UserImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$UserImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$UserImpl>
     implements _$$UserImplCopyWith<$Res> {
   __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -2602,7 +1419,7 @@ class __$$UserImplCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -2636,14 +1453,14 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.user(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.user(id: $id, attributes: $attributes)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Relationship.user'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.user'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
@@ -2662,7 +1479,7 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
@@ -2673,8 +1490,11 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
     required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
+            List<MangaDexEntity>? relationships, MangaRelations? related)
         manga,
     required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
@@ -2683,6 +1503,13 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
     required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
   }) {
     return user(id, attributes);
   }
@@ -2690,8 +1517,11 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
@@ -2699,6 +1529,13 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
   }) {
     return user?.call(id, attributes);
   }
@@ -2706,8 +1543,11 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
@@ -2715,6 +1555,13 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
     TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
     required TResult orElse(),
   }) {
     if (user != null) {
@@ -2726,6 +1573,7 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
     required TResult Function(Manga value) manga,
     required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
@@ -2733,6 +1581,9 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
   }) {
     return user(this);
   }
@@ -2740,6 +1591,7 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
     TResult? Function(Manga value)? manga,
     TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
@@ -2747,6 +1599,9 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
   }) {
     return user?.call(this);
   }
@@ -2754,6 +1609,7 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
     TResult Function(Manga value)? manga,
     TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
@@ -2761,6 +1617,9 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
     required TResult orElse(),
   }) {
     if (user != null) {
@@ -2777,7 +1636,7 @@ class _$UserImpl with DiagnosticableTreeMixin implements User {
   }
 }
 
-abstract class User implements Relationship {
+abstract class User implements MangaDexEntity {
   const factory User(
       {required final String id,
       final UserAttributes? attributes}) = _$UserImpl;
@@ -2788,7 +1647,7 @@ abstract class User implements Relationship {
   String get id;
   UserAttributes? get attributes;
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2798,7 +1657,7 @@ abstract class User implements Relationship {
 
 /// @nodoc
 abstract class _$$ArtistImplCopyWith<$Res>
-    implements $RelationshipCopyWith<$Res> {
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$ArtistImplCopyWith(
           _$ArtistImpl value, $Res Function(_$ArtistImpl) then) =
       __$$ArtistImplCopyWithImpl<$Res>;
@@ -2811,13 +1670,13 @@ abstract class _$$ArtistImplCopyWith<$Res>
 
 /// @nodoc
 class __$$ArtistImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$ArtistImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$ArtistImpl>
     implements _$$ArtistImplCopyWith<$Res> {
   __$$ArtistImplCopyWithImpl(
       _$ArtistImpl _value, $Res Function(_$ArtistImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -2837,7 +1696,7 @@ class __$$ArtistImplCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -2868,14 +1727,14 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.artist(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.artist(id: $id, attributes: $attributes)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Relationship.artist'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.artist'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
@@ -2894,7 +1753,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
@@ -2905,8 +1764,11 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
     required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
+            List<MangaDexEntity>? relationships, MangaRelations? related)
         manga,
     required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
@@ -2915,6 +1777,13 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
     required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
   }) {
     return artist(id, attributes);
   }
@@ -2922,8 +1791,11 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
@@ -2931,6 +1803,13 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
   }) {
     return artist?.call(id, attributes);
   }
@@ -2938,8 +1817,11 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
@@ -2947,6 +1829,13 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
     TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
     required TResult orElse(),
   }) {
     if (artist != null) {
@@ -2958,6 +1847,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
     required TResult Function(Manga value) manga,
     required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
@@ -2965,6 +1855,9 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
   }) {
     return artist(this);
   }
@@ -2972,6 +1865,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
     TResult? Function(Manga value)? manga,
     TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
@@ -2979,6 +1873,9 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
   }) {
     return artist?.call(this);
   }
@@ -2986,6 +1883,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
     TResult Function(Manga value)? manga,
     TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
@@ -2993,6 +1891,9 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
     required TResult orElse(),
   }) {
     if (artist != null) {
@@ -3009,7 +1910,7 @@ class _$ArtistImpl with DiagnosticableTreeMixin implements Artist {
   }
 }
 
-abstract class Artist implements Relationship, CreatorType {
+abstract class Artist implements MangaDexEntity, CreatorType {
   const factory Artist(
       {required final String id,
       required final AuthorAttributes attributes}) = _$ArtistImpl;
@@ -3020,7 +1921,7 @@ abstract class Artist implements Relationship, CreatorType {
   String get id;
   AuthorAttributes get attributes;
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3030,7 +1931,7 @@ abstract class Artist implements Relationship, CreatorType {
 
 /// @nodoc
 abstract class _$$AuthorImplCopyWith<$Res>
-    implements $RelationshipCopyWith<$Res> {
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$AuthorImplCopyWith(
           _$AuthorImpl value, $Res Function(_$AuthorImpl) then) =
       __$$AuthorImplCopyWithImpl<$Res>;
@@ -3043,13 +1944,13 @@ abstract class _$$AuthorImplCopyWith<$Res>
 
 /// @nodoc
 class __$$AuthorImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$AuthorImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$AuthorImpl>
     implements _$$AuthorImplCopyWith<$Res> {
   __$$AuthorImplCopyWithImpl(
       _$AuthorImpl _value, $Res Function(_$AuthorImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -3069,7 +1970,7 @@ class __$$AuthorImplCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3100,14 +2001,14 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.author(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.author(id: $id, attributes: $attributes)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Relationship.author'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.author'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
@@ -3126,7 +2027,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
@@ -3137,8 +2038,11 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
     required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
+            List<MangaDexEntity>? relationships, MangaRelations? related)
         manga,
     required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
@@ -3147,6 +2051,13 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
     required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
   }) {
     return author(id, attributes);
   }
@@ -3154,8 +2065,11 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
@@ -3163,6 +2077,13 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
   }) {
     return author?.call(id, attributes);
   }
@@ -3170,8 +2091,11 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
@@ -3179,6 +2103,13 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
     TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
     required TResult orElse(),
   }) {
     if (author != null) {
@@ -3190,6 +2121,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
     required TResult Function(Manga value) manga,
     required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
@@ -3197,6 +2129,9 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
   }) {
     return author(this);
   }
@@ -3204,6 +2139,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
     TResult? Function(Manga value)? manga,
     TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
@@ -3211,6 +2147,9 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
   }) {
     return author?.call(this);
   }
@@ -3218,6 +2157,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
     TResult Function(Manga value)? manga,
     TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
@@ -3225,6 +2165,9 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
     required TResult orElse(),
   }) {
     if (author != null) {
@@ -3241,7 +2184,7 @@ class _$AuthorImpl with DiagnosticableTreeMixin implements Author {
   }
 }
 
-abstract class Author implements Relationship, CreatorType {
+abstract class Author implements MangaDexEntity, CreatorType {
   const factory Author(
       {required final String id,
       required final AuthorAttributes attributes}) = _$AuthorImpl;
@@ -3252,7 +2195,7 @@ abstract class Author implements Relationship, CreatorType {
   String get id;
   AuthorAttributes get attributes;
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3262,7 +2205,7 @@ abstract class Author implements Relationship, CreatorType {
 
 /// @nodoc
 abstract class _$$CreatorIDImplCopyWith<$Res>
-    implements $RelationshipCopyWith<$Res> {
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$CreatorIDImplCopyWith(
           _$CreatorIDImpl value, $Res Function(_$CreatorIDImpl) then) =
       __$$CreatorIDImplCopyWithImpl<$Res>;
@@ -3273,13 +2216,13 @@ abstract class _$$CreatorIDImplCopyWith<$Res>
 
 /// @nodoc
 class __$$CreatorIDImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$CreatorIDImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$CreatorIDImpl>
     implements _$$CreatorIDImplCopyWith<$Res> {
   __$$CreatorIDImplCopyWithImpl(
       _$CreatorIDImpl _value, $Res Function(_$CreatorIDImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -3312,14 +2255,14 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.creator(id: $id)';
+    return 'MangaDexEntity.creator(id: $id)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Relationship.creator'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.creator'))
       ..add(DiagnosticsProperty('id', id));
   }
 
@@ -3335,7 +2278,7 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   int get hashCode => Object.hash(runtimeType, id);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
@@ -3346,8 +2289,11 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
     required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
+            List<MangaDexEntity>? relationships, MangaRelations? related)
         manga,
     required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
@@ -3356,6 +2302,13 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
     required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
   }) {
     return creator(id);
   }
@@ -3363,8 +2316,11 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
@@ -3372,6 +2328,13 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
   }) {
     return creator?.call(id);
   }
@@ -3379,8 +2342,11 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
@@ -3388,6 +2354,13 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
     TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
     required TResult orElse(),
   }) {
     if (creator != null) {
@@ -3399,6 +2372,7 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
     required TResult Function(Manga value) manga,
     required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
@@ -3406,6 +2380,9 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
   }) {
     return creator(this);
   }
@@ -3413,6 +2390,7 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
     TResult? Function(Manga value)? manga,
     TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
@@ -3420,6 +2398,9 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
   }) {
     return creator?.call(this);
   }
@@ -3427,6 +2408,7 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
     TResult Function(Manga value)? manga,
     TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
@@ -3434,6 +2416,9 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
     required TResult orElse(),
   }) {
     if (creator != null) {
@@ -3450,7 +2435,7 @@ class _$CreatorIDImpl with DiagnosticableTreeMixin implements CreatorID {
   }
 }
 
-abstract class CreatorID implements Relationship {
+abstract class CreatorID implements MangaDexEntity {
   const factory CreatorID({required final String id}) = _$CreatorIDImpl;
 
   factory CreatorID.fromJson(Map<String, dynamic> json) =
@@ -3459,7 +2444,7 @@ abstract class CreatorID implements Relationship {
   @override
   String get id;
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3469,7 +2454,7 @@ abstract class CreatorID implements Relationship {
 
 /// @nodoc
 abstract class _$$CoverArtImplCopyWith<$Res>
-    implements $RelationshipCopyWith<$Res> {
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$CoverArtImplCopyWith(
           _$CoverArtImpl value, $Res Function(_$CoverArtImpl) then) =
       __$$CoverArtImplCopyWithImpl<$Res>;
@@ -3482,13 +2467,13 @@ abstract class _$$CoverArtImplCopyWith<$Res>
 
 /// @nodoc
 class __$$CoverArtImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$CoverArtImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$CoverArtImpl>
     implements _$$CoverArtImplCopyWith<$Res> {
   __$$CoverArtImplCopyWithImpl(
       _$CoverArtImpl _value, $Res Function(_$CoverArtImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -3508,7 +2493,7 @@ class __$$CoverArtImplCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3542,14 +2527,14 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.cover(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.cover(id: $id, attributes: $attributes)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Relationship.cover'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.cover'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
@@ -3568,7 +2553,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
@@ -3579,8 +2564,11 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
     required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
+            List<MangaDexEntity>? relationships, MangaRelations? related)
         manga,
     required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
@@ -3589,6 +2577,13 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
     required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
   }) {
     return cover(id, attributes);
   }
@@ -3596,8 +2591,11 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
@@ -3605,6 +2603,13 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
   }) {
     return cover?.call(id, attributes);
   }
@@ -3612,8 +2617,11 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
@@ -3621,6 +2629,13 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
     TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
     required TResult orElse(),
   }) {
     if (cover != null) {
@@ -3632,6 +2647,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
     required TResult Function(Manga value) manga,
     required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
@@ -3639,6 +2655,9 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
   }) {
     return cover(this);
   }
@@ -3646,6 +2665,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
     TResult? Function(Manga value)? manga,
     TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
@@ -3653,6 +2673,9 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
   }) {
     return cover?.call(this);
   }
@@ -3660,6 +2683,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
     TResult Function(Manga value)? manga,
     TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
@@ -3667,6 +2691,9 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
     required TResult orElse(),
   }) {
     if (cover != null) {
@@ -3683,7 +2710,7 @@ class _$CoverArtImpl with DiagnosticableTreeMixin implements CoverArt {
   }
 }
 
-abstract class CoverArt implements Relationship {
+abstract class CoverArt implements MangaDexEntity {
   const factory CoverArt(
       {required final String id,
       final CoverArtAttributes? attributes}) = _$CoverArtImpl;
@@ -3695,7 +2722,7 @@ abstract class CoverArt implements Relationship {
   String get id;
   CoverArtAttributes? get attributes;
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3705,7 +2732,7 @@ abstract class CoverArt implements Relationship {
 
 /// @nodoc
 abstract class _$$GroupImplCopyWith<$Res>
-    implements $RelationshipCopyWith<$Res> {
+    implements $MangaDexEntityCopyWith<$Res> {
   factory _$$GroupImplCopyWith(
           _$GroupImpl value, $Res Function(_$GroupImpl) then) =
       __$$GroupImplCopyWithImpl<$Res>;
@@ -3718,13 +2745,13 @@ abstract class _$$GroupImplCopyWith<$Res>
 
 /// @nodoc
 class __$$GroupImplCopyWithImpl<$Res>
-    extends _$RelationshipCopyWithImpl<$Res, _$GroupImpl>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$GroupImpl>
     implements _$$GroupImplCopyWith<$Res> {
   __$$GroupImplCopyWithImpl(
       _$GroupImpl _value, $Res Function(_$GroupImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -3744,7 +2771,7 @@ class __$$GroupImplCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3775,14 +2802,14 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Relationship.group(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.group(id: $id, attributes: $attributes)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Relationship.group'))
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.group'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('attributes', attributes));
   }
@@ -3801,7 +2828,7 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
@@ -3812,8 +2839,11 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
     required TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)
+            List<MangaDexEntity>? relationships, MangaRelations? related)
         manga,
     required TResult Function(String id, UserAttributes? attributes) user,
     required TResult Function(String id, AuthorAttributes attributes) artist,
@@ -3822,6 +2852,13 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
     required TResult Function(String id, CoverArtAttributes? attributes) cover,
     required TResult Function(String id, ScanlationGroupAttributes attributes)
         group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
   }) {
     return group(id, attributes);
   }
@@ -3829,8 +2866,11 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult? Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult? Function(String id, UserAttributes? attributes)? user,
     TResult? Function(String id, AuthorAttributes attributes)? artist,
@@ -3838,6 +2878,13 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
     TResult? Function(String id)? creator,
     TResult? Function(String id, CoverArtAttributes? attributes)? cover,
     TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
   }) {
     return group?.call(id, attributes);
   }
@@ -3845,8 +2892,11 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
     TResult Function(String id, MangaAttributes? attributes,
-            List<Relationship>? relationships, MangaRelations? related)?
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
         manga,
     TResult Function(String id, UserAttributes? attributes)? user,
     TResult Function(String id, AuthorAttributes attributes)? artist,
@@ -3854,6 +2904,13 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
     TResult Function(String id)? creator,
     TResult Function(String id, CoverArtAttributes? attributes)? cover,
     TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
     required TResult orElse(),
   }) {
     if (group != null) {
@@ -3865,6 +2922,7 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
     required TResult Function(Manga value) manga,
     required TResult Function(User value) user,
     required TResult Function(Artist value) artist,
@@ -3872,6 +2930,9 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
     required TResult Function(CreatorID value) creator,
     required TResult Function(CoverArt value) cover,
     required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
   }) {
     return group(this);
   }
@@ -3879,6 +2940,7 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
     TResult? Function(Manga value)? manga,
     TResult? Function(User value)? user,
     TResult? Function(Artist value)? artist,
@@ -3886,6 +2948,9 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
     TResult? Function(CreatorID value)? creator,
     TResult? Function(CoverArt value)? cover,
     TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
   }) {
     return group?.call(this);
   }
@@ -3893,6 +2958,7 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
     TResult Function(Manga value)? manga,
     TResult Function(User value)? user,
     TResult Function(Artist value)? artist,
@@ -3900,6 +2966,9 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
     TResult Function(CreatorID value)? creator,
     TResult Function(CoverArt value)? cover,
     TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
     required TResult orElse(),
   }) {
     if (group != null) {
@@ -3916,7 +2985,7 @@ class _$GroupImpl with DiagnosticableTreeMixin implements Group {
   }
 }
 
-abstract class Group implements Relationship {
+abstract class Group implements MangaDexEntity {
   const factory Group(
       {required final String id,
       required final ScanlationGroupAttributes attributes}) = _$GroupImpl;
@@ -3927,11 +2996,886 @@ abstract class Group implements Relationship {
   String get id;
   ScanlationGroupAttributes get attributes;
 
-  /// Create a copy of Relationship
+  /// Create a copy of MangaDexEntity
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupImplCopyWith<_$GroupImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$CustomListImplCopyWith<$Res>
+    implements $MangaDexEntityCopyWith<$Res> {
+  factory _$$CustomListImplCopyWith(
+          _$CustomListImpl value, $Res Function(_$CustomListImpl) then) =
+      __$$CustomListImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      CustomListAttributes attributes,
+      List<MangaDexEntity> relationships});
+
+  $CustomListAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class __$$CustomListImplCopyWithImpl<$Res>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$CustomListImpl>
+    implements _$$CustomListImplCopyWith<$Res> {
+  __$$CustomListImplCopyWithImpl(
+      _$CustomListImpl _value, $Res Function(_$CustomListImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+    Object? relationships = null,
+  }) {
+    return _then(_$CustomListImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as CustomListAttributes,
+      relationships: null == relationships
+          ? _value._relationships
+          : relationships // ignore: cast_nullable_to_non_nullable
+              as List<MangaDexEntity>,
+    ));
+  }
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CustomListAttributesCopyWith<$Res> get attributes {
+    return $CustomListAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value));
+    });
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CustomListImpl
+    with DiagnosticableTreeMixin, CustomListOps
+    implements CustomList {
+  _$CustomListImpl(
+      {required this.id,
+      required this.attributes,
+      required final List<MangaDexEntity> relationships,
+      final String? $type})
+      : _relationships = relationships,
+        $type = $type ?? 'custom_list';
+
+  factory _$CustomListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CustomListImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final CustomListAttributes attributes;
+  final List<MangaDexEntity> _relationships;
+  @override
+  List<MangaDexEntity> get relationships {
+    if (_relationships is EqualUnmodifiableListView) return _relationships;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_relationships);
+  }
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaDexEntity.customList(id: $id, attributes: $attributes, relationships: $relationships)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.customList'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('attributes', attributes))
+      ..add(DiagnosticsProperty('relationships', relationships));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CustomListImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.attributes, attributes) ||
+                other.attributes == attributes) &&
+            const DeepCollectionEquality()
+                .equals(other._relationships, _relationships));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, attributes,
+      const DeepCollectionEquality().hash(_relationships));
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
+      __$$CustomListImplCopyWithImpl<_$CustomListImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
+    required TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)
+        manga,
+    required TResult Function(String id, UserAttributes? attributes) user,
+    required TResult Function(String id, AuthorAttributes attributes) artist,
+    required TResult Function(String id, AuthorAttributes attributes) author,
+    required TResult Function(String id) creator,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
+    required TResult Function(String id, ScanlationGroupAttributes attributes)
+        group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
+  }) {
+    return customList(id, attributes, relationships);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult? Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult? Function(String id, UserAttributes? attributes)? user,
+    TResult? Function(String id, AuthorAttributes attributes)? artist,
+    TResult? Function(String id, AuthorAttributes attributes)? author,
+    TResult? Function(String id)? creator,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
+  }) {
+    return customList?.call(id, attributes, relationships);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult Function(String id, UserAttributes? attributes)? user,
+    TResult Function(String id, AuthorAttributes attributes)? artist,
+    TResult Function(String id, AuthorAttributes attributes)? author,
+    TResult Function(String id)? creator,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
+    required TResult orElse(),
+  }) {
+    if (customList != null) {
+      return customList(id, attributes, relationships);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
+    required TResult Function(Manga value) manga,
+    required TResult Function(User value) user,
+    required TResult Function(Artist value) artist,
+    required TResult Function(Author value) author,
+    required TResult Function(CreatorID value) creator,
+    required TResult Function(CoverArt value) cover,
+    required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
+  }) {
+    return customList(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
+    TResult? Function(Manga value)? manga,
+    TResult? Function(User value)? user,
+    TResult? Function(Artist value)? artist,
+    TResult? Function(Author value)? author,
+    TResult? Function(CreatorID value)? creator,
+    TResult? Function(CoverArt value)? cover,
+    TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
+  }) {
+    return customList?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
+    TResult Function(Manga value)? manga,
+    TResult Function(User value)? user,
+    TResult Function(Artist value)? artist,
+    TResult Function(Author value)? author,
+    TResult Function(CreatorID value)? creator,
+    TResult Function(CoverArt value)? cover,
+    TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
+    required TResult orElse(),
+  }) {
+    if (customList != null) {
+      return customList(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CustomListImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class CustomList implements MangaDexEntity, CustomListOps {
+  factory CustomList(
+      {required final String id,
+      required final CustomListAttributes attributes,
+      required final List<MangaDexEntity> relationships}) = _$CustomListImpl;
+
+  factory CustomList.fromJson(Map<String, dynamic> json) =
+      _$CustomListImpl.fromJson;
+
+  @override
+  String get id;
+  CustomListAttributes get attributes;
+  List<MangaDexEntity> get relationships;
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$MDErrorImplCopyWith<$Res>
+    implements $MangaDexEntityCopyWith<$Res> {
+  factory _$$MDErrorImplCopyWith(
+          _$MDErrorImpl value, $Res Function(_$MDErrorImpl) then) =
+      __$$MDErrorImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id, int status, String title, String? detail, String? context});
+}
+
+/// @nodoc
+class __$$MDErrorImplCopyWithImpl<$Res>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$MDErrorImpl>
+    implements _$$MDErrorImplCopyWith<$Res> {
+  __$$MDErrorImplCopyWithImpl(
+      _$MDErrorImpl _value, $Res Function(_$MDErrorImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? status = null,
+    Object? title = null,
+    Object? detail = freezed,
+    Object? context = freezed,
+  }) {
+    return _then(_$MDErrorImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as int,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      detail: freezed == detail
+          ? _value.detail
+          : detail // ignore: cast_nullable_to_non_nullable
+              as String?,
+      context: freezed == context
+          ? _value.context
+          : context // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MDErrorImpl with DiagnosticableTreeMixin implements MDError {
+  const _$MDErrorImpl(
+      {required this.id,
+      required this.status,
+      required this.title,
+      this.detail,
+      this.context,
+      final String? $type})
+      : $type = $type ?? 'error';
+
+  factory _$MDErrorImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MDErrorImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final int status;
+  @override
+  final String title;
+  @override
+  final String? detail;
+  @override
+  final String? context;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaDexEntity.error(id: $id, status: $status, title: $title, detail: $detail, context: $context)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.error'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('status', status))
+      ..add(DiagnosticsProperty('title', title))
+      ..add(DiagnosticsProperty('detail', detail))
+      ..add(DiagnosticsProperty('context', context));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MDErrorImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.detail, detail) || other.detail == detail) &&
+            (identical(other.context, context) || other.context == context));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, status, title, detail, context);
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
+      __$$MDErrorImplCopyWithImpl<_$MDErrorImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
+    required TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)
+        manga,
+    required TResult Function(String id, UserAttributes? attributes) user,
+    required TResult Function(String id, AuthorAttributes attributes) artist,
+    required TResult Function(String id, AuthorAttributes attributes) author,
+    required TResult Function(String id) creator,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
+    required TResult Function(String id, ScanlationGroupAttributes attributes)
+        group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
+  }) {
+    return error(id, status, title, detail, context);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult? Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult? Function(String id, UserAttributes? attributes)? user,
+    TResult? Function(String id, AuthorAttributes attributes)? artist,
+    TResult? Function(String id, AuthorAttributes attributes)? author,
+    TResult? Function(String id)? creator,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
+  }) {
+    return error?.call(id, status, title, detail, context);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult Function(String id, UserAttributes? attributes)? user,
+    TResult Function(String id, AuthorAttributes attributes)? artist,
+    TResult Function(String id, AuthorAttributes attributes)? author,
+    TResult Function(String id)? creator,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
+    required TResult orElse(),
+  }) {
+    if (error != null) {
+      return error(id, status, title, detail, context);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
+    required TResult Function(Manga value) manga,
+    required TResult Function(User value) user,
+    required TResult Function(Artist value) artist,
+    required TResult Function(Author value) author,
+    required TResult Function(CreatorID value) creator,
+    required TResult Function(CoverArt value) cover,
+    required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
+  }) {
+    return error(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
+    TResult? Function(Manga value)? manga,
+    TResult? Function(User value)? user,
+    TResult? Function(Artist value)? artist,
+    TResult? Function(Author value)? author,
+    TResult? Function(CreatorID value)? creator,
+    TResult? Function(CoverArt value)? cover,
+    TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
+  }) {
+    return error?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
+    TResult Function(Manga value)? manga,
+    TResult Function(User value)? user,
+    TResult Function(Artist value)? artist,
+    TResult Function(Author value)? author,
+    TResult Function(CreatorID value)? creator,
+    TResult Function(CoverArt value)? cover,
+    TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
+    required TResult orElse(),
+  }) {
+    if (error != null) {
+      return error(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MDErrorImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class MDError implements MangaDexEntity {
+  const factory MDError(
+      {required final String id,
+      required final int status,
+      required final String title,
+      final String? detail,
+      final String? context}) = _$MDErrorImpl;
+
+  factory MDError.fromJson(Map<String, dynamic> json) = _$MDErrorImpl.fromJson;
+
+  @override
+  String get id;
+  int get status;
+  String get title;
+  String? get detail;
+  String? get context;
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$TagImplCopyWith<$Res>
+    implements $MangaDexEntityCopyWith<$Res> {
+  factory _$$TagImplCopyWith(_$TagImpl value, $Res Function(_$TagImpl) then) =
+      __$$TagImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, TagAttributes attributes});
+
+  $TagAttributesCopyWith<$Res> get attributes;
+}
+
+/// @nodoc
+class __$$TagImplCopyWithImpl<$Res>
+    extends _$MangaDexEntityCopyWithImpl<$Res, _$TagImpl>
+    implements _$$TagImplCopyWith<$Res> {
+  __$$TagImplCopyWithImpl(_$TagImpl _value, $Res Function(_$TagImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? attributes = null,
+  }) {
+    return _then(_$TagImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      attributes: null == attributes
+          ? _value.attributes
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as TagAttributes,
+    ));
+  }
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagAttributesCopyWith<$Res> get attributes {
+    return $TagAttributesCopyWith<$Res>(_value.attributes, (value) {
+      return _then(_value.copyWith(attributes: value));
+    });
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TagImpl with DiagnosticableTreeMixin implements Tag {
+  const _$TagImpl(
+      {required this.id, required this.attributes, final String? $type})
+      : $type = $type ?? 'tag';
+
+  factory _$TagImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TagImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final TagAttributes attributes;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'MangaDexEntity.tag(id: $id, attributes: $attributes)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'MangaDexEntity.tag'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('attributes', attributes));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TagImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.attributes, attributes) ||
+                other.attributes == attributes));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, attributes);
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TagImplCopyWith<_$TagImpl> get copyWith =>
+      __$$TagImplCopyWithImpl<_$TagImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)
+        chapter,
+    required TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)
+        manga,
+    required TResult Function(String id, UserAttributes? attributes) user,
+    required TResult Function(String id, AuthorAttributes attributes) artist,
+    required TResult Function(String id, AuthorAttributes attributes) author,
+    required TResult Function(String id) creator,
+    required TResult Function(String id, CoverArtAttributes? attributes) cover,
+    required TResult Function(String id, ScanlationGroupAttributes attributes)
+        group,
+    required TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)
+        customList,
+    required TResult Function(String id, int status, String title,
+            String? detail, String? context)
+        error,
+    required TResult Function(String id, TagAttributes attributes) tag,
+  }) {
+    return tag(id, attributes);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult? Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult? Function(String id, UserAttributes? attributes)? user,
+    TResult? Function(String id, AuthorAttributes attributes)? artist,
+    TResult? Function(String id, AuthorAttributes attributes)? author,
+    TResult? Function(String id)? creator,
+    TResult? Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult? Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult? Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult? Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult? Function(String id, TagAttributes attributes)? tag,
+  }) {
+    return tag?.call(id, attributes);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, ChapterAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        chapter,
+    TResult Function(String id, MangaAttributes? attributes,
+            List<MangaDexEntity>? relationships, MangaRelations? related)?
+        manga,
+    TResult Function(String id, UserAttributes? attributes)? user,
+    TResult Function(String id, AuthorAttributes attributes)? artist,
+    TResult Function(String id, AuthorAttributes attributes)? author,
+    TResult Function(String id)? creator,
+    TResult Function(String id, CoverArtAttributes? attributes)? cover,
+    TResult Function(String id, ScanlationGroupAttributes attributes)? group,
+    TResult Function(String id, CustomListAttributes attributes,
+            List<MangaDexEntity> relationships)?
+        customList,
+    TResult Function(String id, int status, String title, String? detail,
+            String? context)?
+        error,
+    TResult Function(String id, TagAttributes attributes)? tag,
+    required TResult orElse(),
+  }) {
+    if (tag != null) {
+      return tag(id, attributes);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Chapter value) chapter,
+    required TResult Function(Manga value) manga,
+    required TResult Function(User value) user,
+    required TResult Function(Artist value) artist,
+    required TResult Function(Author value) author,
+    required TResult Function(CreatorID value) creator,
+    required TResult Function(CoverArt value) cover,
+    required TResult Function(Group value) group,
+    required TResult Function(CustomList value) customList,
+    required TResult Function(MDError value) error,
+    required TResult Function(Tag value) tag,
+  }) {
+    return tag(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Chapter value)? chapter,
+    TResult? Function(Manga value)? manga,
+    TResult? Function(User value)? user,
+    TResult? Function(Artist value)? artist,
+    TResult? Function(Author value)? author,
+    TResult? Function(CreatorID value)? creator,
+    TResult? Function(CoverArt value)? cover,
+    TResult? Function(Group value)? group,
+    TResult? Function(CustomList value)? customList,
+    TResult? Function(MDError value)? error,
+    TResult? Function(Tag value)? tag,
+  }) {
+    return tag?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Chapter value)? chapter,
+    TResult Function(Manga value)? manga,
+    TResult Function(User value)? user,
+    TResult Function(Artist value)? artist,
+    TResult Function(Author value)? author,
+    TResult Function(CreatorID value)? creator,
+    TResult Function(CoverArt value)? cover,
+    TResult Function(Group value)? group,
+    TResult Function(CustomList value)? customList,
+    TResult Function(MDError value)? error,
+    TResult Function(Tag value)? tag,
+    required TResult orElse(),
+  }) {
+    if (tag != null) {
+      return tag(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TagImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class Tag implements MangaDexEntity {
+  const factory Tag(
+      {required final String id,
+      required final TagAttributes attributes}) = _$TagImpl;
+
+  factory Tag.fromJson(Map<String, dynamic> json) = _$TagImpl.fromJson;
+
+  @override
+  String get id;
+  TagAttributes get attributes;
+
+  /// Create a copy of MangaDexEntity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$TagImplCopyWith<_$TagImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -6011,187 +5955,1354 @@ abstract class _MangaAttributes implements MangaAttributes {
       throw _privateConstructorUsedError;
 }
 
-Tag _$TagFromJson(Map<String, dynamic> json) {
-  return _Tag.fromJson(json);
+ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) {
+  return _ChapterAttributes.fromJson(json);
 }
 
 /// @nodoc
-mixin _$Tag {
-  String get id => throw _privateConstructorUsedError;
-  TagAttributes get attributes => throw _privateConstructorUsedError;
+mixin _$ChapterAttributes {
+  String? get title => throw _privateConstructorUsedError;
+  String? get volume => throw _privateConstructorUsedError;
+  String? get chapter => throw _privateConstructorUsedError;
+  @LanguageConverter()
+  Language get translatedLanguage => throw _privateConstructorUsedError;
+  String? get uploader => throw _privateConstructorUsedError;
+  String? get externalUrl => throw _privateConstructorUsedError;
+  int get version => throw _privateConstructorUsedError;
+  @TimestampSerializer()
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @TimestampSerializer()
+  DateTime get updatedAt => throw _privateConstructorUsedError;
+  @TimestampSerializer()
+  DateTime get publishAt => throw _privateConstructorUsedError;
 
-  /// Serializes this Tag to a JSON map.
+  /// Serializes this ChapterAttributes to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of Tag
+  /// Create a copy of ChapterAttributes
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $TagCopyWith<Tag> get copyWith => throw _privateConstructorUsedError;
+  $ChapterAttributesCopyWith<ChapterAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $TagCopyWith<$Res> {
-  factory $TagCopyWith(Tag value, $Res Function(Tag) then) =
-      _$TagCopyWithImpl<$Res, Tag>;
+abstract class $ChapterAttributesCopyWith<$Res> {
+  factory $ChapterAttributesCopyWith(
+          ChapterAttributes value, $Res Function(ChapterAttributes) then) =
+      _$ChapterAttributesCopyWithImpl<$Res, ChapterAttributes>;
   @useResult
-  $Res call({String id, TagAttributes attributes});
-
-  $TagAttributesCopyWith<$Res> get attributes;
+  $Res call(
+      {String? title,
+      String? volume,
+      String? chapter,
+      @LanguageConverter() Language translatedLanguage,
+      String? uploader,
+      String? externalUrl,
+      int version,
+      @TimestampSerializer() DateTime createdAt,
+      @TimestampSerializer() DateTime updatedAt,
+      @TimestampSerializer() DateTime publishAt});
 }
 
 /// @nodoc
-class _$TagCopyWithImpl<$Res, $Val extends Tag> implements $TagCopyWith<$Res> {
-  _$TagCopyWithImpl(this._value, this._then);
+class _$ChapterAttributesCopyWithImpl<$Res, $Val extends ChapterAttributes>
+    implements $ChapterAttributesCopyWith<$Res> {
+  _$ChapterAttributesCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Tag
+  /// Create a copy of ChapterAttributes
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? attributes = null,
+    Object? title = freezed,
+    Object? volume = freezed,
+    Object? chapter = freezed,
+    Object? translatedLanguage = null,
+    Object? uploader = freezed,
+    Object? externalUrl = freezed,
+    Object? version = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+    Object? publishAt = null,
   }) {
     return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      attributes: null == attributes
-          ? _value.attributes
-          : attributes // ignore: cast_nullable_to_non_nullable
-              as TagAttributes,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      volume: freezed == volume
+          ? _value.volume
+          : volume // ignore: cast_nullable_to_non_nullable
+              as String?,
+      chapter: freezed == chapter
+          ? _value.chapter
+          : chapter // ignore: cast_nullable_to_non_nullable
+              as String?,
+      translatedLanguage: null == translatedLanguage
+          ? _value.translatedLanguage
+          : translatedLanguage // ignore: cast_nullable_to_non_nullable
+              as Language,
+      uploader: freezed == uploader
+          ? _value.uploader
+          : uploader // ignore: cast_nullable_to_non_nullable
+              as String?,
+      externalUrl: freezed == externalUrl
+          ? _value.externalUrl
+          : externalUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      publishAt: null == publishAt
+          ? _value.publishAt
+          : publishAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
-
-  /// Create a copy of Tag
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $TagAttributesCopyWith<$Res> get attributes {
-    return $TagAttributesCopyWith<$Res>(_value.attributes, (value) {
-      return _then(_value.copyWith(attributes: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
-abstract class _$$TagImplCopyWith<$Res> implements $TagCopyWith<$Res> {
-  factory _$$TagImplCopyWith(_$TagImpl value, $Res Function(_$TagImpl) then) =
-      __$$TagImplCopyWithImpl<$Res>;
+abstract class _$$ChapterAttributesImplCopyWith<$Res>
+    implements $ChapterAttributesCopyWith<$Res> {
+  factory _$$ChapterAttributesImplCopyWith(_$ChapterAttributesImpl value,
+          $Res Function(_$ChapterAttributesImpl) then) =
+      __$$ChapterAttributesImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, TagAttributes attributes});
-
-  @override
-  $TagAttributesCopyWith<$Res> get attributes;
+  $Res call(
+      {String? title,
+      String? volume,
+      String? chapter,
+      @LanguageConverter() Language translatedLanguage,
+      String? uploader,
+      String? externalUrl,
+      int version,
+      @TimestampSerializer() DateTime createdAt,
+      @TimestampSerializer() DateTime updatedAt,
+      @TimestampSerializer() DateTime publishAt});
 }
 
 /// @nodoc
-class __$$TagImplCopyWithImpl<$Res> extends _$TagCopyWithImpl<$Res, _$TagImpl>
-    implements _$$TagImplCopyWith<$Res> {
-  __$$TagImplCopyWithImpl(_$TagImpl _value, $Res Function(_$TagImpl) _then)
+class __$$ChapterAttributesImplCopyWithImpl<$Res>
+    extends _$ChapterAttributesCopyWithImpl<$Res, _$ChapterAttributesImpl>
+    implements _$$ChapterAttributesImplCopyWith<$Res> {
+  __$$ChapterAttributesImplCopyWithImpl(_$ChapterAttributesImpl _value,
+      $Res Function(_$ChapterAttributesImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Tag
+  /// Create a copy of ChapterAttributes
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? attributes = null,
+    Object? title = freezed,
+    Object? volume = freezed,
+    Object? chapter = freezed,
+    Object? translatedLanguage = null,
+    Object? uploader = freezed,
+    Object? externalUrl = freezed,
+    Object? version = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+    Object? publishAt = null,
   }) {
-    return _then(_$TagImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      attributes: null == attributes
-          ? _value.attributes
-          : attributes // ignore: cast_nullable_to_non_nullable
-              as TagAttributes,
+    return _then(_$ChapterAttributesImpl(
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      volume: freezed == volume
+          ? _value.volume
+          : volume // ignore: cast_nullable_to_non_nullable
+              as String?,
+      chapter: freezed == chapter
+          ? _value.chapter
+          : chapter // ignore: cast_nullable_to_non_nullable
+              as String?,
+      translatedLanguage: null == translatedLanguage
+          ? _value.translatedLanguage
+          : translatedLanguage // ignore: cast_nullable_to_non_nullable
+              as Language,
+      uploader: freezed == uploader
+          ? _value.uploader
+          : uploader // ignore: cast_nullable_to_non_nullable
+              as String?,
+      externalUrl: freezed == externalUrl
+          ? _value.externalUrl
+          : externalUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      publishAt: null == publishAt
+          ? _value.publishAt
+          : publishAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$TagImpl with DiagnosticableTreeMixin implements _Tag {
-  const _$TagImpl({required this.id, required this.attributes});
+class _$ChapterAttributesImpl
+    with DiagnosticableTreeMixin
+    implements _ChapterAttributes {
+  const _$ChapterAttributesImpl(
+      {this.title,
+      this.volume,
+      this.chapter,
+      @LanguageConverter() required this.translatedLanguage,
+      this.uploader,
+      this.externalUrl,
+      required this.version,
+      @TimestampSerializer() required this.createdAt,
+      @TimestampSerializer() required this.updatedAt,
+      @TimestampSerializer() required this.publishAt});
 
-  factory _$TagImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TagImplFromJson(json);
+  factory _$ChapterAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterAttributesImplFromJson(json);
 
   @override
-  final String id;
+  final String? title;
   @override
-  final TagAttributes attributes;
+  final String? volume;
+  @override
+  final String? chapter;
+  @override
+  @LanguageConverter()
+  final Language translatedLanguage;
+  @override
+  final String? uploader;
+  @override
+  final String? externalUrl;
+  @override
+  final int version;
+  @override
+  @TimestampSerializer()
+  final DateTime createdAt;
+  @override
+  @TimestampSerializer()
+  final DateTime updatedAt;
+  @override
+  @TimestampSerializer()
+  final DateTime publishAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Tag(id: $id, attributes: $attributes)';
+    return 'ChapterAttributes(title: $title, volume: $volume, chapter: $chapter, translatedLanguage: $translatedLanguage, uploader: $uploader, externalUrl: $externalUrl, version: $version, createdAt: $createdAt, updatedAt: $updatedAt, publishAt: $publishAt)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Tag'))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('attributes', attributes));
+      ..add(DiagnosticsProperty('type', 'ChapterAttributes'))
+      ..add(DiagnosticsProperty('title', title))
+      ..add(DiagnosticsProperty('volume', volume))
+      ..add(DiagnosticsProperty('chapter', chapter))
+      ..add(DiagnosticsProperty('translatedLanguage', translatedLanguage))
+      ..add(DiagnosticsProperty('uploader', uploader))
+      ..add(DiagnosticsProperty('externalUrl', externalUrl))
+      ..add(DiagnosticsProperty('version', version))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('publishAt', publishAt));
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$TagImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes));
+            other is _$ChapterAttributesImpl &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.volume, volume) || other.volume == volume) &&
+            (identical(other.chapter, chapter) || other.chapter == chapter) &&
+            (identical(other.translatedLanguage, translatedLanguage) ||
+                other.translatedLanguage == translatedLanguage) &&
+            (identical(other.uploader, uploader) ||
+                other.uploader == uploader) &&
+            (identical(other.externalUrl, externalUrl) ||
+                other.externalUrl == externalUrl) &&
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.publishAt, publishAt) ||
+                other.publishAt == publishAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, attributes);
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      volume,
+      chapter,
+      translatedLanguage,
+      uploader,
+      externalUrl,
+      version,
+      createdAt,
+      updatedAt,
+      publishAt);
 
-  /// Create a copy of Tag
+  /// Create a copy of ChapterAttributes
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$TagImplCopyWith<_$TagImpl> get copyWith =>
-      __$$TagImplCopyWithImpl<_$TagImpl>(this, _$identity);
+  _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
+      __$$ChapterAttributesImplCopyWithImpl<_$ChapterAttributesImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$TagImplToJson(
+    return _$$ChapterAttributesImplToJson(
       this,
     );
   }
 }
 
-abstract class _Tag implements Tag {
-  const factory _Tag(
-      {required final String id,
-      required final TagAttributes attributes}) = _$TagImpl;
+abstract class _ChapterAttributes implements ChapterAttributes {
+  const factory _ChapterAttributes(
+          {final String? title,
+          final String? volume,
+          final String? chapter,
+          @LanguageConverter() required final Language translatedLanguage,
+          final String? uploader,
+          final String? externalUrl,
+          required final int version,
+          @TimestampSerializer() required final DateTime createdAt,
+          @TimestampSerializer() required final DateTime updatedAt,
+          @TimestampSerializer() required final DateTime publishAt}) =
+      _$ChapterAttributesImpl;
 
-  factory _Tag.fromJson(Map<String, dynamic> json) = _$TagImpl.fromJson;
+  factory _ChapterAttributes.fromJson(Map<String, dynamic> json) =
+      _$ChapterAttributesImpl.fromJson;
 
   @override
-  String get id;
+  String? get title;
   @override
-  TagAttributes get attributes;
+  String? get volume;
+  @override
+  String? get chapter;
+  @override
+  @LanguageConverter()
+  Language get translatedLanguage;
+  @override
+  String? get uploader;
+  @override
+  String? get externalUrl;
+  @override
+  int get version;
+  @override
+  @TimestampSerializer()
+  DateTime get createdAt;
+  @override
+  @TimestampSerializer()
+  DateTime get updatedAt;
+  @override
+  @TimestampSerializer()
+  DateTime get publishAt;
 
-  /// Create a copy of Tag
+  /// Create a copy of ChapterAttributes
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TagImplCopyWith<_$TagImpl> get copyWith =>
+  _$$ChapterAttributesImplCopyWith<_$ChapterAttributesImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ScanlationGroupAttributes _$ScanlationGroupAttributesFromJson(
+    Map<String, dynamic> json) {
+  return _ScanlationGroupAttributes.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ScanlationGroupAttributes {
+  String get name => throw _privateConstructorUsedError;
+  String? get website => throw _privateConstructorUsedError;
+  String? get discord => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+
+  /// Serializes this ScanlationGroupAttributes to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ScanlationGroupAttributesCopyWith<ScanlationGroupAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ScanlationGroupAttributesCopyWith<$Res> {
+  factory $ScanlationGroupAttributesCopyWith(ScanlationGroupAttributes value,
+          $Res Function(ScanlationGroupAttributes) then) =
+      _$ScanlationGroupAttributesCopyWithImpl<$Res, ScanlationGroupAttributes>;
+  @useResult
+  $Res call(
+      {String name, String? website, String? discord, String? description});
+}
+
+/// @nodoc
+class _$ScanlationGroupAttributesCopyWithImpl<$Res,
+        $Val extends ScanlationGroupAttributes>
+    implements $ScanlationGroupAttributesCopyWith<$Res> {
+  _$ScanlationGroupAttributesCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? website = freezed,
+    Object? discord = freezed,
+    Object? description = freezed,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      discord: freezed == discord
+          ? _value.discord
+          : discord // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ScanlationGroupAttributesImplCopyWith<$Res>
+    implements $ScanlationGroupAttributesCopyWith<$Res> {
+  factory _$$ScanlationGroupAttributesImplCopyWith(
+          _$ScanlationGroupAttributesImpl value,
+          $Res Function(_$ScanlationGroupAttributesImpl) then) =
+      __$$ScanlationGroupAttributesImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String name, String? website, String? discord, String? description});
+}
+
+/// @nodoc
+class __$$ScanlationGroupAttributesImplCopyWithImpl<$Res>
+    extends _$ScanlationGroupAttributesCopyWithImpl<$Res,
+        _$ScanlationGroupAttributesImpl>
+    implements _$$ScanlationGroupAttributesImplCopyWith<$Res> {
+  __$$ScanlationGroupAttributesImplCopyWithImpl(
+      _$ScanlationGroupAttributesImpl _value,
+      $Res Function(_$ScanlationGroupAttributesImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? website = freezed,
+    Object? discord = freezed,
+    Object? description = freezed,
+  }) {
+    return _then(_$ScanlationGroupAttributesImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      discord: freezed == discord
+          ? _value.discord
+          : discord // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ScanlationGroupAttributesImpl
+    with DiagnosticableTreeMixin
+    implements _ScanlationGroupAttributes {
+  const _$ScanlationGroupAttributesImpl(
+      {required this.name, this.website, this.discord, this.description});
+
+  factory _$ScanlationGroupAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ScanlationGroupAttributesImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String? website;
+  @override
+  final String? discord;
+  @override
+  final String? description;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ScanlationGroupAttributes(name: $name, website: $website, discord: $discord, description: $description)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ScanlationGroupAttributes'))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('website', website))
+      ..add(DiagnosticsProperty('discord', discord))
+      ..add(DiagnosticsProperty('description', description));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ScanlationGroupAttributesImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.website, website) || other.website == website) &&
+            (identical(other.discord, discord) || other.discord == discord) &&
+            (identical(other.description, description) ||
+                other.description == description));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, name, website, discord, description);
+
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
+      get copyWith => __$$ScanlationGroupAttributesImplCopyWithImpl<
+          _$ScanlationGroupAttributesImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ScanlationGroupAttributesImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ScanlationGroupAttributes implements ScanlationGroupAttributes {
+  const factory _ScanlationGroupAttributes(
+      {required final String name,
+      final String? website,
+      final String? discord,
+      final String? description}) = _$ScanlationGroupAttributesImpl;
+
+  factory _ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) =
+      _$ScanlationGroupAttributesImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String? get website;
+  @override
+  String? get discord;
+  @override
+  String? get description;
+
+  /// Create a copy of ScanlationGroupAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ScanlationGroupAttributesImplCopyWith<_$ScanlationGroupAttributesImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+CoverArtAttributes _$CoverArtAttributesFromJson(Map<String, dynamic> json) {
+  return _CoverArtAttributes.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CoverArtAttributes {
+  String? get volume => throw _privateConstructorUsedError;
+  String get fileName => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  String? get locale => throw _privateConstructorUsedError;
+
+  /// Serializes this CoverArtAttributes to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $CoverArtAttributesCopyWith<CoverArtAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CoverArtAttributesCopyWith<$Res> {
+  factory $CoverArtAttributesCopyWith(
+          CoverArtAttributes value, $Res Function(CoverArtAttributes) then) =
+      _$CoverArtAttributesCopyWithImpl<$Res, CoverArtAttributes>;
+  @useResult
+  $Res call(
+      {String? volume, String fileName, String? description, String? locale});
+}
+
+/// @nodoc
+class _$CoverArtAttributesCopyWithImpl<$Res, $Val extends CoverArtAttributes>
+    implements $CoverArtAttributesCopyWith<$Res> {
+  _$CoverArtAttributesCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? volume = freezed,
+    Object? fileName = null,
+    Object? description = freezed,
+    Object? locale = freezed,
+  }) {
+    return _then(_value.copyWith(
+      volume: freezed == volume
+          ? _value.volume
+          : volume // ignore: cast_nullable_to_non_nullable
+              as String?,
+      fileName: null == fileName
+          ? _value.fileName
+          : fileName // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      locale: freezed == locale
+          ? _value.locale
+          : locale // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CoverArtAttributesImplCopyWith<$Res>
+    implements $CoverArtAttributesCopyWith<$Res> {
+  factory _$$CoverArtAttributesImplCopyWith(_$CoverArtAttributesImpl value,
+          $Res Function(_$CoverArtAttributesImpl) then) =
+      __$$CoverArtAttributesImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? volume, String fileName, String? description, String? locale});
+}
+
+/// @nodoc
+class __$$CoverArtAttributesImplCopyWithImpl<$Res>
+    extends _$CoverArtAttributesCopyWithImpl<$Res, _$CoverArtAttributesImpl>
+    implements _$$CoverArtAttributesImplCopyWith<$Res> {
+  __$$CoverArtAttributesImplCopyWithImpl(_$CoverArtAttributesImpl _value,
+      $Res Function(_$CoverArtAttributesImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? volume = freezed,
+    Object? fileName = null,
+    Object? description = freezed,
+    Object? locale = freezed,
+  }) {
+    return _then(_$CoverArtAttributesImpl(
+      volume: freezed == volume
+          ? _value.volume
+          : volume // ignore: cast_nullable_to_non_nullable
+              as String?,
+      fileName: null == fileName
+          ? _value.fileName
+          : fileName // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      locale: freezed == locale
+          ? _value.locale
+          : locale // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CoverArtAttributesImpl
+    with DiagnosticableTreeMixin
+    implements _CoverArtAttributes {
+  const _$CoverArtAttributesImpl(
+      {this.volume, required this.fileName, this.description, this.locale});
+
+  factory _$CoverArtAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CoverArtAttributesImplFromJson(json);
+
+  @override
+  final String? volume;
+  @override
+  final String fileName;
+  @override
+  final String? description;
+  @override
+  final String? locale;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'CoverArtAttributes(volume: $volume, fileName: $fileName, description: $description, locale: $locale)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CoverArtAttributes'))
+      ..add(DiagnosticsProperty('volume', volume))
+      ..add(DiagnosticsProperty('fileName', fileName))
+      ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('locale', locale));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CoverArtAttributesImpl &&
+            (identical(other.volume, volume) || other.volume == volume) &&
+            (identical(other.fileName, fileName) ||
+                other.fileName == fileName) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.locale, locale) || other.locale == locale));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, volume, fileName, description, locale);
+
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
+      __$$CoverArtAttributesImplCopyWithImpl<_$CoverArtAttributesImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CoverArtAttributesImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CoverArtAttributes implements CoverArtAttributes {
+  const factory _CoverArtAttributes(
+      {final String? volume,
+      required final String fileName,
+      final String? description,
+      final String? locale}) = _$CoverArtAttributesImpl;
+
+  factory _CoverArtAttributes.fromJson(Map<String, dynamic> json) =
+      _$CoverArtAttributesImpl.fromJson;
+
+  @override
+  String? get volume;
+  @override
+  String get fileName;
+  @override
+  String? get description;
+  @override
+  String? get locale;
+
+  /// Create a copy of CoverArtAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CoverArtAttributesImplCopyWith<_$CoverArtAttributesImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+UserAttributes _$UserAttributesFromJson(Map<String, dynamic> json) {
+  return _UserAttributes.fromJson(json);
+}
+
+/// @nodoc
+mixin _$UserAttributes {
+  String get username => throw _privateConstructorUsedError;
+
+  /// Serializes this UserAttributes to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $UserAttributesCopyWith<UserAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserAttributesCopyWith<$Res> {
+  factory $UserAttributesCopyWith(
+          UserAttributes value, $Res Function(UserAttributes) then) =
+      _$UserAttributesCopyWithImpl<$Res, UserAttributes>;
+  @useResult
+  $Res call({String username});
+}
+
+/// @nodoc
+class _$UserAttributesCopyWithImpl<$Res, $Val extends UserAttributes>
+    implements $UserAttributesCopyWith<$Res> {
+  _$UserAttributesCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? username = null,
+  }) {
+    return _then(_value.copyWith(
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UserAttributesImplCopyWith<$Res>
+    implements $UserAttributesCopyWith<$Res> {
+  factory _$$UserAttributesImplCopyWith(_$UserAttributesImpl value,
+          $Res Function(_$UserAttributesImpl) then) =
+      __$$UserAttributesImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String username});
+}
+
+/// @nodoc
+class __$$UserAttributesImplCopyWithImpl<$Res>
+    extends _$UserAttributesCopyWithImpl<$Res, _$UserAttributesImpl>
+    implements _$$UserAttributesImplCopyWith<$Res> {
+  __$$UserAttributesImplCopyWithImpl(
+      _$UserAttributesImpl _value, $Res Function(_$UserAttributesImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? username = null,
+  }) {
+    return _then(_$UserAttributesImpl(
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$UserAttributesImpl
+    with DiagnosticableTreeMixin
+    implements _UserAttributes {
+  const _$UserAttributesImpl({required this.username});
+
+  factory _$UserAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserAttributesImplFromJson(json);
+
+  @override
+  final String username;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'UserAttributes(username: $username)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserAttributes'))
+      ..add(DiagnosticsProperty('username', username));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserAttributesImpl &&
+            (identical(other.username, username) ||
+                other.username == username));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, username);
+
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
+      __$$UserAttributesImplCopyWithImpl<_$UserAttributesImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$UserAttributesImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _UserAttributes implements UserAttributes {
+  const factory _UserAttributes({required final String username}) =
+      _$UserAttributesImpl;
+
+  factory _UserAttributes.fromJson(Map<String, dynamic> json) =
+      _$UserAttributesImpl.fromJson;
+
+  @override
+  String get username;
+
+  /// Create a copy of UserAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UserAttributesImplCopyWith<_$UserAttributesImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+AuthorAttributes _$AuthorAttributesFromJson(Map<String, dynamic> json) {
+  return _AuthorAttributes.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AuthorAttributes {
+  String get name => throw _privateConstructorUsedError;
+  String? get imageUrl => throw _privateConstructorUsedError;
+  Map<String, String> get biography => throw _privateConstructorUsedError;
+  String? get twitter => throw _privateConstructorUsedError;
+  String? get pixiv => throw _privateConstructorUsedError;
+  String? get youtube => throw _privateConstructorUsedError;
+  String? get website => throw _privateConstructorUsedError;
+  @TimestampSerializer()
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @TimestampSerializer()
+  DateTime get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this AuthorAttributes to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $AuthorAttributesCopyWith<AuthorAttributes> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AuthorAttributesCopyWith<$Res> {
+  factory $AuthorAttributesCopyWith(
+          AuthorAttributes value, $Res Function(AuthorAttributes) then) =
+      _$AuthorAttributesCopyWithImpl<$Res, AuthorAttributes>;
+  @useResult
+  $Res call(
+      {String name,
+      String? imageUrl,
+      Map<String, String> biography,
+      String? twitter,
+      String? pixiv,
+      String? youtube,
+      String? website,
+      @TimestampSerializer() DateTime createdAt,
+      @TimestampSerializer() DateTime updatedAt});
+}
+
+/// @nodoc
+class _$AuthorAttributesCopyWithImpl<$Res, $Val extends AuthorAttributes>
+    implements $AuthorAttributesCopyWith<$Res> {
+  _$AuthorAttributesCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? imageUrl = freezed,
+    Object? biography = null,
+    Object? twitter = freezed,
+    Object? pixiv = freezed,
+    Object? youtube = freezed,
+    Object? website = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      biography: null == biography
+          ? _value.biography
+          : biography // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+      twitter: freezed == twitter
+          ? _value.twitter
+          : twitter // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pixiv: freezed == pixiv
+          ? _value.pixiv
+          : pixiv // ignore: cast_nullable_to_non_nullable
+              as String?,
+      youtube: freezed == youtube
+          ? _value.youtube
+          : youtube // ignore: cast_nullable_to_non_nullable
+              as String?,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AuthorAttributesImplCopyWith<$Res>
+    implements $AuthorAttributesCopyWith<$Res> {
+  factory _$$AuthorAttributesImplCopyWith(_$AuthorAttributesImpl value,
+          $Res Function(_$AuthorAttributesImpl) then) =
+      __$$AuthorAttributesImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String name,
+      String? imageUrl,
+      Map<String, String> biography,
+      String? twitter,
+      String? pixiv,
+      String? youtube,
+      String? website,
+      @TimestampSerializer() DateTime createdAt,
+      @TimestampSerializer() DateTime updatedAt});
+}
+
+/// @nodoc
+class __$$AuthorAttributesImplCopyWithImpl<$Res>
+    extends _$AuthorAttributesCopyWithImpl<$Res, _$AuthorAttributesImpl>
+    implements _$$AuthorAttributesImplCopyWith<$Res> {
+  __$$AuthorAttributesImplCopyWithImpl(_$AuthorAttributesImpl _value,
+      $Res Function(_$AuthorAttributesImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? imageUrl = freezed,
+    Object? biography = null,
+    Object? twitter = freezed,
+    Object? pixiv = freezed,
+    Object? youtube = freezed,
+    Object? website = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_$AuthorAttributesImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      biography: null == biography
+          ? _value._biography
+          : biography // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+      twitter: freezed == twitter
+          ? _value.twitter
+          : twitter // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pixiv: freezed == pixiv
+          ? _value.pixiv
+          : pixiv // ignore: cast_nullable_to_non_nullable
+              as String?,
+      youtube: freezed == youtube
+          ? _value.youtube
+          : youtube // ignore: cast_nullable_to_non_nullable
+              as String?,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AuthorAttributesImpl
+    with DiagnosticableTreeMixin
+    implements _AuthorAttributes {
+  const _$AuthorAttributesImpl(
+      {required this.name,
+      this.imageUrl,
+      required final Map<String, String> biography,
+      this.twitter,
+      this.pixiv,
+      this.youtube,
+      this.website,
+      @TimestampSerializer() required this.createdAt,
+      @TimestampSerializer() required this.updatedAt})
+      : _biography = biography;
+
+  factory _$AuthorAttributesImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AuthorAttributesImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String? imageUrl;
+  final Map<String, String> _biography;
+  @override
+  Map<String, String> get biography {
+    if (_biography is EqualUnmodifiableMapView) return _biography;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_biography);
+  }
+
+  @override
+  final String? twitter;
+  @override
+  final String? pixiv;
+  @override
+  final String? youtube;
+  @override
+  final String? website;
+  @override
+  @TimestampSerializer()
+  final DateTime createdAt;
+  @override
+  @TimestampSerializer()
+  final DateTime updatedAt;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'AuthorAttributes(name: $name, imageUrl: $imageUrl, biography: $biography, twitter: $twitter, pixiv: $pixiv, youtube: $youtube, website: $website, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'AuthorAttributes'))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('imageUrl', imageUrl))
+      ..add(DiagnosticsProperty('biography', biography))
+      ..add(DiagnosticsProperty('twitter', twitter))
+      ..add(DiagnosticsProperty('pixiv', pixiv))
+      ..add(DiagnosticsProperty('youtube', youtube))
+      ..add(DiagnosticsProperty('website', website))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AuthorAttributesImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
+            const DeepCollectionEquality()
+                .equals(other._biography, _biography) &&
+            (identical(other.twitter, twitter) || other.twitter == twitter) &&
+            (identical(other.pixiv, pixiv) || other.pixiv == pixiv) &&
+            (identical(other.youtube, youtube) || other.youtube == youtube) &&
+            (identical(other.website, website) || other.website == website) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      name,
+      imageUrl,
+      const DeepCollectionEquality().hash(_biography),
+      twitter,
+      pixiv,
+      youtube,
+      website,
+      createdAt,
+      updatedAt);
+
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
+      __$$AuthorAttributesImplCopyWithImpl<_$AuthorAttributesImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AuthorAttributesImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _AuthorAttributes implements AuthorAttributes {
+  const factory _AuthorAttributes(
+          {required final String name,
+          final String? imageUrl,
+          required final Map<String, String> biography,
+          final String? twitter,
+          final String? pixiv,
+          final String? youtube,
+          final String? website,
+          @TimestampSerializer() required final DateTime createdAt,
+          @TimestampSerializer() required final DateTime updatedAt}) =
+      _$AuthorAttributesImpl;
+
+  factory _AuthorAttributes.fromJson(Map<String, dynamic> json) =
+      _$AuthorAttributesImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String? get imageUrl;
+  @override
+  Map<String, String> get biography;
+  @override
+  String? get twitter;
+  @override
+  String? get pixiv;
+  @override
+  String? get youtube;
+  @override
+  String? get website;
+  @override
+  @TimestampSerializer()
+  DateTime get createdAt;
+  @override
+  @TimestampSerializer()
+  DateTime get updatedAt;
+
+  /// Create a copy of AuthorAttributes
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$AuthorAttributesImplCopyWith<_$AuthorAttributesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -8283,235 +9394,6 @@ abstract class _CustomListList implements CustomListList {
       throw _privateConstructorUsedError;
 }
 
-CustomList _$CustomListFromJson(Map<String, dynamic> json) {
-  return _CustomList.fromJson(json);
-}
-
-/// @nodoc
-mixin _$CustomList {
-  String get id => throw _privateConstructorUsedError;
-  CustomListAttributes get attributes => throw _privateConstructorUsedError;
-  List<Relationship> get relationships => throw _privateConstructorUsedError;
-
-  /// Serializes this CustomList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CustomList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CustomListCopyWith<CustomList> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $CustomListCopyWith<$Res> {
-  factory $CustomListCopyWith(
-          CustomList value, $Res Function(CustomList) then) =
-      _$CustomListCopyWithImpl<$Res, CustomList>;
-  @useResult
-  $Res call(
-      {String id,
-      CustomListAttributes attributes,
-      List<Relationship> relationships});
-
-  $CustomListAttributesCopyWith<$Res> get attributes;
-}
-
-/// @nodoc
-class _$CustomListCopyWithImpl<$Res, $Val extends CustomList>
-    implements $CustomListCopyWith<$Res> {
-  _$CustomListCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of CustomList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? attributes = null,
-    Object? relationships = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      attributes: null == attributes
-          ? _value.attributes
-          : attributes // ignore: cast_nullable_to_non_nullable
-              as CustomListAttributes,
-      relationships: null == relationships
-          ? _value.relationships
-          : relationships // ignore: cast_nullable_to_non_nullable
-              as List<Relationship>,
-    ) as $Val);
-  }
-
-  /// Create a copy of CustomList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $CustomListAttributesCopyWith<$Res> get attributes {
-    return $CustomListAttributesCopyWith<$Res>(_value.attributes, (value) {
-      return _then(_value.copyWith(attributes: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$CustomListImplCopyWith<$Res>
-    implements $CustomListCopyWith<$Res> {
-  factory _$$CustomListImplCopyWith(
-          _$CustomListImpl value, $Res Function(_$CustomListImpl) then) =
-      __$$CustomListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      CustomListAttributes attributes,
-      List<Relationship> relationships});
-
-  @override
-  $CustomListAttributesCopyWith<$Res> get attributes;
-}
-
-/// @nodoc
-class __$$CustomListImplCopyWithImpl<$Res>
-    extends _$CustomListCopyWithImpl<$Res, _$CustomListImpl>
-    implements _$$CustomListImplCopyWith<$Res> {
-  __$$CustomListImplCopyWithImpl(
-      _$CustomListImpl _value, $Res Function(_$CustomListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of CustomList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? attributes = null,
-    Object? relationships = null,
-  }) {
-    return _then(_$CustomListImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      attributes: null == attributes
-          ? _value.attributes
-          : attributes // ignore: cast_nullable_to_non_nullable
-              as CustomListAttributes,
-      relationships: null == relationships
-          ? _value._relationships
-          : relationships // ignore: cast_nullable_to_non_nullable
-              as List<Relationship>,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$CustomListImpl extends _CustomList with DiagnosticableTreeMixin {
-  _$CustomListImpl(
-      {required this.id,
-      required this.attributes,
-      required final List<Relationship> relationships})
-      : _relationships = relationships,
-        super._();
-
-  factory _$CustomListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CustomListImplFromJson(json);
-
-  @override
-  final String id;
-  @override
-  final CustomListAttributes attributes;
-  final List<Relationship> _relationships;
-  @override
-  List<Relationship> get relationships {
-    if (_relationships is EqualUnmodifiableListView) return _relationships;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_relationships);
-  }
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CustomList(id: $id, attributes: $attributes, relationships: $relationships)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'CustomList'))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('attributes', attributes))
-      ..add(DiagnosticsProperty('relationships', relationships));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CustomListImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.attributes, attributes) ||
-                other.attributes == attributes) &&
-            const DeepCollectionEquality()
-                .equals(other._relationships, _relationships));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, attributes,
-      const DeepCollectionEquality().hash(_relationships));
-
-  /// Create a copy of CustomList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
-      __$$CustomListImplCopyWithImpl<_$CustomListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$CustomListImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _CustomList extends CustomList {
-  factory _CustomList(
-      {required final String id,
-      required final CustomListAttributes attributes,
-      required final List<Relationship> relationships}) = _$CustomListImpl;
-  _CustomList._() : super._();
-
-  factory _CustomList.fromJson(Map<String, dynamic> json) =
-      _$CustomListImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  CustomListAttributes get attributes;
-  @override
-  List<Relationship> get relationships;
-
-  /// Create a copy of CustomList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CustomListImplCopyWith<_$CustomListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
 CustomListAttributes _$CustomListAttributesFromJson(Map<String, dynamic> json) {
   return _CustomListAttributes.fromJson(json);
 }
@@ -8894,239 +9776,5 @@ abstract class _ErrorResponse implements ErrorResponse {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ErrorResponseImplCopyWith<_$ErrorResponseImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-MDError _$MDErrorFromJson(Map<String, dynamic> json) {
-  return _MDError.fromJson(json);
-}
-
-/// @nodoc
-mixin _$MDError {
-  String get id => throw _privateConstructorUsedError;
-  int get status => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String? get detail => throw _privateConstructorUsedError;
-  String? get context => throw _privateConstructorUsedError;
-
-  /// Serializes this MDError to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of MDError
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $MDErrorCopyWith<MDError> get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $MDErrorCopyWith<$Res> {
-  factory $MDErrorCopyWith(MDError value, $Res Function(MDError) then) =
-      _$MDErrorCopyWithImpl<$Res, MDError>;
-  @useResult
-  $Res call(
-      {String id, int status, String title, String? detail, String? context});
-}
-
-/// @nodoc
-class _$MDErrorCopyWithImpl<$Res, $Val extends MDError>
-    implements $MDErrorCopyWith<$Res> {
-  _$MDErrorCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of MDError
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? status = null,
-    Object? title = null,
-    Object? detail = freezed,
-    Object? context = freezed,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as int,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      detail: freezed == detail
-          ? _value.detail
-          : detail // ignore: cast_nullable_to_non_nullable
-              as String?,
-      context: freezed == context
-          ? _value.context
-          : context // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$MDErrorImplCopyWith<$Res> implements $MDErrorCopyWith<$Res> {
-  factory _$$MDErrorImplCopyWith(
-          _$MDErrorImpl value, $Res Function(_$MDErrorImpl) then) =
-      __$$MDErrorImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id, int status, String title, String? detail, String? context});
-}
-
-/// @nodoc
-class __$$MDErrorImplCopyWithImpl<$Res>
-    extends _$MDErrorCopyWithImpl<$Res, _$MDErrorImpl>
-    implements _$$MDErrorImplCopyWith<$Res> {
-  __$$MDErrorImplCopyWithImpl(
-      _$MDErrorImpl _value, $Res Function(_$MDErrorImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of MDError
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? status = null,
-    Object? title = null,
-    Object? detail = freezed,
-    Object? context = freezed,
-  }) {
-    return _then(_$MDErrorImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as int,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      detail: freezed == detail
-          ? _value.detail
-          : detail // ignore: cast_nullable_to_non_nullable
-              as String?,
-      context: freezed == context
-          ? _value.context
-          : context // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$MDErrorImpl with DiagnosticableTreeMixin implements _MDError {
-  const _$MDErrorImpl(
-      {required this.id,
-      required this.status,
-      required this.title,
-      this.detail,
-      this.context});
-
-  factory _$MDErrorImpl.fromJson(Map<String, dynamic> json) =>
-      _$$MDErrorImplFromJson(json);
-
-  @override
-  final String id;
-  @override
-  final int status;
-  @override
-  final String title;
-  @override
-  final String? detail;
-  @override
-  final String? context;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'MDError(id: $id, status: $status, title: $title, detail: $detail, context: $context)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'MDError'))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('status', status))
-      ..add(DiagnosticsProperty('title', title))
-      ..add(DiagnosticsProperty('detail', detail))
-      ..add(DiagnosticsProperty('context', context));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$MDErrorImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.status, status) || other.status == status) &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.detail, detail) || other.detail == detail) &&
-            (identical(other.context, context) || other.context == context));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, status, title, detail, context);
-
-  /// Create a copy of MDError
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
-      __$$MDErrorImplCopyWithImpl<_$MDErrorImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$MDErrorImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _MDError implements MDError {
-  const factory _MDError(
-      {required final String id,
-      required final int status,
-      required final String title,
-      final String? detail,
-      final String? context}) = _$MDErrorImpl;
-
-  factory _MDError.fromJson(Map<String, dynamic> json) = _$MDErrorImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  int get status;
-  @override
-  String get title;
-  @override
-  String? get detail;
-  @override
-  String? get context;
-
-  /// Create a copy of MDError
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$MDErrorImplCopyWith<_$MDErrorImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
