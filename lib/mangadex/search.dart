@@ -127,8 +127,11 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                     Expanded(
                       child: TextField(
                         textInputAction: TextInputAction.search,
-                        autofocus: false,
+                        autofocus: true,
                         autocorrect: false,
+                        onTapOutside: (event) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        },
                         controller: controller,
                         decoration: const InputDecoration(
                           icon: Icon(Icons.search),
