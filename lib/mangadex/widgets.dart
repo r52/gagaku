@@ -202,13 +202,13 @@ class ChapterFeedWidget extends HookConsumerWidget {
                             },
                           ),
                         ),
-                        if (isLoading) Styles.listSpinner,
+                        if (isLoading) const ListSpinner(),
                       ],
                     ),
             ),
           ),
-        _ => const Stack(
-            children: Styles.loadingOverlay,
+        AsyncValue(:final progress) => LoadingOverlayStack(
+            progress: progress?.toDouble(),
           ),
       },
     );
@@ -301,7 +301,8 @@ class ChapterFeedItem extends HookConsumerWidget {
         ),
         width: screenSizeSmall ? 64.0 : 128.0,
         height: screenSizeSmall ? 91.0 : 182.0,
-        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
         errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
@@ -750,7 +751,8 @@ class _GridMangaItem extends HookConsumerWidget {
         child: CachedNetworkImage(
           imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
           width: 256.0,
-          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
           errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
       ),
@@ -892,7 +894,8 @@ class _GridMangaDetailedItem extends HookConsumerWidget {
                     child: CachedNetworkImage(
                       imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                       width: screenSizeSmall ? 80.0 : 128.0,
-                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                      progressIndicatorBuilder: (context, url, downloadProgress) =>
+                          Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
                       errorWidget: (context, url, error) => const Icon(Icons.error),
                     ),
                   ),
@@ -971,7 +974,8 @@ class _ListMangaItem extends HookConsumerWidget {
               child: CachedNetworkImage(
                 imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
                 width: 80.0,
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),

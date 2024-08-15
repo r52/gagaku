@@ -99,7 +99,9 @@ class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
         AsyncValue(value: final manga?) => MangaDexMangaViewWidget(
             manga: manga,
           ),
-        _ => Styles.listSpinner,
+        AsyncValue(:final progress) => ListSpinner(
+            progress: progress?.toDouble(),
+          ),
       },
     );
   }
@@ -262,7 +264,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     colorBlendMode: BlendMode.modulate,
                     color: Colors.grey,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                    progressIndicatorBuilder: (context, url, downloadProgress) =>
+                        Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
                     errorWidget: (context, url, error) => const Icon(Icons.error),
                   ),
                 ),
@@ -789,8 +792,10 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                                     );
                                                                   },
                                                                   fit: BoxFit.contain,
-                                                                  placeholder: (context, url) =>
-                                                                      const Center(child: CircularProgressIndicator()),
+                                                                  progressIndicatorBuilder:
+                                                                      (context, url, downloadProgress) => Center(
+                                                                          child: CircularProgressIndicator(
+                                                                              value: downloadProgress.progress)),
                                                                   errorWidget: (context, url, error) =>
                                                                       const Icon(Icons.error),
                                                                 ),
@@ -1033,7 +1038,8 @@ class _CoverArtItem extends HookWidget {
         child: CachedNetworkImage(
           imageUrl: url.quality(quality: CoverArtQuality.medium),
           width: 256.0,
-          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
           errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
       ),

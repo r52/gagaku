@@ -30,8 +30,7 @@ Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<List<ChapterFeedItemData>> _fetchListFeed(
-    _FetchListFeedRef ref, CustomList list) async {
+Future<List<ChapterFeedItemData>> _fetchListFeed(_FetchListFeedRef ref, CustomList list) async {
   final loggedin = await ref.watch(authControlProvider.future);
 
   final api = ref.watch(mangadexProvider);
@@ -39,8 +38,7 @@ Future<List<ChapterFeedItemData>> _fetchListFeed(
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
 
-  final mangas =
-      await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
   await ref.read(statisticsProvider.notifier).get(mangas);
 
@@ -105,8 +103,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
         return Scaffold(
           appBar: AppBar(),
           body: RefreshIndicator(
-            onRefresh: () async =>
-                ref.refresh(listSourceProvider(listId).future),
+            onRefresh: () async => ref.refresh(listSourceProvider(listId).future),
             child: ErrorList(
               error: error,
               stackTrace: stackTrace,
@@ -128,9 +125,8 @@ class MangaDexListViewWidget extends HookConsumerWidget {
             ),
             flexibleSpace: GestureDetector(
               onTap: () {
-                controllers[view.value.index].animateTo(0.0,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut);
+                controllers[view.value.index]
+                    .animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
               },
               child: TitleFlexBar(title: list.attributes.name),
             ),
@@ -140,21 +136,16 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 children: [
                   Consumer(
                     builder: (context, ref, child) {
-                      final followedLists =
-                          ref.watch(followedListsProvider).value;
-                      final idx =
-                          followedLists?.indexWhere((e) => e.id == list.id);
+                      final followedLists = ref.watch(followedListsProvider).value;
+                      final idx = followedLists?.indexWhere((e) => e.id == list.id);
 
                       if (idx == null) {
                         return const SizedBox.shrink();
                       }
 
                       return ElevatedButton.icon(
-                        style: Styles.buttonStyle(
-                            backgroundColor: Colors.deepOrange.shade800),
-                        onPressed: () => ref
-                            .read(followedListsProvider.notifier)
-                            .setFollow(list, idx == -1),
+                        style: Styles.buttonStyle(backgroundColor: Colors.deepOrange.shade800),
+                        onPressed: () => ref.read(followedListsProvider.notifier).setFollow(list, idx == -1),
                         icon: const Icon(Icons.bookmark_border),
                         label: Text(idx == -1 ? 'Follow' : 'Unfollow'),
                       );
@@ -220,9 +211,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                     key: const Key('/list?tab=titles'),
                     builder: (context, ref, child) {
                       final currentPage = useState(0);
-                      final titlesProvider = ref.watch(
-                          getMangaListByPageProvider(
-                              list.set, currentPage.value));
+                      final titlesProvider = ref.watch(getMangaListByPageProvider(list.set, currentPage.value));
 
                       return Stack(
                         children: [
@@ -230,42 +219,31 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                             children: switch (titlesProvider) {
                               AsyncValue(:final error?, :final stackTrace?) => [
                                   RefreshIndicator(
-                                    onRefresh: () async => ref.refresh(
-                                        getMangaListByPageProvider(
-                                                list.set, currentPage.value)
-                                            .future),
-                                    child: ErrorList(
-                                        error: error, stackTrace: stackTrace),
+                                    onRefresh: () async =>
+                                        ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
+                                    child: ErrorList(error: error, stackTrace: stackTrace),
                                   )
                                 ],
                               AsyncValue(value: final mangas) => [
                                   Expanded(
                                     child: RefreshIndicator(
-                                      onRefresh: () async => ref.refresh(
-                                          getMangaListByPageProvider(
-                                                  list.set, currentPage.value)
-                                              .future),
+                                      onRefresh: () async =>
+                                          ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
                                       child: MangaListWidget(
                                         title: Text(
                                           'Titles (${list.set.length})',
                                           style: const TextStyle(fontSize: 24),
                                         ),
-                                        physics:
-                                            const AlwaysScrollableScrollPhysics(),
+                                        physics: const AlwaysScrollableScrollPhysics(),
                                         controller: controllers[0],
                                         children: [
-                                          if (mangas != null)
-                                            MangaListViewSliver(items: mangas),
+                                          if (mangas != null) MangaListViewSliver(items: mangas),
                                         ],
                                       ),
                                     ),
                                   ),
                                   NumberPaginator(
-                                    numberPages: max(
-                                        (list.set.length /
-                                                MangaDexEndpoints.searchLimit)
-                                            .ceil(),
-                                        1),
+                                    numberPages: max((list.set.length / MangaDexEndpoints.searchLimit).ceil(), 1),
                                     onPageChange: (int index) {
                                       currentPage.value = index;
                                     },
@@ -285,15 +263,10 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                         provider: _fetchListFeedProvider(list),
                         title: 'List Feed',
                         emptyText: 'No chapters!',
-                        onAtEdge: () => ref
-                            .read(customListFeedProvider(list).notifier)
-                            .getMore(),
+                        onAtEdge: () => ref.read(customListFeedProvider(list).notifier).getMore(),
                         onRefresh: () async {
-                          ref
-                              .read(customListFeedProvider(list).notifier)
-                              .clear();
-                          return ref
-                              .refresh(_fetchListFeedProvider(list).future);
+                          ref.read(customListFeedProvider(list).notifier).clear();
+                          return ref.refresh(_fetchListFeedProvider(list).future);
                         },
                         controller: controllers[1],
                         restorationId: 'list_feed_offset',
@@ -313,9 +286,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
 
               if (currTab == _ViewType.values[index]) {
                 // Scroll to top if on the same tab
-                controllers[index].animateTo(0.0,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut);
+                controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
               } else {
                 // Switch tab
                 view.value = _ViewType.values[index];
@@ -330,8 +301,12 @@ class MangaDexListViewWidget extends HookConsumerWidget {
             child: Text('List with ID $listId does not exist!'),
           ),
         );
-      case _:
-        return const Scaffold(body: Styles.listSpinner);
+      case AsyncValue(:final progress):
+        return Scaffold(
+          body: ListSpinner(
+            progress: progress?.toDouble(),
+          ),
+        );
     }
   }
 }

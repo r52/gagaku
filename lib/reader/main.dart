@@ -65,13 +65,11 @@ class ReaderWidget extends HookConsumerWidget {
     page.cached = true;
   }
 
-  void cachePages(
-      ValueNotifier<int> currentPage, int precacheCount, BuildContext context) {
+  void cachePages(ValueNotifier<int> currentPage, int precacheCount, BuildContext context) {
     final pageCount = pages.length;
 
     // Forward cache precacheCount() pages
-    if (currentPage.value + 1 < pageCount &&
-        !pages.elementAt(currentPage.value + 1).cached) {
+    if (currentPage.value + 1 < pageCount && !pages.elementAt(currentPage.value + 1).cached) {
       while (!pages.elementAt(currentPage.value + 1).cached) {
         pages.skip(currentPage.value).take(precacheCount).forEach((element) {
           if (!element.cached) {
@@ -304,8 +302,7 @@ class ReaderWidget extends HookConsumerWidget {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position =
-            viewController[currentPage.value].position + Offset(0.0, offset);
+        viewController[currentPage.value].position = viewController[currentPage.value].position + Offset(0.0, offset);
         break;
       default:
         // Do nothing
@@ -332,15 +329,13 @@ class ReaderWidget extends HookConsumerWidget {
 
         if (max == pages.length - 1 &&
             scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
+            scrollController.position.pixels == scrollController.position.maxScrollExtent) {
           if (context.canPop()) {
             context.pop();
           }
         } else {
           scrollController.animateTo(scrollController.offset + offset,
-              duration: const Duration(milliseconds: 50),
-              curve: Curves.easeInOut);
+              duration: const Duration(milliseconds: 50), curve: Curves.easeInOut);
         }
       }
 
@@ -350,8 +345,7 @@ class ReaderWidget extends HookConsumerWidget {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position =
-            viewController[currentPage.value].position - Offset(0.0, offset);
+        viewController[currentPage.value].position = viewController[currentPage.value].position - Offset(0.0, offset);
         break;
       default:
         // Do nothing
@@ -366,26 +360,21 @@ class ReaderWidget extends HookConsumerWidget {
     final pageCount = pages.length;
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
-    final scaleStateController = List<PhotoViewScaleStateController>.generate(
-        pageCount, (index) => usePhotoViewScaleStateController());
-    final viewController = List<PhotoViewController>.generate(
-        pageCount, (index) => usePhotoViewController());
+    final scaleStateController =
+        List<PhotoViewScaleStateController>.generate(pageCount, (index) => usePhotoViewScaleStateController());
+    final viewController = List<PhotoViewController>.generate(pageCount, (index) => usePhotoViewController());
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
     final currentPage = useValueNotifier(0);
     final listController = useListController();
     final scrollController = useScrollController();
-    final subtext =
-        useValueNotifier<String?>(subtitle ?? pages.elementAt(0).sortKey);
+    final subtext = useValueNotifier<String?>(subtitle ?? pages.elementAt(0).sortKey);
     final format = longstrip ? ReaderFormat.longstrip : settings.format;
     final isPortrait = DeviceContext.isPortraitMode(context);
-    final longStripScale = useValueNotifier(
-        isPortrait ? LongStripScale.full : LongStripScale.small);
+    final longStripScale = useValueNotifier(isPortrait ? LongStripScale.full : LongStripScale.small);
 
     final precacheCount = useCallback(() {
-      return (settings.precacheCount > 9 || format == ReaderFormat.longstrip)
-          ? pageCount
-          : settings.precacheCount;
+      return (settings.precacheCount > 9 || format == ReaderFormat.longstrip) ? pageCount : settings.precacheCount;
     }, [settings, format]);
 
     useEffect(() {
@@ -434,9 +423,7 @@ class ReaderWidget extends HookConsumerWidget {
     }, [listController, settings]);
 
     final pageDropdownItems = List<DropdownMenuEntry<int>>.generate(
-        pageCount,
-        (int index) => DropdownMenuEntry<int>(
-            value: index, label: (index + 1).toString()));
+        pageCount, (int index) => DropdownMenuEntry<int>(value: index, label: (index + 1).toString()));
 
     return Scaffold(
       extendBodyBehindAppBar: false,
@@ -602,9 +589,7 @@ class ReaderWidget extends HookConsumerWidget {
                           ? null
                           : (value) {
                               if (value) {
-                                ref
-                                    .read(readerSettingsProvider.notifier)
-                                    .save(settings.copyWith(format: f));
+                                ref.read(readerSettingsProvider.notifier).save(settings.copyWith(format: f));
                               }
                             },
                     ),
@@ -616,14 +601,11 @@ class ReaderWidget extends HookConsumerWidget {
                 label: const Text('Toggle Page Size'),
                 onPressed: (format == ReaderFormat.longstrip)
                     ? () {
-                        longStripScale.value =
-                            toggleLongStripScale(longStripScale.value);
+                        longStripScale.value = toggleLongStripScale(longStripScale.value);
                       }
                     : () {
                         scaleStateController[currentPage.value].scaleState =
-                            defaultScaleStateCycle(
-                                scaleStateController[currentPage.value]
-                                    .scaleState);
+                            defaultScaleStateCycle(scaleStateController[currentPage.value].scaleState);
                       },
               ),
               const SizedBox(height: 10.0),
@@ -642,9 +624,7 @@ class ReaderWidget extends HookConsumerWidget {
                           ? null
                           : (value) {
                               if (value) {
-                                ref
-                                    .read(readerSettingsProvider.notifier)
-                                    .save(settings.copyWith(direction: dir));
+                                ref.read(readerSettingsProvider.notifier).save(settings.copyWith(direction: dir));
                               }
                             },
                     ),
@@ -653,47 +633,44 @@ class ReaderWidget extends HookConsumerWidget {
               const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(
-                  settings.showProgressBar
-                      ? Icons.donut_small
-                      : Icons.donut_small_outlined,
+                  settings.showProgressBar ? Icons.donut_small : Icons.donut_small_outlined,
                   color: theme.iconTheme.color,
                 ),
                 label: const Text('Progress Bar'),
                 onPressed: () {
-                  ref.read(readerSettingsProvider.notifier).save(settings
-                      .copyWith(showProgressBar: !settings.showProgressBar));
+                  ref
+                      .read(readerSettingsProvider.notifier)
+                      .save(settings.copyWith(showProgressBar: !settings.showProgressBar));
                 },
               ),
               const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(
                   Icons.swipe,
-                  color: settings.swipeGestures
-                      ? theme.iconTheme.color
-                      : theme.disabledColor,
+                  color: settings.swipeGestures ? theme.iconTheme.color : theme.disabledColor,
                 ),
                 label: const Text('Swipe Gestures'),
                 onPressed: (format == ReaderFormat.longstrip)
                     ? null
                     : () {
-                        ref.read(readerSettingsProvider.notifier).save(settings
-                            .copyWith(swipeGestures: !settings.swipeGestures));
+                        ref
+                            .read(readerSettingsProvider.notifier)
+                            .save(settings.copyWith(swipeGestures: !settings.swipeGestures));
                       },
               ),
               const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(
                   Icons.mouse,
-                  color: settings.clickToTurn
-                      ? theme.iconTheme.color
-                      : theme.disabledColor,
+                  color: settings.clickToTurn ? theme.iconTheme.color : theme.disabledColor,
                 ),
                 label: const Text('Click/Tap to Turn Page'),
                 onPressed: (format == ReaderFormat.longstrip)
                     ? null
                     : () {
-                        ref.read(readerSettingsProvider.notifier).save(settings
-                            .copyWith(clickToTurn: !settings.clickToTurn));
+                        ref
+                            .read(readerSettingsProvider.notifier)
+                            .save(settings.copyWith(clickToTurn: !settings.clickToTurn));
                       },
               ),
               Row(
@@ -719,18 +696,14 @@ class ReaderWidget extends HookConsumerWidget {
                     ),
                     onSelected: (int? value) {
                       if (value != null) {
-                        ref
-                            .read(readerSettingsProvider.notifier)
-                            .save(settings.copyWith(precacheCount: value));
+                        ref.read(readerSettingsProvider.notifier).save(settings.copyWith(precacheCount: value));
                       }
                     },
                     dropdownMenuEntries: List<DropdownMenuEntry<int>>.generate(
                       10,
                       (int index) => DropdownMenuEntry<int>(
                         value: index + 1,
-                        label: (index + 1 > 9)
-                            ? 'Max (not recommended)'
-                            : (index + 1).toString(),
+                        label: (index + 1 > 9) ? 'Max (not recommended)' : (index + 1).toString(),
                       ),
                     ),
                   ),
@@ -907,8 +880,7 @@ class ReaderWidget extends HookConsumerWidget {
                             final scale = useValueListenable(longStripScale);
                             final width = mediaSize.width * scale.scale;
                             return ConstrainedBox(
-                              constraints: BoxConstraints(
-                                  minWidth: width, maxWidth: width),
+                              constraints: BoxConstraints(minWidth: width, maxWidth: width),
                               child: KeepAliveImage(
                                 image: page.provider,
                                 fit: BoxFit.contain,
@@ -918,8 +890,12 @@ class ReaderWidget extends HookConsumerWidget {
                                     return child;
                                   }
 
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: event.expectedTotalBytes != null
+                                          ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                                          : null,
+                                    ),
                                   );
                                 },
                               ),
@@ -935,16 +911,18 @@ class ReaderWidget extends HookConsumerWidget {
             return PhotoViewGallery.builder(
               allowImplicitScrolling: true,
               reverse: settings.direction == ReaderDirection.rightToLeft,
-              scrollPhysics: !settings.swipeGestures
-                  ? const NeverScrollableScrollPhysics()
-                  : null,
+              scrollPhysics: !settings.swipeGestures ? const NeverScrollableScrollPhysics() : null,
               backgroundDecoration: const BoxDecoration(color: Colors.black),
               pageController: pageController,
               onPageChanged: (int index) {
                 focusNode.requestFocus();
               },
-              loadingBuilder: (context, event) => const Center(
-                child: CircularProgressIndicator(),
+              loadingBuilder: (context, event) => Center(
+                child: LinearProgressIndicator(
+                  value: event != null && event.expectedTotalBytes != null
+                      ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                      : null,
+                ),
               ),
               itemCount: pageCount,
               wantKeepAlive: true,
@@ -1003,8 +981,7 @@ class ReaderWidget extends HookConsumerWidget {
       extendBody: true,
       bottomNavigationBar: settings.showProgressBar
           ? ProgressIndicator(
-              reverse: (format != ReaderFormat.longstrip) &&
-                  settings.direction == ReaderDirection.rightToLeft,
+              reverse: (format != ReaderFormat.longstrip) && settings.direction == ReaderDirection.rightToLeft,
               currentPage: currentPage,
               itemCount: pageCount,
               color: theme.colorScheme.primary,
@@ -1109,9 +1086,7 @@ class _ProgressBarSection extends StatelessWidget {
               builder: (context) {
                 final page = useValueListenable(currentPage);
                 return Material(
-                  color: (index == 0 || page >= index)
-                      ? color
-                      : Colors.transparent,
+                  color: (index == 0 || page >= index) ? color : Colors.transparent,
                   child: SizedBox(
                     height: height,
                     width: double.infinity,

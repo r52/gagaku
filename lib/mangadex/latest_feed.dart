@@ -9,15 +9,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'latest_feed.g.dart';
 
 @riverpod
-Future<List<ChapterFeedItemData>> _fetchGlobalChapters(
-    _FetchGlobalChaptersRef ref) async {
+Future<List<ChapterFeedItemData>> _fetchGlobalChapters(_FetchGlobalChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
+
   final chapters = await ref.watch(latestGlobalFeedProvider.future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-
-  final mangas =
-      await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
   await ref.read(statisticsProvider.notifier).get(mangas);
 

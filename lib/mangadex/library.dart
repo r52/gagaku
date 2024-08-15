@@ -13,18 +13,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library.g.dart';
 
-final libraryViewTypeProvider =
-    StateProvider((ref) => MangaReadingStatus.reading);
+final libraryViewTypeProvider = StateProvider((ref) => MangaReadingStatus.reading);
 
 @riverpod
-Future<List<String>> _getLibraryListByType(
-    _GetLibraryListByTypeRef ref, MangaReadingStatus type) async {
+Future<List<String>> _getLibraryListByType(_GetLibraryListByTypeRef ref, MangaReadingStatus type) async {
   final library = await ref.watch(userLibraryProvider.future);
 
-  final results = library.entries
-      .where((element) => element.value == type)
-      .map((e) => e.key)
-      .toList();
+  final results = library.entries.where((element) => element.value == type).map((e) => e.key).toList();
 
   return results;
 }
@@ -50,8 +45,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
 
     switch (listProvider) {
       case AsyncValue(value: final list?):
-        final titlesProvider =
-            ref.watch(getMangaListByPageProvider(list, currentPage.value));
+        final titlesProvider = ref.watch(getMangaListByPageProvider(list, currentPage.value));
 
         isLoading = titlesProvider.isLoading;
 
@@ -61,22 +55,19 @@ class MangaDexLibraryView extends HookConsumerWidget {
               AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
                   onRefresh: () async {
                     ref.read(userLibraryProvider.notifier).clear();
-                    return ref
-                        .refresh(_getLibraryListByTypeProvider(type).future);
+                    return ref.refresh(_getLibraryListByTypeProvider(type).future);
                   },
                   child: ErrorList(
                     error: error,
                     stackTrace: stackTrace,
-                    message:
-                        "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
+                    message: "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
                   ),
                 ),
               AsyncValue(value: final mangas) => RefreshIndicator(
                   onRefresh: () async {
                     ref.read(userLibraryProvider.notifier).clear();
                     final lt = ref.read(libraryViewTypeProvider);
-                    return ref
-                        .refresh(_getLibraryListByTypeProvider(lt).future);
+                    return ref.refresh(_getLibraryListByTypeProvider(lt).future);
                   },
                   child: MangaListWidget(
                     title: Text(
@@ -93,8 +84,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
             },
           ),
           NumberPaginator(
-            numberPages:
-                max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+            numberPages: max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
             onPageChange: (int index) {
               currentPage.value = index;
             },
@@ -118,8 +108,12 @@ class MangaDexLibraryView extends HookConsumerWidget {
           ),
         ];
         break;
-      case _:
-        children = [Styles.listSpinner];
+      case AsyncValue(:final progress):
+        children = [
+          ListSpinner(
+            progress: progress?.toDouble(),
+          )
+        ];
         break;
     }
 
@@ -148,21 +142,15 @@ class MangaDexLibraryView extends HookConsumerWidget {
                     ),
                     onSelected: (MangaReadingStatus? status) async {
                       if (status != null) {
-                        ref.read(libraryViewTypeProvider.notifier).state =
-                            status;
+                        ref.read(libraryViewTypeProvider.notifier).state = status;
                         currentPage.value = 0;
                       }
                     },
-                    dropdownMenuEntries:
-                        List<DropdownMenuEntry<MangaReadingStatus>>.generate(
+                    dropdownMenuEntries: List<DropdownMenuEntry<MangaReadingStatus>>.generate(
                       MangaReadingStatus.values.skip(1).length,
                       (int index) => DropdownMenuEntry<MangaReadingStatus>(
-                        value:
-                            MangaReadingStatus.values.skip(1).elementAt(index),
-                        label: MangaReadingStatus.values
-                            .skip(1)
-                            .elementAt(index)
-                            .label,
+                        value: MangaReadingStatus.values.skip(1).elementAt(index),
+                        label: MangaReadingStatus.values.skip(1).elementAt(index).label,
                       ),
                     ),
                   ),

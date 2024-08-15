@@ -193,7 +193,7 @@ class LocalLibraryHome extends StatelessWidget {
                   },
                 );
               } else {
-                return Styles.listSpinner;
+                return const ListSpinner();
               }
 
               return RefreshIndicator(
@@ -226,7 +226,7 @@ class LocalLibraryHome extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    const CircularProgressIndicator(),
+                    CircularProgressIndicator(value: progress?.toDouble()),
                     if (progress != null)
                       Text(
                         '${(progress * 100).floor()}%',

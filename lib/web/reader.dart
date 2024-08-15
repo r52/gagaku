@@ -45,20 +45,21 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<WebReaderData> _fetchWebChapterInfo(
-    _FetchWebChapterInfoRef ref, ProxyInfo info) async {
+Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, ProxyInfo info) async {
   final api = ref.watch(proxyProvider);
   final proxy = await api.handleProxy(info);
 
   if (proxy.code != null) {
-    ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(
-        title: '${info.proxy}: ${info.code}', url: '${info.getURL()}1/1/'));
+    ref
+        .read(webSourceHistoryProvider.notifier)
+        .add(HistoryLink(title: '${info.proxy}: ${info.code}', url: '${info.getURL()}1/1/'));
     return WebReaderData(source: proxy.code!);
   }
 
   if (proxy.manga != null) {
-    ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(
-        title: '${info.proxy}: ${proxy.manga?.title}', url: info.getURL()));
+    ref
+        .read(webSourceHistoryProvider.notifier)
+        .add(HistoryLink(title: '${info.proxy}: ${proxy.manga?.title}', url: info.getURL()));
 
     final chapter = proxy.manga!.getChapter(info.chapter!);
 
@@ -118,8 +119,7 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final info = ProxyInfo(
-        proxy: proxy, code: code, chapter: chapter.replaceFirst('-', '.'));
+    final info = ProxyInfo(proxy: proxy, code: code, chapter: chapter.replaceFirst('-', '.'));
     final dataProvider = ref.watch(_fetchWebChapterInfoProvider(info));
 
     Widget child;
@@ -155,8 +155,10 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
           ),
         );
         break;
-      case _:
-        child = Styles.listSpinner;
+      case AsyncValue(:final progress):
+        child = ListSpinner(
+          progress: progress?.toDouble(),
+        );
         break;
     }
 
@@ -207,9 +209,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
         if (info != null && readKey != null) {
-          ref
-              .read(webReadMarkersProvider.notifier)
-              .set(info!.getKey(), readKey!, true);
+          ref.read(webReadMarkersProvider.notifier).set(info!.getKey(), readKey!, true);
         }
       });
 
@@ -245,9 +245,9 @@ class WebSourceReaderWidget extends HookConsumerWidget {
           onLinkPressed: onLinkPressed,
           backRoute: backRoute,
         );
-      case _:
-        return const Center(
-          child: CircularProgressIndicator(),
+      case AsyncValue(:final progress):
+        return ListSpinner(
+          progress: progress?.toDouble(),
         );
     }
   }

@@ -15,12 +15,11 @@ enum _FeedViewType { chapters, manga }
 @riverpod
 Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
+
   final chapters = await ref.watch(latestChaptersFeedProvider.future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-
-  final mangas =
-      await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
   await ref.read(statisticsProvider.notifier).get(mangas);
   await ref.read(readChaptersProvider.notifier).get(mangas);
@@ -75,8 +74,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
               const Spacer(),
               SegmentedButton<_FeedViewType>(
                 style: SegmentedButton.styleFrom(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(4.0)))),
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0)))),
                 showSelectedIcon: false,
                 segments: const <ButtonSegment<_FeedViewType>>[
                   ButtonSegment<_FeedViewType>(
@@ -101,8 +99,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
             _FeedViewType.chapters => ChapterFeedWidget(
                 provider: _fetchChaptersProvider,
                 emptyText: 'Find some manga to follow!',
-                onAtEdge: () =>
-                    ref.read(latestChaptersFeedProvider.notifier).getMore(),
+                onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
                 onRefresh: () async {
                   ref.read(latestChaptersFeedProvider.notifier).clear();
                   return ref.refresh(_fetchChaptersProvider.future);

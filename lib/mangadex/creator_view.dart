@@ -23,8 +23,7 @@ Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
       creator: creator,
     );
   } else {
-    child = QueriedMangaDexCreatorViewWidget(
-        creatorId: state.pathParameters['creatorId']!);
+    child = QueriedMangaDexCreatorViewWidget(creatorId: state.pathParameters['creatorId']!);
   }
 
   return CustomTransitionPage<void>(
@@ -35,16 +34,14 @@ Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<CreatorType> _fetchCreatorFromId(
-    _FetchCreatorFromIdRef ref, String creatorId) async {
+Future<CreatorType> _fetchCreatorFromId(_FetchCreatorFromIdRef ref, String creatorId) async {
   final api = ref.watch(mangadexProvider);
   final creator = await api.fetchCreators([creatorId]);
   return creator.first;
 }
 
 @riverpod
-Future<List<Manga>> _fetchCreatorTitles(
-    _FetchCreatorTitlesRef ref, CreatorType creator) async {
+Future<List<Manga>> _fetchCreatorTitles(_FetchCreatorTitlesRef ref, CreatorType creator) async {
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
   await ref.read(statisticsProvider.notifier).get(mangas);
 
@@ -72,7 +69,9 @@ class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
             stackTrace: stackTrace,
             message: "_fetchCreatorFromIdProvider($creatorId) failed",
           ),
-        _ => Styles.listSpinner,
+        AsyncValue(:final progress) => ListSpinner(
+            progress: progress?.toDouble(),
+          ),
       },
     );
   }
@@ -130,8 +129,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                           flexibleSpace: GestureDetector(
                             onTap: () {
                               scrollController.animateTo(0.0,
-                                  duration: const Duration(milliseconds: 400),
-                                  curve: Curves.easeInOut);
+                                  duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
                             },
                             child: TitleFlexBar(title: creator.attributes.name),
                           ),
@@ -141,22 +139,19 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                             ExpansionTile(
                               title: const Text('Biography'),
                               children: [
-                                for (final MapEntry(key: prop, value: desc)
-                                    in creator.attributes.biography.entries)
+                                for (final MapEntry(key: prop, value: desc) in creator.attributes.biography.entries)
                                   ExpansionTile(
                                     title: Text(prop),
                                     children: [
                                       Container(
                                         width: double.infinity,
                                         padding: const EdgeInsets.all(8),
-                                        color: theme.colorScheme
-                                            .surfaceContainerHighest,
+                                        color: theme.colorScheme.surfaceContainerHighest,
                                         child: MarkdownBody(
                                           data: desc,
                                           onTapLink: (text, url, title) async {
                                             if (url != null) {
-                                              if (!await launchUrl(
-                                                  Uri.parse(url))) {
+                                              if (!await launchUrl(Uri.parse(url))) {
                                                 throw 'Could not launch $url';
                                               }
                                             }
@@ -182,21 +177,13 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                     runSpacing: 4.0,
                                     children: [
                                       if (creator.attributes.twitter != null)
-                                        _LinkChip(
-                                            url: creator.attributes.twitter!,
-                                            text: 'Twitter'),
+                                        _LinkChip(url: creator.attributes.twitter!, text: 'Twitter'),
                                       if (creator.attributes.pixiv != null)
-                                        _LinkChip(
-                                            url: creator.attributes.pixiv!,
-                                            text: 'Pixiv'),
+                                        _LinkChip(url: creator.attributes.pixiv!, text: 'Pixiv'),
                                       if (creator.attributes.youtube != null)
-                                        _LinkChip(
-                                            url: creator.attributes.youtube!,
-                                            text: 'Youtube'),
+                                        _LinkChip(url: creator.attributes.youtube!, text: 'Youtube'),
                                       if (creator.attributes.website != null)
-                                        _LinkChip(
-                                            url: creator.attributes.website!,
-                                            text: 'Website'),
+                                        _LinkChip(url: creator.attributes.website!, text: 'Website'),
                                     ],
                                   ),
                                 ),
@@ -210,16 +197,14 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                       ),
                       physics: const AlwaysScrollableScrollPhysics(),
                       controller: scrollController,
-                      onAtEdge: () => ref
-                          .read(creatorTitlesProvider(creator).notifier)
-                          .getMore(),
+                      onAtEdge: () => ref.read(creatorTitlesProvider(creator).notifier).getMore(),
                       children: [
                         MangaListViewSliver(items: mangas),
                       ],
                     ),
             ),
-          _ => const Stack(
-              children: Styles.loadingOverlay,
+          AsyncValue(:final progress) => LoadingOverlayStack(
+              progress: progress?.toDouble(),
             ),
         },
         if (isLoading) ...Styles.loadingOverlay,

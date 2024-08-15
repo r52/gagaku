@@ -140,8 +140,10 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
           ),
         );
         break;
-      case _:
-        child = Styles.listSpinner;
+      case AsyncValue(:final progress):
+        child = ListSpinner(
+          progress: progress?.toDouble(),
+        );
         break;
     }
 
@@ -189,8 +191,10 @@ class RedirectedWebMangaViewWidget extends ConsumerWidget {
           ),
         );
         break;
-      case _:
-        child = Styles.listSpinner;
+      case AsyncValue(:final progress):
+        child = ListSpinner(
+          progress: progress?.toDouble(),
+        );
         break;
     }
 
@@ -260,7 +264,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
               colorBlendMode: BlendMode.modulate,
               color: Colors.grey,
               fit: BoxFit.cover,
-              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
               errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
           ),

@@ -44,8 +44,7 @@ Page<dynamic> buildMDReaderPage(BuildContext context, GoRouterState state) {
       onLinkPressed: data.onLinkPressed,
     );
   } else {
-    child = QueriedMangaDexReaderWidget(
-        chapterId: state.pathParameters['chapterId']!);
+    child = QueriedMangaDexReaderWidget(chapterId: state.pathParameters['chapterId']!);
   }
 
   return CustomTransitionPage<void>(
@@ -56,16 +55,14 @@ Page<dynamic> buildMDReaderPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<ReaderData> _fetchChapterData(
-    _FetchChapterDataRef ref, String chapterId) async {
+Future<ReaderData> _fetchChapterData(_FetchChapterDataRef ref, String chapterId) async {
   final api = ref.watch(mangadexProvider);
 
   final chapters = await api.fetchChapters([chapterId]);
   final chapter = chapters.first;
 
   final mangaId = chapter.manga.id;
-  final mangas =
-      await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
   final manga = mangas.first;
 
   final data = ReaderData(
@@ -78,8 +75,7 @@ Future<ReaderData> _fetchChapterData(
 }
 
 @riverpod
-Future<List<ReaderPage>> _fetchChapterPages(
-    _FetchChapterPagesRef ref, Chapter chapter) async {
+Future<List<ReaderPage>> _fetchChapterPages(_FetchChapterPagesRef ref, Chapter chapter) async {
   final api = ref.watch(mangadexProvider);
   final mpages = await api.getChapterServer(chapter);
 
@@ -129,7 +125,9 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
             },
             backRoute: '/',
           ),
-        _ => Styles.listSpinner,
+        AsyncValue(:final progress) => ListSpinner(
+            progress: progress?.toDouble(),
+          ),
       },
     );
   }

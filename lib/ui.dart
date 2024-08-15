@@ -461,6 +461,50 @@ class ErrorList extends StatelessWidget {
   }
 }
 
+class LoadingOverlayStack extends StatelessWidget {
+  const LoadingOverlayStack({
+    super.key,
+    this.progress,
+  });
+
+  final double? progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        const ModalBarrier(dismissible: false, color: Colors.black87),
+        Center(
+          child: CircularProgressIndicator(
+            value: progress,
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class ListSpinner extends StatelessWidget {
+  const ListSpinner({
+    super.key,
+    this.progress,
+  });
+
+  final double? progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Center(
+        child: CircularProgressIndicator(
+          value: progress,
+        ),
+      ),
+    );
+  }
+}
+
 class Styles {
   static ButtonStyle buttonStyle({
     Color? backgroundColor,
@@ -484,13 +528,6 @@ class Styles {
       child: CircularProgressIndicator(),
     ),
   ];
-
-  static const listSpinner = Padding(
-    padding: EdgeInsets.symmetric(vertical: 5.0),
-    child: Center(
-      child: CircularProgressIndicator(),
-    ),
-  );
 
   static void showErrorSnackBar(ScaffoldMessengerState state, String content) {
     Future.delayed(

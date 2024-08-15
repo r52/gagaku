@@ -22,8 +22,7 @@ Page<dynamic> buildListEditPage(BuildContext context, GoRouterState state) {
       list: list,
     );
   } else {
-    child =
-        QueriedMangaDexEditListScreen(listId: state.pathParameters['listId']!);
+    child = QueriedMangaDexEditListScreen(listId: state.pathParameters['listId']!);
   }
 
   return CustomTransitionPage<void>(
@@ -49,15 +48,15 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
             stackTrace: stackTrace,
             message: "_fetchListFromIdProvider($listId) failed",
           ),
-        AsyncValue(hasValue: true, value: final list) when list != null =>
-          MangaDexEditListScreen(
+        AsyncValue(hasValue: true, value: final list) when list != null => MangaDexEditListScreen(
             list: list,
           ),
-        AsyncValue(hasValue: true, value: final list) when list == null =>
-          Center(
+        AsyncValue(hasValue: true, value: final list) when list == null => Center(
             child: Text('Invalid listId $listId!'),
           ),
-        _ => Styles.listSpinner,
+        AsyncValue(:final progress) => ListSpinner(
+            progress: progress?.toDouble(),
+          ),
       },
     );
   }
@@ -70,12 +69,9 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final listNameController =
-        useTextEditingController(text: list?.attributes.name);
+    final listNameController = useTextEditingController(text: list?.attributes.name);
 
-    final visibility = useValueNotifier(list != null
-        ? list!.attributes.visibility
-        : CustomListVisibility.private);
+    final visibility = useValueNotifier(list != null ? list!.attributes.visibility : CustomListVisibility.private);
 
     final pendingAction = useState<Future<bool>?>(null);
     final snapshot = useFuture(pendingAction.value);
@@ -85,8 +81,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
         initialAction: MangaSetAction(action: MangaSetActions.none));
     final currentPage = useState(0);
 
-    final titlesProvider = ref
-        .watch(getMangaListByPageProvider(selected.state, currentPage.value));
+    final titlesProvider = ref.watch(getMangaListByPageProvider(selected.state, currentPage.value));
     final titles = titlesProvider.value;
 
     final isLoading = titlesProvider.isLoading;
@@ -102,8 +97,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
             }
           },
         ),
-        flexibleSpace:
-            TitleFlexBar(title: '${list != null ? 'Edit' : 'Create'} List'),
+        flexibleSpace: TitleFlexBar(title: '${list != null ? 'Edit' : 'Create'} List'),
         actions: [
           OverflowBar(
             spacing: 8.0,
@@ -127,8 +121,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   return ElevatedButton(
                     style: Styles.buttonStyle(),
                     onPressed: listNameChanged ||
-                            (list != null &&
-                                !setEquals(selected.state, list!.set)) ||
+                            (list != null && !setEquals(selected.state, list!.set)) ||
                             (list != null && vis != list!.attributes.visibility)
                         ? () async {
                             final messenger = ScaffoldMessenger.of(context);
@@ -139,13 +132,11 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                               if (list != null) {
                                 success = ref
                                     .read(userListsProvider.notifier)
-                                    .editList(list!, listNameController.text,
-                                        vis, selected.state);
+                                    .editList(list!, listNameController.text, vis, selected.state);
                               } else {
                                 success = ref
                                     .read(userListsProvider.notifier)
-                                    .newList(listNameController.text, vis,
-                                        selected.state);
+                                    .newList(listNameController.text, vis, selected.state);
                               }
 
                               success.then((success) {
@@ -157,8 +148,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                     ..removeCurrentSnackBar()
                                     ..showSnackBar(
                                       SnackBar(
-                                        content: Text(
-                                            'Failed to ${list != null ? 'edit' : 'create'} list.'),
+                                        content: Text('Failed to ${list != null ? 'edit' : 'create'} list.'),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -204,9 +194,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? 'List Name cannot be empty.'
-                              : null;
+                          return (value == null || value.isEmpty) ? 'List Name cannot be empty.' : null;
                         },
                       ),
                     ),
@@ -238,14 +226,10 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 const SizedBox(height: 12.0),
                 ElevatedButton(
                   style: Styles.buttonStyle(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                   ),
                   onPressed: () {
-                    context
-                        .push<Set<String>>('/search?selectMode=true',
-                            extra: selected.state)
-                        .then((result) {
+                    context.push<Set<String>>('/search?selectMode=true', extra: selected.state).then((result) {
                       if (result != null) {
                         selected.dispatch(MangaSetAction(
                           action: MangaSetActions.replace,
@@ -284,10 +268,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   ),
                 ),
                 NumberPaginator(
-                  numberPages: max(
-                      (selected.state.length / MangaDexEndpoints.searchLimit)
-                          .ceil(),
-                      1),
+                  numberPages: max((selected.state.length / MangaDexEndpoints.searchLimit).ceil(), 1),
                   onPageChange: (int index) {
                     currentPage.value = index;
                   },
@@ -295,8 +276,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (snapshot.connectionState == ConnectionState.waiting || isLoading)
-            ...Styles.loadingOverlay
+          if (snapshot.connectionState == ConnectionState.waiting || isLoading) ...Styles.loadingOverlay
         ],
       ),
     );
