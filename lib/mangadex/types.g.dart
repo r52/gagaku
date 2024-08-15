@@ -97,20 +97,6 @@ const _$FilterOrderEnumMap = {
   FilterOrder.title_desc: 'title_desc',
 };
 
-_$ChapterListImpl _$$ChapterListImplFromJson(Map<String, dynamic> json) =>
-    _$ChapterListImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['total'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$$ChapterListImplToJson(_$ChapterListImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'total': instance.total,
-    };
-
 _$ChapterImpl _$$ChapterImplFromJson(Map<String, dynamic> json) =>
     _$ChapterImpl(
       id: json['id'] as String,
@@ -388,6 +374,20 @@ Map<String, dynamic> _$$ChapterAPIImplToJson(_$ChapterAPIImpl instance) =>
     <String, dynamic>{
       'baseUrl': instance.baseUrl,
       'chapter': instance.chapter,
+    };
+
+_$ChapterListImpl _$$ChapterListImplFromJson(Map<String, dynamic> json) =>
+    _$ChapterListImpl(
+      (json['data'] as List<dynamic>)
+          .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      (json['total'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$ChapterListImplToJson(_$ChapterListImpl instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'total': instance.total,
     };
 
 _$CoverListImpl _$$CoverListImplFromJson(Map<String, dynamic> json) =>

@@ -107,10 +107,8 @@ enum FilterOrder {
   relevance_desc('Best Match', MapEntry('order[relevance]', 'desc')),
   followedCount_asc('Fewest Follows', MapEntry('order[followedCount]', 'asc')),
   followedCount_desc('Most Follows', MapEntry('order[followedCount]', 'desc')),
-  latestUploadedChapter_asc(
-      'Oldest Upload', MapEntry('order[latestUploadedChapter]', 'asc')),
-  latestUploadedChapter_desc(
-      'Latest Upload', MapEntry('order[latestUploadedChapter]', 'desc')),
+  latestUploadedChapter_asc('Oldest Upload', MapEntry('order[latestUploadedChapter]', 'asc')),
+  latestUploadedChapter_desc('Latest Upload', MapEntry('order[latestUploadedChapter]', 'desc')),
   updatedAt_asc('Oldest Update', MapEntry('order[updatedAt]', 'asc')),
   updatedAt_desc('Latest Update', MapEntry('order[updatedAt]', 'desc')),
   createdAt_asc('Oldest Added', MapEntry('order[createdAt]', 'asc')),
@@ -182,8 +180,7 @@ class MangaFilterAction {
       excludedTags: excludedTags ?? state.excludedTags,
       excludedTagsMode: excludedTagsMode ?? state.excludedTagsMode,
       status: status ?? state.status,
-      publicationDemographic:
-          publicationDemographic ?? state.publicationDemographic,
+      publicationDemographic: publicationDemographic ?? state.publicationDemographic,
       contentRating: contentRating ?? state.contentRating,
     );
 
@@ -206,8 +203,7 @@ class MangaFilters with _$MangaFilters {
     @Default(FilterOrder.relevance_desc) FilterOrder order,
   }) = _MangaFilters;
 
-  factory MangaFilters.fromJson(Map<String, dynamic> json) =>
-      _$MangaFiltersFromJson(json);
+  factory MangaFilters.fromJson(Map<String, dynamic> json) => _$MangaFiltersFromJson(json);
 
   Map<String, dynamic> getMap() {
     var params = <String, dynamic>{};
@@ -227,8 +223,7 @@ class MangaFilters with _$MangaFilters {
     }
 
     if (publicationDemographic.isNotEmpty) {
-      params['publicationDemographic[]'] =
-          publicationDemographic.map((e) => e.name).toList();
+      params['publicationDemographic[]'] = publicationDemographic.map((e) => e.name).toList();
     }
 
     if (contentRating.isNotEmpty) {
@@ -336,8 +331,7 @@ enum Language {
 }
 
 class Languages {
-  static Iterable<Language> get languages =>
-      Language.values.where((element) => element.nonStandard == false);
+  static Iterable<Language> get languages => Language.values.where((element) => element.nonStandard == false);
 
   static Language get(String code) {
     final langs = Language.values.where((element) => element.code == code);
@@ -357,17 +351,6 @@ mixin MangaDexUUID {
 }
 
 @freezed
-class ChapterList with _$ChapterList {
-  const factory ChapterList(
-    List<Chapter> data,
-    int total,
-  ) = _ChapterList;
-
-  factory ChapterList.fromJson(Map<String, dynamic> json) =>
-      _$ChapterListFromJson(json);
-}
-
-@freezed
 class Chapter with _$Chapter, MangaDexUUID {
   Chapter._();
 
@@ -377,8 +360,7 @@ class Chapter with _$Chapter, MangaDexUUID {
     required List<Relationship> relationships,
   }) = _Chapter;
 
-  factory Chapter.fromJson(Map<String, dynamic> json) =>
-      _$ChapterFromJson(json);
+  factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
 
   late final title = _getTitle();
   late final groups = _getGroups();
@@ -449,8 +431,7 @@ class ChapterAttributes with _$ChapterAttributes {
     @TimestampSerializer() required DateTime publishAt,
   }) = _ChapterAttributes;
 
-  factory ChapterAttributes.fromJson(Map<String, dynamic> json) =>
-      _$ChapterAttributesFromJson(json);
+  factory ChapterAttributes.fromJson(Map<String, dynamic> json) => _$ChapterAttributesFromJson(json);
 }
 
 @freezed
@@ -462,8 +443,7 @@ class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
     String? description,
   }) = _ScanlationGroupAttributes;
 
-  factory ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) =>
-      _$ScanlationGroupAttributesFromJson(json);
+  factory ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) => _$ScanlationGroupAttributesFromJson(json);
 }
 
 @freezed
@@ -475,8 +455,7 @@ class CoverArtAttributes with _$CoverArtAttributes {
     String? locale,
   }) = _CoverArtAttributes;
 
-  factory CoverArtAttributes.fromJson(Map<String, dynamic> json) =>
-      _$CoverArtAttributesFromJson(json);
+  factory CoverArtAttributes.fromJson(Map<String, dynamic> json) => _$CoverArtAttributesFromJson(json);
 }
 
 @freezed
@@ -485,8 +464,7 @@ class UserAttributes with _$UserAttributes {
     required String username,
   }) = _UserAttributes;
 
-  factory UserAttributes.fromJson(Map<String, dynamic> json) =>
-      _$UserAttributesFromJson(json);
+  factory UserAttributes.fromJson(Map<String, dynamic> json) => _$UserAttributesFromJson(json);
 }
 
 @freezed
@@ -503,8 +481,7 @@ class AuthorAttributes with _$AuthorAttributes {
     @TimestampSerializer() required DateTime updatedAt,
   }) = _AuthorAttributes;
 
-  factory AuthorAttributes.fromJson(Map<String, dynamic> json) =>
-      _$AuthorAttributesFromJson(json);
+  factory AuthorAttributes.fromJson(Map<String, dynamic> json) => _$AuthorAttributesFromJson(json);
 }
 
 abstract class CreatorType with MangaDexUUID {
@@ -554,8 +531,7 @@ class Relationship with _$Relationship, MangaDexUUID {
     required ScanlationGroupAttributes attributes,
   }) = Group;
 
-  factory Relationship.fromJson(Map<String, dynamic> json) =>
-      _$RelationshipFromJson(json);
+  factory Relationship.fromJson(Map<String, dynamic> json) => _$RelationshipFromJson(json);
 }
 
 @freezed
@@ -566,8 +542,7 @@ class ChapterAPIData with _$ChapterAPIData {
     required List<String> dataSaver,
   }) = _ChapterAPIData;
 
-  factory ChapterAPIData.fromJson(Map<String, dynamic> json) =>
-      _$ChapterAPIDataFromJson(json);
+  factory ChapterAPIData.fromJson(Map<String, dynamic> json) => _$ChapterAPIDataFromJson(json);
 }
 
 @freezed
@@ -579,11 +554,19 @@ class ChapterAPI with _$ChapterAPI {
     required ChapterAPIData chapter,
   }) = _ChapterAPI;
 
-  factory ChapterAPI.fromJson(Map<String, dynamic> json) =>
-      _$ChapterAPIFromJson(json);
+  factory ChapterAPI.fromJson(Map<String, dynamic> json) => _$ChapterAPIFromJson(json);
 
-  String getUrl(bool datasaver) =>
-      '$baseUrl/${datasaver ? 'data-saver' : 'data'}/${chapter.hash}/';
+  String getUrl(bool datasaver) => '$baseUrl/${datasaver ? 'data-saver' : 'data'}/${chapter.hash}/';
+}
+
+@freezed
+class ChapterList with _$ChapterList {
+  const factory ChapterList(
+    List<Chapter> data,
+    int total,
+  ) = _ChapterList;
+
+  factory ChapterList.fromJson(Map<String, dynamic> json) => _$ChapterListFromJson(json);
 }
 
 @freezed
@@ -593,8 +576,7 @@ class CoverList with _$CoverList {
     int total,
   ) = _CoverList;
 
-  factory CoverList.fromJson(Map<String, dynamic> json) =>
-      _$CoverListFromJson(json);
+  factory CoverList.fromJson(Map<String, dynamic> json) => _$CoverListFromJson(json);
 }
 
 @freezed
@@ -604,8 +586,7 @@ class MangaList with _$MangaList {
     int total,
   ) = _MangaList;
 
-  factory MangaList.fromJson(Map<String, dynamic> json) =>
-      _$MangaListFromJson(json);
+  factory MangaList.fromJson(Map<String, dynamic> json) => _$MangaListFromJson(json);
 }
 
 @freezed
@@ -615,8 +596,7 @@ class GroupList with _$GroupList {
     int total,
   ) = _GroupList;
 
-  factory GroupList.fromJson(Map<String, dynamic> json) =>
-      _$GroupListFromJson(json);
+  factory GroupList.fromJson(Map<String, dynamic> json) => _$GroupListFromJson(json);
 }
 
 @freezed
@@ -626,8 +606,7 @@ class CreatorList with _$CreatorList {
     int total,
   ) = _CreatorListList;
 
-  factory CreatorList.fromJson(Map<String, dynamic> json) =>
-      _$CreatorListFromJson(json);
+  factory CreatorList.fromJson(Map<String, dynamic> json) => _$CreatorListFromJson(json);
 }
 
 mixin MangaOps {
@@ -679,16 +658,14 @@ mixin MangaOps {
     return covers.first.quality(quality: quality);
   }
 
-  CoverArtUrl getUrlFromCover(CoverArt cover,
-      {CoverArtQuality quality = CoverArtQuality.best}) {
+  CoverArtUrl getUrlFromCover(CoverArt cover, {CoverArtQuality quality = CoverArtQuality.best}) {
     final filename = cover.attributes?.fileName;
 
     if (filename == null) {
       return 'https://mangadex.org/img/cover-placeholder.jpg';
     }
 
-    return 'https://uploads.mangadex.org/covers/$id/$filename'
-        .quality(quality: quality);
+    return 'https://uploads.mangadex.org/covers/$id/$filename'.quality(quality: quality);
   }
 
   List<CreatorType>? _getAuthor() {
@@ -718,9 +695,7 @@ mixin MangaOps {
 
     final tags = attributes!.tags;
 
-    final lstag = tags.any((e) =>
-        e.attributes.group == TagGroup.format &&
-        e.attributes.name.get('en') == "Long Strip");
+    final lstag = tags.any((e) => e.attributes.group == TagGroup.format && e.attributes.name.get('en') == "Long Strip");
 
     return lstag;
   }
@@ -745,8 +720,7 @@ class MangaLinks with _$MangaLinks {
     String? mal,
   }) = _MangaLinks;
 
-  factory MangaLinks.fromJson(Map<String, dynamic> json) =>
-      _$MangaLinksFromJson(json);
+  factory MangaLinks.fromJson(Map<String, dynamic> json) => _$MangaLinksFromJson(json);
 }
 
 @freezed
@@ -769,8 +743,7 @@ class MangaAttributes with _$MangaAttributes {
     @TimestampSerializer() required DateTime updatedAt,
   }) = _MangaAttributes;
 
-  factory MangaAttributes.fromJson(Map<String, dynamic> json) =>
-      _$MangaAttributesFromJson(json);
+  factory MangaAttributes.fromJson(Map<String, dynamic> json) => _$MangaAttributesFromJson(json);
 }
 
 @freezed
@@ -791,8 +764,7 @@ class TagAttributes with _$TagAttributes {
     required TagGroup group,
   }) = _TagAttributes;
 
-  factory TagAttributes.fromJson(Map<String, dynamic> json) =>
-      _$TagAttributesFromJson(json);
+  factory TagAttributes.fromJson(Map<String, dynamic> json) => _$TagAttributesFromJson(json);
 }
 
 @freezed
@@ -802,8 +774,7 @@ class TagResponse with _$TagResponse {
     int total,
   ) = _TagResponse;
 
-  factory TagResponse.fromJson(Map<String, dynamic> json) =>
-      _$TagResponseFromJson(json);
+  factory TagResponse.fromJson(Map<String, dynamic> json) => _$TagResponseFromJson(json);
 }
 
 @freezed
@@ -812,8 +783,7 @@ class MangaStatisticsResponse with _$MangaStatisticsResponse {
     Map<String, MangaStatistics> statistics,
   ) = _MangaStatisticsResponse;
 
-  factory MangaStatisticsResponse.fromJson(Map<String, dynamic> json) =>
-      _$MangaStatisticsResponseFromJson(json);
+  factory MangaStatisticsResponse.fromJson(Map<String, dynamic> json) => _$MangaStatisticsResponseFromJson(json);
 }
 
 @freezed
@@ -822,8 +792,7 @@ class ChapterStatisticsResponse with _$ChapterStatisticsResponse {
     Map<String, ChapterStatistics> statistics,
   ) = _ChapterStatisticsResponse;
 
-  factory ChapterStatisticsResponse.fromJson(Map<String, dynamic> json) =>
-      _$ChapterStatisticsResponseFromJson(json);
+  factory ChapterStatisticsResponse.fromJson(Map<String, dynamic> json) => _$ChapterStatisticsResponseFromJson(json);
 }
 
 @freezed
@@ -834,8 +803,7 @@ class MangaStatistics with _$MangaStatistics {
     required int follows,
   }) = _MangaStatistics;
 
-  factory MangaStatistics.fromJson(Map<String, dynamic> json) =>
-      _$MangaStatisticsFromJson(json);
+  factory MangaStatistics.fromJson(Map<String, dynamic> json) => _$MangaStatisticsFromJson(json);
 }
 
 @freezed
@@ -844,8 +812,7 @@ class ChapterStatistics with _$ChapterStatistics {
     StatisticsDetailsComments? comments,
   }) = _ChapterStatistics;
 
-  factory ChapterStatistics.fromJson(Map<String, dynamic> json) =>
-      _$ChapterStatisticsFromJson(json);
+  factory ChapterStatistics.fromJson(Map<String, dynamic> json) => _$ChapterStatisticsFromJson(json);
 }
 
 @freezed
@@ -855,8 +822,7 @@ class StatisticsDetailsComments with _$StatisticsDetailsComments {
     required int repliesCount,
   }) = _StatisticsDetailsComments;
 
-  factory StatisticsDetailsComments.fromJson(Map<String, dynamic> json) =>
-      _$StatisticsDetailsCommentsFromJson(json);
+  factory StatisticsDetailsComments.fromJson(Map<String, dynamic> json) => _$StatisticsDetailsCommentsFromJson(json);
 }
 
 @freezed
@@ -866,8 +832,7 @@ class StatisticsDetailsRating with _$StatisticsDetailsRating {
     required double bayesian,
   }) = _StatisticsDetailsRating;
 
-  factory StatisticsDetailsRating.fromJson(Map<String, dynamic> json) =>
-      _$StatisticsDetailsRatingFromJson(json);
+  factory StatisticsDetailsRating.fromJson(Map<String, dynamic> json) => _$StatisticsDetailsRatingFromJson(json);
 }
 
 @freezed
@@ -876,8 +841,7 @@ class SelfRatingResponse with _$SelfRatingResponse {
     Map<String, SelfRating> ratings,
   ) = _SelfRatingResponse;
 
-  factory SelfRatingResponse.fromJson(Map<String, dynamic> json) =>
-      _$SelfRatingResponseFromJson(json);
+  factory SelfRatingResponse.fromJson(Map<String, dynamic> json) => _$SelfRatingResponseFromJson(json);
 }
 
 @freezed
@@ -892,8 +856,7 @@ class SelfRating with _$SelfRating, ExpiringData {
   @override
   final expiry = DateTime.now().add(const Duration(minutes: 10));
 
-  factory SelfRating.fromJson(Map<String, dynamic> json) =>
-      _$SelfRatingFromJson(json);
+  factory SelfRating.fromJson(Map<String, dynamic> json) => _$SelfRatingFromJson(json);
 }
 
 @freezed
@@ -903,8 +866,7 @@ class CustomListList with _$CustomListList {
     int total,
   ) = _CustomListList;
 
-  factory CustomListList.fromJson(Map<String, dynamic> json) =>
-      _$CustomListListFromJson(json);
+  factory CustomListList.fromJson(Map<String, dynamic> json) => _$CustomListListFromJson(json);
 }
 
 @freezed
@@ -920,8 +882,7 @@ class CustomList with _$CustomList, MangaDexUUID {
   late final set = _convertIDs();
   late final user = _getUser();
 
-  factory CustomList.fromJson(Map<String, dynamic> json) =>
-      _$CustomListFromJson(json);
+  factory CustomList.fromJson(Map<String, dynamic> json) => _$CustomListFromJson(json);
 
   Set<String> _convertIDs() {
     final rs = relationships.whereType<Manga>();
@@ -952,8 +913,7 @@ class CustomListAttributes with _$CustomListAttributes {
     required int version,
   }) = _CustomListAttributes;
 
-  factory CustomListAttributes.fromJson(Map<String, dynamic> json) =>
-      _$CustomListAttributesFromJson(json);
+  factory CustomListAttributes.fromJson(Map<String, dynamic> json) => _$CustomListAttributesFromJson(json);
 }
 
 @freezed
@@ -963,8 +923,7 @@ class ErrorResponse with _$ErrorResponse {
     List<MDError> errors,
   ) = _ErrorResponse;
 
-  factory ErrorResponse.fromJson(Map<String, dynamic> json) =>
-      _$ErrorResponseFromJson(json);
+  factory ErrorResponse.fromJson(Map<String, dynamic> json) => _$ErrorResponseFromJson(json);
 }
 
 @freezed
@@ -977,8 +936,7 @@ class MDError with _$MDError {
     String? context,
   }) = _MDError;
 
-  factory MDError.fromJson(Map<String, dynamic> json) =>
-      _$MDErrorFromJson(json);
+  factory MDError.fromJson(Map<String, dynamic> json) => _$MDErrorFromJson(json);
 }
 
 class MangaDexException implements Exception {
@@ -1023,8 +981,7 @@ class ChapterFeedItemData {
   final Manga manga;
 
   String get mangaId => manga.id;
-  String get coverArt =>
-      manga.getFirstCoverUrl(quality: CoverArtQuality.medium);
+  String get coverArt => manga.getFirstCoverUrl(quality: CoverArtQuality.medium);
   late final id = generateKey();
 
   final List<Chapter> chapters = [];

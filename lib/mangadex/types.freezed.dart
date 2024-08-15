@@ -562,188 +562,6 @@ abstract class _MangaSearchParameters implements MangaSearchParameters {
       get copyWith => throw _privateConstructorUsedError;
 }
 
-ChapterList _$ChapterListFromJson(Map<String, dynamic> json) {
-  return _ChapterList.fromJson(json);
-}
-
-/// @nodoc
-mixin _$ChapterList {
-  List<Chapter> get data => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-
-  /// Serializes this ChapterList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ChapterList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ChapterListCopyWith<ChapterList> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ChapterListCopyWith<$Res> {
-  factory $ChapterListCopyWith(
-          ChapterList value, $Res Function(ChapterList) then) =
-      _$ChapterListCopyWithImpl<$Res, ChapterList>;
-  @useResult
-  $Res call({List<Chapter> data, int total});
-}
-
-/// @nodoc
-class _$ChapterListCopyWithImpl<$Res, $Val extends ChapterList>
-    implements $ChapterListCopyWith<$Res> {
-  _$ChapterListCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ChapterList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Chapter>,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$ChapterListImplCopyWith<$Res>
-    implements $ChapterListCopyWith<$Res> {
-  factory _$$ChapterListImplCopyWith(
-          _$ChapterListImpl value, $Res Function(_$ChapterListImpl) then) =
-      __$$ChapterListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<Chapter> data, int total});
-}
-
-/// @nodoc
-class __$$ChapterListImplCopyWithImpl<$Res>
-    extends _$ChapterListCopyWithImpl<$Res, _$ChapterListImpl>
-    implements _$$ChapterListImplCopyWith<$Res> {
-  __$$ChapterListImplCopyWithImpl(
-      _$ChapterListImpl _value, $Res Function(_$ChapterListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ChapterList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_$ChapterListImpl(
-      null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Chapter>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ChapterListImpl with DiagnosticableTreeMixin implements _ChapterList {
-  const _$ChapterListImpl(final List<Chapter> data, this.total) : _data = data;
-
-  factory _$ChapterListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ChapterListImplFromJson(json);
-
-  final List<Chapter> _data;
-  @override
-  List<Chapter> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final int total;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ChapterList(data: $data, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'ChapterList'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('total', total));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ChapterListImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
-
-  /// Create a copy of ChapterList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
-      __$$ChapterListImplCopyWithImpl<_$ChapterListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ChapterListImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _ChapterList implements ChapterList {
-  const factory _ChapterList(final List<Chapter> data, final int total) =
-      _$ChapterListImpl;
-
-  factory _ChapterList.fromJson(Map<String, dynamic> json) =
-      _$ChapterListImpl.fromJson;
-
-  @override
-  List<Chapter> get data;
-  @override
-  int get total;
-
-  /// Create a copy of ChapterList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
 Chapter _$ChapterFromJson(Map<String, dynamic> json) {
   return _Chapter.fromJson(json);
 }
@@ -4525,6 +4343,188 @@ abstract class _ChapterAPI extends ChapterAPI {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChapterAPIImplCopyWith<_$ChapterAPIImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ChapterList _$ChapterListFromJson(Map<String, dynamic> json) {
+  return _ChapterList.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ChapterList {
+  List<Chapter> get data => throw _privateConstructorUsedError;
+  int get total => throw _privateConstructorUsedError;
+
+  /// Serializes this ChapterList to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ChapterListCopyWith<ChapterList> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ChapterListCopyWith<$Res> {
+  factory $ChapterListCopyWith(
+          ChapterList value, $Res Function(ChapterList) then) =
+      _$ChapterListCopyWithImpl<$Res, ChapterList>;
+  @useResult
+  $Res call({List<Chapter> data, int total});
+}
+
+/// @nodoc
+class _$ChapterListCopyWithImpl<$Res, $Val extends ChapterList>
+    implements $ChapterListCopyWith<$Res> {
+  _$ChapterListCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Chapter>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ChapterListImplCopyWith<$Res>
+    implements $ChapterListCopyWith<$Res> {
+  factory _$$ChapterListImplCopyWith(
+          _$ChapterListImpl value, $Res Function(_$ChapterListImpl) then) =
+      __$$ChapterListImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<Chapter> data, int total});
+}
+
+/// @nodoc
+class __$$ChapterListImplCopyWithImpl<$Res>
+    extends _$ChapterListCopyWithImpl<$Res, _$ChapterListImpl>
+    implements _$$ChapterListImplCopyWith<$Res> {
+  __$$ChapterListImplCopyWithImpl(
+      _$ChapterListImpl _value, $Res Function(_$ChapterListImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+    Object? total = null,
+  }) {
+    return _then(_$ChapterListImpl(
+      null == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<Chapter>,
+      null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ChapterListImpl with DiagnosticableTreeMixin implements _ChapterList {
+  const _$ChapterListImpl(final List<Chapter> data, this.total) : _data = data;
+
+  factory _$ChapterListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChapterListImplFromJson(json);
+
+  final List<Chapter> _data;
+  @override
+  List<Chapter> get data {
+    if (_data is EqualUnmodifiableListView) return _data;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_data);
+  }
+
+  @override
+  final int total;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ChapterList(data: $data, total: $total)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ChapterList'))
+      ..add(DiagnosticsProperty('data', data))
+      ..add(DiagnosticsProperty('total', total));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChapterListImpl &&
+            const DeepCollectionEquality().equals(other._data, _data) &&
+            (identical(other.total, total) || other.total == total));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_data), total);
+
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
+      __$$ChapterListImplCopyWithImpl<_$ChapterListImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ChapterListImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ChapterList implements ChapterList {
+  const factory _ChapterList(final List<Chapter> data, final int total) =
+      _$ChapterListImpl;
+
+  factory _ChapterList.fromJson(Map<String, dynamic> json) =
+      _$ChapterListImpl.fromJson;
+
+  @override
+  List<Chapter> get data;
+  @override
+  int get total;
+
+  /// Create a copy of ChapterList
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

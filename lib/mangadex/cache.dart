@@ -8,12 +8,10 @@ import 'package:gagaku/types.dart';
 extension MDCacheManagerExt on CacheManager {
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
   Future<void> putAllAPIResolved(Iterable<MangaDexUUID> list,
-      [Duration expiry = const Duration(minutes: 15),
-      UnserializeCallback? unserializer]) async {
+      [Duration expiry = const Duration(minutes: 15), UnserializeCallback? unserializer]) async {
     final resolved = {
       for (var e in list)
-        e.id: CacheEntry(json.encode(e.toJson()),
-            duration: expiry, reference: e, unserializer: unserializer)
+        e.id: CacheEntry(json.encode(e.toJson()), duration: expiry, reference: e, unserializer: unserializer)
     };
 
     await putAll(resolved);
@@ -43,8 +41,7 @@ extension MDCacheManagerExt on CacheManager {
 
   /// Gets all API data that is a part of a special query given by [key]
   /// Assumes the special query [key] exists.
-  Future<Iterable<CRef>> getSpecialList(String key,
-      [UnserializeCallback? unserializer]) async {
+  Future<Iterable<CRef>> getSpecialList(String key, [UnserializeCallback? unserializer]) async {
     logger.d('CacheManager: retrieving list: $key');
 
     final entry = get(key).get<List<dynamic>>();
