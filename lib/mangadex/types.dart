@@ -454,53 +454,17 @@ class ChapterAPI with _$ChapterAPI {
 }
 
 @freezed
-class ChapterList with _$ChapterList {
-  const factory ChapterList(
-    List<Chapter> data,
-    int total,
-  ) = _ChapterList;
+class MDEntityList with _$MDEntityList {
+  const factory MDEntityList({
+    required String result,
+    required String response,
+    required List<MangaDexEntity> data,
+    required int limit,
+    required int offset,
+    required int total,
+  }) = _MDEntityList;
 
-  factory ChapterList.fromJson(Map<String, dynamic> json) => _$ChapterListFromJson(json);
-}
-
-@freezed
-class CoverList with _$CoverList {
-  const factory CoverList(
-    List<CoverArt> data,
-    int total,
-  ) = _CoverList;
-
-  factory CoverList.fromJson(Map<String, dynamic> json) => _$CoverListFromJson(json);
-}
-
-@freezed
-class MangaList with _$MangaList {
-  const factory MangaList(
-    List<Manga> data,
-    int total,
-  ) = _MangaList;
-
-  factory MangaList.fromJson(Map<String, dynamic> json) => _$MangaListFromJson(json);
-}
-
-@freezed
-class GroupList with _$GroupList {
-  const factory GroupList(
-    List<Group> data,
-    int total,
-  ) = _GroupList;
-
-  factory GroupList.fromJson(Map<String, dynamic> json) => _$GroupListFromJson(json);
-}
-
-@freezed
-class CreatorList with _$CreatorList {
-  const factory CreatorList(
-    List<Author> data,
-    int total,
-  ) = _CreatorListList;
-
-  factory CreatorList.fromJson(Map<String, dynamic> json) => _$CreatorListFromJson(json);
+  factory MDEntityList.fromJson(Map<String, dynamic> json) => _$MDEntityListFromJson(json);
 }
 
 mixin ChapterOps {
@@ -808,16 +772,6 @@ class TagAttributes with _$TagAttributes {
 }
 
 @freezed
-class TagResponse with _$TagResponse {
-  const factory TagResponse(
-    List<Tag> data,
-    int total,
-  ) = _TagResponse;
-
-  factory TagResponse.fromJson(Map<String, dynamic> json) => _$TagResponseFromJson(json);
-}
-
-@freezed
 class MangaStatisticsResponse with _$MangaStatisticsResponse {
   const factory MangaStatisticsResponse(
     Map<String, MangaStatistics> statistics,
@@ -897,16 +851,6 @@ class SelfRating with _$SelfRating, ExpiringData {
   final expiry = DateTime.now().add(const Duration(minutes: 10));
 
   factory SelfRating.fromJson(Map<String, dynamic> json) => _$SelfRatingFromJson(json);
-}
-
-@freezed
-class CustomListList with _$CustomListList {
-  const factory CustomListList(
-    List<CustomList> data,
-    int total,
-  ) = _CustomListList;
-
-  factory CustomListList.fromJson(Map<String, dynamic> json) => _$CustomListListFromJson(json);
 }
 
 @freezed

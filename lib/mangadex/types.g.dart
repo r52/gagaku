@@ -323,75 +323,25 @@ Map<String, dynamic> _$$ChapterAPIImplToJson(_$ChapterAPIImpl instance) =>
       'chapter': instance.chapter,
     };
 
-_$ChapterListImpl _$$ChapterListImplFromJson(Map<String, dynamic> json) =>
-    _$ChapterListImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
+_$MDEntityListImpl _$$MDEntityListImplFromJson(Map<String, dynamic> json) =>
+    _$MDEntityListImpl(
+      result: json['result'] as String,
+      response: json['response'] as String,
+      data: (json['data'] as List<dynamic>)
+          .map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
           .toList(),
-      (json['total'] as num).toInt(),
+      limit: (json['limit'] as num).toInt(),
+      offset: (json['offset'] as num).toInt(),
+      total: (json['total'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$ChapterListImplToJson(_$ChapterListImpl instance) =>
+Map<String, dynamic> _$$MDEntityListImplToJson(_$MDEntityListImpl instance) =>
     <String, dynamic>{
+      'result': instance.result,
+      'response': instance.response,
       'data': instance.data,
-      'total': instance.total,
-    };
-
-_$CoverListImpl _$$CoverListImplFromJson(Map<String, dynamic> json) =>
-    _$CoverListImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => CoverArt.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['total'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$$CoverListImplToJson(_$CoverListImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'total': instance.total,
-    };
-
-_$MangaListImpl _$$MangaListImplFromJson(Map<String, dynamic> json) =>
-    _$MangaListImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => Manga.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['total'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$$MangaListImplToJson(_$MangaListImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'total': instance.total,
-    };
-
-_$GroupListImpl _$$GroupListImplFromJson(Map<String, dynamic> json) =>
-    _$GroupListImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => Group.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['total'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$$GroupListImplToJson(_$GroupListImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'total': instance.total,
-    };
-
-_$CreatorListListImpl _$$CreatorListListImplFromJson(
-        Map<String, dynamic> json) =>
-    _$CreatorListListImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => Author.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['total'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$$CreatorListListImplToJson(
-        _$CreatorListListImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
+      'limit': instance.limit,
+      'offset': instance.offset,
       'total': instance.total,
     };
 
@@ -589,20 +539,6 @@ const _$TagGroupEnumMap = {
   TagGroup.theme: 'theme',
 };
 
-_$TagResponseImpl _$$TagResponseImplFromJson(Map<String, dynamic> json) =>
-    _$TagResponseImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['total'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$$TagResponseImplToJson(_$TagResponseImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'total': instance.total,
-    };
-
 _$MangaStatisticsResponseImpl _$$MangaStatisticsResponseImplFromJson(
         Map<String, dynamic> json) =>
     _$MangaStatisticsResponseImpl(
@@ -720,21 +656,6 @@ Map<String, dynamic> _$$SelfRatingImplToJson(_$SelfRatingImpl instance) =>
     <String, dynamic>{
       'rating': instance.rating,
       'createdAt': const TimestampSerializer().toJson(instance.createdAt),
-    };
-
-_$CustomListListImpl _$$CustomListListImplFromJson(Map<String, dynamic> json) =>
-    _$CustomListListImpl(
-      (json['data'] as List<dynamic>)
-          .map((e) => CustomList.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['total'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$$CustomListListImplToJson(
-        _$CustomListListImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'total': instance.total,
     };
 
 _$CustomListAttributesImpl _$$CustomListAttributesImplFromJson(

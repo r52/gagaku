@@ -344,7 +344,7 @@ class MangaDexModel {
   /// [feedKey]   sets the key for caching purposes
   /// [limit]     limits number of items per query
   /// [offset]    denotes the nth item to start fetching from.
-  /// [entity]    a [MangaDexUUID] entity that the feed corresponds to
+  /// [entity]    a [MangaDexEntity] entity that the feed corresponds to
   /// [orderKey]  order scheme
   /// [order]     order direction
   ///
@@ -354,7 +354,7 @@ class MangaDexModel {
     required String feedKey,
     required int limit,
     int offset = 0,
-    MangaDexUUID? entity,
+    MangaDexEntity? entity,
     String orderKey = 'publishAt',
     String order = 'desc',
   }) async {
@@ -390,12 +390,12 @@ class MangaDexModel {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-      final result = ChapterList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data and list
       await _cache.putSpecialList(key, result.data, resolve: true);
 
-      return result.data;
+      return result.data.cast<Chapter>();
     }
 
     // Throw if failure
@@ -433,7 +433,7 @@ class MangaDexModel {
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
-          final result = ChapterList.fromJson(body);
+          final result = MDEntityList.fromJson(body);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
@@ -490,7 +490,7 @@ class MangaDexModel {
 
           if (response.statusCode == 200) {
             final Map<String, dynamic> body = json.decode(response.body);
-            final mangalist = MangaList.fromJson(body);
+            final mangalist = MDEntityList.fromJson(body);
 
             // Cache the data
             await _cache.putAllAPIResolved(mangalist.data);
@@ -529,12 +529,12 @@ class MangaDexModel {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = json.decode(response.body);
-        final mangalist = MangaList.fromJson(body);
+        final result = MDEntityList.fromJson(body);
 
         // Cache the data
-        await _cache.putAllAPIResolved(mangalist.data);
+        await _cache.putAllAPIResolved(result.data);
 
-        return mangalist.data;
+        return result.data.cast<Manga>();
       } else {
         // Throw if failure
         throw createException("fetchManga(filterId) failed.", response);
@@ -579,12 +579,12 @@ class MangaDexModel {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-      final mlist = MangaList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data
-      await _cache.putAllAPIResolved(mlist.data);
+      await _cache.putAllAPIResolved(result.data);
 
-      return mlist.data;
+      return result.data.cast<Manga>();
     }
 
     // Throw if failure
@@ -871,12 +871,12 @@ class MangaDexModel {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-      final result = TagResponse.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data and list
       await _cache.putSpecialList(CacheLists.tags, result.data, resolve: true, expiry: const Duration(days: 7));
 
-      return result.data;
+      return result.data.cast<Tag>();
     }
 
     // Throw if failure
@@ -963,12 +963,12 @@ class MangaDexModel {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-      final result = CoverList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data
       await _cache.putSpecialList(key, result.data, resolve: true);
 
-      return result.data;
+      return result.data.cast<CoverArt>();
     }
 
     // Throw if failure
@@ -1082,7 +1082,7 @@ class MangaDexModel {
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
-          final result = GroupList.fromJson(body);
+          final result = MDEntityList.fromJson(body);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
@@ -1128,7 +1128,7 @@ class MangaDexModel {
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
-          final result = CreatorList.fromJson(body);
+          final result = MDEntityList.fromJson(body);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
@@ -1202,7 +1202,7 @@ class MangaDexModel {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-      final result = CustomListList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache entries
       await _cache.putAllAPIResolved(result.data);
@@ -1274,7 +1274,7 @@ class MangaDexModel {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-      final result = CustomListList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache entries
       await _cache.putAllAPIResolved(result.data);
@@ -2556,6 +2556,7 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
 class RateLimitedClient extends http.BaseClient {
   final http.Client _baseClient = RetryClient(
     http.Client(),
+    retries: 2,
     when: (response) => false,
     whenError: (error, stacktrace) => error is HttpException || error is http.ClientException,
   );

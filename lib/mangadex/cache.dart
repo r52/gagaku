@@ -7,7 +7,7 @@ import 'package:gagaku/types.dart';
 
 extension MDCacheManagerExt on CacheManager {
   /// Adds all API data from a [list] into the cache, resolving its ids automatically
-  Future<void> putAllAPIResolved(Iterable<MangaDexUUID> list,
+  Future<void> putAllAPIResolved(Iterable<MangaDexEntity> list,
       [Duration expiry = const Duration(minutes: 15), UnserializeCallback? unserializer]) async {
     final resolved = {
       for (var e in list)
@@ -21,7 +21,7 @@ extension MDCacheManagerExt on CacheManager {
   /// if requested, as a part of a special query given by [key]
   Future<void> putSpecialList(
     String key,
-    Iterable<MangaDexUUID> list, {
+    Iterable<MangaDexEntity> list, {
     bool resolve = true,
     Duration expiry = const Duration(minutes: 15),
     UnserializeCallback? unserializer,

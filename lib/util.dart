@@ -68,8 +68,7 @@ extension StringExtension on String {
 class DeviceContext {
   static bool isMobile() => (Platform.isIOS || Platform.isAndroid);
 
-  static bool isDesktop() =>
-      (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
+  static bool isDesktop() => (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
   static bool screenWidthSmall(BuildContext context) {
     // Somewhat arbitrary measurement but w/e
@@ -161,8 +160,7 @@ mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>, FutureOr<T>> {
 
     ref.onCancel(() {
       _staleTimer = Timer(duration, () {
-        logger.d(
-            '${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+        logger.d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
         link.close();
       });
     });
@@ -199,8 +197,7 @@ extension CacheForExtension on Ref<Object?> {
     final link = keepAlive();
 
     onCancel(() {
-      logger
-          .d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+      logger.d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
       timer = Timer(duration, link.close);
     });
 

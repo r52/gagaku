@@ -4290,57 +4290,87 @@ abstract class _ChapterAPI extends ChapterAPI {
       throw _privateConstructorUsedError;
 }
 
-ChapterList _$ChapterListFromJson(Map<String, dynamic> json) {
-  return _ChapterList.fromJson(json);
+MDEntityList _$MDEntityListFromJson(Map<String, dynamic> json) {
+  return _MDEntityList.fromJson(json);
 }
 
 /// @nodoc
-mixin _$ChapterList {
-  List<Chapter> get data => throw _privateConstructorUsedError;
+mixin _$MDEntityList {
+  String get result => throw _privateConstructorUsedError;
+  String get response => throw _privateConstructorUsedError;
+  List<MangaDexEntity> get data => throw _privateConstructorUsedError;
+  int get limit => throw _privateConstructorUsedError;
+  int get offset => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
-  /// Serializes this ChapterList to a JSON map.
+  /// Serializes this MDEntityList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of ChapterList
+  /// Create a copy of MDEntityList
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ChapterListCopyWith<ChapterList> get copyWith =>
+  $MDEntityListCopyWith<MDEntityList> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $ChapterListCopyWith<$Res> {
-  factory $ChapterListCopyWith(
-          ChapterList value, $Res Function(ChapterList) then) =
-      _$ChapterListCopyWithImpl<$Res, ChapterList>;
+abstract class $MDEntityListCopyWith<$Res> {
+  factory $MDEntityListCopyWith(
+          MDEntityList value, $Res Function(MDEntityList) then) =
+      _$MDEntityListCopyWithImpl<$Res, MDEntityList>;
   @useResult
-  $Res call({List<Chapter> data, int total});
+  $Res call(
+      {String result,
+      String response,
+      List<MangaDexEntity> data,
+      int limit,
+      int offset,
+      int total});
 }
 
 /// @nodoc
-class _$ChapterListCopyWithImpl<$Res, $Val extends ChapterList>
-    implements $ChapterListCopyWith<$Res> {
-  _$ChapterListCopyWithImpl(this._value, this._then);
+class _$MDEntityListCopyWithImpl<$Res, $Val extends MDEntityList>
+    implements $MDEntityListCopyWith<$Res> {
+  _$MDEntityListCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of ChapterList
+  /// Create a copy of MDEntityList
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? result = null,
+    Object? response = null,
     Object? data = null,
+    Object? limit = null,
+    Object? offset = null,
     Object? total = null,
   }) {
     return _then(_value.copyWith(
+      result: null == result
+          ? _value.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as String,
+      response: null == response
+          ? _value.response
+          : response // ignore: cast_nullable_to_non_nullable
+              as String,
       data: null == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<Chapter>,
+              as List<MangaDexEntity>,
+      limit: null == limit
+          ? _value.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+      offset: null == offset
+          ? _value.offset
+          : offset // ignore: cast_nullable_to_non_nullable
+              as int,
       total: null == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
@@ -4350,803 +4380,120 @@ class _$ChapterListCopyWithImpl<$Res, $Val extends ChapterList>
 }
 
 /// @nodoc
-abstract class _$$ChapterListImplCopyWith<$Res>
-    implements $ChapterListCopyWith<$Res> {
-  factory _$$ChapterListImplCopyWith(
-          _$ChapterListImpl value, $Res Function(_$ChapterListImpl) then) =
-      __$$ChapterListImplCopyWithImpl<$Res>;
+abstract class _$$MDEntityListImplCopyWith<$Res>
+    implements $MDEntityListCopyWith<$Res> {
+  factory _$$MDEntityListImplCopyWith(
+          _$MDEntityListImpl value, $Res Function(_$MDEntityListImpl) then) =
+      __$$MDEntityListImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<Chapter> data, int total});
+  $Res call(
+      {String result,
+      String response,
+      List<MangaDexEntity> data,
+      int limit,
+      int offset,
+      int total});
 }
 
 /// @nodoc
-class __$$ChapterListImplCopyWithImpl<$Res>
-    extends _$ChapterListCopyWithImpl<$Res, _$ChapterListImpl>
-    implements _$$ChapterListImplCopyWith<$Res> {
-  __$$ChapterListImplCopyWithImpl(
-      _$ChapterListImpl _value, $Res Function(_$ChapterListImpl) _then)
+class __$$MDEntityListImplCopyWithImpl<$Res>
+    extends _$MDEntityListCopyWithImpl<$Res, _$MDEntityListImpl>
+    implements _$$MDEntityListImplCopyWith<$Res> {
+  __$$MDEntityListImplCopyWithImpl(
+      _$MDEntityListImpl _value, $Res Function(_$MDEntityListImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of ChapterList
+  /// Create a copy of MDEntityList
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? result = null,
+    Object? response = null,
     Object? data = null,
+    Object? limit = null,
+    Object? offset = null,
     Object? total = null,
   }) {
-    return _then(_$ChapterListImpl(
-      null == data
+    return _then(_$MDEntityListImpl(
+      result: null == result
+          ? _value.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as String,
+      response: null == response
+          ? _value.response
+          : response // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<Chapter>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
+              as List<MangaDexEntity>,
+      limit: null == limit
+          ? _value.limit
+          : limit // ignore: cast_nullable_to_non_nullable
               as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ChapterListImpl with DiagnosticableTreeMixin implements _ChapterList {
-  const _$ChapterListImpl(final List<Chapter> data, this.total) : _data = data;
-
-  factory _$ChapterListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ChapterListImplFromJson(json);
-
-  final List<Chapter> _data;
-  @override
-  List<Chapter> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final int total;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ChapterList(data: $data, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'ChapterList'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('total', total));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ChapterListImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
-
-  /// Create a copy of ChapterList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
-      __$$ChapterListImplCopyWithImpl<_$ChapterListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ChapterListImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _ChapterList implements ChapterList {
-  const factory _ChapterList(final List<Chapter> data, final int total) =
-      _$ChapterListImpl;
-
-  factory _ChapterList.fromJson(Map<String, dynamic> json) =
-      _$ChapterListImpl.fromJson;
-
-  @override
-  List<Chapter> get data;
-  @override
-  int get total;
-
-  /// Create a copy of ChapterList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ChapterListImplCopyWith<_$ChapterListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-CoverList _$CoverListFromJson(Map<String, dynamic> json) {
-  return _CoverList.fromJson(json);
-}
-
-/// @nodoc
-mixin _$CoverList {
-  List<CoverArt> get data => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-
-  /// Serializes this CoverList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CoverList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CoverListCopyWith<CoverList> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $CoverListCopyWith<$Res> {
-  factory $CoverListCopyWith(CoverList value, $Res Function(CoverList) then) =
-      _$CoverListCopyWithImpl<$Res, CoverList>;
-  @useResult
-  $Res call({List<CoverArt> data, int total});
-}
-
-/// @nodoc
-class _$CoverListCopyWithImpl<$Res, $Val extends CoverList>
-    implements $CoverListCopyWith<$Res> {
-  _$CoverListCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of CoverList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<CoverArt>,
+      offset: null == offset
+          ? _value.offset
+          : offset // ignore: cast_nullable_to_non_nullable
+              as int,
       total: null == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
               as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$CoverListImplCopyWith<$Res>
-    implements $CoverListCopyWith<$Res> {
-  factory _$$CoverListImplCopyWith(
-          _$CoverListImpl value, $Res Function(_$CoverListImpl) then) =
-      __$$CoverListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<CoverArt> data, int total});
-}
-
-/// @nodoc
-class __$$CoverListImplCopyWithImpl<$Res>
-    extends _$CoverListCopyWithImpl<$Res, _$CoverListImpl>
-    implements _$$CoverListImplCopyWith<$Res> {
-  __$$CoverListImplCopyWithImpl(
-      _$CoverListImpl _value, $Res Function(_$CoverListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of CoverList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_$CoverListImpl(
-      null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<CoverArt>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$CoverListImpl with DiagnosticableTreeMixin implements _CoverList {
-  const _$CoverListImpl(final List<CoverArt> data, this.total) : _data = data;
-
-  factory _$CoverListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CoverListImplFromJson(json);
-
-  final List<CoverArt> _data;
-  @override
-  List<CoverArt> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final int total;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CoverList(data: $data, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'CoverList'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('total', total));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CoverListImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
-
-  /// Create a copy of CoverList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CoverListImplCopyWith<_$CoverListImpl> get copyWith =>
-      __$$CoverListImplCopyWithImpl<_$CoverListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$CoverListImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _CoverList implements CoverList {
-  const factory _CoverList(final List<CoverArt> data, final int total) =
-      _$CoverListImpl;
-
-  factory _CoverList.fromJson(Map<String, dynamic> json) =
-      _$CoverListImpl.fromJson;
-
-  @override
-  List<CoverArt> get data;
-  @override
-  int get total;
-
-  /// Create a copy of CoverList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CoverListImplCopyWith<_$CoverListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-MangaList _$MangaListFromJson(Map<String, dynamic> json) {
-  return _MangaList.fromJson(json);
-}
-
-/// @nodoc
-mixin _$MangaList {
-  List<Manga> get data => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-
-  /// Serializes this MangaList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of MangaList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $MangaListCopyWith<MangaList> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $MangaListCopyWith<$Res> {
-  factory $MangaListCopyWith(MangaList value, $Res Function(MangaList) then) =
-      _$MangaListCopyWithImpl<$Res, MangaList>;
-  @useResult
-  $Res call({List<Manga> data, int total});
-}
-
-/// @nodoc
-class _$MangaListCopyWithImpl<$Res, $Val extends MangaList>
-    implements $MangaListCopyWith<$Res> {
-  _$MangaListCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of MangaList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Manga>,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$MangaListImplCopyWith<$Res>
-    implements $MangaListCopyWith<$Res> {
-  factory _$$MangaListImplCopyWith(
-          _$MangaListImpl value, $Res Function(_$MangaListImpl) then) =
-      __$$MangaListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<Manga> data, int total});
-}
-
-/// @nodoc
-class __$$MangaListImplCopyWithImpl<$Res>
-    extends _$MangaListCopyWithImpl<$Res, _$MangaListImpl>
-    implements _$$MangaListImplCopyWith<$Res> {
-  __$$MangaListImplCopyWithImpl(
-      _$MangaListImpl _value, $Res Function(_$MangaListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of MangaList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_$MangaListImpl(
-      null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Manga>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$MangaListImpl with DiagnosticableTreeMixin implements _MangaList {
-  const _$MangaListImpl(final List<Manga> data, this.total) : _data = data;
-
-  factory _$MangaListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$MangaListImplFromJson(json);
-
-  final List<Manga> _data;
-  @override
-  List<Manga> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final int total;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'MangaList(data: $data, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'MangaList'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('total', total));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$MangaListImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
-
-  /// Create a copy of MangaList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$MangaListImplCopyWith<_$MangaListImpl> get copyWith =>
-      __$$MangaListImplCopyWithImpl<_$MangaListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$MangaListImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _MangaList implements MangaList {
-  const factory _MangaList(final List<Manga> data, final int total) =
-      _$MangaListImpl;
-
-  factory _MangaList.fromJson(Map<String, dynamic> json) =
-      _$MangaListImpl.fromJson;
-
-  @override
-  List<Manga> get data;
-  @override
-  int get total;
-
-  /// Create a copy of MangaList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$MangaListImplCopyWith<_$MangaListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-GroupList _$GroupListFromJson(Map<String, dynamic> json) {
-  return _GroupList.fromJson(json);
-}
-
-/// @nodoc
-mixin _$GroupList {
-  List<Group> get data => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-
-  /// Serializes this GroupList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of GroupList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $GroupListCopyWith<GroupList> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $GroupListCopyWith<$Res> {
-  factory $GroupListCopyWith(GroupList value, $Res Function(GroupList) then) =
-      _$GroupListCopyWithImpl<$Res, GroupList>;
-  @useResult
-  $Res call({List<Group> data, int total});
-}
-
-/// @nodoc
-class _$GroupListCopyWithImpl<$Res, $Val extends GroupList>
-    implements $GroupListCopyWith<$Res> {
-  _$GroupListCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of GroupList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Group>,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$GroupListImplCopyWith<$Res>
-    implements $GroupListCopyWith<$Res> {
-  factory _$$GroupListImplCopyWith(
-          _$GroupListImpl value, $Res Function(_$GroupListImpl) then) =
-      __$$GroupListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<Group> data, int total});
-}
-
-/// @nodoc
-class __$$GroupListImplCopyWithImpl<$Res>
-    extends _$GroupListCopyWithImpl<$Res, _$GroupListImpl>
-    implements _$$GroupListImplCopyWith<$Res> {
-  __$$GroupListImplCopyWithImpl(
-      _$GroupListImpl _value, $Res Function(_$GroupListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GroupList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_$GroupListImpl(
-      null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Group>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$GroupListImpl with DiagnosticableTreeMixin implements _GroupList {
-  const _$GroupListImpl(final List<Group> data, this.total) : _data = data;
-
-  factory _$GroupListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GroupListImplFromJson(json);
-
-  final List<Group> _data;
-  @override
-  List<Group> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final int total;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GroupList(data: $data, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'GroupList'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('total', total));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$GroupListImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
-
-  /// Create a copy of GroupList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$GroupListImplCopyWith<_$GroupListImpl> get copyWith =>
-      __$$GroupListImplCopyWithImpl<_$GroupListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GroupListImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _GroupList implements GroupList {
-  const factory _GroupList(final List<Group> data, final int total) =
-      _$GroupListImpl;
-
-  factory _GroupList.fromJson(Map<String, dynamic> json) =
-      _$GroupListImpl.fromJson;
-
-  @override
-  List<Group> get data;
-  @override
-  int get total;
-
-  /// Create a copy of GroupList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GroupListImplCopyWith<_$GroupListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-CreatorList _$CreatorListFromJson(Map<String, dynamic> json) {
-  return _CreatorListList.fromJson(json);
-}
-
-/// @nodoc
-mixin _$CreatorList {
-  List<Author> get data => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-
-  /// Serializes this CreatorList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CreatorList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CreatorListCopyWith<CreatorList> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $CreatorListCopyWith<$Res> {
-  factory $CreatorListCopyWith(
-          CreatorList value, $Res Function(CreatorList) then) =
-      _$CreatorListCopyWithImpl<$Res, CreatorList>;
-  @useResult
-  $Res call({List<Author> data, int total});
-}
-
-/// @nodoc
-class _$CreatorListCopyWithImpl<$Res, $Val extends CreatorList>
-    implements $CreatorListCopyWith<$Res> {
-  _$CreatorListCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of CreatorList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Author>,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$CreatorListListImplCopyWith<$Res>
-    implements $CreatorListCopyWith<$Res> {
-  factory _$$CreatorListListImplCopyWith(_$CreatorListListImpl value,
-          $Res Function(_$CreatorListListImpl) then) =
-      __$$CreatorListListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<Author> data, int total});
-}
-
-/// @nodoc
-class __$$CreatorListListImplCopyWithImpl<$Res>
-    extends _$CreatorListCopyWithImpl<$Res, _$CreatorListListImpl>
-    implements _$$CreatorListListImplCopyWith<$Res> {
-  __$$CreatorListListImplCopyWithImpl(
-      _$CreatorListListImpl _value, $Res Function(_$CreatorListListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of CreatorList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_$CreatorListListImpl(
-      null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Author>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$CreatorListListImpl
-    with DiagnosticableTreeMixin
-    implements _CreatorListList {
-  const _$CreatorListListImpl(final List<Author> data, this.total)
+class _$MDEntityListImpl with DiagnosticableTreeMixin implements _MDEntityList {
+  const _$MDEntityListImpl(
+      {required this.result,
+      required this.response,
+      required final List<MangaDexEntity> data,
+      required this.limit,
+      required this.offset,
+      required this.total})
       : _data = data;
 
-  factory _$CreatorListListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CreatorListListImplFromJson(json);
+  factory _$MDEntityListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MDEntityListImplFromJson(json);
 
-  final List<Author> _data;
   @override
-  List<Author> get data {
+  final String result;
+  @override
+  final String response;
+  final List<MangaDexEntity> _data;
+  @override
+  List<MangaDexEntity> get data {
     if (_data is EqualUnmodifiableListView) return _data;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_data);
   }
 
   @override
+  final int limit;
+  @override
+  final int offset;
+  @override
   final int total;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CreatorList(data: $data, total: $total)';
+    return 'MDEntityList(result: $result, response: $response, data: $data, limit: $limit, offset: $offset, total: $total)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'CreatorList'))
+      ..add(DiagnosticsProperty('type', 'MDEntityList'))
+      ..add(DiagnosticsProperty('result', result))
+      ..add(DiagnosticsProperty('response', response))
       ..add(DiagnosticsProperty('data', data))
+      ..add(DiagnosticsProperty('limit', limit))
+      ..add(DiagnosticsProperty('offset', offset))
       ..add(DiagnosticsProperty('total', total));
   }
 
@@ -5154,50 +4501,67 @@ class _$CreatorListListImpl
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$CreatorListListImpl &&
+            other is _$MDEntityListImpl &&
+            (identical(other.result, result) || other.result == result) &&
+            (identical(other.response, response) ||
+                other.response == response) &&
             const DeepCollectionEquality().equals(other._data, _data) &&
+            (identical(other.limit, limit) || other.limit == limit) &&
+            (identical(other.offset, offset) || other.offset == offset) &&
             (identical(other.total, total) || other.total == total));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
+  int get hashCode => Object.hash(runtimeType, result, response,
+      const DeepCollectionEquality().hash(_data), limit, offset, total);
 
-  /// Create a copy of CreatorList
+  /// Create a copy of MDEntityList
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$CreatorListListImplCopyWith<_$CreatorListListImpl> get copyWith =>
-      __$$CreatorListListImplCopyWithImpl<_$CreatorListListImpl>(
-          this, _$identity);
+  _$$MDEntityListImplCopyWith<_$MDEntityListImpl> get copyWith =>
+      __$$MDEntityListImplCopyWithImpl<_$MDEntityListImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CreatorListListImplToJson(
+    return _$$MDEntityListImplToJson(
       this,
     );
   }
 }
 
-abstract class _CreatorListList implements CreatorList {
-  const factory _CreatorListList(final List<Author> data, final int total) =
-      _$CreatorListListImpl;
+abstract class _MDEntityList implements MDEntityList {
+  const factory _MDEntityList(
+      {required final String result,
+      required final String response,
+      required final List<MangaDexEntity> data,
+      required final int limit,
+      required final int offset,
+      required final int total}) = _$MDEntityListImpl;
 
-  factory _CreatorListList.fromJson(Map<String, dynamic> json) =
-      _$CreatorListListImpl.fromJson;
+  factory _MDEntityList.fromJson(Map<String, dynamic> json) =
+      _$MDEntityListImpl.fromJson;
 
   @override
-  List<Author> get data;
+  String get result;
+  @override
+  String get response;
+  @override
+  List<MangaDexEntity> get data;
+  @override
+  int get limit;
+  @override
+  int get offset;
   @override
   int get total;
 
-  /// Create a copy of CreatorList
+  /// Create a copy of MDEntityList
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CreatorListListImplCopyWith<_$CreatorListListImpl> get copyWith =>
+  _$$MDEntityListImplCopyWith<_$MDEntityListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -7530,188 +6894,6 @@ abstract class _TagAttributes implements TagAttributes {
       throw _privateConstructorUsedError;
 }
 
-TagResponse _$TagResponseFromJson(Map<String, dynamic> json) {
-  return _TagResponse.fromJson(json);
-}
-
-/// @nodoc
-mixin _$TagResponse {
-  List<Tag> get data => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-
-  /// Serializes this TagResponse to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of TagResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $TagResponseCopyWith<TagResponse> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $TagResponseCopyWith<$Res> {
-  factory $TagResponseCopyWith(
-          TagResponse value, $Res Function(TagResponse) then) =
-      _$TagResponseCopyWithImpl<$Res, TagResponse>;
-  @useResult
-  $Res call({List<Tag> data, int total});
-}
-
-/// @nodoc
-class _$TagResponseCopyWithImpl<$Res, $Val extends TagResponse>
-    implements $TagResponseCopyWith<$Res> {
-  _$TagResponseCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of TagResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Tag>,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$TagResponseImplCopyWith<$Res>
-    implements $TagResponseCopyWith<$Res> {
-  factory _$$TagResponseImplCopyWith(
-          _$TagResponseImpl value, $Res Function(_$TagResponseImpl) then) =
-      __$$TagResponseImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<Tag> data, int total});
-}
-
-/// @nodoc
-class __$$TagResponseImplCopyWithImpl<$Res>
-    extends _$TagResponseCopyWithImpl<$Res, _$TagResponseImpl>
-    implements _$$TagResponseImplCopyWith<$Res> {
-  __$$TagResponseImplCopyWithImpl(
-      _$TagResponseImpl _value, $Res Function(_$TagResponseImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of TagResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_$TagResponseImpl(
-      null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<Tag>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$TagResponseImpl with DiagnosticableTreeMixin implements _TagResponse {
-  const _$TagResponseImpl(final List<Tag> data, this.total) : _data = data;
-
-  factory _$TagResponseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TagResponseImplFromJson(json);
-
-  final List<Tag> _data;
-  @override
-  List<Tag> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final int total;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TagResponse(data: $data, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'TagResponse'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('total', total));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$TagResponseImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
-
-  /// Create a copy of TagResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$TagResponseImplCopyWith<_$TagResponseImpl> get copyWith =>
-      __$$TagResponseImplCopyWithImpl<_$TagResponseImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$TagResponseImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _TagResponse implements TagResponse {
-  const factory _TagResponse(final List<Tag> data, final int total) =
-      _$TagResponseImpl;
-
-  factory _TagResponse.fromJson(Map<String, dynamic> json) =
-      _$TagResponseImpl.fromJson;
-
-  @override
-  List<Tag> get data;
-  @override
-  int get total;
-
-  /// Create a copy of TagResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TagResponseImplCopyWith<_$TagResponseImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
 MangaStatisticsResponse _$MangaStatisticsResponseFromJson(
     Map<String, dynamic> json) {
   return _MangaStatisticsResponse.fromJson(json);
@@ -9205,192 +8387,6 @@ abstract class _SelfRating extends SelfRating {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SelfRatingImplCopyWith<_$SelfRatingImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-CustomListList _$CustomListListFromJson(Map<String, dynamic> json) {
-  return _CustomListList.fromJson(json);
-}
-
-/// @nodoc
-mixin _$CustomListList {
-  List<CustomList> get data => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-
-  /// Serializes this CustomListList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CustomListList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CustomListListCopyWith<CustomListList> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $CustomListListCopyWith<$Res> {
-  factory $CustomListListCopyWith(
-          CustomListList value, $Res Function(CustomListList) then) =
-      _$CustomListListCopyWithImpl<$Res, CustomListList>;
-  @useResult
-  $Res call({List<CustomList> data, int total});
-}
-
-/// @nodoc
-class _$CustomListListCopyWithImpl<$Res, $Val extends CustomListList>
-    implements $CustomListListCopyWith<$Res> {
-  _$CustomListListCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of CustomListList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<CustomList>,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$CustomListListImplCopyWith<$Res>
-    implements $CustomListListCopyWith<$Res> {
-  factory _$$CustomListListImplCopyWith(_$CustomListListImpl value,
-          $Res Function(_$CustomListListImpl) then) =
-      __$$CustomListListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<CustomList> data, int total});
-}
-
-/// @nodoc
-class __$$CustomListListImplCopyWithImpl<$Res>
-    extends _$CustomListListCopyWithImpl<$Res, _$CustomListListImpl>
-    implements _$$CustomListListImplCopyWith<$Res> {
-  __$$CustomListListImplCopyWithImpl(
-      _$CustomListListImpl _value, $Res Function(_$CustomListListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of CustomListList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? total = null,
-  }) {
-    return _then(_$CustomListListImpl(
-      null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<CustomList>,
-      null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$CustomListListImpl
-    with DiagnosticableTreeMixin
-    implements _CustomListList {
-  const _$CustomListListImpl(final List<CustomList> data, this.total)
-      : _data = data;
-
-  factory _$CustomListListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CustomListListImplFromJson(json);
-
-  final List<CustomList> _data;
-  @override
-  List<CustomList> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final int total;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CustomListList(data: $data, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'CustomListList'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('total', total));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CustomListListImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), total);
-
-  /// Create a copy of CustomListList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CustomListListImplCopyWith<_$CustomListListImpl> get copyWith =>
-      __$$CustomListListImplCopyWithImpl<_$CustomListListImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$CustomListListImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _CustomListList implements CustomListList {
-  const factory _CustomListList(final List<CustomList> data, final int total) =
-      _$CustomListListImpl;
-
-  factory _CustomListList.fromJson(Map<String, dynamic> json) =
-      _$CustomListListImpl.fromJson;
-
-  @override
-  List<CustomList> get data;
-  @override
-  int get total;
-
-  /// Create a copy of CustomListList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CustomListListImplCopyWith<_$CustomListListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
