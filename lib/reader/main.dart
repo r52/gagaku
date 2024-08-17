@@ -918,10 +918,13 @@ class ReaderWidget extends HookConsumerWidget {
                 focusNode.requestFocus();
               },
               loadingBuilder: (context, event) => Center(
-                child: LinearProgressIndicator(
-                  value: event != null && event.expectedTotalBytes != null
-                      ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
-                      : null,
+                child: SizedBox(
+                  width: 150,
+                  child: LinearProgressIndicator(
+                    value: event != null && event.expectedTotalBytes != null
+                        ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                        : null,
+                  ),
                 ),
               ),
               itemCount: pageCount,
