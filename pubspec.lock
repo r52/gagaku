@@ -1110,10 +1110,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: c5e5b2a142a893a752cb36ae5888680248686725a54afceff31f9a3a76bc53c2
+      sha256: "7b41b6c3507854a159e24ae90a8e3e9cc01eb26a477c118d6dca065b5f55453e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4+1"
+    version: "2.5.4+2"
   stack_trace:
     dependency: transitive
     description:

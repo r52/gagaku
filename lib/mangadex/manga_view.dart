@@ -910,7 +910,8 @@ class _ChapterListSliver extends HookConsumerWidget {
               (index == 0 ||
                   (index > 0 &&
                       keysGrouped[vol]!.elementAt(index - 1).attributes.chapter != chapter.attributes.chapter))) {
-            list.add('${header}Chapter ${chapter.attributes.chapter}');
+            list.add(
+                '$header${chapter.attributes.chapter != null ? 'Chapter ${chapter.attributes.chapter}' : chapter.title}');
           }
 
           list.add(chapter.id);
