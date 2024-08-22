@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gagaku/cache.dart';
+import 'package:gagaku/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
@@ -25,7 +26,7 @@ class ProxyHandler {
   }
 
   final Ref ref;
-  final http.Client _client = http.Client();
+  final http.Client _client = RateLimitedClient();
   late final CacheManager _cache;
 
   Future<void> invalidateCacheItem(String item) async {
@@ -38,16 +39,12 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
-  Future<bool> handleUrl(
-      {required String url, required BuildContext context}) async {
+  Future<bool> handleUrl({required String url, required BuildContext context}) async {
     if (url.startsWith('https://imgur.com/a/')) {
       final src = url.substring(20);
       final code = '/read/api/imgur/chapter/$src';
-      GoRouter.of(context)
-          .push('/read/imgur/$src/1/1/', extra: WebReaderData(source: code));
-      ref
-          .read(webSourceHistoryProvider.notifier)
-          .add(HistoryLink(title: url, url: url));
+      GoRouter.of(context).push('/read/imgur/$src/1/1/', extra: WebReaderData(source: code));
+      ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(title: url, url: url));
       return true;
     }
 
@@ -60,8 +57,7 @@ class ProxyHandler {
 
       if (!context.mounted) return false;
       if (info.chapter != null) {
-        GoRouter.of(context)
-            .push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
+        GoRouter.of(context).push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
       } else {
         GoRouter.of(context).push('/read/${info.proxy}/${info.code}');
       }
@@ -95,11 +91,9 @@ class ProxyHandler {
         return ProxyInfo(proxy: proxy[1], code: proxy[2]);
       default:
         logger.d('ProxyHandler: retrieving url $url');
-        final response = await _client.send(
-            (http.Request('GET', Uri.parse(url))..followRedirects = false));
+        final response = await _client.send((http.Request('GET', Uri.parse(url))..followRedirects = false));
 
-        if (response.statusCode != 302 ||
-            !response.headers.containsKey('location')) {
+        if (response.statusCode != 302 || !response.headers.containsKey('location')) {
           return null;
         }
 
@@ -135,8 +129,7 @@ class ProxyHandler {
 
   Future<WebManga> _getMangaFromProxy(ProxyInfo info) async {
     final key = info.getKey();
-    final url =
-        "https://cubari.moe/read/api/${info.proxy}/series/${info.code}/";
+    final url = "https://cubari.moe/read/api/${info.proxy}/series/${info.code}/";
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
@@ -231,6 +224,27 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       }
 
       final udp = [link, ...oldstate];
+
+      final links = udp.map((e) => e.toJson()).toList();
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_favorites', json.encode(links));
+
+      return udp;
+    });
+  }
+
+  Future<void> replace(HistoryLink link) async {
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final idx = oldstate.indexOf(link);
+
+      if (idx != -1) {
+        oldstate[idx] = link;
+      }
+
+      final udp = [...oldstate];
 
       final links = udp.map((e) => e.toJson()).toList();
 
@@ -430,8 +444,7 @@ class WebReadMarkers extends _$WebReadMarkers {
         }
       }
 
-      final converted =
-          oldstate.map((key, value) => MapEntry(key, value.toList()));
+      final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
 
       final box = Hive.box(gagakuBox);
       await box.put('web_read_history', json.encode(converted));
@@ -473,8 +486,7 @@ class WebReadMarkers extends _$WebReadMarkers {
         }
       }
 
-      final converted =
-          oldstate.map((key, value) => MapEntry(key, value.toList()));
+      final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
 
       final box = Hive.box(gagakuBox);
       await box.put('web_read_history', json.encode(converted));

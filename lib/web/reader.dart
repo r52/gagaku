@@ -59,7 +59,7 @@ Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, ProxyInf
   if (proxy.manga != null) {
     ref
         .read(webSourceHistoryProvider.notifier)
-        .add(HistoryLink(title: '${info.proxy}: ${proxy.manga?.title}', url: info.getURL()));
+        .add(HistoryLink(title: '${info.proxy}: ${proxy.manga?.title}', url: info.getURL(), cover: proxy.manga!.cover));
 
     final chapter = proxy.manga!.getChapter(info.chapter!);
 

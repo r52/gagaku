@@ -10,12 +10,14 @@ _$HistoryLinkImpl _$$HistoryLinkImplFromJson(Map<String, dynamic> json) =>
     _$HistoryLinkImpl(
       title: json['title'] as String,
       url: json['url'] as String,
+      cover: json['cover'] as String?,
     );
 
 Map<String, dynamic> _$$HistoryLinkImplToJson(_$HistoryLinkImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'url': instance.url,
+      'cover': instance.cover,
     };
 
 _$WebMangaImpl _$$WebMangaImplFromJson(Map<String, dynamic> json) =>

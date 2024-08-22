@@ -121,7 +121,7 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'ec58f50c2a93e4a3e5b619cc2545d77b5aed48c1';
+    r'59188a5d4f269b6f6d3ce28bdd0a08c0a84b6b71';
 
 abstract class _$WebSourceFavorites extends $AsyncNotifier<List<HistoryLink>> {
   FutureOr<List<HistoryLink>> build();

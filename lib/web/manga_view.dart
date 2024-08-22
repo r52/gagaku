@@ -214,13 +214,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final link = HistoryLink(title: '${info.proxy}: ${manga.title}', url: info.getURL());
+    final link = HistoryLink(title: '${info.proxy}: ${manga.title}', url: info.getURL(), cover: manga.cover);
     final chapterlist = manga.chapters.entries.map((e) => ChapterEntry(e.key, e.value)).toList();
     chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
         ref.read(webSourceHistoryProvider.notifier).add(link);
+        ref.read(webSourceFavoritesProvider.notifier).replace(link);
       });
       return null;
     }, []);

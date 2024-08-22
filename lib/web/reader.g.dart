@@ -91,7 +91,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'5d11600ba0f7a9d1cd357f4fa199b9b85cdf316c';
+    r'd5f51eb0e901ac6ac2fbe386459d08d2ee354ee6';
 
 final class _FetchWebChapterInfoFamily extends Family {
   const _FetchWebChapterInfoFamily._()

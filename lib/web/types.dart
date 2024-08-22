@@ -73,8 +73,7 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
   }
 }
 
-class MappedEpochTimestampSerializer
-    implements JsonConverter<DateTime?, dynamic> {
+class MappedEpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
   const MappedEpochTimestampSerializer();
 
   @override
@@ -112,11 +111,13 @@ class MappedEpochTimestampSerializer
 class HistoryLink with _$HistoryLink {
   const HistoryLink._();
 
-  const factory HistoryLink({required String title, required String url}) =
-      _HistoryLink;
+  const factory HistoryLink({
+    required String title,
+    required String url,
+    String? cover,
+  }) = _HistoryLink;
 
-  factory HistoryLink.fromJson(Map<String, dynamic> json) =>
-      _$HistoryLinkFromJson(json);
+  factory HistoryLink.fromJson(Map<String, dynamic> json) => _$HistoryLinkFromJson(json);
 
   @override
   bool operator ==(Object other) {
@@ -144,8 +145,7 @@ class WebManga with _$WebManga {
     required Map<String, WebChapter> chapters,
   }) = _WebManga;
 
-  factory WebManga.fromJson(Map<String, dynamic> json) =>
-      _$WebMangaFromJson(json);
+  factory WebManga.fromJson(Map<String, dynamic> json) => _$WebMangaFromJson(json);
 
   WebChapter? getChapter(String chapter) {
     if (chapters.containsKey(chapter)) {
@@ -169,8 +169,7 @@ class WebChapter with _$WebChapter {
     required Map<String, dynamic> groups,
   }) = _WebChapter;
 
-  factory WebChapter.fromJson(Map<String, dynamic> json) =>
-      _$WebChapterFromJson(json);
+  factory WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
 
   String getTitle(String index) {
     String output = index;
@@ -190,6 +189,5 @@ class ImgurPage with _$ImgurPage {
     required String src,
   }) = _ImgurPage;
 
-  factory ImgurPage.fromJson(Map<String, dynamic> json) =>
-      _$ImgurPageFromJson(json);
+  factory ImgurPage.fromJson(Map<String, dynamic> json) => _$ImgurPageFromJson(json);
 }

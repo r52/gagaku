@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/web/model.dart';
 import 'package:gagaku/web/ui.dart';
+import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebSourceHistory extends HookConsumerWidget {
@@ -15,7 +16,6 @@ class WebSourceHistory extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final api = ref.watch(proxyProvider);
 
     final scrollController = controller ?? useScrollController();
@@ -57,8 +57,7 @@ class WebSourceHistory extends HookConsumerWidget {
         AsyncValue(value: final history?) => Column(
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
                 child: Row(
                   children: [
                     const Text(
@@ -74,8 +73,7 @@ class WebSourceHistory extends HookConsumerWidget {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: const Text('Clear History'),
-                              content: const Text(
-                                  'Are you sure you want to remove all history?'),
+                              content: const Text('Are you sure you want to remove all history?'),
                               actions: <Widget>[
                                 TextButton(
                                   child: const Text('No'),
@@ -105,91 +103,17 @@ class WebSourceHistory extends HookConsumerWidget {
                 ),
               ),
               Expanded(
-                child: ListView.separated(
-                  controller: scrollController,
+                child: WebMangaListWidget(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(6),
-                  itemCount: history.length,
-                  separatorBuilder: (_, __) => const SizedBox(
-                    height: 4.0,
-                  ),
-                  itemBuilder: (context, index) {
-                    final item = history.elementAt(index);
-                    return ListTile(
-                      key: ValueKey(item.hashCode),
-                      tileColor: index.isOdd
-                          ? theme.colorScheme.surfaceContainer
-                          : theme.colorScheme.surfaceContainerHighest,
-                      leading: Consumer(
-                        builder: (context, refx, child) {
-                          final favorited =
-                              ref.watch(webSourceFavoritesProvider.select(
-                            (value) => switch (value) {
-                              AsyncValue(value: final data?) =>
-                                data.indexWhere((e) => e.url == item.url) > -1,
-                              _ => null,
-                            },
-                          ));
-
-                          if (favorited == null) {
-                            return const CircularProgressIndicator();
-                          }
-
-                          return IconButton(
-                            tooltip: favorited
-                                ? 'Remove from Favorites'
-                                : 'Add to Favorites',
-                            icon: Icon(favorited
-                                ? Icons.favorite
-                                : Icons.favorite_border),
-                            color: favorited ? theme.colorScheme.primary : null,
-                            onPressed: () async {
-                              if (favorited) {
-                                ref
-                                    .read(webSourceFavoritesProvider.notifier)
-                                    .remove(item);
-                              } else {
-                                ref
-                                    .read(webSourceFavoritesProvider.notifier)
-                                    .add(item);
-                              }
-                            },
-                          );
-                        },
-                      ),
-                      trailing: IconButton(
-                        tooltip: 'Remove from History',
-                        icon: const Icon(Icons.clear),
-                        onPressed: () async {
-                          ref
-                              .read(webSourceHistoryProvider.notifier)
-                              .remove(item);
-                        },
-                      ),
-                      title: Text(item.title),
-                      textColor: Colors.blue,
-                      onTap: () async {
-                        final messenger = ScaffoldMessenger.of(context);
-                        final parseResult = await api.handleUrl(
-                            url: item.url, context: context);
-
-                        if (!parseResult) {
-                          messenger
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(const SnackBar(
-                              content: Text('Unsupported URL'),
-                              backgroundColor: Colors.red,
-                            ));
-                        }
-                      },
-                    );
-                  },
+                  controller: scrollController,
+                  children: [
+                    WebMangaListViewSliver(items: history.toList()),
+                  ],
                 ),
               ),
             ],
           ),
-        AsyncValue(:final error?, :final stackTrace?) =>
-          ErrorColumn(error: error, stackTrace: stackTrace),
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(error: error, stackTrace: stackTrace),
         _ => const Center(
             child: CircularProgressIndicator(),
           ),

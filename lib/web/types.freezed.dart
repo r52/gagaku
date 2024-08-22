@@ -186,6 +186,7 @@ HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) {
 mixin _$HistoryLink {
   String get title => throw _privateConstructorUsedError;
   String get url => throw _privateConstructorUsedError;
+  String? get cover => throw _privateConstructorUsedError;
 
   /// Serializes this HistoryLink to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -203,7 +204,7 @@ abstract class $HistoryLinkCopyWith<$Res> {
           HistoryLink value, $Res Function(HistoryLink) then) =
       _$HistoryLinkCopyWithImpl<$Res, HistoryLink>;
   @useResult
-  $Res call({String title, String url});
+  $Res call({String title, String url, String? cover});
 }
 
 /// @nodoc
@@ -223,6 +224,7 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
   $Res call({
     Object? title = null,
     Object? url = null,
+    Object? cover = freezed,
   }) {
     return _then(_value.copyWith(
       title: null == title
@@ -233,6 +235,10 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String,
+      cover: freezed == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -245,7 +251,7 @@ abstract class _$$HistoryLinkImplCopyWith<$Res>
       __$$HistoryLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String url});
+  $Res call({String title, String url, String? cover});
 }
 
 /// @nodoc
@@ -263,6 +269,7 @@ class __$$HistoryLinkImplCopyWithImpl<$Res>
   $Res call({
     Object? title = null,
     Object? url = null,
+    Object? cover = freezed,
   }) {
     return _then(_$HistoryLinkImpl(
       title: null == title
@@ -273,6 +280,10 @@ class __$$HistoryLinkImplCopyWithImpl<$Res>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String,
+      cover: freezed == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -280,7 +291,8 @@ class __$$HistoryLinkImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$HistoryLinkImpl extends _HistoryLink {
-  const _$HistoryLinkImpl({required this.title, required this.url}) : super._();
+  const _$HistoryLinkImpl({required this.title, required this.url, this.cover})
+      : super._();
 
   factory _$HistoryLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$HistoryLinkImplFromJson(json);
@@ -289,10 +301,12 @@ class _$HistoryLinkImpl extends _HistoryLink {
   final String title;
   @override
   final String url;
+  @override
+  final String? cover;
 
   @override
   String toString() {
-    return 'HistoryLink(title: $title, url: $url)';
+    return 'HistoryLink(title: $title, url: $url, cover: $cover)';
   }
 
   /// Create a copy of HistoryLink
@@ -314,7 +328,8 @@ class _$HistoryLinkImpl extends _HistoryLink {
 abstract class _HistoryLink extends HistoryLink {
   const factory _HistoryLink(
       {required final String title,
-      required final String url}) = _$HistoryLinkImpl;
+      required final String url,
+      final String? cover}) = _$HistoryLinkImpl;
   const _HistoryLink._() : super._();
 
   factory _HistoryLink.fromJson(Map<String, dynamic> json) =
@@ -324,6 +339,8 @@ abstract class _HistoryLink extends HistoryLink {
   String get title;
   @override
   String get url;
+  @override
+  String? get cover;
 
   /// Create a copy of HistoryLink
   /// with the given fields replaced by the non-null parameter values.
