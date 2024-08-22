@@ -15,6 +15,82 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
+class GridAlbumImage extends StatelessWidget {
+  const GridAlbumImage({
+    super.key,
+    required this.gradient,
+    required this.child,
+  });
+
+  final AlignmentGeometry gradient;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
+      clipBehavior: Clip.antiAlias,
+      child: ShaderMask(
+        shaderCallback: (rect) {
+          return LinearGradient(
+            begin: gradient,
+            end: Alignment.bottomCenter,
+            colors: const [Colors.black, Colors.transparent],
+          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
+        },
+        blendMode: BlendMode.dstIn,
+        child: child,
+      ),
+    );
+  }
+}
+
+class GridAlbumTextBar extends StatelessWidget {
+  const GridAlbumTextBar({
+    super.key,
+    required this.height,
+    this.leading,
+    this.backgroundColor,
+    required this.text,
+    this.bottom = true,
+  });
+
+  final double height;
+  final Widget? leading;
+  final Color? backgroundColor;
+  final String text;
+  final bool bottom;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Material(
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: !bottom ? const Radius.circular(4) : Radius.zero,
+            bottom: bottom ? const Radius.circular(4) : Radius.zero,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: GridTileBar(
+          leading: leading,
+          backgroundColor: backgroundColor,
+          title: Text(
+            text,
+            softWrap: true,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              overflow: TextOverflow.fade,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class KeepAliveImage extends Image {
   const KeepAliveImage({
     super.key,

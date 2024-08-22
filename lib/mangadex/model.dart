@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
+import 'package:gagaku/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/cache.dart';
@@ -13,11 +13,9 @@ import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/legacy.dart';
-import 'package:http/retry.dart';
 import 'package:mutex/mutex.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
@@ -143,7 +141,7 @@ class MangaDexModel {
   TokenResponse? _token;
   Credential? _credential;
   final _tokenMutex = ReadWriteMutex();
-  http.Client _client = RateLimitedClient();
+  http.Client _client = RateLimitedClient(useCustomUA: true);
   late Future _future;
   Future get future => _future;
 
@@ -226,10 +224,10 @@ class MangaDexModel {
 
           // If any steps fail, assign a default client
           logger.w("refreshToken() returned error ${token['error']}", error: token.toString());
-          _client = RateLimitedClient();
+          _client = RateLimitedClient(useCustomUA: true);
         } catch (e) {
           logger.w("refreshToken() error ${e.toString()}", error: e);
-          _client = RateLimitedClient();
+          _client = RateLimitedClient(useCustomUA: true);
         }
       }
     });
@@ -287,7 +285,7 @@ class MangaDexModel {
         if (response.statusCode == 200) {
           return await _tokenMutex.protectWrite(() async {
             _token = null;
-            _client = RateLimitedClient();
+            _client = RateLimitedClient(useCustomUA: true);
             _credential = null;
 
             final storage = Hive.box(gagakuBox);
@@ -2550,34 +2548,5 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
     ref.invalidate(followingStatusProvider);
     await api.invalidateAll(LatestChaptersFeed.feedKey);
     ref.invalidate(latestChaptersFeedProvider);
-  }
-}
-
-class RateLimitedClient extends http.BaseClient {
-  final http.Client _baseClient = RetryClient(
-    http.Client(),
-    retries: 2,
-    when: (response) => false,
-    whenError: (error, stacktrace) => error is HttpException || error is http.ClientException,
-  );
-  final _userAgent = PackageInfo.fromPlatform().then((info) => '${info.appName}/${info.version}');
-
-  static const _rateLimit = Duration(milliseconds: 200); // 5 per second
-  final _pendingCalls = <int>[];
-
-  RateLimitedClient();
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final numPending = _pendingCalls.length;
-    _pendingCalls.add(request.hashCode);
-
-    final wait = _rateLimit * numPending;
-    await Future.delayed(wait);
-
-    request.headers[HttpHeaders.userAgentHeader] = await _userAgent;
-    return _baseClient.send(request).whenComplete(() {
-      _pendingCalls.remove(request.hashCode);
-    });
   }
 }

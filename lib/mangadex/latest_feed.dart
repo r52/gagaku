@@ -8,7 +8,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'latest_feed.g.dart';
 
-@riverpod
+Duration? _noRetry(int retryCount, Object error) {
+  return null;
+}
+
+@Riverpod(retry: _noRetry)
 Future<List<ChapterFeedItemData>> _fetchGlobalChapters(_FetchGlobalChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
 

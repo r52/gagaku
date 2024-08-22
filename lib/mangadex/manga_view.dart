@@ -1024,25 +1024,14 @@ class _CoverArtItem extends HookWidget {
     final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
     final url = manga.getUrlFromCover(cover);
 
-    final Widget image = Material(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
-      clipBehavior: Clip.antiAlias,
-      child: ShaderMask(
-        shaderCallback: (rect) {
-          return LinearGradient(
-            begin: gradient,
-            end: Alignment.bottomCenter,
-            colors: const [Colors.black, Colors.transparent],
-          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
-        },
-        blendMode: BlendMode.dstIn,
-        child: CachedNetworkImage(
-          imageUrl: url.quality(quality: CoverArtQuality.medium),
-          width: 256.0,
-          progressIndicatorBuilder: (context, url, downloadProgress) =>
-              Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-        ),
+    final image = GridAlbumImage(
+      gradient: gradient,
+      child: CachedNetworkImage(
+        imageUrl: url.quality(quality: CoverArtQuality.medium),
+        width: 256.0,
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
 
@@ -1061,25 +1050,9 @@ class _CoverArtItem extends HookWidget {
           },
           child: GridTile(
             footer: cover.attributes?.volume != null
-                ? SizedBox(
+                ? GridAlbumTextBar(
                     height: 40,
-                    child: Material(
-                      color: Colors.transparent,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: GridTileBar(
-                        title: Text(
-                          'Volume ${cover.attributes!.volume!}',
-                          softWrap: true,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            overflow: TextOverflow.fade,
-                          ),
-                        ),
-                      ),
-                    ),
+                    text: 'Volume ${cover.attributes!.volume!}',
                   )
                 : null,
             child: image,

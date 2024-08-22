@@ -68,8 +68,7 @@ class LibraryListWidget extends StatelessWidget {
                       ref.read(librarySortTypeProvider.notifier).state = sort;
                     }
                   },
-                  dropdownMenuEntries:
-                      List<DropdownMenuEntry<LibrarySort>>.generate(
+                  dropdownMenuEntries: List<DropdownMenuEntry<LibrarySort>>.generate(
                     LibrarySort.values.length,
                     (int index) => DropdownMenuEntry<LibrarySort>(
                       value: LibrarySort.values.elementAt(index),
@@ -121,34 +120,20 @@ class _GridLibraryItem extends HookWidget {
   @override
   Widget build(BuildContext context) {
     useAutomaticKeepAlive();
-    final aniController =
-        useAnimationController(duration: const Duration(milliseconds: 100));
-    final gradient =
-        useAnimation(aniController.drive(Styles.coverArtGradientTween));
+    final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
+    final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
 
-    final Widget image = Material(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4.0))),
-      clipBehavior: Clip.antiAlias,
-      child: ShaderMask(
-        shaderCallback: (rect) {
-          return LinearGradient(
-            begin: gradient,
-            end: Alignment.bottomCenter,
-            colors: const [Colors.black, Colors.transparent],
-          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
-        },
-        blendMode: BlendMode.dstIn,
-        child: item.thumbnail != null
-            ? Image.file(
-                File(item.thumbnail!),
-                width: 256.0,
-              )
-            : Icon(
-                item.isReadable ? Icons.menu_book : Icons.folder,
-                size: 128.0,
-              ),
-      ),
+    final image = GridAlbumImage(
+      gradient: gradient,
+      child: item.thumbnail != null
+          ? Image.file(
+              File(item.thumbnail!),
+              width: 256.0,
+            )
+          : Icon(
+              item.isReadable ? Icons.menu_book : Icons.folder,
+              size: 128.0,
+            ),
     );
 
     return Tooltip(
@@ -168,25 +153,9 @@ class _GridLibraryItem extends HookWidget {
           }
         },
         child: GridTile(
-          footer: SizedBox(
+          footer: GridAlbumTextBar(
             height: 80,
-            child: Material(
-              color: Colors.transparent,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: GridTileBar(
-                title: Text(
-                  item.name ?? item.path,
-                  softWrap: true,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    overflow: TextOverflow.fade,
-                  ),
-                ),
-              ),
-            ),
+            text: item.name ?? item.path,
           ),
           child: image,
         ),

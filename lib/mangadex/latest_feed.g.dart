@@ -25,7 +25,7 @@ final class _FetchGlobalChaptersProvider extends $FunctionalProvider<
         super(
           from: null,
           argument: null,
-          retry: null,
+          retry: _noRetry,
           name: r'_fetchGlobalChaptersProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -62,7 +62,7 @@ final class _FetchGlobalChaptersProvider extends $FunctionalProvider<
 }
 
 String _$fetchGlobalChaptersHash() =>
-    r'6f910d66a76674b411aae587f1729b9ec63d9922';
+    r'20d45c2dedcc7e5428da6f3f483010a35ecbb038';
 
 // ignore_for_file: type=lint
 // ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

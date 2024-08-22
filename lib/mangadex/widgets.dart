@@ -734,27 +734,14 @@ class _GridMangaItem extends HookConsumerWidget {
     final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
 
-    final Widget image = Material(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4.0)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: ShaderMask(
-        shaderCallback: (rect) {
-          return LinearGradient(
-            begin: gradient,
-            end: Alignment.bottomCenter,
-            colors: const [Colors.black, Colors.transparent],
-          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
-        },
-        blendMode: BlendMode.dstIn,
-        child: CachedNetworkImage(
-          imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-          width: 256.0,
-          progressIndicatorBuilder: (context, url, downloadProgress) =>
-              Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-        ),
+    final image = GridAlbumImage(
+      gradient: gradient,
+      child: CachedNetworkImage(
+        imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+        width: 256.0,
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
 
@@ -785,50 +772,20 @@ class _GridMangaItem extends HookConsumerWidget {
                 ),
               )
             : (header != null
-                ? SizedBox(
+                ? GridAlbumTextBar(
                     height: 40,
-                    child: Material(
-                      color: Colors.transparent,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: GridTileBar(
-                        backgroundColor: Colors.black87,
-                        title: Text(
-                          header!,
-                          softWrap: true,
-                          style: const TextStyle(
-                            overflow: TextOverflow.fade,
-                          ),
-                        ),
-                      ),
-                    ),
+                    backgroundColor: Colors.black87,
+                    text: header!,
+                    bottom: false,
                   )
                 : null),
-        footer: SizedBox(
+        footer: GridAlbumTextBar(
           height: 80,
-          child: Material(
-            color: Colors.transparent,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: GridTileBar(
-              leading: CountryFlag(
-                flag: manga.attributes!.originalLanguage.flag,
-                size: 18,
-              ),
-              title: Text(
-                manga.attributes!.title.get('en'),
-                softWrap: true,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  overflow: TextOverflow.fade,
-                ),
-              ),
-            ),
+          leading: CountryFlag(
+            flag: manga.attributes!.originalLanguage.flag,
+            size: 18,
           ),
+          text: manga.attributes!.title.get('en'),
         ),
         child: image,
       ),
