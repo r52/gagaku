@@ -25,7 +25,8 @@ mixin _$GagakuConfig {
 
   /// Theme color
   @ColorConverter()
-  Color get theme => throw _privateConstructorUsedError;
+  Color get theme => throw _privateConstructorUsedError; // Grid view size
+  GridAlbumExtent get gridAlbumExtent => throw _privateConstructorUsedError;
 
   /// Serializes this GagakuConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -43,7 +44,10 @@ abstract class $GagakuConfigCopyWith<$Res> {
           GagakuConfig value, $Res Function(GagakuConfig) then) =
       _$GagakuConfigCopyWithImpl<$Res, GagakuConfig>;
   @useResult
-  $Res call({ThemeMode themeMode, @ColorConverter() Color theme});
+  $Res call(
+      {ThemeMode themeMode,
+      @ColorConverter() Color theme,
+      GridAlbumExtent gridAlbumExtent});
 }
 
 /// @nodoc
@@ -63,6 +67,7 @@ class _$GagakuConfigCopyWithImpl<$Res, $Val extends GagakuConfig>
   $Res call({
     Object? themeMode = null,
     Object? theme = null,
+    Object? gridAlbumExtent = null,
   }) {
     return _then(_value.copyWith(
       themeMode: null == themeMode
@@ -73,6 +78,10 @@ class _$GagakuConfigCopyWithImpl<$Res, $Val extends GagakuConfig>
           ? _value.theme
           : theme // ignore: cast_nullable_to_non_nullable
               as Color,
+      gridAlbumExtent: null == gridAlbumExtent
+          ? _value.gridAlbumExtent
+          : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
+              as GridAlbumExtent,
     ) as $Val);
   }
 }
@@ -85,7 +94,10 @@ abstract class _$$GagakuConfigImplCopyWith<$Res>
       __$$GagakuConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({ThemeMode themeMode, @ColorConverter() Color theme});
+  $Res call(
+      {ThemeMode themeMode,
+      @ColorConverter() Color theme,
+      GridAlbumExtent gridAlbumExtent});
 }
 
 /// @nodoc
@@ -103,6 +115,7 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
   $Res call({
     Object? themeMode = null,
     Object? theme = null,
+    Object? gridAlbumExtent = null,
   }) {
     return _then(_$GagakuConfigImpl(
       themeMode: null == themeMode
@@ -113,6 +126,10 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
           ? _value.theme
           : theme // ignore: cast_nullable_to_non_nullable
               as Color,
+      gridAlbumExtent: null == gridAlbumExtent
+          ? _value.gridAlbumExtent
+          : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
+              as GridAlbumExtent,
     ));
   }
 }
@@ -122,7 +139,8 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
 class _$GagakuConfigImpl implements _GagakuConfig {
   const _$GagakuConfigImpl(
       {this.themeMode = ThemeMode.system,
-      @ColorConverter() this.theme = const Color(0xFFFFC107)});
+      @ColorConverter() this.theme = const Color(0xFFFFC107),
+      this.gridAlbumExtent = GridAlbumExtent.medium});
 
   factory _$GagakuConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$GagakuConfigImplFromJson(json);
@@ -137,10 +155,14 @@ class _$GagakuConfigImpl implements _GagakuConfig {
   @JsonKey()
   @ColorConverter()
   final Color theme;
+// Grid view size
+  @override
+  @JsonKey()
+  final GridAlbumExtent gridAlbumExtent;
 
   @override
   String toString() {
-    return 'GagakuConfig(themeMode: $themeMode, theme: $theme)';
+    return 'GagakuConfig(themeMode: $themeMode, theme: $theme, gridAlbumExtent: $gridAlbumExtent)';
   }
 
   @override
@@ -150,12 +172,15 @@ class _$GagakuConfigImpl implements _GagakuConfig {
             other is _$GagakuConfigImpl &&
             (identical(other.themeMode, themeMode) ||
                 other.themeMode == themeMode) &&
-            (identical(other.theme, theme) || other.theme == theme));
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.gridAlbumExtent, gridAlbumExtent) ||
+                other.gridAlbumExtent == gridAlbumExtent));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, themeMode, theme);
+  int get hashCode =>
+      Object.hash(runtimeType, themeMode, theme, gridAlbumExtent);
 
   /// Create a copy of GagakuConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -176,7 +201,8 @@ class _$GagakuConfigImpl implements _GagakuConfig {
 abstract class _GagakuConfig implements GagakuConfig {
   const factory _GagakuConfig(
       {final ThemeMode themeMode,
-      @ColorConverter() final Color theme}) = _$GagakuConfigImpl;
+      @ColorConverter() final Color theme,
+      final GridAlbumExtent gridAlbumExtent}) = _$GagakuConfigImpl;
 
   factory _GagakuConfig.fromJson(Map<String, dynamic> json) =
       _$GagakuConfigImpl.fromJson;
@@ -188,7 +214,9 @@ abstract class _GagakuConfig implements GagakuConfig {
   /// Theme color
   @override
   @ColorConverter()
-  Color get theme;
+  Color get theme; // Grid view size
+  @override
+  GridAlbumExtent get gridAlbumExtent;
 
   /// Create a copy of GagakuConfig
   /// with the given fields replaced by the non-null parameter values.

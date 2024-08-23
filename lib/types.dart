@@ -14,9 +14,7 @@ class CRef {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is CRef &&
-            other.ref.runtimeType == ref.runtimeType &&
-            identical(other.ref, ref));
+        (other is CRef && other.ref.runtimeType == ref.runtimeType && identical(other.ref, ref));
   }
 
   @override

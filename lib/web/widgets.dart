@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/config.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/web/model.dart';
 import 'package:gagaku/web/types.dart';
@@ -66,6 +67,7 @@ class WebMangaListWidget extends HookConsumerWidget {
               children: [
                 if (title != null) title!,
                 const Spacer(),
+                const GridExtentSlider(),
                 if (showToggle)
                   SegmentedButton<WebMangaListView>(
                     showSelectedIcon: false,
@@ -113,6 +115,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
     final view = ref.watch(_mangaListViewProvider);
+    final cfg = ref.watch(gagakuSettingsProvider);
     final theme = Theme.of(context);
 
     switch (view) {
@@ -248,8 +251,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
       case WebMangaListView.grid:
       default:
         return SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 256,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
@@ -353,6 +356,7 @@ class _GridMangaItem extends HookConsumerWidget {
                 }
 
                 return FloatingActionButton(
+                  heroTag: UniqueKey(),
                   mini: true,
                   shape: const CircleBorder(),
                   tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
@@ -372,6 +376,7 @@ class _GridMangaItem extends HookConsumerWidget {
             Align(
               alignment: Alignment.topRight,
               child: FloatingActionButton(
+                heroTag: UniqueKey(),
                 mini: true,
                 shape: const CircleBorder(),
                 tooltip: 'Remove from History',

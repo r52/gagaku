@@ -2,6 +2,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/config.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/ui.dart';
@@ -582,6 +583,7 @@ class MangaListWidget extends HookConsumerWidget {
               children: [
                 if (title != null) title!,
                 const Spacer(),
+                const GridExtentSlider(),
                 if (showToggle)
                   SegmentedButton<MangaListView>(
                     showSelectedIcon: false,
@@ -636,8 +638,8 @@ class MangaListViewSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cfg = ref.watch(gagakuSettingsProvider);
     final view = selectMode ? MangaListView.grid : ref.watch(_mangaListViewProvider);
-    final onMobilePortrait = DeviceContext.isPortraitMode(context) && DeviceContext.isMobile();
 
     switch (view) {
       case MangaListView.list:
@@ -660,10 +662,10 @@ class MangaListViewSliver extends ConsumerWidget {
       case MangaListView.detailed:
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 1024,
+            maxCrossAxisExtent: cfg.gridAlbumExtent.detailed,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            childAspectRatio: onMobilePortrait ? 1.0 : 3.0,
+            childAspectRatio: DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
           ),
           findChildIndexCallback: (key) {
             final valueKey = key as ValueKey<String>;
@@ -684,8 +686,8 @@ class MangaListViewSliver extends ConsumerWidget {
       case MangaListView.grid:
       default:
         return SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 256,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,

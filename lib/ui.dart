@@ -1,8 +1,10 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   const MouseTouchScrollBehavior();
@@ -13,6 +15,42 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
         PointerDeviceKind.mouse,
         PointerDeviceKind.trackpad,
       };
+}
+
+class GridExtentSlider extends ConsumerWidget {
+  const GridExtentSlider({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cfg = ref.watch(gagakuSettingsProvider);
+    return MenuAnchor(
+      menuChildren: <Widget>[
+        Slider(
+          value: cfg.gridAlbumExtent.index.toDouble(),
+          max: 3,
+          divisions: 3,
+          label: cfg.gridAlbumExtent.name.capitalize(),
+          onChanged: (double value) {
+            final c = cfg.copyWith(gridAlbumExtent: GridAlbumExtent.values.elementAt(value.toInt()));
+            ref.read(gagakuSettingsProvider.notifier).save(c);
+          },
+        ),
+      ],
+      builder: (_, MenuController controller, Widget? child) {
+        return IconButton(
+          tooltip: 'Grid Size',
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          icon: const Icon(Icons.width_normal),
+        );
+      },
+    );
+  }
 }
 
 class GridAlbumImage extends StatelessWidget {

@@ -9,6 +9,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'config.freezed.dart';
 part 'config.g.dart';
 
+enum GridAlbumExtent {
+  xsmall(128, 512),
+  small(192, 768),
+  medium(256, 1024),
+  large(512, 2048);
+
+  final double grid;
+  final double detailed;
+
+  const GridAlbumExtent(this.grid, this.detailed);
+}
+
 class ColorConverter implements JsonConverter<Color, dynamic> {
   const ColorConverter();
 
@@ -27,10 +39,12 @@ class GagakuConfig with _$GagakuConfig {
 
     /// Theme color
     @Default(Color(0xFFFFC107)) @ColorConverter() Color theme,
+
+    // Grid view size
+    @Default(GridAlbumExtent.medium) GridAlbumExtent gridAlbumExtent,
   }) = _GagakuConfig;
 
-  factory GagakuConfig.fromJson(Map<String, dynamic> json) =>
-      _$GagakuConfigFromJson(json);
+  factory GagakuConfig.fromJson(Map<String, dynamic> json) => _$GagakuConfigFromJson(json);
 }
 
 @riverpod

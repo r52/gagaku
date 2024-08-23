@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/config.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef LibraryItemTapCallback = void Function(LocalLibraryItem);
 
-class LibraryListWidget extends StatelessWidget {
+class LibraryListWidget extends ConsumerWidget {
   const LibraryListWidget({
     super.key,
     required this.title,
@@ -25,7 +26,8 @@ class LibraryListWidget extends StatelessWidget {
   final LibraryItemTapCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cfg = ref.watch(gagakuSettingsProvider);
     return CustomScrollView(
       scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
@@ -42,6 +44,7 @@ class LibraryListWidget extends StatelessWidget {
               : const SizedBox.shrink(),
           title: title,
           actions: [
+            const GridExtentSlider(),
             Consumer(
               builder: (context, ref, child) {
                 final theme = Theme.of(context);
@@ -49,7 +52,7 @@ class LibraryListWidget extends StatelessWidget {
 
                 return DropdownMenu<LibrarySort>(
                   initialSelection: initial,
-                  width: 180.0,
+                  width: 200.0,
                   enableFilter: false,
                   enableSearch: false,
                   requestFocusOnTap: false,
@@ -81,8 +84,8 @@ class LibraryListWidget extends StatelessWidget {
           ],
         ),
         SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 256,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,

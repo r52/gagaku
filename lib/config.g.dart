@@ -13,18 +13,29 @@ _$GagakuConfigImpl _$$GagakuConfigImplFromJson(Map<String, dynamic> json) =>
       theme: json['theme'] == null
           ? const Color(0xFFFFC107)
           : const ColorConverter().fromJson(json['theme']),
+      gridAlbumExtent: $enumDecodeNullable(
+              _$GridAlbumExtentEnumMap, json['gridAlbumExtent']) ??
+          GridAlbumExtent.medium,
     );
 
 Map<String, dynamic> _$$GagakuConfigImplToJson(_$GagakuConfigImpl instance) =>
     <String, dynamic>{
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
       'theme': const ColorConverter().toJson(instance.theme),
+      'gridAlbumExtent': _$GridAlbumExtentEnumMap[instance.gridAlbumExtent]!,
     };
 
 const _$ThemeModeEnumMap = {
   ThemeMode.system: 'system',
   ThemeMode.light: 'light',
   ThemeMode.dark: 'dark',
+};
+
+const _$GridAlbumExtentEnumMap = {
+  GridAlbumExtent.xsmall: 'xsmall',
+  GridAlbumExtent.small: 'small',
+  GridAlbumExtent.medium: 'medium',
+  GridAlbumExtent.large: 'large',
 };
 
 // **************************************************************************
