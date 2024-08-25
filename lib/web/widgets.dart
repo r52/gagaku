@@ -111,6 +111,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
   final bool reorderable;
   final bool showRemoveButton;
 
+  int? _findChildIndexCb(Key? key) {
+    final valueKey = key as ValueKey<int>;
+    final val = items.indexWhere((i) => i.hashCode == valueKey.value);
+    return val >= 0 ? val : null;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
@@ -125,6 +131,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 onReorder: (int oldIndex, int newIndex) =>
                     ref.read(webSourceFavoritesProvider.notifier).updateList(oldIndex, newIndex),
                 itemCount: items.length,
+                findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
                   final item = items.elementAt(index);
                   return ReorderableDelayedDragStartListener(
@@ -184,11 +191,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 separatorBuilder: (_, __) => const SizedBox(
                   height: 4.0,
                 ),
-                findChildIndexCallback: (key) {
-                  final valueKey = key as ValueKey<int>;
-                  final val = items.indexWhere((i) => i.hashCode == valueKey.value);
-                  return val >= 0 ? val : null;
-                },
+                findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
                   final item = items.elementAt(index);
                   return ListTile(
@@ -257,11 +260,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
           ),
-          findChildIndexCallback: (key) {
-            final valueKey = key as ValueKey<int>;
-            final val = items.indexWhere((i) => i.hashCode == valueKey.value);
-            return val >= 0 ? val : null;
-          },
+          findChildIndexCallback: _findChildIndexCb,
           itemBuilder: (context, index) {
             final item = items.elementAt(index);
             return _GridMangaItem(

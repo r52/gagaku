@@ -636,6 +636,12 @@ class MangaListViewSliver extends ConsumerWidget {
   final MangaSelectCallback? onSelected;
   final Map<String, String>? headers;
 
+  int? _findChildIndexCb(Key? key) {
+    final valueKey = key as ValueKey<String>;
+    final val = items.indexWhere((i) => i.id == valueKey.value);
+    return val >= 0 ? val : null;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cfg = ref.watch(gagakuSettingsProvider);
@@ -644,11 +650,7 @@ class MangaListViewSliver extends ConsumerWidget {
     switch (view) {
       case MangaListView.list:
         return SliverList.builder(
-          findChildIndexCallback: (key) {
-            final valueKey = key as ValueKey<String>;
-            final val = items.indexWhere((i) => i.id == valueKey.value);
-            return val >= 0 ? val : null;
-          },
+          findChildIndexCallback: _findChildIndexCb,
           itemBuilder: (BuildContext context, int index) {
             final manga = items.elementAt(index);
             return _ListMangaItem(
@@ -667,11 +669,7 @@ class MangaListViewSliver extends ConsumerWidget {
             crossAxisSpacing: 8,
             childAspectRatio: DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
           ),
-          findChildIndexCallback: (key) {
-            final valueKey = key as ValueKey<String>;
-            final val = items.indexWhere((i) => i.id == valueKey.value);
-            return val >= 0 ? val : null;
-          },
+          findChildIndexCallback: _findChildIndexCb,
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
             return _GridMangaDetailedItem(
@@ -692,11 +690,7 @@ class MangaListViewSliver extends ConsumerWidget {
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
           ),
-          findChildIndexCallback: (key) {
-            final valueKey = key as ValueKey<String>;
-            final val = items.indexWhere((i) => i.id == valueKey.value);
-            return val >= 0 ? val : null;
-          },
+          findChildIndexCallback: _findChildIndexCb,
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
             return _GridMangaItem(
