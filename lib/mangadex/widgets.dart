@@ -672,7 +672,7 @@ class MangaListViewSliver extends ConsumerWidget {
           findChildIndexCallback: _findChildIndexCb,
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
-            return _GridMangaDetailedItem(
+            return GridMangaDetailedItem(
               key: ValueKey(manga.id),
               manga: manga,
               header: headers?[manga.id],
@@ -693,7 +693,7 @@ class MangaListViewSliver extends ConsumerWidget {
           findChildIndexCallback: _findChildIndexCb,
           itemBuilder: (context, index) {
             final manga = items.elementAt(index);
-            return _GridMangaItem(
+            return GridMangaItem(
               key: ValueKey(manga.id),
               manga: manga,
               selectMode: selectMode,
@@ -708,8 +708,8 @@ class MangaListViewSliver extends ConsumerWidget {
   }
 }
 
-class _GridMangaItem extends HookConsumerWidget {
-  const _GridMangaItem({
+class GridMangaItem extends HookConsumerWidget {
+  const GridMangaItem({
     super.key,
     required this.manga,
     this.selectMode = false,
@@ -735,6 +735,7 @@ class _GridMangaItem extends HookConsumerWidget {
       child: CachedNetworkImage(
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
         width: 256.0,
+        fit: BoxFit.cover,
         progressIndicatorBuilder: (context, url, downloadProgress) =>
             Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
         errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -789,8 +790,8 @@ class _GridMangaItem extends HookConsumerWidget {
   }
 }
 
-class _GridMangaDetailedItem extends HookConsumerWidget {
-  const _GridMangaDetailedItem({
+class GridMangaDetailedItem extends HookConsumerWidget {
+  const GridMangaDetailedItem({
     super.key,
     required this.manga,
     this.header,

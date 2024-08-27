@@ -12,11 +12,7 @@ part 'chapter_feed.g.dart';
 
 enum _FeedViewType { chapters, manga }
 
-Duration? _noRetry(int retryCount, Object error) {
-  return null;
-}
-
-@Riverpod(retry: _noRetry)
+@Riverpod(retry: noRetry)
 Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
   final api = ref.watch(mangadexProvider);
 

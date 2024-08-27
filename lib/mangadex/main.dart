@@ -23,8 +23,7 @@ class MangaDexHome extends HookConsumerWidget {
     final lifecycle = useAppLifecycleState();
 
     useEffect(() {
-      if (lifecycle == AppLifecycleState.resumed &&
-          ref.exists(authControlProvider)) {
+      if (lifecycle == AppLifecycleState.resumed && ref.exists(authControlProvider)) {
         ref.read(authControlProvider.notifier).invalidate();
       }
       return null;
@@ -37,9 +36,7 @@ class MangaDexHome extends HookConsumerWidget {
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controllers?[index].animateTo(0.0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut);
+            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
           },
           child: const TitleFlexBar(title: 'MangaDex'),
         ),
@@ -99,13 +96,9 @@ class MangaDexHome extends HookConsumerWidget {
                           message: loggedin ? 'Logout' : 'Login',
                           child: IconButton(
                             color: theme.colorScheme.primary,
-                            icon: loggedin
-                                ? const Icon(Icons.logout)
-                                : const Icon(Icons.login),
+                            icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
                             onPressed: loggedin
-                                ? () => ref
-                                    .read(authControlProvider.notifier)
-                                    .logout()
+                                ? () => ref.read(authControlProvider.notifier).logout()
                                 : () => context.push(GagakuRoute.login),
                           ),
                         ),
@@ -134,7 +127,7 @@ class MangaDexHome extends HookConsumerWidget {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home),
-            label: 'Latest',
+            label: 'Home',
           ),
           NavigationDestination(
             icon: Icon(Icons.menu_book),
@@ -159,9 +152,7 @@ class MangaDexHome extends HookConsumerWidget {
 
           if (currTab == index) {
             // Scroll to top if on the same tab
-            controllers?[index].animateTo(0.0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut);
+            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
           } else {
             // Switch tab
             _onItemTapped(index, context);

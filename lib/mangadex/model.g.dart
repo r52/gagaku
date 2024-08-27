@@ -67,6 +67,68 @@ final class MangadexProvider
 
 String _$mangadexHash() => r'a292b576f657f3f4f75a624bdf14e965c33f39fe';
 
+@ProviderFor(RecentlyAdded)
+const recentlyAddedProvider = RecentlyAddedProvider._();
+
+final class RecentlyAddedProvider
+    extends $AsyncNotifierProvider<RecentlyAdded, List<Manga>> {
+  const RecentlyAddedProvider._(
+      {super.runNotifierBuildOverride, RecentlyAdded Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'recentlyAddedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final RecentlyAdded Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$recentlyAddedHash();
+
+  @$internal
+  @override
+  RecentlyAdded create() => _createCb?.call() ?? RecentlyAdded();
+
+  @$internal
+  @override
+  RecentlyAddedProvider $copyWithCreate(
+    RecentlyAdded Function() create,
+  ) {
+    return RecentlyAddedProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  RecentlyAddedProvider $copyWithBuild(
+    FutureOr<List<Manga>> Function(
+      Ref<AsyncValue<List<Manga>>>,
+      RecentlyAdded,
+    ) build,
+  ) {
+    return RecentlyAddedProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<RecentlyAdded, List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$recentlyAddedHash() => r'22496d90f057786107d262caac09e636442e6af0';
+
+abstract class _$RecentlyAdded extends $AsyncNotifier<List<Manga>> {
+  FutureOr<List<Manga>> build();
+  @$internal
+  @override
+  FutureOr<List<Manga>> runBuild() => build();
+}
+
 @ProviderFor(LatestChaptersFeed)
 const latestChaptersFeedProvider = LatestChaptersFeedProvider._();
 
@@ -734,7 +796,7 @@ final class MangaChaptersProvider
   }
 }
 
-String _$mangaChaptersHash() => r'7c998a5b1496d97e1de4086dead388d90338f649';
+String _$mangaChaptersHash() => r'bc3689a302f9e21dfed0b987c259cd9aedcb5db4';
 
 final class MangaChaptersFamily extends Family {
   const MangaChaptersFamily._()

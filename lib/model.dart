@@ -1,4 +1,6 @@
 abstract class GagakuRoute {
+  static const latestfeed = '/titles/latest';
+  static const recentfeed = '/titles/recent';
   static const chapterfeed = '/titles/feed';
   static const library = '/titles/follows';
   static const history = '/my/history';

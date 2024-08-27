@@ -355,6 +355,7 @@ class MangaDexModel {
     MangaDexEntity? entity,
     String orderKey = 'publishAt',
     String order = 'desc',
+    bool ignoreOriginalLanguage = false,
   }) async {
     final key = '$feedKey(${entity != null ? '${entity.id},' : ''}$offset,$orderKey,$order)';
 
@@ -369,7 +370,8 @@ class MangaDexModel {
       'limit': limit.toString(),
       'offset': offset.toString(),
       'translatedLanguage[]': settings.translatedLanguages.map(const LanguageConverter().toJson).toList(),
-      'originalLanguage[]': settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
+      if (!ignoreOriginalLanguage)
+        'originalLanguage[]': settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[$orderKey]': order,
@@ -458,19 +460,25 @@ class MangaDexModel {
     Iterable<String>? ids,
     MangaDexUUID? filterId,
     int offset = 0,
+    FilterOrder order = FilterOrder.latestUploadedChapter_desc,
+    Map<String, dynamic>? extraParams,
   }) async {
     final settings = ref.read(mdConfigProvider);
 
-    final queryParams = {
+    var queryParams = <String, dynamic>{
       'limit': limit.toString(),
-      'order[latestUploadedChapter]': 'desc',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'includes[]': ['cover_art', 'author', 'artist']
     };
 
-    final list = <Manga>[];
+    queryParams.addEntries([order.json]);
+
+    if (extraParams != null) {
+      queryParams.addAll(extraParams);
+    }
 
     if (ids != null) {
+      final list = <Manga>[];
       final fetch = (await ids.whereAsync((id) async => !await _cache.exists(id))).toList();
 
       if (fetch.isNotEmpty) {
@@ -505,9 +513,11 @@ class MangaDexModel {
           list.add(_cache.get(id, Manga.fromJson).get<Manga>());
         }
       }
-    } else if (filterId != null) {
-      queryParams['offset'] = offset.toString();
 
+      return list;
+    }
+
+    if (filterId != null) {
       switch (filterId) {
         case Author(:final id) || Artist(:final id):
           queryParams['authorOrArtist'] = id;
@@ -520,26 +530,26 @@ class MangaDexModel {
           logger.e(msg);
           throw Exception(msg);
       }
-
-      final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
-
-      final response = await _client.get(uri);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
-        final result = MDEntityList.fromJson(body);
-
-        // Cache the data
-        await _cache.putAllAPIResolved(result.data);
-
-        return result.data.cast<Manga>();
-      } else {
-        // Throw if failure
-        throw createException("fetchManga(filterId) failed.", response);
-      }
     }
 
-    return list;
+    queryParams['offset'] = offset.toString();
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      final result = MDEntityList.fromJson(body);
+
+      // Cache the data
+      await _cache.putAllAPIResolved(result.data);
+
+      return result.data.cast<Manga>();
+    } else {
+      // Throw if failure
+      throw createException("fetchManga() failed.", response);
+    }
   }
 
   /// Searches for manga using the MangaDex API with the search term [searchTerm].
@@ -1470,6 +1480,50 @@ class MangaDexModel {
 }
 
 @riverpod
+class RecentlyAdded extends _$RecentlyAdded with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    final settings = ref.read(mdConfigProvider);
+
+    final extraParams = {
+      'hasAvailableChapters': 'true',
+      'availableTranslatedLanguage[]': settings.translatedLanguages.map(const LanguageConverter().toJson).toList(),
+      'originalLanguage[]': settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
+    };
+
+    final manga = await api.fetchManga(
+      limit: limit,
+      offset: offset,
+      order: FilterOrder.createdAt_desc,
+      extraParams: extraParams,
+    );
+
+    ref.disposeAfter(const Duration(minutes: 10));
+
+    return manga;
+  }
+
+  @override
+  Future<List<Manga>> build() async {
+    return fetchData(0);
+  }
+
+  /// Clears the list and refetch from the beginning
+  @override
+  Future<void> clear() async {
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
+  }
+}
+
+@riverpod
 class LatestChaptersFeed extends _$LatestChaptersFeed with ListBasedInfiniteScrollMix {
   static const feedKey = 'LatestChaptersFeed';
   static const _limit = MangaDexEndpoints.searchLimit;
@@ -1675,6 +1729,7 @@ class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix, ListBased
       entity: manga,
       orderKey: 'chapter',
       order: sort.order,
+      ignoreOriginalLanguage: true,
     );
 
     await ref.read(chapterStatsProvider.notifier).get(chapters);

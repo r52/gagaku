@@ -25,7 +25,7 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
         super(
           from: null,
           argument: null,
-          retry: _noRetry,
+          retry: noRetry,
           name: r'_fetchChaptersProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -61,7 +61,7 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchChaptersHash() => r'ebc682b7b2179a5ffb9d1e8f236402bf5579e614';
+String _$fetchChaptersHash() => r'4e7e78b20393a8e82977b8f310ca9688cd913e49';
 
 // ignore_for_file: type=lint
 // ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

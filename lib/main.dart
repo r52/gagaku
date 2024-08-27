@@ -9,6 +9,7 @@ import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
 import 'package:gagaku/mangadex/creator_view.dart';
 import 'package:gagaku/mangadex/edit_list.dart';
+import 'package:gagaku/mangadex/frontpage.dart';
 import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/history_feed.dart';
 import 'package:gagaku/mangadex/latest_feed.dart';
@@ -19,6 +20,7 @@ import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/main.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/reader.dart';
+import 'package:gagaku/mangadex/recent_feed.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/settings.dart';
@@ -36,12 +38,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:go_router/go_router.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _mdShellNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'mdshell');
-final GlobalKey<NavigatorState> _proxyShellNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'proxyshell');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _mdShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'mdshell');
+final GlobalKey<NavigatorState> _proxyShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'proxyshell');
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -179,6 +178,16 @@ class _AppState extends ConsumerState<App> {
           return const MangaDexLoginScreen();
         },
       ),
+      GoRoute(
+        path: GagakuRoute.latestfeed,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildLatestFeedPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.recentfeed,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildRecentFeedPage,
+      ),
       // Main mangadex page
       ShellRoute(
         navigatorKey: _mdShellNavigatorKey,
@@ -194,7 +203,7 @@ class _AppState extends ConsumerState<App> {
             path: '/',
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: MangaDexGlobalFeed(
+              child: MangaDexFrontPage(
                 controller: _mdcontrollers[0],
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
@@ -381,8 +390,7 @@ class _AppState extends ConsumerState<App> {
       title: 'Gagaku',
       theme: ThemeData(
         brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: config.theme, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(seedColor: config.theme, brightness: Brightness.light),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
@@ -391,8 +399,7 @@ class _AppState extends ConsumerState<App> {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: config.theme, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(seedColor: config.theme, brightness: Brightness.dark),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,

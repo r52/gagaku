@@ -879,9 +879,18 @@ class _ChapterListSliver extends HookConsumerWidget {
   final Manga manga;
 
   static const header = '_HEADER_';
+  static const _noVolumeKey = 'none';
+  static const _noVolumeHeader = '${header}No Volume';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // final sort = ref.watch(mangaChaptersListSortProvider);
+    // final sortfunc = sort == ListSort.ascending
+    //     ? compareNatural
+    //     : (a, b) {
+    //         return compareNatural(b, a);
+    //       };
+
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
@@ -890,14 +899,22 @@ class _ChapterListSliver extends HookConsumerWidget {
       return null;
     });
 
+    if (chapters.isEmpty) {
+      return const SliverToBoxAdapter(
+        child: Center(
+          child: Text('No Chapters'),
+        ),
+      );
+    }
+
     final keys = useMemoized(() {
-      final keysGrouped = chapters.groupListsBy((chapter) => chapter.attributes.volume);
+      final keysGrouped = chapters.groupListsBy((chapter) => chapter.attributes.volume ?? _noVolumeKey);
 
       var keys = <String>[];
 
       for (final vol in keysGrouped.keys) {
-        if (vol == null) {
-          keys.add('${header}No Volume');
+        if (vol == _noVolumeKey) {
+          keys.add(_noVolumeHeader);
         } else {
           keys.add('${header}Volume $vol');
         }
@@ -958,11 +975,15 @@ class _ChapterListSliver extends HookConsumerWidget {
         );
 
         if (chapid > 0) {
-          lastChapIsSame = chapters.elementAt(chapid - 1).attributes.chapter == thischap.attributes.chapter;
+          final lastchap = chapters.elementAt(chapid - 1);
+          lastChapIsSame = lastchap.attributes.chapter == thischap.attributes.chapter &&
+              lastchap.attributes.volume == thischap.attributes.volume;
         }
 
         if (chapid < chapters.length - 1) {
-          nextChapIsSame = chapters.elementAt(chapid + 1).attributes.chapter == thischap.attributes.chapter;
+          final nextchap = chapters.elementAt(chapid + 1);
+          nextChapIsSame = nextchap.attributes.chapter == thischap.attributes.chapter &&
+              nextchap.attributes.volume == thischap.attributes.volume;
         }
 
         if (lastChapIsSame || nextChapIsSame) {

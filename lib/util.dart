@@ -13,6 +13,10 @@ String cleanBaseDomains(String url) {
   return url;
 }
 
+Duration? noRetry(int retryCount, Object error) {
+  return null;
+}
+
 mixin ExpiringData {
   DateTime get expiry;
 
