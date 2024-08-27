@@ -132,6 +132,7 @@ class _GridLibraryItem extends HookWidget {
           ? Image.file(
               File(item.thumbnail!),
               width: 256.0,
+              fit: BoxFit.cover,
             )
           : Icon(
               item.isReadable ? Icons.menu_book : Icons.folder,

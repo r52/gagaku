@@ -301,6 +301,7 @@ class _GridMangaItem extends HookConsumerWidget {
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
               errorWidget: (context, url, error) => const Icon(Icons.error),
+              fit: BoxFit.cover,
             )
           : const Icon(
               Icons.menu_book,

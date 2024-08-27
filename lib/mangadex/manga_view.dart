@@ -1053,6 +1053,7 @@ class _CoverArtItem extends HookWidget {
         progressIndicatorBuilder: (context, url, downloadProgress) =>
             Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
         errorWidget: (context, url, error) => const Icon(Icons.error),
+        fit: BoxFit.cover,
       ),
     );
 
