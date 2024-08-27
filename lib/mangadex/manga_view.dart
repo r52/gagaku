@@ -445,7 +445,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           title: 'Author',
                           children: manga.author!
                               .map((e) => ButtonChip(
-                                    text: Text(e.attributes.name),
+                                    text: e.attributes.name,
                                     onPressed: () {
                                       context.push('/author/${e.id}', extra: e);
                                     },
@@ -457,7 +457,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                           title: 'Artist',
                           children: manga.artist!
                               .map((e) => ButtonChip(
-                                    text: Text(e.attributes.name),
+                                    text: e.attributes.name,
                                     onPressed: () {
                                       context.push('/author/${e.id}', extra: e);
                                     },
@@ -505,7 +505,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: const Text('Official Raw'),
+                              text: 'Official Raw',
                             ),
                           if (manga.attributes!.links?.mu != null)
                             ButtonChip(
@@ -521,7 +521,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: const Text('MangaUpdates'),
+                              text: 'MangaUpdates',
                             ),
                           if (manga.attributes!.links?.al != null)
                             ButtonChip(
@@ -531,7 +531,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: const Text('AniList'),
+                              text: 'AniList',
                             ),
                           if (manga.attributes!.links?.mal != null)
                             ButtonChip(
@@ -541,7 +541,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: const Text('MyAnimeList'),
+                              text: 'MyAnimeList',
                             ),
                           ButtonChip(
                             onPressed: () async {
@@ -552,7 +552,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 throw 'Could not launch $url';
                               }
                             },
-                            text: const Text('Open on MangaDex'),
+                            text: 'Open on MangaDex',
                           ),
                         ],
                       ),

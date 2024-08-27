@@ -376,7 +376,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           throw 'Could not launch $url';
                         }
                       },
-                      text: const Text('Open on cubari.moe'),
+                      text: 'Open on cubari.moe',
                     ),
                   ],
                 ),

@@ -38,7 +38,7 @@ class GagakuConfig with _$GagakuConfig {
     @Default(ThemeMode.system) ThemeMode themeMode,
 
     /// Theme color
-    @Default(Color(0xFFFFC107)) @ColorConverter() Color theme,
+    @Default(Color(0xFF827717)) @ColorConverter() Color theme,
 
     // Grid view size
     @Default(GridAlbumExtent.medium) GridAlbumExtent gridAlbumExtent,

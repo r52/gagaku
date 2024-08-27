@@ -227,7 +227,7 @@ class _LinkChip extends StatelessWidget {
           throw 'Could not launch $url';
         }
       },
-      text: Text(text),
+      text: text,
     );
   }
 }

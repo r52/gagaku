@@ -1005,7 +1005,7 @@ class ChapterTitle extends ConsumerWidget {
 
     if (!loggedin) {
       textstyle = TextStyle(
-        color: theme.colorScheme.primary,
+        color: theme.colorScheme.onPrimaryContainer,
       );
     } else {
       bool? isRead = ref.watch(readChaptersProvider.select(
@@ -1015,7 +1015,7 @@ class ChapterTitle extends ConsumerWidget {
         },
       ));
 
-      textstyle = TextStyle(color: (isRead == true ? theme.highlightColor : theme.colorScheme.primary));
+      textstyle = TextStyle(color: (isRead == true ? theme.highlightColor : theme.colorScheme.onPrimaryContainer));
     }
 
     return Text(
@@ -1200,6 +1200,7 @@ class _PubTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
 
@@ -1209,6 +1210,7 @@ class _PubTime extends StatelessWidget {
     );
 
     return Text.rich(
+      style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
       TextSpan(
         children: [
           WidgetSpan(alignment: PlaceholderAlignment.middle, child: iconSet[_IconSet.schedule]!),

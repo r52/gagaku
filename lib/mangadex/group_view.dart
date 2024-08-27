@@ -195,7 +195,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch ${group.attributes.website!}';
                                 }
                               },
-                              text: const Text('Website'),
+                              text: 'Website',
                             ),
                           if (group.attributes.discord != null)
                             ButtonChip(
@@ -205,7 +205,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: const Text('Discord'),
+                              text: 'Discord',
                             ),
                         ],
                       ),

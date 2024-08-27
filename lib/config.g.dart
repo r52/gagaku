@@ -11,7 +11,7 @@ _$GagakuConfigImpl _$$GagakuConfigImplFromJson(Map<String, dynamic> json) =>
       themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
           ThemeMode.system,
       theme: json['theme'] == null
-          ? const Color(0xFFFFC107)
+          ? const Color(0xFF827717)
           : const ColorConverter().fromJson(json['theme']),
       gridAlbumExtent: $enumDecodeNullable(
               _$GridAlbumExtentEnumMap, json['gridAlbumExtent']) ??

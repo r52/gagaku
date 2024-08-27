@@ -73,7 +73,23 @@ class MainDrawer extends ConsumerWidget {
           ),
           child: const Center(
             child: Column(
-              children: [appicon, Text('Gagaku')],
+              children: [
+                appicon,
+                Text(
+                  'Gagaku',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(1.5, 1.5),
+                        blurRadius: 0.5,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -137,8 +153,7 @@ class MainDrawer extends ConsumerWidget {
                           text: 'GitHub',
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              launchUrl(
-                                  Uri.parse('https://github.com/r52/gagaku'));
+                              launchUrl(Uri.parse('https://github.com/r52/gagaku'));
                             },
                         ),
                         const TextSpan(text: '.'),

@@ -40,8 +40,7 @@ class SettingsHome extends HookConsumerWidget {
                     dropdownMenuEntries: const [
                       DropdownMenuEntry(value: ThemeMode.light, label: 'Light'),
                       DropdownMenuEntry(value: ThemeMode.dark, label: 'Dark'),
-                      DropdownMenuEntry(
-                          value: ThemeMode.system, label: 'System defined'),
+                      DropdownMenuEntry(value: ThemeMode.system, label: 'System defined'),
                     ],
                     onSelected: (ThemeMode? value) {
                       if (value != null) {
@@ -70,25 +69,17 @@ class SettingsHome extends HookConsumerWidget {
                     enableFilter: false,
                     requestFocusOnTap: false,
                     dropdownMenuEntries: [
-                      DropdownMenuEntry(
-                          value: Colors.amber.shade500, label: 'Amber (MD)'),
-                      DropdownMenuEntry(
-                          value: Colors.blue.shade500, label: 'Blue (Gagaku)'),
-                      DropdownMenuEntry(
-                          value: Colors.teal.shade500, label: 'Teal'),
-                      DropdownMenuEntry(
-                          value: Colors.green.shade500, label: 'Green'),
-                      DropdownMenuEntry(
-                          value: Colors.lightGreen.shade500,
-                          label: 'Light Green'),
-                      DropdownMenuEntry(
-                          value: Colors.red.shade500, label: 'Red'),
-                      DropdownMenuEntry(
-                          value: Colors.orange.shade500, label: 'Orange'),
-                      DropdownMenuEntry(
-                          value: Colors.yellow.shade500, label: 'Yellow'),
-                      DropdownMenuEntry(
-                          value: Colors.purple.shade500, label: 'Purple'),
+                      DropdownMenuEntry(value: Colors.lime.shade900, label: 'Lime'),
+                      DropdownMenuEntry(value: Colors.grey.shade800, label: 'Grey'),
+                      DropdownMenuEntry(value: Colors.amberAccent.shade700, label: 'Amber'),
+                      DropdownMenuEntry(value: Colors.blue.shade800, label: 'Blue'),
+                      DropdownMenuEntry(value: Colors.teal.shade800, label: 'Teal'),
+                      DropdownMenuEntry(value: Colors.green.shade800, label: 'Green'),
+                      DropdownMenuEntry(value: Colors.lightGreen.shade800, label: 'Light Green'),
+                      DropdownMenuEntry(value: Colors.red.shade800, label: 'Red'),
+                      DropdownMenuEntry(value: Colors.orange.shade800, label: 'Orange'),
+                      DropdownMenuEntry(value: Colors.yellow.shade800, label: 'Yellow'),
+                      DropdownMenuEntry(value: Colors.purple.shade800, label: 'Purple'),
                     ],
                     onSelected: (Color? value) {
                       if (value != null) {

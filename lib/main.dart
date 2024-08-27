@@ -399,7 +399,8 @@ class _AppState extends ConsumerState<App> {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(seedColor: config.theme, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: config.theme, brightness: Brightness.dark, dynamicSchemeVariant: DynamicSchemeVariant.content),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,

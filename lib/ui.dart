@@ -241,12 +241,14 @@ class ButtonChip extends StatelessWidget {
     super.key,
     this.icon,
     required this.text,
+    this.style,
     this.color,
     this.onPressed,
   });
 
   final Widget? icon;
-  final Widget text;
+  final String text;
+  final TextStyle? style;
   final Color? color;
   final VoidCallback? onPressed;
 
@@ -254,7 +256,7 @@ class ButtonChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final style = Styles.buttonStyle(
+    final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
       textStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
@@ -262,15 +264,21 @@ class ButtonChip extends StatelessWidget {
 
     return (icon != null)
         ? ElevatedButton.icon(
-            style: style,
+            style: bstyle,
             onPressed: onPressed,
             icon: icon!,
-            label: text,
+            label: Text(
+              text,
+              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
+            ),
           )
         : ElevatedButton(
-            style: style,
+            style: bstyle,
             onPressed: onPressed,
-            child: text,
+            child: Text(
+              text,
+              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
+            ),
           );
   }
 }
@@ -298,7 +306,7 @@ class IconTextChip extends StatelessWidget {
     final child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       child: Text.rich(
-        style: style,
+        style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
         overflow: TextOverflow.ellipsis,
         TextSpan(
           children: [
