@@ -92,6 +92,9 @@ class MangaDexFrontPage extends ConsumerWidget {
         ref.invalidate(staffPicks);
         ref.invalidate(seasonal);
         ref.invalidate(_recentlyAddedProvider);
+        ref.invalidate(recentlyAddedProvider);
+        ref.invalidate(_latestUpdatesProvider);
+        ref.read(latestGlobalFeedProvider.notifier).clear();
         return ref.refresh(_popularTitlesProvider.future);
       },
       child: ScrollConfiguration(
