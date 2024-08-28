@@ -25,6 +25,10 @@ class GridExtentSlider extends ConsumerWidget {
     final cfg = ref.watch(gagakuSettingsProvider);
     return MenuAnchor(
       menuChildren: <Widget>[
+        const Padding(
+          padding: EdgeInsets.only(left: 10, top: 10),
+          child: Text('Grid Size'),
+        ),
         Slider(
           value: cfg.gridAlbumExtent.index.toDouble(),
           max: 3,
