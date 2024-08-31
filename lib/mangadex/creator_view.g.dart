@@ -6,194 +6,264 @@ part of 'creator_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchCreatorFromIdHash() =>
-    r'de996798e5488880f40df3da59b157931b1d0e6d';
+typedef _FetchCreatorFromIdRef = Ref<AsyncValue<CreatorType>>;
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-typedef _FetchCreatorFromIdRef = AutoDisposeFutureProviderRef<CreatorType>;
-
-/// See also [_fetchCreatorFromId].
 @ProviderFor(_fetchCreatorFromId)
-const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily();
+const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily._();
 
-/// See also [_fetchCreatorFromId].
-class _FetchCreatorFromIdFamily extends Family<AsyncValue<CreatorType>> {
-  /// See also [_fetchCreatorFromId].
-  const _FetchCreatorFromIdFamily();
-
-  /// See also [_fetchCreatorFromId].
-  _FetchCreatorFromIdProvider call(
-    String creatorId,
-  ) {
-    return _FetchCreatorFromIdProvider(
-      creatorId,
-    );
-  }
-
-  @override
-  _FetchCreatorFromIdProvider getProviderOverride(
-    covariant _FetchCreatorFromIdProvider provider,
-  ) {
-    return call(
-      provider.creatorId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchCreatorFromIdProvider';
-}
-
-/// See also [_fetchCreatorFromId].
-class _FetchCreatorFromIdProvider
-    extends AutoDisposeFutureProvider<CreatorType> {
-  /// See also [_fetchCreatorFromId].
-  _FetchCreatorFromIdProvider(
-    this.creatorId,
-  ) : super.internal(
-          (ref) => _fetchCreatorFromId(
-            ref,
-            creatorId,
-          ),
-          from: _fetchCreatorFromIdProvider,
+final class _FetchCreatorFromIdProvider
+    extends $FunctionalProvider<AsyncValue<CreatorType>, FutureOr<CreatorType>>
+    with
+        $FutureModifier<CreatorType>,
+        $FutureProvider<CreatorType, _FetchCreatorFromIdRef> {
+  const _FetchCreatorFromIdProvider._(
+      {required _FetchCreatorFromIdFamily super.from,
+      required String super.argument,
+      FutureOr<CreatorType> Function(
+        _FetchCreatorFromIdRef ref,
+        String creatorId,
+      )? create})
+      : _createCb = create,
+        super(
+          retry: null,
           name: r'_fetchCreatorFromIdProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchCreatorFromIdHash,
-          dependencies: _FetchCreatorFromIdFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchCreatorFromIdFamily._allTransitiveDependencies,
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final String creatorId;
+  final FutureOr<CreatorType> Function(
+    _FetchCreatorFromIdRef ref,
+    String creatorId,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchCreatorFromIdHash();
+
+  @override
+  String toString() {
+    return r'_fetchCreatorFromIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<CreatorType> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchCreatorFromIdProvider $copyWithCreate(
+    FutureOr<CreatorType> Function(
+      _FetchCreatorFromIdRef ref,
+    ) create,
+  ) {
+    return _FetchCreatorFromIdProvider._(
+        argument: argument as String,
+        from: from! as _FetchCreatorFromIdFamily,
+        create: (
+          ref,
+          String creatorId,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<CreatorType> create(_FetchCreatorFromIdRef ref) {
+    final _$cb = _createCb ?? _fetchCreatorFromId;
+    final argument = this.argument as String;
+    return _$cb(
+      ref,
+      argument,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
-    return other is _FetchCreatorFromIdProvider && other.creatorId == creatorId;
+    return other is _FetchCreatorFromIdProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, creatorId.hashCode);
+    return argument.hashCode;
+  }
+}
 
-    return _SystemHash.finish(hash);
+String _$fetchCreatorFromIdHash() =>
+    r'de996798e5488880f40df3da59b157931b1d0e6d';
+
+final class _FetchCreatorFromIdFamily extends Family {
+  const _FetchCreatorFromIdFamily._()
+      : super(
+          retry: null,
+          name: r'_fetchCreatorFromIdProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  _FetchCreatorFromIdProvider call(
+    String creatorId,
+  ) =>
+      _FetchCreatorFromIdProvider._(argument: creatorId, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchCreatorFromIdHash();
+
+  @override
+  String toString() => r'_fetchCreatorFromIdProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<CreatorType> Function(
+      _FetchCreatorFromIdRef ref,
+      String args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchCreatorFromIdProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+typedef _FetchCreatorTitlesRef = Ref<AsyncValue<List<Manga>>>;
+
+@ProviderFor(_fetchCreatorTitles)
+const _fetchCreatorTitlesProvider = _FetchCreatorTitlesFamily._();
+
+final class _FetchCreatorTitlesProvider
+    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    with
+        $FutureModifier<List<Manga>>,
+        $FutureProvider<List<Manga>, _FetchCreatorTitlesRef> {
+  const _FetchCreatorTitlesProvider._(
+      {required _FetchCreatorTitlesFamily super.from,
+      required CreatorType super.argument,
+      FutureOr<List<Manga>> Function(
+        _FetchCreatorTitlesRef ref,
+        CreatorType creator,
+      )? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'_fetchCreatorTitlesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<Manga>> Function(
+    _FetchCreatorTitlesRef ref,
+    CreatorType creator,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchCreatorTitlesHash();
+
+  @override
+  String toString() {
+    return r'_fetchCreatorTitlesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchCreatorTitlesProvider $copyWithCreate(
+    FutureOr<List<Manga>> Function(
+      _FetchCreatorTitlesRef ref,
+    ) create,
+  ) {
+    return _FetchCreatorTitlesProvider._(
+        argument: argument as CreatorType,
+        from: from! as _FetchCreatorTitlesFamily,
+        create: (
+          ref,
+          CreatorType creator,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<List<Manga>> create(_FetchCreatorTitlesRef ref) {
+    final _$cb = _createCb ?? _fetchCreatorTitles;
+    final argument = this.argument as CreatorType;
+    return _$cb(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchCreatorTitlesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
   }
 }
 
 String _$fetchCreatorTitlesHash() =>
-    r'efd02209a7239c89af2fdf44b2e5db30b1626f4f';
-typedef _FetchCreatorTitlesRef = AutoDisposeFutureProviderRef<Iterable<Manga>>;
+    r'9519b9552042e93cd2dc17173733cd154356c5b4';
 
-/// See also [_fetchCreatorTitles].
-@ProviderFor(_fetchCreatorTitles)
-const _fetchCreatorTitlesProvider = _FetchCreatorTitlesFamily();
-
-/// See also [_fetchCreatorTitles].
-class _FetchCreatorTitlesFamily extends Family<AsyncValue<Iterable<Manga>>> {
-  /// See also [_fetchCreatorTitles].
-  const _FetchCreatorTitlesFamily();
-
-  /// See also [_fetchCreatorTitles].
-  _FetchCreatorTitlesProvider call(
-    CreatorType creator,
-  ) {
-    return _FetchCreatorTitlesProvider(
-      creator,
-    );
-  }
-
-  @override
-  _FetchCreatorTitlesProvider getProviderOverride(
-    covariant _FetchCreatorTitlesProvider provider,
-  ) {
-    return call(
-      provider.creator,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchCreatorTitlesProvider';
-}
-
-/// See also [_fetchCreatorTitles].
-class _FetchCreatorTitlesProvider
-    extends AutoDisposeFutureProvider<Iterable<Manga>> {
-  /// See also [_fetchCreatorTitles].
-  _FetchCreatorTitlesProvider(
-    this.creator,
-  ) : super.internal(
-          (ref) => _fetchCreatorTitles(
-            ref,
-            creator,
-          ),
-          from: _fetchCreatorTitlesProvider,
+final class _FetchCreatorTitlesFamily extends Family {
+  const _FetchCreatorTitlesFamily._()
+      : super(
+          retry: null,
           name: r'_fetchCreatorTitlesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchCreatorTitlesHash,
-          dependencies: _FetchCreatorTitlesFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchCreatorTitlesFamily._allTransitiveDependencies,
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
         );
 
-  final CreatorType creator;
+  _FetchCreatorTitlesProvider call(
+    CreatorType creator,
+  ) =>
+      _FetchCreatorTitlesProvider._(argument: creator, from: this);
 
   @override
-  bool operator ==(Object other) {
-    return other is _FetchCreatorTitlesProvider && other.creator == creator;
-  }
+  String debugGetCreateSourceHash() => _$fetchCreatorTitlesHash();
 
   @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, creator.hashCode);
+  String toString() => r'_fetchCreatorTitlesProvider';
 
-    return _SystemHash.finish(hash);
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<List<Manga>> Function(
+      _FetchCreatorTitlesRef ref,
+      CreatorType args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchCreatorTitlesProvider;
+
+        final argument = provider.argument as CreatorType;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

@@ -92,7 +92,7 @@ BEGIN
             VALUE "FileDescription", "gagaku" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "gagaku" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 r52. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 r52. All rights reserved." "\0"
             VALUE "OriginalFilename", "gagaku.exe" "\0"
             VALUE "ProductName", "gagaku" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

@@ -2,12 +2,12 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -23,128 +23,88 @@ class MangaDexHome extends HookConsumerWidget {
     final lifecycle = useAppLifecycleState();
 
     useEffect(() {
-      if (lifecycle == AppLifecycleState.resumed) {
+      if (lifecycle == AppLifecycleState.resumed && ref.exists(authControlProvider)) {
         ref.read(authControlProvider.notifier).invalidate();
       }
       return null;
     }, [lifecycle]);
 
-    const bottomNavigationBarItems = <Widget>[
-      NavigationDestination(
-        icon: Icon(Icons.home),
-        label: 'Latest Feed',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.menu_book),
-        label: 'Manga Feed',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.feed),
-        label: 'Chapter Feed',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.collections),
-        label: 'Library',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.history),
-        label: 'History',
-      )
-    ];
-
     final index = _calculateSelectedIndex(context);
 
     return Scaffold(
+      restorationId: 'md_home_restore',
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controllers?[index].animateTo(0.0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut);
+            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
           },
-          child: Styles.titleFlexBar(context: context, title: 'MangaDex'),
+          child: const TitleFlexBar(title: 'MangaDex'),
         ),
         actions: [
-          ButtonBar(
+          OverflowBar(
+            spacing: 8.0,
             children: [
-              OpenContainer(
-                closedColor: theme.cardColor,
-                closedShape: const CircleBorder(),
-                closedBuilder: (context, openContainer) {
-                  return Tooltip(
-                    message: 'Search Manga',
-                    child: IconButton(
+              Tooltip(
+                message: 'Search Manga',
+                child: OpenContainer(
+                  closedColor: theme.colorScheme.surface,
+                  closedShape: const CircleBorder(),
+                  closedBuilder: (context, openContainer) {
+                    return IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () {
                         openContainer();
                       },
-                    ),
-                  );
-                },
-                openBuilder: (context, closedContainer) {
-                  return const MangaDexSearchWidget();
-                },
+                    );
+                  },
+                  openBuilder: (context, closedContainer) {
+                    return const MangaDexSearchWidget();
+                  },
+                ),
               ),
-              OpenContainer<bool>(
-                closedColor: theme.cardColor,
-                closedShape: const CircleBorder(),
-                closedBuilder: (context, openContainer) {
-                  return Tooltip(
-                    message: 'MangaDex Settings',
-                    child: IconButton(
+              Tooltip(
+                message: 'MangaDex Settings',
+                child: OpenContainer<bool>(
+                  closedColor: theme.colorScheme.surface,
+                  closedShape: const CircleBorder(),
+                  closedBuilder: (context, openContainer) {
+                    return IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () {
                         openContainer();
                       },
-                    ),
-                  );
-                },
-                openBuilder: (context, closedContainer) {
-                  return const MangaDexSettingsWidget();
-                },
+                    );
+                  },
+                  openBuilder: (context, closedContainer) {
+                    return const MangaDexSettingsWidget();
+                  },
+                ),
               ),
               Consumer(
                 builder: (context, ref, child) {
                   final auth = ref.watch(authControlProvider);
 
                   switch (auth) {
-                    case AsyncData(value: final loggedin):
+                    case AsyncValue(value: final loggedin?):
                       // XXX: This changes when OAuth is released
-                      Widget logbtn = Tooltip(
-                        message: 'Login',
-                        child: IconButton(
-                          color: theme.colorScheme.primary,
-                          icon: const Icon(Icons.login),
-                          onPressed: () {
-                            context.push(GagakuRoute.login);
-                          },
-                        ),
-                      );
-
-                      if (loggedin) {
-                        logbtn = Tooltip(
-                          message: 'Logout',
-                          child: IconButton(
-                            color: theme.colorScheme.primary,
-                            icon: const Icon(Icons.logout),
-                            onPressed: () =>
-                                ref.read(authControlProvider.notifier).logout(),
-                          ),
-                        );
-                      }
-
                       return Ink(
                         decoration: ShapeDecoration(
-                          color: theme.cardColor,
+                          color: theme.colorScheme.surface,
                           shape: const CircleBorder(),
                         ),
-                        child: logbtn,
+                        child: Tooltip(
+                          message: loggedin ? 'Logout' : 'Login',
+                          child: IconButton(
+                            color: theme.colorScheme.primary,
+                            icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
+                            onPressed: loggedin
+                                ? () => ref.read(authControlProvider.notifier).logout()
+                                : () => context.push(GagakuRoute.login),
+                          ),
+                        ),
                       );
-                    case AsyncError(:final error, :final stackTrace):
-                      final messenger = ScaffoldMessenger.of(context);
-                      Styles.showErrorSnackBar(messenger, '$error');
-                      logger.e("authControlProvider failed",
-                          error: error, stackTrace: stackTrace);
+                    // ignore: unused_local_variable
+                    case AsyncValue(:final error?, :final stackTrace?):
                       return const Icon(Icons.error);
                     case _:
                       return const Center(
@@ -164,16 +124,35 @@ class MangaDexHome extends HookConsumerWidget {
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: bottomNavigationBarItems,
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.menu_book),
+            label: 'My Feed',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.collections),
+            label: 'Library',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.list),
+            label: 'My Lists',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.history),
+            label: 'History',
+          )
+        ],
         selectedIndex: index,
         onDestinationSelected: (index) {
           final currTab = _calculateSelectedIndex(context);
 
           if (currTab == index) {
             // Scroll to top if on the same tab
-            controllers?[index].animateTo(0.0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut);
+            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
           } else {
             // Switch tab
             _onItemTapped(index, context);
@@ -189,13 +168,13 @@ class MangaDexHome extends HookConsumerWidget {
         GoRouter.of(context).go('/');
         break;
       case 1:
-        GoRouter.of(context).go(GagakuRoute.mangafeed);
-        break;
-      case 2:
         GoRouter.of(context).go(GagakuRoute.chapterfeed);
         break;
-      case 3:
+      case 2:
         GoRouter.of(context).go(GagakuRoute.library);
+        break;
+      case 3:
+        GoRouter.of(context).go(GagakuRoute.lists);
         break;
       case 4:
         GoRouter.of(context).go(GagakuRoute.history);
@@ -204,14 +183,14 @@ class MangaDexHome extends HookConsumerWidget {
   }
 
   static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.toString();
+    final location = cleanBaseDomains(GoRouterState.of(context).uri.toString());
 
     switch (location) {
-      case GagakuRoute.mangafeed:
-        return 1;
       case GagakuRoute.chapterfeed:
-        return 2;
+        return 1;
       case GagakuRoute.library:
+        return 2;
+      case GagakuRoute.lists:
         return 3;
       case GagakuRoute.history:
         return 4;

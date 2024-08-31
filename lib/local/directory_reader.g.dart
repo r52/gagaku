@@ -6,109 +6,133 @@ part of 'directory_reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getDirectoryPagesHash() => r'b0d54343c0f0f752fbf7c378626d8054632121c1';
+typedef _GetDirectoryPagesRef = Ref<AsyncValue<List<ReaderPage>>>;
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-typedef _GetDirectoryPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
-
-/// See also [_getDirectoryPages].
 @ProviderFor(_getDirectoryPages)
-const _getDirectoryPagesProvider = _GetDirectoryPagesFamily();
+const _getDirectoryPagesProvider = _GetDirectoryPagesFamily._();
 
-/// See also [_getDirectoryPages].
-class _GetDirectoryPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
-  /// See also [_getDirectoryPages].
-  const _GetDirectoryPagesFamily();
-
-  /// See also [_getDirectoryPages].
-  _GetDirectoryPagesProvider call(
-    String path,
-  ) {
-    return _GetDirectoryPagesProvider(
-      path,
-    );
-  }
-
-  @override
-  _GetDirectoryPagesProvider getProviderOverride(
-    covariant _GetDirectoryPagesProvider provider,
-  ) {
-    return call(
-      provider.path,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_getDirectoryPagesProvider';
-}
-
-/// See also [_getDirectoryPages].
-class _GetDirectoryPagesProvider
-    extends AutoDisposeFutureProvider<List<ReaderPage>> {
-  /// See also [_getDirectoryPages].
-  _GetDirectoryPagesProvider(
-    this.path,
-  ) : super.internal(
-          (ref) => _getDirectoryPages(
-            ref,
-            path,
-          ),
-          from: _getDirectoryPagesProvider,
+final class _GetDirectoryPagesProvider extends $FunctionalProvider<
+        AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
+    with
+        $FutureModifier<List<ReaderPage>>,
+        $FutureProvider<List<ReaderPage>, _GetDirectoryPagesRef> {
+  const _GetDirectoryPagesProvider._(
+      {required _GetDirectoryPagesFamily super.from,
+      required String super.argument,
+      FutureOr<List<ReaderPage>> Function(
+        _GetDirectoryPagesRef ref,
+        String path,
+      )? create})
+      : _createCb = create,
+        super(
+          retry: null,
           name: r'_getDirectoryPagesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$getDirectoryPagesHash,
-          dependencies: _GetDirectoryPagesFamily._dependencies,
-          allTransitiveDependencies:
-              _GetDirectoryPagesFamily._allTransitiveDependencies,
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final String path;
+  final FutureOr<List<ReaderPage>> Function(
+    _GetDirectoryPagesRef ref,
+    String path,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$getDirectoryPagesHash();
+
+  @override
+  String toString() {
+    return r'_getDirectoryPagesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ReaderPage>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _GetDirectoryPagesProvider $copyWithCreate(
+    FutureOr<List<ReaderPage>> Function(
+      _GetDirectoryPagesRef ref,
+    ) create,
+  ) {
+    return _GetDirectoryPagesProvider._(
+        argument: argument as String,
+        from: from! as _GetDirectoryPagesFamily,
+        create: (
+          ref,
+          String path,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<List<ReaderPage>> create(_GetDirectoryPagesRef ref) {
+    final _$cb = _createCb ?? _getDirectoryPages;
+    final argument = this.argument as String;
+    return _$cb(
+      ref,
+      argument,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
-    return other is _GetDirectoryPagesProvider && other.path == path;
+    return other is _GetDirectoryPagesProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, path.hashCode);
+    return argument.hashCode;
+  }
+}
 
-    return _SystemHash.finish(hash);
+String _$getDirectoryPagesHash() => r'9abbc559ffe1f52639956e7f09aecb4c4fa56913';
+
+final class _GetDirectoryPagesFamily extends Family {
+  const _GetDirectoryPagesFamily._()
+      : super(
+          retry: null,
+          name: r'_getDirectoryPagesProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  _GetDirectoryPagesProvider call(
+    String path,
+  ) =>
+      _GetDirectoryPagesProvider._(argument: path, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$getDirectoryPagesHash();
+
+  @override
+  String toString() => r'_getDirectoryPagesProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<List<ReaderPage>> Function(
+      _GetDirectoryPagesRef ref,
+      String args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _GetDirectoryPagesProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

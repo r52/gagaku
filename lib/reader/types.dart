@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 enum ReaderDirection {
-  leftToRight,
-  rightToLeft,
-  topToBottom,
+  leftToRight('Left to Right', Icons.arrow_forward),
+  rightToLeft('Right to Left', Icons.arrow_back);
+
+  const ReaderDirection(this.label, this.icon);
+  final String label;
+  final IconData icon;
 }
 
-extension ReaderDirectionExt on ReaderDirection {
-  IconData get icon => const [
-        Icons.arrow_forward,
-        Icons.arrow_back,
-        Icons.arrow_downward,
-      ].elementAt(index);
+enum ReaderFormat {
+  single(
+    'Single',
+    Icons.note,
+  ),
+  longstrip(
+    'Long Strip',
+    Icons.view_stream,
+  );
 
-  String get formatted => const [
-        'Left to Right',
-        'Right to Left',
-        'Top to Bottom',
-      ].elementAt(index);
-
-  static ReaderDirection parse(int index) {
-    return ReaderDirection.values.elementAt(index);
-  }
+  const ReaderFormat(this.label, this.icon);
+  final String label;
+  final IconData icon;
 }
 
 class ReaderPage {
   final ImageProvider provider;
+  final String? sortKey;
 
   bool cached = false;
+  final id = const Uuid().v4();
 
-  ReaderPage({required this.provider});
+  ReaderPage({required this.provider, this.sortKey});
 }

@@ -6,20 +6,129 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$localLibraryHash() => r'230eb54c9d40cf1747fcd27e40fdd231f395428c';
-
-/// See also [LocalLibrary].
 @ProviderFor(LocalLibrary)
-final localLibraryProvider =
-    AsyncNotifierProvider<LocalLibrary, LocalLibraryItem>.internal(
-  LocalLibrary.new,
-  name: r'localLibraryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$localLibraryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const localLibraryProvider = LocalLibraryProvider._();
 
-typedef _$LocalLibrary = AsyncNotifier<LocalLibraryItem>;
+final class LocalLibraryProvider
+    extends $AsyncNotifierProvider<LocalLibrary, LocalLibraryItem> {
+  const LocalLibraryProvider._(
+      {super.runNotifierBuildOverride, LocalLibrary Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'localLibraryProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final LocalLibrary Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$localLibraryHash();
+
+  @$internal
+  @override
+  LocalLibrary create() => _createCb?.call() ?? LocalLibrary();
+
+  @$internal
+  @override
+  LocalLibraryProvider $copyWithCreate(
+    LocalLibrary Function() create,
+  ) {
+    return LocalLibraryProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  LocalLibraryProvider $copyWithBuild(
+    FutureOr<LocalLibraryItem> Function(
+      Ref<AsyncValue<LocalLibraryItem>>,
+      LocalLibrary,
+    ) build,
+  ) {
+    return LocalLibraryProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<LocalLibrary, LocalLibraryItem> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$localLibraryHash() => r'aa1621fdeb37c7a0f4c2a447188c9b34bf5b318d';
+
+abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
+  FutureOr<LocalLibraryItem> build();
+  @$internal
+  @override
+  FutureOr<LocalLibraryItem> runBuild() => build();
+}
+
+@ProviderFor(SupportedFormats)
+const supportedFormatsProvider = SupportedFormatsProvider._();
+
+final class SupportedFormatsProvider
+    extends $AsyncNotifierProvider<SupportedFormats, FormatInfo> {
+  const SupportedFormatsProvider._(
+      {super.runNotifierBuildOverride, SupportedFormats Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'supportedFormatsProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final SupportedFormats Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$supportedFormatsHash();
+
+  @$internal
+  @override
+  SupportedFormats create() => _createCb?.call() ?? SupportedFormats();
+
+  @$internal
+  @override
+  SupportedFormatsProvider $copyWithCreate(
+    SupportedFormats Function() create,
+  ) {
+    return SupportedFormatsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  SupportedFormatsProvider $copyWithBuild(
+    FutureOr<FormatInfo> Function(
+      Ref<AsyncValue<FormatInfo>>,
+      SupportedFormats,
+    ) build,
+  ) {
+    return SupportedFormatsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<SupportedFormats, FormatInfo> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$supportedFormatsHash() => r'3840c7ebd8357ef2b7163a74cb1335481d03be80';
+
+abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
+  FutureOr<FormatInfo> build();
+  @$internal
+  @override
+  FutureOr<FormatInfo> runBuild() => build();
+}
+
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

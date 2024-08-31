@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/types.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
@@ -13,52 +11,73 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'archive_reader.g.dart';
 
-Route createArchiveReaderRoute(
-  String path, {
-  String? title,
-  Widget? link,
-  VoidCallback? onLinkPressed,
-}) {
-  return Styles.buildSlideTransitionRoute(
-    (context, animation, secondaryAnimation) => ArchiveReaderWidget(
-      path: path,
-      title: title,
-      link: link,
-      onLinkPressed: onLinkPressed,
-    ),
-  );
+class ArchiveReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
+  final String path;
+  final String? title;
+  final Widget? link;
+  final VoidCallback? onLinkPressed;
+
+  ArchiveReaderRouteBuilder({
+    required this.path,
+    this.title,
+    this.link,
+    this.onLinkPressed,
+  }) : super(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              ArchiveReaderWidget(
+            path: path,
+            title: title,
+            link: link,
+            onLinkPressed: onLinkPressed,
+          ),
+        );
+}
+
+class _ExtractInfo {
+  const _ExtractInfo({
+    required this.type,
+    required this.formats,
+    required this.path,
+  });
+
+  final ArchiveType type;
+  final FormatInfo formats;
+  final String path;
 }
 
 @riverpod
 Future<List<ReaderPage>> _getArchivePages(
     _GetArchivePagesRef ref, String path) async {
-  final bytes = await File(path).readAsBytes();
+  final formats = await ref.watch(supportedFormatsProvider.future);
+  var type = ArchiveType.zip;
 
   if (path.endsWith('.cbt') || path.endsWith('.tar')) {
-    return compute(_extractTar, bytes);
+    type = ArchiveType.tar;
   }
 
-  return compute(_extractZip, bytes);
+  final pages = await compute(
+      _extractArchive, _ExtractInfo(type: type, formats: formats, path: path));
+
+  /// pages MUST be cleared on dispose otherwise MemoryImage and its
+  /// accompanying Uint8List buffer won't get GC'd for whatever reason
+  ref.onDispose(() {
+    pages.clear();
+  });
+
+  return pages;
 }
 
-List<ReaderPage> _extractZip(Uint8List bytes) {
-  return _extractArchive(ArchiveType.zip, bytes);
-}
-
-List<ReaderPage> _extractTar(Uint8List bytes) {
-  return _extractArchive(ArchiveType.tar, bytes);
-}
-
-List<ReaderPage> _extractArchive(ArchiveType type, Uint8List bytes) {
+Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
   Archive archive;
+  final file = InputFileStream(info.path);
 
-  switch (type) {
+  switch (info.type) {
     case ArchiveType.tar:
-      archive = TarDecoder().decodeBytes(bytes);
+      archive = TarDecoder().decodeBuffer(file);
       break;
     case ArchiveType.zip:
     default:
-      archive = ZipDecoder().decodeBytes(bytes);
+      archive = ZipDecoder().decodeBuffer(file);
       break;
   }
 
@@ -68,11 +87,16 @@ List<ReaderPage> _extractArchive(ArchiveType type, Uint8List bytes) {
     if (file.isFile &&
         (file.name.endsWith(".jpg") ||
             file.name.endsWith(".png") ||
-            file.name.endsWith(".jpeg"))) {
-      final data = file.content as Uint8List;
-      pages.add(ReaderPage(provider: MemoryImage(data)));
+            file.name.endsWith(".jpeg") ||
+            (info.formats.avif && file.name.endsWith(".avif")))) {
+      pages.add(ReaderPage(
+        provider: MemoryImage(file.content as Uint8List),
+        sortKey: file.name,
+      ));
     }
   }
+
+  await archive.clear();
 
   return pages;
 }
@@ -93,8 +117,7 @@ class ArchiveReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pages = ref.watch(_getArchivePagesProvider(path));
-    final theme = Theme.of(context);
+    final pageProvider = ref.watch(_getArchivePagesProvider(path));
 
     String strtitle = path;
 
@@ -102,31 +125,34 @@ class ArchiveReaderWidget extends ConsumerWidget {
       strtitle = title!;
     }
 
-    switch (pages) {
+    switch (pageProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_getArchivePagesProvider($path) failed",
-            error: error, stackTrace: stackTrace);
-
         return Scaffold(
           appBar: AppBar(
             leading: const BackButton(),
           ),
-          body: Styles.errorColumn(error, stackTrace),
+          body: ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_getArchivePagesProvider($path) failed",
+          ),
         );
-      case AsyncValue(:final value?):
-        if (value.isEmpty) {
-          return const Center(
-            child: Text("This archive contains no images!"),
+      case AsyncValue(value: final pages?):
+        if (pages.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(
+              leading: const BackButton(),
+            ),
+            body: const Center(
+              child: Text("This archive contains no readable images!"),
+            ),
           );
         }
 
         return ReaderWidget(
-          pages: value,
-          pageCount: value.length,
+          pages: pages,
           title: strtitle,
-          isLongStrip: false, // TODO longstrip
+          longstrip: false,
           link: link,
           onLinkPressed: onLinkPressed,
         );
@@ -138,7 +164,7 @@ class ArchiveReaderWidget extends ConsumerWidget {
               Text(
                 "Extracting archive...",
                 style: TextStyle(
-                  color: theme.colorScheme.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.normal,
                   fontSize: 18,
                   decoration: TextDecoration.none,

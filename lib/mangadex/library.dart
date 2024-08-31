@@ -1,15 +1,30 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:gagaku/log.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/legacy.dart';
+import 'package:number_paginator/number_paginator.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final libraryViewTypeProvider =
-    StateProvider((ref) => MangaReadingStatus.reading);
+part 'library.g.dart';
 
-class MangaDexLibraryView extends ConsumerWidget {
+final libraryViewTypeProvider = StateProvider((ref) => MangaReadingStatus.reading);
+
+@riverpod
+Future<List<String>> _getLibraryListByType(_GetLibraryListByTypeRef ref, MangaReadingStatus type) async {
+  final library = await ref.watch(userLibraryProvider.future);
+
+  final results = library.entries.where((element) => element.value == type).map((e) => e.key).toList();
+
+  return results;
+}
+
+class MangaDexLibraryView extends HookConsumerWidget {
   const MangaDexLibraryView({
     super.key,
     this.controller,
@@ -19,77 +34,131 @@ class MangaDexLibraryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final type = ref.watch(libraryViewTypeProvider);
-    final results = ref.watch(userLibraryProvider(type));
-    final isLoading = results.isLoading;
+    final currentPage = useState(0);
+    bool isLoading = false;
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            ScrollConfiguration(
-              behavior: MouseTouchScrollBehavior(),
-              child: Scrollbar(
-                child: SingleChildScrollView(
-                  primary: true,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 10.0),
-                  scrollDirection: Axis.horizontal,
-                  child: ToggleButtons(
-                    isSelected: List<bool>.generate(
-                        MangaReadingStatus.values.skip(1).length,
-                        (index) => type.index == (index + 1)),
-                    onPressed: (index) {
-                      ref.read(libraryViewTypeProvider.notifier).state =
-                          MangaReadingStatus.values.skip(1).elementAt(index);
-                    },
+    final listProvider = ref.watch(_getLibraryListByTypeProvider(type));
+
+    List<Widget> children;
+
+    switch (listProvider) {
+      case AsyncValue(value: final list?):
+        final titlesProvider = ref.watch(getMangaListByPageProvider(list, currentPage.value));
+
+        isLoading = titlesProvider.isLoading;
+
+        children = [
+          Expanded(
+            child: switch (titlesProvider) {
+              AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+                  onRefresh: () async {
+                    ref.read(userLibraryProvider.notifier).clear();
+                    return ref.refresh(_getLibraryListByTypeProvider(type).future);
+                  },
+                  child: ErrorList(
+                    error: error,
+                    stackTrace: stackTrace,
+                    message: "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
+                  ),
+                ),
+              AsyncValue(value: final mangas) => RefreshIndicator(
+                  onRefresh: () async {
+                    ref.read(userLibraryProvider.notifier).clear();
+                    final lt = ref.read(libraryViewTypeProvider);
+                    return ref.refresh(_getLibraryListByTypeProvider(lt).future);
+                  },
+                  child: MangaListWidget(
+                    title: Text(
+                      '${list.length} Mangas',
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: controller,
                     children: [
-                      ...MangaReadingStatus.values
-                          .skip(1)
-                          .map((e) => Text(
-                                e.formatted,
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ))
-                          .toList()
+                      if (mangas != null) MangaListViewSliver(items: mangas),
                     ],
                   ),
                 ),
+            },
+          ),
+          NumberPaginator(
+            numberPages: max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+            onPageChange: (int index) {
+              currentPage.value = index;
+            },
+          )
+        ];
+        break;
+      case AsyncValue(:final error?, :final stackTrace?):
+        children = [
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                ref.read(userLibraryProvider.notifier).clear();
+                return ref.refresh(_getLibraryListByTypeProvider(type).future);
+              },
+              child: ErrorList(
+                error: error,
+                stackTrace: stackTrace,
+                message: "_getLibraryListByTypeProvider($type) failed",
               ),
             ),
-            Expanded(
-              child: Stack(
-                children: [
-                  switch (results) {
-                    AsyncValue(:final error?, :final stackTrace?) => () {
-                        final messenger = ScaffoldMessenger.of(context);
-                        Styles.showErrorSnackBar(messenger, '$error');
-                        logger.e("userLibraryProvider($type) failed",
-                            error: error, stackTrace: stackTrace);
+          ),
+        ];
+        break;
+      case AsyncValue(:final progress):
+        children = [
+          ListSpinner(
+            progress: progress?.toDouble(),
+          )
+        ];
+        break;
+    }
 
-                        return Styles.errorColumn(error, stackTrace);
-                      }(),
-                    AsyncValue(:final value?) => MangaListWidget(
-                        title: Text(
-                          '${ref.watch(userLibraryProvider(type).notifier).total()} Mangas',
-                          style: const TextStyle(fontSize: 24),
+    return Scaffold(
+      body: Center(
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: const Alignment(-0.95, 0.0),
+                  child: DropdownMenu<MangaReadingStatus>(
+                    initialSelection: type,
+                    enableFilter: false,
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    inputDecorationTheme: InputDecorationTheme(
+                      filled: true,
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 2.0,
+                          color: theme.colorScheme.inversePrimary,
                         ),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        controller: controller,
-                        onAtEdge: () {
-                          final lt = ref.read(libraryViewTypeProvider);
-                          ref.read(userLibraryProvider(lt).notifier).getMore();
-                        },
-                        children: [
-                          MangaListViewSliver(items: value),
-                        ],
                       ),
-                    _ => const SizedBox.shrink(),
-                  },
-                  if (isLoading) ...Styles.loadingOverlay,
-                ],
-              ),
+                    ),
+                    onSelected: (MangaReadingStatus? status) async {
+                      if (status != null) {
+                        ref.read(libraryViewTypeProvider.notifier).state = status;
+                        currentPage.value = 0;
+                      }
+                    },
+                    dropdownMenuEntries: List<DropdownMenuEntry<MangaReadingStatus>>.generate(
+                      MangaReadingStatus.values.skip(1).length,
+                      (int index) => DropdownMenuEntry<MangaReadingStatus>(
+                        value: MangaReadingStatus.values.skip(1).elementAt(index),
+                        label: MangaReadingStatus.values.skip(1).elementAt(index).label,
+                      ),
+                    ),
+                  ),
+                ),
+                ...children,
+              ],
             ),
+            if (isLoading) ...Styles.loadingOverlay,
           ],
         ),
       ),

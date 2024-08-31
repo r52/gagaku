@@ -6,21 +6,61 @@ part of 'manga_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchMangaFeedHash() => r'7a1e8fda3fb4215e4472ac5c94ed8ba0e6fa6cac';
+typedef _FetchMangaFeedRef = Ref<AsyncValue<List<Manga>>>;
 
-/// See also [_fetchMangaFeed].
 @ProviderFor(_fetchMangaFeed)
-final _fetchMangaFeedProvider =
-    AutoDisposeFutureProvider<Iterable<Manga>>.internal(
-  _fetchMangaFeed,
-  name: r'_fetchMangaFeedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$fetchMangaFeedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const _fetchMangaFeedProvider = _FetchMangaFeedProvider._();
 
-typedef _FetchMangaFeedRef = AutoDisposeFutureProviderRef<Iterable<Manga>>;
+final class _FetchMangaFeedProvider
+    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    with
+        $FutureModifier<List<Manga>>,
+        $FutureProvider<List<Manga>, _FetchMangaFeedRef> {
+  const _FetchMangaFeedProvider._(
+      {FutureOr<List<Manga>> Function(
+        _FetchMangaFeedRef ref,
+      )? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'_fetchMangaFeedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<Manga>> Function(
+    _FetchMangaFeedRef ref,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchMangaFeedHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchMangaFeedProvider $copyWithCreate(
+    FutureOr<List<Manga>> Function(
+      _FetchMangaFeedRef ref,
+    ) create,
+  ) {
+    return _FetchMangaFeedProvider._(create: create);
+  }
+
+  @override
+  FutureOr<List<Manga>> create(_FetchMangaFeedRef ref) {
+    final _$cb = _createCb ?? _fetchMangaFeed;
+    return _$cb(ref);
+  }
+}
+
+String _$fetchMangaFeedHash() => r'a1a1dd400c006bc9bdb6fb1cf39c9ced046f5888';
+
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

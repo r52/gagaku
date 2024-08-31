@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -24,8 +23,7 @@ Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
       creator: creator,
     );
   } else {
-    child = QueriedMangaDexCreatorViewWidget(
-        creatorId: state.pathParameters['creatorId']!);
+    child = QueriedMangaDexCreatorViewWidget(creatorId: state.pathParameters['creatorId']!);
   }
 
   return CustomTransitionPage<void>(
@@ -36,20 +34,18 @@ Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<CreatorType> _fetchCreatorFromId(
-    _FetchCreatorFromIdRef ref, String creatorId) async {
+Future<CreatorType> _fetchCreatorFromId(_FetchCreatorFromIdRef ref, String creatorId) async {
   final api = ref.watch(mangadexProvider);
   final creator = await api.fetchCreators([creatorId]);
   return creator.first;
 }
 
 @riverpod
-Future<Iterable<Manga>> _fetchCreatorTitles(
-    _FetchCreatorTitlesRef ref, CreatorType creator) async {
+Future<List<Manga>> _fetchCreatorTitles(_FetchCreatorTitlesRef ref, CreatorType creator) async {
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
-  ref.keepAlive();
+  ref.disposeAfter(const Duration(minutes: 5));
 
   return mangas;
 }
@@ -61,30 +57,22 @@ class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final group = ref.watch(_fetchCreatorFromIdProvider(creatorId));
-
-    Widget child;
-
-    switch (group) {
-      case AsyncData(:final value):
-        return MangaDexCreatorViewWidget(
-          creator: value,
-        );
-      case AsyncError(:final error, :final stackTrace):
-        final messenger = ScaffoldMessenger.of(context);
-        Styles.showErrorSnackBar(messenger, '$error');
-        logger.e("_fetchCreatorFromIdProvider($creatorId) failed",
-            error: error, stackTrace: stackTrace);
-
-        child = Styles.errorColumn(error, stackTrace);
-        break;
-      case _:
-        child = Styles.listSpinner;
-        break;
-    }
+    final creatorProvider = ref.watch(_fetchCreatorFromIdProvider(creatorId));
 
     return Scaffold(
-      body: child,
+      body: switch (creatorProvider) {
+        AsyncValue(value: final creator?) => MangaDexCreatorViewWidget(
+            creator: creator,
+          ),
+        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchCreatorFromIdProvider($creatorId) failed",
+          ),
+        AsyncValue(:final progress) => ListSpinner(
+            progress: progress?.toDouble(),
+          ),
+      },
     );
   }
 }
@@ -98,162 +86,148 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = useScrollController();
     final theme = Theme.of(context);
-    final mangas = ref.watch(_fetchCreatorTitlesProvider(creator));
-    final isLoading = ref.watch(creatorTitlesProvider(creator)).isLoading;
-
-    Widget createLinkChip(String url, String text) {
-      return ButtonChip(
-        onPressed: () async {
-          if (!await launchUrl(Uri.parse(url))) {
-            throw 'Could not launch $url';
-          }
-        },
-        text: Text(text),
-      );
-    }
+    final titleProvider = ref.watch(_fetchCreatorTitlesProvider(creator));
+    final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
 
     return Scaffold(
         body: Stack(
       children: [
-        switch (mangas) {
-          AsyncValue(:final error?, :final stackTrace?) => () {
-              final messenger = ScaffoldMessenger.of(context);
-              Styles.showErrorSnackBar(messenger, '$error');
-              logger.e("_fetchCreatorTitlesProvider(creator) failed",
-                  error: error, stackTrace: stackTrace);
-
-              return RefreshIndicator(
-                onRefresh: () async {
-                  ref.invalidate(creatorTitlesProvider(creator));
-                  return await ref
-                      .refresh(_fetchCreatorTitlesProvider(creator).future);
-                },
-                child: Styles.errorList(error, stackTrace),
-              );
-            }(),
-          AsyncValue(:final value?) => () {
-              if (value.isEmpty) {
-                return const Text('No manga!');
-              }
-
-              return RefreshIndicator(
-                onRefresh: () async {
-                  ref.read(creatorTitlesProvider(creator).notifier).clear();
-                  return await ref
-                      .refresh(_fetchCreatorTitlesProvider(creator).future);
-                },
-                child: MangaListWidget(
-                  leading: [
-                    SliverAppBar(
-                      pinned: true,
-                      snap: false,
-                      floating: false,
-                      leading: BackButton(
-                        onPressed: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go('/');
-                          }
-                        },
-                      ),
-                      flexibleSpace: GestureDetector(
-                        onTap: () {
-                          scrollController.animateTo(0.0,
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeInOut);
-                        },
-                        child: Styles.titleFlexBar(
-                            context: context, title: creator.attributes.name),
-                      ),
-                    ),
-                    if (creator.attributes.biography.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: ExpansionTile(
-                          title: const Text('Biography'),
-                          children: [
-                            for (final MapEntry(key: prop, value: desc)
-                                in creator.attributes.biography.entries)
-                              ExpansionTile(
-                                title: Text(prop),
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(8),
-                                    color: theme.colorScheme.surfaceVariant,
-                                    child: MarkdownBody(
-                                      data: desc,
-                                      onTapLink: (text, url, title) async {
-                                        if (url != null) {
-                                          if (!await launchUrl(
-                                              Uri.parse(url))) {
-                                            throw 'Could not launch $url';
-                                          }
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              )
-                          ],
+        switch (titleProvider) {
+          AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+              onRefresh: () async {
+                ref.read(creatorTitlesProvider(creator).notifier).clear();
+                return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
+              },
+              child: ErrorList(
+                error: error,
+                stackTrace: stackTrace,
+                message: "_fetchCreatorTitlesProvider(${creator.id}) failed",
+              ),
+            ),
+          AsyncValue(value: final mangas?) => RefreshIndicator(
+              onRefresh: () async {
+                ref.read(creatorTitlesProvider(creator).notifier).clear();
+                return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
+              },
+              child: mangas.isEmpty
+                  ? const Text('No manga!')
+                  : MangaListWidget(
+                      leading: [
+                        SliverAppBar(
+                          pinned: true,
+                          snap: false,
+                          floating: false,
+                          leading: BackButton(
+                            onPressed: () {
+                              if (context.canPop()) {
+                                context.pop();
+                              } else {
+                                context.go('/');
+                              }
+                            },
+                          ),
+                          flexibleSpace: GestureDetector(
+                            onTap: () {
+                              scrollController.animateTo(0.0,
+                                  duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+                            },
+                            child: TitleFlexBar(title: creator.attributes.name),
+                          ),
                         ),
-                      ),
-                    if (creator.attributes.twitter != null ||
-                        creator.attributes.pixiv != null ||
-                        creator.attributes.youtube != null ||
-                        creator.attributes.website != null)
-                      SliverToBoxAdapter(
-                        child: ExpansionTile(
-                          expandedAlignment: Alignment.centerLeft,
-                          title: const Text('Follow'),
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              color: theme.colorScheme.background,
-                              child: Wrap(
-                                spacing: 4.0,
-                                runSpacing: 4.0,
-                                children: [
-                                  if (creator.attributes.twitter != null)
-                                    createLinkChip(
-                                        creator.attributes.twitter!, 'Twitter'),
-                                  if (creator.attributes.pixiv != null)
-                                    createLinkChip(
-                                        creator.attributes.pixiv!, 'Pixiv'),
-                                  if (creator.attributes.youtube != null)
-                                    createLinkChip(
-                                        creator.attributes.youtube!, 'Youtube'),
-                                  if (creator.attributes.website != null)
-                                    createLinkChip(
-                                        creator.attributes.website!, 'website'),
-                                ],
-                              ),
+                        SliverList.list(children: [
+                          if (creator.attributes.biography.isNotEmpty)
+                            ExpansionTile(
+                              title: const Text('Biography'),
+                              children: [
+                                for (final MapEntry(key: prop, value: desc) in creator.attributes.biography.entries)
+                                  ExpansionTile(
+                                    title: Text(prop),
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(8),
+                                        color: theme.colorScheme.surfaceContainerHighest,
+                                        child: MarkdownBody(
+                                          data: desc,
+                                          onTapLink: (text, url, title) async {
+                                            if (url != null) {
+                                              if (!await launchUrl(Uri.parse(url))) {
+                                                throw 'Could not launch $url';
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ],
                             ),
-                          ],
-                        ),
+                          if (creator.attributes.twitter != null ||
+                              creator.attributes.pixiv != null ||
+                              creator.attributes.youtube != null ||
+                              creator.attributes.website != null)
+                            ExpansionTile(
+                              expandedAlignment: Alignment.centerLeft,
+                              title: const Text('Follow'),
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Wrap(
+                                    spacing: 4.0,
+                                    runSpacing: 4.0,
+                                    children: [
+                                      if (creator.attributes.twitter != null)
+                                        _LinkChip(url: creator.attributes.twitter!, text: 'Twitter'),
+                                      if (creator.attributes.pixiv != null)
+                                        _LinkChip(url: creator.attributes.pixiv!, text: 'Pixiv'),
+                                      if (creator.attributes.youtube != null)
+                                        _LinkChip(url: creator.attributes.youtube!, text: 'Youtube'),
+                                      if (creator.attributes.website != null)
+                                        _LinkChip(url: creator.attributes.website!, text: 'Website'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ]),
+                      ],
+                      title: const Text(
+                        'Works',
+                        style: TextStyle(fontSize: 24),
                       ),
-                  ],
-                  title: const Text(
-                    'Works',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: scrollController,
-                  onAtEdge: () => ref
-                      .read(creatorTitlesProvider(creator).notifier)
-                      .getMore(),
-                  children: [
-                    MangaListViewSliver(items: value),
-                  ],
-                ),
-              );
-            }(),
-          _ => const Stack(
-              children: Styles.loadingOverlay,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: scrollController,
+                      onAtEdge: () => ref.read(creatorTitlesProvider(creator).notifier).getMore(),
+                      children: [
+                        MangaListViewSliver(items: mangas),
+                      ],
+                    ),
+            ),
+          AsyncValue(:final progress) => LoadingOverlayStack(
+              progress: progress?.toDouble(),
             ),
         },
         if (isLoading) ...Styles.loadingOverlay,
       ],
     ));
+  }
+}
+
+class _LinkChip extends StatelessWidget {
+  final String text;
+  final String url;
+
+  const _LinkChip({required this.text, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return ButtonChip(
+      onPressed: () async {
+        if (!await launchUrl(Uri.parse(url))) {
+          throw 'Could not launch $url';
+        }
+      },
+      text: text,
+    );
   }
 }

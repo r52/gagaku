@@ -1,12 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/config.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/ui.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef LibraryItemTapCallback = void Function(LocalLibraryItem);
 
-class LibraryListWidget extends StatelessWidget {
+class LibraryListWidget extends ConsumerWidget {
   const LibraryListWidget({
     super.key,
     required this.title,
@@ -23,42 +26,79 @@ class LibraryListWidget extends StatelessWidget {
   final LibraryItemTapCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cfg = ref.watch(gagakuSettingsProvider);
     return CustomScrollView(
-      scrollBehavior: MouseTouchScrollBehavior(),
+      scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
       slivers: [
         ...leading,
-        SliverToBoxAdapter(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-            child: Row(
-              children: [
-                if (item.parent != null && onTap != null)
-                  BackButton(
-                    onPressed: () {
-                      onTap!(item.parent!);
-                    },
+        SliverAppBar(
+          pinned: true,
+          leading: (item.parent != null && onTap != null)
+              ? BackButton(
+                  onPressed: () {
+                    onTap!(item.parent!);
+                  },
+                )
+              : const SizedBox.shrink(),
+          title: title,
+          actions: [
+            const GridExtentSlider(),
+            Consumer(
+              builder: (context, ref, child) {
+                final theme = Theme.of(context);
+                final initial = ref.watch(librarySortTypeProvider);
+
+                return DropdownMenu<LibrarySort>(
+                  initialSelection: initial,
+                  width: 200.0,
+                  enableFilter: false,
+                  enableSearch: false,
+                  requestFocusOnTap: false,
+                  inputDecorationTheme: InputDecorationTheme(
+                    filled: true,
+                    fillColor: theme.colorScheme.surface.withAlpha(200),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 2.0,
+                        color: theme.colorScheme.inversePrimary,
+                      ),
+                    ),
                   ),
-                const SizedBox(
-                  width: 10,
-                ),
-                title,
-              ],
+                  onSelected: (LibrarySort? sort) async {
+                    if (sort != null) {
+                      ref.read(librarySortTypeProvider.notifier).state = sort;
+                    }
+                  },
+                  dropdownMenuEntries: List<DropdownMenuEntry<LibrarySort>>.generate(
+                    LibrarySort.values.length,
+                    (int index) => DropdownMenuEntry<LibrarySort>(
+                      value: LibrarySort.values.elementAt(index),
+                      label: LibrarySort.values.elementAt(index).label,
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
+          ],
         ),
         SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 256,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
           ),
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<int>;
+            final val = item.children.indexWhere((i) => i.id == valueKey.value);
+            return val >= 0 ? val : null;
+          },
           itemBuilder: (context, index) {
             final i = item.children.elementAt(index);
             return _GridLibraryItem(
+              key: ValueKey(i.id),
               item: i,
               onTap: onTap,
             );
@@ -70,22 +110,29 @@ class LibraryListWidget extends StatelessWidget {
   }
 }
 
-class _GridLibraryItem extends StatelessWidget {
-  const _GridLibraryItem({required this.item, this.onTap});
+class _GridLibraryItem extends HookWidget {
+  const _GridLibraryItem({
+    super.key,
+    required this.item,
+    this.onTap,
+  });
 
   final LocalLibraryItem item;
   final LibraryItemTapCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final Widget image = Material(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4.0))),
-      clipBehavior: Clip.antiAlias,
+    useAutomaticKeepAlive();
+    final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
+    final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
+
+    final image = GridAlbumImage(
+      gradient: gradient,
       child: item.thumbnail != null
           ? Image.file(
               File(item.thumbnail!),
               width: 256.0,
+              fit: BoxFit.cover,
             )
           : Icon(
               item.isReadable ? Icons.menu_book : Icons.folder,
@@ -102,26 +149,17 @@ class _GridLibraryItem extends StatelessWidget {
             onTap!(item);
           }
         },
+        onHover: (hovering) {
+          if (hovering) {
+            aniController.forward();
+          } else {
+            aniController.reverse();
+          }
+        },
         child: GridTile(
-          footer: SizedBox(
-            height: 60,
-            child: Material(
-              color: Colors.transparent,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: GridTileBar(
-                backgroundColor: Colors.black45,
-                title: Text(
-                  item.name ?? item.path,
-                  softWrap: true,
-                  style: const TextStyle(
-                    overflow: TextOverflow.fade,
-                  ),
-                ),
-              ),
-            ),
+          footer: GridAlbumTextBar(
+            height: 80,
+            text: item.name ?? item.path,
           ),
           child: image,
         ),

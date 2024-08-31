@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -11,7 +12,7 @@ class MainDrawer extends ConsumerWidget {
   const MainDrawer({super.key});
 
   static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.toString();
+    final location = cleanBaseDomains(GoRouterState.of(context).uri.toString());
 
     if (location.startsWith(GagakuRoute.web)) {
       return 2;
@@ -20,10 +21,15 @@ class MainDrawer extends ConsumerWidget {
     switch (location) {
       case GagakuRoute.local:
         return 1;
+      case GagakuRoute.proxyHome:
+      case GagakuRoute.proxySaved:
+        return 2;
+      case GagakuRoute.config:
+        return 3;
       case '/':
-      case GagakuRoute.mangafeed:
       case GagakuRoute.chapterfeed:
       case GagakuRoute.library:
+      case GagakuRoute.lists:
       case GagakuRoute.history:
       default:
         return 0;
@@ -39,7 +45,10 @@ class MainDrawer extends ConsumerWidget {
         GoRouter.of(context).go(GagakuRoute.local);
         break;
       case 2:
-        GoRouter.of(context).go(GagakuRoute.web);
+        GoRouter.of(context).go(GagakuRoute.proxyHome);
+        break;
+      case 3:
+        GoRouter.of(context).go(GagakuRoute.config);
         break;
     }
   }
@@ -64,7 +73,23 @@ class MainDrawer extends ConsumerWidget {
           ),
           child: const Center(
             child: Column(
-              children: [appicon, Text('Gagaku')],
+              children: [
+                appicon,
+                Text(
+                  'Gagaku',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(1.5, 1.5),
+                        blurRadius: 0.5,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -82,6 +107,11 @@ class MainDrawer extends ConsumerWidget {
           icon: Icon(Icons.language_outlined),
           selectedIcon: Icon(Icons.language),
           label: Text('Web Sources'),
+        ),
+        const NavigationDrawerDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings),
+          label: Text('Settings'),
         ),
         const Divider(),
         FutureBuilder(
@@ -123,8 +153,7 @@ class MainDrawer extends ConsumerWidget {
                           text: 'GitHub',
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              launchUrl(
-                                  Uri.parse('https://github.com/r52/gagaku'));
+                              launchUrl(Uri.parse('https://github.com/r52/gagaku'));
                             },
                         ),
                         const TextSpan(text: '.'),

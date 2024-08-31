@@ -7,16 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+String cleanBaseDomains(String url) {
+  url = url.startsWith('https://mangadex.org/') ? url.substring(20) : url;
+  url = url.startsWith('https://cubari.moe/') ? url.substring(18) : url;
+  return url;
+}
+
+Duration? noRetry(int retryCount, Object error) {
+  return null;
+}
+
 mixin ExpiringData {
   DateTime get expiry;
 
   bool isExpired() => DateTime.now().compareTo(expiry) >= 0;
 }
 
-extension MaterialStateSet on Set<MaterialState> {
-  bool get isSelected => contains(MaterialState.selected);
-  bool get isHovered => contains(MaterialState.hovered);
-  bool get isDisabled => contains(MaterialState.disabled);
+extension WidgetStateSet on Set<WidgetState> {
+  bool get isSelected => contains(WidgetState.selected);
+  bool get isHovered => contains(WidgetState.hovered);
+  bool get isDisabled => contains(WidgetState.disabled);
 }
 
 extension IterableAsync<T> on Iterable<T> {
@@ -57,26 +67,82 @@ extension StringExtension on String {
 
     return this;
   }
+
+  String format(List<String> values) {
+    int index = 0;
+    return replaceAllMapped(RegExp(r'{.*?}'), (_) {
+      final value = values[index];
+      index++;
+      return value;
+    });
+  }
+
+  String formatWithMap(Map<String, String> mappedValues) {
+    return replaceAllMapped(RegExp(r'{(.*?)}'), (match) {
+      final mapped = mappedValues[match[1]];
+      if (mapped == null) throw ArgumentError('$mappedValues does not contain the key "${match[1]}"');
+      return mapped;
+    });
+  }
 }
 
 class DeviceContext {
   static bool isMobile() => (Platform.isIOS || Platform.isAndroid);
 
-  static bool isDesktop() =>
-      (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
+  static bool isDesktop() => (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
   static bool screenWidthSmall(BuildContext context) {
     // Somewhat arbitrary measurement but w/e
-    return MediaQuery.of(context).size.width <= 480;
+    return MediaQuery.sizeOf(context).width <= 600;
   }
 
   static bool isPortraitMode(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     return size.height > size.width;
   }
 }
 
-mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
+/// XXX: this may break because its depending on an internal riverpod class
+mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
+  int offset = 0;
+  bool atEnd = false;
+  int get limit;
+
+  Future<List<T>> fetchData(int offset);
+  Future<void> clear();
+
+  Future<void> getMore() async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    if (atEnd) {
+      return;
+    }
+
+    final oldstate = await future;
+
+    // If there is more content, get more
+    if (oldstate.length == offset + limit && !atEnd) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final result = await fetchData(offset + limit);
+        offset += limit;
+
+        if (result.isEmpty) {
+          atEnd = true;
+        }
+
+        return [...oldstate, ...result];
+      });
+    } else {
+      // Otherwise, do nothing because there is no more content
+      atEnd = true;
+    }
+  }
+}
+
+mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>, FutureOr<T>> {
   Timer? _staleTimer;
   DateTime? _expiry;
 
@@ -84,6 +150,7 @@ mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
     _staleTimer?.cancel();
   }
 
+  /// Invalidates the provider after [expiry]
   void staleTime(Duration expiry) {
     _staleTimer?.cancel();
 
@@ -98,6 +165,29 @@ mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
         logger.d('${runtimeType.toString()}: staleTime expiry');
         ref.invalidateSelf();
       }
+    });
+
+    ref.onDispose(() {
+      logger.d('${runtimeType.toString()}: disposed');
+      _staleTimer?.cancel();
+    });
+  }
+
+  /// Keeps the provider alive for [duration] after pause
+  void disposeAfter(Duration duration) {
+    _staleTimer?.cancel();
+
+    final link = ref.keepAlive();
+
+    ref.onCancel(() {
+      _staleTimer = Timer(duration, () {
+        logger.d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+        link.close();
+      });
+    });
+
+    ref.onResume(() {
+      _staleTimer?.cancel();
     });
 
     ref.onDispose(() {
@@ -107,33 +197,38 @@ mixin AutoDisposeAsyncNotifierMix<T> on BuildlessAutoDisposeAsyncNotifier<T> {
   }
 }
 
-mixin AsyncNotifierMix<T> on BuildlessAsyncNotifier<T> {
-  Timer? _staleTimer;
-  DateTime? _expiry;
+// From riverpod doc https://riverpod.dev/docs/essentials/auto_dispose
+extension CacheForExtension on Ref<Object?> {
+  /// Keeps the provider alive for [duration].
+  void cacheFor(Duration duration) {
+    // Immediately prevent the state from getting destroyed.
+    final link = keepAlive();
+    // After duration has elapsed, we re-enable automatic disposal.
+    final timer = Timer(duration, link.close);
 
-  void cancelStaleTime() {
-    _staleTimer?.cancel();
+    // Optional: when the provider is recomputed (such as with ref.watch),
+    // we cancel the pending timer.
+    onDispose(timer.cancel);
   }
 
-  void staleTime(Duration expiry) {
-    _staleTimer?.cancel();
+  /// Keeps the provider alive for [duration] after pause
+  void disposeAfter(Duration duration) {
+    Timer? timer;
 
-    _expiry = DateTime.now().add(expiry);
+    final link = keepAlive();
 
-    _staleTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      if (_expiry == null) {
-        timer.cancel();
-      }
-
-      if (_expiry != null && DateTime.now().compareTo(_expiry!) >= 0) {
-        logger.d('${runtimeType.toString()}: staleTime expiry');
-        ref.invalidateSelf();
-      }
+    onCancel(() {
+      logger.d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+      timer = Timer(duration, link.close);
     });
 
-    ref.onDispose(() {
+    onResume(() {
+      timer?.cancel();
+    });
+
+    onDispose(() {
       logger.d('${runtimeType.toString()}: disposed');
-      _staleTimer?.cancel();
+      timer?.cancel();
     });
   }
 }

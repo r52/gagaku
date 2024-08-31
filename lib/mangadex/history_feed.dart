@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,38 +16,38 @@ Future<List<ChapterFeedItemData>> _fetchHistoryFeed(
 
   final chapters = await ref.watch(mangaDexHistoryProvider.future);
 
-  final mangaIds = chapters.map((e) => e.getMangaID()).toSet();
-  mangaIds.removeWhere((element) => element.isEmpty);
+  final mangaIds = chapters.map((e) => e.manga.id).toSet();
 
-  final mangas = await api.fetchManga(ids: mangaIds);
+  final mangas =
+      await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.watch(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.notifier).get(mangas);
 
   if (loggedin) {
-    await ref.watch(readChaptersProvider.notifier).get(mangas);
+    await ref.read(readChaptersProvider.notifier).get(mangas);
   }
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
   // Craft feed items
-  List<ChapterFeedItemData> dlist = [];
-
-  for (final chapter in chapters) {
-    final cid = chapter.getMangaID();
-    if (cid.isNotEmpty && mangaMap.containsKey(cid)) {
+  final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
+    final mid = chapter.manga.id;
+    if (mid.isNotEmpty && mangaMap.containsKey(mid)) {
       ChapterFeedItemData? item;
-      if (dlist.isNotEmpty && dlist.last.mangaId == cid) {
-        item = dlist.last;
+      if (list.isNotEmpty && list.last.mangaId == mid) {
+        item = list.last;
       } else {
-        item = ChapterFeedItemData(manga: mangaMap[cid]!);
-        dlist.add(item);
+        item = ChapterFeedItemData(manga: mangaMap[mid]!);
+        list.add(item);
       }
 
       item.chapters.add(chapter);
     }
-  }
 
-  ref.keepAlive();
+    return list;
+  });
+
+  ref.disposeAfter(const Duration(minutes: 5));
 
   return dlist;
 }
@@ -65,9 +66,7 @@ class MangaDexHistoryFeed extends ConsumerWidget {
       provider: _fetchHistoryFeedProvider,
       title: 'Reading History (local)',
       emptyText: 'No reading history!',
-      onRefresh: () async {
-        return await ref.refresh(mangaDexHistoryProvider.future);
-      },
+      onRefresh: () async => ref.refresh(mangaDexHistoryProvider.future),
       controller: controller,
       restorationId: 'history_list_offset',
     );

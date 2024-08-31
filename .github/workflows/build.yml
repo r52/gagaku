@@ -1,19 +1,26 @@
 name: Build Gagaku
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
   workflow_dispatch:
-  release:
-    types:
-      - published
+    inputs:
+      tagName:
+        description: 'Tag name'
+        type: string
+        default: ''
+        required: false
+      doRelease:
+        description: 'Publish new release'
+        type: boolean
+        default: false
+        required: false
 
 jobs:
   build:
+    if: github.event.pull_request.draft == false
     strategy:
       fail-fast: true
       matrix:
@@ -34,13 +41,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
 
       - name: Setup Java
         if: matrix.builder == 'android'
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
@@ -69,20 +76,55 @@ jobs:
       - name: Build Project
         run: flutter build ${{ matrix.pkg }}
 
+      - name: Package Gagaku (Windows)
+        id: windows-pkg
+        if: matrix.builder == 'windows'
+        run: |
+          $RELEASE_PACKAGE_FILE = "gagaku-windows.zip"
+          Compress-Archive build/windows/x64/runner/Release/* $RELEASE_PACKAGE_FILE
+          $release_filepath = Get-ChildItem $RELEASE_PACKAGE_FILE | %{$_[0].FullName}
+          echo "artifact_slug=$release_filepath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
       - name: Upload Build Artifact (Windows)
         if: matrix.builder == 'windows'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: gagaku-windows
-          path: build/windows/runner/Release/
+          path: ${{ steps.windows-pkg.outputs.artifact_slug }}
           if-no-files-found: error
           retention-days: 1
 
       - name: Upload Build Artifact (Android)
         if: matrix.builder == 'android'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: gagaku-android-apk
+          name: gagaku-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 1
+
+  publish_release:
+    name: Publish release
+    if: ${{ !cancelled() && github.event.inputs.doRelease == 'true' && github.event.inputs.tagName != '' && needs.build.result == 'success' }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Create release
+        id: create_release
+        run: |
+          set -xe
+          shopt -s nullglob
+          RELDATE="$(date +'%Y-%m-%d %H:%M')"
+          NAME="${{ github.event.inputs.tagName }}"
+          TAGNAME="${{ github.event.inputs.tagName }}"
+          gh release create "$TAGNAME" --target "master" --title "$NAME" artifacts/**/*.{zip,tar.xz,.apk}
+          echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
+          echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

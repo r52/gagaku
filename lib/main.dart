@@ -2,23 +2,32 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/config.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
 import 'package:gagaku/mangadex/creator_view.dart';
+import 'package:gagaku/mangadex/edit_list.dart';
+import 'package:gagaku/mangadex/frontpage.dart';
 import 'package:gagaku/mangadex/group_view.dart';
 import 'package:gagaku/mangadex/history_feed.dart';
 import 'package:gagaku/mangadex/latest_feed.dart';
 import 'package:gagaku/mangadex/library.dart';
-import 'package:gagaku/mangadex/login_old.dart';
+import 'package:gagaku/mangadex/list_view.dart';
+import 'package:gagaku/mangadex/lists.dart';
+import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/main.dart';
-import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/reader.dart';
+import 'package:gagaku/mangadex/recent_feed.dart';
+import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/settings.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
+import 'package:gagaku/web/favorites.dart';
+import 'package:gagaku/web/history.dart';
 import 'package:gagaku/web/main.dart';
 import 'package:gagaku/web/manga_view.dart';
 import 'package:gagaku/web/reader.dart';
@@ -29,10 +38,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:go_router/go_router.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shell');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _mdShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'mdshell');
+final GlobalKey<NavigatorState> _proxyShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'proxyshell');
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -60,7 +68,7 @@ void main() async {
     filter: kReleaseMode ? ProductionFilter() : null,
     printer: PrettyPrinter(
       colors: false,
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTime,
       excludeBox: {
         Level.trace: true,
         Level.debug: true,
@@ -80,18 +88,20 @@ void main() async {
   runApp(const ProviderScope(child: App()));
 }
 
-class App extends StatefulWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  State<App> createState() => _AppState();
+  ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> {
-  final List<ScrollController> _controllers = [];
+class _AppState extends ConsumerState<App> {
+  final List<ScrollController> _mdcontrollers = [];
+  final List<ScrollController> _proxycontrollers = [];
 
   late final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
+    restorationScopeId: 'root_route_restore',
     initialLocation: '/',
     debugLogDiagnostics: !kReleaseMode,
     onException: (_, GoRouterState state, GoRouter router) {
@@ -135,18 +145,56 @@ class _AppState extends State<App> {
         pageBuilder: buildCreatorViewPage,
       ),
       GoRoute(
+        path: GagakuRoute.listEdit,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildListEditPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.list,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildListViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.listAlt,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildListViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.search,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: buildMDSearchPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.listCreate,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (BuildContext context, GoRouterState state) {
+          return const MangaDexEditListScreen();
+        },
+      ),
+      GoRoute(
         path: GagakuRoute.login,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (BuildContext context, GoRouterState state) {
           return const MangaDexLoginScreen();
         },
       ),
+      GoRoute(
+        path: GagakuRoute.latestfeed,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildLatestFeedPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.recentfeed,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildRecentFeedPage,
+      ),
       // Main mangadex page
       ShellRoute(
-        navigatorKey: _shellNavigatorKey,
+        navigatorKey: _mdShellNavigatorKey,
+        restorationScopeId: 'md_route_restore',
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return MangaDexHome(
-            controllers: _controllers,
+            controllers: _mdcontrollers,
             child: child,
           );
         },
@@ -155,25 +203,11 @@ class _AppState extends State<App> {
             path: '/',
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: MangaDexGlobalFeed(
-                controller: _controllers[0],
+              child: MangaDexFrontPage(
+                controller: _mdcontrollers[0],
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
-            ),
-          ),
-          GoRoute(
-            path: GagakuRoute.mangafeed,
-            pageBuilder: (context, state) => CustomTransitionPage<void>(
-              key: state.pageKey,
-              child: MangaDexLoginWidget(
-                key: const Key(GagakuRoute.mangafeed),
-                builder: (context, ref) {
-                  return MangaDexMangaFeed(
-                    controller: _controllers[1],
-                  );
-                },
-              ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_main_restore',
             ),
           ),
           GoRoute(
@@ -184,11 +218,12 @@ class _AppState extends State<App> {
                 key: const Key(GagakuRoute.chapterfeed),
                 builder: (context, ref) {
                   return MangaDexChapterFeed(
-                    controller: _controllers[2],
+                    controller: _mdcontrollers[1],
                   );
                 },
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_chapterfeed_restore',
             ),
           ),
           GoRoute(
@@ -199,11 +234,28 @@ class _AppState extends State<App> {
                 key: const Key(GagakuRoute.library),
                 builder: (context, ref) {
                   return MangaDexLibraryView(
-                    controller: _controllers[3],
+                    controller: _mdcontrollers[2],
                   );
                 },
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_library_restore',
+            ),
+          ),
+          GoRoute(
+            path: GagakuRoute.lists,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: MangaDexLoginWidget(
+                key: const Key(GagakuRoute.lists),
+                builder: (context, ref) {
+                  return MangaDexListsView(
+                    controller: _mdcontrollers[3],
+                  );
+                },
+              ),
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_lists_restore',
             ),
           ),
           GoRoute(
@@ -211,9 +263,10 @@ class _AppState extends State<App> {
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
               child: MangaDexHistoryFeed(
-                controller: _controllers[4],
+                controller: _mdcontrollers[4],
               ),
-              transitionsBuilder: Styles.horizontalSharedAxisTransitionBuilder,
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'md_history_restore',
             ),
           ),
         ],
@@ -226,23 +279,66 @@ class _AppState extends State<App> {
         },
       ),
       // Web
-      GoRoute(
-        path: GagakuRoute.web,
-        builder: (BuildContext context, GoRouterState state) {
-          return const WebSourcesHome();
+      ShellRoute(
+        navigatorKey: _proxyShellNavigatorKey,
+        restorationScopeId: 'proxy_route_restore',
+        builder: (BuildContext context, GoRouterState state, Widget child) {
+          return WebSourceHome(
+            controllers: _proxycontrollers,
+            child: child,
+          );
         },
         routes: <RouteBase>[
           GoRoute(
-            path: GagakuRoute.webManga,
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: buildWebMangaViewPage,
+            path: GagakuRoute.proxyHome,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: WebSourceHistory(
+                controller: _proxycontrollers[0],
+              ),
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'proxy_home_restore',
+            ),
           ),
           GoRoute(
-            path: GagakuRoute.webMangaFull,
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: buildWebReaderPage,
+            path: GagakuRoute.proxySaved,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: WebSourceFavorites(
+                controller: _proxycontrollers[1],
+              ),
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'proxy_saved_restore',
+            ),
           ),
         ],
+      ),
+      GoRoute(
+        path: GagakuRoute.webManga,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildWebMangaViewPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.webMangaFull,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildWebReaderPage,
+      ),
+      GoRoute(
+        path: '/ml/:url(.*)',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildRedirectedWebMangaViewPage,
+      ),
+      GoRoute(
+        path: '/mk/:url(.*)',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildRedirectedWebMangaViewPage,
+      ),
+      // Settings route
+      GoRoute(
+        path: GagakuRoute.config,
+        builder: (BuildContext context, GoRouterState state) {
+          return const SettingsHome();
+        },
       ),
       // Error route
       GoRoute(
@@ -258,10 +354,15 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
 
-    _controllers.addAll([
+    _mdcontrollers.addAll([
       ScrollController(),
       ScrollController(),
       ScrollController(),
+      ScrollController(),
+      ScrollController(),
+    ]);
+
+    _proxycontrollers.addAll([
       ScrollController(),
       ScrollController(),
     ]);
@@ -271,7 +372,11 @@ class _AppState extends State<App> {
   void dispose() {
     super.dispose();
 
-    for (var element in _controllers) {
+    for (var element in _mdcontrollers) {
+      element.dispose();
+    }
+
+    for (var element in _proxycontrollers) {
       element.dispose();
     }
   }
@@ -279,12 +384,13 @@ class _AppState extends State<App> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final config = ref.watch(gagakuSettingsProvider);
+
     return MaterialApp.router(
       title: 'Gagaku',
       theme: ThemeData(
         brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.amber, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(seedColor: config.theme, brightness: Brightness.light),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
@@ -294,15 +400,17 @@ class _AppState extends State<App> {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.amber, brightness: Brightness.dark),
+            seedColor: config.theme, brightness: Brightness.dark, dynamicSchemeVariant: DynamicSchemeVariant.content),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
         ),
         useMaterial3: true,
       ),
+      themeMode: config.themeMode,
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
+      restorationScopeId: 'app_root_restore',
     );
   }
 }

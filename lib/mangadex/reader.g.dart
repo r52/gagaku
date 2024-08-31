@@ -6,191 +6,261 @@ part of 'reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchChapterDataHash() => r'9e8b6fa7433ff78d9562ff05a58747eca63f1c30';
+typedef _FetchChapterDataRef = Ref<AsyncValue<ReaderData>>;
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
+@ProviderFor(_fetchChapterData)
+const _fetchChapterDataProvider = _FetchChapterDataFamily._();
 
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
+final class _FetchChapterDataProvider
+    extends $FunctionalProvider<AsyncValue<ReaderData>, FutureOr<ReaderData>>
+    with
+        $FutureModifier<ReaderData>,
+        $FutureProvider<ReaderData, _FetchChapterDataRef> {
+  const _FetchChapterDataProvider._(
+      {required _FetchChapterDataFamily super.from,
+      required String super.argument,
+      FutureOr<ReaderData> Function(
+        _FetchChapterDataRef ref,
+        String chapterId,
+      )? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'_fetchChapterDataProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<ReaderData> Function(
+    _FetchChapterDataRef ref,
+    String chapterId,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchChapterDataHash();
+
+  @override
+  String toString() {
+    return r'_fetchChapterDataProvider'
+        ''
+        '($argument)';
   }
 
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  @$internal
+  @override
+  $FutureProviderElement<ReaderData> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchChapterDataProvider $copyWithCreate(
+    FutureOr<ReaderData> Function(
+      _FetchChapterDataRef ref,
+    ) create,
+  ) {
+    return _FetchChapterDataProvider._(
+        argument: argument as String,
+        from: from! as _FetchChapterDataFamily,
+        create: (
+          ref,
+          String chapterId,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<ReaderData> create(_FetchChapterDataRef ref) {
+    final _$cb = _createCb ?? _fetchChapterData;
+    final argument = this.argument as String;
+    return _$cb(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _FetchChapterDataProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
   }
 }
 
-typedef _FetchChapterDataRef = AutoDisposeFutureProviderRef<ReaderData>;
+String _$fetchChapterDataHash() => r'77340a27fbc2d76f76dd9fe5919792f6454e6223';
 
-/// See also [_fetchChapterData].
-@ProviderFor(_fetchChapterData)
-const _fetchChapterDataProvider = _FetchChapterDataFamily();
+final class _FetchChapterDataFamily extends Family {
+  const _FetchChapterDataFamily._()
+      : super(
+          retry: null,
+          name: r'_fetchChapterDataProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
 
-/// See also [_fetchChapterData].
-class _FetchChapterDataFamily extends Family<AsyncValue<ReaderData>> {
-  /// See also [_fetchChapterData].
-  const _FetchChapterDataFamily();
-
-  /// See also [_fetchChapterData].
   _FetchChapterDataProvider call(
     String chapterId,
+  ) =>
+      _FetchChapterDataProvider._(argument: chapterId, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchChapterDataHash();
+
+  @override
+  String toString() => r'_fetchChapterDataProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<ReaderData> Function(
+      _FetchChapterDataRef ref,
+      String args,
+    ) create,
   ) {
-    return _FetchChapterDataProvider(
-      chapterId,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchChapterDataProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
     );
   }
-
-  @override
-  _FetchChapterDataProvider getProviderOverride(
-    covariant _FetchChapterDataProvider provider,
-  ) {
-    return call(
-      provider.chapterId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchChapterDataProvider';
 }
 
-/// See also [_fetchChapterData].
-class _FetchChapterDataProvider extends AutoDisposeFutureProvider<ReaderData> {
-  /// See also [_fetchChapterData].
-  _FetchChapterDataProvider(
-    this.chapterId,
-  ) : super.internal(
-          (ref) => _fetchChapterData(
-            ref,
-            chapterId,
-          ),
-          from: _fetchChapterDataProvider,
-          name: r'_fetchChapterDataProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchChapterDataHash,
-          dependencies: _FetchChapterDataFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchChapterDataFamily._allTransitiveDependencies,
+typedef _FetchChapterPagesRef = Ref<AsyncValue<List<ReaderPage>>>;
+
+@ProviderFor(_fetchChapterPages)
+const _fetchChapterPagesProvider = _FetchChapterPagesFamily._();
+
+final class _FetchChapterPagesProvider extends $FunctionalProvider<
+        AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
+    with
+        $FutureModifier<List<ReaderPage>>,
+        $FutureProvider<List<ReaderPage>, _FetchChapterPagesRef> {
+  const _FetchChapterPagesProvider._(
+      {required _FetchChapterPagesFamily super.from,
+      required Chapter super.argument,
+      FutureOr<List<ReaderPage>> Function(
+        _FetchChapterPagesRef ref,
+        Chapter chapter,
+      )? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'_fetchChapterPagesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final String chapterId;
+  final FutureOr<List<ReaderPage>> Function(
+    _FetchChapterPagesRef ref,
+    Chapter chapter,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchChapterPagesHash();
+
+  @override
+  String toString() {
+    return r'_fetchChapterPagesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ReaderPage>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchChapterPagesProvider $copyWithCreate(
+    FutureOr<List<ReaderPage>> Function(
+      _FetchChapterPagesRef ref,
+    ) create,
+  ) {
+    return _FetchChapterPagesProvider._(
+        argument: argument as Chapter,
+        from: from! as _FetchChapterPagesFamily,
+        create: (
+          ref,
+          Chapter chapter,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<List<ReaderPage>> create(_FetchChapterPagesRef ref) {
+    final _$cb = _createCb ?? _fetchChapterPages;
+    final argument = this.argument as Chapter;
+    return _$cb(
+      ref,
+      argument,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
-    return other is _FetchChapterDataProvider && other.chapterId == chapterId;
+    return other is _FetchChapterPagesProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, chapterId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-String _$fetchChapterPagesHash() => r'd95fb71f4cc56d537abd2ffe7db4441503825b39';
-typedef _FetchChapterPagesRef = AutoDisposeFutureProviderRef<List<ReaderPage>>;
+String _$fetchChapterPagesHash() => r'311ed9043598e22995b7b1f22c8beb97421fea35';
 
-/// See also [_fetchChapterPages].
-@ProviderFor(_fetchChapterPages)
-const _fetchChapterPagesProvider = _FetchChapterPagesFamily();
+final class _FetchChapterPagesFamily extends Family {
+  const _FetchChapterPagesFamily._()
+      : super(
+          retry: null,
+          name: r'_fetchChapterPagesProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
 
-/// See also [_fetchChapterPages].
-class _FetchChapterPagesFamily extends Family<AsyncValue<List<ReaderPage>>> {
-  /// See also [_fetchChapterPages].
-  const _FetchChapterPagesFamily();
-
-  /// See also [_fetchChapterPages].
   _FetchChapterPagesProvider call(
     Chapter chapter,
+  ) =>
+      _FetchChapterPagesProvider._(argument: chapter, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchChapterPagesHash();
+
+  @override
+  String toString() => r'_fetchChapterPagesProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<List<ReaderPage>> Function(
+      _FetchChapterPagesRef ref,
+      Chapter args,
+    ) create,
   ) {
-    return _FetchChapterPagesProvider(
-      chapter,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _FetchChapterPagesProvider;
+
+        final argument = provider.argument as Chapter;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
     );
-  }
-
-  @override
-  _FetchChapterPagesProvider getProviderOverride(
-    covariant _FetchChapterPagesProvider provider,
-  ) {
-    return call(
-      provider.chapter,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'_fetchChapterPagesProvider';
-}
-
-/// See also [_fetchChapterPages].
-class _FetchChapterPagesProvider
-    extends AutoDisposeFutureProvider<List<ReaderPage>> {
-  /// See also [_fetchChapterPages].
-  _FetchChapterPagesProvider(
-    this.chapter,
-  ) : super.internal(
-          (ref) => _fetchChapterPages(
-            ref,
-            chapter,
-          ),
-          from: _fetchChapterPagesProvider,
-          name: r'_fetchChapterPagesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$fetchChapterPagesHash,
-          dependencies: _FetchChapterPagesFamily._dependencies,
-          allTransitiveDependencies:
-              _FetchChapterPagesFamily._allTransitiveDependencies,
-        );
-
-  final Chapter chapter;
-
-  @override
-  bool operator ==(Object other) {
-    return other is _FetchChapterPagesProvider && other.chapter == chapter;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, chapter.hashCode);
-
-    return _SystemHash.finish(hash);
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

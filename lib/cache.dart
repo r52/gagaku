@@ -1,21 +1,26 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/types.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cache.g.dart';
 
+/// A simple in-memory + on-disk cache for temporarily storing MangaDex data.
+/// Mainly to stop gagaku from querying the API for the same stuff
+/// too often.
+
+typedef UnserializeCallback<T extends Object> = T Function(Map<String, dynamic> json);
+
 @Riverpod(keepAlive: true)
 CacheManager cache(CacheRef ref) {
   return CacheManager();
 }
-
-/// A simple in-memory + on-disk cache for temporarily storing MangaDex data.
-/// Mainly to stop gagaku from querying the API for the same stuff
-/// too often.
 
 class CacheEntryAdapter extends TypeAdapter<CacheEntry> {
   @override
@@ -32,32 +37,130 @@ class CacheEntryAdapter extends TypeAdapter<CacheEntry> {
   @override
   void write(BinaryWriter writer, CacheEntry obj) {
     writer.writeString(obj.expiry.toString());
-    writer.writeString(obj.entry);
+    writer.writeString(obj.data);
   }
 }
 
 class CacheEntry with ExpiringData {
   @override
-  final DateTime expiry;
+  DateTime expiry;
 
-  final String _entry;
-  String get entry => _entry;
+  String _data;
+  String get data => _data;
 
-  CacheEntry(this._entry,
-      {DateTime? expire, Duration duration = const Duration(minutes: 15)})
-      : expiry = (expire != null) ? expire : DateTime.now().add(duration);
+  CRef? _ref;
+  UnserializeCallback? unserializer;
+
+  CacheEntry(
+    this._data, {
+    DateTime? expire,
+    Duration duration = const Duration(minutes: 15),
+    Object? reference,
+    this.unserializer,
+  })  : expiry = (expire != null) ? expire : DateTime.now().add(duration),
+        _ref = (reference != null) ? CRef(reference) : null;
+
+  CRef get([UnserializeCallback? unserialize]) {
+    if (_ref != null) {
+      return _ref!;
+    }
+
+    // Load from data if a ref doesn't already exist
+
+    final interm = json.decode(data);
+
+    if (unserialize == null && unserializer == null) {
+      _ref = CRef(interm);
+    } else if (unserialize != null) {
+      _ref = CRef(unserialize(interm));
+    } else {
+      _ref = CRef(unserializer!(interm));
+    }
+
+    return _ref!;
+  }
+
+  void overwrite(CacheEntry other) {
+    _data = other._data;
+    expiry = other.expiry;
+    unserializer = other.unserializer;
+
+    if (other._ref != null) {
+      if (_ref != null) {
+        _ref!.replace(other._ref!.get());
+      } else {
+        _ref = other._ref;
+      }
+    } else {
+      if (_ref != null && unserializer != null) {
+        final interm = json.decode(data);
+        _ref!.replace(unserializer!(interm));
+      } else {
+        // Not enough data to reproduce a new ref
+        _ref = null;
+      }
+    }
+  }
+
+  void overwriteRaw(
+    String data, [
+    Duration expires = const Duration(minutes: 15),
+    Object? reference,
+    UnserializeCallback? unserialize,
+  ]) {
+    _data = data;
+    expiry = DateTime.now().add(expires);
+    unserializer = unserialize;
+
+    if (reference != null) {
+      if (_ref != null) {
+        _ref!.replace(reference);
+      } else {
+        _ref = CRef(reference);
+      }
+    } else {
+      if (_ref != null && unserializer != null) {
+        final interm = json.decode(data);
+        _ref!.replace(unserializer!(interm));
+      } else {
+        // Not enough data to reproduce a new ref
+        _ref = null;
+      }
+    }
+  }
 }
 
 class CacheManager {
   static const _preferredMaxEntries = 20000;
-  static const _preferredMaxDiskEntries = 2000;
+  static const _preferredMaxDiskEntries = 5000;
 
   final LazyBox<CacheEntry> _box;
+  // ignore: unused_field
+  Timer? _pruneSchedule;
 
   /// Cache of API data
   final Map<String, CacheEntry> _cache = <String, CacheEntry>{};
 
-  CacheManager() : _box = Hive.lazyBox(gagakuCache);
+  CacheManager() : _box = Hive.lazyBox(gagakuCache) {
+    _pruneSchedule = Timer.periodic(const Duration(minutes: 1), (timer) async {
+      await _checkForPrune();
+    });
+  }
+
+  Future<void> _checkForPrune() async {
+    if (_cache.length > _preferredMaxEntries) {
+      _pruneExpiredMemory();
+    }
+
+    if (_box.length > _preferredMaxDiskEntries) {
+      _pruneExpiredDisk();
+    }
+
+    final imageCache = PaintingBinding.instance.imageCache;
+    if (imageCache.currentSize >= imageCache.maximumSize) {
+      imageCache.clear();
+    }
+  }
 
   /// Prunes all expired entries
   Future<void> _pruneExpiredMemory() async {
@@ -143,51 +246,46 @@ class CacheManager {
   }
 
   /// Returns a single entry from the cache. Assumes the entry [exists].
-  T get<T>(String key, [T Function(Map<String, dynamic> json)? unserializer]) {
-    final interm = json.decode(_cache[key]!.entry);
-
-    if (unserializer == null) {
-      return interm as T;
-    }
-
-    return unserializer(interm);
-  }
+  CRef get(String key, [UnserializeCallback? unserializer]) => _cache[key]!.get(unserializer);
 
   /// Inserts a single entry into the cache if it doesn't [exists]
   /// If [overwrite] is true, then the entry is inserted regardless, overwriting
   /// existing values
-  Future<void> put(String key, dynamic val, bool overwrite,
-      [Duration expiry = const Duration(minutes: 15)]) async {
-    final entry = CacheEntry(json.encode(val), duration: expiry);
+  Future<CRef> put(
+    String key,
+    String data,
+    Object reference,
+    bool overwrite, {
+    Duration expiry = const Duration(minutes: 15),
+    UnserializeCallback? unserializer,
+  }) async {
+    final entry = CacheEntry(data, duration: expiry, reference: reference, unserializer: unserializer);
     if (!await exists(key)) {
       _cache.putIfAbsent(key, () => entry);
       await _box.put(key, entry);
     } else if (overwrite) {
-      _cache[key] = entry;
+      _cache[key]!.overwrite(entry);
       await _box.put(key, entry);
     }
 
-    if (_cache.length > _preferredMaxEntries) {
-      _pruneExpiredMemory();
-    }
+    logger.d("CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
 
-    if (_box.length > _preferredMaxDiskEntries) {
-      _pruneExpiredDisk();
-    }
+    return _cache[key]!.get(unserializer);
   }
 
   /// Inserts all provided entries into the cache, overwriting any existing
   /// entries
   Future<void> putAll(Map<String, CacheEntry> map) async {
-    _cache.addAll(map);
+    for (var MapEntry(:key, value: entry) in map.entries) {
+      if (!await exists(key)) {
+        _cache.putIfAbsent(key, () => entry);
+      } else {
+        _cache[key]!.overwrite(entry);
+      }
+    }
+
     await _box.putAll(map);
 
-    if (_cache.length > _preferredMaxEntries) {
-      _pruneExpiredMemory();
-    }
-
-    if (_box.length > _preferredMaxDiskEntries) {
-      _pruneExpiredDisk();
-    }
+    logger.d("CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
   }
 }

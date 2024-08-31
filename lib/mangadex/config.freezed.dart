@@ -12,7 +12,7 @@ part of 'config.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 MangaDexConfig _$MangaDexConfigFromJson(Map<String, dynamic> json) {
   return _MangaDexConfig.fromJson(json);
@@ -38,8 +38,12 @@ mixin _$MangaDexConfig {
   Set<String> get groupBlacklist => throw _privateConstructorUsedError;
   set groupBlacklist(Set<String> value) => throw _privateConstructorUsedError;
 
+  /// Serializes this MangaDexConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MangaDexConfigCopyWith<MangaDexConfig> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -68,6 +72,8 @@ class _$MangaDexConfigCopyWithImpl<$Res, $Val extends MangaDexConfig>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -103,11 +109,11 @@ class _$MangaDexConfigCopyWithImpl<$Res, $Val extends MangaDexConfig>
 }
 
 /// @nodoc
-abstract class _$$_MangaDexConfigCopyWith<$Res>
+abstract class _$$MangaDexConfigImplCopyWith<$Res>
     implements $MangaDexConfigCopyWith<$Res> {
-  factory _$$_MangaDexConfigCopyWith(
-          _$_MangaDexConfig value, $Res Function(_$_MangaDexConfig) then) =
-      __$$_MangaDexConfigCopyWithImpl<$Res>;
+  factory _$$MangaDexConfigImplCopyWith(_$MangaDexConfigImpl value,
+          $Res Function(_$MangaDexConfigImpl) then) =
+      __$$MangaDexConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -119,13 +125,15 @@ abstract class _$$_MangaDexConfigCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_MangaDexConfigCopyWithImpl<$Res>
-    extends _$MangaDexConfigCopyWithImpl<$Res, _$_MangaDexConfig>
-    implements _$$_MangaDexConfigCopyWith<$Res> {
-  __$$_MangaDexConfigCopyWithImpl(
-      _$_MangaDexConfig _value, $Res Function(_$_MangaDexConfig) _then)
+class __$$MangaDexConfigImplCopyWithImpl<$Res>
+    extends _$MangaDexConfigCopyWithImpl<$Res, _$MangaDexConfigImpl>
+    implements _$$MangaDexConfigImplCopyWith<$Res> {
+  __$$MangaDexConfigImplCopyWithImpl(
+      _$MangaDexConfigImpl _value, $Res Function(_$MangaDexConfigImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -135,7 +143,7 @@ class __$$_MangaDexConfigCopyWithImpl<$Res>
     Object? dataSaver = null,
     Object? groupBlacklist = null,
   }) {
-    return _then(_$_MangaDexConfig(
+    return _then(_$MangaDexConfigImpl(
       translatedLanguages: null == translatedLanguages
           ? _value.translatedLanguages
           : translatedLanguages // ignore: cast_nullable_to_non_nullable
@@ -162,8 +170,8 @@ class __$$_MangaDexConfigCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MangaDexConfig implements _MangaDexConfig {
-  _$_MangaDexConfig(
+class _$MangaDexConfigImpl implements _MangaDexConfig {
+  _$MangaDexConfigImpl(
       {@LanguageConverter() this.translatedLanguages = const {},
       @LanguageConverter() this.originalLanguage = const {},
       this.contentRating = const {
@@ -174,8 +182,8 @@ class _$_MangaDexConfig implements _MangaDexConfig {
       this.dataSaver = false,
       this.groupBlacklist = const {}});
 
-  factory _$_MangaDexConfig.fromJson(Map<String, dynamic> json) =>
-      _$$_MangaDexConfigFromJson(json);
+  factory _$MangaDexConfigImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MangaDexConfigImplFromJson(json);
 
   @override
   @JsonKey()
@@ -200,15 +208,18 @@ class _$_MangaDexConfig implements _MangaDexConfig {
     return 'MangaDexConfig(translatedLanguages: $translatedLanguages, originalLanguage: $originalLanguage, contentRating: $contentRating, dataSaver: $dataSaver, groupBlacklist: $groupBlacklist)';
   }
 
-  @JsonKey(ignore: true)
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MangaDexConfigCopyWith<_$_MangaDexConfig> get copyWith =>
-      __$$_MangaDexConfigCopyWithImpl<_$_MangaDexConfig>(this, _$identity);
+  _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
+      __$$MangaDexConfigImplCopyWithImpl<_$MangaDexConfigImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MangaDexConfigToJson(
+    return _$$MangaDexConfigImplToJson(
       this,
     );
   }
@@ -220,10 +231,10 @@ abstract class _MangaDexConfig implements MangaDexConfig {
       @LanguageConverter() Set<Language> originalLanguage,
       Set<ContentRating> contentRating,
       bool dataSaver,
-      Set<String> groupBlacklist}) = _$_MangaDexConfig;
+      Set<String> groupBlacklist}) = _$MangaDexConfigImpl;
 
   factory _MangaDexConfig.fromJson(Map<String, dynamic> json) =
-      _$_MangaDexConfig.fromJson;
+      _$MangaDexConfigImpl.fromJson;
 
   @override
   @LanguageConverter()
@@ -244,8 +255,11 @@ abstract class _MangaDexConfig implements MangaDexConfig {
   @override
   Set<String> get groupBlacklist;
   set groupBlacklist(Set<String> value);
+
+  /// Create a copy of MangaDexConfig
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$$_MangaDexConfigCopyWith<_$_MangaDexConfig> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

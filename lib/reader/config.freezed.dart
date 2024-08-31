@@ -12,7 +12,7 @@ part of 'config.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) {
   return _ReaderConfig.fromJson(json);
@@ -20,6 +20,9 @@ ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ReaderConfig {
+  /// Reader format
+  ReaderFormat get format => throw _privateConstructorUsedError;
+
   /// Reader direction
   ReaderDirection get direction => throw _privateConstructorUsedError;
 
@@ -35,8 +38,12 @@ mixin _$ReaderConfig {
   /// The number of images/pages to preload
   int get precacheCount => throw _privateConstructorUsedError;
 
+  /// Serializes this ReaderConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ReaderConfigCopyWith<ReaderConfig> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -48,7 +55,8 @@ abstract class $ReaderConfigCopyWith<$Res> {
       _$ReaderConfigCopyWithImpl<$Res, ReaderConfig>;
   @useResult
   $Res call(
-      {ReaderDirection direction,
+      {ReaderFormat format,
+      ReaderDirection direction,
       bool showProgressBar,
       bool clickToTurn,
       bool swipeGestures,
@@ -65,9 +73,12 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? format = null,
     Object? direction = null,
     Object? showProgressBar = null,
     Object? clickToTurn = null,
@@ -75,6 +86,10 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
     Object? precacheCount = null,
   }) {
     return _then(_value.copyWith(
+      format: null == format
+          ? _value.format
+          : format // ignore: cast_nullable_to_non_nullable
+              as ReaderFormat,
       direction: null == direction
           ? _value.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -100,15 +115,16 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
 }
 
 /// @nodoc
-abstract class _$$_ReaderConfigCopyWith<$Res>
+abstract class _$$ReaderConfigImplCopyWith<$Res>
     implements $ReaderConfigCopyWith<$Res> {
-  factory _$$_ReaderConfigCopyWith(
-          _$_ReaderConfig value, $Res Function(_$_ReaderConfig) then) =
-      __$$_ReaderConfigCopyWithImpl<$Res>;
+  factory _$$ReaderConfigImplCopyWith(
+          _$ReaderConfigImpl value, $Res Function(_$ReaderConfigImpl) then) =
+      __$$ReaderConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
-      {ReaderDirection direction,
+      {ReaderFormat format,
+      ReaderDirection direction,
       bool showProgressBar,
       bool clickToTurn,
       bool swipeGestures,
@@ -116,23 +132,30 @@ abstract class _$$_ReaderConfigCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_ReaderConfigCopyWithImpl<$Res>
-    extends _$ReaderConfigCopyWithImpl<$Res, _$_ReaderConfig>
-    implements _$$_ReaderConfigCopyWith<$Res> {
-  __$$_ReaderConfigCopyWithImpl(
-      _$_ReaderConfig _value, $Res Function(_$_ReaderConfig) _then)
+class __$$ReaderConfigImplCopyWithImpl<$Res>
+    extends _$ReaderConfigCopyWithImpl<$Res, _$ReaderConfigImpl>
+    implements _$$ReaderConfigImplCopyWith<$Res> {
+  __$$ReaderConfigImplCopyWithImpl(
+      _$ReaderConfigImpl _value, $Res Function(_$ReaderConfigImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? format = null,
     Object? direction = null,
     Object? showProgressBar = null,
     Object? clickToTurn = null,
     Object? swipeGestures = null,
     Object? precacheCount = null,
   }) {
-    return _then(_$_ReaderConfig(
+    return _then(_$ReaderConfigImpl(
+      format: null == format
+          ? _value.format
+          : format // ignore: cast_nullable_to_non_nullable
+              as ReaderFormat,
       direction: null == direction
           ? _value.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -159,16 +182,22 @@ class __$$_ReaderConfigCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ReaderConfig implements _ReaderConfig {
-  const _$_ReaderConfig(
-      {this.direction = ReaderDirection.leftToRight,
+class _$ReaderConfigImpl implements _ReaderConfig {
+  const _$ReaderConfigImpl(
+      {this.format = ReaderFormat.single,
+      this.direction = ReaderDirection.leftToRight,
       this.showProgressBar = false,
       this.clickToTurn = true,
       this.swipeGestures = true,
       this.precacheCount = 3});
 
-  factory _$_ReaderConfig.fromJson(Map<String, dynamic> json) =>
-      _$$_ReaderConfigFromJson(json);
+  factory _$ReaderConfigImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ReaderConfigImplFromJson(json);
+
+  /// Reader format
+  @override
+  @JsonKey()
+  final ReaderFormat format;
 
   /// Reader direction
   @override
@@ -197,14 +226,15 @@ class _$_ReaderConfig implements _ReaderConfig {
 
   @override
   String toString() {
-    return 'ReaderConfig(direction: $direction, showProgressBar: $showProgressBar, clickToTurn: $clickToTurn, swipeGestures: $swipeGestures, precacheCount: $precacheCount)';
+    return 'ReaderConfig(format: $format, direction: $direction, showProgressBar: $showProgressBar, clickToTurn: $clickToTurn, swipeGestures: $swipeGestures, precacheCount: $precacheCount)';
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ReaderConfig &&
+            other is _$ReaderConfigImpl &&
+            (identical(other.format, format) || other.format == format) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             (identical(other.showProgressBar, showProgressBar) ||
@@ -217,20 +247,22 @@ class _$_ReaderConfig implements _ReaderConfig {
                 other.precacheCount == precacheCount));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, direction, showProgressBar,
-      clickToTurn, swipeGestures, precacheCount);
+  int get hashCode => Object.hash(runtimeType, format, direction,
+      showProgressBar, clickToTurn, swipeGestures, precacheCount);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ReaderConfigCopyWith<_$_ReaderConfig> get copyWith =>
-      __$$_ReaderConfigCopyWithImpl<_$_ReaderConfig>(this, _$identity);
+  _$$ReaderConfigImplCopyWith<_$ReaderConfigImpl> get copyWith =>
+      __$$ReaderConfigImplCopyWithImpl<_$ReaderConfigImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ReaderConfigToJson(
+    return _$$ReaderConfigImplToJson(
       this,
     );
   }
@@ -238,37 +270,44 @@ class _$_ReaderConfig implements _ReaderConfig {
 
 abstract class _ReaderConfig implements ReaderConfig {
   const factory _ReaderConfig(
-      {final ReaderDirection direction,
+      {final ReaderFormat format,
+      final ReaderDirection direction,
       final bool showProgressBar,
       final bool clickToTurn,
       final bool swipeGestures,
-      final int precacheCount}) = _$_ReaderConfig;
+      final int precacheCount}) = _$ReaderConfigImpl;
 
   factory _ReaderConfig.fromJson(Map<String, dynamic> json) =
-      _$_ReaderConfig.fromJson;
+      _$ReaderConfigImpl.fromJson;
 
+  /// Reader format
   @override
+  ReaderFormat get format;
 
   /// Reader direction
-  ReaderDirection get direction;
   @override
+  ReaderDirection get direction;
 
   /// Displays progress bar if true (default false)
-  bool get showProgressBar;
   @override
+  bool get showProgressBar;
 
   /// Enable click/tap to turn page gesture
-  bool get clickToTurn;
   @override
+  bool get clickToTurn;
 
   /// Enable swipe gestures
-  bool get swipeGestures;
   @override
+  bool get swipeGestures;
 
   /// The number of images/pages to preload
-  int get precacheCount;
   @override
-  @JsonKey(ignore: true)
-  _$$_ReaderConfigCopyWith<_$_ReaderConfig> get copyWith =>
+  int get precacheCount;
+
+  /// Create a copy of ReaderConfig
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ReaderConfigImplCopyWith<_$ReaderConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

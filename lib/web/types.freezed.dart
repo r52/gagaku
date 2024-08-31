@@ -12,7 +12,7 @@ part of 'types.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$ProxyInfo {
@@ -20,7 +20,9 @@ mixin _$ProxyInfo {
   String get code => throw _privateConstructorUsedError;
   String? get chapter => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ProxyInfoCopyWith<ProxyInfo> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -43,6 +45,8 @@ class _$ProxyInfoCopyWithImpl<$Res, $Val extends ProxyInfo>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -68,23 +72,26 @@ class _$ProxyInfoCopyWithImpl<$Res, $Val extends ProxyInfo>
 }
 
 /// @nodoc
-abstract class _$$_ProxyInfoCopyWith<$Res> implements $ProxyInfoCopyWith<$Res> {
-  factory _$$_ProxyInfoCopyWith(
-          _$_ProxyInfo value, $Res Function(_$_ProxyInfo) then) =
-      __$$_ProxyInfoCopyWithImpl<$Res>;
+abstract class _$$ProxyInfoImplCopyWith<$Res>
+    implements $ProxyInfoCopyWith<$Res> {
+  factory _$$ProxyInfoImplCopyWith(
+          _$ProxyInfoImpl value, $Res Function(_$ProxyInfoImpl) then) =
+      __$$ProxyInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String proxy, String code, String? chapter});
 }
 
 /// @nodoc
-class __$$_ProxyInfoCopyWithImpl<$Res>
-    extends _$ProxyInfoCopyWithImpl<$Res, _$_ProxyInfo>
-    implements _$$_ProxyInfoCopyWith<$Res> {
-  __$$_ProxyInfoCopyWithImpl(
-      _$_ProxyInfo _value, $Res Function(_$_ProxyInfo) _then)
+class __$$ProxyInfoImplCopyWithImpl<$Res>
+    extends _$ProxyInfoCopyWithImpl<$Res, _$ProxyInfoImpl>
+    implements _$$ProxyInfoImplCopyWith<$Res> {
+  __$$ProxyInfoImplCopyWithImpl(
+      _$ProxyInfoImpl _value, $Res Function(_$ProxyInfoImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -92,7 +99,7 @@ class __$$_ProxyInfoCopyWithImpl<$Res>
     Object? code = null,
     Object? chapter = freezed,
   }) {
-    return _then(_$_ProxyInfo(
+    return _then(_$ProxyInfoImpl(
       proxy: null == proxy
           ? _value.proxy
           : proxy // ignore: cast_nullable_to_non_nullable
@@ -111,8 +118,8 @@ class __$$_ProxyInfoCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_ProxyInfo extends _ProxyInfo {
-  const _$_ProxyInfo({required this.proxy, required this.code, this.chapter})
+class _$ProxyInfoImpl extends _ProxyInfo {
+  const _$ProxyInfoImpl({required this.proxy, required this.code, this.chapter})
       : super._();
 
   @override
@@ -128,10 +135,10 @@ class _$_ProxyInfo extends _ProxyInfo {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ProxyInfo &&
+            other is _$ProxyInfoImpl &&
             (identical(other.proxy, proxy) || other.proxy == proxy) &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.chapter, chapter) || other.chapter == chapter));
@@ -140,18 +147,20 @@ class _$_ProxyInfo extends _ProxyInfo {
   @override
   int get hashCode => Object.hash(runtimeType, proxy, code, chapter);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ProxyInfoCopyWith<_$_ProxyInfo> get copyWith =>
-      __$$_ProxyInfoCopyWithImpl<_$_ProxyInfo>(this, _$identity);
+  _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
+      __$$ProxyInfoImplCopyWithImpl<_$ProxyInfoImpl>(this, _$identity);
 }
 
 abstract class _ProxyInfo extends ProxyInfo {
   const factory _ProxyInfo(
       {required final String proxy,
       required final String code,
-      final String? chapter}) = _$_ProxyInfo;
+      final String? chapter}) = _$ProxyInfoImpl;
   const _ProxyInfo._() : super._();
 
   @override
@@ -160,9 +169,12 @@ abstract class _ProxyInfo extends ProxyInfo {
   String get code;
   @override
   String? get chapter;
+
+  /// Create a copy of ProxyInfo
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$$_ProxyInfoCopyWith<_$_ProxyInfo> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -174,9 +186,14 @@ HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) {
 mixin _$HistoryLink {
   String get title => throw _privateConstructorUsedError;
   String get url => throw _privateConstructorUsedError;
+  String? get cover => throw _privateConstructorUsedError;
 
+  /// Serializes this HistoryLink to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $HistoryLinkCopyWith<HistoryLink> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -187,7 +204,7 @@ abstract class $HistoryLinkCopyWith<$Res> {
           HistoryLink value, $Res Function(HistoryLink) then) =
       _$HistoryLinkCopyWithImpl<$Res, HistoryLink>;
   @useResult
-  $Res call({String title, String url});
+  $Res call({String title, String url, String? cover});
 }
 
 /// @nodoc
@@ -200,11 +217,14 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? title = null,
     Object? url = null,
+    Object? cover = freezed,
   }) {
     return _then(_value.copyWith(
       title: null == title
@@ -215,36 +235,43 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String,
+      cover: freezed == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$_HistoryLinkCopyWith<$Res>
+abstract class _$$HistoryLinkImplCopyWith<$Res>
     implements $HistoryLinkCopyWith<$Res> {
-  factory _$$_HistoryLinkCopyWith(
-          _$_HistoryLink value, $Res Function(_$_HistoryLink) then) =
-      __$$_HistoryLinkCopyWithImpl<$Res>;
+  factory _$$HistoryLinkImplCopyWith(
+          _$HistoryLinkImpl value, $Res Function(_$HistoryLinkImpl) then) =
+      __$$HistoryLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String url});
+  $Res call({String title, String url, String? cover});
 }
 
 /// @nodoc
-class __$$_HistoryLinkCopyWithImpl<$Res>
-    extends _$HistoryLinkCopyWithImpl<$Res, _$_HistoryLink>
-    implements _$$_HistoryLinkCopyWith<$Res> {
-  __$$_HistoryLinkCopyWithImpl(
-      _$_HistoryLink _value, $Res Function(_$_HistoryLink) _then)
+class __$$HistoryLinkImplCopyWithImpl<$Res>
+    extends _$HistoryLinkCopyWithImpl<$Res, _$HistoryLinkImpl>
+    implements _$$HistoryLinkImplCopyWith<$Res> {
+  __$$HistoryLinkImplCopyWithImpl(
+      _$HistoryLinkImpl _value, $Res Function(_$HistoryLinkImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? title = null,
     Object? url = null,
+    Object? cover = freezed,
   }) {
-    return _then(_$_HistoryLink(
+    return _then(_$HistoryLinkImpl(
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -253,37 +280,46 @@ class __$$_HistoryLinkCopyWithImpl<$Res>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String,
+      cover: freezed == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$_HistoryLink extends _HistoryLink {
-  const _$_HistoryLink({required this.title, required this.url}) : super._();
+class _$HistoryLinkImpl extends _HistoryLink {
+  const _$HistoryLinkImpl({required this.title, required this.url, this.cover})
+      : super._();
 
-  factory _$_HistoryLink.fromJson(Map<String, dynamic> json) =>
-      _$$_HistoryLinkFromJson(json);
+  factory _$HistoryLinkImpl.fromJson(Map<String, dynamic> json) =>
+      _$$HistoryLinkImplFromJson(json);
 
   @override
   final String title;
   @override
   final String url;
+  @override
+  final String? cover;
 
   @override
   String toString() {
-    return 'HistoryLink(title: $title, url: $url)';
+    return 'HistoryLink(title: $title, url: $url, cover: $cover)';
   }
 
-  @JsonKey(ignore: true)
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$_HistoryLinkCopyWith<_$_HistoryLink> get copyWith =>
-      __$$_HistoryLinkCopyWithImpl<_$_HistoryLink>(this, _$identity);
+  _$$HistoryLinkImplCopyWith<_$HistoryLinkImpl> get copyWith =>
+      __$$HistoryLinkImplCopyWithImpl<_$HistoryLinkImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_HistoryLinkToJson(
+    return _$$HistoryLinkImplToJson(
       this,
     );
   }
@@ -292,19 +328,25 @@ class _$_HistoryLink extends _HistoryLink {
 abstract class _HistoryLink extends HistoryLink {
   const factory _HistoryLink(
       {required final String title,
-      required final String url}) = _$_HistoryLink;
+      required final String url,
+      final String? cover}) = _$HistoryLinkImpl;
   const _HistoryLink._() : super._();
 
   factory _HistoryLink.fromJson(Map<String, dynamic> json) =
-      _$_HistoryLink.fromJson;
+      _$HistoryLinkImpl.fromJson;
 
   @override
   String get title;
   @override
   String get url;
   @override
-  @JsonKey(ignore: true)
-  _$$_HistoryLinkCopyWith<_$_HistoryLink> get copyWith =>
+  String? get cover;
+
+  /// Create a copy of HistoryLink
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$HistoryLinkImplCopyWith<_$HistoryLinkImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -322,8 +364,12 @@ mixin _$WebManga {
   Map<String, String>? get groups => throw _privateConstructorUsedError;
   Map<String, WebChapter> get chapters => throw _privateConstructorUsedError;
 
+  /// Serializes this WebManga to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WebMangaCopyWith<WebManga> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -353,6 +399,8 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -398,10 +446,11 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
 }
 
 /// @nodoc
-abstract class _$$_WebMangaCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
-  factory _$$_WebMangaCopyWith(
-          _$_WebManga value, $Res Function(_$_WebManga) then) =
-      __$$_WebMangaCopyWithImpl<$Res>;
+abstract class _$$WebMangaImplCopyWith<$Res>
+    implements $WebMangaCopyWith<$Res> {
+  factory _$$WebMangaImplCopyWith(
+          _$WebMangaImpl value, $Res Function(_$WebMangaImpl) then) =
+      __$$WebMangaImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -415,13 +464,15 @@ abstract class _$$_WebMangaCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_WebMangaCopyWithImpl<$Res>
-    extends _$WebMangaCopyWithImpl<$Res, _$_WebManga>
-    implements _$$_WebMangaCopyWith<$Res> {
-  __$$_WebMangaCopyWithImpl(
-      _$_WebManga _value, $Res Function(_$_WebManga) _then)
+class __$$WebMangaImplCopyWithImpl<$Res>
+    extends _$WebMangaCopyWithImpl<$Res, _$WebMangaImpl>
+    implements _$$WebMangaImplCopyWith<$Res> {
+  __$$WebMangaImplCopyWithImpl(
+      _$WebMangaImpl _value, $Res Function(_$WebMangaImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -433,7 +484,7 @@ class __$$_WebMangaCopyWithImpl<$Res>
     Object? groups = freezed,
     Object? chapters = null,
   }) {
-    return _then(_$_WebManga(
+    return _then(_$WebMangaImpl(
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -468,8 +519,8 @@ class __$$_WebMangaCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_WebManga extends _WebManga {
-  const _$_WebManga(
+class _$WebMangaImpl extends _WebManga {
+  const _$WebMangaImpl(
       {required this.title,
       required this.description,
       required this.artist,
@@ -481,8 +532,8 @@ class _$_WebManga extends _WebManga {
         _chapters = chapters,
         super._();
 
-  factory _$_WebManga.fromJson(Map<String, dynamic> json) =>
-      _$$_WebMangaFromJson(json);
+  factory _$WebMangaImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebMangaImplFromJson(json);
 
   @override
   final String title;
@@ -518,10 +569,10 @@ class _$_WebManga extends _WebManga {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_WebManga &&
+            other is _$WebMangaImpl &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -532,7 +583,7 @@ class _$_WebManga extends _WebManga {
             const DeepCollectionEquality().equals(other._chapters, _chapters));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -544,15 +595,17 @@ class _$_WebManga extends _WebManga {
       const DeepCollectionEquality().hash(_groups),
       const DeepCollectionEquality().hash(_chapters));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$_WebMangaCopyWith<_$_WebManga> get copyWith =>
-      __$$_WebMangaCopyWithImpl<_$_WebManga>(this, _$identity);
+  _$$WebMangaImplCopyWith<_$WebMangaImpl> get copyWith =>
+      __$$WebMangaImplCopyWithImpl<_$WebMangaImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_WebMangaToJson(
+    return _$$WebMangaImplToJson(
       this,
     );
   }
@@ -566,10 +619,11 @@ abstract class _WebManga extends WebManga {
       required final String author,
       required final String cover,
       final Map<String, String>? groups,
-      required final Map<String, WebChapter> chapters}) = _$_WebManga;
+      required final Map<String, WebChapter> chapters}) = _$WebMangaImpl;
   const _WebManga._() : super._();
 
-  factory _WebManga.fromJson(Map<String, dynamic> json) = _$_WebManga.fromJson;
+  factory _WebManga.fromJson(Map<String, dynamic> json) =
+      _$WebMangaImpl.fromJson;
 
   @override
   String get title;
@@ -585,9 +639,12 @@ abstract class _WebManga extends WebManga {
   Map<String, String>? get groups;
   @override
   Map<String, WebChapter> get chapters;
+
+  /// Create a copy of WebManga
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$$_WebMangaCopyWith<_$_WebManga> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WebMangaImplCopyWith<_$WebMangaImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -597,16 +654,20 @@ WebChapter _$WebChapterFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WebChapter {
-  String get title => throw _privateConstructorUsedError;
-  String get volume => throw _privateConstructorUsedError;
+  String? get title => throw _privateConstructorUsedError;
+  String? get volume => throw _privateConstructorUsedError;
   @EpochTimestampSerializer()
   DateTime? get lastUpdated => throw _privateConstructorUsedError;
   @MappedEpochTimestampSerializer()
   DateTime? get releaseDate => throw _privateConstructorUsedError;
   Map<String, dynamic> get groups => throw _privateConstructorUsedError;
 
+  /// Serializes this WebChapter to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WebChapterCopyWith<WebChapter> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -618,8 +679,8 @@ abstract class $WebChapterCopyWith<$Res> {
       _$WebChapterCopyWithImpl<$Res, WebChapter>;
   @useResult
   $Res call(
-      {String title,
-      String volume,
+      {String? title,
+      String? volume,
       @EpochTimestampSerializer() DateTime? lastUpdated,
       @MappedEpochTimestampSerializer() DateTime? releaseDate,
       Map<String, dynamic> groups});
@@ -635,24 +696,26 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = null,
-    Object? volume = null,
+    Object? title = freezed,
+    Object? volume = freezed,
     Object? lastUpdated = freezed,
     Object? releaseDate = freezed,
     Object? groups = null,
   }) {
     return _then(_value.copyWith(
-      title: null == title
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      volume: null == volume
+              as String?,
+      volume: freezed == volume
           ? _value.volume
           : volume // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       lastUpdated: freezed == lastUpdated
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
@@ -670,47 +733,49 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
 }
 
 /// @nodoc
-abstract class _$$_WebChapterCopyWith<$Res>
+abstract class _$$WebChapterImplCopyWith<$Res>
     implements $WebChapterCopyWith<$Res> {
-  factory _$$_WebChapterCopyWith(
-          _$_WebChapter value, $Res Function(_$_WebChapter) then) =
-      __$$_WebChapterCopyWithImpl<$Res>;
+  factory _$$WebChapterImplCopyWith(
+          _$WebChapterImpl value, $Res Function(_$WebChapterImpl) then) =
+      __$$WebChapterImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
-      {String title,
-      String volume,
+      {String? title,
+      String? volume,
       @EpochTimestampSerializer() DateTime? lastUpdated,
       @MappedEpochTimestampSerializer() DateTime? releaseDate,
       Map<String, dynamic> groups});
 }
 
 /// @nodoc
-class __$$_WebChapterCopyWithImpl<$Res>
-    extends _$WebChapterCopyWithImpl<$Res, _$_WebChapter>
-    implements _$$_WebChapterCopyWith<$Res> {
-  __$$_WebChapterCopyWithImpl(
-      _$_WebChapter _value, $Res Function(_$_WebChapter) _then)
+class __$$WebChapterImplCopyWithImpl<$Res>
+    extends _$WebChapterCopyWithImpl<$Res, _$WebChapterImpl>
+    implements _$$WebChapterImplCopyWith<$Res> {
+  __$$WebChapterImplCopyWithImpl(
+      _$WebChapterImpl _value, $Res Function(_$WebChapterImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = null,
-    Object? volume = null,
+    Object? title = freezed,
+    Object? volume = freezed,
     Object? lastUpdated = freezed,
     Object? releaseDate = freezed,
     Object? groups = null,
   }) {
-    return _then(_$_WebChapter(
-      title: null == title
+    return _then(_$WebChapterImpl(
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      volume: null == volume
+              as String?,
+      volume: freezed == volume
           ? _value.volume
           : volume // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       lastUpdated: freezed == lastUpdated
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
@@ -730,23 +795,23 @@ class __$$_WebChapterCopyWithImpl<$Res>
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class _$_WebChapter extends _WebChapter {
-  const _$_WebChapter(
-      {required this.title,
-      required this.volume,
+class _$WebChapterImpl extends _WebChapter {
+  const _$WebChapterImpl(
+      {this.title,
+      this.volume,
       @EpochTimestampSerializer() this.lastUpdated,
       @MappedEpochTimestampSerializer() this.releaseDate,
       required final Map<String, dynamic> groups})
       : _groups = groups,
         super._();
 
-  factory _$_WebChapter.fromJson(Map<String, dynamic> json) =>
-      _$$_WebChapterFromJson(json);
+  factory _$WebChapterImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebChapterImplFromJson(json);
 
   @override
-  final String title;
+  final String? title;
   @override
-  final String volume;
+  final String? volume;
   @override
   @EpochTimestampSerializer()
   final DateTime? lastUpdated;
@@ -767,10 +832,10 @@ class _$_WebChapter extends _WebChapter {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_WebChapter &&
+            other is _$WebChapterImpl &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.volume, volume) || other.volume == volume) &&
             (identical(other.lastUpdated, lastUpdated) ||
@@ -780,20 +845,22 @@ class _$_WebChapter extends _WebChapter {
             const DeepCollectionEquality().equals(other._groups, _groups));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, title, volume, lastUpdated,
       releaseDate, const DeepCollectionEquality().hash(_groups));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$_WebChapterCopyWith<_$_WebChapter> get copyWith =>
-      __$$_WebChapterCopyWithImpl<_$_WebChapter>(this, _$identity);
+  _$$WebChapterImplCopyWith<_$WebChapterImpl> get copyWith =>
+      __$$WebChapterImplCopyWithImpl<_$WebChapterImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_WebChapterToJson(
+    return _$$WebChapterImplToJson(
       this,
     );
   }
@@ -801,20 +868,20 @@ class _$_WebChapter extends _WebChapter {
 
 abstract class _WebChapter extends WebChapter {
   const factory _WebChapter(
-      {required final String title,
-      required final String volume,
+      {final String? title,
+      final String? volume,
       @EpochTimestampSerializer() final DateTime? lastUpdated,
       @MappedEpochTimestampSerializer() final DateTime? releaseDate,
-      required final Map<String, dynamic> groups}) = _$_WebChapter;
+      required final Map<String, dynamic> groups}) = _$WebChapterImpl;
   const _WebChapter._() : super._();
 
   factory _WebChapter.fromJson(Map<String, dynamic> json) =
-      _$_WebChapter.fromJson;
+      _$WebChapterImpl.fromJson;
 
   @override
-  String get title;
+  String? get title;
   @override
-  String get volume;
+  String? get volume;
   @override
   @EpochTimestampSerializer()
   DateTime? get lastUpdated;
@@ -823,9 +890,12 @@ abstract class _WebChapter extends WebChapter {
   DateTime? get releaseDate;
   @override
   Map<String, dynamic> get groups;
+
+  /// Create a copy of WebChapter
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$$_WebChapterCopyWith<_$_WebChapter> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WebChapterImplCopyWith<_$WebChapterImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -838,8 +908,12 @@ mixin _$ImgurPage {
   String get description => throw _privateConstructorUsedError;
   String get src => throw _privateConstructorUsedError;
 
+  /// Serializes this ImgurPage to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ImgurPageCopyWith<ImgurPage> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -862,6 +936,8 @@ class _$ImgurPageCopyWithImpl<$Res, $Val extends ImgurPage>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -882,30 +958,33 @@ class _$ImgurPageCopyWithImpl<$Res, $Val extends ImgurPage>
 }
 
 /// @nodoc
-abstract class _$$_ImgurPageCopyWith<$Res> implements $ImgurPageCopyWith<$Res> {
-  factory _$$_ImgurPageCopyWith(
-          _$_ImgurPage value, $Res Function(_$_ImgurPage) then) =
-      __$$_ImgurPageCopyWithImpl<$Res>;
+abstract class _$$ImgurPageImplCopyWith<$Res>
+    implements $ImgurPageCopyWith<$Res> {
+  factory _$$ImgurPageImplCopyWith(
+          _$ImgurPageImpl value, $Res Function(_$ImgurPageImpl) then) =
+      __$$ImgurPageImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String description, String src});
 }
 
 /// @nodoc
-class __$$_ImgurPageCopyWithImpl<$Res>
-    extends _$ImgurPageCopyWithImpl<$Res, _$_ImgurPage>
-    implements _$$_ImgurPageCopyWith<$Res> {
-  __$$_ImgurPageCopyWithImpl(
-      _$_ImgurPage _value, $Res Function(_$_ImgurPage) _then)
+class __$$ImgurPageImplCopyWithImpl<$Res>
+    extends _$ImgurPageCopyWithImpl<$Res, _$ImgurPageImpl>
+    implements _$$ImgurPageImplCopyWith<$Res> {
+  __$$ImgurPageImplCopyWithImpl(
+      _$ImgurPageImpl _value, $Res Function(_$ImgurPageImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? description = null,
     Object? src = null,
   }) {
-    return _then(_$_ImgurPage(
+    return _then(_$ImgurPageImpl(
       description: null == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -920,11 +999,11 @@ class __$$_ImgurPageCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ImgurPage implements _ImgurPage {
-  const _$_ImgurPage({required this.description, required this.src});
+class _$ImgurPageImpl implements _ImgurPage {
+  const _$ImgurPageImpl({required this.description, required this.src});
 
-  factory _$_ImgurPage.fromJson(Map<String, dynamic> json) =>
-      _$$_ImgurPageFromJson(json);
+  factory _$ImgurPageImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ImgurPageImplFromJson(json);
 
   @override
   final String description;
@@ -937,28 +1016,30 @@ class _$_ImgurPage implements _ImgurPage {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ImgurPage &&
+            other is _$ImgurPageImpl &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.src, src) || other.src == src));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, description, src);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ImgurPageCopyWith<_$_ImgurPage> get copyWith =>
-      __$$_ImgurPageCopyWithImpl<_$_ImgurPage>(this, _$identity);
+  _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
+      __$$ImgurPageImplCopyWithImpl<_$ImgurPageImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ImgurPageToJson(
+    return _$$ImgurPageImplToJson(
       this,
     );
   }
@@ -967,17 +1048,20 @@ class _$_ImgurPage implements _ImgurPage {
 abstract class _ImgurPage implements ImgurPage {
   const factory _ImgurPage(
       {required final String description,
-      required final String src}) = _$_ImgurPage;
+      required final String src}) = _$ImgurPageImpl;
 
   factory _ImgurPage.fromJson(Map<String, dynamic> json) =
-      _$_ImgurPage.fromJson;
+      _$ImgurPageImpl.fromJson;
 
   @override
   String get description;
   @override
   String get src;
+
+  /// Create a copy of ImgurPage
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$$_ImgurPageCopyWith<_$_ImgurPage> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

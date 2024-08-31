@@ -1,17 +1,243 @@
 import 'package:animations/animations.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/config.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/util.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
+  const MouseTouchScrollBehavior();
+
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad
+        PointerDeviceKind.trackpad,
       };
+}
+
+class GridExtentSlider extends ConsumerWidget {
+  const GridExtentSlider({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cfg = ref.watch(gagakuSettingsProvider);
+    return MenuAnchor(
+      menuChildren: <Widget>[
+        const Padding(
+          padding: EdgeInsets.only(left: 10, top: 10),
+          child: Text('Grid Size'),
+        ),
+        Slider(
+          value: cfg.gridAlbumExtent.index.toDouble(),
+          max: 3,
+          divisions: 3,
+          label: cfg.gridAlbumExtent.name.capitalize(),
+          onChanged: (double value) {
+            final c = cfg.copyWith(gridAlbumExtent: GridAlbumExtent.values.elementAt(value.toInt()));
+            ref.read(gagakuSettingsProvider.notifier).save(c);
+          },
+        ),
+      ],
+      builder: (_, MenuController controller, Widget? child) {
+        return IconButton(
+          tooltip: 'Grid Size',
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          icon: const Icon(Icons.width_normal),
+        );
+      },
+    );
+  }
+}
+
+class GridAlbumImage extends StatelessWidget {
+  const GridAlbumImage({
+    super.key,
+    required this.gradient,
+    required this.child,
+  });
+
+  final AlignmentGeometry gradient;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
+      clipBehavior: Clip.antiAlias,
+      child: ShaderMask(
+        shaderCallback: (rect) {
+          return LinearGradient(
+            begin: gradient,
+            end: Alignment.bottomCenter,
+            colors: const [Colors.black, Colors.transparent],
+          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
+        },
+        blendMode: BlendMode.dstIn,
+        child: child,
+      ),
+    );
+  }
+}
+
+class GridAlbumTextBar extends StatelessWidget {
+  const GridAlbumTextBar({
+    super.key,
+    required this.height,
+    this.leading,
+    this.backgroundColor,
+    required this.text,
+    this.bottom = true,
+  });
+
+  final double height;
+  final Widget? leading;
+  final Color? backgroundColor;
+  final String text;
+  final bool bottom;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Material(
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: !bottom ? const Radius.circular(4) : Radius.zero,
+            bottom: bottom ? const Radius.circular(4) : Radius.zero,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: GridTileBar(
+          leading: leading,
+          backgroundColor: backgroundColor,
+          title: Text(
+            text,
+            softWrap: true,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              overflow: TextOverflow.fade,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class KeepAliveImage extends Image {
+  const KeepAliveImage({
+    super.key,
+    required super.image,
+    super.frameBuilder,
+    super.loadingBuilder,
+    super.errorBuilder,
+    super.semanticLabel,
+    super.excludeFromSemantics = false,
+    super.width,
+    super.height,
+    super.color,
+    super.opacity,
+    super.colorBlendMode,
+    super.fit,
+    super.alignment = Alignment.center,
+    super.repeat = ImageRepeat.noRepeat,
+    super.centerSlice,
+    super.matchTextDirection = false,
+    super.gaplessPlayback = false,
+    super.isAntiAlias = false,
+    super.filterQuality = FilterQuality.medium,
+  });
+
+  @override
+  State<KeepAliveImage> createState() => _KeepAliveImageState();
+}
+
+class _KeepAliveImageState extends State<KeepAliveImage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    return Image(
+      image: widget.image,
+      frameBuilder: widget.frameBuilder,
+      loadingBuilder: widget.loadingBuilder,
+      errorBuilder: widget.errorBuilder,
+      semanticLabel: widget.semanticLabel,
+      excludeFromSemantics: widget.excludeFromSemantics,
+      width: widget.width,
+      height: widget.height,
+      color: widget.color,
+      opacity: widget.opacity,
+      colorBlendMode: widget.colorBlendMode,
+      fit: widget.fit,
+      alignment: widget.alignment,
+      repeat: widget.repeat,
+      centerSlice: widget.centerSlice,
+      matchTextDirection: widget.matchTextDirection,
+      gaplessPlayback: widget.gaplessPlayback,
+      isAntiAlias: widget.isAntiAlias,
+      filterQuality: widget.filterQuality,
+    );
+  }
+}
+
+class MultiChildExpansionTile extends StatelessWidget {
+  const MultiChildExpansionTile({
+    super.key,
+    required this.title,
+    this.children = const <Widget>[],
+  });
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpansionTile(
+      expandedAlignment: Alignment.centerLeft,
+      title: Text(title),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Wrap(
+            spacing: 4.0,
+            runSpacing: 4.0,
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CountryFlag extends StatelessWidget {
+  const CountryFlag({super.key, required this.flag, this.size = 18});
+
+  final String flag;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      flag,
+      style: TextStyle(
+        fontFamily: 'Twemoji',
+        fontSize: size,
+      ),
+    );
+  }
 }
 
 class ButtonChip extends StatelessWidget {
@@ -19,12 +245,14 @@ class ButtonChip extends StatelessWidget {
     super.key,
     this.icon,
     required this.text,
+    this.style,
     this.color,
     this.onPressed,
   });
 
   final Widget? icon;
-  final Widget text;
+  final String text;
+  final TextStyle? style;
   final Color? color;
   final VoidCallback? onPressed;
 
@@ -32,83 +260,80 @@ class ButtonChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final style = ElevatedButton.styleFrom(
+    final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
-      textStyle:
-          theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
+      textStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(6.0)),
-      ),
     );
 
-    final btn = icon != null
+    return (icon != null)
         ? ElevatedButton.icon(
-            style: style,
+            style: bstyle,
             onPressed: onPressed,
             icon: icon!,
-            label: text,
+            label: Text(
+              text,
+              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
+            ),
           )
         : ElevatedButton(
-            style: style,
+            style: bstyle,
             onPressed: onPressed,
-            child: text,
+            child: Text(
+              text,
+              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
+            ),
           );
-
-    return btn;
   }
 }
 
-class IconTextChip extends HookWidget {
+class IconTextChip extends StatelessWidget {
   const IconTextChip({
     super.key,
     this.icon,
     required this.text,
+    this.style,
     this.color,
     this.onPressed,
   });
 
   final Widget? icon;
-  final Widget text;
+  final String text;
+  final TextStyle? style;
   final Color? color;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bgColor = color ?? theme.colorScheme.tertiaryContainer;
-    final hoverColor = theme.colorScheme.primary.withOpacity(0.08);
-    final hover = useState(false);
 
-    Widget chip = UnconstrainedBox(
-      child: Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        ),
-        foregroundDecoration:
-            hover.value ? BoxDecoration(color: hoverColor) : null,
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+    final child = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      child: Text.rich(
+        style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
+        overflow: TextOverflow.ellipsis,
+        TextSpan(
           children: [
-            if (icon != null) ...[icon!, const SizedBox(width: 5)],
-            text,
+            if (icon != null) WidgetSpan(alignment: PlaceholderAlignment.middle, child: icon!),
+            TextSpan(text: '${icon != null ? ' ' : ''}$text'),
           ],
         ),
       ),
     );
 
-    if (onPressed != null) {
-      chip = InkWell(
-        onTap: onPressed,
-        onHover: (value) => hover.value = value,
-        child: chip,
-      );
-    }
-
-    return chip;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 24.0),
+      child: Material(
+        borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+        color: color ?? theme.colorScheme.tertiaryContainer,
+        child: (onPressed != null)
+            ? InkWell(
+                onTap: onPressed,
+                child: child,
+              )
+            : child,
+      ),
+    );
   }
 }
 
@@ -166,7 +391,7 @@ class TriStateChip extends StatelessWidget {
     }
   }
 
-  BorderSide? _getBorder(Set<MaterialState> states) {
+  BorderSide? _getBorder(Set<WidgetState> states) {
     if (selectedColor == null) {
       return null;
     }
@@ -203,7 +428,7 @@ class TriStateChip extends StatelessWidget {
       onPressed: _onPressed,
       labelStyle: labelStyle,
       selectedColor: selectedColor,
-      side: MaterialStateBorderSide.resolveWith(_getBorder),
+      side: WidgetStateBorderSide.resolveWith(_getBorder),
       shape: shape,
       clipBehavior: clipBehavior,
       focusNode: focusNode,
@@ -222,8 +447,12 @@ class TriStateChip extends StatelessWidget {
 }
 
 class SettingCardWidget extends StatelessWidget {
-  const SettingCardWidget(
-      {super.key, required this.title, this.subtitle, required this.builder});
+  const SettingCardWidget({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.builder,
+  });
 
   final Widget title;
   final Widget? subtitle;
@@ -238,7 +467,7 @@ class SettingCardWidget extends StatelessWidget {
         title: title,
         subtitle: subtitle,
         children: [
-          Container(
+          ColoredBox(
             color: Theme.of(context).cardColor,
             child: Center(
               child: builder(context),
@@ -249,9 +478,8 @@ class SettingCardWidget extends StatelessWidget {
     }
 
     return Card(
-      margin: const EdgeInsets.all(6),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         child: Row(
           children: [
             Expanded(
@@ -273,71 +501,159 @@ class SettingCardWidget extends StatelessWidget {
   }
 }
 
+class TitleFlexBar extends StatelessWidget {
+  const TitleFlexBar({super.key, required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlexibleSpaceBar(
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          shadows: <Shadow>[
+            Shadow(
+              offset: Offset(1.5, 1.5),
+              blurRadius: 0.5,
+              color: Color.fromARGB(255, 0, 0, 0),
+            ),
+          ],
+        ),
+      ),
+      background: ColoredBox(color: Theme.of(context).colorScheme.primaryContainer),
+    );
+  }
+}
+
+class ErrorColumn extends StatelessWidget {
+  final Object error;
+  final StackTrace stackTrace;
+  final String message;
+
+  const ErrorColumn({
+    super.key,
+    required this.error,
+    required this.stackTrace,
+    String? message,
+  }) : message = message ?? "Build error";
+
+  @override
+  Widget build(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+    Styles.showErrorSnackBar(messenger, '$error');
+    logger.e(message, error: error, stackTrace: stackTrace);
+
+    return Center(
+      child: Column(
+        children: [
+          Text('$error'),
+          Text(stackTrace.toString()),
+        ],
+      ),
+    );
+  }
+}
+
+class ErrorList extends StatelessWidget {
+  final Object error;
+  final StackTrace stackTrace;
+  final String message;
+
+  const ErrorList({super.key, required this.error, required this.stackTrace, String? message})
+      : message = message ?? "Build error";
+
+  @override
+  Widget build(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+    Styles.showErrorSnackBar(messenger, '$error');
+    logger.e(message, error: error, stackTrace: stackTrace);
+
+    return Center(
+      child: ScrollConfiguration(
+        behavior: const MouseTouchScrollBehavior(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Text('$error'),
+            Text(stackTrace.toString()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LoadingOverlayStack extends StatelessWidget {
+  const LoadingOverlayStack({
+    super.key,
+    this.progress,
+  });
+
+  final double? progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        const ModalBarrier(dismissible: false, color: Colors.black87),
+        Center(
+          child: CircularProgressIndicator(
+            value: progress,
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class ListSpinner extends StatelessWidget {
+  const ListSpinner({
+    super.key,
+    this.progress,
+  });
+
+  final double? progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Center(
+        child: CircularProgressIndicator(
+          value: progress,
+        ),
+      ),
+    );
+  }
+}
+
 class Styles {
+  static ButtonStyle buttonStyle({
+    Color? backgroundColor,
+    TextStyle? textStyle,
+    EdgeInsetsGeometry? padding,
+  }) =>
+      ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        textStyle: textStyle,
+        padding: padding,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(6.0)),
+        ),
+      );
+
+  static final coverArtGradientTween = Tween(begin: Alignment.center, end: Alignment.topCenter);
+
   static const List<Widget> loadingOverlay = [
-    Opacity(
-      opacity: 0.75,
-      child: ModalBarrier(dismissible: false, color: Colors.black),
-    ),
+    ModalBarrier(dismissible: false, color: Colors.black87),
     Center(
       child: CircularProgressIndicator(),
     ),
   ];
-
-  static const listSpinner = Padding(
-    padding: EdgeInsets.symmetric(vertical: 5.0),
-    child: Center(
-      child: CircularProgressIndicator(),
-    ),
-  );
-
-  static Widget errorColumn(Object err, StackTrace stack) => Center(
-        child: Column(
-          children: [
-            Text('Error: $err'),
-            Text(stack.toString()),
-          ],
-        ),
-      );
-
-  static Widget errorList(Object err, StackTrace stack) => Center(
-        child: ScrollConfiguration(
-          behavior: MouseTouchScrollBehavior(),
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              Text('Error: $err'),
-              Text(stack.toString()),
-            ],
-          ),
-        ),
-      );
-
-  static Widget titleFlexBar({
-    required BuildContext context,
-    required String title,
-  }) =>
-      FlexibleSpaceBar(
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            shadows: <Shadow>[
-              Shadow(
-                offset: Offset(2.0, 2.0),
-                blurRadius: 1.0,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
-            ],
-          ),
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-          ),
-        ),
-      );
 
   static void showErrorSnackBar(ScaffoldMessengerState state, String content) {
     Future.delayed(
@@ -353,30 +669,19 @@ class Styles {
     );
   }
 
+  static final slideTween =
+      Tween(begin: const Offset(0.0, 1.0), end: Offset.zero).chain(CurveTween(curve: Curves.ease));
+
   static Widget slideTransitionBuilder(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-    const begin = Offset(0.0, 1.0);
-    const end = Offset.zero;
-    const curve = Curves.ease;
-
-    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-    return SlideTransition(
-      position: animation.drive(tween),
-      child: child,
-    );
-  }
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
+      SlideTransition(
+        position: animation.drive(slideTween),
+        child: child,
+      );
 
   static Widget scaledSharedAxisTransitionBuilder(
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child) =>
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
       SharedAxisTransition(
-        fillColor: Theme.of(context).cardColor,
         animation: animation,
         secondaryAnimation: secondaryAnimation,
         transitionType: SharedAxisTransitionType.scaled,
@@ -384,65 +689,73 @@ class Styles {
       );
 
   static Widget horizontalSharedAxisTransitionBuilder(
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child) =>
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
       SharedAxisTransition(
-        fillColor: Theme.of(context).cardColor,
         animation: animation,
         secondaryAnimation: secondaryAnimation,
         transitionType: SharedAxisTransitionType.horizontal,
         child: child,
       );
 
-  static Route<T> buildSlideTransitionRoute<T>(RoutePageBuilder builder) {
-    return PageRouteBuilder<T>(
-      pageBuilder: builder,
-      transitionsBuilder: slideTransitionBuilder,
-    );
-  }
-
-  static Route<T> buildSharedAxisTransitionRoute<T>(
-      RoutePageBuilder builder, SharedAxisTransitionType transitionType) {
-    return PageRouteBuilder<T>(
-      pageBuilder: builder,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return SharedAxisTransition(
-          fillColor: Theme.of(context).cardColor,
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          transitionType: transitionType,
-          child: child,
-        );
-      },
-    );
-  }
+  static Widget fadeThroughTransitionBuilder(
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
+      FadeThroughTransition(
+        animation: animation,
+        secondaryAnimation: secondaryAnimation,
+        child: child,
+      );
 }
 
-Widget? extendedImageLoadStateHandler(ExtendedImageState state) {
-  switch (state.extendedImageLoadState) {
-    case LoadState.loading:
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    case LoadState.completed:
-      return null;
-    case LoadState.failed:
-      return GestureDetector(
-        child: const Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            Icon(Icons.error),
-            Text(
-              "Image load failed",
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        // onTap: () {
-        //   state.reLoadImage();
-        // },
-      );
+class SlideTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
+  SlideTransitionRouteBuilder({
+    required super.pageBuilder,
+  }) : super(transitionsBuilder: Styles.slideTransitionBuilder);
+}
+
+class TransparentOverlay<T> extends ModalRoute<T> {
+  TransparentOverlay({
+    required this.builder,
+  }) : super();
+
+  final WidgetBuilder builder;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  bool get opaque => false;
+
+  @override
+  bool get barrierDismissible => true;
+
+  @override
+  Color get barrierColor => Colors.black.withOpacity(0.5);
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return builder(context);
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return FadeTransition(
+      opacity: animation,
+      child: child,
+    );
   }
 }

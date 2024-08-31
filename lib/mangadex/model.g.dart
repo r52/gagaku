@@ -6,1028 +6,2644 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+typedef MangadexRef = Ref<MangaDexModel>;
+
+@ProviderFor(mangadex)
+const mangadexProvider = MangadexProvider._();
+
+final class MangadexProvider
+    extends $FunctionalProvider<MangaDexModel, MangaDexModel>
+    with $Provider<MangaDexModel, MangadexRef> {
+  const MangadexProvider._(
+      {MangaDexModel Function(
+        MangadexRef ref,
+      )? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'mangadexProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final MangaDexModel Function(
+    MangadexRef ref,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$mangadexHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MangaDexModel value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<MangaDexModel>(value),
+    );
+  }
+
+  @$internal
+  @override
+  $ProviderElement<MangaDexModel> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(this, pointer);
+
+  @override
+  MangadexProvider $copyWithCreate(
+    MangaDexModel Function(
+      MangadexRef ref,
+    ) create,
+  ) {
+    return MangadexProvider._(create: create);
+  }
+
+  @override
+  MangaDexModel create(MangadexRef ref) {
+    final _$cb = _createCb ?? mangadex;
+    return _$cb(ref);
+  }
+}
+
 String _$mangadexHash() => r'a292b576f657f3f4f75a624bdf14e965c33f39fe';
 
-/// See also [mangadex].
-@ProviderFor(mangadex)
-final mangadexProvider = Provider<MangaDexModel>.internal(
-  mangadex,
-  name: r'mangadexProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$mangadexHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(RecentlyAdded)
+const recentlyAddedProvider = RecentlyAddedProvider._();
 
-typedef MangadexRef = ProviderRef<MangaDexModel>;
-String _$latestChaptersFeedHash() =>
-    r'60d043a5de065e52957daa4d989266e69faef500';
+final class RecentlyAddedProvider
+    extends $AsyncNotifierProvider<RecentlyAdded, List<Manga>> {
+  const RecentlyAddedProvider._(
+      {super.runNotifierBuildOverride, RecentlyAdded Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'recentlyAddedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
 
-/// See also [LatestChaptersFeed].
+  final RecentlyAdded Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$recentlyAddedHash();
+
+  @$internal
+  @override
+  RecentlyAdded create() => _createCb?.call() ?? RecentlyAdded();
+
+  @$internal
+  @override
+  RecentlyAddedProvider $copyWithCreate(
+    RecentlyAdded Function() create,
+  ) {
+    return RecentlyAddedProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  RecentlyAddedProvider $copyWithBuild(
+    FutureOr<List<Manga>> Function(
+      Ref<AsyncValue<List<Manga>>>,
+      RecentlyAdded,
+    ) build,
+  ) {
+    return RecentlyAddedProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<RecentlyAdded, List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$recentlyAddedHash() => r'22496d90f057786107d262caac09e636442e6af0';
+
+abstract class _$RecentlyAdded extends $AsyncNotifier<List<Manga>> {
+  FutureOr<List<Manga>> build();
+  @$internal
+  @override
+  FutureOr<List<Manga>> runBuild() => build();
+}
+
 @ProviderFor(LatestChaptersFeed)
-final latestChaptersFeedProvider =
-    AsyncNotifierProvider<LatestChaptersFeed, List<Chapter>>.internal(
-  LatestChaptersFeed.new,
-  name: r'latestChaptersFeedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$latestChaptersFeedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const latestChaptersFeedProvider = LatestChaptersFeedProvider._();
 
-typedef _$LatestChaptersFeed = AsyncNotifier<List<Chapter>>;
-String _$latestGlobalFeedHash() => r'9bfa9061fd0965dac54ac74eb8327367238d5f2a';
+final class LatestChaptersFeedProvider
+    extends $AsyncNotifierProvider<LatestChaptersFeed, List<Chapter>> {
+  const LatestChaptersFeedProvider._(
+      {super.runNotifierBuildOverride, LatestChaptersFeed Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'latestChaptersFeedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
 
-/// See also [LatestGlobalFeed].
+  final LatestChaptersFeed Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$latestChaptersFeedHash();
+
+  @$internal
+  @override
+  LatestChaptersFeed create() => _createCb?.call() ?? LatestChaptersFeed();
+
+  @$internal
+  @override
+  LatestChaptersFeedProvider $copyWithCreate(
+    LatestChaptersFeed Function() create,
+  ) {
+    return LatestChaptersFeedProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  LatestChaptersFeedProvider $copyWithBuild(
+    FutureOr<List<Chapter>> Function(
+      Ref<AsyncValue<List<Chapter>>>,
+      LatestChaptersFeed,
+    ) build,
+  ) {
+    return LatestChaptersFeedProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<LatestChaptersFeed, List<Chapter>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$latestChaptersFeedHash() =>
+    r'caa79e27227730166609d8902b84c77313fc138c';
+
+abstract class _$LatestChaptersFeed extends $AsyncNotifier<List<Chapter>> {
+  FutureOr<List<Chapter>> build();
+  @$internal
+  @override
+  FutureOr<List<Chapter>> runBuild() => build();
+}
+
 @ProviderFor(LatestGlobalFeed)
-final latestGlobalFeedProvider =
-    AsyncNotifierProvider<LatestGlobalFeed, List<Chapter>>.internal(
-  LatestGlobalFeed.new,
-  name: r'latestGlobalFeedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$latestGlobalFeedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const latestGlobalFeedProvider = LatestGlobalFeedProvider._();
 
-typedef _$LatestGlobalFeed = AsyncNotifier<List<Chapter>>;
-String _$groupFeedHash() => r'd75febca41e84cb2349b467a01e6e75226838f06';
+final class LatestGlobalFeedProvider
+    extends $AsyncNotifierProvider<LatestGlobalFeed, List<Chapter>> {
+  const LatestGlobalFeedProvider._(
+      {super.runNotifierBuildOverride, LatestGlobalFeed Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'latestGlobalFeedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
+  final LatestGlobalFeed Function()? _createCb;
 
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
+  @override
+  String debugGetCreateSourceHash() => _$latestGlobalFeedHash();
+
+  @$internal
+  @override
+  LatestGlobalFeed create() => _createCb?.call() ?? LatestGlobalFeed();
+
+  @$internal
+  @override
+  LatestGlobalFeedProvider $copyWithCreate(
+    LatestGlobalFeed Function() create,
+  ) {
+    return LatestGlobalFeedProvider._(create: create);
   }
 
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  @$internal
+  @override
+  LatestGlobalFeedProvider $copyWithBuild(
+    FutureOr<List<Chapter>> Function(
+      Ref<AsyncValue<List<Chapter>>>,
+      LatestGlobalFeed,
+    ) build,
+  ) {
+    return LatestGlobalFeedProvider._(runNotifierBuildOverride: build);
   }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<LatestGlobalFeed, List<Chapter>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 }
 
-abstract class _$GroupFeed extends BuildlessAsyncNotifier<List<Chapter>> {
-  late final Group group;
+String _$latestGlobalFeedHash() => r'a2980ea27c687eb7d0bbc45526f2626d4d6ae2c0';
 
-  FutureOr<List<Chapter>> build(
-    Group group,
-  );
+abstract class _$LatestGlobalFeed extends $AsyncNotifier<List<Chapter>> {
+  FutureOr<List<Chapter>> build();
+  @$internal
+  @override
+  FutureOr<List<Chapter>> runBuild() => build();
 }
 
-/// See also [GroupFeed].
 @ProviderFor(GroupFeed)
-const groupFeedProvider = GroupFeedFamily();
+const groupFeedProvider = GroupFeedFamily._();
 
-/// See also [GroupFeed].
-class GroupFeedFamily extends Family<AsyncValue<List<Chapter>>> {
-  /// See also [GroupFeed].
-  const GroupFeedFamily();
+final class GroupFeedProvider
+    extends $AsyncNotifierProvider<GroupFeed, List<Chapter>> {
+  const GroupFeedProvider._(
+      {required GroupFeedFamily super.from,
+      required Group super.argument,
+      super.runNotifierBuildOverride,
+      GroupFeed Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'groupFeedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
 
-  /// See also [GroupFeed].
+  final GroupFeed Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$groupFeedHash();
+
+  @override
+  String toString() {
+    return r'groupFeedProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  GroupFeed create() => _createCb?.call() ?? GroupFeed();
+
+  @$internal
+  @override
+  GroupFeedProvider $copyWithCreate(
+    GroupFeed Function() create,
+  ) {
+    return GroupFeedProvider._(
+        argument: argument as Group,
+        from: from! as GroupFeedFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  GroupFeedProvider $copyWithBuild(
+    FutureOr<List<Chapter>> Function(
+      Ref<AsyncValue<List<Chapter>>>,
+      GroupFeed,
+    ) build,
+  ) {
+    return GroupFeedProvider._(
+        argument: argument as Group,
+        from: from! as GroupFeedFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<GroupFeed, List<Chapter>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupFeedProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$groupFeedHash() => r'bff829162cb0bf702a6e2450c78ebee5e2fb0626';
+
+final class GroupFeedFamily extends Family {
+  const GroupFeedFamily._()
+      : super(
+          retry: null,
+          name: r'groupFeedProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
   GroupFeedProvider call(
     Group group,
+  ) =>
+      GroupFeedProvider._(argument: group, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$groupFeedHash();
+
+  @override
+  String toString() => r'groupFeedProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    GroupFeed Function(
+      Group args,
+    ) create,
   ) {
-    return GroupFeedProvider(
-      group,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as GroupFeedProvider;
+
+        final argument = provider.argument as Group;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
     );
   }
 
-  @override
-  GroupFeedProvider getProviderOverride(
-    covariant GroupFeedProvider provider,
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<Chapter>> Function(Ref<AsyncValue<List<Chapter>>> ref,
+            GroupFeed notifier, Group argument)
+        build,
   ) {
-    return call(
-      provider.group,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as GroupFeedProvider;
+
+        final argument = provider.argument as Group;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'groupFeedProvider';
 }
 
-/// See also [GroupFeed].
-class GroupFeedProvider
-    extends AsyncNotifierProviderImpl<GroupFeed, List<Chapter>> {
-  /// See also [GroupFeed].
-  GroupFeedProvider(
-    this.group,
-  ) : super.internal(
-          () => GroupFeed()..group = group,
-          from: groupFeedProvider,
-          name: r'groupFeedProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$groupFeedHash,
-          dependencies: GroupFeedFamily._dependencies,
-          allTransitiveDependencies: GroupFeedFamily._allTransitiveDependencies,
+abstract class _$GroupFeed extends $AsyncNotifier<List<Chapter>> {
+  late final _$args = ref.$arg as Group;
+  Group get group => _$args;
+
+  FutureOr<List<Chapter>> build(
+    Group group,
+  );
+  @$internal
+  @override
+  FutureOr<List<Chapter>> runBuild() => build(
+        _$args,
+      );
+}
+
+@ProviderFor(GroupTitles)
+const groupTitlesProvider = GroupTitlesFamily._();
+
+final class GroupTitlesProvider
+    extends $AsyncNotifierProvider<GroupTitles, List<Manga>> {
+  const GroupTitlesProvider._(
+      {required GroupTitlesFamily super.from,
+      required Group super.argument,
+      super.runNotifierBuildOverride,
+      GroupTitles Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'groupTitlesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final Group group;
+  final GroupTitles Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$groupTitlesHash();
+
+  @override
+  String toString() {
+    return r'groupTitlesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  GroupTitles create() => _createCb?.call() ?? GroupTitles();
+
+  @$internal
+  @override
+  GroupTitlesProvider $copyWithCreate(
+    GroupTitles Function() create,
+  ) {
+    return GroupTitlesProvider._(
+        argument: argument as Group,
+        from: from! as GroupTitlesFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  GroupTitlesProvider $copyWithBuild(
+    FutureOr<List<Manga>> Function(
+      Ref<AsyncValue<List<Manga>>>,
+      GroupTitles,
+    ) build,
+  ) {
+    return GroupTitlesProvider._(
+        argument: argument as Group,
+        from: from! as GroupTitlesFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<GroupTitles, List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is GroupFeedProvider && other.group == group;
+    return other is GroupTitlesProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, group.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-
-  @override
-  FutureOr<List<Chapter>> runNotifierBuild(
-    covariant GroupFeed notifier,
-  ) {
-    return notifier.build(
-      group,
-    );
+    return argument.hashCode;
   }
 }
 
-String _$groupTitlesHash() => r'bb3138a274c1973f59fa2aa7c0a8b3c80b99a3ad';
+String _$groupTitlesHash() => r'82b39c5d8b6e102f2a20956fbc8e950fbddebc99';
 
-abstract class _$GroupTitles extends BuildlessAsyncNotifier<List<Manga>> {
-  late final Group group;
+final class GroupTitlesFamily extends Family {
+  const GroupTitlesFamily._()
+      : super(
+          retry: null,
+          name: r'groupTitlesProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
 
-  FutureOr<List<Manga>> build(
-    Group group,
-  );
-}
-
-/// See also [GroupTitles].
-@ProviderFor(GroupTitles)
-const groupTitlesProvider = GroupTitlesFamily();
-
-/// See also [GroupTitles].
-class GroupTitlesFamily extends Family<AsyncValue<List<Manga>>> {
-  /// See also [GroupTitles].
-  const GroupTitlesFamily();
-
-  /// See also [GroupTitles].
   GroupTitlesProvider call(
     Group group,
+  ) =>
+      GroupTitlesProvider._(argument: group, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$groupTitlesHash();
+
+  @override
+  String toString() => r'groupTitlesProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    GroupTitles Function(
+      Group args,
+    ) create,
   ) {
-    return GroupTitlesProvider(
-      group,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as GroupTitlesProvider;
+
+        final argument = provider.argument as Group;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
     );
   }
 
-  @override
-  GroupTitlesProvider getProviderOverride(
-    covariant GroupTitlesProvider provider,
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<Manga>> Function(Ref<AsyncValue<List<Manga>>> ref,
+            GroupTitles notifier, Group argument)
+        build,
   ) {
-    return call(
-      provider.group,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as GroupTitlesProvider;
+
+        final argument = provider.argument as Group;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'groupTitlesProvider';
 }
 
-/// See also [GroupTitles].
-class GroupTitlesProvider
-    extends AsyncNotifierProviderImpl<GroupTitles, List<Manga>> {
-  /// See also [GroupTitles].
-  GroupTitlesProvider(
-    this.group,
-  ) : super.internal(
-          () => GroupTitles()..group = group,
-          from: groupTitlesProvider,
-          name: r'groupTitlesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$groupTitlesHash,
-          dependencies: GroupTitlesFamily._dependencies,
-          allTransitiveDependencies:
-              GroupTitlesFamily._allTransitiveDependencies,
+abstract class _$GroupTitles extends $AsyncNotifier<List<Manga>> {
+  late final _$args = ref.$arg as Group;
+  Group get group => _$args;
+
+  FutureOr<List<Manga>> build(
+    Group group,
+  );
+  @$internal
+  @override
+  FutureOr<List<Manga>> runBuild() => build(
+        _$args,
+      );
+}
+
+@ProviderFor(CreatorTitles)
+const creatorTitlesProvider = CreatorTitlesFamily._();
+
+final class CreatorTitlesProvider
+    extends $AsyncNotifierProvider<CreatorTitles, List<Manga>> {
+  const CreatorTitlesProvider._(
+      {required CreatorTitlesFamily super.from,
+      required CreatorType super.argument,
+      super.runNotifierBuildOverride,
+      CreatorTitles Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'creatorTitlesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final Group group;
+  final CreatorTitles Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$creatorTitlesHash();
+
+  @override
+  String toString() {
+    return r'creatorTitlesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  CreatorTitles create() => _createCb?.call() ?? CreatorTitles();
+
+  @$internal
+  @override
+  CreatorTitlesProvider $copyWithCreate(
+    CreatorTitles Function() create,
+  ) {
+    return CreatorTitlesProvider._(
+        argument: argument as CreatorType,
+        from: from! as CreatorTitlesFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  CreatorTitlesProvider $copyWithBuild(
+    FutureOr<List<Manga>> Function(
+      Ref<AsyncValue<List<Manga>>>,
+      CreatorTitles,
+    ) build,
+  ) {
+    return CreatorTitlesProvider._(
+        argument: argument as CreatorType,
+        from: from! as CreatorTitlesFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<CreatorTitles, List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is GroupTitlesProvider && other.group == group;
+    return other is CreatorTitlesProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, group.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
+}
+
+String _$creatorTitlesHash() => r'1f1e50d06abe63f8af040675627d6f02d71c588c';
+
+final class CreatorTitlesFamily extends Family {
+  const CreatorTitlesFamily._()
+      : super(
+          retry: null,
+          name: r'creatorTitlesProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  CreatorTitlesProvider call(
+    CreatorType creator,
+  ) =>
+      CreatorTitlesProvider._(argument: creator, from: this);
 
   @override
-  FutureOr<List<Manga>> runNotifierBuild(
-    covariant GroupTitles notifier,
+  String debugGetCreateSourceHash() => _$creatorTitlesHash();
+
+  @override
+  String toString() => r'creatorTitlesProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    CreatorTitles Function(
+      CreatorType args,
+    ) create,
   ) {
-    return notifier.build(
-      group,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as CreatorTitlesProvider;
+
+        final argument = provider.argument as CreatorType;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<Manga>> Function(Ref<AsyncValue<List<Manga>>> ref,
+            CreatorTitles notifier, CreatorType argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as CreatorTitlesProvider;
+
+        final argument = provider.argument as CreatorType;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
 }
 
-String _$creatorTitlesHash() => r'873b599622ede2fbd363a8fe527bc111397538ae';
-
-abstract class _$CreatorTitles extends BuildlessAsyncNotifier<List<Manga>> {
-  late final CreatorType creator;
+abstract class _$CreatorTitles extends $AsyncNotifier<List<Manga>> {
+  late final _$args = ref.$arg as CreatorType;
+  CreatorType get creator => _$args;
 
   FutureOr<List<Manga>> build(
     CreatorType creator,
   );
+  @$internal
+  @override
+  FutureOr<List<Manga>> runBuild() => build(
+        _$args,
+      );
 }
 
-/// See also [CreatorTitles].
-@ProviderFor(CreatorTitles)
-const creatorTitlesProvider = CreatorTitlesFamily();
+@ProviderFor(MangaChapters)
+const mangaChaptersProvider = MangaChaptersFamily._();
 
-/// See also [CreatorTitles].
-class CreatorTitlesFamily extends Family<AsyncValue<List<Manga>>> {
-  /// See also [CreatorTitles].
-  const CreatorTitlesFamily();
-
-  /// See also [CreatorTitles].
-  CreatorTitlesProvider call(
-    CreatorType creator,
-  ) {
-    return CreatorTitlesProvider(
-      creator,
-    );
-  }
-
-  @override
-  CreatorTitlesProvider getProviderOverride(
-    covariant CreatorTitlesProvider provider,
-  ) {
-    return call(
-      provider.creator,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'creatorTitlesProvider';
-}
-
-/// See also [CreatorTitles].
-class CreatorTitlesProvider
-    extends AsyncNotifierProviderImpl<CreatorTitles, List<Manga>> {
-  /// See also [CreatorTitles].
-  CreatorTitlesProvider(
-    this.creator,
-  ) : super.internal(
-          () => CreatorTitles()..creator = creator,
-          from: creatorTitlesProvider,
-          name: r'creatorTitlesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$creatorTitlesHash,
-          dependencies: CreatorTitlesFamily._dependencies,
-          allTransitiveDependencies:
-              CreatorTitlesFamily._allTransitiveDependencies,
+final class MangaChaptersProvider
+    extends $AsyncNotifierProvider<MangaChapters, List<Chapter>> {
+  const MangaChaptersProvider._(
+      {required MangaChaptersFamily super.from,
+      required Manga super.argument,
+      super.runNotifierBuildOverride,
+      MangaChapters Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'mangaChaptersProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final CreatorType creator;
+  final MangaChapters Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaChaptersHash();
+
+  @override
+  String toString() {
+    return r'mangaChaptersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  MangaChapters create() => _createCb?.call() ?? MangaChapters();
+
+  @$internal
+  @override
+  MangaChaptersProvider $copyWithCreate(
+    MangaChapters Function() create,
+  ) {
+    return MangaChaptersProvider._(
+        argument: argument as Manga,
+        from: from! as MangaChaptersFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  MangaChaptersProvider $copyWithBuild(
+    FutureOr<List<Chapter>> Function(
+      Ref<AsyncValue<List<Chapter>>>,
+      MangaChapters,
+    ) build,
+  ) {
+    return MangaChaptersProvider._(
+        argument: argument as Manga,
+        from: from! as MangaChaptersFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<MangaChapters, List<Chapter>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is CreatorTitlesProvider && other.creator == creator;
+    return other is MangaChaptersProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, creator.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
+}
+
+String _$mangaChaptersHash() => r'bc3689a302f9e21dfed0b987c259cd9aedcb5db4';
+
+final class MangaChaptersFamily extends Family {
+  const MangaChaptersFamily._()
+      : super(
+          retry: null,
+          name: r'mangaChaptersProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  MangaChaptersProvider call(
+    Manga manga,
+  ) =>
+      MangaChaptersProvider._(argument: manga, from: this);
 
   @override
-  FutureOr<List<Manga>> runNotifierBuild(
-    covariant CreatorTitles notifier,
+  String debugGetCreateSourceHash() => _$mangaChaptersHash();
+
+  @override
+  String toString() => r'mangaChaptersProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    MangaChapters Function(
+      Manga args,
+    ) create,
   ) {
-    return notifier.build(
-      creator,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaChaptersProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<Chapter>> Function(Ref<AsyncValue<List<Chapter>>> ref,
+            MangaChapters notifier, Manga argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaChaptersProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
 }
 
-String _$mangaChaptersHash() => r'74cbf3b45413db87c22b3971de100ff673499f36';
-
-abstract class _$MangaChapters extends BuildlessAsyncNotifier<List<Chapter>> {
-  late final Manga manga;
+abstract class _$MangaChapters extends $AsyncNotifier<List<Chapter>> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
 
   FutureOr<List<Chapter>> build(
     Manga manga,
   );
+  @$internal
+  @override
+  FutureOr<List<Chapter>> runBuild() => build(
+        _$args,
+      );
 }
 
-/// See also [MangaChapters].
-@ProviderFor(MangaChapters)
-const mangaChaptersProvider = MangaChaptersFamily();
+@ProviderFor(MangaCovers)
+const mangaCoversProvider = MangaCoversFamily._();
 
-/// See also [MangaChapters].
-class MangaChaptersFamily extends Family<AsyncValue<List<Chapter>>> {
-  /// See also [MangaChapters].
-  const MangaChaptersFamily();
-
-  /// See also [MangaChapters].
-  MangaChaptersProvider call(
-    Manga manga,
-  ) {
-    return MangaChaptersProvider(
-      manga,
-    );
-  }
-
-  @override
-  MangaChaptersProvider getProviderOverride(
-    covariant MangaChaptersProvider provider,
-  ) {
-    return call(
-      provider.manga,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'mangaChaptersProvider';
-}
-
-/// See also [MangaChapters].
-class MangaChaptersProvider
-    extends AsyncNotifierProviderImpl<MangaChapters, List<Chapter>> {
-  /// See also [MangaChapters].
-  MangaChaptersProvider(
-    this.manga,
-  ) : super.internal(
-          () => MangaChapters()..manga = manga,
-          from: mangaChaptersProvider,
-          name: r'mangaChaptersProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$mangaChaptersHash,
-          dependencies: MangaChaptersFamily._dependencies,
-          allTransitiveDependencies:
-              MangaChaptersFamily._allTransitiveDependencies,
+final class MangaCoversProvider
+    extends $AsyncNotifierProvider<MangaCovers, List<CoverArt>> {
+  const MangaCoversProvider._(
+      {required MangaCoversFamily super.from,
+      required Manga super.argument,
+      super.runNotifierBuildOverride,
+      MangaCovers Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'mangaCoversProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final Manga manga;
+  final MangaCovers Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaCoversHash();
+
+  @override
+  String toString() {
+    return r'mangaCoversProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  MangaCovers create() => _createCb?.call() ?? MangaCovers();
+
+  @$internal
+  @override
+  MangaCoversProvider $copyWithCreate(
+    MangaCovers Function() create,
+  ) {
+    return MangaCoversProvider._(
+        argument: argument as Manga,
+        from: from! as MangaCoversFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  MangaCoversProvider $copyWithBuild(
+    FutureOr<List<CoverArt>> Function(
+      Ref<AsyncValue<List<CoverArt>>>,
+      MangaCovers,
+    ) build,
+  ) {
+    return MangaCoversProvider._(
+        argument: argument as Manga,
+        from: from! as MangaCoversFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<MangaCovers, List<CoverArt>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is MangaChaptersProvider && other.manga == manga;
+    return other is MangaCoversProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, manga.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-
-  @override
-  FutureOr<List<Chapter>> runNotifierBuild(
-    covariant MangaChapters notifier,
-  ) {
-    return notifier.build(
-      manga,
-    );
+    return argument.hashCode;
   }
 }
 
-String _$mangaCoversHash() => r'53e93ef0159dc2a20beb82d03b60bcab5d67fbe8';
+String _$mangaCoversHash() => r'cf841ca39bf9272b4ce4c45d68fdb83cfcf8c56c';
 
-abstract class _$MangaCovers extends BuildlessAsyncNotifier<List<Cover>> {
-  late final Manga manga;
+final class MangaCoversFamily extends Family {
+  const MangaCoversFamily._()
+      : super(
+          retry: null,
+          name: r'mangaCoversProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
 
-  FutureOr<List<Cover>> build(
-    Manga manga,
-  );
-}
-
-/// See also [MangaCovers].
-@ProviderFor(MangaCovers)
-const mangaCoversProvider = MangaCoversFamily();
-
-/// See also [MangaCovers].
-class MangaCoversFamily extends Family<AsyncValue<List<Cover>>> {
-  /// See also [MangaCovers].
-  const MangaCoversFamily();
-
-  /// See also [MangaCovers].
   MangaCoversProvider call(
     Manga manga,
+  ) =>
+      MangaCoversProvider._(argument: manga, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaCoversHash();
+
+  @override
+  String toString() => r'mangaCoversProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    MangaCovers Function(
+      Manga args,
+    ) create,
   ) {
-    return MangaCoversProvider(
-      manga,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaCoversProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
     );
   }
 
-  @override
-  MangaCoversProvider getProviderOverride(
-    covariant MangaCoversProvider provider,
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<CoverArt>> Function(Ref<AsyncValue<List<CoverArt>>> ref,
+            MangaCovers notifier, Manga argument)
+        build,
   ) {
-    return call(
-      provider.manga,
-    );
-  }
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaCoversProvider;
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+        final argument = provider.argument as Manga;
 
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'mangaCoversProvider';
-}
-
-/// See also [MangaCovers].
-class MangaCoversProvider
-    extends AsyncNotifierProviderImpl<MangaCovers, List<Cover>> {
-  /// See also [MangaCovers].
-  MangaCoversProvider(
-    this.manga,
-  ) : super.internal(
-          () => MangaCovers()..manga = manga,
-          from: mangaCoversProvider,
-          name: r'mangaCoversProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$mangaCoversHash,
-          dependencies: MangaCoversFamily._dependencies,
-          allTransitiveDependencies:
-              MangaCoversFamily._allTransitiveDependencies,
-        );
-
-  final Manga manga;
-
-  @override
-  bool operator ==(Object other) {
-    return other is MangaCoversProvider && other.manga == manga;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, manga.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-
-  @override
-  FutureOr<List<Cover>> runNotifierBuild(
-    covariant MangaCovers notifier,
-  ) {
-    return notifier.build(
-      manga,
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
 }
 
-String _$readChaptersHash() => r'429f19ab4f255aee8b5e414fd754ac8621091dc2';
+abstract class _$MangaCovers extends $AsyncNotifier<List<CoverArt>> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
 
-/// See also [ReadChapters].
-@ProviderFor(ReadChapters)
-final readChaptersProvider =
-    AsyncNotifierProvider<ReadChapters, Map<String, ReadChapterSet>>.internal(
-  ReadChapters.new,
-  name: r'readChaptersProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$readChaptersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$ReadChapters = AsyncNotifier<Map<String, ReadChapterSet>>;
-String _$userLibraryHash() => r'db728effebe55f58d3dd147c3727b6fdf3db8f09';
-
-abstract class _$UserLibrary extends BuildlessAsyncNotifier<Iterable<Manga>> {
-  late final MangaReadingStatus status;
-
-  FutureOr<Iterable<Manga>> build(
-    MangaReadingStatus status,
+  FutureOr<List<CoverArt>> build(
+    Manga manga,
   );
+  @$internal
+  @override
+  FutureOr<List<CoverArt>> runBuild() => build(
+        _$args,
+      );
 }
 
-/// See also [UserLibrary].
-@ProviderFor(UserLibrary)
-const userLibraryProvider = UserLibraryFamily();
+@ProviderFor(ReadChapters)
+const readChaptersProvider = ReadChaptersProvider._();
 
-/// See also [UserLibrary].
-class UserLibraryFamily extends Family<AsyncValue<Iterable<Manga>>> {
-  /// See also [UserLibrary].
-  const UserLibraryFamily();
-
-  /// See also [UserLibrary].
-  UserLibraryProvider call(
-    MangaReadingStatus status,
-  ) {
-    return UserLibraryProvider(
-      status,
-    );
-  }
-
-  @override
-  UserLibraryProvider getProviderOverride(
-    covariant UserLibraryProvider provider,
-  ) {
-    return call(
-      provider.status,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'userLibraryProvider';
-}
-
-/// See also [UserLibrary].
-class UserLibraryProvider
-    extends AsyncNotifierProviderImpl<UserLibrary, Iterable<Manga>> {
-  /// See also [UserLibrary].
-  UserLibraryProvider(
-    this.status,
-  ) : super.internal(
-          () => UserLibrary()..status = status,
-          from: userLibraryProvider,
-          name: r'userLibraryProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$userLibraryHash,
-          dependencies: UserLibraryFamily._dependencies,
-          allTransitiveDependencies:
-              UserLibraryFamily._allTransitiveDependencies,
+final class ReadChaptersProvider
+    extends $AsyncNotifierProvider<ReadChapters, ReadChaptersMap> {
+  const ReadChaptersProvider._(
+      {super.runNotifierBuildOverride, ReadChapters Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'readChaptersProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final MangaReadingStatus status;
+  final ReadChapters Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$readChaptersHash();
+
+  @$internal
+  @override
+  ReadChapters create() => _createCb?.call() ?? ReadChapters();
+
+  @$internal
+  @override
+  ReadChaptersProvider $copyWithCreate(
+    ReadChapters Function() create,
+  ) {
+    return ReadChaptersProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  ReadChaptersProvider $copyWithBuild(
+    FutureOr<ReadChaptersMap> Function(
+      Ref<AsyncValue<ReadChaptersMap>>,
+      ReadChapters,
+    ) build,
+  ) {
+    return ReadChaptersProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<ReadChapters, ReadChaptersMap> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$readChaptersHash() => r'9dc56d4c2e1bb428b45ea668007ea2af536c4fcc';
+
+abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
+  FutureOr<ReadChaptersMap> build();
+  @$internal
+  @override
+  FutureOr<ReadChaptersMap> runBuild() => build();
+}
+
+@ProviderFor(UserLibrary)
+const userLibraryProvider = UserLibraryProvider._();
+
+final class UserLibraryProvider extends $AsyncNotifierProvider<UserLibrary,
+    Map<String, MangaReadingStatus>> {
+  const UserLibraryProvider._(
+      {super.runNotifierBuildOverride, UserLibrary Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'userLibraryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final UserLibrary Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$userLibraryHash();
+
+  @$internal
+  @override
+  UserLibrary create() => _createCb?.call() ?? UserLibrary();
+
+  @$internal
+  @override
+  UserLibraryProvider $copyWithCreate(
+    UserLibrary Function() create,
+  ) {
+    return UserLibraryProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  UserLibraryProvider $copyWithBuild(
+    FutureOr<Map<String, MangaReadingStatus>> Function(
+      Ref<AsyncValue<Map<String, MangaReadingStatus>>>,
+      UserLibrary,
+    ) build,
+  ) {
+    return UserLibraryProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<UserLibrary, Map<String, MangaReadingStatus>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$userLibraryHash() => r'58d3a7add927e3c970b317ca85b19a8090556ef2';
+
+abstract class _$UserLibrary
+    extends $AsyncNotifier<Map<String, MangaReadingStatus>> {
+  FutureOr<Map<String, MangaReadingStatus>> build();
+  @$internal
+  @override
+  FutureOr<Map<String, MangaReadingStatus>> runBuild() => build();
+}
+
+@ProviderFor(UserLists)
+const userListsProvider = UserListsProvider._();
+
+final class UserListsProvider
+    extends $AsyncNotifierProvider<UserLists, List<CustomList>> {
+  const UserListsProvider._(
+      {super.runNotifierBuildOverride, UserLists Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'userListsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final UserLists Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$userListsHash();
+
+  @$internal
+  @override
+  UserLists create() => _createCb?.call() ?? UserLists();
+
+  @$internal
+  @override
+  UserListsProvider $copyWithCreate(
+    UserLists Function() create,
+  ) {
+    return UserListsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  UserListsProvider $copyWithBuild(
+    FutureOr<List<CustomList>> Function(
+      Ref<AsyncValue<List<CustomList>>>,
+      UserLists,
+    ) build,
+  ) {
+    return UserListsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<UserLists, List<CustomList>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$userListsHash() => r'905a900594b91b998953be64e3978287932d413b';
+
+abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
+  FutureOr<List<CustomList>> build();
+  @$internal
+  @override
+  FutureOr<List<CustomList>> runBuild() => build();
+}
+
+@ProviderFor(FollowedLists)
+const followedListsProvider = FollowedListsProvider._();
+
+final class FollowedListsProvider
+    extends $AsyncNotifierProvider<FollowedLists, List<CustomList>> {
+  const FollowedListsProvider._(
+      {super.runNotifierBuildOverride, FollowedLists Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'followedListsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FollowedLists Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$followedListsHash();
+
+  @$internal
+  @override
+  FollowedLists create() => _createCb?.call() ?? FollowedLists();
+
+  @$internal
+  @override
+  FollowedListsProvider $copyWithCreate(
+    FollowedLists Function() create,
+  ) {
+    return FollowedListsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  FollowedListsProvider $copyWithBuild(
+    FutureOr<List<CustomList>> Function(
+      Ref<AsyncValue<List<CustomList>>>,
+      FollowedLists,
+    ) build,
+  ) {
+    return FollowedListsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<FollowedLists, List<CustomList>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$followedListsHash() => r'1065619118b8e74f6214367c8db1a64e747c3207';
+
+abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
+  FutureOr<List<CustomList>> build();
+  @$internal
+  @override
+  FutureOr<List<CustomList>> runBuild() => build();
+}
+
+@ProviderFor(CustomListFeed)
+const customListFeedProvider = CustomListFeedFamily._();
+
+final class CustomListFeedProvider
+    extends $AsyncNotifierProvider<CustomListFeed, List<Chapter>> {
+  const CustomListFeedProvider._(
+      {required CustomListFeedFamily super.from,
+      required CustomList super.argument,
+      super.runNotifierBuildOverride,
+      CustomListFeed Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'customListFeedProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final CustomListFeed Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$customListFeedHash();
+
+  @override
+  String toString() {
+    return r'customListFeedProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  CustomListFeed create() => _createCb?.call() ?? CustomListFeed();
+
+  @$internal
+  @override
+  CustomListFeedProvider $copyWithCreate(
+    CustomListFeed Function() create,
+  ) {
+    return CustomListFeedProvider._(
+        argument: argument as CustomList,
+        from: from! as CustomListFeedFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  CustomListFeedProvider $copyWithBuild(
+    FutureOr<List<Chapter>> Function(
+      Ref<AsyncValue<List<Chapter>>>,
+      CustomListFeed,
+    ) build,
+  ) {
+    return CustomListFeedProvider._(
+        argument: argument as CustomList,
+        from: from! as CustomListFeedFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<CustomListFeed, List<Chapter>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is UserLibraryProvider && other.status == status;
+    return other is CustomListFeedProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, status.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
+}
+
+String _$customListFeedHash() => r'1a9d4a376d8682dd783b29c779cdc8155d900e6a';
+
+final class CustomListFeedFamily extends Family {
+  const CustomListFeedFamily._()
+      : super(
+          retry: null,
+          name: r'customListFeedProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  CustomListFeedProvider call(
+    CustomList list,
+  ) =>
+      CustomListFeedProvider._(argument: list, from: this);
 
   @override
-  FutureOr<Iterable<Manga>> runNotifierBuild(
-    covariant UserLibrary notifier,
+  String debugGetCreateSourceHash() => _$customListFeedHash();
+
+  @override
+  String toString() => r'customListFeedProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    CustomListFeed Function(
+      CustomList args,
+    ) create,
   ) {
-    return notifier.build(
-      status,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as CustomListFeedProvider;
+
+        final argument = provider.argument as CustomList;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<Chapter>> Function(Ref<AsyncValue<List<Chapter>>> ref,
+            CustomListFeed notifier, CustomList argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as CustomListFeedProvider;
+
+        final argument = provider.argument as CustomList;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
 }
 
-String _$tagListHash() => r'0a1fc9b1354d4786d8aac74ab1a13e872b6e9e1b';
+abstract class _$CustomListFeed extends $AsyncNotifier<List<Chapter>> {
+  late final _$args = ref.$arg as CustomList;
+  CustomList get list => _$args;
 
-/// See also [TagList].
+  FutureOr<List<Chapter>> build(
+    CustomList list,
+  );
+  @$internal
+  @override
+  FutureOr<List<Chapter>> runBuild() => build(
+        _$args,
+      );
+}
+
+typedef GetMangaListByPageRef = Ref<AsyncValue<List<Manga>>>;
+
+@ProviderFor(getMangaListByPage)
+const getMangaListByPageProvider = GetMangaListByPageFamily._();
+
+final class GetMangaListByPageProvider
+    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    with
+        $FutureModifier<List<Manga>>,
+        $FutureProvider<List<Manga>, GetMangaListByPageRef> {
+  const GetMangaListByPageProvider._(
+      {required GetMangaListByPageFamily super.from,
+      required (
+        Iterable<String>,
+        int,
+      )
+          super.argument,
+      FutureOr<List<Manga>> Function(
+        GetMangaListByPageRef ref,
+        Iterable<String> list,
+        int page,
+      )? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'getMangaListByPageProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<Manga>> Function(
+    GetMangaListByPageRef ref,
+    Iterable<String> list,
+    int page,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$getMangaListByPageHash();
+
+  @override
+  String toString() {
+    return r'getMangaListByPageProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  GetMangaListByPageProvider $copyWithCreate(
+    FutureOr<List<Manga>> Function(
+      GetMangaListByPageRef ref,
+    ) create,
+  ) {
+    return GetMangaListByPageProvider._(
+        argument: argument as (
+          Iterable<String>,
+          int,
+        ),
+        from: from! as GetMangaListByPageFamily,
+        create: (
+          ref,
+          Iterable<String> list,
+          int page,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<List<Manga>> create(GetMangaListByPageRef ref) {
+    final _$cb = _createCb ?? getMangaListByPage;
+    final argument = this.argument as (
+      Iterable<String>,
+      int,
+    );
+    return _$cb(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GetMangaListByPageProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$getMangaListByPageHash() =>
+    r'287ea8f8be406e7ebefc2ac3b8d47e7e03270f35';
+
+final class GetMangaListByPageFamily extends Family {
+  const GetMangaListByPageFamily._()
+      : super(
+          retry: null,
+          name: r'getMangaListByPageProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  GetMangaListByPageProvider call(
+    Iterable<String> list,
+    int page,
+  ) =>
+      GetMangaListByPageProvider._(argument: (
+        list,
+        page,
+      ), from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$getMangaListByPageHash();
+
+  @override
+  String toString() => r'getMangaListByPageProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<List<Manga>> Function(
+      GetMangaListByPageRef ref,
+      (
+        Iterable<String>,
+        int,
+      ) args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as GetMangaListByPageProvider;
+
+        final argument = provider.argument as (
+          Iterable<String>,
+          int,
+        );
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+@ProviderFor(ListSource)
+const listSourceProvider = ListSourceFamily._();
+
+final class ListSourceProvider
+    extends $AsyncNotifierProvider<ListSource, CustomList?> {
+  const ListSourceProvider._(
+      {required ListSourceFamily super.from,
+      required String super.argument,
+      super.runNotifierBuildOverride,
+      ListSource Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'listSourceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final ListSource Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$listSourceHash();
+
+  @override
+  String toString() {
+    return r'listSourceProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  ListSource create() => _createCb?.call() ?? ListSource();
+
+  @$internal
+  @override
+  ListSourceProvider $copyWithCreate(
+    ListSource Function() create,
+  ) {
+    return ListSourceProvider._(
+        argument: argument as String,
+        from: from! as ListSourceFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  ListSourceProvider $copyWithBuild(
+    FutureOr<CustomList?> Function(
+      Ref<AsyncValue<CustomList?>>,
+      ListSource,
+    ) build,
+  ) {
+    return ListSourceProvider._(
+        argument: argument as String,
+        from: from! as ListSourceFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<ListSource, CustomList?> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+
+  @override
+  bool operator ==(Object other) {
+    return other is ListSourceProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$listSourceHash() => r'9f85bdb85e5530013d8842bb4095cf7fd5538c2c';
+
+final class ListSourceFamily extends Family {
+  const ListSourceFamily._()
+      : super(
+          retry: null,
+          name: r'listSourceProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  ListSourceProvider call(
+    String listId,
+  ) =>
+      ListSourceProvider._(argument: listId, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$listSourceHash();
+
+  @override
+  String toString() => r'listSourceProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    ListSource Function(
+      String args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as ListSourceProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<CustomList?> Function(Ref<AsyncValue<CustomList?>> ref,
+            ListSource notifier, String argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as ListSourceProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
+  late final _$args = ref.$arg as String;
+  String get listId => _$args;
+
+  FutureOr<CustomList?> build(
+    String listId,
+  );
+  @$internal
+  @override
+  FutureOr<CustomList?> runBuild() => build(
+        _$args,
+      );
+}
+
 @ProviderFor(TagList)
-final tagListProvider = AsyncNotifierProvider<TagList, Iterable<Tag>>.internal(
-  TagList.new,
-  name: r'tagListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$tagListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const tagListProvider = TagListProvider._();
 
-typedef _$TagList = AsyncNotifier<Iterable<Tag>>;
-String _$mangaSearchHash() => r'e5e3db3c56b9a668163093c117e6d49a1fb81269';
+final class TagListProvider
+    extends $AsyncNotifierProvider<TagList, Iterable<Tag>> {
+  const TagListProvider._(
+      {super.runNotifierBuildOverride, TagList Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tagListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
 
-abstract class _$MangaSearch
-    extends BuildlessAutoDisposeAsyncNotifier<List<Manga>> {
-  late final MangaSearchParameters params;
+  final TagList Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$tagListHash();
+
+  @$internal
+  @override
+  TagList create() => _createCb?.call() ?? TagList();
+
+  @$internal
+  @override
+  TagListProvider $copyWithCreate(
+    TagList Function() create,
+  ) {
+    return TagListProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  TagListProvider $copyWithBuild(
+    FutureOr<Iterable<Tag>> Function(
+      Ref<AsyncValue<Iterable<Tag>>>,
+      TagList,
+    ) build,
+  ) {
+    return TagListProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<TagList, Iterable<Tag>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$tagListHash() => r'5d3bda30cfa4e84118d92e60be6dfa7b23364c85';
+
+abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
+  FutureOr<Iterable<Tag>> build();
+  @$internal
+  @override
+  FutureOr<Iterable<Tag>> runBuild() => build();
+}
+
+@ProviderFor(MangaSearch)
+const mangaSearchProvider = MangaSearchFamily._();
+
+final class MangaSearchProvider
+    extends $AsyncNotifierProvider<MangaSearch, List<Manga>> {
+  const MangaSearchProvider._(
+      {required MangaSearchFamily super.from,
+      required MangaSearchParameters super.argument,
+      super.runNotifierBuildOverride,
+      MangaSearch Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'mangaSearchProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final MangaSearch Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaSearchHash();
+
+  @override
+  String toString() {
+    return r'mangaSearchProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  MangaSearch create() => _createCb?.call() ?? MangaSearch();
+
+  @$internal
+  @override
+  MangaSearchProvider $copyWithCreate(
+    MangaSearch Function() create,
+  ) {
+    return MangaSearchProvider._(
+        argument: argument as MangaSearchParameters,
+        from: from! as MangaSearchFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  MangaSearchProvider $copyWithBuild(
+    FutureOr<List<Manga>> Function(
+      Ref<AsyncValue<List<Manga>>>,
+      MangaSearch,
+    ) build,
+  ) {
+    return MangaSearchProvider._(
+        argument: argument as MangaSearchParameters,
+        from: from! as MangaSearchFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<MangaSearch, List<Manga>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+
+  @override
+  bool operator ==(Object other) {
+    return other is MangaSearchProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$mangaSearchHash() => r'6665657a31d7f907fc6142523de5d0e7a5bb5f21';
+
+final class MangaSearchFamily extends Family {
+  const MangaSearchFamily._()
+      : super(
+          retry: null,
+          name: r'mangaSearchProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  MangaSearchProvider call(
+    MangaSearchParameters params,
+  ) =>
+      MangaSearchProvider._(argument: params, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaSearchHash();
+
+  @override
+  String toString() => r'mangaSearchProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    MangaSearch Function(
+      MangaSearchParameters args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaSearchProvider;
+
+        final argument = provider.argument as MangaSearchParameters;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<Manga>> Function(Ref<AsyncValue<List<Manga>>> ref,
+            MangaSearch notifier, MangaSearchParameters argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as MangaSearchProvider;
+
+        final argument = provider.argument as MangaSearchParameters;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+abstract class _$MangaSearch extends $AsyncNotifier<List<Manga>> {
+  late final _$args = ref.$arg as MangaSearchParameters;
+  MangaSearchParameters get params => _$args;
 
   FutureOr<List<Manga>> build(
     MangaSearchParameters params,
   );
+  @$internal
+  @override
+  FutureOr<List<Manga>> runBuild() => build(
+        _$args,
+      );
 }
 
-/// See also [MangaSearch].
-@ProviderFor(MangaSearch)
-const mangaSearchProvider = MangaSearchFamily();
+@ProviderFor(Statistics)
+const statisticsProvider = StatisticsProvider._();
 
-/// See also [MangaSearch].
-class MangaSearchFamily extends Family<AsyncValue<List<Manga>>> {
-  /// See also [MangaSearch].
-  const MangaSearchFamily();
-
-  /// See also [MangaSearch].
-  MangaSearchProvider call(
-    MangaSearchParameters params,
-  ) {
-    return MangaSearchProvider(
-      params,
-    );
-  }
-
-  @override
-  MangaSearchProvider getProviderOverride(
-    covariant MangaSearchProvider provider,
-  ) {
-    return call(
-      provider.params,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'mangaSearchProvider';
-}
-
-/// See also [MangaSearch].
-class MangaSearchProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<MangaSearch, List<Manga>> {
-  /// See also [MangaSearch].
-  MangaSearchProvider(
-    this.params,
-  ) : super.internal(
-          () => MangaSearch()..params = params,
-          from: mangaSearchProvider,
-          name: r'mangaSearchProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$mangaSearchHash,
-          dependencies: MangaSearchFamily._dependencies,
-          allTransitiveDependencies:
-              MangaSearchFamily._allTransitiveDependencies,
+final class StatisticsProvider
+    extends $AsyncNotifierProvider<Statistics, Map<String, MangaStatistics>> {
+  const StatisticsProvider._(
+      {super.runNotifierBuildOverride, Statistics Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'statisticsProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final MangaSearchParameters params;
+  final Statistics Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$statisticsHash();
+
+  @$internal
+  @override
+  Statistics create() => _createCb?.call() ?? Statistics();
+
+  @$internal
+  @override
+  StatisticsProvider $copyWithCreate(
+    Statistics Function() create,
+  ) {
+    return StatisticsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  StatisticsProvider $copyWithBuild(
+    FutureOr<Map<String, MangaStatistics>> Function(
+      Ref<AsyncValue<Map<String, MangaStatistics>>>,
+      Statistics,
+    ) build,
+  ) {
+    return StatisticsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<Statistics, Map<String, MangaStatistics>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$statisticsHash() => r'88e01c08880b752299a19619540057b3dffabc17';
+
+abstract class _$Statistics
+    extends $AsyncNotifier<Map<String, MangaStatistics>> {
+  FutureOr<Map<String, MangaStatistics>> build();
+  @$internal
+  @override
+  FutureOr<Map<String, MangaStatistics>> runBuild() => build();
+}
+
+@ProviderFor(ChapterStats)
+const chapterStatsProvider = ChapterStatsProvider._();
+
+final class ChapterStatsProvider extends $AsyncNotifierProvider<ChapterStats,
+    Map<String, ChapterStatistics>> {
+  const ChapterStatsProvider._(
+      {super.runNotifierBuildOverride, ChapterStats Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'chapterStatsProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final ChapterStats Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$chapterStatsHash();
+
+  @$internal
+  @override
+  ChapterStats create() => _createCb?.call() ?? ChapterStats();
+
+  @$internal
+  @override
+  ChapterStatsProvider $copyWithCreate(
+    ChapterStats Function() create,
+  ) {
+    return ChapterStatsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  ChapterStatsProvider $copyWithBuild(
+    FutureOr<Map<String, ChapterStatistics>> Function(
+      Ref<AsyncValue<Map<String, ChapterStatistics>>>,
+      ChapterStats,
+    ) build,
+  ) {
+    return ChapterStatsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<ChapterStats, Map<String, ChapterStatistics>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$chapterStatsHash() => r'5feda95580c7bcd820271f414a9d27adeeff85fc';
+
+abstract class _$ChapterStats
+    extends $AsyncNotifier<Map<String, ChapterStatistics>> {
+  FutureOr<Map<String, ChapterStatistics>> build();
+  @$internal
+  @override
+  FutureOr<Map<String, ChapterStatistics>> runBuild() => build();
+}
+
+@ProviderFor(Ratings)
+const ratingsProvider = RatingsProvider._();
+
+final class RatingsProvider
+    extends $AsyncNotifierProvider<Ratings, Map<String, SelfRating>> {
+  const RatingsProvider._(
+      {super.runNotifierBuildOverride, Ratings Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'ratingsProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final Ratings Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$ratingsHash();
+
+  @$internal
+  @override
+  Ratings create() => _createCb?.call() ?? Ratings();
+
+  @$internal
+  @override
+  RatingsProvider $copyWithCreate(
+    Ratings Function() create,
+  ) {
+    return RatingsProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  RatingsProvider $copyWithBuild(
+    FutureOr<Map<String, SelfRating>> Function(
+      Ref<AsyncValue<Map<String, SelfRating>>>,
+      Ratings,
+    ) build,
+  ) {
+    return RatingsProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<Ratings, Map<String, SelfRating>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$ratingsHash() => r'a36bf273c0f57b64c9ace138fc690d57ce6ed5dd';
+
+abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
+  FutureOr<Map<String, SelfRating>> build();
+  @$internal
+  @override
+  FutureOr<Map<String, SelfRating>> runBuild() => build();
+}
+
+@ProviderFor(ReadingStatus)
+const readingStatusProvider = ReadingStatusFamily._();
+
+final class ReadingStatusProvider
+    extends $AsyncNotifierProvider<ReadingStatus, MangaReadingStatus?> {
+  const ReadingStatusProvider._(
+      {required ReadingStatusFamily super.from,
+      required Manga super.argument,
+      super.runNotifierBuildOverride,
+      ReadingStatus Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'readingStatusProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final ReadingStatus Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$readingStatusHash();
+
+  @override
+  String toString() {
+    return r'readingStatusProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  ReadingStatus create() => _createCb?.call() ?? ReadingStatus();
+
+  @$internal
+  @override
+  ReadingStatusProvider $copyWithCreate(
+    ReadingStatus Function() create,
+  ) {
+    return ReadingStatusProvider._(
+        argument: argument as Manga,
+        from: from! as ReadingStatusFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  ReadingStatusProvider $copyWithBuild(
+    FutureOr<MangaReadingStatus?> Function(
+      Ref<AsyncValue<MangaReadingStatus?>>,
+      ReadingStatus,
+    ) build,
+  ) {
+    return ReadingStatusProvider._(
+        argument: argument as Manga,
+        from: from! as ReadingStatusFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is MangaSearchProvider && other.params == params;
+    return other is ReadingStatusProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, params.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
+}
+
+String _$readingStatusHash() => r'd2a8a5435a9d4e8818ebf814652f65efed49bf3d';
+
+final class ReadingStatusFamily extends Family {
+  const ReadingStatusFamily._()
+      : super(
+          retry: null,
+          name: r'readingStatusProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  ReadingStatusProvider call(
+    Manga manga,
+  ) =>
+      ReadingStatusProvider._(argument: manga, from: this);
 
   @override
-  FutureOr<List<Manga>> runNotifierBuild(
-    covariant MangaSearch notifier,
+  String debugGetCreateSourceHash() => _$readingStatusHash();
+
+  @override
+  String toString() => r'readingStatusProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    ReadingStatus Function(
+      Manga args,
+    ) create,
   ) {
-    return notifier.build(
-      params,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as ReadingStatusProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<MangaReadingStatus?> Function(
+            Ref<AsyncValue<MangaReadingStatus?>> ref,
+            ReadingStatus notifier,
+            Manga argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as ReadingStatusProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
 }
 
-String _$statisticsHash() => r'847be5129b04dafb2f25ea8cb8fc3a846342e358';
-
-/// See also [Statistics].
-@ProviderFor(Statistics)
-final statisticsProvider =
-    AsyncNotifierProvider<Statistics, Map<String, MangaStatistics>>.internal(
-  Statistics.new,
-  name: r'statisticsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$statisticsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$Statistics = AsyncNotifier<Map<String, MangaStatistics>>;
-String _$ratingsHash() => r'd5689480a48de244cd7961f14e225e23811e08b9';
-
-/// See also [Ratings].
-@ProviderFor(Ratings)
-final ratingsProvider =
-    AsyncNotifierProvider<Ratings, Map<String, SelfRating>>.internal(
-  Ratings.new,
-  name: r'ratingsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$ratingsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$Ratings = AsyncNotifier<Map<String, SelfRating>>;
-String _$readingStatusHash() => r'910a1148a373a364b8246af6f85d7a2f525d0bd9';
-
-abstract class _$ReadingStatus
-    extends BuildlessAsyncNotifier<MangaReadingStatus?> {
-  late final Manga manga;
+abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
 
   FutureOr<MangaReadingStatus?> build(
     Manga manga,
   );
+  @$internal
+  @override
+  FutureOr<MangaReadingStatus?> runBuild() => build(
+        _$args,
+      );
 }
 
-/// See also [ReadingStatus].
-@ProviderFor(ReadingStatus)
-const readingStatusProvider = ReadingStatusFamily();
+@ProviderFor(FollowingStatus)
+const followingStatusProvider = FollowingStatusFamily._();
 
-/// See also [ReadingStatus].
-class ReadingStatusFamily extends Family<AsyncValue<MangaReadingStatus?>> {
-  /// See also [ReadingStatus].
-  const ReadingStatusFamily();
-
-  /// See also [ReadingStatus].
-  ReadingStatusProvider call(
-    Manga manga,
-  ) {
-    return ReadingStatusProvider(
-      manga,
-    );
-  }
-
-  @override
-  ReadingStatusProvider getProviderOverride(
-    covariant ReadingStatusProvider provider,
-  ) {
-    return call(
-      provider.manga,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'readingStatusProvider';
-}
-
-/// See also [ReadingStatus].
-class ReadingStatusProvider
-    extends AsyncNotifierProviderImpl<ReadingStatus, MangaReadingStatus?> {
-  /// See also [ReadingStatus].
-  ReadingStatusProvider(
-    this.manga,
-  ) : super.internal(
-          () => ReadingStatus()..manga = manga,
-          from: readingStatusProvider,
-          name: r'readingStatusProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$readingStatusHash,
-          dependencies: ReadingStatusFamily._dependencies,
-          allTransitiveDependencies:
-              ReadingStatusFamily._allTransitiveDependencies,
+final class FollowingStatusProvider
+    extends $AsyncNotifierProvider<FollowingStatus, bool> {
+  const FollowingStatusProvider._(
+      {required FollowingStatusFamily super.from,
+      required Manga super.argument,
+      super.runNotifierBuildOverride,
+      FollowingStatus Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'followingStatusProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final Manga manga;
+  final FollowingStatus Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$followingStatusHash();
+
+  @override
+  String toString() {
+    return r'followingStatusProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  FollowingStatus create() => _createCb?.call() ?? FollowingStatus();
+
+  @$internal
+  @override
+  FollowingStatusProvider $copyWithCreate(
+    FollowingStatus Function() create,
+  ) {
+    return FollowingStatusProvider._(
+        argument: argument as Manga,
+        from: from! as FollowingStatusFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  FollowingStatusProvider $copyWithBuild(
+    FutureOr<bool> Function(
+      Ref<AsyncValue<bool>>,
+      FollowingStatus,
+    ) build,
+  ) {
+    return FollowingStatusProvider._(
+        argument: argument as Manga,
+        from: from! as FollowingStatusFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<FollowingStatus, bool> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
-    return other is ReadingStatusProvider && other.manga == manga;
+    return other is FollowingStatusProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, manga.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
+}
+
+String _$followingStatusHash() => r'a6108611a7a36518f2eef9b81a8861fdab800e2e';
+
+final class FollowingStatusFamily extends Family {
+  const FollowingStatusFamily._()
+      : super(
+          retry: null,
+          name: r'followingStatusProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  FollowingStatusProvider call(
+    Manga manga,
+  ) =>
+      FollowingStatusProvider._(argument: manga, from: this);
 
   @override
-  FutureOr<MangaReadingStatus?> runNotifierBuild(
-    covariant ReadingStatus notifier,
+  String debugGetCreateSourceHash() => _$followingStatusHash();
+
+  @override
+  String toString() => r'followingStatusProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FollowingStatus Function(
+      Manga args,
+    ) create,
   ) {
-    return notifier.build(
-      manga,
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as FollowingStatusProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<bool> Function(
+            Ref<AsyncValue<bool>> ref, FollowingStatus notifier, Manga argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as FollowingStatusProvider;
+
+        final argument = provider.argument as Manga;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
     );
   }
 }
 
-String _$followingStatusHash() => r'fb96192a8468fb7dacb102b3b253c4235cd4c1cc';
-
-abstract class _$FollowingStatus extends BuildlessAsyncNotifier<bool> {
-  late final Manga manga;
+abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
 
   FutureOr<bool> build(
     Manga manga,
   );
+  @$internal
+  @override
+  FutureOr<bool> runBuild() => build(
+        _$args,
+      );
 }
 
-/// See also [FollowingStatus].
-@ProviderFor(FollowingStatus)
-const followingStatusProvider = FollowingStatusFamily();
+@ProviderFor(MangaDexHistory)
+const mangaDexHistoryProvider = MangaDexHistoryProvider._();
 
-/// See also [FollowingStatus].
-class FollowingStatusFamily extends Family<AsyncValue<bool>> {
-  /// See also [FollowingStatus].
-  const FollowingStatusFamily();
-
-  /// See also [FollowingStatus].
-  FollowingStatusProvider call(
-    Manga manga,
-  ) {
-    return FollowingStatusProvider(
-      manga,
-    );
-  }
-
-  @override
-  FollowingStatusProvider getProviderOverride(
-    covariant FollowingStatusProvider provider,
-  ) {
-    return call(
-      provider.manga,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'followingStatusProvider';
-}
-
-/// See also [FollowingStatus].
-class FollowingStatusProvider
-    extends AsyncNotifierProviderImpl<FollowingStatus, bool> {
-  /// See also [FollowingStatus].
-  FollowingStatusProvider(
-    this.manga,
-  ) : super.internal(
-          () => FollowingStatus()..manga = manga,
-          from: followingStatusProvider,
-          name: r'followingStatusProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$followingStatusHash,
-          dependencies: FollowingStatusFamily._dependencies,
-          allTransitiveDependencies:
-              FollowingStatusFamily._allTransitiveDependencies,
+final class MangaDexHistoryProvider
+    extends $AsyncNotifierProvider<MangaDexHistory, Queue<Chapter>> {
+  const MangaDexHistoryProvider._(
+      {super.runNotifierBuildOverride, MangaDexHistory Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'mangaDexHistoryProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
         );
 
-  final Manga manga;
+  final MangaDexHistory Function()? _createCb;
 
   @override
-  bool operator ==(Object other) {
-    return other is FollowingStatusProvider && other.manga == manga;
-  }
+  String debugGetCreateSourceHash() => _$mangaDexHistoryHash();
 
+  @$internal
   @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, manga.hashCode);
+  MangaDexHistory create() => _createCb?.call() ?? MangaDexHistory();
 
-    return _SystemHash.finish(hash);
-  }
-
+  @$internal
   @override
-  FutureOr<bool> runNotifierBuild(
-    covariant FollowingStatus notifier,
+  MangaDexHistoryProvider $copyWithCreate(
+    MangaDexHistory Function() create,
   ) {
-    return notifier.build(
-      manga,
-    );
+    return MangaDexHistoryProvider._(create: create);
   }
+
+  @$internal
+  @override
+  MangaDexHistoryProvider $copyWithBuild(
+    FutureOr<Queue<Chapter>> Function(
+      Ref<AsyncValue<Queue<Chapter>>>,
+      MangaDexHistory,
+    ) build,
+  ) {
+    return MangaDexHistoryProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<MangaDexHistory, Queue<Chapter>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$mangaDexHistoryHash() => r'364392a2ac6c30f242510afe9ea65e021c131e43';
+String _$mangaDexHistoryHash() => r'9247a4447ae06ae9da1a0b34220597f9a6c2119a';
 
-/// See also [MangaDexHistory].
-@ProviderFor(MangaDexHistory)
-final mangaDexHistoryProvider =
-    AsyncNotifierProvider<MangaDexHistory, Queue<Chapter>>.internal(
-  MangaDexHistory.new,
-  name: r'mangaDexHistoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$mangaDexHistoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
+  FutureOr<Queue<Chapter>> build();
+  @$internal
+  @override
+  FutureOr<Queue<Chapter>> runBuild() => build();
+}
 
-typedef _$MangaDexHistory = AsyncNotifier<Queue<Chapter>>;
-String _$authControlHash() => r'f25650165fcc9db88651cdc07f10b82d4d315cce';
+@ProviderFor(LoggedUser)
+const loggedUserProvider = LoggedUserProvider._();
 
-/// See also [AuthControl].
+final class LoggedUserProvider
+    extends $AsyncNotifierProvider<LoggedUser, User?> {
+  const LoggedUserProvider._(
+      {super.runNotifierBuildOverride, LoggedUser Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'loggedUserProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final LoggedUser Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$loggedUserHash();
+
+  @$internal
+  @override
+  LoggedUser create() => _createCb?.call() ?? LoggedUser();
+
+  @$internal
+  @override
+  LoggedUserProvider $copyWithCreate(
+    LoggedUser Function() create,
+  ) {
+    return LoggedUserProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  LoggedUserProvider $copyWithBuild(
+    FutureOr<User?> Function(
+      Ref<AsyncValue<User?>>,
+      LoggedUser,
+    ) build,
+  ) {
+    return LoggedUserProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<LoggedUser, User?> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$loggedUserHash() => r'57b59b906ca3803768fb2dd9e231239755558a97';
+
+abstract class _$LoggedUser extends $AsyncNotifier<User?> {
+  FutureOr<User?> build();
+  @$internal
+  @override
+  FutureOr<User?> runBuild() => build();
+}
+
 @ProviderFor(AuthControl)
-final authControlProvider =
-    AutoDisposeAsyncNotifierProvider<AuthControl, bool>.internal(
-  AuthControl.new,
-  name: r'authControlProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$authControlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const authControlProvider = AuthControlProvider._();
 
-typedef _$AuthControl = AutoDisposeAsyncNotifier<bool>;
+final class AuthControlProvider
+    extends $AsyncNotifierProvider<AuthControl, bool> {
+  const AuthControlProvider._(
+      {super.runNotifierBuildOverride, AuthControl Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'authControlProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final AuthControl Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$authControlHash();
+
+  @$internal
+  @override
+  AuthControl create() => _createCb?.call() ?? AuthControl();
+
+  @$internal
+  @override
+  AuthControlProvider $copyWithCreate(
+    AuthControl Function() create,
+  ) {
+    return AuthControlProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  AuthControlProvider $copyWithBuild(
+    FutureOr<bool> Function(
+      Ref<AsyncValue<bool>>,
+      AuthControl,
+    ) build,
+  ) {
+    return AuthControlProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<AuthControl, bool> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
+}
+
+String _$authControlHash() => r'15553d6b37c81a84a64601e9f345254049a7a952';
+
+abstract class _$AuthControl extends $AsyncNotifier<bool> {
+  FutureOr<bool> build();
+  @$internal
+  @override
+  FutureOr<bool> runBuild() => build();
+}
+
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

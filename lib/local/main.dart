@@ -8,14 +8,10 @@ import 'package:gagaku/local/directory_reader.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-enum LocalLibraryAction { open, settings }
-
-class LocalLibraryHome extends HookConsumerWidget {
+class LocalLibraryHome extends StatelessWidget {
   const LocalLibraryHome({super.key});
 
   Future<PlatformFile?> _pickMangaArchive() async {
@@ -35,55 +31,47 @@ class LocalLibraryHome extends HookConsumerWidget {
     PlatformFile? result = await _pickMangaArchive();
 
     if (result != null) {
-      navigator
-          .push(createArchiveReaderRoute(result.path!, title: result.name));
+      navigator.push(ArchiveReaderRouteBuilder(path: result.path!, title: result.name));
     }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final nav = Navigator.of(context);
-    final settings = ref.watch(localConfigProvider);
-    final result = ref.watch(localLibraryProvider);
     final theme = Theme.of(context);
-    final currentItem = useState<LocalLibraryItem?>(null);
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace:
-            Styles.titleFlexBar(context: context, title: 'Local Library'),
+        flexibleSpace: const TitleFlexBar(title: 'Local Library'),
         actions: [
-          ButtonBar(
+          OverflowBar(
+            spacing: 8.0,
             children: [
-              PopupMenuButton<LocalLibraryAction>(
-                icon: const Icon(Icons.more_vert),
-                onSelected: (LocalLibraryAction result) async {
-                  switch (result) {
-                    case LocalLibraryAction.open:
+              MenuAnchor(
+                builder: (context, controller, child) => IconButton(
+                  onPressed: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  icon: const Icon(Icons.more_vert),
+                ),
+                menuChildren: [
+                  MenuItemButton(
+                    onPressed: () async {
                       await _readArchive(nav);
-                      break;
-                    case LocalLibraryAction.settings:
-                      nav.push(createLocalLibrarySettingsRoute());
-                      break;
-                    default:
-                      break;
-                  }
-                },
-                itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<LocalLibraryAction>>[
-                  const PopupMenuItem<LocalLibraryAction>(
-                    value: LocalLibraryAction.open,
-                    child: ListTile(
-                      leading: Icon(Icons.folder_open),
-                      title: Text('Read Archive'),
-                    ),
+                    },
+                    leadingIcon: const Icon(Icons.folder_open),
+                    child: const Text('Read Archive'),
                   ),
-                  const PopupMenuItem<LocalLibraryAction>(
-                    value: LocalLibraryAction.settings,
-                    child: ListTile(
-                      leading: Icon(Icons.settings),
-                      title: Text('Settings'),
-                    ),
+                  MenuItemButton(
+                    onPressed: () {
+                      nav.push(LocalLibrarySettingsRouteBuilder());
+                    },
+                    leadingIcon: const Icon(Icons.settings),
+                    child: const Text('Settings'),
                   ),
                 ],
               ),
@@ -92,20 +80,48 @@ class LocalLibraryHome extends HookConsumerWidget {
         ],
       ),
       drawer: const MainDrawer(),
-      body: () {
-        if (DeviceContext.isMobile() || settings.libraryDirectory.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (DeviceContext.isDesktop()) ...[
+      body: HookConsumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+          final settings = ref.watch(localConfigProvider);
+          final libraryProvider = ref.watch(localLibraryProvider);
+          final sort = ref.watch(librarySortTypeProvider);
+          final currentItem = useState<LocalLibraryItem?>(libraryProvider.value);
+
+          useEffect(() {
+            final newVal = libraryProvider.value;
+            if (currentItem.value != null && newVal != null) {
+              final result = findLibraryItem(currentItem.value!, newVal, sort);
+
+              if (result != null) {
+                currentItem.value = result;
+              } else {
+                currentItem.value = newVal;
+              }
+            }
+
+            currentItem.value ??= newVal;
+            return null;
+          }, [libraryProvider]);
+
+          useEffect(() {
+            if (currentItem.value != null && currentItem.value?.sort != null && currentItem.value?.sort != sort) {
+              currentItem.value?.setSortType(sort);
+            }
+            return null;
+          }, [currentItem.value, sort]);
+
+          if (settings.libraryDirectory.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   const Text('No library directory set!'),
                   const SizedBox(
                     height: 10,
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      nav.push(createLocalLibrarySettingsRoute());
+                      nav.push(LocalLibrarySettingsRouteBuilder());
                     },
                     icon: const Icon(Icons.library_add),
                     label: const Text('Set Library Directory'),
@@ -117,107 +133,116 @@ class LocalLibraryHome extends HookConsumerWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                ],
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await _readArchive(nav);
-                  },
-                  icon: const Icon(Icons.folder_open),
-                  label: const Text('Read Archive'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        switch (result) {
-          case AsyncData(:final value):
-            currentItem.value ??= value;
-            Widget child;
-
-            if (value.children.isEmpty) {
-              child = Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Library is empty!'),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        await _readArchive(nav);
-                      },
-                      icon: const Icon(Icons.folder_open),
-                      label: const Text('Read Archive'),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              child = LibraryListWidget(
-                title: Text(
-                  currentItem.value!.path,
-                  style: const TextStyle(fontSize: 24),
-                ),
-                item: currentItem.value!,
-                onTap: (item) {
-                  if (item.isReadable) {
-                    if (item.isDirectory) {
-                      nav.push(createDirectoryReaderRoute(item.path,
-                          title: item.name ?? item.path));
-                    } else {
-                      nav.push(createArchiveReaderRoute(item.path,
-                          title: item.name ?? item.path));
-                    }
-                  } else {
-                    currentItem.value = item;
-                  }
-                },
-              );
-            }
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                return await ref.refresh(localLibraryProvider.future);
-              },
-              child: child,
-            );
-          case AsyncError(:final error, :final stackTrace):
-            final messenger = ScaffoldMessenger.of(context);
-            Styles.showErrorSnackBar(messenger, '$error');
-            logger.e("localLibraryProvider failed",
-                error: error, stackTrace: stackTrace);
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                return await ref.refresh(localLibraryProvider.future);
-              },
-              child: Styles.errorList(error, stackTrace),
-            );
-          case _:
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Scanning library...",
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18,
-                      decoration: TextDecoration.none,
-                    ),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await _readArchive(nav);
+                    },
+                    icon: const Icon(Icons.folder_open),
+                    label: const Text('Read Archive'),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const CircularProgressIndicator()
                 ],
               ),
             );
-        }
-      }(),
+          }
+
+          switch (libraryProvider) {
+            case AsyncValue(value: final top?):
+              Widget child;
+
+              if (top.error != null) {
+                child = Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(top.error!),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await _readArchive(nav);
+                        },
+                        icon: const Icon(Icons.folder_open),
+                        label: const Text('Read Archive'),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (currentItem.value != null) {
+                child = LibraryListWidget(
+                  title: Text(
+                    currentItem.value!.path,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  item: currentItem.value!,
+                  onTap: (item) {
+                    if (item.isReadable) {
+                      switch (item.type) {
+                        case LibraryItemType.directory:
+                          nav.push(DirectoryReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
+                          break;
+                        case LibraryItemType.archive:
+                          nav.push(ArchiveReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
+                          break;
+                        default:
+                          break;
+                      }
+                    } else {
+                      currentItem.value = item;
+                    }
+                  },
+                );
+              } else {
+                return const ListSpinner();
+              }
+
+              return RefreshIndicator(
+                onRefresh: () async => ref.refresh(localLibraryProvider.future),
+                child: child,
+              );
+            case AsyncValue(:final error?, :final stackTrace?):
+              return RefreshIndicator(
+                onRefresh: () async => ref.refresh(localLibraryProvider.future),
+                child: ErrorList(
+                  error: error,
+                  stackTrace: stackTrace,
+                  message: "localLibraryProvider failed",
+                ),
+              );
+            case AsyncValue(:final progress):
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Scanning library...",
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 18,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CircularProgressIndicator(value: progress?.toDouble()),
+                    if (progress != null)
+                      Text(
+                        '${(progress * 100).floor()}%',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 18,
+                          decoration: TextDecoration.none,
+                        ),
+                      )
+                  ],
+                ),
+              );
+          }
+        },
+      ),
     );
   }
 }

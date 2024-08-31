@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
+import 'package:gagaku/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/mangadex/cache.dart';
@@ -12,9 +12,10 @@ import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/legacy.dart';
 import 'package:mutex/mutex.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:openid_client/openid_client.dart';
+import 'package:openid_client/openid_client_io.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,18 +24,15 @@ part 'model.g.dart';
 abstract class MangaDexEndpoints {
   static final api = Uri.https('api.mangadex.org', '');
 
-  static const apiQueryLimit = 50;
-  static const apiSearchLimit = 10;
+  static const breakLimit = 50;
+  static const searchLimit = 32;
+  static const chapterLimit = 100;
 
-  // For future OAuth
-  static final provider =
-      Uri.parse('https://auth.mangadex.org/realms/mangadex');
-  static const login = '/auth/login';
-  static const logout = '/auth/logout';
-  static const refresh = '/auth/refresh';
+  // OAuth provider
+  static final provider = Uri.parse('https://auth.mangadex.org/realms/mangadex');
 
   /// App Client ID
-  /// TODO change this when client ID reg becomes available
+  /// TODO change this when public clients become available
   static const clientId = 'thirdparty-oauth-client';
 
   /// User chapter feed. Returns [Chapter]s
@@ -76,6 +74,9 @@ abstract class MangaDexEndpoints {
   /// Gets statistics for given manga
   static const statistics = '/statistics/manga';
 
+  /// Gets statistics for given chapter
+  static const chapterStats = '/statistics/chapter';
+
   /// Gets self-ratings for given mangas
   static const getRating = '/rating';
 
@@ -90,13 +91,39 @@ abstract class MangaDexEndpoints {
 
   /// Gets author/creator info
   static const creator = '/author';
+
+  /// Gets logged user [CustomList] list
+  static const userList = '/user/list';
+
+  /// Adds/removes manga to/from CustomList
+  static const updateMangaInList = '/manga/{id}/list/{listId}';
+
+  /// Create list
+  static const createList = '/list';
+
+  /// Get/update/delete CustomList
+  static const modifyList = '/list/{id}';
+
+  /// [CustomList] manga feed
+  static const listFeed = '/list/{id}/feed';
+
+  /// Get logged User followed [CustomList] list
+  static const followedList = '/user/follows/list';
+
+  /// Follow/unfollow CustomList
+  static const followList = '/list/{id}/follow';
+
+  /// Logged in user details
+  static const me = '/user/me';
 }
 
 abstract class CacheLists {
-  static const latestChapters = 'latestChapters';
-  static const latestGlobalChapters = 'latestGlobalChapters';
   static const library = 'userLibrary';
   static const tags = 'tags';
+}
+
+extension TokenHelper on TokenResponse {
+  bool get isValid => accessToken != null && refreshToken != null;
 }
 
 @Riverpod(keepAlive: true)
@@ -111,10 +138,10 @@ class MangaDexModel {
   }
 
   final Ref ref;
-  //TokenResponse? _token;
-  OldToken? _token;
+  TokenResponse? _token;
+  Credential? _credential;
   final _tokenMutex = ReadWriteMutex();
-  http.Client _client = RateLimitedClient();
+  http.Client _client = RateLimitedClient(useCustomUA: true);
   late Future _future;
   Future get future => _future;
 
@@ -129,19 +156,13 @@ class MangaDexModel {
   //   }
   // }
 
-  // bool _tokenExpired(TokenResponse token) {
-  //   return token.expiresAt != null
-  //       ? (DateTime.now().difference(token.expiresAt!).inMinutes > -5)
-  //       : false;
-  // }
-
   Future<Duration?> timeUntilTokenExpiry() async {
     return await _tokenMutex.protectRead(() async {
       if (_token == null) {
         return null;
       }
 
-      return _token!.timeUntilExpiry;
+      return _token!.expiresIn;
     });
   }
 
@@ -151,199 +172,134 @@ class MangaDexModel {
         return false;
       }
 
-      return _token!.isExpired();
+      return _token!.expiresIn!.inSeconds <= 0;
     });
   }
 
   Future<bool> loggedIn() async {
     return await _tokenMutex.protectRead(() async {
-      return (_token != null && _client is AuthenticatedClient);
+      return (_token != null && _credential != null && _token!.isValid);
     });
   }
 
-  // Future<void> refreshToken() async {
-  //   const storage = FlutterSecureStorage();
-  //   bool accessTokenSaved = await storage.read(key: 'accessToken') != null;
-
-  //   if (accessTokenSaved) {
-  //     final tt = await storage.read(key: 'tokenType');
-  //     final rt = await storage.read(key: 'refreshToken');
-  //     final it = await storage.read(key: 'idToken');
-
-  //     var issuer = await Issuer.discover(MangaDexEndpoints.provider);
-  //     var client = Client(issuer, MangaDexEndpoints.clientId);
-
-  //     var credential = client.createCredential(
-  //       accessToken: null, // force use refresh to get new token
-  //       tokenType: tt,
-  //       refreshToken: rt,
-  //       idToken: it,
-  //     );
-
-  //     credential.validateToken(validateClaims: true, validateExpiry: true);
-
-  //     try {
-  //       final token = await credential.getTokenResponse();
-  //       _saveToken(token);
-
-  //       _token = token;
-  //       _client = credential.createHttpClient();
-  //     } catch (e) {
-  //       print("Error during token refresh: ${e.toString()}");
-  //     }
-  //   }
-  // }
-
   Future<void> refreshToken() async {
-    await _tokenMutex.protectWrite(() async {
+    return await _tokenMutex.protectWrite(() async {
       // Clear old data
       _token = null;
 
       final storage = Hive.box(gagakuBox);
-      String? strken = await storage.get('oldtoken') as String?;
+      bool accessTokenSaved = storage.get('accessToken') != null;
 
-      if (strken != null) {
-        final jstr = json.decode(strken);
-        OldToken token = OldToken.fromJson(jstr);
+      if (accessTokenSaved) {
+        final tt = storage.get('tokenType') as String;
+        final rt = storage.get('refreshToken') as String;
+        final it = storage.get('idToken') as String;
+        final clientId = storage.get('clientId') as String;
+        final clientSecret = storage.get('clientSecret') as String;
 
-        if (token.isValid) {
-          Map<String, String> payload = {'token': token.refresh};
+        final issuer =
+            _credential?.client.issuer ?? await Issuer.discover(MangaDexEndpoints.provider, httpClient: _client);
+        final client = _credential?.client ?? Client(issuer, clientId, clientSecret: clientSecret);
 
-          final response = await http.post(
-              MangaDexEndpoints.api.replace(path: MangaDexEndpoints.refresh),
-              headers: {'Content-Type': 'application/json'},
-              body: json.encode(payload));
+        final credential = _credential ??
+            client.createCredential(
+              accessToken: null, // force use refresh to get new token
+              tokenType: tt,
+              refreshToken: rt,
+              idToken: it,
+            );
 
-          if (response.statusCode == 200) {
-            Map<String, dynamic> body = json.decode(response.body);
+        try {
+          credential.validateToken(validateClaims: true, validateExpiry: true);
+          final token = await credential.getTokenResponse();
+          if (token.isValid) {
+            _saveToken(token);
 
-            if (body['result'] == 'ok') {
-              OldToken t = OldToken.fromJson(body['token']);
-
-              if (t.isValid) {
-                await _saveToken(t);
-                _token = t;
-                _client = AuthenticatedClient(RateLimitedClient(), t);
-                logger.i("refreshToken(): MangaDex token refreshed");
-                return;
-              }
-            }
+            _token = token;
+            _client = credential.createHttpClient(_client);
+            _credential = credential;
+            logger.i("refreshToken(): MangaDex token refreshed");
+            return;
           }
 
-          logger.w("refreshToken() returned code ${response.statusCode}",
-              error: response.body);
+          // If any steps fail, assign a default client
+          logger.w("refreshToken() returned error ${token['error']}", error: token.toString());
+          _client = RateLimitedClient(useCustomUA: true);
+        } catch (e) {
+          logger.w("refreshToken() error ${e.toString()}", error: e);
+          _client = RateLimitedClient(useCustomUA: true);
         }
       }
-
-      // If any steps fail, assign a default client
-      _client = RateLimitedClient();
     });
   }
 
-  // Future<void> authenticate() async {
-  //   var issuer = await Issuer.discover(MangaDexEndpoints.provider);
-  //   var client = Client(issuer, MangaDexEndpoints.clientId);
+  Future<void> authenticate(String user, String pass, String clientId, String clientSecret) async {
+    final issuer = await Issuer.discover(MangaDexEndpoints.provider, httpClient: _client);
 
-  //   var authenticator = Authenticator(
-  //     client,
-  //     scopes: ['openid', 'profile'],
-  //     //redirectUri: Uri.parse('https://localhost/'),
-  //     port: 3000,
-  //     urlLancher: _urlLauncher,
-  //   );
+    final client = Client(issuer, clientId, clientSecret: clientSecret);
 
-  //   var credential = await authenticator.authorize();
+    final flow = Flow.password(client);
 
-  //   if (Platform.isAndroid || Platform.isIOS) {
-  //     closeInAppWebView();
-  //   }
+    final credential = await flow.loginWithPassword(username: user, password: pass);
 
-  //   final token = await credential.getTokenResponse();
-  //   _saveToken(token);
+    final token = await credential.getTokenResponse();
 
-  //   _token = token;
-  //   _client = credential.createHttpClient();
-  // }
+    if (token.isValid) {
+      return await _tokenMutex.protectWrite(() async {
+        await _saveToken(token);
+        await _saveCredentials(user, clientId, clientSecret);
+        _token = token;
+        _client = credential.createHttpClient(_client);
+        _credential = credential;
 
-  Future<void> authenticate(String user, String pass) async {
-    Map<String, String> payload = {'username': user, 'password': pass};
-
-    final response = await http.post(
-        MangaDexEndpoints.api.replace(path: MangaDexEndpoints.login),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload));
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> body = jsonDecode(response.body);
-
-      if (body['result'] == 'ok') {
-        OldToken t = OldToken.fromJson(body['token']);
-
-        if (t.isValid) {
-          return await _tokenMutex.protectWrite(() async {
-            await _saveToken(t);
-            _token = t;
-            _client = AuthenticatedClient(RateLimitedClient(), t);
-
-            logger.i("authenticate(): MangaDex user logged in");
-          });
-        }
-      }
+        logger.i("authenticate(): MangaDex user logged in");
+      });
     }
 
-    logger.w("authenticate() returned code ${response.statusCode}",
-        error: response.body);
+    logger.w("authenticate() returned error ${token['error']}", error: token.toString());
   }
 
-  // Future<void> _saveToken(TokenResponse token) async {
-  //   final storage = Hive.box(gagakuBox);
-
-  //   await storage.put('accessToken', token.accessToken);
-  //   await storage.put('refreshToken', token.refreshToken);
-  //   await storage.put('tokenType', token.tokenType);
-  //   await storage.put(
-  //       'idToken', token.idToken.toCompactSerialization());
-  // }
-
-  Future<void> _saveToken(OldToken token) async {
+  Future<void> _saveCredentials(String username, String clientId, String clientSecret) async {
     final storage = Hive.box(gagakuBox);
-    await storage.put('oldtoken', json.encode(token.toJson()));
+
+    await storage.put('username', username);
+    await storage.put('clientId', clientId);
+    await storage.put('clientSecret', clientSecret);
   }
 
-  // Future<void> logout() async {
-  //   _token = null;
-  //   _client = null;
+  Future<void> _saveToken(TokenResponse token) async {
+    final storage = Hive.box(gagakuBox);
 
-  //   final storage = Hive.box(gagakuBox);
-  //   await storage.delete('accessToken');
-  //   await storage.delete('refreshToken');
-  //   await storage.delete('tokenType');
-  //   await storage.delete('idToken');
-  // }
+    await storage.put('accessToken', token.accessToken);
+    await storage.put('refreshToken', token.refreshToken);
+    await storage.put('tokenType', token.tokenType);
+    await storage.put('idToken', token.idToken.toCompactSerialization());
+  }
 
   Future<void> logout() async {
-    if (await loggedIn()) {
-      final response = await _client
-          .post(MangaDexEndpoints.api.replace(path: MangaDexEndpoints.logout));
+    if (await loggedIn() && _credential != null) {
+      final logoutUrl = _credential!.generateLogoutUrl();
+      if (logoutUrl != null) {
+        final response = await _client.post(logoutUrl);
 
-      if (response.statusCode == 200) {
-        Map<String, dynamic> body = jsonDecode(response.body);
-
-        if (body['result'] == 'ok') {
+        if (response.statusCode == 200) {
           return await _tokenMutex.protectWrite(() async {
             _token = null;
-            _client = RateLimitedClient();
+            _client = RateLimitedClient(useCustomUA: true);
+            _credential = null;
 
             final storage = Hive.box(gagakuBox);
-            await storage.delete('oldtoken');
+            await storage.delete('accessToken');
+            await storage.delete('refreshToken');
+            await storage.delete('tokenType');
+            await storage.delete('idToken');
 
             logger.i("logout(): MangaDex user logged out");
           });
         }
-      }
 
-      logger.w("logout() returned code ${response.statusCode}",
-          error: response.body);
+        logger.w("logout() returned code ${response.statusCode}", error: response.body);
+      }
     }
   }
 
@@ -351,145 +307,99 @@ class MangaDexModel {
   ///
   /// [item] - key of the item to be invalidated
   Future<void> invalidateCacheItem(String item) async {
-    if (await _cache.exists(item)) {
-      await _cache.remove(item);
-    }
+    logger.d("Invalidating cache item: $item");
+    await _cache.remove(item);
   }
 
   Future<void> invalidateAll(String startsWith) async {
     await _cache.invalidateAll(startsWith);
   }
 
-  /// Fetches the latest chapters feed of the MangaDex user
-  ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiQueryLimit] number of items.
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  ///
-  /// Do not use directly. The provider [latestChaptersFeedProvider] should be
-  /// used instead as it provides auto state management.
-  Future<Iterable<Chapter>> fetchUserFeed([int offset = 0]) async {
-    if (!await loggedIn()) {
-      throw Exception(
-          "fetchUserFeed() called on invalid token/login. Shouldn't ever get here");
+  Exception createException(String msg, http.Response response) {
+    if (response.statusCode == 503) {
+      msg = 'MangaDex is down for maintanence';
     }
 
-    final key = 'fetchUserFeed($offset)';
+    final message = "$msg\nServer returned ${response.statusCode}: ${response.reasonPhrase}";
 
-    if (await _cache.exists(key)) {
-      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
+    if (response.statusCode >= 500) {
+      logger.e(message);
+      return Exception(message);
     }
 
-    final settings = ref.read(mdConfigProvider);
-
-    // Download missing data
-    final queryParams = {
-      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
-      'offset': offset.toString(),
-      'translatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'includeFutureUpdates': '0',
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[publishAt]': 'desc',
-      'includes[]': ['scanlation_group', 'user']
-    };
-
-    if (settings.groupBlacklist.isNotEmpty) {
-      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
-    }
-
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.feed, queryParameters: queryParams);
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = ChapterList.fromJson(body);
-
-      // Cache the data and list
-      _cache.putSpecialList(key, result.data, resolve: true);
-
-      return result.data;
-    }
-
-    // Throw if failure
-    final msg = "fetchUserFeed() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    // MD API error
+    final body = json.decode(response.body);
+    final err = ErrorResponse.fromJson(body);
+    final ex = MangaDexException(msg, err.errors);
+    logger.e(msg, error: ex);
+    return ex;
   }
 
-  /// Fetches the chapter feed based on the given parameters
+  /// Fetches a generic [ChapterList] feed based on given parameters, respecting
+  /// user settings.
   ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiQueryLimit] number of items.
+  /// [path]      the path to the feed on the MangaDex API
+  /// [feedKey]   sets the key for caching purposes
+  /// [limit]     limits number of items per query
+  /// [offset]    denotes the nth item to start fetching from.
+  /// [entity]    a [MangaDexEntity] entity that the feed corresponds to
+  /// [orderKey]  order scheme
+  /// [order]     order direction
   ///
-  /// [offset] denotes the nth item to start fetching from.
-  ///
-  /// [group] specifies a specific scanlation group to retrieve the feed for.
-  /// Regular options apply.
-  ///
-  /// Do not use directly. The provider [latestGlobalFeedProvider] should be
-  /// used instead as it provides auto state management.
-  Future<Iterable<Chapter>> fetchChapterFeed(
-      {int offset = 0, Group? group}) async {
-    final settings = ref.read(mdConfigProvider);
-
-    final key = 'fetchChapterFeed(${group?.id},$offset)';
+  /// Use specific providers that determine the feed to fetch
+  Future<Iterable<Chapter>> fetchFeed({
+    required String path,
+    required String feedKey,
+    required int limit,
+    int offset = 0,
+    MangaDexEntity? entity,
+    String orderKey = 'publishAt',
+    String order = 'desc',
+    bool ignoreOriginalLanguage = false,
+  }) async {
+    final key = '$feedKey(${entity != null ? '${entity.id},' : ''}$offset,$orderKey,$order)';
 
     if (await _cache.exists(key)) {
-      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
+      return (await _cache.getSpecialList(key, Chapter.fromJson)).map((e) => e.get<Chapter>());
     }
+
+    final settings = ref.read(mdConfigProvider);
 
     // Download missing data
     final queryParams = {
-      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+      'limit': limit.toString(),
       'offset': offset.toString(),
-      'translatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
+      'translatedLanguage[]': settings.translatedLanguages.map(const LanguageConverter().toJson).toList(),
+      if (!ignoreOriginalLanguage)
+        'originalLanguage[]': settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[publishAt]': 'desc',
+      'order[$orderKey]': order,
       'includes[]': ['scanlation_group', 'user']
     };
 
-    if (group != null) {
-      queryParams['groups[]'] = group.id;
+    if (entity != null && entity is Group) {
+      queryParams['groups[]'] = entity.id;
     } else if (settings.groupBlacklist.isNotEmpty) {
       queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
     }
 
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.chapter, queryParameters: queryParams);
+    final uri = MangaDexEndpoints.api.replace(path: path, queryParameters: queryParams);
 
     final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = ChapterList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data and list
-      _cache.putSpecialList(key, result.data, resolve: true);
+      await _cache.putSpecialList(key, result.data, resolve: true);
 
-      return result.data;
+      return result.data.cast<Chapter>();
     }
 
     // Throw if failure
-    final msg =
-        "fetchChapterFeed() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    throw createException("$feedKey() failed.", response);
   }
 
   /// Fetches chapter data of the given chapter [uuids]
@@ -498,15 +408,13 @@ class MangaDexModel {
 
     final list = <Chapter>[];
 
-    final fetch =
-        (await uuids.whereAsync((id) async => !await _cache.exists(id)))
-            .toList();
+    final fetch = (await uuids.whereAsync((id) async => !await _cache.exists(id))).toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
 
       var queryParams = {
-        'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+        'limit': MangaDexEndpoints.breakLimit.toString(),
         'includeFutureUpdates': '0',
         //'order[publishAt]': 'desc',
         'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
@@ -515,28 +423,23 @@ class MangaDexModel {
 
       while (end < fetch.length) {
         start = end;
-        end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
+        end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
         queryParams['ids[]'] = fetch.getRange(start, end);
 
-        final uri = MangaDexEndpoints.api.replace(
-            path: MangaDexEndpoints.chapter, queryParameters: queryParams);
+        final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.chapter, queryParameters: queryParams);
 
         final response = await _client.get(uri);
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
-
-          final result = ChapterList.fromJson(body);
+          final result = MDEntityList.fromJson(body);
 
           // Cache the data
-          _cache.putAllAPIResolved(result.data);
+          await _cache.putAllAPIResolved(result.data);
         } else {
           // Throw if failure
-          final msg =
-              "fetchChapters() failed. Response code: ${response.statusCode}";
-          logger.e(msg, error: response.body);
-          throw Exception(msg);
+          throw createException("fetchChapters() failed.", response);
         }
       }
     }
@@ -544,7 +447,7 @@ class MangaDexModel {
     // Craft the list
     for (final id in uuids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get<Chapter>(id, Chapter.fromJson));
+        list.add(_cache.get(id, Chapter.fromJson).get<Chapter>());
       }
     }
 
@@ -552,51 +455,54 @@ class MangaDexModel {
   }
 
   /// Fetches a list of manga data given the query parameters
-  Future<Iterable<Manga>> fetchManga(
-      {Iterable<String>? ids, MangaDexUUID? filterId, int offset = 0}) async {
+  Future<List<Manga>> fetchManga({
+    required int limit,
+    Iterable<String>? ids,
+    MangaDexUUID? filterId,
+    int offset = 0,
+    FilterOrder order = FilterOrder.latestUploadedChapter_desc,
+    Map<String, dynamic>? extraParams,
+  }) async {
     final settings = ref.read(mdConfigProvider);
 
-    final queryParams = {
-      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
-      'order[latestUploadedChapter]': 'desc',
+    var queryParams = <String, dynamic>{
+      'limit': limit.toString(),
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'includes[]': ['cover_art', 'author', 'artist']
     };
 
-    Set<Manga> list = <Manga>{};
+    queryParams.addEntries([order.json]);
+
+    if (extraParams != null) {
+      queryParams.addAll(extraParams);
+    }
 
     if (ids != null) {
-      final fetch =
-          (await ids.whereAsync((id) async => !await _cache.exists(id)))
-              .toList();
+      final list = <Manga>[];
+      final fetch = (await ids.whereAsync((id) async => !await _cache.exists(id))).toList();
 
       if (fetch.isNotEmpty) {
         int start = 0, end = 0;
 
         while (end < fetch.length) {
           start = end;
-          end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
+          end += min(fetch.length - start, limit);
 
           queryParams['ids[]'] = fetch.getRange(start, end);
 
-          final uri = MangaDexEndpoints.api.replace(
-              path: MangaDexEndpoints.manga, queryParameters: queryParams);
+          final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
           final response = await _client.get(uri);
 
           if (response.statusCode == 200) {
             final Map<String, dynamic> body = json.decode(response.body);
-
-            final mangalist = MangaList.fromJson(body);
+            final mangalist = MDEntityList.fromJson(body);
 
             // Cache the data
-            _cache.putAllAPIResolved(mangalist.data);
+            await _cache.putAllAPIResolved(mangalist.data);
           } else {
             // Throw if failure
-            final msg =
-                "fetchManga(ids) failed. Response code: ${response.statusCode}";
-            logger.e(msg, error: response.body);
-            throw Exception(msg);
+            throw createException("fetchManga(ids) failed.", response);
           }
         }
       }
@@ -604,12 +510,14 @@ class MangaDexModel {
       // Craft the list
       for (final id in ids) {
         if (await _cache.exists(id)) {
-          list.add(_cache.get<Manga>(id, Manga.fromJson));
+          list.add(_cache.get(id, Manga.fromJson).get<Manga>());
         }
       }
-    } else if (filterId != null) {
-      queryParams['offset'] = offset.toString();
 
+      return list;
+    }
+
+    if (filterId != null) {
       switch (filterId) {
         case Author(:final id) || Artist(:final id):
           queryParams['authorOrArtist'] = id;
@@ -618,59 +526,51 @@ class MangaDexModel {
           queryParams['group'] = id;
           break;
         default:
-          const msg = "fetchManga(filterId) failed. Invalid filter type.";
+          final msg = "fetchManga(filterId) failed. Invalid filter type ${filterId.runtimeType}.";
           logger.e(msg);
           throw Exception(msg);
       }
-
-      final uri = MangaDexEndpoints.api
-          .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
-
-      final response = await _client.get(uri);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
-
-        final mangalist = MangaList.fromJson(body);
-
-        // Cache the data
-        _cache.putAllAPIResolved(mangalist.data);
-
-        list.addAll(mangalist.data);
-      } else {
-        // Throw if failure
-        final msg =
-            "fetchManga(filterId) failed. Response code: ${response.statusCode}";
-        logger.e(msg, error: response.body);
-        throw Exception(msg);
-      }
     }
 
-    return list;
+    queryParams['offset'] = offset.toString();
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      final result = MDEntityList.fromJson(body);
+
+      // Cache the data
+      await _cache.putAllAPIResolved(result.data);
+
+      return result.data.cast<Manga>();
+    } else {
+      // Throw if failure
+      throw createException("fetchManga() failed.", response);
+    }
   }
 
   /// Searches for manga using the MangaDex API with the search term [searchTerm].
   ///
   /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiSearchLimit] number of items.
+  /// [limit] number of items.
   ///
   /// [offset] denotes the nth item to start fetching from.
   Future<List<Manga>> searchManga(
     String searchTerm, {
+    required int limit,
     required MangaFilters filter,
     int offset = 0,
   }) async {
     final settings = ref.read(mdConfigProvider);
 
     Map<String, dynamic> queryParams = {
-      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
+      'limit': limit.toString(),
       'offset': offset.toString(),
-      'availableTranslatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
+      'availableTranslatedLanguage[]': settings.translatedLanguages.map(const LanguageConverter().toJson).toList(),
+      'originalLanguage[]': settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'includes[]': ['cover_art', 'author', 'artist'],
     };
@@ -681,37 +581,31 @@ class MangaDexModel {
 
     queryParams.addAll(filter.getMap());
 
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.manga, queryParameters: queryParams);
 
     final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-
-      final mlist = MangaList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data
-      _cache.putAllAPIResolved(mlist.data);
+      await _cache.putAllAPIResolved(result.data);
 
-      return mlist.data;
+      return result.data.cast<Manga>();
     }
 
     // Throw if failure
-    final msg = "searchManga() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    throw createException("searchManga() failed.", response);
   }
 
   /// Gets whether or not the user is following [manga]
   Future<bool> getMangaFollowing(Manga manga) async {
     if (!await loggedIn()) {
-      throw Exception(
-          "getMangaFollowing() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("getMangaFollowing() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id));
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id));
 
     final response = await _client.get(uri);
 
@@ -724,8 +618,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "getMangaFollowing() failed. Response code: ${response.statusCode}";
+    final msg = "getMangaFollowing() failed. Response code: ${response.statusCode}";
     logger.e(msg, error: response.body);
     throw Exception(msg);
   }
@@ -733,12 +626,10 @@ class MangaDexModel {
   /// Sets the manga's following status [setFollow] of the [manga]
   Future<bool> setMangaFollowing(Manga manga, bool setFollow) async {
     if (!await loggedIn()) {
-      throw Exception(
-          "setMangaFollowing() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("setMangaFollowing() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.setFollow.replaceFirst('{id}', manga.id));
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.setFollow.replaceFirst('{id}', manga.id));
 
     http.Response response;
 
@@ -754,9 +645,7 @@ class MangaDexModel {
     }
 
     // Log the failure
-    logger.w(
-        "setMangaFollowing(${manga.id}, $setFollow) returned code ${response.statusCode}",
-        error: response.body);
+    logger.w("setMangaFollowing(${manga.id}, $setFollow) returned code ${response.statusCode}", error: response.body);
 
     return false;
   }
@@ -764,23 +653,21 @@ class MangaDexModel {
   /// Gets the user's reading status for [manga]
   Future<MangaReadingStatus?> getMangaReadingStatus(Manga manga) async {
     if (!await loggedIn()) {
-      throw Exception(
-          "getMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("getMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
     final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = json.decode(response.body);
+      final Map<String, dynamic> body = json.decode(response.body);
 
       if (body['result'] == 'ok') {
         MangaReadingStatus? status;
 
         if (body['status'] != null) {
-          status = MangaReadingStatusExt.parse(body['status']);
+          status = MangaReadingStatus.values.byName(body['status']);
         }
 
         return status;
@@ -790,32 +677,20 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "getMangaReadingStatus() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    throw createException("getMangaReadingStatus() failed.", response);
   }
 
   /// Sets the manga's reading status [status] of the [manga]
-  Future<bool> setMangaReadingStatus(
-      Manga manga, MangaReadingStatus? status) async {
+  Future<bool> setMangaReadingStatus(Manga manga, MangaReadingStatus? status) async {
     if (!await loggedIn()) {
-      throw Exception(
-          "setMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("setMangaReadingStatus() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final params = {
-      'status': (status != null && status != MangaReadingStatus.remove)
-          ? status.name
-          : null
-    };
+    final params = {'status': (status != null && status != MangaReadingStatus.remove) ? status.name : null};
 
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id));
 
-    final response = await _client.post(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(params));
+    final response = await _client.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(params));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> body = json.decode(response.body);
@@ -826,9 +701,7 @@ class MangaDexModel {
     }
 
     // Log the failure
-    logger.w(
-        "setMangaReadingStatus(${manga.id}, $status) returned code ${response.statusCode}",
-        error: response.body);
+    logger.w("setMangaReadingStatus(${manga.id}, $status) returned code ${response.statusCode}", error: response.body);
 
     return false;
   }
@@ -839,8 +712,7 @@ class MangaDexModel {
   /// state management.
   Future<ReadChaptersMap> fetchReadChapters(Iterable<Manga> mangas) async {
     if (!await loggedIn()) {
-      throw Exception(
-          "fetchReadChapters() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("fetchReadChapters() called on invalid token/login. Shouldn't ever get here");
     }
 
     final fetch = mangas.map((e) => e.id);
@@ -848,8 +720,7 @@ class MangaDexModel {
     if (fetch.isNotEmpty) {
       final queryParams = {'ids[]': fetch, 'grouped': 'true'};
 
-      final uri = MangaDexEndpoints.api.replace(
-          path: MangaDexEndpoints.getRead, queryParameters: queryParams);
+      final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.getRead, queryParameters: queryParams);
 
       final response = await _client.get(uri);
 
@@ -870,109 +741,42 @@ class MangaDexModel {
 
         final cmap = body['data'] as Map<String, dynamic>;
 
-        final readmap = cmap.map((key, value) => MapEntry(
-            key,
-            ReadChapterSet(
-                key, List<String>.from(value as List<dynamic>).toSet())));
+        final readmap = cmap
+            .map((key, value) => MapEntry(key, ReadChapterSet(key, List<String>.from(value as List<dynamic>).toSet())));
 
         return readmap;
       } else {
         // Throw if failure
-        final msg =
-            "fetchReadChapters() failed. Response code: ${response.statusCode}";
-        logger.e(msg, error: response.body);
-        throw Exception(msg);
+        throw createException("fetchReadChapters() failed.", response);
       }
     }
 
     return {};
   }
 
-  /// Fetches the latest chapters of a specific [manga]
-  ///
-  /// Each operation that queries the MangaDex API is limited to
-  /// [MangaDexEndpoints.apiQueryLimit] number of items.
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  ///
-  /// Do not use directly. The [mangaChaptersProvider] provider should
-  /// be used instead as it provides results caching and auto state
-  /// management.
-  Future<Iterable<Chapter>> fetchMangaChapters(Manga manga,
-      [int offset = 0]) async {
-    final settings = ref.read(mdConfigProvider);
-
-    final key = 'fetchMangaChapters(${manga.id},$offset)';
-
-    if (await _cache.exists(key)) {
-      return _cache.getSpecialList<Chapter>(key, Chapter.fromJson);
-    }
-
-    // Download missing data
-    final queryParams = {
-      'limit': MangaDexEndpoints.apiQueryLimit.toString(),
-      'offset': offset.toString(),
-      'translatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'originalLanguage[]': settings.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[chapter]': 'desc',
-      'includes[]': ['scanlation_group', 'user']
-    };
-
-    if (settings.groupBlacklist.isNotEmpty) {
-      queryParams['excludedGroups[]'] = settings.groupBlacklist.toList();
-    }
-
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
-        queryParameters: queryParams);
-
-    final response = await _client.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = ChapterList.fromJson(body);
-
-      // Cache the data
-      _cache.putSpecialList(key, result.data, resolve: true);
-
-      return result.data;
-    }
-
-    // Throw if failure
-    final msg =
-        "fetchMangaChapters() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
-  }
-
-  /// Sets the chapter read status [setRead] of the [chapters]
+  /// Sets the given chapters as [read] or [unread]
   Future<bool> setChaptersRead(
-      Manga manga, Iterable<Chapter> chapters, bool setRead) async {
+    Manga manga, {
+    Iterable<Chapter>? read,
+    Iterable<Chapter>? unread,
+  }) async {
     if (!await loggedIn()) {
-      throw Exception(
-          "setChaptersRead() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("setChaptersRead() called on invalid token/login. Shouldn't ever get here");
     }
 
     Map<String, dynamic> params = {};
 
-    if (setRead) {
-      params['chapterIdsRead'] = chapters.map((e) => e.id).toList();
-    } else {
-      params['chapterIdsUnread'] = chapters.map((e) => e.id).toList();
+    if (read != null && read.isNotEmpty) {
+      params['chapterIdsRead'] = read.map((e) => e.id).toList();
     }
 
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id));
+    if (unread != null && unread.isNotEmpty) {
+      params['chapterIdsUnread'] = unread.map((e) => e.id).toList();
+    }
 
-    final response = await _client.post(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(params));
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id));
+
+    final response = await _client.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(params));
 
     if (response.statusCode == 200) {
       // Success
@@ -981,7 +785,7 @@ class MangaDexModel {
 
     // Log the failure
     logger.w(
-        "setChaptersRead(${manga.id}, ${chapters.toString()}, $setRead) returned code ${response.statusCode}",
+        "setChaptersRead(${manga.id}, ${read.toString()}, ${unread.toString()}) returned code ${response.statusCode}",
         error: response.body);
 
     return false;
@@ -996,14 +800,12 @@ class MangaDexModel {
 
     final settings = ref.read(mdConfigProvider);
 
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id));
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id));
 
     final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-
       final apidat = ChapterAPI.fromJson(body);
 
       final chapterUrl = apidat.getUrl(settings.dataSaver);
@@ -1020,26 +822,23 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "getChapterServer() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    throw createException("getChapterServer() failed.", response);
   }
 
   /// Fetches the user's manga library
   Future<LibraryMap?> fetchUserLibrary() async {
     if (!await loggedIn()) {
-      throw Exception(
-          "fetchUserLibrary() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("fetchUserLibrary() called on invalid token/login. Shouldn't ever get here");
     }
 
-    decoder(String key, value) =>
-        MapEntry(key, MangaReadingStatusExt.parse(value));
+    decoder(String key, value) => MapEntry(key, MangaReadingStatus.values.byName(value));
 
     if (await _cache.exists(CacheLists.library)) {
-      return _cache.get<LibraryMap>(CacheLists.library, (decoded) {
+      logger.d("Retrieving cached user library");
+      final libMap = _cache.get(CacheLists.library, (decoded) {
         return decoded.map(decoder);
-      });
+      }).get<LibraryMap>();
+      return libMap;
     }
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
@@ -1058,22 +857,20 @@ class MangaDexModel {
 
       final libMap = mlist.map(decoder);
 
-      _cache.put(CacheLists.library, mlist, true);
+      logger.d("Caching user library");
+      await _cache.put(CacheLists.library, json.encode(mlist), libMap, true);
 
       return libMap;
     }
 
     // Throw if failure
-    final msg =
-        "fetchUserLibrary() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    throw createException("fetchUserLibrary() failed.", response);
   }
 
   /// Retrieve all MangaDex tags
   Future<Iterable<Tag>> getTagList() async {
     if (await _cache.exists(CacheLists.tags)) {
-      return _cache.getSpecialList<Tag>(CacheLists.tags, Tag.fromJson);
+      return (await _cache.getSpecialList(CacheLists.tags, Tag.fromJson)).map((e) => e.get<Tag>());
     }
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
@@ -1082,50 +879,68 @@ class MangaDexModel {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = TagResponse.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data and list
-      _cache.putSpecialList(CacheLists.tags, result.data,
-          resolve: true, expiry: const Duration(days: 7));
+      await _cache.putSpecialList(CacheLists.tags, result.data, resolve: true, expiry: const Duration(days: 7));
 
-      return result.data;
+      return result.data.cast<Tag>();
     }
 
     // Throw if failure
-    final msg = "getTagList() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    throw createException("getTagList() failed.", response);
   }
 
   /// Fetches statistics of given [mangas]
   ///
   /// Do not use directly. Prefer [statisticsProvider] for its caching and
   /// state management.
-  Future<Map<String, MangaStatistics>> fetchStatistics(
-      Iterable<Manga> mangas) async {
+  Future<Map<String, MangaStatistics>> fetchStatistics(Iterable<Manga> mangas) async {
     final fetch = mangas.map((e) => e.id);
 
     if (fetch.isNotEmpty) {
       final queryParams = {'manga[]': fetch.toList()};
 
-      final uri = MangaDexEndpoints.api.replace(
-          path: MangaDexEndpoints.statistics, queryParameters: queryParams);
+      final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.statistics, queryParameters: queryParams);
 
       final response = await _client.get(uri);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = json.decode(response.body);
-
         final resp = MangaStatisticsResponse.fromJson(body);
 
         return resp.statistics;
       } else {
         // Throw if failure
-        final msg =
-            "fetchStatistics() failed. Response code: ${response.statusCode}";
-        logger.e(msg, error: response.body);
-        throw Exception(msg);
+        throw createException("fetchStatistics() failed.", response);
+      }
+    }
+
+    return {};
+  }
+
+  /// Fetches statistics of given [chapters]
+  ///
+  /// Do not use directly. Prefer [chapterStatsProvider] for its caching and
+  /// state management.
+  Future<Map<String, ChapterStatistics>> fetchChapterStats(Iterable<Chapter> chapters) async {
+    final fetch = chapters.map((e) => e.id);
+
+    if (fetch.isNotEmpty) {
+      final queryParams = {'chapter[]': fetch.toList()};
+
+      final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.chapterStats, queryParameters: queryParams);
+
+      final response = await _client.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+        final resp = ChapterStatisticsResponse.fromJson(body);
+
+        return resp.statistics;
+      } else {
+        // Throw if failure
+        throw createException("fetchChapterStats() failed.", response);
       }
     }
 
@@ -1133,39 +948,39 @@ class MangaDexModel {
   }
 
   /// Retrieve cover art for a specific manga
-  Future<Iterable<Cover>> getCoverList(Manga manga, [int offset = 0]) async {
-    final key = 'getCoverList(${manga.id},$offset)';
+  Future<Iterable<CoverArt>> getCoverList(
+    Manga manga, {
+    required int limit,
+    int offset = 0,
+  }) async {
+    final key = 'CoverList(${manga.id},$offset)';
 
     if (await _cache.exists(key)) {
-      return _cache.getSpecialList<Cover>(key, CoverArt.fromJson);
+      return (await _cache.getSpecialList(key, CoverArt.fromJson)).map((e) => e.get<CoverArt>());
     }
 
     final queryParams = {
-      'limit': MangaDexEndpoints.apiSearchLimit.toString(),
+      'limit': limit.toString(),
       'offset': offset.toString(),
       'order[volume]': 'asc',
       'manga[]': manga.id,
     };
-    final uri = MangaDexEndpoints.api
-        .replace(path: MangaDexEndpoints.cover, queryParameters: queryParams);
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.cover, queryParameters: queryParams);
 
     final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
-
-      final result = CoverList.fromJson(body);
+      final result = MDEntityList.fromJson(body);
 
       // Cache the data
-      _cache.putSpecialList(key, result.data, resolve: true);
+      await _cache.putSpecialList(key, result.data, resolve: true);
 
-      return result.data;
+      return result.data.cast<CoverArt>();
     }
 
     // Throw if failure
-    final msg = "getCoverList() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
-    throw Exception(msg);
+    throw createException("getCoverList() failed.", response);
   }
 
   /// Fetches the user's self-rating of given [mangas]
@@ -1178,23 +993,38 @@ class MangaDexModel {
     if (fetch.isNotEmpty) {
       final queryParams = {'manga[]': fetch.toList()};
 
-      final uri = MangaDexEndpoints.api.replace(
-          path: MangaDexEndpoints.getRating, queryParameters: queryParams);
+      final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.getRating, queryParameters: queryParams);
 
       final response = await _client.get(uri);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = json.decode(response.body);
 
+        if (body['ratings'] is List) {
+          // If the api returns a List, then the result is null
+          Map<String, SelfRating> map = {};
+
+          for (final m in mangas) {
+            map[m.id] = SelfRating(rating: -1, createdAt: DateTime.now());
+          }
+
+          return map;
+        }
+
         final resp = SelfRatingResponse.fromJson(body);
 
-        return resp.ratings;
+        Map<String, SelfRating> map = resp.ratings;
+
+        for (final m in mangas) {
+          if (!map.containsKey(m.id)) {
+            map[m.id] = SelfRating(rating: -1, createdAt: DateTime.now());
+          }
+        }
+
+        return map;
       } else {
         // Throw if failure
-        final msg =
-            "fetchRating() failed. Response code: ${response.statusCode}";
-        logger.e(msg, error: response.body);
-        throw Exception(msg);
+        throw createException("fetchRating() failed.", response);
       }
     }
 
@@ -1204,12 +1034,10 @@ class MangaDexModel {
   /// Sets the [manga]'s self-rating
   Future<bool> setMangaRating(Manga manga, int? rating) async {
     if (!await loggedIn()) {
-      throw Exception(
-          "setMangaRating() called on invalid token/login. Shouldn't ever get here");
+      throw StateError("setMangaRating() called on invalid token/login. Shouldn't ever get here");
     }
 
-    final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.setRating.replaceFirst('{id}', manga.id));
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.setRating.replaceFirst('{id}', manga.id));
 
     http.Response? response;
 
@@ -1218,9 +1046,7 @@ class MangaDexModel {
         'rating': rating,
       };
 
-      response = await _client.post(uri,
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(params));
+      response = await _client.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(params));
     } else {
       response = await _client.delete(uri);
     }
@@ -1234,9 +1060,7 @@ class MangaDexModel {
     }
 
     // Log the failure
-    logger.w(
-        "setMangaRating(${manga.id}, $rating) returned code ${response.statusCode}",
-        error: response.body);
+    logger.w("setMangaRating(${manga.id}, $rating) returned code ${response.statusCode}", error: response.body);
 
     return false;
   }
@@ -1245,41 +1069,34 @@ class MangaDexModel {
   Future<List<Group>> fetchGroups(Iterable<String> uuids) async {
     final list = <Group>[];
 
-    final fetch =
-        (await uuids.whereAsync((id) async => !await _cache.exists(id)))
-            .toList();
+    final fetch = (await uuids.whereAsync((id) async => !await _cache.exists(id))).toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
 
       var queryParams = <String, dynamic>{
-        'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+        'limit': MangaDexEndpoints.breakLimit.toString(),
       };
 
       while (end < fetch.length) {
         start = end;
-        end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
+        end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
         queryParams['ids[]'] = fetch.getRange(start, end);
 
-        final uri = MangaDexEndpoints.api.replace(
-            path: MangaDexEndpoints.group, queryParameters: queryParams);
+        final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.group, queryParameters: queryParams);
 
         final response = await _client.get(uri);
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
-
-          final result = GroupList.fromJson(body);
+          final result = MDEntityList.fromJson(body);
 
           // Cache the data
-          _cache.putAllAPIResolved(result.data);
+          await _cache.putAllAPIResolved(result.data);
         } else {
           // Throw if failure
-          final msg =
-              "fetchGroups() failed. Response code: ${response.statusCode}";
-          logger.e(msg, error: response.body);
-          throw Exception(msg);
+          throw createException("fetchGroups() failed.", response);
         }
       }
     }
@@ -1287,52 +1104,45 @@ class MangaDexModel {
     // Craft the list
     for (final id in uuids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get<Group>(id, ScanlationGroup.fromJson));
+        list.add(_cache.get(id, Group.fromJson).get<Group>());
       }
     }
 
     return list;
   }
 
-  /// Fetches group info of the given group [uuids]
+  /// Fetches creator info of the given [uuids]
   Future<List<CreatorType>> fetchCreators(Iterable<String> uuids) async {
     final list = <CreatorType>[];
 
-    final fetch =
-        (await uuids.whereAsync((id) async => !await _cache.exists(id)))
-            .toList();
+    final fetch = (await uuids.whereAsync((id) async => !await _cache.exists(id))).toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
 
       var queryParams = <String, dynamic>{
-        'limit': MangaDexEndpoints.apiQueryLimit.toString(),
+        'limit': MangaDexEndpoints.breakLimit.toString(),
       };
 
       while (end < fetch.length) {
         start = end;
-        end += min(fetch.length - start, MangaDexEndpoints.apiQueryLimit);
+        end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
         queryParams['ids[]'] = fetch.getRange(start, end);
 
-        final uri = MangaDexEndpoints.api.replace(
-            path: MangaDexEndpoints.creator, queryParameters: queryParams);
+        final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.creator, queryParameters: queryParams);
 
         final response = await _client.get(uri);
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> body = json.decode(response.body);
-
-          final result = CreatorList.fromJson(body);
+          final result = MDEntityList.fromJson(body);
 
           // Cache the data
-          _cache.putAllAPIResolved(result.data);
+          await _cache.putAllAPIResolved(result.data);
         } else {
           // Throw if failure
-          final msg =
-              "fetchGroups() failed. Response code: ${response.statusCode}";
-          logger.e(msg, error: response.body);
-          throw Exception(msg);
+          throw createException("fetchCreators() failed.", response);
         }
       }
     }
@@ -1340,442 +1150,638 @@ class MangaDexModel {
     // Craft the list
     for (final id in uuids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get<CreatorType>(id, Author.fromJson));
+        list.add(_cache.get(id, Author.fromJson).get<CreatorType>());
       }
     }
 
     return list;
   }
+
+  /// Fetches a [CustomList] by id
+  Future<CustomList?> fetchListById(String listId) async {
+    if (listId.isEmpty) {
+      logger.w('Invalid listId $listId');
+      return null;
+    }
+
+    if (await _cache.exists(listId)) {
+      return _cache.get(listId, CustomList.fromJson).get<CustomList>();
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.modifyList.replaceFirst('{id}', listId));
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      final result = CustomList.fromJson(body['data']);
+
+      // Cache the result
+      return (await _cache.put(listId, json.encode(result.toJson()), result, true, unserializer: CustomList.fromJson))
+          .get<CustomList>();
+    } else if (response.statusCode == 404) {
+      // List not found
+      return null;
+    }
+
+    // Throw if unknown code
+    throw createException("fetchListById() failed.", response);
+  }
+
+  /// Fetches logged user's followed [CustomList] list
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// Do not use directly. Use [followedListsProvider] instead
+  Future<List<CustomList>> fetchFollowedList({required int limit, int offset = 0}) async {
+    if (!await loggedIn()) {
+      throw StateError("fetchFollowedList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    // Download missing data
+    final queryParams = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+    };
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.followedList, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      final result = MDEntityList.fromJson(body);
+
+      // Cache entries
+      await _cache.putAllAPIResolved(result.data);
+
+      final list = <CustomList>[];
+
+      for (final e in result.data) {
+        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
+      }
+
+      return list;
+    }
+
+    // Throw if failure
+    throw createException("fetchFollowedList() failed.", response);
+  }
+
+  /// Adds/removes a [CustomList] from user followed list
+  Future<bool> setFollowList(CustomList list, bool follow) async {
+    if (!await loggedIn()) {
+      throw StateError("setFollowList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final id = list.id;
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.followList.replaceFirst('{id}', list.id));
+
+    http.Response? response;
+
+    if (follow) {
+      response = await _client.post(uri);
+    } else {
+      response = await _client.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        return true;
+      }
+    }
+
+    // Log the failure
+    logger.w("setFollowList($id, $follow) returned code ${response.statusCode}", error: response.body);
+
+    return false;
+  }
+
+  /// Fetches logged user's [CustomList] list
+  ///
+  /// [offset] denotes the nth item to start fetching from.
+  ///
+  /// Do not use directly. Use [userListsProvider] instead
+  Future<List<CustomList>> fetchUserList({required int limit, int offset = 0}) async {
+    if (!await loggedIn()) {
+      throw StateError("fetchUserList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    // Download missing data
+    final queryParams = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+    };
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.userList, queryParameters: queryParams);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      final result = MDEntityList.fromJson(body);
+
+      // Cache entries
+      await _cache.putAllAPIResolved(result.data);
+
+      final list = <CustomList>[];
+
+      for (final e in result.data) {
+        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
+      }
+
+      return list;
+    }
+
+    // Throw if failure
+    throw createException("fetchUserList() failed.", response);
+  }
+
+  /// Adds/removes a [Manga] from a [CustomList]
+  Future<CustomList?> updateMangaInCustomList(CustomList list, Manga manga, bool add) async {
+    if (!await loggedIn()) {
+      throw StateError("updateMangaInCustomList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final id = list.id;
+
+    final uri = MangaDexEndpoints.api
+        .replace(path: MangaDexEndpoints.updateMangaInList.replaceFirst('{id}', manga.id).replaceFirst('{listId}', id));
+
+    http.Response? response;
+
+    if (add) {
+      response = await _client.post(uri);
+    } else {
+      response = await _client.delete(uri);
+    }
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        final relationships = [...list.relationships];
+
+        if (add) {
+          relationships.add(Manga(id: manga.id));
+        } else {
+          relationships.removeWhere((e) => e.id == manga.id);
+        }
+
+        final updated = list.copyWith(
+            attributes: list.attributes.copyWith(version: list.attributes.version + 1), relationships: relationships);
+
+        return (await _cache.put(updated.id, json.encode(updated.toJson()), updated, true,
+                unserializer: CustomList.fromJson))
+            .get<CustomList>();
+      }
+    }
+
+    // Log the failure
+    logger.w("updateMangaInCustomList($id, ${manga.id}, $add) returned code ${response.statusCode}",
+        error: response.body);
+
+    return null;
+  }
+
+  /// Deletes a [CustomList]
+  Future<bool> deleteList(CustomList list) async {
+    if (!await loggedIn()) {
+      throw StateError("deleteList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final id = list.id;
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id));
+
+    http.Response? response;
+
+    response = await _client.delete(uri);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        // Remove the cache
+        _cache.remove(id);
+        return true;
+      }
+    }
+
+    // Log the failure
+    logger.w("deleteList($id) returned code ${response.statusCode}", error: response.body);
+
+    return false;
+  }
+
+  /// Creates a new [CustomList]
+  Future<CustomList?> createNewList(String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
+    if (!await loggedIn()) {
+      throw StateError("createNewList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.createList);
+
+    final params = {
+      'name': name,
+      'visibility': visibility.name,
+      'manga': mangaIds.toList(),
+    };
+
+    final response = await _client.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(params));
+
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        // Process new list
+        final nlist = CustomList.fromJson(body['data']);
+
+        // Cache the result
+        return (await _cache.put(nlist.id, json.encode(nlist.toJson()), nlist, true, unserializer: CustomList.fromJson))
+            .get<CustomList>();
+      }
+    }
+
+    // Log the failure
+    logger.w("createNewList($name, ${visibility.name}) returned code ${response.statusCode}", error: response.body);
+
+    return null;
+  }
+
+  /// Edits an existing [CustomList]
+  Future<CustomList> editList(
+      CustomList list, String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
+    if (!await loggedIn()) {
+      throw StateError("editList() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final id = list.id;
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id));
+
+    final params = {
+      'name': name,
+      'visibility': visibility.name,
+      'manga': mangaIds.toList(),
+      'version': list.attributes.version,
+    };
+
+    final response = await _client.put(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(params),
+    );
+
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        // Process new list
+        final nlist = CustomList.fromJson(body['data']);
+
+        // Cache the result
+        return (await _cache.put(nlist.id, json.encode(nlist.toJson()), nlist, true, unserializer: CustomList.fromJson))
+            .get<CustomList>();
+      }
+    }
+
+    // Throw if failure
+    throw createException("editList($id, ${visibility.name}) failed.", response);
+  }
+
+  /// Get logged in user details
+  Future<User> getLoggedUser() async {
+    if (!await loggedIn()) {
+      throw StateError("getLoggedUser() called on invalid token/login. Shouldn't ever get here");
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.me);
+
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      if (body['result'] == 'ok') {
+        // Process new list
+        final user = User.fromJson(body['data']);
+
+        return user;
+      }
+    }
+
+    // Throw if failure
+    throw createException("getLoggedUser() failed.", response);
+  }
 }
 
-@Riverpod(keepAlive: true)
-class LatestChaptersFeed extends _$LatestChaptersFeed {
-  int _offset = 0;
-  bool _atEnd = false;
+@riverpod
+class RecentlyAdded extends _$RecentlyAdded with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    final settings = ref.read(mdConfigProvider);
+
+    final extraParams = {
+      'hasAvailableChapters': 'true',
+      'availableTranslatedLanguage[]': settings.translatedLanguages.map(const LanguageConverter().toJson).toList(),
+      'originalLanguage[]': settings.originalLanguage.map(const LanguageConverter().toJson).toList(),
+    };
+
+    final manga = await api.fetchManga(
+      limit: limit,
+      offset: offset,
+      order: FilterOrder.createdAt_desc,
+      extraParams: extraParams,
+    );
+
+    ref.disposeAfter(const Duration(minutes: 10));
+
+    return manga;
+  }
+
+  @override
+  Future<List<Manga>> build() async {
+    return fetchData(0);
+  }
+
+  /// Clears the list and refetch from the beginning
+  @override
+  Future<void> clear() async {
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
+  }
+}
+
+@riverpod
+class LatestChaptersFeed extends _$LatestChaptersFeed with ListBasedInfiniteScrollMix {
+  static const feedKey = 'LatestChaptersFeed';
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
 
   ///Fetch the latest chapters list based on offset
-  Future<List<Chapter>> _fetchLatestChapters(int offset) async {
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return [];
     }
 
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchUserFeed(offset);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.feed,
+      feedKey: feedKey,
+      limit: limit,
+      offset: offset,
+    );
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
 
     return chapters.toList();
   }
 
   @override
-  FutureOr<List<Chapter>> build() async {
-    return _fetchLatestChapters(0);
-  }
-
-  /// Fetch more latest chapters if more data exists
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull ?? [];
-    // If there is more content, get more
-    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchLatestChapters(
-            _offset + MangaDexEndpoints.apiQueryLimit);
-        _offset += MangaDexEndpoints.apiQueryLimit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  Future<List<Chapter>> build() async {
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchUserFeed');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchLatestChapters(_offset);
-    });
+    await api.invalidateAll(feedKey);
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
-@Riverpod(keepAlive: true)
-class LatestGlobalFeed extends _$LatestGlobalFeed {
-  int _offset = 0;
-  bool _atEnd = false;
+@riverpod
+class LatestGlobalFeed extends _$LatestGlobalFeed with ListBasedInfiniteScrollMix {
+  static const feedKey = 'LatestGlobalFeed';
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
 
   ///Fetch the latest chapters list based on offset
-  Future<List<Chapter>> _fetchLatestChapters(int offset) async {
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchChapterFeed(offset: offset);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.chapter,
+      feedKey: feedKey,
+      limit: limit,
+      offset: offset,
+    );
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
 
     return chapters.toList();
   }
 
   @override
-  FutureOr<List<Chapter>> build() async {
-    return _fetchLatestChapters(0);
-  }
-
-  /// Fetch more latest chapters if more data exists
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull ?? [];
-    // If there is more content, get more
-    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchLatestChapters(
-            _offset + MangaDexEndpoints.apiQueryLimit);
-        _offset += MangaDexEndpoints.apiQueryLimit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  Future<List<Chapter>> build() async {
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchChapterFeed');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchLatestChapters(_offset);
-    });
+    await api.invalidateAll(feedKey);
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
-@Riverpod(keepAlive: true)
-class GroupFeed extends _$GroupFeed {
-  int _offset = 0;
-  bool _atEnd = false;
+@riverpod
+class GroupFeed extends _$GroupFeed with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const feedKey = 'GroupFeed';
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Chapter>> _fetchChapters(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchChapterFeed(offset: offset, group: group);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.chapter,
+      feedKey: feedKey,
+      limit: limit,
+      offset: offset,
+      entity: group,
+    );
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
+
+    disposeAfter(const Duration(minutes: 5));
 
     return chapters.toList();
   }
 
   @override
-  FutureOr<List<Chapter>> build(Group group) async {
-    return _fetchChapters(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull ?? [];
-    // If there is more content, get more
-    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters =
-            await _fetchChapters(_offset + MangaDexEndpoints.apiQueryLimit);
-        _offset += MangaDexEndpoints.apiQueryLimit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  Future<List<Chapter>> build(Group group) async {
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchChapterFeed(${group.id}');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchChapters(_offset);
-    });
+    await api.invalidateAll('$feedKey(${group.id}');
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
-@Riverpod(keepAlive: true)
-class GroupTitles extends _$GroupTitles {
-  int _offset = 0;
-  bool _atEnd = false;
+@riverpod
+class GroupTitles extends _$GroupTitles with ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Manga>> _fetchManga(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final manga = await api.fetchManga(offset: offset, filterId: group);
+    final manga = await api.fetchManga(limit: limit, offset: offset, filterId: group);
 
-    return manga.toList();
+    return manga;
   }
 
   @override
-  FutureOr<List<Manga>> build(Group group) async {
-    return _fetchManga(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull ?? [];
-    // If there is more content, get more
-    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final manga =
-            await _fetchManga(_offset + MangaDexEndpoints.apiQueryLimit);
-        _offset += MangaDexEndpoints.apiQueryLimit;
-
-        if (manga.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...manga];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  Future<List<Manga>> build(Group group) async {
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      return _fetchManga(_offset);
-    });
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
-@Riverpod(keepAlive: true)
-class CreatorTitles extends _$CreatorTitles {
-  int _offset = 0;
-  bool _atEnd = false;
+@riverpod
+class CreatorTitles extends _$CreatorTitles with ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Manga>> _fetchManga(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final manga = await api.fetchManga(offset: offset, filterId: creator);
+    final manga = await api.fetchManga(limit: limit, offset: offset, filterId: creator);
 
-    return manga.toList();
+    return manga;
   }
 
   @override
-  FutureOr<List<Manga>> build(CreatorType creator) async {
-    return _fetchManga(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull ?? [];
-    // If there is more content, get more
-    if (oldstate.length == _offset + MangaDexEndpoints.apiQueryLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final manga =
-            await _fetchManga(_offset + MangaDexEndpoints.apiQueryLimit);
-        _offset += MangaDexEndpoints.apiQueryLimit;
-
-        if (manga.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...manga];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  Future<List<Manga>> build(CreatorType creator) async {
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      return _fetchManga(_offset);
-    });
+    offset = 0;
+    atEnd = false;
   }
 }
 
-@Riverpod(keepAlive: true)
-class MangaChapters extends _$MangaChapters {
-  int _offset = 0;
-  bool _atEnd = false;
+final mangaChaptersListSortProvider = StateProvider((ref) => ListSort.descending);
 
-  Future<List<Chapter>> _fetchMangaChapters(int offset) async {
+@riverpod
+class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const feedKey = 'MangaChapters';
+  static const _limit = MangaDexEndpoints.chapterLimit;
+
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final chapters = await api.fetchMangaChapters(manga, offset);
+    final sort = ref.watch(mangaChaptersListSortProvider);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.mangaFeed.replaceFirst('{id}', manga.id),
+      feedKey: feedKey,
+      limit: limit,
+      offset: offset,
+      entity: manga,
+      orderKey: 'chapter',
+      order: sort.order,
+      ignoreOriginalLanguage: true,
+    );
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
+
+    disposeAfter(const Duration(minutes: 5));
 
     return chapters.toList();
   }
 
   @override
-  FutureOr<List<Chapter>> build(Manga manga) async {
-    return _fetchMangaChapters(0);
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull;
-    // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiQueryLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final chapters = await _fetchMangaChapters(
-            _offset + MangaDexEndpoints.apiQueryLimit);
-        _offset += MangaDexEndpoints.apiQueryLimit;
-
-        if (chapters.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate!, ...chapters];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  Future<List<Chapter>> build(Manga manga) async {
+    return fetchData(0);
   }
 
   /// Clears the list and refetch from the beginning
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('fetchMangaChapters(${manga.id}');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchMangaChapters(_offset);
-    });
+    await api.invalidateAll('$feedKey(${manga.id}');
+    offset = 0;
+    atEnd = false;
   }
 }
 
-@Riverpod(keepAlive: true)
-class MangaCovers extends _$MangaCovers {
-  int _offset = 0;
-  bool _atEnd = false;
+@riverpod
+class MangaCovers extends _$MangaCovers with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
 
-  Future<List<Cover>> _fetchCovers(int offset) async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<CoverArt>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final covers = await api.getCoverList(manga, offset);
+    final covers = await api.getCoverList(manga, limit: limit, offset: offset);
+
+    disposeAfter(const Duration(minutes: 5));
 
     return covers.toList();
   }
 
   @override
-  FutureOr<List<Cover>> build(Manga manga) async {
-    return _fetchCovers(0);
+  Future<List<CoverArt>> build(Manga manga) async {
+    return fetchData(0);
   }
 
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull ?? [];
-    // If there is more content, get more
-    if (oldstate.length == _offset + MangaDexEndpoints.apiSearchLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final covers =
-            await _fetchCovers(_offset + MangaDexEndpoints.apiSearchLimit);
-        _offset += MangaDexEndpoints.apiSearchLimit;
-
-        if (covers.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate, ...covers];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
-  }
-
+  @override
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.invalidateAll('getCoverList(${manga.id}');
-      _offset = 0;
-      _atEnd = false;
-      return _fetchCovers(_offset);
-    });
+    await api.invalidateAll('CoverList(${manga.id}');
+    offset = 0;
+    atEnd = false;
   }
 }
 
@@ -1787,13 +1793,17 @@ class ReadChapters extends _$ReadChapters {
       return {};
     }
 
+    if (mangas.isEmpty) {
+      return {};
+    }
+
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchReadChapters(mangas);
     return map;
   }
 
   @override
-  FutureOr<ReadChaptersMap> build() async {
+  Future<ReadChaptersMap> build() async {
     return {};
   }
 
@@ -1804,16 +1814,16 @@ class ReadChapters extends _$ReadChapters {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) =>
-          !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
       final map = await _fetchReadChapters(mg);
       return {...oldstate, ...map};
     });
@@ -1821,46 +1831,41 @@ class ReadChapters extends _$ReadChapters {
 
   /// Sets a list of chapters for a manga read or unread
   Future<void> set(
-      Manga manga, Iterable<Chapter> chapters, bool setRead) async {
+    Manga manga, {
+    Iterable<Chapter>? read,
+    Iterable<Chapter>? unread,
+  }) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final chapIdSet = chapters.map((e) => e.id).toSet();
-      bool result = await api.setChaptersRead(manga, chapters, setRead);
+      bool result = await api.setChaptersRead(manga, read: read, unread: unread);
 
       if (result) {
         final keyExists = oldstate.containsKey(manga.id);
 
         // Refresh
         if (keyExists) {
-          switch (setRead) {
-            case true:
-              oldstate[manga.id]?.addAll(chapIdSet);
-              break;
-            case false:
-              oldstate[manga.id]?.removeAll(chapIdSet);
-              break;
+          if (read != null) {
+            oldstate[manga.id]?.addAll(read.map((e) => e.id));
+          }
+
+          if (unread != null) {
+            oldstate[manga.id]?.removeAll(unread.map((e) => e.id));
           }
         } else {
-          switch (setRead) {
-            case true:
-              oldstate[manga.id] = ReadChapterSet(manga.id, chapIdSet);
-              break;
-            case false:
-              oldstate[manga.id] = ReadChapterSet(manga.id, {});
-              break;
+          if (read != null) {
+            oldstate[manga.id] = ReadChapterSet(manga.id, read.map((e) => e.id).toSet());
+          }
+
+          if (unread != null) {
+            oldstate[manga.id] = ReadChapterSet(manga.id, {});
           }
         }
       }
@@ -1870,133 +1875,342 @@ class ReadChapters extends _$ReadChapters {
   }
 }
 
-@Riverpod(keepAlive: true)
-class UserLibrary extends _$UserLibrary {
-  int _total = 0;
-  int _offset = 0;
-  int _currentPage = 0;
-  bool _atEnd = false;
-
-  Future<Iterable<Manga>> _fetchUserLibrary() async {
-    final loggedin = await ref.read(authControlProvider.future);
+@riverpod
+class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
+  @override
+  Future<Map<String, MangaReadingStatus>> build() async {
+    final loggedin = await ref.watch(authControlProvider.future);
     if (!loggedin) {
-      return [];
+      return {};
     }
 
     final api = ref.watch(mangadexProvider);
     final library = await api.fetchUserLibrary();
 
     if (library == null) {
-      return [];
+      return {};
     }
 
-    final results = library.entries
-        .where((element) => element.value == status)
-        .map((e) => e.key)
-        .toList();
+    disposeAfter(const Duration(minutes: 5));
 
-    _total = results.length;
-
-    if (_offset > _total) {
-      // No more items
-      return [];
-    }
-
-    final range = min(_total, _offset + MangaDexEndpoints.apiQueryLimit);
-    final mangas = await api.fetchManga(ids: results.getRange(_offset, range));
-
-    _currentPage += (range - _offset);
-
-    if (mangas.isNotEmpty) {
-      await ref.read(statisticsProvider.notifier).get(mangas);
-    }
-
-    return mangas;
+    return library;
   }
 
-  Future<Iterable<Manga>> _fetchAndCheck() async {
-    final mangas = await _fetchUserLibrary();
+  Future<void> set(Manga manga, MangaReadingStatus? status) async {
+    final oldstate = await future;
 
-    if (mangas.isEmpty) {
-      _atEnd = true;
-    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      if (status == null) {
+        oldstate.remove(manga.id);
+      } else {
+        oldstate[manga.id] = status;
+      }
 
-    return mangas;
-  }
-
-  @override
-  FutureOr<Iterable<Manga>> build(MangaReadingStatus status) async {
-    return _fetchAndCheck();
-  }
-
-  int total() {
-    return _total;
-  }
-
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull;
-    // If there is more content, get more
-    if (_currentPage == _offset + MangaDexEndpoints.apiQueryLimit && !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        _offset += MangaDexEndpoints.apiQueryLimit;
-        final mangas = await _fetchAndCheck();
-
-        return [...oldstate!, ...mangas];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+      return {...oldstate};
+    });
   }
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _offset = 0;
-      _atEnd = false;
-      _currentPage = 0;
-      return _fetchAndCheck();
-    });
-  }
-}
-
-@Riverpod(keepAlive: true)
-class TagList extends _$TagList {
-  ///Fetch the global tag list
-  Future<Iterable<Tag>> _fetchTagList() async {
     final api = ref.watch(mangadexProvider);
+    await api.invalidateCacheItem(CacheLists.library);
 
-    final list = await api.getTagList();
-
-    return list;
-  }
-
-  @override
-  FutureOr<Iterable<Tag>> build() async {
-    return _fetchTagList();
+    ref.invalidateSelf();
   }
 }
 
 @riverpod
-class MangaSearch extends _$MangaSearch {
-  int _offset = 0;
-  bool _atEnd = false;
+class UserLists extends _$UserLists with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.breakLimit;
 
-  Future<List<Manga>> _searchManga() async {
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<CustomList>> fetchData(int offset) async {
+    final loggedin = await ref.watch(authControlProvider.future);
+    if (!loggedin) {
+      return [];
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final lists = await api.fetchUserList(limit: limit, offset: offset);
+
+    disposeAfter(const Duration(minutes: 5));
+
+    return lists;
+  }
+
+  @override
+  Future<List<CustomList>> build() async {
+    return fetchData(0);
+  }
+
+  Future<void> updateList(CustomList list, Manga manga, bool add) async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
     final api = ref.watch(mangadexProvider);
 
-    final manga = await api.searchManga(params.query,
-        filter: params.filter, offset: _offset);
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.updateMangaInCustomList(list, manga, add);
+
+      if (result != null) {
+        final idx = oldstate.indexWhere((e) => e.id == result.id);
+        if (idx >= 0) {
+          oldstate[idx] = result;
+        }
+      }
+
+      return [...oldstate];
+    });
+  }
+
+  Future<bool> editList(
+      CustomList list, String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
+    if (state.isLoading || state.isReloading) {
+      return false;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.editList(list, name, visibility, mangaIds);
+      final idx = oldstate.indexWhere((e) => e.id == result.id);
+      if (idx >= 0) {
+        oldstate[idx] = result;
+      }
+
+      return [...oldstate];
+    });
+
+    return !state.hasError;
+  }
+
+  Future<bool> deleteList(CustomList list) async {
+    if (state.isLoading || state.isReloading) {
+      return false;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.deleteList(list);
+
+      if (result) {
+        oldstate.removeWhere((e) => e.id == list.id);
+      }
+
+      return [...oldstate];
+    });
+
+    return (state.value ?? []).indexWhere((e) => e.id == list.id) == -1;
+  }
+
+  Future<bool> newList(String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
+    if (state.isLoading || state.isReloading) {
+      return false;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.createNewList(name, visibility, mangaIds);
+
+      if (result != null) {
+        return [...oldstate, result];
+      }
+
+      return [...oldstate];
+    });
+
+    return (state.value ?? []).length != oldstate.length;
+  }
+
+  /// Clears the list and refetch from the beginning
+  @override
+  Future<void> clear() async {
+    offset = 0;
+    atEnd = false;
+  }
+}
+
+@riverpod
+class FollowedLists extends _$FollowedLists with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.breakLimit;
+
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<CustomList>> fetchData(int offset) async {
+    final loggedin = await ref.watch(authControlProvider.future);
+    if (!loggedin) {
+      return [];
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final lists = await api.fetchFollowedList(limit: limit, offset: offset);
+
+    disposeAfter(const Duration(minutes: 5));
+
+    return lists;
+  }
+
+  @override
+  Future<List<CustomList>> build() async {
+    return fetchData(0);
+  }
+
+  Future<void> setFollow(CustomList list, bool follow) async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await api.setFollowList(list, follow);
+
+      if (result) {
+        if (follow) {
+          final idx = oldstate.indexWhere((e) => e.id == list.id);
+          if (idx == -1) {
+            oldstate.add(list);
+          }
+        } else {
+          oldstate.removeWhere((e) => e.id == list.id);
+        }
+      }
+
+      return [...oldstate];
+    });
+  }
+
+  /// Clears the list and refetch from the beginning
+  @override
+  Future<void> clear() async {
+    offset = 0;
+    atEnd = false;
+  }
+}
+
+@riverpod
+class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
+  static const feedKey = 'CustomListFeed';
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Chapter>> fetchData(int offset) async {
+    final api = ref.watch(mangadexProvider);
+    final chapters = await api.fetchFeed(
+      path: MangaDexEndpoints.listFeed.replaceFirst('{id}', list.id),
+      feedKey: feedKey,
+      limit: limit,
+      offset: offset,
+      entity: list,
+    );
+
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
+
+    disposeAfter(const Duration(minutes: 5));
+
+    return chapters.toList();
+  }
+
+  @override
+  Future<List<Chapter>> build(CustomList list) async {
+    return fetchData(0);
+  }
+
+  /// Clears the list and refetch from the beginning
+  @override
+  Future<void> clear() async {
+    final api = ref.watch(mangadexProvider);
+    await api.invalidateAll('$feedKey(${list.id}');
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
+  }
+}
+
+@riverpod
+Future<List<Manga>> getMangaListByPage(GetMangaListByPageRef ref, Iterable<String> list, int page) async {
+  final start = page * MangaDexEndpoints.searchLimit;
+  final end = min((page + 1) * MangaDexEndpoints.searchLimit, list.length);
+
+  final range = list.toList().getRange(start, end);
+
+  final api = ref.watch(mangadexProvider);
+  final mangas = await api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
+
+  await ref.read(statisticsProvider.notifier).get(mangas);
+
+  return mangas;
+}
+
+@riverpod
+class ListSource extends _$ListSource {
+  @override
+  Future<CustomList?> build(String listId) async {
+    final loggedin = await ref.watch(authControlProvider.future);
+
+    if (loggedin) {
+      final userlists = await ref.watch(userListsProvider.future);
+      final found = userlists.indexWhere((e) => e.id == listId);
+      if (found >= 0) {
+        return userlists.elementAt(found);
+      }
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final list = await api.fetchListById(listId);
+    return list;
+  }
+}
+
+@riverpod
+class TagList extends _$TagList with AutoDisposeExpiryMix {
+  ///Fetch the global tag list
+  @override
+  Future<Iterable<Tag>> build() async {
+    final api = ref.watch(mangadexProvider);
+
+    final list = await api.getTagList();
+
+    disposeAfter(const Duration(minutes: 5));
+
+    return list;
+  }
+}
+
+@riverpod
+class MangaSearch extends _$MangaSearch with ListBasedInfiniteScrollMix {
+  static const _limit = MangaDexEndpoints.searchLimit;
+
+  @override
+  get limit => _limit;
+
+  @override
+  Future<List<Manga>> fetchData(int offset) async {
+    final api = ref.watch(mangadexProvider);
+
+    final manga = await api.searchManga(params.query, limit: limit, filter: params.filter, offset: offset);
 
     if (manga.isNotEmpty) {
       await ref.read(statisticsProvider.notifier).get(manga);
@@ -2006,49 +2220,29 @@ class MangaSearch extends _$MangaSearch {
   }
 
   @override
-  FutureOr<List<Manga>> build(MangaSearchParameters params) async {
-    return _searchManga();
+  Future<List<Manga>> build(MangaSearchParameters params) async {
+    return fetchData(0);
   }
 
   bool isAtEnd() {
-    return _atEnd;
+    return atEnd;
   }
 
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
-    if (_atEnd) {
-      return;
-    }
-
-    final oldstate = state.valueOrNull;
-    // If there is more content, get more
-    if (oldstate?.length == _offset + MangaDexEndpoints.apiSearchLimit &&
-        !_atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        _offset += MangaDexEndpoints.apiSearchLimit;
-        final list = await _searchManga();
-
-        if (list.isEmpty) {
-          _atEnd = true;
-        }
-
-        return [...oldstate!, ...list];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      _atEnd = true;
-    }
+  @override
+  Future<void> clear() async {
+    offset = 0;
+    atEnd = false;
+    ref.invalidateSelf();
   }
 }
 
 @Riverpod(keepAlive: true)
 class Statistics extends _$Statistics {
-  Future<Map<String, MangaStatistics>> _fetchStatistics(
-      Iterable<Manga> mangas) async {
+  Future<Map<String, MangaStatistics>> _fetchStatistics(Iterable<Manga> mangas) async {
+    if (mangas.isEmpty) {
+      return {};
+    }
+
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchStatistics(mangas);
 
@@ -2056,21 +2250,58 @@ class Statistics extends _$Statistics {
   }
 
   @override
-  FutureOr<Map<String, MangaStatistics>> build() async {
+  Future<Map<String, MangaStatistics>> build() async {
     return {};
   }
 
   /// Fetch statistics for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
+      final map = await _fetchStatistics(mg);
+      return {...oldstate, ...map};
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ChapterStats extends _$ChapterStats {
+  Future<Map<String, ChapterStatistics>> _fetchStatistics(Iterable<Chapter> chapters) async {
+    if (chapters.isEmpty) {
+      return {};
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchChapterStats(chapters);
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, ChapterStatistics>> build() async {
+    return {};
+  }
+
+  /// Fetch statistics for the provided list of mangas
+  Future<void> get(Iterable<Chapter> chapters) async {
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final mg = chapters.where((c) => !oldstate.containsKey(c.id));
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
       final map = await _fetchStatistics(mg);
       return {...oldstate, ...map};
     });
@@ -2085,13 +2316,17 @@ class Ratings extends _$Ratings {
       return {};
     }
 
+    if (mangas.isEmpty) {
+      return {};
+    }
+
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchRatings(mangas);
     return map;
   }
 
   @override
-  FutureOr<Map<String, SelfRating>> build() async {
+  Future<Map<String, SelfRating>> build() async {
     return {};
   }
 
@@ -2102,16 +2337,16 @@ class Ratings extends _$Ratings {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) =>
-          !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
+
       final map = await _fetchRatings(mg);
       return {...oldstate, ...map};
     });
@@ -2124,13 +2359,8 @@ class Ratings extends _$Ratings {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull ?? {};
+    final oldstate = await future;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -2139,11 +2369,10 @@ class Ratings extends _$Ratings {
       if (result) {
         switch (rating) {
           case null:
-            oldstate.remove(manga.id);
+            oldstate[manga.id] = SelfRating(rating: -1, createdAt: DateTime.now());
             break;
           case _:
-            oldstate[manga.id] =
-                SelfRating(rating: rating, createdAt: DateTime.now());
+            oldstate[manga.id] = SelfRating(rating: rating, createdAt: DateTime.now());
             break;
         }
       }
@@ -2153,9 +2382,10 @@ class Ratings extends _$Ratings {
   }
 }
 
-@Riverpod(keepAlive: true)
-class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
-  Future<MangaReadingStatus?> _fetchReadingStatus() async {
+@riverpod
+class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
+  @override
+  Future<MangaReadingStatus?> build(Manga manga) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return null;
@@ -2164,14 +2394,9 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaReadingStatus(manga);
 
-    staleTime(const Duration(minutes: 10));
+    disposeAfter(const Duration(minutes: 5));
 
     return status;
-  }
-
-  @override
-  FutureOr<MangaReadingStatus?> build(Manga manga) async {
-    return _fetchReadingStatus();
   }
 
   Future<void> set(MangaReadingStatus? status) async {
@@ -2180,21 +2405,16 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull;
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      MangaReadingStatus? resolved =
-          status == MangaReadingStatus.remove ? null : status;
+      MangaReadingStatus? resolved = status == MangaReadingStatus.remove ? null : status;
       bool success = await api.setMangaReadingStatus(manga, resolved);
       if (success) {
-        await api.invalidateCacheItem(CacheLists.library);
-        ref.invalidate(userLibraryProvider);
+        if (ref.exists(userLibraryProvider)) {
+          await ref.read(userLibraryProvider.notifier).set(manga, resolved);
+        }
 
         return resolved;
       }
@@ -2204,9 +2424,10 @@ class ReadingStatus extends _$ReadingStatus with AsyncNotifierMix {
   }
 }
 
-@Riverpod(keepAlive: true)
-class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
-  Future<bool> _fetchFollowingStatus() async {
+@riverpod
+class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
+  @override
+  Future<bool> build(Manga manga) async {
     final loggedin = await ref.read(authControlProvider.future);
     if (!loggedin) {
       return false;
@@ -2215,14 +2436,9 @@ class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
     final api = ref.watch(mangadexProvider);
     final status = await api.getMangaFollowing(manga);
 
-    staleTime(const Duration(minutes: 10));
+    disposeAfter(const Duration(minutes: 5));
 
     return status;
-  }
-
-  @override
-  FutureOr<bool> build(Manga manga) async {
-    return _fetchFollowingStatus();
   }
 
   Future<void> set(bool following) async {
@@ -2231,13 +2447,8 @@ class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
       return;
     }
 
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
     final api = ref.watch(mangadexProvider);
-    final oldstate = state.valueOrNull ?? false;
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       bool success = await api.setMangaFollowing(manga, following);
@@ -2252,9 +2463,10 @@ class FollowingStatus extends _$FollowingStatus with AsyncNotifierMix {
 
 @Riverpod(keepAlive: true)
 class MangaDexHistory extends _$MangaDexHistory {
-  final _numItems = 50;
+  static const _numItems = 50;
 
-  Future<Queue<Chapter>> _fetch() async {
+  @override
+  Future<Queue<Chapter>> build() async {
     final box = Hive.box(gagakuBox);
     final str = box.get('mangadex_history');
 
@@ -2268,21 +2480,13 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final chapters = await api.fetchChapters(uuids);
 
+    await ref.read(chapterStatsProvider.notifier).get(chapters);
+
     return Queue.of(chapters);
   }
 
-  @override
-  FutureOr<Queue<Chapter>> build() async {
-    return _fetch();
-  }
-
   Future<void> add(Chapter chapter) async {
-    // If state is loading, wait for it first
-    if (state.isLoading || state.isReloading) {
-      await future;
-    }
-
-    final oldstate = state.valueOrNull ?? Queue<Chapter>();
+    final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final cpy = Queue.of(oldstate);
@@ -2307,12 +2511,34 @@ class MangaDexHistory extends _$MangaDexHistory {
   }
 }
 
-@riverpod
-class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
+@Riverpod(keepAlive: true)
+class LoggedUser extends _$LoggedUser {
+  @override
+  Future<User?> build() async {
+    final loggedin = await ref.read(authControlProvider.future);
+    if (!loggedin) {
+      return null;
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final user = await api.getLoggedUser();
+
+    return user;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
   Future<void> invalidate() async {
-    state = await AsyncValue.guard(() async {
-      return await _build();
-    });
+    final prevState = await future;
+
+    final refreshed = await build();
+
+    if (refreshed != prevState) {
+      state = await AsyncValue.guard(() async {
+        return refreshed;
+      });
+    }
   }
 
   Future<void> _setStaleTime() async {
@@ -2323,13 +2549,13 @@ class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
     final expireTime = await api.timeUntilTokenExpiry();
 
     if (expireTime != null) {
-      final delay = expireTime + const Duration(seconds: 10);
-      logger.d("AuthControl: setting stale time to ${delay.inSeconds} seconds");
-      staleTime(delay);
+      logger.d("AuthControl: setting stale time to ${expireTime.inSeconds} seconds");
+      staleTime(expireTime);
     }
   }
 
-  Future<bool> _build() async {
+  @override
+  Future<bool> build() async {
     final api = ref.watch(mangadexProvider);
     await api.future;
 
@@ -2340,20 +2566,16 @@ class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
 
     await _setStaleTime();
 
-    return await api.loggedIn();
+    return api.loggedIn();
   }
 
-  @override
-  FutureOr<bool> build() async {
-    return await _build();
-  }
-
-  Future<bool> login(String user, String pass) async {
+  Future<bool> login(String user, String pass, String clientId, String clientSecret) async {
     final api = ref.watch(mangadexProvider);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await api.authenticate(user, pass);
+      await api.authenticate(user, pass, clientId, clientSecret);
       await _setStaleTime();
+      ref.invalidate(loggedUserProvider);
       return await api.loggedIn();
     });
 
@@ -2368,37 +2590,18 @@ class AuthControl extends _$AuthControl with AutoDisposeAsyncNotifierMix {
       await _setStaleTime();
       return await api.loggedIn();
     });
-  }
-}
 
-class RateLimitedClient extends http.BaseClient {
-  final http.Client baseClient = http.Client();
-  final userAgent = PackageInfo.fromPlatform()
-      .then((info) => '${info.appName}/${info.version}');
-  final _mutex = Mutex();
-
-  RateLimitedClient();
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    return await _mutex.protect(() async {
-      request.headers[HttpHeaders.userAgentHeader] = await userAgent;
-      return baseClient.send(request);
-    });
-  }
-}
-
-// Deprecated stuff
-class AuthenticatedClient extends http.BaseClient {
-  final OldToken token;
-  final http.Client baseClient;
-
-  AuthenticatedClient(this.baseClient, this.token);
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    request.headers[HttpHeaders.authorizationHeader] =
-        'Bearer ${token.session}';
-    return baseClient.send(request);
+    // Invalidate stuff
+    ref.invalidate(loggedUserProvider);
+    await api.invalidateCacheItem(CacheLists.library);
+    ref.invalidate(userLibraryProvider);
+    ref.invalidate(readChaptersProvider);
+    ref.invalidate(ratingsProvider);
+    ref.invalidate(userListsProvider);
+    ref.invalidate(followedListsProvider);
+    ref.invalidate(readingStatusProvider);
+    ref.invalidate(followingStatusProvider);
+    await api.invalidateAll(LatestChaptersFeed.feedKey);
+    ref.invalidate(latestChaptersFeedProvider);
   }
 }

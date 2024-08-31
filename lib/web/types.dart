@@ -1,7 +1,28 @@
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
+
+class WebReaderData {
+  const WebReaderData({
+    required this.source,
+    this.title,
+    this.manga,
+    this.link,
+    this.info,
+    this.readKey,
+    this.onLinkPressed,
+  });
+
+  final dynamic source;
+  final String? title;
+  final WebManga? manga;
+  final Widget? link;
+  final ProxyInfo? info;
+  final String? readKey;
+  final VoidCallback? onLinkPressed;
+}
 
 @freezed
 class ProxyInfo with _$ProxyInfo {
@@ -33,7 +54,11 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
       return null;
     }
 
-    final epoch = timestamp is int ? timestamp : int.parse(timestamp);
+    final epoch = switch (timestamp) {
+      int t => t,
+      double d => d.round(),
+      _ => int.parse(timestamp),
+    };
 
     return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
   }
@@ -44,12 +69,11 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
       return null;
     }
 
-    return (date.millisecondsSinceEpoch / 1000).toString();
+    return (date.millisecondsSinceEpoch / 1000).round().toString();
   }
 }
 
-class MappedEpochTimestampSerializer
-    implements JsonConverter<DateTime?, dynamic> {
+class MappedEpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
   const MappedEpochTimestampSerializer();
 
   @override
@@ -63,7 +87,12 @@ class MappedEpochTimestampSerializer
     }
 
     final date = timestamp.entries.first.value;
-    final epoch = date is int ? date : int.parse(date);
+
+    final epoch = switch (date) {
+      int t => t,
+      double d => d.round(),
+      _ => int.parse(date),
+    };
 
     return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
   }
@@ -74,7 +103,7 @@ class MappedEpochTimestampSerializer
       return null;
     }
 
-    return {'0': (date.millisecondsSinceEpoch / 1000).toString()};
+    return {'0': (date.millisecondsSinceEpoch / 1000).round().toString()};
   }
 }
 
@@ -82,17 +111,19 @@ class MappedEpochTimestampSerializer
 class HistoryLink with _$HistoryLink {
   const HistoryLink._();
 
-  const factory HistoryLink({required String title, required String url}) =
-      _HistoryLink;
+  const factory HistoryLink({
+    required String title,
+    required String url,
+    String? cover,
+  }) = _HistoryLink;
 
-  factory HistoryLink.fromJson(Map<String, dynamic> json) =>
-      _$HistoryLinkFromJson(json);
+  factory HistoryLink.fromJson(Map<String, dynamic> json) => _$HistoryLinkFromJson(json);
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_HistoryLink &&
+            other is _$HistoryLinkImpl &&
             (identical(other.url, url) || other.url == url));
   }
 
@@ -114,8 +145,7 @@ class WebManga with _$WebManga {
     required Map<String, WebChapter> chapters,
   }) = _WebManga;
 
-  factory WebManga.fromJson(Map<String, dynamic> json) =>
-      _$WebMangaFromJson(json);
+  factory WebManga.fromJson(Map<String, dynamic> json) => _$WebMangaFromJson(json);
 
   WebChapter? getChapter(String chapter) {
     if (chapters.containsKey(chapter)) {
@@ -132,20 +162,19 @@ class WebChapter with _$WebChapter {
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory WebChapter({
-    required String title,
-    required String volume,
+    String? title,
+    String? volume,
     @EpochTimestampSerializer() DateTime? lastUpdated,
     @MappedEpochTimestampSerializer() DateTime? releaseDate,
     required Map<String, dynamic> groups,
   }) = _WebChapter;
 
-  factory WebChapter.fromJson(Map<String, dynamic> json) =>
-      _$WebChapterFromJson(json);
+  factory WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
 
   String getTitle(String index) {
     String output = index;
 
-    if (title.isNotEmpty) {
+    if (title != null && title!.isNotEmpty) {
       output += ': $title';
     }
 
@@ -160,6 +189,5 @@ class ImgurPage with _$ImgurPage {
     required String src,
   }) = _ImgurPage;
 
-  factory ImgurPage.fromJson(Map<String, dynamic> json) =>
-      _$ImgurPageFromJson(json);
+  factory ImgurPage.fromJson(Map<String, dynamic> json) => _$ImgurPageFromJson(json);
 }

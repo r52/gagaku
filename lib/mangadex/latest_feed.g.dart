@@ -6,23 +6,63 @@ part of 'latest_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fetchGlobalChaptersHash() =>
-    r'2b701980c89260727f80ee9be563725a55f23ad1';
+typedef _FetchGlobalChaptersRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
 
-/// See also [_fetchGlobalChapters].
 @ProviderFor(_fetchGlobalChapters)
-final _fetchGlobalChaptersProvider =
-    AutoDisposeFutureProvider<List<ChapterFeedItemData>>.internal(
-  _fetchGlobalChapters,
-  name: r'_fetchGlobalChaptersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$fetchGlobalChaptersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const _fetchGlobalChaptersProvider = _FetchGlobalChaptersProvider._();
 
-typedef _FetchGlobalChaptersRef
-    = AutoDisposeFutureProviderRef<List<ChapterFeedItemData>>;
+final class _FetchGlobalChaptersProvider extends $FunctionalProvider<
+        AsyncValue<List<ChapterFeedItemData>>,
+        FutureOr<List<ChapterFeedItemData>>>
+    with
+        $FutureModifier<List<ChapterFeedItemData>>,
+        $FutureProvider<List<ChapterFeedItemData>, _FetchGlobalChaptersRef> {
+  const _FetchGlobalChaptersProvider._(
+      {FutureOr<List<ChapterFeedItemData>> Function(
+        _FetchGlobalChaptersRef ref,
+      )? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: noRetry,
+          name: r'_fetchGlobalChaptersProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<ChapterFeedItemData>> Function(
+    _FetchGlobalChaptersRef ref,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchGlobalChaptersHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ChapterFeedItemData>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchGlobalChaptersProvider $copyWithCreate(
+    FutureOr<List<ChapterFeedItemData>> Function(
+      _FetchGlobalChaptersRef ref,
+    ) create,
+  ) {
+    return _FetchGlobalChaptersProvider._(create: create);
+  }
+
+  @override
+  FutureOr<List<ChapterFeedItemData>> create(_FetchGlobalChaptersRef ref) {
+    final _$cb = _createCb ?? _fetchGlobalChapters;
+    return _$cb(ref);
+  }
+}
+
+String _$fetchGlobalChaptersHash() =>
+    r'beb21f31f863413c4cbebf5b9f16da158225b2f3';
+
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member
+// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
