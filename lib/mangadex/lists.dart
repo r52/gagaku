@@ -281,6 +281,9 @@ class MangaDexListsView extends HookConsumerWidget {
 
                                         return Card(
                                           key: ValueKey(item.id),
+                                          color: index.isOdd
+                                              ? theme.colorScheme.surfaceContainer
+                                              : theme.colorScheme.surfaceContainerHighest,
                                           child: ListTile(
                                             leading: Tooltip(
                                                 message: item.attributes.visibility.name.capitalize(),
