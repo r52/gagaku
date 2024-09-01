@@ -227,7 +227,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     ),
                     trailing: IconButton(
                       tooltip: 'Remove from History',
-                      icon: const Icon(Icons.clear),
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
                       onPressed: () async {
                         ref.read(webSourceHistoryProvider.notifier).remove(item);
                       },
@@ -291,6 +294,7 @@ class _GridMangaItem extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
+    final theme = Theme.of(context);
 
     final image = GridAlbumImage(
       gradient: gradient,
@@ -367,7 +371,9 @@ class _GridMangaItem extends HookConsumerWidget {
                       ref.read(webSourceFavoritesProvider.notifier).add(link);
                     }
                   },
-                  child: Icon(favorited ? Icons.favorite : Icons.favorite_border),
+                  child: Icon(
+                    favorited ? Icons.favorite : Icons.favorite_border,
+                  ),
                 );
               },
             ),
@@ -383,7 +389,11 @@ class _GridMangaItem extends HookConsumerWidget {
                 onPressed: () async {
                   ref.read(webSourceHistoryProvider.notifier).remove(link);
                 },
-                child: const Icon(Icons.clear),
+                backgroundColor: theme.colorScheme.errorContainer,
+                child: Icon(
+                  Icons.delete,
+                  color: theme.colorScheme.onErrorContainer,
+                ),
               ),
             ),
         ],
