@@ -1065,3 +1065,1493 @@ abstract class _ImgurPage implements ImgurPage {
   _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+TagParser _$TagParserFromJson(Map<String, dynamic> json) {
+  return _TagParser.fromJson(json);
+}
+
+/// @nodoc
+mixin _$TagParser {
+  String get pattern => throw _privateConstructorUsedError;
+  String? get content => throw _privateConstructorUsedError;
+  String? get format => throw _privateConstructorUsedError;
+
+  /// Serializes this TagParser to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of TagParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $TagParserCopyWith<TagParser> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TagParserCopyWith<$Res> {
+  factory $TagParserCopyWith(TagParser value, $Res Function(TagParser) then) =
+      _$TagParserCopyWithImpl<$Res, TagParser>;
+  @useResult
+  $Res call({String pattern, String? content, String? format});
+}
+
+/// @nodoc
+class _$TagParserCopyWithImpl<$Res, $Val extends TagParser>
+    implements $TagParserCopyWith<$Res> {
+  _$TagParserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of TagParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? pattern = null,
+    Object? content = freezed,
+    Object? format = freezed,
+  }) {
+    return _then(_value.copyWith(
+      pattern: null == pattern
+          ? _value.pattern
+          : pattern // ignore: cast_nullable_to_non_nullable
+              as String,
+      content: freezed == content
+          ? _value.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String?,
+      format: freezed == format
+          ? _value.format
+          : format // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$TagParserImplCopyWith<$Res>
+    implements $TagParserCopyWith<$Res> {
+  factory _$$TagParserImplCopyWith(
+          _$TagParserImpl value, $Res Function(_$TagParserImpl) then) =
+      __$$TagParserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String pattern, String? content, String? format});
+}
+
+/// @nodoc
+class __$$TagParserImplCopyWithImpl<$Res>
+    extends _$TagParserCopyWithImpl<$Res, _$TagParserImpl>
+    implements _$$TagParserImplCopyWith<$Res> {
+  __$$TagParserImplCopyWithImpl(
+      _$TagParserImpl _value, $Res Function(_$TagParserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of TagParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? pattern = null,
+    Object? content = freezed,
+    Object? format = freezed,
+  }) {
+    return _then(_$TagParserImpl(
+      pattern: null == pattern
+          ? _value.pattern
+          : pattern // ignore: cast_nullable_to_non_nullable
+              as String,
+      content: freezed == content
+          ? _value.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String?,
+      format: freezed == format
+          ? _value.format
+          : format // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TagParserImpl extends _TagParser {
+  const _$TagParserImpl({required this.pattern, this.content, this.format})
+      : super._();
+
+  factory _$TagParserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TagParserImplFromJson(json);
+
+  @override
+  final String pattern;
+  @override
+  final String? content;
+  @override
+  final String? format;
+
+  @override
+  String toString() {
+    return 'TagParser(pattern: $pattern, content: $content, format: $format)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TagParserImpl &&
+            (identical(other.pattern, pattern) || other.pattern == pattern) &&
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.format, format) || other.format == format));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, pattern, content, format);
+
+  /// Create a copy of TagParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TagParserImplCopyWith<_$TagParserImpl> get copyWith =>
+      __$$TagParserImplCopyWithImpl<_$TagParserImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TagParserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _TagParser extends TagParser {
+  const factory _TagParser(
+      {required final String pattern,
+      final String? content,
+      final String? format}) = _$TagParserImpl;
+  const _TagParser._() : super._();
+
+  factory _TagParser.fromJson(Map<String, dynamic> json) =
+      _$TagParserImpl.fromJson;
+
+  @override
+  String get pattern;
+  @override
+  String? get content;
+  @override
+  String? get format;
+
+  /// Create a copy of TagParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$TagParserImplCopyWith<_$TagParserImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+WebSource _$WebSourceFromJson(Map<String, dynamic> json) {
+  return _WebSource.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WebSource {
+  String get name => throw _privateConstructorUsedError;
+  String get version => throw _privateConstructorUsedError;
+  WebSourceParseType get type => throw _privateConstructorUsedError;
+  String get baseUrl => throw _privateConstructorUsedError;
+  WebSourceSearchParser get search => throw _privateConstructorUsedError;
+  WebSourceMangaParser? get manga => throw _privateConstructorUsedError;
+  String get slug => throw _privateConstructorUsedError;
+
+  /// Serializes this WebSource to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WebSource
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $WebSourceCopyWith<WebSource> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WebSourceCopyWith<$Res> {
+  factory $WebSourceCopyWith(WebSource value, $Res Function(WebSource) then) =
+      _$WebSourceCopyWithImpl<$Res, WebSource>;
+  @useResult
+  $Res call(
+      {String name,
+      String version,
+      WebSourceParseType type,
+      String baseUrl,
+      WebSourceSearchParser search,
+      WebSourceMangaParser? manga,
+      String slug});
+
+  $WebSourceSearchParserCopyWith<$Res> get search;
+  $WebSourceMangaParserCopyWith<$Res>? get manga;
+}
+
+/// @nodoc
+class _$WebSourceCopyWithImpl<$Res, $Val extends WebSource>
+    implements $WebSourceCopyWith<$Res> {
+  _$WebSourceCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of WebSource
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? version = null,
+    Object? type = null,
+    Object? baseUrl = null,
+    Object? search = null,
+    Object? manga = freezed,
+    Object? slug = null,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as WebSourceParseType,
+      baseUrl: null == baseUrl
+          ? _value.baseUrl
+          : baseUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      search: null == search
+          ? _value.search
+          : search // ignore: cast_nullable_to_non_nullable
+              as WebSourceSearchParser,
+      manga: freezed == manga
+          ? _value.manga
+          : manga // ignore: cast_nullable_to_non_nullable
+              as WebSourceMangaParser?,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+
+  /// Create a copy of WebSource
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WebSourceSearchParserCopyWith<$Res> get search {
+    return $WebSourceSearchParserCopyWith<$Res>(_value.search, (value) {
+      return _then(_value.copyWith(search: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSource
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WebSourceMangaParserCopyWith<$Res>? get manga {
+    if (_value.manga == null) {
+      return null;
+    }
+
+    return $WebSourceMangaParserCopyWith<$Res>(_value.manga!, (value) {
+      return _then(_value.copyWith(manga: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$WebSourceImplCopyWith<$Res>
+    implements $WebSourceCopyWith<$Res> {
+  factory _$$WebSourceImplCopyWith(
+          _$WebSourceImpl value, $Res Function(_$WebSourceImpl) then) =
+      __$$WebSourceImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String name,
+      String version,
+      WebSourceParseType type,
+      String baseUrl,
+      WebSourceSearchParser search,
+      WebSourceMangaParser? manga,
+      String slug});
+
+  @override
+  $WebSourceSearchParserCopyWith<$Res> get search;
+  @override
+  $WebSourceMangaParserCopyWith<$Res>? get manga;
+}
+
+/// @nodoc
+class __$$WebSourceImplCopyWithImpl<$Res>
+    extends _$WebSourceCopyWithImpl<$Res, _$WebSourceImpl>
+    implements _$$WebSourceImplCopyWith<$Res> {
+  __$$WebSourceImplCopyWithImpl(
+      _$WebSourceImpl _value, $Res Function(_$WebSourceImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of WebSource
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? version = null,
+    Object? type = null,
+    Object? baseUrl = null,
+    Object? search = null,
+    Object? manga = freezed,
+    Object? slug = null,
+  }) {
+    return _then(_$WebSourceImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as WebSourceParseType,
+      baseUrl: null == baseUrl
+          ? _value.baseUrl
+          : baseUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      search: null == search
+          ? _value.search
+          : search // ignore: cast_nullable_to_non_nullable
+              as WebSourceSearchParser,
+      manga: freezed == manga
+          ? _value.manga
+          : manga // ignore: cast_nullable_to_non_nullable
+              as WebSourceMangaParser?,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WebSourceImpl extends _WebSource {
+  const _$WebSourceImpl(
+      {required this.name,
+      required this.version,
+      required this.type,
+      required this.baseUrl,
+      required this.search,
+      this.manga,
+      required this.slug})
+      : super._();
+
+  factory _$WebSourceImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebSourceImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String version;
+  @override
+  final WebSourceParseType type;
+  @override
+  final String baseUrl;
+  @override
+  final WebSourceSearchParser search;
+  @override
+  final WebSourceMangaParser? manga;
+  @override
+  final String slug;
+
+  @override
+  String toString() {
+    return 'WebSource(name: $name, version: $version, type: $type, baseUrl: $baseUrl, search: $search, manga: $manga, slug: $slug)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WebSourceImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl) &&
+            (identical(other.search, search) || other.search == search) &&
+            (identical(other.manga, manga) || other.manga == manga) &&
+            (identical(other.slug, slug) || other.slug == slug));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, name, version, type, baseUrl, search, manga, slug);
+
+  /// Create a copy of WebSource
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WebSourceImplCopyWith<_$WebSourceImpl> get copyWith =>
+      __$$WebSourceImplCopyWithImpl<_$WebSourceImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WebSourceImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WebSource extends WebSource {
+  const factory _WebSource(
+      {required final String name,
+      required final String version,
+      required final WebSourceParseType type,
+      required final String baseUrl,
+      required final WebSourceSearchParser search,
+      final WebSourceMangaParser? manga,
+      required final String slug}) = _$WebSourceImpl;
+  const _WebSource._() : super._();
+
+  factory _WebSource.fromJson(Map<String, dynamic> json) =
+      _$WebSourceImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String get version;
+  @override
+  WebSourceParseType get type;
+  @override
+  String get baseUrl;
+  @override
+  WebSourceSearchParser get search;
+  @override
+  WebSourceMangaParser? get manga;
+  @override
+  String get slug;
+
+  /// Create a copy of WebSource
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WebSourceImplCopyWith<_$WebSourceImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+WebSourceSearchParser _$WebSourceSearchParserFromJson(
+    Map<String, dynamic> json) {
+  return _WebSourceSearchParser.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WebSourceSearchParser {
+  String get searchPath => throw _privateConstructorUsedError;
+  TagParser get items => throw _privateConstructorUsedError;
+  TagParser get url => throw _privateConstructorUsedError;
+  TagParser get cover => throw _privateConstructorUsedError;
+  TagParser get title => throw _privateConstructorUsedError;
+  TagParser? get altTitles => throw _privateConstructorUsedError;
+  TagParser? get urlTrim => throw _privateConstructorUsedError;
+
+  /// Serializes this WebSourceSearchParser to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $WebSourceSearchParserCopyWith<WebSourceSearchParser> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WebSourceSearchParserCopyWith<$Res> {
+  factory $WebSourceSearchParserCopyWith(WebSourceSearchParser value,
+          $Res Function(WebSourceSearchParser) then) =
+      _$WebSourceSearchParserCopyWithImpl<$Res, WebSourceSearchParser>;
+  @useResult
+  $Res call(
+      {String searchPath,
+      TagParser items,
+      TagParser url,
+      TagParser cover,
+      TagParser title,
+      TagParser? altTitles,
+      TagParser? urlTrim});
+
+  $TagParserCopyWith<$Res> get items;
+  $TagParserCopyWith<$Res> get url;
+  $TagParserCopyWith<$Res> get cover;
+  $TagParserCopyWith<$Res> get title;
+  $TagParserCopyWith<$Res>? get altTitles;
+  $TagParserCopyWith<$Res>? get urlTrim;
+}
+
+/// @nodoc
+class _$WebSourceSearchParserCopyWithImpl<$Res,
+        $Val extends WebSourceSearchParser>
+    implements $WebSourceSearchParserCopyWith<$Res> {
+  _$WebSourceSearchParserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? searchPath = null,
+    Object? items = null,
+    Object? url = null,
+    Object? cover = null,
+    Object? title = null,
+    Object? altTitles = freezed,
+    Object? urlTrim = freezed,
+  }) {
+    return _then(_value.copyWith(
+      searchPath: null == searchPath
+          ? _value.searchPath
+          : searchPath // ignore: cast_nullable_to_non_nullable
+              as String,
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      cover: null == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      altTitles: freezed == altTitles
+          ? _value.altTitles
+          : altTitles // ignore: cast_nullable_to_non_nullable
+              as TagParser?,
+      urlTrim: freezed == urlTrim
+          ? _value.urlTrim
+          : urlTrim // ignore: cast_nullable_to_non_nullable
+              as TagParser?,
+    ) as $Val);
+  }
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get items {
+    return $TagParserCopyWith<$Res>(_value.items, (value) {
+      return _then(_value.copyWith(items: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get url {
+    return $TagParserCopyWith<$Res>(_value.url, (value) {
+      return _then(_value.copyWith(url: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get cover {
+    return $TagParserCopyWith<$Res>(_value.cover, (value) {
+      return _then(_value.copyWith(cover: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get title {
+    return $TagParserCopyWith<$Res>(_value.title, (value) {
+      return _then(_value.copyWith(title: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res>? get altTitles {
+    if (_value.altTitles == null) {
+      return null;
+    }
+
+    return $TagParserCopyWith<$Res>(_value.altTitles!, (value) {
+      return _then(_value.copyWith(altTitles: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res>? get urlTrim {
+    if (_value.urlTrim == null) {
+      return null;
+    }
+
+    return $TagParserCopyWith<$Res>(_value.urlTrim!, (value) {
+      return _then(_value.copyWith(urlTrim: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$WebSourceSearchParserImplCopyWith<$Res>
+    implements $WebSourceSearchParserCopyWith<$Res> {
+  factory _$$WebSourceSearchParserImplCopyWith(
+          _$WebSourceSearchParserImpl value,
+          $Res Function(_$WebSourceSearchParserImpl) then) =
+      __$$WebSourceSearchParserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String searchPath,
+      TagParser items,
+      TagParser url,
+      TagParser cover,
+      TagParser title,
+      TagParser? altTitles,
+      TagParser? urlTrim});
+
+  @override
+  $TagParserCopyWith<$Res> get items;
+  @override
+  $TagParserCopyWith<$Res> get url;
+  @override
+  $TagParserCopyWith<$Res> get cover;
+  @override
+  $TagParserCopyWith<$Res> get title;
+  @override
+  $TagParserCopyWith<$Res>? get altTitles;
+  @override
+  $TagParserCopyWith<$Res>? get urlTrim;
+}
+
+/// @nodoc
+class __$$WebSourceSearchParserImplCopyWithImpl<$Res>
+    extends _$WebSourceSearchParserCopyWithImpl<$Res,
+        _$WebSourceSearchParserImpl>
+    implements _$$WebSourceSearchParserImplCopyWith<$Res> {
+  __$$WebSourceSearchParserImplCopyWithImpl(_$WebSourceSearchParserImpl _value,
+      $Res Function(_$WebSourceSearchParserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? searchPath = null,
+    Object? items = null,
+    Object? url = null,
+    Object? cover = null,
+    Object? title = null,
+    Object? altTitles = freezed,
+    Object? urlTrim = freezed,
+  }) {
+    return _then(_$WebSourceSearchParserImpl(
+      searchPath: null == searchPath
+          ? _value.searchPath
+          : searchPath // ignore: cast_nullable_to_non_nullable
+              as String,
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      cover: null == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      altTitles: freezed == altTitles
+          ? _value.altTitles
+          : altTitles // ignore: cast_nullable_to_non_nullable
+              as TagParser?,
+      urlTrim: freezed == urlTrim
+          ? _value.urlTrim
+          : urlTrim // ignore: cast_nullable_to_non_nullable
+              as TagParser?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WebSourceSearchParserImpl implements _WebSourceSearchParser {
+  const _$WebSourceSearchParserImpl(
+      {required this.searchPath,
+      required this.items,
+      required this.url,
+      required this.cover,
+      required this.title,
+      this.altTitles,
+      this.urlTrim});
+
+  factory _$WebSourceSearchParserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebSourceSearchParserImplFromJson(json);
+
+  @override
+  final String searchPath;
+  @override
+  final TagParser items;
+  @override
+  final TagParser url;
+  @override
+  final TagParser cover;
+  @override
+  final TagParser title;
+  @override
+  final TagParser? altTitles;
+  @override
+  final TagParser? urlTrim;
+
+  @override
+  String toString() {
+    return 'WebSourceSearchParser(searchPath: $searchPath, items: $items, url: $url, cover: $cover, title: $title, altTitles: $altTitles, urlTrim: $urlTrim)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WebSourceSearchParserImpl &&
+            (identical(other.searchPath, searchPath) ||
+                other.searchPath == searchPath) &&
+            (identical(other.items, items) || other.items == items) &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.cover, cover) || other.cover == cover) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.altTitles, altTitles) ||
+                other.altTitles == altTitles) &&
+            (identical(other.urlTrim, urlTrim) || other.urlTrim == urlTrim));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, searchPath, items, url, cover, title, altTitles, urlTrim);
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WebSourceSearchParserImplCopyWith<_$WebSourceSearchParserImpl>
+      get copyWith => __$$WebSourceSearchParserImplCopyWithImpl<
+          _$WebSourceSearchParserImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WebSourceSearchParserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WebSourceSearchParser implements WebSourceSearchParser {
+  const factory _WebSourceSearchParser(
+      {required final String searchPath,
+      required final TagParser items,
+      required final TagParser url,
+      required final TagParser cover,
+      required final TagParser title,
+      final TagParser? altTitles,
+      final TagParser? urlTrim}) = _$WebSourceSearchParserImpl;
+
+  factory _WebSourceSearchParser.fromJson(Map<String, dynamic> json) =
+      _$WebSourceSearchParserImpl.fromJson;
+
+  @override
+  String get searchPath;
+  @override
+  TagParser get items;
+  @override
+  TagParser get url;
+  @override
+  TagParser get cover;
+  @override
+  TagParser get title;
+  @override
+  TagParser? get altTitles;
+  @override
+  TagParser? get urlTrim;
+
+  /// Create a copy of WebSourceSearchParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WebSourceSearchParserImplCopyWith<_$WebSourceSearchParserImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+WebSourceMangaParser _$WebSourceMangaParserFromJson(Map<String, dynamic> json) {
+  return _WebSourceMangaParser.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WebSourceMangaParser {
+  String get mangaPath => throw _privateConstructorUsedError;
+  TagParser get title => throw _privateConstructorUsedError;
+  TagParser get description => throw _privateConstructorUsedError;
+  TagParser get artist => throw _privateConstructorUsedError;
+  TagParser get author => throw _privateConstructorUsedError;
+  TagParser get cover => throw _privateConstructorUsedError;
+  WebSourceChapterParser get chapters => throw _privateConstructorUsedError;
+
+  /// Serializes this WebSourceMangaParser to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $WebSourceMangaParserCopyWith<WebSourceMangaParser> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WebSourceMangaParserCopyWith<$Res> {
+  factory $WebSourceMangaParserCopyWith(WebSourceMangaParser value,
+          $Res Function(WebSourceMangaParser) then) =
+      _$WebSourceMangaParserCopyWithImpl<$Res, WebSourceMangaParser>;
+  @useResult
+  $Res call(
+      {String mangaPath,
+      TagParser title,
+      TagParser description,
+      TagParser artist,
+      TagParser author,
+      TagParser cover,
+      WebSourceChapterParser chapters});
+
+  $TagParserCopyWith<$Res> get title;
+  $TagParserCopyWith<$Res> get description;
+  $TagParserCopyWith<$Res> get artist;
+  $TagParserCopyWith<$Res> get author;
+  $TagParserCopyWith<$Res> get cover;
+  $WebSourceChapterParserCopyWith<$Res> get chapters;
+}
+
+/// @nodoc
+class _$WebSourceMangaParserCopyWithImpl<$Res,
+        $Val extends WebSourceMangaParser>
+    implements $WebSourceMangaParserCopyWith<$Res> {
+  _$WebSourceMangaParserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? mangaPath = null,
+    Object? title = null,
+    Object? description = null,
+    Object? artist = null,
+    Object? author = null,
+    Object? cover = null,
+    Object? chapters = null,
+  }) {
+    return _then(_value.copyWith(
+      mangaPath: null == mangaPath
+          ? _value.mangaPath
+          : mangaPath // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      artist: null == artist
+          ? _value.artist
+          : artist // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      author: null == author
+          ? _value.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      cover: null == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      chapters: null == chapters
+          ? _value.chapters
+          : chapters // ignore: cast_nullable_to_non_nullable
+              as WebSourceChapterParser,
+    ) as $Val);
+  }
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get title {
+    return $TagParserCopyWith<$Res>(_value.title, (value) {
+      return _then(_value.copyWith(title: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get description {
+    return $TagParserCopyWith<$Res>(_value.description, (value) {
+      return _then(_value.copyWith(description: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get artist {
+    return $TagParserCopyWith<$Res>(_value.artist, (value) {
+      return _then(_value.copyWith(artist: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get author {
+    return $TagParserCopyWith<$Res>(_value.author, (value) {
+      return _then(_value.copyWith(author: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get cover {
+    return $TagParserCopyWith<$Res>(_value.cover, (value) {
+      return _then(_value.copyWith(cover: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WebSourceChapterParserCopyWith<$Res> get chapters {
+    return $WebSourceChapterParserCopyWith<$Res>(_value.chapters, (value) {
+      return _then(_value.copyWith(chapters: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$WebSourceMangaParserImplCopyWith<$Res>
+    implements $WebSourceMangaParserCopyWith<$Res> {
+  factory _$$WebSourceMangaParserImplCopyWith(_$WebSourceMangaParserImpl value,
+          $Res Function(_$WebSourceMangaParserImpl) then) =
+      __$$WebSourceMangaParserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String mangaPath,
+      TagParser title,
+      TagParser description,
+      TagParser artist,
+      TagParser author,
+      TagParser cover,
+      WebSourceChapterParser chapters});
+
+  @override
+  $TagParserCopyWith<$Res> get title;
+  @override
+  $TagParserCopyWith<$Res> get description;
+  @override
+  $TagParserCopyWith<$Res> get artist;
+  @override
+  $TagParserCopyWith<$Res> get author;
+  @override
+  $TagParserCopyWith<$Res> get cover;
+  @override
+  $WebSourceChapterParserCopyWith<$Res> get chapters;
+}
+
+/// @nodoc
+class __$$WebSourceMangaParserImplCopyWithImpl<$Res>
+    extends _$WebSourceMangaParserCopyWithImpl<$Res, _$WebSourceMangaParserImpl>
+    implements _$$WebSourceMangaParserImplCopyWith<$Res> {
+  __$$WebSourceMangaParserImplCopyWithImpl(_$WebSourceMangaParserImpl _value,
+      $Res Function(_$WebSourceMangaParserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? mangaPath = null,
+    Object? title = null,
+    Object? description = null,
+    Object? artist = null,
+    Object? author = null,
+    Object? cover = null,
+    Object? chapters = null,
+  }) {
+    return _then(_$WebSourceMangaParserImpl(
+      mangaPath: null == mangaPath
+          ? _value.mangaPath
+          : mangaPath // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      artist: null == artist
+          ? _value.artist
+          : artist // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      author: null == author
+          ? _value.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      cover: null == cover
+          ? _value.cover
+          : cover // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      chapters: null == chapters
+          ? _value.chapters
+          : chapters // ignore: cast_nullable_to_non_nullable
+              as WebSourceChapterParser,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WebSourceMangaParserImpl implements _WebSourceMangaParser {
+  const _$WebSourceMangaParserImpl(
+      {required this.mangaPath,
+      required this.title,
+      required this.description,
+      required this.artist,
+      required this.author,
+      required this.cover,
+      required this.chapters});
+
+  factory _$WebSourceMangaParserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebSourceMangaParserImplFromJson(json);
+
+  @override
+  final String mangaPath;
+  @override
+  final TagParser title;
+  @override
+  final TagParser description;
+  @override
+  final TagParser artist;
+  @override
+  final TagParser author;
+  @override
+  final TagParser cover;
+  @override
+  final WebSourceChapterParser chapters;
+
+  @override
+  String toString() {
+    return 'WebSourceMangaParser(mangaPath: $mangaPath, title: $title, description: $description, artist: $artist, author: $author, cover: $cover, chapters: $chapters)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WebSourceMangaParserImpl &&
+            (identical(other.mangaPath, mangaPath) ||
+                other.mangaPath == mangaPath) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.artist, artist) || other.artist == artist) &&
+            (identical(other.author, author) || other.author == author) &&
+            (identical(other.cover, cover) || other.cover == cover) &&
+            (identical(other.chapters, chapters) ||
+                other.chapters == chapters));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, mangaPath, title, description,
+      artist, author, cover, chapters);
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WebSourceMangaParserImplCopyWith<_$WebSourceMangaParserImpl>
+      get copyWith =>
+          __$$WebSourceMangaParserImplCopyWithImpl<_$WebSourceMangaParserImpl>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WebSourceMangaParserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WebSourceMangaParser implements WebSourceMangaParser {
+  const factory _WebSourceMangaParser(
+          {required final String mangaPath,
+          required final TagParser title,
+          required final TagParser description,
+          required final TagParser artist,
+          required final TagParser author,
+          required final TagParser cover,
+          required final WebSourceChapterParser chapters}) =
+      _$WebSourceMangaParserImpl;
+
+  factory _WebSourceMangaParser.fromJson(Map<String, dynamic> json) =
+      _$WebSourceMangaParserImpl.fromJson;
+
+  @override
+  String get mangaPath;
+  @override
+  TagParser get title;
+  @override
+  TagParser get description;
+  @override
+  TagParser get artist;
+  @override
+  TagParser get author;
+  @override
+  TagParser get cover;
+  @override
+  WebSourceChapterParser get chapters;
+
+  /// Create a copy of WebSourceMangaParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WebSourceMangaParserImplCopyWith<_$WebSourceMangaParserImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+WebSourceChapterParser _$WebSourceChapterParserFromJson(
+    Map<String, dynamic> json) {
+  return _WebSourceChapterParser.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WebSourceChapterParser {
+  TagParser get items => throw _privateConstructorUsedError;
+  TagParser get url => throw _privateConstructorUsedError;
+  TagParser get title => throw _privateConstructorUsedError;
+  TagParser get lastUpdated => throw _privateConstructorUsedError;
+
+  /// Serializes this WebSourceChapterParser to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $WebSourceChapterParserCopyWith<WebSourceChapterParser> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WebSourceChapterParserCopyWith<$Res> {
+  factory $WebSourceChapterParserCopyWith(WebSourceChapterParser value,
+          $Res Function(WebSourceChapterParser) then) =
+      _$WebSourceChapterParserCopyWithImpl<$Res, WebSourceChapterParser>;
+  @useResult
+  $Res call(
+      {TagParser items, TagParser url, TagParser title, TagParser lastUpdated});
+
+  $TagParserCopyWith<$Res> get items;
+  $TagParserCopyWith<$Res> get url;
+  $TagParserCopyWith<$Res> get title;
+  $TagParserCopyWith<$Res> get lastUpdated;
+}
+
+/// @nodoc
+class _$WebSourceChapterParserCopyWithImpl<$Res,
+        $Val extends WebSourceChapterParser>
+    implements $WebSourceChapterParserCopyWith<$Res> {
+  _$WebSourceChapterParserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+    Object? url = null,
+    Object? title = null,
+    Object? lastUpdated = null,
+  }) {
+    return _then(_value.copyWith(
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+    ) as $Val);
+  }
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get items {
+    return $TagParserCopyWith<$Res>(_value.items, (value) {
+      return _then(_value.copyWith(items: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get url {
+    return $TagParserCopyWith<$Res>(_value.url, (value) {
+      return _then(_value.copyWith(url: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get title {
+    return $TagParserCopyWith<$Res>(_value.title, (value) {
+      return _then(_value.copyWith(title: value) as $Val);
+    });
+  }
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $TagParserCopyWith<$Res> get lastUpdated {
+    return $TagParserCopyWith<$Res>(_value.lastUpdated, (value) {
+      return _then(_value.copyWith(lastUpdated: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$WebSourceChapterParserImplCopyWith<$Res>
+    implements $WebSourceChapterParserCopyWith<$Res> {
+  factory _$$WebSourceChapterParserImplCopyWith(
+          _$WebSourceChapterParserImpl value,
+          $Res Function(_$WebSourceChapterParserImpl) then) =
+      __$$WebSourceChapterParserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {TagParser items, TagParser url, TagParser title, TagParser lastUpdated});
+
+  @override
+  $TagParserCopyWith<$Res> get items;
+  @override
+  $TagParserCopyWith<$Res> get url;
+  @override
+  $TagParserCopyWith<$Res> get title;
+  @override
+  $TagParserCopyWith<$Res> get lastUpdated;
+}
+
+/// @nodoc
+class __$$WebSourceChapterParserImplCopyWithImpl<$Res>
+    extends _$WebSourceChapterParserCopyWithImpl<$Res,
+        _$WebSourceChapterParserImpl>
+    implements _$$WebSourceChapterParserImplCopyWith<$Res> {
+  __$$WebSourceChapterParserImplCopyWithImpl(
+      _$WebSourceChapterParserImpl _value,
+      $Res Function(_$WebSourceChapterParserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+    Object? url = null,
+    Object? title = null,
+    Object? lastUpdated = null,
+  }) {
+    return _then(_$WebSourceChapterParserImpl(
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as TagParser,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WebSourceChapterParserImpl implements _WebSourceChapterParser {
+  const _$WebSourceChapterParserImpl(
+      {required this.items,
+      required this.url,
+      required this.title,
+      required this.lastUpdated});
+
+  factory _$WebSourceChapterParserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebSourceChapterParserImplFromJson(json);
+
+  @override
+  final TagParser items;
+  @override
+  final TagParser url;
+  @override
+  final TagParser title;
+  @override
+  final TagParser lastUpdated;
+
+  @override
+  String toString() {
+    return 'WebSourceChapterParser(items: $items, url: $url, title: $title, lastUpdated: $lastUpdated)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WebSourceChapterParserImpl &&
+            (identical(other.items, items) || other.items == items) &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.lastUpdated, lastUpdated) ||
+                other.lastUpdated == lastUpdated));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, items, url, title, lastUpdated);
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WebSourceChapterParserImplCopyWith<_$WebSourceChapterParserImpl>
+      get copyWith => __$$WebSourceChapterParserImplCopyWithImpl<
+          _$WebSourceChapterParserImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WebSourceChapterParserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WebSourceChapterParser implements WebSourceChapterParser {
+  const factory _WebSourceChapterParser(
+      {required final TagParser items,
+      required final TagParser url,
+      required final TagParser title,
+      required final TagParser lastUpdated}) = _$WebSourceChapterParserImpl;
+
+  factory _WebSourceChapterParser.fromJson(Map<String, dynamic> json) =
+      _$WebSourceChapterParserImpl.fromJson;
+
+  @override
+  TagParser get items;
+  @override
+  TagParser get url;
+  @override
+  TagParser get title;
+  @override
+  TagParser get lastUpdated;
+
+  /// Create a copy of WebSourceChapterParser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WebSourceChapterParserImplCopyWith<_$WebSourceChapterParserImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}

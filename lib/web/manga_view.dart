@@ -316,6 +316,60 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     );
                   },
                 ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final key = info.getKey();
+
+                    return IconButton.filledTonal(
+                      tooltip: 'Reset Read Markers',
+                      style: IconButton.styleFrom(
+                        backgroundColor: theme.colorScheme.surface.withAlpha(200),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(6.0),
+                          ),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            final nav = Navigator.of(context);
+                            return AlertDialog(
+                              title: const Text('Reset Read Markers'),
+                              content: const Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Are you sure you want to reset all read markers for this manga?'),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                ElevatedButton(
+                                  child: const Text('No'),
+                                  onPressed: () {
+                                    nav.pop(false);
+                                  },
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    nav.pop(true);
+                                  },
+                                  child: const Text('Yes'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (result == true) {
+                          ref.read(webReadMarkersProvider.notifier).deleteKey(key);
+                        }
+                      },
+                      icon: const Icon(Icons.restore),
+                    );
+                  },
+                ),
                 const SizedBox(width: 2),
               ],
             ),

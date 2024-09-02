@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gagaku/cache.dart';
@@ -7,6 +8,7 @@ import 'package:gagaku/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
+import 'package:gagaku/web/config.dart';
 import 'package:gagaku/web/types.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -26,7 +28,7 @@ class ProxyHandler {
   }
 
   final Ref ref;
-  final http.Client _client = RateLimitedClient();
+  final http.Client client = CustomClient();
   late final CacheManager _cache;
 
   Future<void> invalidateCacheItem(String item) async {
@@ -91,7 +93,7 @@ class ProxyHandler {
         return ProxyInfo(proxy: proxy[1], code: proxy[2]);
       default:
         logger.d('ProxyHandler: retrieving url $url');
-        final response = await _client.send((http.Request('GET', Uri.parse(url))..followRedirects = false));
+        final response = await client.send((http.Request('GET', Uri.parse(url))..followRedirects = false));
 
         if (response.statusCode != 302 || !response.headers.containsKey('location')) {
           return null;
@@ -136,7 +138,7 @@ class ProxyHandler {
       return _cache.get(key, WebManga.fromJson).get<WebManga>();
     }
 
-    final response = await _client.get(Uri.parse(url));
+    final response = await client.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
@@ -157,7 +159,7 @@ class ProxyHandler {
   Future<List<String>> getChapter(String code) async {
     final url = "https://cubari.moe$code";
 
-    final response = await _client.get(Uri.parse(url));
+    final response = await client.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
@@ -493,5 +495,97 @@ class WebReadMarkers extends _$WebReadMarkers {
 
       return {...oldstate};
     });
+  }
+
+  Future<void> deleteKey(String manga) async {
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final keyExists = oldstate.containsKey(manga);
+
+      // Refresh
+      if (keyExists) {
+        oldstate.remove(manga);
+      }
+
+      final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_read_history', json.encode(converted));
+
+      return {...oldstate};
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class WebSourceManager extends _$WebSourceManager {
+  Future<Map<String, WebSource>> fetchData() async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    final list = <String, WebSource>{};
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final entities = await dir.list().toList();
+
+      for (final e in entities) {
+        if (e is File && e.path.endsWith('.json')) {
+          String dat = await e.readAsString();
+
+          try {
+            final source = WebSource.fromJson(json.decode(dat));
+            list.putIfAbsent(source.name, () => source);
+          } catch (ex) {
+            logger.w("Error parsing web source file ${e.path}", error: ex);
+          }
+        }
+      }
+    }
+
+    return list;
+  }
+
+  @override
+  FutureOr<Map<String, WebSource>> build() async {
+    return fetchData();
+  }
+
+  Future<void> addSource(WebSource source) async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final data = json.encode(source.toJson());
+      await File('${dir.path}${Platform.pathSeparator}${source.name}.json').writeAsString(data, flush: true);
+    }
+
+    ref.invalidateSelf();
+  }
+
+  Future<void> removeSource(WebSource source) async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final file = File('${dir.path}${Platform.pathSeparator}${source.name}.json');
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    }
+
+    ref.invalidateSelf();
+  }
+
+  Future<void> updateSource(WebSource source) async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final data = json.encode(source.toJson());
+      await File('${dir.path}${Platform.pathSeparator}${source.name}.json').writeAsString(data, flush: true);
+    }
+
+    ref.invalidateSelf();
   }
 }
