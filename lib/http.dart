@@ -1,27 +1,29 @@
 import 'dart:io';
 
+import 'package:cronet_http/cronet_http.dart';
+import 'package:gagaku/model.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 const _baseUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0';
 
-class RateLimitedClient extends http.BaseClient {
-  final http.Client _baseClient = RetryClient(
-    http.Client(),
-    retries: 2,
-    when: (response) => false,
-    whenError: (error, stacktrace) => error is HttpException || error is http.ClientException,
-  );
-  final Future<String> _userAgent;
+http.Client _createHttpClient([bool useCustomUA = false]) {
+  final userAgent = useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
 
+  if (Platform.isAndroid) {
+    final engine = CronetEngine.build(cacheMode: CacheMode.memory, cacheMaxSize: 4 * 1024 * 1024, userAgent: userAgent);
+    return CronetClient.fromCronetEngine(engine, closeEngine: true);
+  }
+
+  return IOClient(HttpClient()..userAgent = userAgent);
+}
+
+class RateLimitedClient extends CustomClient {
   static const _rateLimit = Duration(milliseconds: 200); // 5 per second
   final _pendingCalls = <int>[];
 
-  RateLimitedClient({useCustomUA = false})
-      : _userAgent = useCustomUA
-            ? PackageInfo.fromPlatform().then((info) => '${info.appName}/${info.version}')
-            : Future.value(_baseUserAgent);
+  RateLimitedClient({super.useCustomUA});
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
@@ -31,7 +33,6 @@ class RateLimitedClient extends http.BaseClient {
     final wait = _rateLimit * numPending;
     await Future.delayed(wait);
 
-    request.headers[HttpHeaders.userAgentHeader] = await _userAgent;
     return _baseClient.send(request).whenComplete(() {
       _pendingCalls.remove(request.hashCode);
     });
@@ -39,22 +40,18 @@ class RateLimitedClient extends http.BaseClient {
 }
 
 class CustomClient extends http.BaseClient {
-  final http.Client _baseClient = RetryClient(
-    http.Client(),
-    retries: 2,
-    when: (response) => false,
-    whenError: (error, stacktrace) => error is HttpException || error is http.ClientException,
-  );
-  final Future<String> _userAgent;
+  final http.Client _baseClient;
 
-  CustomClient({useCustomUA = false})
-      : _userAgent = useCustomUA
-            ? PackageInfo.fromPlatform().then((info) => '${info.appName}/${info.version}')
-            : Future.value(_baseUserAgent);
+  CustomClient({bool useCustomUA = false})
+      : _baseClient = RetryClient(
+          _createHttpClient(useCustomUA),
+          retries: 2,
+          when: (response) => false,
+          whenError: (error, stacktrace) => error is HttpException || error is http.ClientException,
+        );
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    request.headers[HttpHeaders.userAgentHeader] = await _userAgent;
     return _baseClient.send(request);
   }
 }

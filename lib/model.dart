@@ -33,3 +33,16 @@ abstract class GagakuRoute {
 
 const gagakuBox = 'gagaku_box';
 const gagakuCache = 'gagaku_cache';
+
+class GagakuData {
+  GagakuData._internal();
+
+  static final GagakuData _instance = GagakuData._internal();
+
+  // Default user agent
+  String gagakuUserAgent = 'gagaku/1.x';
+
+  factory GagakuData() {
+    return _instance;
+  }
+}
