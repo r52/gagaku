@@ -583,7 +583,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       left: BorderSide(color: isRead == true ? tileColor : Colors.blue, width: 4.0),
     );
 
-    final textstyle = TextStyle(color: (isRead == true ? theme.highlightColor : theme.colorScheme.primary));
+    final textstyle = TextStyle(color: (isRead == true ? theme.disabledColor : theme.colorScheme.primary));
 
     final markReadBtn = IconButton(
       onPressed: () async {
@@ -596,7 +596,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       iconSize: 20,
       tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
       icon: Icon(isRead == true ? Icons.visibility_off : Icons.visibility,
-          color: (isRead == true ? theme.highlightColor : theme.primaryIconTheme.color)),
+          color: (isRead == true ? theme.disabledColor : theme.primaryIconTheme.color)),
       constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
       visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
     );
