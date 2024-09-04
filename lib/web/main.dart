@@ -19,6 +19,7 @@ class WebSourceHome extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final api = ref.watch(proxyProvider);
 
@@ -38,6 +39,7 @@ class WebSourceHome extends HookConsumerWidget {
             spacing: 0.0,
             children: [
               IconButton(
+                color: theme.colorScheme.onPrimaryContainer,
                 icon: const Icon(Icons.search),
                 onPressed: () => nav.push(SlideTransitionRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) => const WebSourceSearchWidget(),
@@ -45,12 +47,14 @@ class WebSourceHome extends HookConsumerWidget {
                 tooltip: 'Search Web Sources',
               ),
               IconButton(
+                color: theme.colorScheme.onPrimaryContainer,
                 onPressed: () => openLinkDialog(context, api),
                 icon: const Icon(Icons.open_in_browser),
                 tooltip: 'Open Link',
               ),
               MenuAnchor(
                 builder: (context, controller, child) => IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
                   onPressed: () {
                     if (controller.isOpen) {
                       controller.close();

@@ -49,6 +49,7 @@ class LocalLibraryHome extends StatelessWidget {
             children: [
               MenuAnchor(
                 builder: (context, controller, child) => IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
                   onPressed: () {
                     if (controller.isOpen) {
                       controller.close();
