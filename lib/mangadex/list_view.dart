@@ -145,7 +145,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                       }
 
                       return IconButton(
-                        style: Styles.buttonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
+                        style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
                         onPressed: () => ref.read(followedListsProvider.notifier).setFollow(list, idx == -1),
                         icon: Icon(
                           idx == -1 ? Icons.bookmark_border : Icons.bookmark,
@@ -157,7 +157,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                   ),
                   if (list.user != null && me != null && list.user!.id == me.id)
                     IconButton(
-                      style: Styles.buttonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
+                      style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
                       onPressed: () {
                         context.push('/list/edit/${list.id}', extra: list);
                       },

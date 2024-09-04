@@ -632,6 +632,20 @@ class ListSpinner extends StatelessWidget {
 }
 
 class Styles {
+  static ButtonStyle squareIconButtonStyle({
+    Color? backgroundColor,
+  }) =>
+      IconButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: EdgeInsets.zero,
+        backgroundColor: backgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(6.0),
+          ),
+        ),
+      );
+
   static ButtonStyle buttonStyle({
     Color? backgroundColor,
     TextStyle? textStyle,

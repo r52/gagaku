@@ -294,16 +294,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       );
                     }
 
-                    return IconButton.filledTonal(
+                    return IconButton(
                       tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
-                      style: IconButton.styleFrom(
-                        backgroundColor: theme.colorScheme.surface.withAlpha(200),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(6.0),
-                          ),
-                        ),
-                      ),
+                      style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surface.withAlpha(200)),
                       color: favorited ? theme.colorScheme.primary : null,
                       onPressed: () async {
                         if (favorited) {
@@ -320,16 +313,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   builder: (context, ref, child) {
                     final key = info.getKey();
 
-                    return IconButton.filledTonal(
+                    return IconButton(
                       tooltip: 'Reset Read Markers',
-                      style: IconButton.styleFrom(
-                        backgroundColor: theme.colorScheme.surface.withAlpha(200),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(6.0),
-                          ),
-                        ),
-                      ),
+                      style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surface.withAlpha(200)),
                       onPressed: () async {
                         final result = await showDialog<bool>(
                           context: context,

@@ -307,19 +307,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 }
 
                                 if (reading != null) {
-                                  return IconButton.filledTonal(
+                                  return IconButton(
                                     padding: EdgeInsets.zero,
                                     tooltip: following ? 'Unfollow Manga' : 'Follow Manga',
-                                    style: IconButton.styleFrom(
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      padding: EdgeInsets.zero,
-                                      backgroundColor: theme.colorScheme.surface.withAlpha(200),
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(6.0),
-                                        ),
-                                      ),
-                                    ),
+                                    style: Styles.squareIconButtonStyle(
+                                        backgroundColor: theme.colorScheme.surface.withAlpha(200)),
                                     color: theme.colorScheme.primary,
                                     onPressed: () async {
                                       bool set = !following;
