@@ -1193,13 +1193,13 @@ class _RatingMenu extends HookConsumerWidget {
                   alignment: PlaceholderAlignment.middle,
                   child: Icon(
                     Icons.star_border,
-                    color: hasRating ? theme.colorScheme.onPrimary : null,
+                    color: hasRating ? theme.colorScheme.onPrimaryContainer : null,
                   )),
               if (hasRating)
                 TextSpan(
                   text: ' ${ratings[manga.id]!.rating}',
                   style: TextStyle(
-                    color: theme.colorScheme.onPrimary,
+                    color: theme.colorScheme.onPrimaryContainer,
                   ),
                 )
             ],
