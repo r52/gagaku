@@ -7,8 +7,8 @@ import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
-import 'package:gagaku/web/model.dart';
-import 'package:gagaku/web/types.dart';
+import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -45,21 +45,20 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, ProxyInfo info) async {
+Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
-  final proxy = await api.handleProxy(info);
+  final proxy = await api.handleSource(info);
 
   if (proxy.code != null) {
     ref
         .read(webSourceHistoryProvider.notifier)
-        .add(HistoryLink(title: '${info.proxy}: ${info.code}', url: '${info.getURL()}1/1/'));
-    return WebReaderData(source: proxy.code!);
+        .add(HistoryLink(title: '${info.source}: ${info.location}', url: '${info.getURL()}1/1/'));
+    return WebReaderData(source: proxy.code!, info: info);
   }
 
   if (proxy.manga != null) {
-    ref
-        .read(webSourceHistoryProvider.notifier)
-        .add(HistoryLink(title: '${info.proxy}: ${proxy.manga?.title}', url: info.getURL(), cover: proxy.manga!.cover));
+    ref.read(webSourceHistoryProvider.notifier).add(
+        HistoryLink(title: '${info.source}: ${proxy.manga?.title}', url: info.getURL(), cover: proxy.manga!.cover));
 
     final chapter = proxy.manga!.getChapter(info.chapter!);
 
@@ -81,7 +80,7 @@ Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, ProxyInf
   throw Exception('Invalid WebChapter link. Data not found.');
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
   List<String> links;
 
@@ -89,7 +88,44 @@ Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
     links = List<String>.from(source);
   } else {
     final api = ref.watch(proxyProvider);
-    links = await api.getChapter(source);
+    links = await api.getChapterFromProxy(source);
+  }
+
+  final pages = links
+      .map((e) => ReaderPage(
+            provider: NetworkImage(e),
+          ))
+      .toList();
+
+  ref.onDispose(() {
+    pages.clear();
+  });
+
+  return pages;
+}
+
+@Riverpod(retry: noRetry)
+Future<List<ReaderPage>> _getSourcePages(_GetSourcePagesRef ref, dynamic source, SourceInfo info) async {
+  List<String>? links;
+
+  final srcMgr = await ref.watch(webSourceManagerProvider.future);
+  final api = ref.watch(proxyProvider);
+
+  if (srcMgr != null) {
+    if (info.parser != null) {
+      links = await srcMgr.parsePages(info.parser!, Uri.parse(source), api.client);
+    } else {
+      for (final MapEntry(key: key, value: src) in srcMgr.sources.entries) {
+        if (info.source == src.name) {
+          links = await srcMgr.parsePages(key, Uri.parse(source), api.client);
+          break;
+        }
+      }
+    }
+  }
+
+  if (links == null) {
+    throw Exception('Failed to download pages from $source');
   }
 
   final pages = links
@@ -119,7 +155,8 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final info = ProxyInfo(proxy: proxy, code: code, chapter: chapter.replaceFirst('-', '.'));
+    final info =
+        SourceInfo(type: SourceType.proxy, source: proxy, location: code, chapter: chapter.replaceFirst('-', '.'));
     final dataProvider = ref.watch(_fetchWebChapterInfoProvider(info));
 
     Widget child;
@@ -176,7 +213,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
     this.title,
     this.manga,
     this.link,
-    this.info,
+    required this.info,
     this.readKey,
     this.onLinkPressed,
     this.backRoute,
@@ -186,7 +223,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
   final String? title;
   final WebManga? manga;
   final Widget? link;
-  final ProxyInfo? info;
+  final SourceInfo info;
   final String? readKey;
   final VoidCallback? onLinkPressed;
   final String? backRoute;
@@ -202,14 +239,16 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       name = source;
     }
 
-    final pageProvider = ref.watch(_getPagesProvider(source));
+    final pageProvider = info.type == SourceType.proxy
+        ? ref.watch(_getPagesProvider(source))
+        : ref.watch(_getSourcePagesProvider(source, info));
 
     useEffect(() {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
-        if (info != null && readKey != null) {
-          ref.read(webReadMarkersProvider.notifier).set(info!.getKey(), readKey!, true);
+        if (readKey != null) {
+          ref.read(webReadMarkersProvider.notifier).set(info.getKey(), readKey!, true);
         }
       });
 

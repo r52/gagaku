@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/web/model.dart';
+import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
-import 'package:gagaku/web/model.dart';
-import 'package:gagaku/web/types.dart';
+import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -16,28 +17,18 @@ import 'package:url_launcher/url_launcher.dart';
 part 'manga_view.g.dart';
 
 Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
-  final manga = state.extra.asOrNull<WebManga>();
+  final info = state.extra.asOrNull<SourceInfo>();
 
-  Widget child;
-
-  if (manga != null) {
-    child = WebMangaViewWidget(
-      manga: manga,
-      info: ProxyInfo(
-        proxy: state.pathParameters['proxy']!,
-        code: state.pathParameters['code']!,
-      ),
-    );
-  } else {
-    child = QueriedWebMangaViewWidget(
-      proxy: state.pathParameters['proxy']!,
-      code: state.pathParameters['code']!,
-    );
-  }
+  final proxy = state.pathParameters['proxy'] ?? state.pathParameters['source'];
+  final code = state.pathParameters['code'] ?? state.pathParameters['url'];
 
   return CustomTransitionPage<void>(
     key: state.pageKey,
-    child: child,
+    child: QueriedWebMangaViewWidget(
+      proxy: proxy,
+      code: code,
+      info: info,
+    ),
     transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
 }
@@ -53,9 +44,9 @@ Page<dynamic> buildRedirectedWebMangaViewPage(BuildContext context, GoRouterStat
 }
 
 @riverpod
-Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, ProxyInfo info) async {
+Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
-  final proxy = await api.handleProxy(info);
+  final proxy = await api.handleSource(info);
 
   if (proxy.manga != null) {
     return proxy.manga!;
@@ -65,7 +56,7 @@ Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, ProxyInfo info) a
 }
 
 @riverpod
-Future<ProxyInfo> _fetchWebMangaRedirect(_FetchWebMangaRedirectRef ref, String url) async {
+Future<SourceInfo> _fetchWebMangaRedirect(_FetchWebMangaRedirectRef ref, String url) async {
   final api = ref.watch(proxyProvider);
   final proxy = await api.parseUrl(url);
 
@@ -95,12 +86,17 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
 
   final String? proxy;
   final String? code;
-  final ProxyInfo? info;
+  final SourceInfo? info;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
-    final inf = info ?? ProxyInfo(proxy: proxy!, code: code!);
+    final inf = info ??
+        SourceInfo(
+          type: SourceType.proxy,
+          source: proxy!,
+          location: code!,
+        );
     final mangaProvider = ref.watch(_fetchWebMangaInfoProvider(inf));
 
     Widget child;
@@ -209,14 +205,15 @@ class WebMangaViewWidget extends HookConsumerWidget {
   const WebMangaViewWidget({super.key, required this.manga, required this.info});
 
   final WebManga manga;
-  final ProxyInfo info;
+  final SourceInfo info;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final link = HistoryLink(title: '${info.proxy}: ${manga.title}', url: info.getURL(), cover: manga.cover);
+    final link = HistoryLink(title: '${info.source}: ${manga.title}', url: info.getURL(), cover: manga.cover);
     final chapterlist = manga.chapters.entries.map((e) => ChapterEntry(e.key, e.value)).toList();
-    chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
+    //chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
+    chapterlist.sort((a, b) => compareNatural(b.name, a.name));
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
@@ -407,17 +404,29 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 MultiChildExpansionTile(
                   title: 'Links',
                   children: [
-                    ButtonChip(
-                      onPressed: () async {
-                        final route = cleanBaseDomains(GoRouterState.of(context).uri.toString());
-                        final url = Uri.parse('http://cubari.moe$route');
+                    if (info.type == SourceType.proxy)
+                      ButtonChip(
+                        onPressed: () async {
+                          final route = cleanBaseDomains(GoRouterState.of(context).uri.toString());
+                          final url = Uri.parse('http://cubari.moe$route');
 
-                        if (!await launchUrl(url)) {
-                          throw 'Could not launch $url';
-                        }
-                      },
-                      text: 'Open on cubari.moe',
-                    ),
+                          if (!await launchUrl(url)) {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                        text: 'Open on cubari.moe',
+                      ),
+                    if (info.type == SourceType.source)
+                      ButtonChip(
+                        onPressed: () async {
+                          final url = Uri.parse(info.location);
+
+                          if (!await launchUrl(url)) {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                        text: 'Open on ${info.source}',
+                      ),
                   ],
                 ),
               ],
@@ -536,7 +545,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
   final ChapterEntry data;
   final WebManga manga;
-  final ProxyInfo info;
+  final SourceInfo info;
   final Widget? link;
   final VoidCallback? onLinkPressed;
 
@@ -587,9 +596,15 @@ class ChapterButtonWidget extends HookConsumerWidget {
       visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
     );
 
+    var url = '/read/${info.source}/${info.location}/$name/1/';
+
+    if (info.type == SourceType.source) {
+      url = '/read-chapter/${info.source}/${data.chapter.groups.entries.first.value}';
+    }
+
     return ListTile(
       onTap: () {
-        context.push('/read/${info.proxy}/${info.code}/$name/1/',
+        context.push(url,
             extra: WebReaderData(
               source: data.chapter.groups.entries.first.value,
               title: title,

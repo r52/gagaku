@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/web/config.dart';
-import 'package:gagaku/web/model.dart';
+import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/settings.dart';
-import 'package:gagaku/web/types.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 class SourceManager extends HookConsumerWidget {
   const SourceManager({super.key});
 
-  Future<Map<String, WebSource>> fetchRepo(List<String> repoList) async {
-    final list = <String, WebSource>{};
+  Future<Map<String, RepoInfo>> fetchRepo(List<String> repoList) async {
+    final list = <String, RepoInfo>{};
 
     for (final repo in repoList) {
       final uri = Uri.parse(repo);
@@ -26,8 +26,9 @@ class SourceManager extends HookConsumerWidget {
 
         if (data.isNotEmpty) {
           final entries = data.map((e) {
-            final source = WebSource.fromJson(e);
-            return MapEntry(source.name, source);
+            final source = RepoInfo.fromJson(e);
+            final key = Uri.parse(source.url).pathSegments.last;
+            return MapEntry(key, source);
           });
 
           list.addEntries(entries);
@@ -64,55 +65,57 @@ class SourceManager extends HookConsumerWidget {
         stackTrace: (sources.hasError) ? sources.asError!.stackTrace : availableSources.stackTrace!,
       );
     } else {
-      final sourceData = sources.value!;
-      if (availableSources.data!.isEmpty) {
+      final srcMgr = sources.value;
+      if (srcMgr != null && availableSources.data!.isEmpty) {
         body = Column(
           children: [
             const Text('No repo data. Showing installed sources only'),
             Expanded(
-              child: ListView.builder(
-                itemCount: sourceData.length,
-                itemBuilder: (context, index) {
-                  final item = sourceData.entries.elementAt(index);
+              child: srcMgr.sources.isEmpty
+                  ? const Center(child: Text('No installed sources'))
+                  : ListView.builder(
+                      itemCount: srcMgr.sources.length,
+                      itemBuilder: (context, index) {
+                        final item = srcMgr.sources.entries.elementAt(index);
 
-                  final actions = <Widget>[
-                    IconButton(
-                      tooltip: 'Delete ${item.key}',
-                      onPressed: () {
-                        final messenger = ScaffoldMessenger.of(context);
-                        ref.read(webSourceManagerProvider.notifier).removeSource(item.value).then((_) {
-                          messenger
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              const SnackBar(
-                                content: Text('Source deleted'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                        });
+                        final actions = <Widget>[
+                          IconButton(
+                            tooltip: 'Delete ${item.value.name}',
+                            onPressed: () {
+                              final messenger = ScaffoldMessenger.of(context);
+                              ref.read(webSourceManagerProvider.notifier).removeSource(item.key).then((_) {
+                                messenger
+                                  ..removeCurrentSnackBar()
+                                  ..showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Source deleted'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ];
+
+                        String version = 'v${item.value.version}';
+
+                        return Card(
+                          key: ValueKey(item.key),
+                          child: ListTile(
+                            leading: const Icon(Icons.rss_feed),
+                            title: Text(item.key),
+                            subtitle: Text(version),
+                            trailing: OverflowBar(
+                              children: actions,
+                            ),
+                          ),
+                        );
                       },
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
                     ),
-                  ];
-
-                  String version = 'v${item.value.version}';
-
-                  return Card(
-                    key: ValueKey(item.key),
-                    child: ListTile(
-                      leading: const Icon(Icons.rss_feed),
-                      title: Text(item.key),
-                      subtitle: Text(version),
-                      trailing: OverflowBar(
-                        children: actions,
-                      ),
-                    ),
-                  );
-                },
-              ),
             )
           ],
         );
@@ -124,13 +127,13 @@ class SourceManager extends HookConsumerWidget {
 
             final actions = <Widget>[];
 
-            if (sourceData.containsKey(item.key)) {
+            if (srcMgr != null && srcMgr.sources.containsKey(item.key)) {
               actions.addAll([
                 IconButton(
-                  tooltip: 'Update/Replace ${item.key}',
+                  tooltip: 'Update/Replace ${item.value.name}',
                   onPressed: () {
                     final messenger = ScaffoldMessenger.of(context);
-                    ref.read(webSourceManagerProvider.notifier).updateSource(item.value).then((_) {
+                    ref.read(webSourceManagerProvider.notifier).updateSource(item.key, item.value).then((_) {
                       messenger
                         ..removeCurrentSnackBar()
                         ..showSnackBar(
@@ -147,10 +150,10 @@ class SourceManager extends HookConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Delete ${item.key}',
+                  tooltip: 'Delete ${item.value.name}',
                   onPressed: () {
                     final messenger = ScaffoldMessenger.of(context);
-                    ref.read(webSourceManagerProvider.notifier).removeSource(item.value).then((_) {
+                    ref.read(webSourceManagerProvider.notifier).removeSource(item.key).then((_) {
                       messenger
                         ..removeCurrentSnackBar()
                         ..showSnackBar(
@@ -170,10 +173,10 @@ class SourceManager extends HookConsumerWidget {
             } else {
               actions.addAll([
                 IconButton(
-                  tooltip: 'Add ${item.key}',
+                  tooltip: 'Add ${item.value.name}',
                   onPressed: () {
                     final messenger = ScaffoldMessenger.of(context);
-                    ref.read(webSourceManagerProvider.notifier).addSource(item.value).then((_) {
+                    ref.read(webSourceManagerProvider.notifier).addSource(item.key, item.value).then((_) {
                       messenger
                         ..removeCurrentSnackBar()
                         ..showSnackBar(
@@ -193,15 +196,15 @@ class SourceManager extends HookConsumerWidget {
             }
 
             String version = 'v${item.value.version}';
-            if (sourceData.containsKey(item.key)) {
-              version += ' (installed: v${sourceData[item.key]!.version})';
+            if (srcMgr != null && srcMgr.sources.containsKey(item.key)) {
+              version += ' (installed: v${srcMgr.sources[item.key]!.version})';
             }
 
             return Card(
               key: ValueKey(item.key),
               child: ListTile(
                 leading: const Icon(Icons.rss_feed),
-                title: Text(item.key),
+                title: Text(item.value.name),
                 subtitle: Text(version),
                 trailing: OverflowBar(
                   children: actions,

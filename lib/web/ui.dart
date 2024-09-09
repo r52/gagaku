@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/web/model.dart';
+import 'package:gagaku/web/model/model.dart';
 
 Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
   final messenger = ScaffoldMessenger.of(context);

@@ -259,7 +259,7 @@ abstract class _$WebReadMarkers
 const webSourceManagerProvider = WebSourceManagerProvider._();
 
 final class WebSourceManagerProvider
-    extends $AsyncNotifierProvider<WebSourceManager, Map<String, WebSource>> {
+    extends $AsyncNotifierProvider<WebSourceManager, WebSource?> {
   const WebSourceManagerProvider._(
       {super.runNotifierBuildOverride, WebSourceManager Function()? create})
       : _createCb = create,
@@ -293,8 +293,8 @@ final class WebSourceManagerProvider
   @$internal
   @override
   WebSourceManagerProvider $copyWithBuild(
-    FutureOr<Map<String, WebSource>> Function(
-      Ref<AsyncValue<Map<String, WebSource>>>,
+    FutureOr<WebSource?> Function(
+      Ref<AsyncValue<WebSource?>>,
       WebSourceManager,
     ) build,
   ) {
@@ -303,19 +303,18 @@ final class WebSourceManagerProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<WebSourceManager, Map<String, WebSource>>
-      $createElement($ProviderPointer pointer) =>
-          $AsyncNotifierProviderElement(this, pointer);
+  $AsyncNotifierProviderElement<WebSourceManager, WebSource?> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$webSourceManagerHash() => r'faba7592e01d658de95ce5e672d58bf4f03a41eb';
+String _$webSourceManagerHash() => r'0d2fdd2a7b52200a3791f75948f30a367e62c8f1';
 
-abstract class _$WebSourceManager
-    extends $AsyncNotifier<Map<String, WebSource>> {
-  FutureOr<Map<String, WebSource>> build();
+abstract class _$WebSourceManager extends $AsyncNotifier<WebSource?> {
+  FutureOr<WebSource?> build();
   @$internal
   @override
-  FutureOr<Map<String, WebSource>> runBuild() => build();
+  FutureOr<WebSource?> runBuild() => build();
 }
 
 // ignore_for_file: type=lint

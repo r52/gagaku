@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/web/model.dart';
+import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -27,8 +27,8 @@ class WebSourceSearchWidget extends HookConsumerWidget {
             message: "webSourceManagerProvider() failed",
           ),
         ),
-      AsyncValue(value: final results?) when results.isNotEmpty => null,
-      AsyncValue(value: final _?) => const SliverToBoxAdapter(
+      AsyncValue(value: final src) when src != null && src.sources.isNotEmpty => null,
+      AsyncValue(value: final src) when src == null || src.sources.isEmpty => const SliverToBoxAdapter(
           child: Center(
             child: Text("No sources installed!"),
           ),
@@ -82,12 +82,12 @@ class WebSourceSearchWidget extends HookConsumerWidget {
           children: [
             if (sourcesResult != null) sourcesResult,
             if (sourcesResult == null)
-              for (var MapEntry(key: name, value: src) in sources.value!.entries) ...[
+              for (var MapEntry(key: key, value: src) in sources.value!.sources.entries) ...[
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 10.0),
                     child: Text(
-                      name,
+                      src.name,
                       style: const TextStyle(fontSize: 24),
                     ),
                   ),
@@ -95,7 +95,8 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                 HookBuilder(
                   builder: (context) {
                     final results = useMemoized(
-                        () => src.searchManga(api.client, searchTerm.value.toLowerCase()), [searchTerm.value]);
+                        () => sources.value!.searchManga(key, searchTerm.value.toLowerCase(), api.client),
+                        [searchTerm.value]);
                     final future = useFuture(results);
 
                     if (future.hasError) {
