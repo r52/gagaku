@@ -34,6 +34,7 @@ import 'package:gagaku/web/reader.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:go_router/go_router.dart';
@@ -84,6 +85,10 @@ void main() async {
               ]))
         : null,
   );
+
+  final pkg = await PackageInfo.fromPlatform();
+  final gdat = GagakuData();
+  gdat.gagakuUserAgent = '${pkg.appName}/${pkg.version}';
 
   runApp(const ProviderScope(child: App()));
 }
@@ -319,7 +324,17 @@ class _AppState extends ConsumerState<App> {
         pageBuilder: buildWebMangaViewPage,
       ),
       GoRoute(
+        path: GagakuRoute.webMangaSource,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildWebMangaViewPage,
+      ),
+      GoRoute(
         path: GagakuRoute.webMangaFull,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildWebReaderPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.webMangaSourceChapter,
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: buildWebReaderPage,
       ),

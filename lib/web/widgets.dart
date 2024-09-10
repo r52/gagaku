@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
 import 'package:gagaku/ui.dart';
-import 'package:gagaku/web/model.dart';
-import 'package:gagaku/web/types.dart';
+import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/legacy.dart';
 
@@ -227,7 +227,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     ),
                     trailing: IconButton(
                       tooltip: 'Remove from History',
-                      icon: const Icon(Icons.clear),
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
                       onPressed: () async {
                         ref.read(webSourceHistoryProvider.notifier).remove(item);
                       },
@@ -263,7 +266,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
           findChildIndexCallback: _findChildIndexCb,
           itemBuilder: (context, index) {
             final item = items.elementAt(index);
-            return _GridMangaItem(
+            return GridMangaItem(
               key: ValueKey(item.hashCode),
               link: item,
               showRemoveButton: showRemoveButton,
@@ -275,14 +278,16 @@ class WebMangaListViewSliver extends ConsumerWidget {
   }
 }
 
-class _GridMangaItem extends HookConsumerWidget {
-  const _GridMangaItem({
+class GridMangaItem extends HookConsumerWidget {
+  const GridMangaItem({
     super.key,
     required this.link,
+    this.showFavoriteButton = true,
     this.showRemoveButton = true,
   });
 
   final HistoryLink link;
+  final bool showFavoriteButton;
   final bool showRemoveButton;
 
   @override
@@ -291,6 +296,7 @@ class _GridMangaItem extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
+    final theme = Theme.of(context);
 
     final image = GridAlbumImage(
       gradient: gradient,
@@ -340,38 +346,41 @@ class _GridMangaItem extends HookConsumerWidget {
             ),
             child: image,
           ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Consumer(
-              builder: (context, refx, child) {
-                final favorited = ref.watch(webSourceFavoritesProvider.select(
-                  (value) => switch (value) {
-                    AsyncValue(value: final data?) => data.indexWhere((e) => e.url == link.url) > -1,
-                    _ => null,
-                  },
-                ));
+          if (showFavoriteButton)
+            Align(
+              alignment: Alignment.topLeft,
+              child: Consumer(
+                builder: (context, refx, child) {
+                  final favorited = ref.watch(webSourceFavoritesProvider.select(
+                    (value) => switch (value) {
+                      AsyncValue(value: final data?) => data.indexWhere((e) => e.url == link.url) > -1,
+                      _ => null,
+                    },
+                  ));
 
-                if (favorited == null) {
-                  return const CircularProgressIndicator();
-                }
+                  if (favorited == null) {
+                    return const CircularProgressIndicator();
+                  }
 
-                return FloatingActionButton(
-                  heroTag: UniqueKey(),
-                  mini: true,
-                  shape: const CircleBorder(),
-                  tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
-                  onPressed: () async {
-                    if (favorited) {
-                      ref.read(webSourceFavoritesProvider.notifier).remove(link);
-                    } else {
-                      ref.read(webSourceFavoritesProvider.notifier).add(link);
-                    }
-                  },
-                  child: Icon(favorited ? Icons.favorite : Icons.favorite_border),
-                );
-              },
+                  return FloatingActionButton(
+                    heroTag: UniqueKey(),
+                    mini: true,
+                    shape: const CircleBorder(),
+                    tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
+                    onPressed: () async {
+                      if (favorited) {
+                        ref.read(webSourceFavoritesProvider.notifier).remove(link);
+                      } else {
+                        ref.read(webSourceFavoritesProvider.notifier).add(link);
+                      }
+                    },
+                    child: Icon(
+                      favorited ? Icons.favorite : Icons.favorite_border,
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
           if (showRemoveButton)
             Align(
               alignment: Alignment.topRight,
@@ -383,7 +392,11 @@ class _GridMangaItem extends HookConsumerWidget {
                 onPressed: () async {
                   ref.read(webSourceHistoryProvider.notifier).remove(link);
                 },
-                child: const Icon(Icons.clear),
+                backgroundColor: theme.colorScheme.errorContainer,
+                child: Icon(
+                  Icons.delete,
+                  color: theme.colorScheme.onErrorContainer,
+                ),
               ),
             ),
         ],

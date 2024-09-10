@@ -27,9 +27,24 @@ abstract class GagakuRoute {
   static const web = '/read';
   static const webManga = '/read/:proxy/:code';
   static const webMangaFull = '/read/:proxy/:code/:chapter/:page';
+  static const webMangaSource = '/read/:source/:url(.*)';
+  static const webMangaSourceChapter = '/read-chapter/:source/:url(.*)';
 
   static const config = '/config';
 }
 
 const gagakuBox = 'gagaku_box';
 const gagakuCache = 'gagaku_cache';
+
+class GagakuData {
+  GagakuData._internal();
+
+  static final GagakuData _instance = GagakuData._internal();
+
+  // Default user agent
+  String gagakuUserAgent = 'gagaku/1.x';
+
+  factory GagakuData() {
+    return _instance;
+  }
+}

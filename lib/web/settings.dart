@@ -1,29 +1,30 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/local/config.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/repo_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class LocalLibrarySettingsRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
-  LocalLibrarySettingsRouteBuilder()
-      : super(pageBuilder: (context, animation, secondaryAnimation) => const LocalLibrarySettingsWidget());
+class WebSourceSettingsRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
+  WebSourceSettingsRouteBuilder()
+      : super(pageBuilder: (context, animation, secondaryAnimation) => const WebSourceSettingsWidget());
 }
 
-class LocalLibrarySettingsWidget extends HookConsumerWidget {
-  const LocalLibrarySettingsWidget({super.key});
+class WebSourceSettingsWidget extends HookConsumerWidget {
+  const WebSourceSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
-    final cfg = ref.watch(localConfigProvider);
+    final cfg = ref.watch(webConfigProvider);
     final config = useState(cfg);
 
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text('Library Settings'),
+        title: const Text('Web Source Settings'),
         actions: [
           OverflowBar(
             spacing: 8.0,
@@ -34,7 +35,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: const Text('Save Settings'),
                   onPressed: () {
-                    ref.read(localConfigProvider.notifier).save(config.value);
+                    ref.read(webConfigProvider.notifier).saveWith(sourceDirectory: config.value.sourceDirectory);
                     nav.pop();
                   },
                 ),
@@ -49,19 +50,19 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
           children: [
             SettingCardWidget(
               title: const Text(
-                'Manga Library Path',
+                'Sources Path',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Text('Choose where to search for your manga library'),
+              subtitle: const Text('Choose where to store your downloaded sources'),
               builder: (context) {
                 return Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(config.value.libraryDirectory),
+                      Text(config.value.sourceDirectory),
                       const SizedBox(
                         width: 10,
                       ),
@@ -73,7 +74,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                             String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
 
                             if (selectedDirectory != null) {
-                              config.value = config.value.copyWith(libraryDirectory: selectedDirectory);
+                              config.value = config.value.copyWith(sourceDirectory: selectedDirectory);
                             }
                           }
                         },
@@ -81,6 +82,29 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                         label: const Text('Browse'),
                       ),
                     ],
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: const Text(
+                'Repos',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: const Text('Configure source repos'),
+              builder: (context) {
+                return Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      nav.push(SlideTransitionRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) => const RepoListManager(),
+                      ));
+                    },
+                    icon: const Icon(Icons.library_add),
+                    label: const Text('Manage'),
                   ),
                 );
               },

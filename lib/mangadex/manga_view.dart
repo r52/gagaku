@@ -307,21 +307,12 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 }
 
                                 if (reading != null) {
-                                  return IconButton.filledTonal(
+                                  return IconButton(
                                     padding: EdgeInsets.zero,
                                     tooltip: following ? 'Unfollow Manga' : 'Follow Manga',
-                                    style: IconButton.styleFrom(
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      padding: EdgeInsets.zero,
-                                      backgroundColor: theme.colorScheme.surface.withAlpha(200),
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(6.0),
-                                        ),
-                                      ),
-                                    ),
+                                    style: Styles.squareIconButtonStyle(
+                                        backgroundColor: theme.colorScheme.surface.withAlpha(200)),
                                     color: theme.colorScheme.primary,
-                                    highlightColor: Colors.orange,
                                     onPressed: () async {
                                       bool set = !following;
                                       ref.read(followingStatusProvider(manga).notifier).set(set);
@@ -1146,6 +1137,7 @@ class _RatingMenu extends HookConsumerWidget {
     final theme = Theme.of(context);
     final ratingProv = ref.watch(ratingsProvider);
     final ratings = ratingProv.value;
+    final hasRating = (ratings != null && ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0);
 
     // Redundancy
     useEffect(() {
@@ -1158,9 +1150,7 @@ class _RatingMenu extends HookConsumerWidget {
     return MenuAnchor(
       builder: (context, controller, child) {
         return Material(
-          color: (ratings != null && ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0)
-              ? Colors.deepOrange.shade800
-              : theme.colorScheme.surfaceContainerHighest,
+          color: hasRating ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceContainerHighest,
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
           child: (ratingProv.isLoading || ratings == null)
               ? _loadingAction
@@ -1186,7 +1176,7 @@ class _RatingMenu extends HookConsumerWidget {
             child: Text(RatingLabel[index + 1]),
           ),
         ).reversed,
-        if (ratings != null && ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0)
+        if (hasRating)
           MenuItemButton(
             onPressed: () {
               ref.read(ratingsProvider.notifier).set(manga, null);
@@ -1199,13 +1189,19 @@ class _RatingMenu extends HookConsumerWidget {
         child: Text.rich(
           TextSpan(
             children: [
-              const WidgetSpan(
+              WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: Icon(
                     Icons.star_border,
+                    color: hasRating ? theme.colorScheme.onPrimaryContainer : null,
                   )),
-              if (ratings != null && ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0)
-                TextSpan(text: ' ${ratings[manga.id]!.rating}')
+              if (hasRating)
+                TextSpan(
+                  text: ' ${ratings[manga.id]!.rating}',
+                  style: TextStyle(
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
+                )
             ],
           ),
         ),

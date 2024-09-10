@@ -1,13 +1,20 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dart_eval/dart_eval.dart';
+import 'package:dart_eval/dart_eval_security.dart';
+import 'package:dart_eval/stdlib/core.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
-import 'package:gagaku/web/types.dart';
+import 'package:gagaku/web/eval/plugin.dart';
+import 'package:gagaku/web/eval/util.dart';
+import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -26,7 +33,7 @@ class ProxyHandler {
   }
 
   final Ref ref;
-  final http.Client _client = RateLimitedClient();
+  final http.Client client = CustomClient();
   late final CacheManager _cache;
 
   Future<void> invalidateCacheItem(String item) async {
@@ -43,7 +50,8 @@ class ProxyHandler {
     if (url.startsWith('https://imgur.com/a/')) {
       final src = url.substring(20);
       final code = '/read/api/imgur/chapter/$src';
-      GoRouter.of(context).push('/read/imgur/$src/1/1/', extra: WebReaderData(source: code));
+      GoRouter.of(context).push('/read/imgur/$src/1/1/',
+          extra: WebReaderData(source: code, info: SourceInfo(type: SourceType.proxy, source: 'imgur', location: src)));
       ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(title: url, url: url));
       return true;
     }
@@ -57,18 +65,30 @@ class ProxyHandler {
 
       if (!context.mounted) return false;
       if (info.chapter != null) {
-        GoRouter.of(context).push('/read/${info.proxy}/${info.code}/${info.chapter}/1/');
+        GoRouter.of(context).push('/read/${info.source}/${info.location}/${info.chapter}/1/');
       } else {
-        GoRouter.of(context).push('/read/${info.proxy}/${info.code}');
+        GoRouter.of(context).push('/read/${info.source}/${info.location}');
       }
 
       return true;
     }
 
+    final sourceMgr = await ref.watch(webSourceManagerProvider.future);
+    if (sourceMgr != null) {
+      for (final MapEntry(key: key, value: src) in sourceMgr.sources.entries) {
+        if (url.startsWith('${src.baseUrl}${src.mangaPath}')) {
+          if (!context.mounted) return false;
+          GoRouter.of(context).push('/read/${src.name}/$url',
+              extra: SourceInfo(type: SourceType.source, source: src.name, location: url, parser: key));
+          return true;
+        }
+      }
+    }
+
     return false;
   }
 
-  Future<ProxyInfo?> parseUrl(String url) async {
+  Future<SourceInfo?> parseUrl(String url) async {
     var src = cleanBaseDomains(url);
 
     if (!src.startsWith('/')) {
@@ -85,13 +105,22 @@ class ProxyHandler {
     switch (proxy[0]) {
       case 'read':
         if (proxy.length >= 4) {
-          return ProxyInfo(proxy: proxy[1], code: proxy[2], chapter: proxy[3]);
+          return SourceInfo(
+            type: SourceType.proxy,
+            source: proxy[1],
+            location: proxy[2],
+            chapter: proxy[3],
+          );
         }
 
-        return ProxyInfo(proxy: proxy[1], code: proxy[2]);
+        return SourceInfo(
+          type: SourceType.proxy,
+          source: proxy[1],
+          location: proxy[2],
+        );
       default:
         logger.d('ProxyHandler: retrieving url $url');
-        final response = await _client.send((http.Request('GET', Uri.parse(url))..followRedirects = false));
+        final response = await client.send((http.Request('GET', Uri.parse(url))..followRedirects = false));
 
         if (response.statusCode != 302 || !response.headers.containsKey('location')) {
           return null;
@@ -109,34 +138,58 @@ class ProxyHandler {
     }
   }
 
-  Future<ProxyData> handleProxy(ProxyInfo info) async {
+  Future<ProxyData> handleSource(SourceInfo info) async {
     ProxyData p = ProxyData();
 
-    switch (info.proxy) {
-      case 'imgur':
-        final code = '/read/api/imgur/chapter/${info.code}';
-        p.code = code;
-        break;
-      default:
-        // Generic proxy
-        final manga = await _getMangaFromProxy(info);
+    switch (info.type) {
+      case SourceType.source:
+        final srcMgr = await ref.watch(webSourceManagerProvider.future);
+        WebManga? manga;
+
+        if (srcMgr != null) {
+          if (info.parser != null) {
+            manga = await srcMgr.parseManga(info.parser!, Uri.parse(info.location), client);
+          } else {
+            for (final MapEntry(key: key, value: src) in srcMgr.sources.entries) {
+              if (info.source == src.name) {
+                manga = await srcMgr.parseManga(key, Uri.parse(info.location), client);
+                break;
+              }
+            }
+          }
+        }
+
         p.manga = manga;
+        break;
+      case SourceType.proxy:
+      default:
+        switch (info.source) {
+          case 'imgur':
+            final code = '/read/api/imgur/chapter/${info.location}';
+            p.code = code;
+            break;
+          default:
+            // Generic proxy
+            final manga = await _getMangaFromProxy(info);
+            p.manga = manga;
+            break;
+        }
         break;
     }
 
     return p;
   }
 
-  Future<WebManga> _getMangaFromProxy(ProxyInfo info) async {
+  Future<WebManga> _getMangaFromProxy(SourceInfo info) async {
     final key = info.getKey();
-    final url = "https://cubari.moe/read/api/${info.proxy}/series/${info.code}/";
+    final url = "https://cubari.moe/read/api/${info.source}/series/${info.location}/";
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
       return _cache.get(key, WebManga.fromJson).get<WebManga>();
     }
 
-    final response = await _client.get(Uri.parse(url));
+    final response = await client.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
@@ -154,10 +207,10 @@ class ProxyHandler {
         "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
 
-  Future<List<String>> getChapter(String code) async {
+  Future<List<String>> getChapterFromProxy(String code) async {
     final url = "https://cubari.moe$code";
 
-    final response = await _client.get(Uri.parse(url));
+    final response = await client.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
@@ -493,5 +546,122 @@ class WebReadMarkers extends _$WebReadMarkers {
 
       return {...oldstate};
     });
+  }
+
+  Future<void> deleteKey(String manga) async {
+    final oldstate = await future;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final keyExists = oldstate.containsKey(manga);
+
+      // Refresh
+      if (keyExists) {
+        oldstate.remove(manga);
+      }
+
+      final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_read_history', json.encode(converted));
+
+      return {...oldstate};
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class WebSourceManager extends _$WebSourceManager {
+  Future<WebSource?> fetchData() async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final plugin = WebSourcePlugin();
+      final compiler = Compiler();
+      compiler.addPlugin(plugin);
+
+      final entities = await dir.list().toList();
+      final sourcefiles = <String, String>{};
+
+      for (final e in entities) {
+        if (e is File && e.path.endsWith('.dart')) {
+          final filename = e.uri.pathSegments.last;
+          String dat = await e.readAsString();
+
+          sourcefiles.putIfAbsent(filename, () => dat);
+          compiler.entrypoints.add('${GagakuWebSources.getPackagePath}/$filename');
+        }
+      }
+
+      final program = compiler.compile({GagakuWebSources.packageName: sourcefiles});
+      final runtime = Runtime.ofProgram(program);
+      runtime.addPlugin(plugin);
+
+      final source = WebSource(runtime: runtime);
+
+      for (final key in sourcefiles.keys) {
+        final result =
+            (runtime.executeLib('${GagakuWebSources.getPackagePath}/$key', 'getSourceInfo') as $String).$value;
+
+        final Map<String, dynamic> dat = json.decode(result);
+        final info = WebSourceInfo.fromJson(dat);
+
+        source.sources.putIfAbsent(key, () => info);
+        runtime.grant(NetworkPermission.url(info.baseUrl));
+      }
+
+      return source;
+    }
+
+    return null;
+  }
+
+  @override
+  FutureOr<WebSource?> build() async {
+    return fetchData();
+  }
+
+  Future<void> addSource(String key, RepoInfo value) async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final api = ref.watch(proxyProvider);
+      final url = Uri.parse(value.url);
+
+      final response = await api.client.get(url);
+      await File('${dir.path}${Platform.pathSeparator}$key').writeAsBytes(response.bodyBytes, flush: true);
+    }
+
+    ref.invalidateSelf();
+  }
+
+  Future<void> removeSource(String key) async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final file = File('${dir.path}${Platform.pathSeparator}$key');
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    }
+
+    ref.invalidateSelf();
+  }
+
+  Future<void> updateSource(String key, RepoInfo value) async {
+    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
+    final dir = Directory(path);
+
+    if (path.isNotEmpty && dir.existsSync()) {
+      final api = ref.watch(proxyProvider);
+      final url = Uri.parse(value.url);
+
+      final response = await api.client.get(url);
+      await File('${dir.path}${Platform.pathSeparator}$key').writeAsBytes(response.bodyBytes, flush: true);
+    }
+
+    ref.invalidateSelf();
   }
 }

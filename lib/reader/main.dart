@@ -368,7 +368,7 @@ class ReaderWidget extends HookConsumerWidget {
     final currentPage = useValueNotifier(0);
     final listController = useListController();
     final scrollController = useScrollController();
-    final subtext = useValueNotifier<String?>(subtitle ?? pages.elementAt(0).sortKey);
+    final subtext = useValueNotifier<String?>(subtitle ?? (pages.isNotEmpty ? pages.elementAt(0).sortKey : ''));
     final format = longstrip ? ReaderFormat.longstrip : settings.format;
     final isPortrait = DeviceContext.isPortraitMode(context);
     final longStripScale = useValueNotifier(isPortrait ? LongStripScale.full : LongStripScale.small);

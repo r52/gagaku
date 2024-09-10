@@ -18,10 +18,10 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
         $FutureProvider<WebReaderData, _FetchWebChapterInfoRef> {
   const _FetchWebChapterInfoProvider._(
       {required _FetchWebChapterInfoFamily super.from,
-      required ProxyInfo super.argument,
+      required SourceInfo super.argument,
       FutureOr<WebReaderData> Function(
         _FetchWebChapterInfoRef ref,
-        ProxyInfo info,
+        SourceInfo info,
       )? create})
       : _createCb = create,
         super(
@@ -34,7 +34,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
 
   final FutureOr<WebReaderData> Function(
     _FetchWebChapterInfoRef ref,
-    ProxyInfo info,
+    SourceInfo info,
   )? _createCb;
 
   @override
@@ -60,11 +60,11 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
     ) create,
   ) {
     return _FetchWebChapterInfoProvider._(
-        argument: argument as ProxyInfo,
+        argument: argument as SourceInfo,
         from: from! as _FetchWebChapterInfoFamily,
         create: (
           ref,
-          ProxyInfo info,
+          SourceInfo info,
         ) =>
             create(ref));
   }
@@ -72,7 +72,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
   @override
   FutureOr<WebReaderData> create(_FetchWebChapterInfoRef ref) {
     final _$cb = _createCb ?? _fetchWebChapterInfo;
-    final argument = this.argument as ProxyInfo;
+    final argument = this.argument as SourceInfo;
     return _$cb(
       ref,
       argument,
@@ -91,7 +91,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'd5f51eb0e901ac6ac2fbe386459d08d2ee354ee6';
+    r'd958fee26e93d2833118459a5f2db45937416f3a';
 
 final class _FetchWebChapterInfoFamily extends Family {
   const _FetchWebChapterInfoFamily._()
@@ -104,7 +104,7 @@ final class _FetchWebChapterInfoFamily extends Family {
         );
 
   _FetchWebChapterInfoProvider call(
-    ProxyInfo info,
+    SourceInfo info,
   ) =>
       _FetchWebChapterInfoProvider._(argument: info, from: this);
 
@@ -118,7 +118,7 @@ final class _FetchWebChapterInfoFamily extends Family {
   Override overrideWith(
     FutureOr<WebReaderData> Function(
       _FetchWebChapterInfoRef ref,
-      ProxyInfo args,
+      SourceInfo args,
     ) create,
   ) {
     return $FamilyOverride(
@@ -126,7 +126,7 @@ final class _FetchWebChapterInfoFamily extends Family {
       createElement: (pointer) {
         final provider = pointer.origin as _FetchWebChapterInfoProvider;
 
-        final argument = provider.argument as ProxyInfo;
+        final argument = provider.argument as SourceInfo;
 
         return provider
             .$copyWithCreate((ref) => create(ref, argument))
@@ -155,7 +155,7 @@ final class _GetPagesProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_getPagesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -220,12 +220,12 @@ final class _GetPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$getPagesHash() => r'406c422b6962a0656219d12106da8b524748e055';
+String _$getPagesHash() => r'aa30fe117016a71670dcc6f2780f8ff2d6a2d7a2';
 
 final class _GetPagesFamily extends Family {
   const _GetPagesFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_getPagesProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -256,6 +256,159 @@ final class _GetPagesFamily extends Family {
         final provider = pointer.origin as _GetPagesProvider;
 
         final argument = provider.argument as dynamic;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+typedef _GetSourcePagesRef = Ref<AsyncValue<List<ReaderPage>>>;
+
+@ProviderFor(_getSourcePages)
+const _getSourcePagesProvider = _GetSourcePagesFamily._();
+
+final class _GetSourcePagesProvider extends $FunctionalProvider<
+        AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
+    with
+        $FutureModifier<List<ReaderPage>>,
+        $FutureProvider<List<ReaderPage>, _GetSourcePagesRef> {
+  const _GetSourcePagesProvider._(
+      {required _GetSourcePagesFamily super.from,
+      required (
+        dynamic,
+        SourceInfo,
+      )
+          super.argument,
+      FutureOr<List<ReaderPage>> Function(
+        _GetSourcePagesRef ref,
+        dynamic source,
+        SourceInfo info,
+      )? create})
+      : _createCb = create,
+        super(
+          retry: noRetry,
+          name: r'_getSourcePagesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<List<ReaderPage>> Function(
+    _GetSourcePagesRef ref,
+    dynamic source,
+    SourceInfo info,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$getSourcePagesHash();
+
+  @override
+  String toString() {
+    return r'_getSourcePagesProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ReaderPage>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _GetSourcePagesProvider $copyWithCreate(
+    FutureOr<List<ReaderPage>> Function(
+      _GetSourcePagesRef ref,
+    ) create,
+  ) {
+    return _GetSourcePagesProvider._(
+        argument: argument as (
+          dynamic,
+          SourceInfo,
+        ),
+        from: from! as _GetSourcePagesFamily,
+        create: (
+          ref,
+          dynamic source,
+          SourceInfo info,
+        ) =>
+            create(ref));
+  }
+
+  @override
+  FutureOr<List<ReaderPage>> create(_GetSourcePagesRef ref) {
+    final _$cb = _createCb ?? _getSourcePages;
+    final argument = this.argument as (
+      dynamic,
+      SourceInfo,
+    );
+    return _$cb(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _GetSourcePagesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$getSourcePagesHash() => r'126d993e9b998ab30b63457fe85a824334e89d60';
+
+final class _GetSourcePagesFamily extends Family {
+  const _GetSourcePagesFamily._()
+      : super(
+          retry: noRetry,
+          name: r'_getSourcePagesProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  _GetSourcePagesProvider call(
+    dynamic source,
+    SourceInfo info,
+  ) =>
+      _GetSourcePagesProvider._(argument: (
+        source,
+        info,
+      ), from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$getSourcePagesHash();
+
+  @override
+  String toString() => r'_getSourcePagesProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<List<ReaderPage>> Function(
+      _GetSourcePagesRef ref,
+      (
+        dynamic,
+        SourceInfo,
+      ) args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as _GetSourcePagesProvider;
+
+        final argument = provider.argument as (
+          dynamic,
+          SourceInfo,
+        );
 
         return provider
             .$copyWithCreate((ref) => create(ref, argument))

@@ -78,6 +78,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).value;
     final listProvider = ref.watch(listSourceProvider(listId));
@@ -143,21 +144,25 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                         return const SizedBox.shrink();
                       }
 
-                      return ElevatedButton.icon(
-                        style: Styles.buttonStyle(backgroundColor: Colors.deepOrange.shade800),
+                      return IconButton(
+                        style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
                         onPressed: () => ref.read(followedListsProvider.notifier).setFollow(list, idx == -1),
-                        icon: const Icon(Icons.bookmark_border),
-                        label: Text(idx == -1 ? 'Follow' : 'Unfollow'),
+                        icon: Icon(
+                          idx == -1 ? Icons.bookmark_border : Icons.bookmark,
+                          color: idx == -1 ? null : theme.colorScheme.primary,
+                        ),
+                        tooltip: idx == -1 ? 'Follow' : 'Unfollow',
                       );
                     },
                   ),
                   if (list.user != null && me != null && list.user!.id == me.id)
-                    ElevatedButton(
-                      style: Styles.buttonStyle(),
+                    IconButton(
+                      style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
                       onPressed: () {
                         context.push('/list/edit/${list.id}', extra: list);
                       },
-                      child: const Text('Edit'),
+                      icon: const Icon(Icons.edit),
+                      tooltip: 'Edit',
                     ),
                   const SizedBox.shrink(),
                   // if (list.user != null && me != null && list.user!.id == me.id)

@@ -1,5 +1,10 @@
+import 'package:dart_eval/dart_eval_bridge.dart';
+import 'package:dart_eval/stdlib/core.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:gagaku/web/eval/http.dart';
+import 'package:gagaku/web/eval/util.dart';
+import 'package:http/http.dart' as http;
 
 part 'types.freezed.dart';
 part 'types.g.dart';
@@ -10,7 +15,7 @@ class WebReaderData {
     this.title,
     this.manga,
     this.link,
-    this.info,
+    required this.info,
     this.readKey,
     this.onLinkPressed,
   });
@@ -19,23 +24,30 @@ class WebReaderData {
   final String? title;
   final WebManga? manga;
   final Widget? link;
-  final ProxyInfo? info;
+  final SourceInfo info;
   final String? readKey;
   final VoidCallback? onLinkPressed;
 }
 
+enum SourceType {
+  proxy,
+  source,
+}
+
 @freezed
-class ProxyInfo with _$ProxyInfo {
-  const ProxyInfo._();
+class SourceInfo with _$SourceInfo {
+  const SourceInfo._();
 
-  const factory ProxyInfo({
-    required String proxy,
-    required String code,
+  const factory SourceInfo({
+    required SourceType type,
+    required String source,
+    required String location,
     String? chapter,
-  }) = _ProxyInfo;
+    String? parser,
+  }) = _SourceInfo;
 
-  String getURL() => 'https://cubari.moe/read/$proxy/$code/';
-  String getKey() => '$proxy/$code';
+  String getURL() => type == SourceType.proxy ? 'https://cubari.moe/read/$source/$location/' : location;
+  String getKey() => '$source/$location';
 }
 
 class ProxyData {
@@ -172,6 +184,10 @@ class WebChapter with _$WebChapter {
   factory WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
 
   String getTitle(String index) {
+    if (index == title) {
+      return index;
+    }
+
     String output = index;
 
     if (title != null && title!.isNotEmpty) {
@@ -190,4 +206,96 @@ class ImgurPage with _$ImgurPage {
   }) = _ImgurPage;
 
   factory ImgurPage.fromJson(Map<String, dynamic> json) => _$ImgurPageFromJson(json);
+}
+
+class WebSource {
+  WebSource({
+    required this.runtime,
+  });
+
+  final Runtime runtime;
+  final Map<String, WebSourceInfo> sources = {};
+
+  Future<List<HistoryLink>> searchManga(String key, String searchTerm, http.Client client) async {
+    if (!sources.containsKey(key)) {
+      throw Exception('Source $key not found');
+    }
+
+    if (searchTerm.isEmpty) {
+      return [];
+    }
+
+    final info = sources[key]!;
+
+    final fut = (runtime.executeLib(
+                '${GagakuWebSources.getPackagePath}/$key', info.search, [$String(searchTerm), $Client.wrap(client)])
+            as $Future)
+        .$reified;
+    final vlist = (await fut) as List<$Value>;
+    final list = vlist.map((e) => e.$value as HistoryLink).toList();
+
+    return list;
+  }
+
+  Future<WebManga?> parseManga(String key, Uri url, http.Client client) async {
+    if (!sources.containsKey(key)) {
+      throw Exception('Source $key not found');
+    }
+
+    final info = sources[key]!;
+
+    final fut = (runtime.executeLib(
+            '${GagakuWebSources.getPackagePath}/$key', info.manga, [$Uri.wrap(url), $Client.wrap(client)]) as $Future)
+        .$reified;
+    final manga = (await fut) as WebManga?;
+
+    return manga;
+  }
+
+  Future<List<String>> parsePages(String key, Uri url, http.Client client) async {
+    if (!sources.containsKey(key)) {
+      throw Exception('Source $key not found');
+    }
+
+    final info = sources[key]!;
+
+    final fut = (runtime.executeLib(
+            '${GagakuWebSources.getPackagePath}/$key', info.pages, [$Uri.wrap(url), $Client.wrap(client)]) as $Future)
+        .$reified;
+    final data = await fut;
+
+    if (data is! List) {
+      throw Exception('Data returned by ${GagakuWebSources.getPackagePath}/$key: ${info.pages} is not a List');
+    }
+
+    final list = data.map((e) => e is $Value ? e.$value as String : e.toString()).toList();
+
+    return list;
+  }
+}
+
+@freezed
+class WebSourceInfo with _$WebSourceInfo {
+  const factory WebSourceInfo({
+    required String name,
+    required String version,
+    required String baseUrl,
+    required String mangaPath,
+    required String search,
+    required String manga,
+    required String pages,
+  }) = _WebSourceInfo;
+
+  factory WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
+}
+
+@freezed
+class RepoInfo with _$RepoInfo {
+  const factory RepoInfo({
+    required String name,
+    required String version,
+    required String url,
+  }) = _RepoInfo;
+
+  factory RepoInfo.fromJson(Map<String, dynamic> json) => _$RepoInfoFromJson(json);
 }

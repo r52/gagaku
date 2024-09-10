@@ -15,102 +15,135 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$ProxyInfo {
-  String get proxy => throw _privateConstructorUsedError;
-  String get code => throw _privateConstructorUsedError;
+mixin _$SourceInfo {
+  SourceType get type => throw _privateConstructorUsedError;
+  String get source => throw _privateConstructorUsedError;
+  String get location => throw _privateConstructorUsedError;
   String? get chapter => throw _privateConstructorUsedError;
+  String? get parser => throw _privateConstructorUsedError;
 
-  /// Create a copy of ProxyInfo
+  /// Create a copy of SourceInfo
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ProxyInfoCopyWith<ProxyInfo> get copyWith =>
+  $SourceInfoCopyWith<SourceInfo> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $ProxyInfoCopyWith<$Res> {
-  factory $ProxyInfoCopyWith(ProxyInfo value, $Res Function(ProxyInfo) then) =
-      _$ProxyInfoCopyWithImpl<$Res, ProxyInfo>;
+abstract class $SourceInfoCopyWith<$Res> {
+  factory $SourceInfoCopyWith(
+          SourceInfo value, $Res Function(SourceInfo) then) =
+      _$SourceInfoCopyWithImpl<$Res, SourceInfo>;
   @useResult
-  $Res call({String proxy, String code, String? chapter});
+  $Res call(
+      {SourceType type,
+      String source,
+      String location,
+      String? chapter,
+      String? parser});
 }
 
 /// @nodoc
-class _$ProxyInfoCopyWithImpl<$Res, $Val extends ProxyInfo>
-    implements $ProxyInfoCopyWith<$Res> {
-  _$ProxyInfoCopyWithImpl(this._value, this._then);
+class _$SourceInfoCopyWithImpl<$Res, $Val extends SourceInfo>
+    implements $SourceInfoCopyWith<$Res> {
+  _$SourceInfoCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of ProxyInfo
+  /// Create a copy of SourceInfo
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? proxy = null,
-    Object? code = null,
+    Object? type = null,
+    Object? source = null,
+    Object? location = null,
     Object? chapter = freezed,
+    Object? parser = freezed,
   }) {
     return _then(_value.copyWith(
-      proxy: null == proxy
-          ? _value.proxy
-          : proxy // ignore: cast_nullable_to_non_nullable
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as SourceType,
+      source: null == source
+          ? _value.source
+          : source // ignore: cast_nullable_to_non_nullable
               as String,
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
+      location: null == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
               as String,
       chapter: freezed == chapter
           ? _value.chapter
           : chapter // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parser: freezed == parser
+          ? _value.parser
+          : parser // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$ProxyInfoImplCopyWith<$Res>
-    implements $ProxyInfoCopyWith<$Res> {
-  factory _$$ProxyInfoImplCopyWith(
-          _$ProxyInfoImpl value, $Res Function(_$ProxyInfoImpl) then) =
-      __$$ProxyInfoImplCopyWithImpl<$Res>;
+abstract class _$$SourceInfoImplCopyWith<$Res>
+    implements $SourceInfoCopyWith<$Res> {
+  factory _$$SourceInfoImplCopyWith(
+          _$SourceInfoImpl value, $Res Function(_$SourceInfoImpl) then) =
+      __$$SourceInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String proxy, String code, String? chapter});
+  $Res call(
+      {SourceType type,
+      String source,
+      String location,
+      String? chapter,
+      String? parser});
 }
 
 /// @nodoc
-class __$$ProxyInfoImplCopyWithImpl<$Res>
-    extends _$ProxyInfoCopyWithImpl<$Res, _$ProxyInfoImpl>
-    implements _$$ProxyInfoImplCopyWith<$Res> {
-  __$$ProxyInfoImplCopyWithImpl(
-      _$ProxyInfoImpl _value, $Res Function(_$ProxyInfoImpl) _then)
+class __$$SourceInfoImplCopyWithImpl<$Res>
+    extends _$SourceInfoCopyWithImpl<$Res, _$SourceInfoImpl>
+    implements _$$SourceInfoImplCopyWith<$Res> {
+  __$$SourceInfoImplCopyWithImpl(
+      _$SourceInfoImpl _value, $Res Function(_$SourceInfoImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of ProxyInfo
+  /// Create a copy of SourceInfo
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? proxy = null,
-    Object? code = null,
+    Object? type = null,
+    Object? source = null,
+    Object? location = null,
     Object? chapter = freezed,
+    Object? parser = freezed,
   }) {
-    return _then(_$ProxyInfoImpl(
-      proxy: null == proxy
-          ? _value.proxy
-          : proxy // ignore: cast_nullable_to_non_nullable
+    return _then(_$SourceInfoImpl(
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as SourceType,
+      source: null == source
+          ? _value.source
+          : source // ignore: cast_nullable_to_non_nullable
               as String,
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
+      location: null == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
               as String,
       chapter: freezed == chapter
           ? _value.chapter
           : chapter // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parser: freezed == parser
+          ? _value.parser
+          : parser // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -118,63 +151,82 @@ class __$$ProxyInfoImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ProxyInfoImpl extends _ProxyInfo {
-  const _$ProxyInfoImpl({required this.proxy, required this.code, this.chapter})
+class _$SourceInfoImpl extends _SourceInfo {
+  const _$SourceInfoImpl(
+      {required this.type,
+      required this.source,
+      required this.location,
+      this.chapter,
+      this.parser})
       : super._();
 
   @override
-  final String proxy;
+  final SourceType type;
   @override
-  final String code;
+  final String source;
+  @override
+  final String location;
   @override
   final String? chapter;
+  @override
+  final String? parser;
 
   @override
   String toString() {
-    return 'ProxyInfo(proxy: $proxy, code: $code, chapter: $chapter)';
+    return 'SourceInfo(type: $type, source: $source, location: $location, chapter: $chapter, parser: $parser)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ProxyInfoImpl &&
-            (identical(other.proxy, proxy) || other.proxy == proxy) &&
-            (identical(other.code, code) || other.code == code) &&
-            (identical(other.chapter, chapter) || other.chapter == chapter));
+            other is _$SourceInfoImpl &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.source, source) || other.source == source) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.chapter, chapter) || other.chapter == chapter) &&
+            (identical(other.parser, parser) || other.parser == parser));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, proxy, code, chapter);
+  int get hashCode =>
+      Object.hash(runtimeType, type, source, location, chapter, parser);
 
-  /// Create a copy of ProxyInfo
+  /// Create a copy of SourceInfo
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
-      __$$ProxyInfoImplCopyWithImpl<_$ProxyInfoImpl>(this, _$identity);
+  _$$SourceInfoImplCopyWith<_$SourceInfoImpl> get copyWith =>
+      __$$SourceInfoImplCopyWithImpl<_$SourceInfoImpl>(this, _$identity);
 }
 
-abstract class _ProxyInfo extends ProxyInfo {
-  const factory _ProxyInfo(
-      {required final String proxy,
-      required final String code,
-      final String? chapter}) = _$ProxyInfoImpl;
-  const _ProxyInfo._() : super._();
+abstract class _SourceInfo extends SourceInfo {
+  const factory _SourceInfo(
+      {required final SourceType type,
+      required final String source,
+      required final String location,
+      final String? chapter,
+      final String? parser}) = _$SourceInfoImpl;
+  const _SourceInfo._() : super._();
 
   @override
-  String get proxy;
+  SourceType get type;
   @override
-  String get code;
+  String get source;
+  @override
+  String get location;
   @override
   String? get chapter;
+  @override
+  String? get parser;
 
-  /// Create a copy of ProxyInfo
+  /// Create a copy of SourceInfo
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ProxyInfoImplCopyWith<_$ProxyInfoImpl> get copyWith =>
+  _$$SourceInfoImplCopyWith<_$SourceInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1063,5 +1115,464 @@ abstract class _ImgurPage implements ImgurPage {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ImgurPageImplCopyWith<_$ImgurPageImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) {
+  return _WebSourceInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WebSourceInfo {
+  String get name => throw _privateConstructorUsedError;
+  String get version => throw _privateConstructorUsedError;
+  String get baseUrl => throw _privateConstructorUsedError;
+  String get mangaPath => throw _privateConstructorUsedError;
+  String get search => throw _privateConstructorUsedError;
+  String get manga => throw _privateConstructorUsedError;
+  String get pages => throw _privateConstructorUsedError;
+
+  /// Serializes this WebSourceInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WebSourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $WebSourceInfoCopyWith<WebSourceInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WebSourceInfoCopyWith<$Res> {
+  factory $WebSourceInfoCopyWith(
+          WebSourceInfo value, $Res Function(WebSourceInfo) then) =
+      _$WebSourceInfoCopyWithImpl<$Res, WebSourceInfo>;
+  @useResult
+  $Res call(
+      {String name,
+      String version,
+      String baseUrl,
+      String mangaPath,
+      String search,
+      String manga,
+      String pages});
+}
+
+/// @nodoc
+class _$WebSourceInfoCopyWithImpl<$Res, $Val extends WebSourceInfo>
+    implements $WebSourceInfoCopyWith<$Res> {
+  _$WebSourceInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of WebSourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? version = null,
+    Object? baseUrl = null,
+    Object? mangaPath = null,
+    Object? search = null,
+    Object? manga = null,
+    Object? pages = null,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      baseUrl: null == baseUrl
+          ? _value.baseUrl
+          : baseUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      mangaPath: null == mangaPath
+          ? _value.mangaPath
+          : mangaPath // ignore: cast_nullable_to_non_nullable
+              as String,
+      search: null == search
+          ? _value.search
+          : search // ignore: cast_nullable_to_non_nullable
+              as String,
+      manga: null == manga
+          ? _value.manga
+          : manga // ignore: cast_nullable_to_non_nullable
+              as String,
+      pages: null == pages
+          ? _value.pages
+          : pages // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$WebSourceInfoImplCopyWith<$Res>
+    implements $WebSourceInfoCopyWith<$Res> {
+  factory _$$WebSourceInfoImplCopyWith(
+          _$WebSourceInfoImpl value, $Res Function(_$WebSourceInfoImpl) then) =
+      __$$WebSourceInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String name,
+      String version,
+      String baseUrl,
+      String mangaPath,
+      String search,
+      String manga,
+      String pages});
+}
+
+/// @nodoc
+class __$$WebSourceInfoImplCopyWithImpl<$Res>
+    extends _$WebSourceInfoCopyWithImpl<$Res, _$WebSourceInfoImpl>
+    implements _$$WebSourceInfoImplCopyWith<$Res> {
+  __$$WebSourceInfoImplCopyWithImpl(
+      _$WebSourceInfoImpl _value, $Res Function(_$WebSourceInfoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of WebSourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? version = null,
+    Object? baseUrl = null,
+    Object? mangaPath = null,
+    Object? search = null,
+    Object? manga = null,
+    Object? pages = null,
+  }) {
+    return _then(_$WebSourceInfoImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      baseUrl: null == baseUrl
+          ? _value.baseUrl
+          : baseUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      mangaPath: null == mangaPath
+          ? _value.mangaPath
+          : mangaPath // ignore: cast_nullable_to_non_nullable
+              as String,
+      search: null == search
+          ? _value.search
+          : search // ignore: cast_nullable_to_non_nullable
+              as String,
+      manga: null == manga
+          ? _value.manga
+          : manga // ignore: cast_nullable_to_non_nullable
+              as String,
+      pages: null == pages
+          ? _value.pages
+          : pages // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WebSourceInfoImpl implements _WebSourceInfo {
+  const _$WebSourceInfoImpl(
+      {required this.name,
+      required this.version,
+      required this.baseUrl,
+      required this.mangaPath,
+      required this.search,
+      required this.manga,
+      required this.pages});
+
+  factory _$WebSourceInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebSourceInfoImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String version;
+  @override
+  final String baseUrl;
+  @override
+  final String mangaPath;
+  @override
+  final String search;
+  @override
+  final String manga;
+  @override
+  final String pages;
+
+  @override
+  String toString() {
+    return 'WebSourceInfo(name: $name, version: $version, baseUrl: $baseUrl, mangaPath: $mangaPath, search: $search, manga: $manga, pages: $pages)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WebSourceInfoImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl) &&
+            (identical(other.mangaPath, mangaPath) ||
+                other.mangaPath == mangaPath) &&
+            (identical(other.search, search) || other.search == search) &&
+            (identical(other.manga, manga) || other.manga == manga) &&
+            (identical(other.pages, pages) || other.pages == pages));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, name, version, baseUrl, mangaPath, search, manga, pages);
+
+  /// Create a copy of WebSourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WebSourceInfoImplCopyWith<_$WebSourceInfoImpl> get copyWith =>
+      __$$WebSourceInfoImplCopyWithImpl<_$WebSourceInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WebSourceInfoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WebSourceInfo implements WebSourceInfo {
+  const factory _WebSourceInfo(
+      {required final String name,
+      required final String version,
+      required final String baseUrl,
+      required final String mangaPath,
+      required final String search,
+      required final String manga,
+      required final String pages}) = _$WebSourceInfoImpl;
+
+  factory _WebSourceInfo.fromJson(Map<String, dynamic> json) =
+      _$WebSourceInfoImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String get version;
+  @override
+  String get baseUrl;
+  @override
+  String get mangaPath;
+  @override
+  String get search;
+  @override
+  String get manga;
+  @override
+  String get pages;
+
+  /// Create a copy of WebSourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WebSourceInfoImplCopyWith<_$WebSourceInfoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+RepoInfo _$RepoInfoFromJson(Map<String, dynamic> json) {
+  return _RepoInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$RepoInfo {
+  String get name => throw _privateConstructorUsedError;
+  String get version => throw _privateConstructorUsedError;
+  String get url => throw _privateConstructorUsedError;
+
+  /// Serializes this RepoInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of RepoInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $RepoInfoCopyWith<RepoInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RepoInfoCopyWith<$Res> {
+  factory $RepoInfoCopyWith(RepoInfo value, $Res Function(RepoInfo) then) =
+      _$RepoInfoCopyWithImpl<$Res, RepoInfo>;
+  @useResult
+  $Res call({String name, String version, String url});
+}
+
+/// @nodoc
+class _$RepoInfoCopyWithImpl<$Res, $Val extends RepoInfo>
+    implements $RepoInfoCopyWith<$Res> {
+  _$RepoInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of RepoInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? version = null,
+    Object? url = null,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$RepoInfoImplCopyWith<$Res>
+    implements $RepoInfoCopyWith<$Res> {
+  factory _$$RepoInfoImplCopyWith(
+          _$RepoInfoImpl value, $Res Function(_$RepoInfoImpl) then) =
+      __$$RepoInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String name, String version, String url});
+}
+
+/// @nodoc
+class __$$RepoInfoImplCopyWithImpl<$Res>
+    extends _$RepoInfoCopyWithImpl<$Res, _$RepoInfoImpl>
+    implements _$$RepoInfoImplCopyWith<$Res> {
+  __$$RepoInfoImplCopyWithImpl(
+      _$RepoInfoImpl _value, $Res Function(_$RepoInfoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of RepoInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? version = null,
+    Object? url = null,
+  }) {
+    return _then(_$RepoInfoImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RepoInfoImpl implements _RepoInfo {
+  const _$RepoInfoImpl(
+      {required this.name, required this.version, required this.url});
+
+  factory _$RepoInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RepoInfoImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String version;
+  @override
+  final String url;
+
+  @override
+  String toString() {
+    return 'RepoInfo(name: $name, version: $version, url: $url)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RepoInfoImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.url, url) || other.url == url));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, name, version, url);
+
+  /// Create a copy of RepoInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RepoInfoImplCopyWith<_$RepoInfoImpl> get copyWith =>
+      __$$RepoInfoImplCopyWithImpl<_$RepoInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RepoInfoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _RepoInfo implements RepoInfo {
+  const factory _RepoInfo(
+      {required final String name,
+      required final String version,
+      required final String url}) = _$RepoInfoImpl;
+
+  factory _RepoInfo.fromJson(Map<String, dynamic> json) =
+      _$RepoInfoImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String get version;
+  @override
+  String get url;
+
+  /// Create a copy of RepoInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$RepoInfoImplCopyWith<_$RepoInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
