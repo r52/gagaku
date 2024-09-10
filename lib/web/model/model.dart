@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_security.dart';
+import 'package:dart_eval/stdlib/core.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/cache.dart';
 import 'package:gagaku/http.dart';
@@ -11,7 +12,6 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/util.dart';
 import 'package:gagaku/web/eval/plugin.dart';
-import 'package:gagaku/web/eval/types.dart';
 import 'package:gagaku/web/eval/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -600,8 +600,12 @@ class WebSourceManager extends _$WebSourceManager {
       final source = WebSource(runtime: runtime);
 
       for (final key in sourcefiles.keys) {
-        final info =
-            (runtime.executeLib('${GagakuWebSources.getPackagePath}/$key', 'getSourceInfo') as $WebSourceInfo).$value;
+        final result =
+            (runtime.executeLib('${GagakuWebSources.getPackagePath}/$key', 'getSourceInfo') as $String).$value;
+
+        final Map<String, dynamic> dat = json.decode(result);
+        final info = WebSourceInfo.fromJson(dat);
+
         source.sources.putIfAbsent(key, () => info);
         runtime.grant(NetworkPermission.url(info.baseUrl));
       }

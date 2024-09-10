@@ -1118,6 +1118,10 @@ abstract class _ImgurPage implements ImgurPage {
       throw _privateConstructorUsedError;
 }
 
+WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) {
+  return _WebSourceInfo.fromJson(json);
+}
+
 /// @nodoc
 mixin _$WebSourceInfo {
   String get name => throw _privateConstructorUsedError;
@@ -1127,6 +1131,9 @@ mixin _$WebSourceInfo {
   String get search => throw _privateConstructorUsedError;
   String get manga => throw _privateConstructorUsedError;
   String get pages => throw _privateConstructorUsedError;
+
+  /// Serializes this WebSourceInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of WebSourceInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -1280,7 +1287,7 @@ class __$$WebSourceInfoImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$WebSourceInfoImpl implements _WebSourceInfo {
   const _$WebSourceInfoImpl(
       {required this.name,
@@ -1290,6 +1297,9 @@ class _$WebSourceInfoImpl implements _WebSourceInfo {
       required this.search,
       required this.manga,
       required this.pages});
+
+  factory _$WebSourceInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WebSourceInfoImplFromJson(json);
 
   @override
   final String name;
@@ -1326,6 +1336,7 @@ class _$WebSourceInfoImpl implements _WebSourceInfo {
             (identical(other.pages, pages) || other.pages == pages));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, name, version, baseUrl, mangaPath, search, manga, pages);
@@ -1337,6 +1348,13 @@ class _$WebSourceInfoImpl implements _WebSourceInfo {
   @pragma('vm:prefer-inline')
   _$$WebSourceInfoImplCopyWith<_$WebSourceInfoImpl> get copyWith =>
       __$$WebSourceInfoImplCopyWithImpl<_$WebSourceInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WebSourceInfoImplToJson(
+      this,
+    );
+  }
 }
 
 abstract class _WebSourceInfo implements WebSourceInfo {
@@ -1348,6 +1366,9 @@ abstract class _WebSourceInfo implements WebSourceInfo {
       required final String search,
       required final String manga,
       required final String pages}) = _$WebSourceInfoImpl;
+
+  factory _WebSourceInfo.fromJson(Map<String, dynamic> json) =
+      _$WebSourceInfoImpl.fromJson;
 
   @override
   String get name;

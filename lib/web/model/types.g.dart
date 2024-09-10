@@ -80,6 +80,28 @@ Map<String, dynamic> _$$ImgurPageImplToJson(_$ImgurPageImpl instance) =>
       'src': instance.src,
     };
 
+_$WebSourceInfoImpl _$$WebSourceInfoImplFromJson(Map<String, dynamic> json) =>
+    _$WebSourceInfoImpl(
+      name: json['name'] as String,
+      version: json['version'] as String,
+      baseUrl: json['baseUrl'] as String,
+      mangaPath: json['mangaPath'] as String,
+      search: json['search'] as String,
+      manga: json['manga'] as String,
+      pages: json['pages'] as String,
+    );
+
+Map<String, dynamic> _$$WebSourceInfoImplToJson(_$WebSourceInfoImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'version': instance.version,
+      'baseUrl': instance.baseUrl,
+      'mangaPath': instance.mangaPath,
+      'search': instance.search,
+      'manga': instance.manga,
+      'pages': instance.pages,
+    };
+
 _$RepoInfoImpl _$$RepoInfoImplFromJson(Map<String, dynamic> json) =>
     _$RepoInfoImpl(
       name: json['name'] as String,

@@ -16,7 +16,6 @@ class WebSourcePlugin implements EvalPlugin {
     $WebChapter.configureForCompile(registry);
     $WebManga.configureForCompile(registry);
     $HistoryLink.configureForCompile(registry);
-    $WebSourceInfo.configureForCompile(registry);
     // html
     $Document.configureForCompile(registry);
     $Element.configureForCompile(registry);
@@ -49,7 +48,6 @@ class WebSourcePlugin implements EvalPlugin {
     $WebChapter.configureForRuntime(runtime);
     $WebManga.configureForRuntime(runtime);
     $HistoryLink.configureForRuntime(runtime);
-    $WebSourceInfo.configureForRuntime(runtime);
     //html
     $Document.configureForRuntime(runtime);
     $Element.configureForRuntime(runtime);

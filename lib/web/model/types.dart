@@ -285,6 +285,8 @@ class WebSourceInfo with _$WebSourceInfo {
     required String manga,
     required String pages,
   }) = _WebSourceInfo;
+
+  factory WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
 }
 
 @freezed

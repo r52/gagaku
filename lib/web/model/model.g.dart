@@ -308,7 +308,7 @@ final class WebSourceManagerProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$webSourceManagerHash() => r'0d2fdd2a7b52200a3791f75948f30a367e62c8f1';
+String _$webSourceManagerHash() => r'e323b9fdc5ff416f2c734bd52a39d1bc512fa80d';
 
 abstract class _$WebSourceManager extends $AsyncNotifier<WebSource?> {
   FutureOr<WebSource?> build();

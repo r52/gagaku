@@ -6,6 +6,7 @@ import 'package:dart_eval/src/eval/utils/wap_helper.dart';
 import 'package:gagaku/web/eval/util.dart';
 import 'package:gagaku/web/model/types.dart';
 
+/*
 class $WebSourceInfo implements $Instance {
   static void configureForCompile(BridgeDeclarationRegistry registry) {
     registry.defineBridgeClass($declaration);
@@ -112,6 +113,7 @@ class $WebSourceInfo implements $Instance {
   @override
   int $getRuntimeType(Runtime runtime) => runtime.lookupType($type.spec!);
 }
+*/
 
 class $HistoryLink implements $Instance {
   static void configureForCompile(BridgeDeclarationRegistry registry) {
