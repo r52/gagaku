@@ -6,6 +6,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:go_router/go_router.dart';
@@ -218,7 +219,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
     useEffect(() {
       Future.delayed(Duration.zero, () {
         ref.read(webSourceHistoryProvider.notifier).add(link);
-        ref.read(webSourceFavoritesProvider.notifier).replace(link);
+        ref.read(webSourceFavoritesProvider.notifier).updateAll(link);
       });
       return null;
     }, []);
@@ -271,41 +272,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
             OverflowBar(
               spacing: 8.0,
               children: [
-                Consumer(
-                  builder: (context, ref, child) {
-                    final favorited = ref.watch(webSourceFavoritesProvider.select(
-                      (value) => switch (value) {
-                        AsyncValue(value: final data?) => data.indexWhere((e) => e.url == info.getURL()) > -1,
-                        _ => null,
-                      },
-                    ));
-
-                    if (favorited == null) {
-                      return const SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-
-                    return IconButton(
-                      tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
-                      style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surface.withAlpha(200)),
-                      color: favorited ? theme.colorScheme.primary : null,
-                      onPressed: () async {
-                        if (favorited) {
-                          ref.read(webSourceFavoritesProvider.notifier).remove(link);
-                        } else {
-                          ref.read(webSourceFavoritesProvider.notifier).add(link);
-                        }
-                      },
-                      icon: Icon(favorited ? Icons.favorite : Icons.favorite_border),
-                    );
-                  },
-                ),
+                _FavoritesMenu(link: link, info: info),
                 Consumer(
                   builder: (context, ref, child) {
                     final key = info.getKey();
@@ -652,6 +619,89 @@ class ChapterButtonWidget extends HookConsumerWidget {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _FavoritesMenu extends HookConsumerWidget {
+  const _FavoritesMenu({
+    required this.link,
+    required this.info,
+  });
+
+  final HistoryLink link;
+  final SourceInfo info;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final cfg = ref.watch(webConfigProvider);
+
+    final favorites = ref.watch(webSourceFavoritesProvider.select(
+      (value) => switch (value) {
+        AsyncValue(value: final data?) => data,
+        _ => null,
+      },
+    ));
+
+    final favorited =
+        useMemoized(() => favorites?.values.any((l) => l.any((e) => e.url == info.getURL())) ?? false, [favorites]);
+
+    return MenuAnchor(
+      builder: (context, controller, child) {
+        return Material(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+          child: favorites == null
+              ? const SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : InkWell(
+                  onTap: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  child: child,
+                ),
+        );
+      },
+      menuChildren: favorites != null
+          ? List.generate(
+              cfg.categories.length,
+              (index) => Builder(
+                builder: (context) {
+                  final cat = cfg.categories.elementAt(index);
+                  return CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(cat.name),
+                    value: favorites[cat.id]?.contains(link) ?? false,
+                    onChanged: (bool? value) async {
+                      if (value == true) {
+                        await ref.read(webSourceFavoritesProvider.notifier).add(cat.id, link);
+                      } else {
+                        await ref.read(webSourceFavoritesProvider.notifier).remove(cat.id, link);
+                      }
+                    },
+                  );
+                },
+              ),
+            )
+          : [],
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Icon(
+          favorited ? Icons.favorite : Icons.favorite_border,
+          color: favorited ? theme.colorScheme.primary : null,
+        ),
+      ),
     );
   }
 }

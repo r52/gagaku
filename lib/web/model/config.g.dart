@@ -6,6 +6,18 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+WebSourceCategory _$WebSourceCategoryFromJson(Map<String, dynamic> json) =>
+    WebSourceCategory(
+      json['id'] as String,
+      json['name'] as String,
+    );
+
+Map<String, dynamic> _$WebSourceCategoryToJson(WebSourceCategory instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+    };
+
 _$WebSourceConfigImpl _$$WebSourceConfigImplFromJson(
         Map<String, dynamic> json) =>
     _$WebSourceConfigImpl(
@@ -14,6 +26,12 @@ _$WebSourceConfigImpl _$$WebSourceConfigImplFromJson(
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      categories: (json['categories'] as List<dynamic>?)
+              ?.map(
+                  (e) => WebSourceCategory.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [_defaultCategory],
+      defaultCategory: json['defaultCategory'] as String? ?? _defaultUUID,
     );
 
 Map<String, dynamic> _$$WebSourceConfigImplToJson(
@@ -21,6 +39,8 @@ Map<String, dynamic> _$$WebSourceConfigImplToJson(
     <String, dynamic>{
       'sourceDirectory': instance.sourceDirectory,
       'repoList': instance.repoList,
+      'categories': instance.categories,
+      'defaultCategory': instance.defaultCategory,
     };
 
 // **************************************************************************
@@ -88,7 +108,7 @@ final class WebConfigProvider
       $NotifierProviderElement(this, pointer);
 }
 
-String _$webConfigHash() => r'd2fe9e2dcf17052f5a15a350429e7671220ce0fe';
+String _$webConfigHash() => r'581d5a27382777d75f47e53f7f5ae3542b91d0ac';
 
 abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();

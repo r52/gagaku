@@ -103,10 +103,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
   const WebMangaListViewSliver({
     super.key,
     required this.items,
+    required this.favoritesKey,
     this.reorderable = false,
     this.showRemoveButton = true,
   });
 
+  final String favoritesKey;
   final List<HistoryLink> items;
   final bool reorderable;
   final bool showRemoveButton;
@@ -121,7 +123,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
     final view = ref.watch(_mangaListViewProvider);
-    final cfg = ref.watch(gagakuSettingsProvider);
+    final gcfg = ref.watch(gagakuSettingsProvider);
     final theme = Theme.of(context);
 
     switch (view) {
@@ -129,7 +131,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
         return reorderable
             ? SliverReorderableList(
                 onReorder: (int oldIndex, int newIndex) =>
-                    ref.read(webSourceFavoritesProvider.notifier).updateList(oldIndex, newIndex),
+                    ref.read(webSourceFavoritesProvider.notifier).updateList(favoritesKey, oldIndex, newIndex),
                 itemCount: items.length,
                 findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
@@ -144,7 +146,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         builder: (context, refx, child) {
                           final favorited = ref.watch(webSourceFavoritesProvider.select(
                             (value) => switch (value) {
-                              AsyncValue(value: final data?) => data.indexWhere((e) => e.url == item.url) > -1,
+                              AsyncValue(value: final data?) => data.values.any((l) => l.contains(item)),
                               _ => null,
                             },
                           ));
@@ -159,9 +161,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             color: favorited ? theme.colorScheme.primary : null,
                             onPressed: () async {
                               if (favorited) {
-                                ref.read(webSourceFavoritesProvider.notifier).remove(item);
+                                ref.read(webSourceFavoritesProvider.notifier).remove(favoritesKey, item);
                               } else {
-                                ref.read(webSourceFavoritesProvider.notifier).add(item);
+                                ref.read(webSourceFavoritesProvider.notifier).add(favoritesKey, item);
                               }
                             },
                           );
@@ -202,7 +204,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       builder: (context, refx, child) {
                         final favorited = ref.watch(webSourceFavoritesProvider.select(
                           (value) => switch (value) {
-                            AsyncValue(value: final data?) => data.indexWhere((e) => e.url == item.url) > -1,
+                            AsyncValue(value: final data?) => data.values.any((l) => l.contains(item)),
                             _ => null,
                           },
                         ));
@@ -217,9 +219,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           color: favorited ? theme.colorScheme.primary : null,
                           onPressed: () async {
                             if (favorited) {
-                              ref.read(webSourceFavoritesProvider.notifier).remove(item);
+                              ref.read(webSourceFavoritesProvider.notifier).remove(favoritesKey, item);
                             } else {
-                              ref.read(webSourceFavoritesProvider.notifier).add(item);
+                              ref.read(webSourceFavoritesProvider.notifier).add(favoritesKey, item);
                             }
                           },
                         );
@@ -258,7 +260,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
       default:
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
+            maxCrossAxisExtent: gcfg.gridAlbumExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
@@ -269,6 +271,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
             return GridMangaItem(
               key: ValueKey(item.hashCode),
               link: item,
+              favoritesKey: favoritesKey,
               showRemoveButton: showRemoveButton,
             );
           },
@@ -282,10 +285,12 @@ class GridMangaItem extends HookConsumerWidget {
   const GridMangaItem({
     super.key,
     required this.link,
+    required this.favoritesKey,
     this.showFavoriteButton = true,
     this.showRemoveButton = true,
   });
 
+  final String favoritesKey;
   final HistoryLink link;
   final bool showFavoriteButton;
   final bool showRemoveButton;
@@ -353,7 +358,7 @@ class GridMangaItem extends HookConsumerWidget {
                 builder: (context, refx, child) {
                   final favorited = ref.watch(webSourceFavoritesProvider.select(
                     (value) => switch (value) {
-                      AsyncValue(value: final data?) => data.indexWhere((e) => e.url == link.url) > -1,
+                      AsyncValue(value: final data?) => data.values.any((l) => l.contains(link)),
                       _ => null,
                     },
                   ));
@@ -369,9 +374,9 @@ class GridMangaItem extends HookConsumerWidget {
                     tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
                     onPressed: () async {
                       if (favorited) {
-                        ref.read(webSourceFavoritesProvider.notifier).remove(link);
+                        ref.read(webSourceFavoritesProvider.notifier).remove(favoritesKey, link);
                       } else {
-                        ref.read(webSourceFavoritesProvider.notifier).add(link);
+                        ref.read(webSourceFavoritesProvider.notifier).add(favoritesKey, link);
                       }
                     },
                     child: Icon(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,6 +15,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gagakucfg = ref.watch(gagakuSettingsProvider);
+    final cfg = ref.watch(webConfigProvider);
     final controller = useTextEditingController();
     final searchTerm = useState('');
     final sources = ref.watch(webSourceManagerProvider);
@@ -131,6 +133,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                         return GridMangaItem(
                           key: ValueKey(item.hashCode),
                           link: item,
+                          favoritesKey: cfg.defaultCategory,
                           showFavoriteButton: false,
                           showRemoveButton: false,
                         );

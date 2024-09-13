@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/ui.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/ui.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class WebSourceHistory extends HookConsumerWidget {
-  const WebSourceHistory({
+class WebSourceHistoryWidget extends HookConsumerWidget {
+  const WebSourceHistoryWidget({
     super.key,
     this.controller,
   });
@@ -17,6 +18,7 @@ class WebSourceHistory extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
+    final cfg = ref.watch(webConfigProvider);
 
     final scrollController = controller ?? useScrollController();
     final historyProvider = ref.watch(webSourceHistoryProvider);
@@ -107,7 +109,10 @@ class WebSourceHistory extends HookConsumerWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   controller: scrollController,
                   children: [
-                    WebMangaListViewSliver(items: history.toList()),
+                    WebMangaListViewSliver(
+                      items: history.toList(),
+                      favoritesKey: cfg.defaultCategory,
+                    ),
                   ],
                 ),
               ),
