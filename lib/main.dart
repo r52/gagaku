@@ -324,14 +324,14 @@ class _AppState extends ConsumerState<App> {
         pageBuilder: buildWebMangaViewPage,
       ),
       GoRoute(
+        path: GagakuRoute.webMangaChapter,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildWebReaderPage,
+      ),
+      GoRoute(
         path: GagakuRoute.webMangaSource,
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: buildWebMangaViewPage,
-      ),
-      GoRoute(
-        path: GagakuRoute.webMangaFull,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: buildWebReaderPage,
       ),
       GoRoute(
         path: GagakuRoute.webMangaSourceChapter,
