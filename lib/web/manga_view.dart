@@ -252,7 +252,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 shadows: <Shadow>[
                   Shadow(
                     offset: Offset(1.0, 1.0),
-                    blurRadius: 1.0,
                     color: Color.fromARGB(255, 0, 0, 0),
                   ),
                 ],

@@ -72,16 +72,21 @@ class GridAlbumImage extends StatelessWidget {
     return Material(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
-      child: ShaderMask(
-        shaderCallback: (rect) {
-          return LinearGradient(
-            begin: gradient,
-            end: Alignment.bottomCenter,
-            colors: const [Colors.black, Colors.transparent],
-          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
-        },
-        blendMode: BlendMode.dstIn,
-        child: child,
+      child: Stack(
+        children: [
+          child,
+          SizedBox.expand(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: FractionalOffset.bottomCenter,
+                  end: gradient,
+                  colors: const [Colors.black, Colors.transparent],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -107,25 +112,21 @@ class GridAlbumTextBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
-      child: Material(
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: !bottom ? const Radius.circular(4) : Radius.zero,
-            bottom: bottom ? const Radius.circular(4) : Radius.zero,
-          ),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: GridTileBar(
-          leading: leading,
-          backgroundColor: backgroundColor,
-          title: Text(
-            text,
-            softWrap: true,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              overflow: TextOverflow.fade,
-            ),
+      child: GridTileBar(
+        leading: leading,
+        backgroundColor: backgroundColor,
+        title: Text(
+          text,
+          softWrap: true,
+          style: const TextStyle(
+            color: Colors.white,
+            shadows: <Shadow>[
+              Shadow(
+                offset: Offset(1.0, 1.0),
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+            ],
+            overflow: TextOverflow.fade,
           ),
         ),
       ),
@@ -518,7 +519,6 @@ class TitleFlexBar extends StatelessWidget {
           shadows: <Shadow>[
             Shadow(
               offset: Offset(1.5, 1.5),
-              blurRadius: 0.5,
               color: Color.fromARGB(255, 0, 0, 0),
             ),
           ],
@@ -660,7 +660,7 @@ class Styles {
         ),
       );
 
-  static final coverArtGradientTween = Tween(begin: Alignment.center, end: Alignment.topCenter);
+  static final coverArtGradientTween = Tween(begin: FractionalOffset.center, end: FractionalOffset.topCenter);
 
   static const List<Widget> loadingOverlay = [
     ModalBarrier(dismissible: false, color: Colors.black87),

@@ -234,7 +234,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             shadows: <Shadow>[
                               Shadow(
                                 offset: Offset(0.5, 0.5),
-                                blurRadius: 1.0,
                                 color: Color.fromARGB(255, 0, 0, 0),
                               ),
                             ],
@@ -250,7 +249,6 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             shadows: <Shadow>[
                               Shadow(
                                 offset: Offset(1.0, 1.0),
-                                blurRadius: 1.0,
                                 color: Color.fromARGB(255, 0, 0, 0),
                               ),
                             ],

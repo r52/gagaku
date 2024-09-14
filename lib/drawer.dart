@@ -83,7 +83,6 @@ class MainDrawer extends ConsumerWidget {
                     shadows: <Shadow>[
                       Shadow(
                         offset: Offset(1.5, 1.5),
-                        blurRadius: 0.5,
                         color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ],
