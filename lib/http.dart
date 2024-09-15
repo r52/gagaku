@@ -12,7 +12,7 @@ http.Client _createHttpClient([bool useCustomUA = false]) {
   final userAgent = useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
 
   if (Platform.isAndroid) {
-    final engine = CronetEngine.build(cacheMode: CacheMode.memory, cacheMaxSize: 4 * 1024 * 1024, userAgent: userAgent);
+    final engine = CronetEngine.build(cacheMode: CacheMode.memory, cacheMaxSize: 5 * 1024 * 1024, userAgent: userAgent);
     return CronetClient.fromCronetEngine(engine, closeEngine: true);
   }
 
