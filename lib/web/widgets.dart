@@ -257,7 +257,6 @@ class WebMangaListViewSliver extends ConsumerWidget {
               );
 
       case WebMangaListView.grid:
-      default:
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: gcfg.gridAlbumExtent.grid,

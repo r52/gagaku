@@ -36,7 +36,6 @@ class MangaDexListsView extends HookConsumerWidget {
               break;
             case _ListViewType.followed:
               ref.read(followedListsProvider.notifier).getMore();
-            default:
               break;
           }
         }

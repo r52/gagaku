@@ -185,8 +185,6 @@ class LocalLibraryHome extends StatelessWidget {
                         case LibraryItemType.archive:
                           nav.push(ArchiveReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
                           break;
-                        default:
-                          break;
                       }
                     } else {
                       currentItem.value = item;

@@ -743,7 +743,7 @@ class TransparentOverlay<T> extends ModalRoute<T> {
   bool get barrierDismissible => true;
 
   @override
-  Color get barrierColor => Colors.black.withOpacity(0.5);
+  Color get barrierColor => Colors.black.withValues(alpha: 0.5);
 
   @override
   String? get barrierLabel => null;

@@ -996,7 +996,6 @@ class MangaSetAction {
       case MangaSetActions.remove:
         return {...state..remove(action.element!)};
       case MangaSetActions.none:
-      default:
         break;
     }
 

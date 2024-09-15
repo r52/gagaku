@@ -230,9 +230,6 @@ class ReaderWidget extends HookConsumerWidget {
           }
         }
         break;
-      default:
-        // Do nothing
-        break;
     }
 
     return KeyEventResult.handled;
@@ -274,9 +271,6 @@ class ReaderWidget extends HookConsumerWidget {
           scrollController: scrollController,
         );
         break;
-      default:
-        // Do nothing
-        break;
     }
 
     return KeyEventResult.handled;
@@ -303,9 +297,6 @@ class ReaderWidget extends HookConsumerWidget {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
         viewController[currentPage.value].position = viewController[currentPage.value].position + Offset(0.0, offset);
-        break;
-      default:
-        // Do nothing
         break;
     }
 
@@ -346,9 +337,6 @@ class ReaderWidget extends HookConsumerWidget {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
         viewController[currentPage.value].position = viewController[currentPage.value].position - Offset(0.0, offset);
-        break;
-      default:
-        // Do nothing
         break;
     }
 

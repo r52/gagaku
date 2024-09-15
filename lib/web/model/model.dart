@@ -162,7 +162,6 @@ class ProxyHandler {
         p.manga = manga;
         break;
       case SourceType.proxy:
-      default:
         switch (info.source) {
           case 'imgur':
             final code = '/read/api/imgur/chapter/${info.location}';

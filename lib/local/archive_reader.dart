@@ -23,8 +23,7 @@ class ArchiveReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
     this.link,
     this.onLinkPressed,
   }) : super(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              ArchiveReaderWidget(
+          pageBuilder: (context, animation, secondaryAnimation) => ArchiveReaderWidget(
             path: path,
             title: title,
             link: link,
@@ -46,8 +45,7 @@ class _ExtractInfo {
 }
 
 @riverpod
-Future<List<ReaderPage>> _getArchivePages(
-    _GetArchivePagesRef ref, String path) async {
+Future<List<ReaderPage>> _getArchivePages(_GetArchivePagesRef ref, String path) async {
   final formats = await ref.watch(supportedFormatsProvider.future);
   var type = ArchiveType.zip;
 
@@ -55,8 +53,7 @@ Future<List<ReaderPage>> _getArchivePages(
     type = ArchiveType.tar;
   }
 
-  final pages = await compute(
-      _extractArchive, _ExtractInfo(type: type, formats: formats, path: path));
+  final pages = await compute(_extractArchive, _ExtractInfo(type: type, formats: formats, path: path));
 
   /// pages MUST be cleared on dispose otherwise MemoryImage and its
   /// accompanying Uint8List buffer won't get GC'd for whatever reason
@@ -76,7 +73,6 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
       archive = TarDecoder().decodeBuffer(file);
       break;
     case ArchiveType.zip:
-    default:
       archive = ZipDecoder().decodeBuffer(file);
       break;
   }

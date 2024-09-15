@@ -683,7 +683,6 @@ class MangaListViewSliver extends ConsumerWidget {
         );
 
       case MangaListView.grid:
-      default:
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
