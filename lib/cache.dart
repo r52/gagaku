@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/types.dart';
 import 'package:gagaku/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -288,4 +287,27 @@ class CacheManager {
 
     logger.d("CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
   }
+}
+
+class CRef {
+  Object ref;
+
+  CRef(this.ref);
+
+  T get<T>() {
+    return ref as T;
+  }
+
+  void replace(Object other) {
+    ref = other;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is CRef && other.ref.runtimeType == ref.runtimeType && identical(other.ref, ref));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, ref);
 }

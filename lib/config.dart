@@ -1,8 +1,11 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/types.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,16 +24,6 @@ enum GridAlbumExtent {
   const GridAlbumExtent(this.grid, this.detailed);
 }
 
-class ColorConverter implements JsonConverter<Color, dynamic> {
-  const ColorConverter();
-
-  @override
-  Color fromJson(dynamic code) => Color(int.parse(code as String));
-
-  @override
-  dynamic toJson(Color color) => color.value.toString();
-}
-
 @freezed
 class GagakuConfig with _$GagakuConfig {
   const factory GagakuConfig({
@@ -38,7 +31,7 @@ class GagakuConfig with _$GagakuConfig {
     @Default(ThemeMode.system) ThemeMode themeMode,
 
     /// Theme color
-    @Default(Color(0xFF827717)) @ColorConverter() Color theme,
+    @JsonKey(unknownEnumValue: GagakuTheme.lime) @Default(GagakuTheme.lime) GagakuTheme theme,
 
     // Grid view size
     @Default(GridAlbumExtent.medium) GridAlbumExtent gridAlbumExtent,

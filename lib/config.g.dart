@@ -10,9 +10,9 @@ _$GagakuConfigImpl _$$GagakuConfigImplFromJson(Map<String, dynamic> json) =>
     _$GagakuConfigImpl(
       themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
           ThemeMode.system,
-      theme: json['theme'] == null
-          ? const Color(0xFF827717)
-          : const ColorConverter().fromJson(json['theme']),
+      theme: $enumDecodeNullable(_$GagakuThemeEnumMap, json['theme'],
+              unknownValue: GagakuTheme.lime) ??
+          GagakuTheme.lime,
       gridAlbumExtent: $enumDecodeNullable(
               _$GridAlbumExtentEnumMap, json['gridAlbumExtent']) ??
           GridAlbumExtent.medium,
@@ -21,7 +21,7 @@ _$GagakuConfigImpl _$$GagakuConfigImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$GagakuConfigImplToJson(_$GagakuConfigImpl instance) =>
     <String, dynamic>{
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
-      'theme': const ColorConverter().toJson(instance.theme),
+      'theme': _$GagakuThemeEnumMap[instance.theme]!,
       'gridAlbumExtent': _$GridAlbumExtentEnumMap[instance.gridAlbumExtent]!,
     };
 
@@ -29,6 +29,20 @@ const _$ThemeModeEnumMap = {
   ThemeMode.system: 'system',
   ThemeMode.light: 'light',
   ThemeMode.dark: 'dark',
+};
+
+const _$GagakuThemeEnumMap = {
+  GagakuTheme.lime: 'lime',
+  GagakuTheme.grey: 'grey',
+  GagakuTheme.amber: 'amber',
+  GagakuTheme.blue: 'blue',
+  GagakuTheme.teal: 'teal',
+  GagakuTheme.green: 'green',
+  GagakuTheme.lightgreen: 'lightgreen',
+  GagakuTheme.red: 'red',
+  GagakuTheme.orange: 'orange',
+  GagakuTheme.yellow: 'yellow',
+  GagakuTheme.purple: 'purple',
 };
 
 const _$GridAlbumExtentEnumMap = {

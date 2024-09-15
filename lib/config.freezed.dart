@@ -24,8 +24,8 @@ mixin _$GagakuConfig {
   ThemeMode get themeMode => throw _privateConstructorUsedError;
 
   /// Theme color
-  @ColorConverter()
-  Color get theme => throw _privateConstructorUsedError; // Grid view size
+  @JsonKey(unknownEnumValue: GagakuTheme.lime)
+  GagakuTheme get theme => throw _privateConstructorUsedError; // Grid view size
   GridAlbumExtent get gridAlbumExtent => throw _privateConstructorUsedError;
 
   /// Serializes this GagakuConfig to a JSON map.
@@ -46,7 +46,7 @@ abstract class $GagakuConfigCopyWith<$Res> {
   @useResult
   $Res call(
       {ThemeMode themeMode,
-      @ColorConverter() Color theme,
+      @JsonKey(unknownEnumValue: GagakuTheme.lime) GagakuTheme theme,
       GridAlbumExtent gridAlbumExtent});
 }
 
@@ -77,7 +77,7 @@ class _$GagakuConfigCopyWithImpl<$Res, $Val extends GagakuConfig>
       theme: null == theme
           ? _value.theme
           : theme // ignore: cast_nullable_to_non_nullable
-              as Color,
+              as GagakuTheme,
       gridAlbumExtent: null == gridAlbumExtent
           ? _value.gridAlbumExtent
           : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
@@ -96,7 +96,7 @@ abstract class _$$GagakuConfigImplCopyWith<$Res>
   @useResult
   $Res call(
       {ThemeMode themeMode,
-      @ColorConverter() Color theme,
+      @JsonKey(unknownEnumValue: GagakuTheme.lime) GagakuTheme theme,
       GridAlbumExtent gridAlbumExtent});
 }
 
@@ -125,7 +125,7 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
       theme: null == theme
           ? _value.theme
           : theme // ignore: cast_nullable_to_non_nullable
-              as Color,
+              as GagakuTheme,
       gridAlbumExtent: null == gridAlbumExtent
           ? _value.gridAlbumExtent
           : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
@@ -139,7 +139,8 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
 class _$GagakuConfigImpl implements _GagakuConfig {
   const _$GagakuConfigImpl(
       {this.themeMode = ThemeMode.system,
-      @ColorConverter() this.theme = const Color(0xFF827717),
+      @JsonKey(unknownEnumValue: GagakuTheme.lime)
+      this.theme = GagakuTheme.lime,
       this.gridAlbumExtent = GridAlbumExtent.medium});
 
   factory _$GagakuConfigImpl.fromJson(Map<String, dynamic> json) =>
@@ -152,9 +153,8 @@ class _$GagakuConfigImpl implements _GagakuConfig {
 
   /// Theme color
   @override
-  @JsonKey()
-  @ColorConverter()
-  final Color theme;
+  @JsonKey(unknownEnumValue: GagakuTheme.lime)
+  final GagakuTheme theme;
 // Grid view size
   @override
   @JsonKey()
@@ -201,7 +201,7 @@ class _$GagakuConfigImpl implements _GagakuConfig {
 abstract class _GagakuConfig implements GagakuConfig {
   const factory _GagakuConfig(
       {final ThemeMode themeMode,
-      @ColorConverter() final Color theme,
+      @JsonKey(unknownEnumValue: GagakuTheme.lime) final GagakuTheme theme,
       final GridAlbumExtent gridAlbumExtent}) = _$GagakuConfigImpl;
 
   factory _GagakuConfig.fromJson(Map<String, dynamic> json) =
@@ -213,8 +213,8 @@ abstract class _GagakuConfig implements GagakuConfig {
 
   /// Theme color
   @override
-  @ColorConverter()
-  Color get theme; // Grid view size
+  @JsonKey(unknownEnumValue: GagakuTheme.lime)
+  GagakuTheme get theme; // Grid view size
   @override
   GridAlbumExtent get gridAlbumExtent;
 

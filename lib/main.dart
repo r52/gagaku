@@ -405,7 +405,7 @@ class _AppState extends ConsumerState<App> {
       title: 'Gagaku',
       theme: ThemeData(
         brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(seedColor: config.theme, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(seedColor: config.theme.color, brightness: Brightness.light),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
@@ -415,7 +415,9 @@ class _AppState extends ConsumerState<App> {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: config.theme, brightness: Brightness.dark, dynamicSchemeVariant: DynamicSchemeVariant.content),
+            seedColor: config.theme.color,
+            brightness: Brightness.dark,
+            dynamicSchemeVariant: DynamicSchemeVariant.content),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
