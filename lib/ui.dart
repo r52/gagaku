@@ -99,14 +99,12 @@ class GridAlbumTextBar extends StatelessWidget {
     this.leading,
     this.backgroundColor,
     required this.text,
-    this.bottom = true,
   });
 
   final double height;
   final Widget? leading;
   final Color? backgroundColor;
   final String text;
-  final bool bottom;
 
   @override
   Widget build(BuildContext context) {

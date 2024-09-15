@@ -22,15 +22,15 @@ class WebSourceSearchWidget extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
 
     Widget? sourcesResult = switch (sources) {
-      AsyncValue(:final error?, :final stackTrace?) => SliverToBoxAdapter(
+      AsyncError(:final error, :final stackTrace) => SliverToBoxAdapter(
           child: ErrorColumn(
             error: error,
             stackTrace: stackTrace,
             message: "webSourceManagerProvider() failed",
           ),
         ),
-      AsyncValue(value: final src) when src != null && src.sources.isNotEmpty => null,
-      AsyncValue(value: final src) when src == null || src.sources.isEmpty => const SliverToBoxAdapter(
+      AsyncData(value: final src) when src != null && src.sources.isNotEmpty => null,
+      AsyncData(value: final src) when src == null || src.sources.isEmpty => const SliverToBoxAdapter(
           child: Center(
             child: Text("No sources installed!"),
           ),
