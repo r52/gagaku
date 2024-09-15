@@ -70,8 +70,8 @@ String _$proxyHash() => r'9c1283bf072913b04bc06342dad4b6ff01fd1e7e';
 @ProviderFor(WebSourceFavorites)
 const webSourceFavoritesProvider = WebSourceFavoritesProvider._();
 
-final class WebSourceFavoritesProvider
-    extends $AsyncNotifierProvider<WebSourceFavorites, List<HistoryLink>> {
+final class WebSourceFavoritesProvider extends $AsyncNotifierProvider<
+    WebSourceFavorites, Map<String, List<HistoryLink>>> {
   const WebSourceFavoritesProvider._(
       {super.runNotifierBuildOverride, WebSourceFavorites Function()? create})
       : _createCb = create,
@@ -105,8 +105,8 @@ final class WebSourceFavoritesProvider
   @$internal
   @override
   WebSourceFavoritesProvider $copyWithBuild(
-    FutureOr<List<HistoryLink>> Function(
-      Ref<AsyncValue<List<HistoryLink>>>,
+    FutureOr<Map<String, List<HistoryLink>>> Function(
+      Ref<AsyncValue<Map<String, List<HistoryLink>>>>,
       WebSourceFavorites,
     ) build,
   ) {
@@ -115,19 +115,21 @@ final class WebSourceFavoritesProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<WebSourceFavorites, List<HistoryLink>>
-      $createElement($ProviderPointer pointer) =>
-          $AsyncNotifierProviderElement(this, pointer);
+  $AsyncNotifierProviderElement<WebSourceFavorites,
+      Map<String, List<HistoryLink>>> $createElement(
+          $ProviderPointer pointer) =>
+      $AsyncNotifierProviderElement(this, pointer);
 }
 
 String _$webSourceFavoritesHash() =>
-    r'59188a5d4f269b6f6d3ce28bdd0a08c0a84b6b71';
+    r'0c35d691ceb6ad9704eaf3c2b110d3a0b4660032';
 
-abstract class _$WebSourceFavorites extends $AsyncNotifier<List<HistoryLink>> {
-  FutureOr<List<HistoryLink>> build();
+abstract class _$WebSourceFavorites
+    extends $AsyncNotifier<Map<String, List<HistoryLink>>> {
+  FutureOr<Map<String, List<HistoryLink>>> build();
   @$internal
   @override
-  FutureOr<List<HistoryLink>> runBuild() => build();
+  FutureOr<Map<String, List<HistoryLink>>> runBuild() => build();
 }
 
 @ProviderFor(WebSourceHistory)

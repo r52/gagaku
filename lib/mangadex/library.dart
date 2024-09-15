@@ -34,134 +34,124 @@ class MangaDexLibraryView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final type = ref.watch(libraryViewTypeProvider);
-    final currentPage = useState(0);
-    bool isLoading = false;
+    final statuses = useMemoized(() => MangaReadingStatus.values.skip(1).toList());
+    final initialtype = ref.read(libraryViewTypeProvider);
+    final tabController = useTabController(initialLength: statuses.length, initialIndex: statuses.indexOf(initialtype));
 
-    final listProvider = ref.watch(_getLibraryListByTypeProvider(type));
+    useEffect(() {
+      void tabCallback() {
+        ref.read(libraryViewTypeProvider.notifier).state = statuses.elementAt(tabController.index);
+      }
 
-    List<Widget> children;
+      tabController.addListener(tabCallback);
+      return () => tabController.removeListener(tabCallback);
+    }, [tabController]);
 
-    switch (listProvider) {
-      case AsyncValue(value: final list?):
-        final titlesProvider = ref.watch(getMangaListByPageProvider(list, currentPage.value));
-
-        isLoading = titlesProvider.isLoading;
-
-        children = [
-          Expanded(
-            child: switch (titlesProvider) {
-              AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(userLibraryProvider.notifier).clear();
-                    return ref.refresh(_getLibraryListByTypeProvider(type).future);
-                  },
-                  child: ErrorList(
-                    error: error,
-                    stackTrace: stackTrace,
-                    message: "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
-                  ),
-                ),
-              AsyncValue(value: final mangas) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(userLibraryProvider.notifier).clear();
-                    final lt = ref.read(libraryViewTypeProvider);
-                    return ref.refresh(_getLibraryListByTypeProvider(lt).future);
-                  },
-                  child: MangaListWidget(
-                    title: Text(
-                      '${list.length} Mangas',
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: controller,
-                    children: [
-                      if (mangas != null) MangaListViewSliver(items: mangas),
-                    ],
-                  ),
-                ),
-            },
-          ),
-          NumberPaginator(
-            numberPages: max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
-            onPageChange: (int index) {
-              currentPage.value = index;
-            },
-          )
-        ];
-        break;
-      case AsyncValue(:final error?, :final stackTrace?):
-        children = [
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {
-                ref.read(userLibraryProvider.notifier).clear();
-                return ref.refresh(_getLibraryListByTypeProvider(type).future);
-              },
-              child: ErrorList(
-                error: error,
-                stackTrace: stackTrace,
-                message: "_getLibraryListByTypeProvider($type) failed",
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ScrollConfiguration(
+          behavior: const MouseTouchScrollBehavior(),
+          child: TabBar(
+            tabAlignment: TabAlignment.center,
+            isScrollable: true,
+            controller: tabController,
+            tabs: List<Tab>.generate(
+              statuses.length,
+              (int index) => Tab(
+                text: statuses.elementAt(index).label,
               ),
             ),
           ),
-        ];
-        break;
-      case AsyncValue(:final progress):
-        children = [
-          ListSpinner(
-            progress: progress?.toDouble(),
-          )
-        ];
-        break;
-    }
-
-    return Scaffold(
-      body: Center(
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: const Alignment(-0.95, 0.0),
-                  child: DropdownMenu<MangaReadingStatus>(
-                    initialSelection: type,
-                    enableFilter: false,
-                    enableSearch: false,
-                    requestFocusOnTap: false,
-                    inputDecorationTheme: InputDecorationTheme(
-                      filled: true,
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2.0,
-                          color: theme.colorScheme.inversePrimary,
-                        ),
-                      ),
-                    ),
-                    onSelected: (MangaReadingStatus? status) async {
-                      if (status != null) {
-                        ref.read(libraryViewTypeProvider.notifier).state = status;
-                        currentPage.value = 0;
-                      }
-                    },
-                    dropdownMenuEntries: List<DropdownMenuEntry<MangaReadingStatus>>.generate(
-                      MangaReadingStatus.values.skip(1).length,
-                      (int index) => DropdownMenuEntry<MangaReadingStatus>(
-                        value: MangaReadingStatus.values.skip(1).elementAt(index),
-                        label: MangaReadingStatus.values.skip(1).elementAt(index).label,
-                      ),
-                    ),
-                  ),
-                ),
-                ...children,
-              ],
-            ),
-            if (isLoading) ...Styles.loadingOverlay,
-          ],
         ),
-      ),
+        Expanded(
+          child: TabBarView(
+            controller: tabController,
+            children: [
+              for (final type in statuses)
+                HookConsumer(
+                  builder: (context, ref, child) {
+                    final currentPage = useState(0);
+                    final scrollController = useScrollController();
+                    final listProvider = ref.watch(_getLibraryListByTypeProvider(type));
+
+                    switch (listProvider) {
+                      case AsyncValue(value: final list?):
+                        final titlesProvider = ref.watch(getMangaListByPageProvider(list, currentPage.value));
+
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: Stack(
+                                children: [
+                                  switch (titlesProvider) {
+                                    AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+                                        onRefresh: () async {
+                                          ref.read(userLibraryProvider.notifier).clear();
+                                          return ref.refresh(_getLibraryListByTypeProvider(type).future);
+                                        },
+                                        child: ErrorList(
+                                          error: error,
+                                          stackTrace: stackTrace,
+                                          message:
+                                              "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
+                                        ),
+                                      ),
+                                    AsyncValue(value: final mangas) => RefreshIndicator(
+                                        onRefresh: () async {
+                                          ref.read(userLibraryProvider.notifier).clear();
+                                          return ref.refresh(_getLibraryListByTypeProvider(type).future);
+                                        },
+                                        child: MangaListWidget(
+                                          title: Text(
+                                            '${list.length} Mangas',
+                                            style: const TextStyle(fontSize: 24),
+                                          ),
+                                          physics: const AlwaysScrollableScrollPhysics(),
+                                          controller: scrollController,
+                                          children: [
+                                            if (mangas != null) MangaListViewSliver(items: mangas),
+                                          ],
+                                        ),
+                                      ),
+                                  },
+                                  if (titlesProvider.isLoading) ...Styles.loadingOverlay,
+                                ],
+                              ),
+                            ),
+                            NumberPaginator(
+                              numberPages: max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                              onPageChange: (int index) {
+                                currentPage.value = index;
+                              },
+                            )
+                          ],
+                        );
+                      case AsyncValue(:final error?, :final stackTrace?):
+                        return Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              ref.read(userLibraryProvider.notifier).clear();
+                              return ref.refresh(_getLibraryListByTypeProvider(type).future);
+                            },
+                            child: ErrorList(
+                              error: error,
+                              stackTrace: stackTrace,
+                              message: "_getLibraryListByTypeProvider($type) failed",
+                            ),
+                          ),
+                        );
+                      case AsyncValue(:final progress):
+                        return ListSpinner(
+                          progress: progress?.toDouble(),
+                        );
+                    }
+                  },
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

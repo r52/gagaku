@@ -235,22 +235,44 @@ class ProxyHandler {
 
 @Riverpod(keepAlive: true)
 class WebSourceFavorites extends _$WebSourceFavorites {
-  Future<List<HistoryLink>> _fetch() async {
+  Future<Map<String, List<HistoryLink>>> _fetch() async {
+    final cfg = ref.read(webConfigProvider);
     final box = Hive.box(gagakuBox);
     final str = box.get('web_favorites');
 
     if (str == null || (str as String).isEmpty) {
-      return <HistoryLink>[];
+      return {};
     }
 
-    final content = json.decode(str) as List<dynamic>;
-    final links = content.map((e) => HistoryLink.fromJson(e));
+    final content = json.decode(str);
 
-    return links.toList();
+    if (content is List) {
+      final links = content.map((e) => HistoryLink.fromJson(e)).toList();
+      return {
+        cfg.defaultCategory: links,
+      };
+    } else if (content is Map) {
+      final map = (content as Map<String, dynamic>)
+          .map((key, value) => MapEntry(key, (value as List).map((e) => HistoryLink.fromJson(e)).toList()));
+
+      final keys = map.keys.toList();
+      for (final key in keys) {
+        // If key doesnt exist in current categories, convert the
+        // list to default
+        if (cfg.categories.indexWhere((e) => e.id == key) == -1) {
+          final list = map.remove(key);
+          map[cfg.defaultCategory] = [...?map[cfg.defaultCategory], ...?list];
+        }
+      }
+
+      return map;
+    }
+
+    return {};
   }
 
   @override
-  FutureOr<List<HistoryLink>> build() async {
+  FutureOr<Map<String, List<HistoryLink>>> build() async {
     return _fetch();
   }
 
@@ -259,7 +281,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final empty = <HistoryLink>[];
+      final empty = <String, List<HistoryLink>>{};
 
       final box = Hive.box(gagakuBox);
       await box.put('web_favorites', json.encode(empty));
@@ -268,66 +290,70 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     });
   }
 
-  Future<void> add(HistoryLink link) async {
+  Future<void> add(String category, HistoryLink link) async {
     final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      while (oldstate.contains(link)) {
-        oldstate.remove(link);
+      final list = oldstate[category];
+
+      while (list?.contains(link) ?? false) {
+        list?.remove(link);
       }
 
-      final udp = [link, ...oldstate];
+      oldstate[category] = [link, ...?list];
 
-      final links = udp.map((e) => e.toJson()).toList();
+      final udp = {...oldstate};
 
       final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(links));
+      await box.put('web_favorites', json.encode(udp));
 
       return udp;
     });
   }
 
-  Future<void> replace(HistoryLink link) async {
+  Future<void> updateAll(HistoryLink link) async {
     final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final idx = oldstate.indexOf(link);
+      for (final cat in oldstate.keys) {
+        final idx = oldstate[cat]!.indexOf(link);
 
-      if (idx != -1) {
-        oldstate[idx] = link;
+        if (idx != -1) {
+          oldstate[cat]![idx] = link;
+        }
       }
 
-      final udp = [...oldstate];
-
-      final links = udp.map((e) => e.toJson()).toList();
+      final udp = {...oldstate};
 
       final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(links));
+      await box.put('web_favorites', json.encode(udp));
 
       return udp;
     });
   }
 
-  Future<void> remove(HistoryLink link) async {
+  Future<void> remove(String category, HistoryLink link) async {
     final oldstate = await future;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final udp = [...oldstate];
+      final list = oldstate[category];
 
-      while (udp.contains(link)) {
-        udp.remove(link);
+      while (list?.contains(link) ?? false) {
+        list?.remove(link);
       }
 
-      final links = udp.map((e) => e.toJson()).toList();
+      oldstate[category] = [...?list];
+
+      final udp = {...oldstate};
 
       final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(links));
+      await box.put('web_favorites', json.encode(udp));
 
       return udp;
     });
   }
 
-  Future<void> updateList(int oldIndex, int newIndex) async {
+  Future<void> updateList(String category, int oldIndex, int newIndex) async {
     final oldstate = await future;
     state = await AsyncValue.guard(() async {
       if (oldIndex < newIndex) {
@@ -335,14 +361,36 @@ class WebSourceFavorites extends _$WebSourceFavorites {
         newIndex -= 1;
       }
 
-      final element = oldstate.removeAt(oldIndex);
-      oldstate.insert(newIndex, element);
+      if (oldstate.containsKey(category)) {
+        final element = oldstate[category]!.removeAt(oldIndex);
+        oldstate[category]!.insert(newIndex, element);
+      }
 
-      final udp = [...oldstate];
-      final map = udp.map((e) => e.toJson()).toList();
+      final udp = {...oldstate};
 
       final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(map));
+      await box.put('web_favorites', json.encode(udp));
+
+      return udp;
+    });
+  }
+
+  Future<void> reconfigureCategories(List<WebSourceCategory> categories, String defaultCategory) async {
+    final oldstate = await future;
+    state = await AsyncValue.guard(() async {
+      // Move all deleted category lists to default
+      final oldkeys = oldstate.keys.toList();
+      for (final oldcat in oldkeys) {
+        if (categories.indexWhere((e) => e.id == oldcat) == -1) {
+          final list = oldstate.remove(oldcat);
+          oldstate[defaultCategory] = [...?oldstate[defaultCategory], ...?list];
+        }
+      }
+
+      final udp = {...oldstate};
+
+      final box = Hive.box(gagakuBox);
+      await box.put('web_favorites', json.encode(udp));
 
       return udp;
     });

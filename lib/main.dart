@@ -298,7 +298,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.proxyHome,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: WebSourceHistory(
+              child: WebSourceHistoryWidget(
                 controller: _proxycontrollers[0],
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
@@ -309,7 +309,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.proxySaved,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: WebSourceFavorites(
+              child: WebSourceFavoritesWidget(
                 controller: _proxycontrollers[1],
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
@@ -324,14 +324,14 @@ class _AppState extends ConsumerState<App> {
         pageBuilder: buildWebMangaViewPage,
       ),
       GoRoute(
+        path: GagakuRoute.webMangaChapter,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildWebReaderPage,
+      ),
+      GoRoute(
         path: GagakuRoute.webMangaSource,
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: buildWebMangaViewPage,
-      ),
-      GoRoute(
-        path: GagakuRoute.webMangaFull,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: buildWebReaderPage,
       ),
       GoRoute(
         path: GagakuRoute.webMangaSourceChapter,

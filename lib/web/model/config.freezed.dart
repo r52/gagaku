@@ -24,6 +24,11 @@ mixin _$WebSourceConfig {
   set sourceDirectory(String value) => throw _privateConstructorUsedError;
   List<String> get repoList => throw _privateConstructorUsedError;
   set repoList(List<String> value) => throw _privateConstructorUsedError;
+  List<WebSourceCategory> get categories => throw _privateConstructorUsedError;
+  set categories(List<WebSourceCategory> value) =>
+      throw _privateConstructorUsedError;
+  String get defaultCategory => throw _privateConstructorUsedError;
+  set defaultCategory(String value) => throw _privateConstructorUsedError;
 
   /// Serializes this WebSourceConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -41,7 +46,11 @@ abstract class $WebSourceConfigCopyWith<$Res> {
           WebSourceConfig value, $Res Function(WebSourceConfig) then) =
       _$WebSourceConfigCopyWithImpl<$Res, WebSourceConfig>;
   @useResult
-  $Res call({String sourceDirectory, List<String> repoList});
+  $Res call(
+      {String sourceDirectory,
+      List<String> repoList,
+      List<WebSourceCategory> categories,
+      String defaultCategory});
 }
 
 /// @nodoc
@@ -61,6 +70,8 @@ class _$WebSourceConfigCopyWithImpl<$Res, $Val extends WebSourceConfig>
   $Res call({
     Object? sourceDirectory = null,
     Object? repoList = null,
+    Object? categories = null,
+    Object? defaultCategory = null,
   }) {
     return _then(_value.copyWith(
       sourceDirectory: null == sourceDirectory
@@ -71,6 +82,14 @@ class _$WebSourceConfigCopyWithImpl<$Res, $Val extends WebSourceConfig>
           ? _value.repoList
           : repoList // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      categories: null == categories
+          ? _value.categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<WebSourceCategory>,
+      defaultCategory: null == defaultCategory
+          ? _value.defaultCategory
+          : defaultCategory // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -83,7 +102,11 @@ abstract class _$$WebSourceConfigImplCopyWith<$Res>
       __$$WebSourceConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String sourceDirectory, List<String> repoList});
+  $Res call(
+      {String sourceDirectory,
+      List<String> repoList,
+      List<WebSourceCategory> categories,
+      String defaultCategory});
 }
 
 /// @nodoc
@@ -101,6 +124,8 @@ class __$$WebSourceConfigImplCopyWithImpl<$Res>
   $Res call({
     Object? sourceDirectory = null,
     Object? repoList = null,
+    Object? categories = null,
+    Object? defaultCategory = null,
   }) {
     return _then(_$WebSourceConfigImpl(
       sourceDirectory: null == sourceDirectory
@@ -111,6 +136,14 @@ class __$$WebSourceConfigImplCopyWithImpl<$Res>
           ? _value.repoList
           : repoList // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      categories: null == categories
+          ? _value.categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<WebSourceCategory>,
+      defaultCategory: null == defaultCategory
+          ? _value.defaultCategory
+          : defaultCategory // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -118,7 +151,11 @@ class __$$WebSourceConfigImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$WebSourceConfigImpl implements _WebSourceConfig {
-  _$WebSourceConfigImpl({this.sourceDirectory = '', this.repoList = const []});
+  _$WebSourceConfigImpl(
+      {this.sourceDirectory = '',
+      this.repoList = const [],
+      this.categories = const [_defaultCategory],
+      this.defaultCategory = _defaultUUID});
 
   factory _$WebSourceConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$WebSourceConfigImplFromJson(json);
@@ -129,10 +166,16 @@ class _$WebSourceConfigImpl implements _WebSourceConfig {
   @override
   @JsonKey()
   List<String> repoList;
+  @override
+  @JsonKey()
+  List<WebSourceCategory> categories;
+  @override
+  @JsonKey()
+  String defaultCategory;
 
   @override
   String toString() {
-    return 'WebSourceConfig(sourceDirectory: $sourceDirectory, repoList: $repoList)';
+    return 'WebSourceConfig(sourceDirectory: $sourceDirectory, repoList: $repoList, categories: $categories, defaultCategory: $defaultCategory)';
   }
 
   /// Create a copy of WebSourceConfig
@@ -153,8 +196,11 @@ class _$WebSourceConfigImpl implements _WebSourceConfig {
 }
 
 abstract class _WebSourceConfig implements WebSourceConfig {
-  factory _WebSourceConfig({String sourceDirectory, List<String> repoList}) =
-      _$WebSourceConfigImpl;
+  factory _WebSourceConfig(
+      {String sourceDirectory,
+      List<String> repoList,
+      List<WebSourceCategory> categories,
+      String defaultCategory}) = _$WebSourceConfigImpl;
 
   factory _WebSourceConfig.fromJson(Map<String, dynamic> json) =
       _$WebSourceConfigImpl.fromJson;
@@ -165,6 +211,12 @@ abstract class _WebSourceConfig implements WebSourceConfig {
   @override
   List<String> get repoList;
   set repoList(List<String> value);
+  @override
+  List<WebSourceCategory> get categories;
+  set categories(List<WebSourceCategory> value);
+  @override
+  String get defaultCategory;
+  set defaultCategory(String value);
 
   /// Create a copy of WebSourceConfig
   /// with the given fields replaced by the non-null parameter values.
