@@ -1534,7 +1534,15 @@ class LatestChaptersFeed extends _$LatestChaptersFeed with ListBasedInfiniteScro
   ///Fetch the latest chapters list based on offset
   @override
   Future<List<Chapter>> fetchData(int offset) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return [];
     }
@@ -1788,7 +1796,15 @@ class MangaCovers extends _$MangaCovers with AutoDisposeExpiryMix, ListBasedInfi
 @Riverpod(keepAlive: true)
 class ReadChapters extends _$ReadChapters {
   Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return {};
     }
@@ -1809,7 +1825,15 @@ class ReadChapters extends _$ReadChapters {
 
   /// Fetch read chapters for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return;
     }
@@ -1835,7 +1859,15 @@ class ReadChapters extends _$ReadChapters {
     Iterable<Chapter>? read,
     Iterable<Chapter>? unread,
   }) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return;
     }
@@ -2311,7 +2343,15 @@ class ChapterStats extends _$ChapterStats {
 @Riverpod(keepAlive: true)
 class Ratings extends _$Ratings {
   Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return {};
     }
@@ -2332,7 +2372,15 @@ class Ratings extends _$Ratings {
 
   /// Fetch user's self-ratings for the provided list of mangas
   Future<void> get(Iterable<Manga> mangas) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return;
     }
@@ -2354,7 +2402,15 @@ class Ratings extends _$Ratings {
 
   /// Sets a self-rating for a manga
   Future<void> set(Manga manga, int? rating) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return;
     }
@@ -2386,7 +2442,15 @@ class Ratings extends _$Ratings {
 class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
   @override
   Future<MangaReadingStatus?> build(Manga manga) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return null;
     }
@@ -2400,7 +2464,15 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
   }
 
   Future<void> set(MangaReadingStatus? status) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return;
     }
@@ -2428,7 +2500,15 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
 class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
   @override
   Future<bool> build(Manga manga) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return false;
     }
@@ -2442,7 +2522,15 @@ class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
   }
 
   Future<void> set(bool following) async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return;
     }
@@ -2515,7 +2603,15 @@ class MangaDexHistory extends _$MangaDexHistory {
 class LoggedUser extends _$LoggedUser {
   @override
   Future<User?> build() async {
-    final loggedin = await ref.read(authControlProvider.future);
+    bool loggedin;
+    final sub = ref.listen(authControlProvider.future, (_, __) {});
+
+    try {
+      loggedin = await sub.read();
+    } finally {
+      sub.close();
+    }
+
     if (!loggedin) {
       return null;
     }

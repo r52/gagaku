@@ -183,7 +183,7 @@ final class LatestChaptersFeedProvider
 }
 
 String _$latestChaptersFeedHash() =>
-    r'caa79e27227730166609d8902b84c77313fc138c';
+    r'df73e072a3355199a967903c61de3bc6cf041f26';
 
 abstract class _$LatestChaptersFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
@@ -1082,7 +1082,7 @@ final class ReadChaptersProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$readChaptersHash() => r'9dc56d4c2e1bb428b45ea668007ea2af536c4fcc';
+String _$readChaptersHash() => r'd3c2327aec85203e6f31291ce1196708a015ee0d';
 
 abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
   FutureOr<ReadChaptersMap> build();
@@ -2138,7 +2138,7 @@ final class RatingsProvider
           $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$ratingsHash() => r'a36bf273c0f57b64c9ace138fc690d57ce6ed5dd';
+String _$ratingsHash() => r'ad6ba697f430b3b67e013eab9b68cf9cf433b71b';
 
 abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
   FutureOr<Map<String, SelfRating>> build();
@@ -2224,7 +2224,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'd2a8a5435a9d4e8818ebf814652f65efed49bf3d';
+String _$readingStatusHash() => r'3303810451b05f8d1d51a65eea1151a432029b5a';
 
 final class ReadingStatusFamily extends Family {
   const ReadingStatusFamily._()
@@ -2381,7 +2381,7 @@ final class FollowingStatusProvider
   }
 }
 
-String _$followingStatusHash() => r'a6108611a7a36518f2eef9b81a8861fdab800e2e';
+String _$followingStatusHash() => r'e591bed0b811dd60f962c2f4b7ceba7652323775';
 
 final class FollowingStatusFamily extends Family {
   const FollowingStatusFamily._()
@@ -2574,7 +2574,7 @@ final class LoggedUserProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$loggedUserHash() => r'57b59b906ca3803768fb2dd9e231239755558a97';
+String _$loggedUserHash() => r'92a0b858ac073648860c2f4d2a832d31d36dec06';
 
 abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
