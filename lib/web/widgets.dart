@@ -23,6 +23,7 @@ class WebMangaListWidget extends HookConsumerWidget {
     this.controller,
     this.noController = false,
     this.showToggle = true,
+    this.isLoading = false,
   });
 
   final Widget? title;
@@ -33,6 +34,7 @@ class WebMangaListWidget extends HookConsumerWidget {
   final ScrollController? controller;
   final bool noController;
   final bool showToggle;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,47 +55,52 @@ class WebMangaListWidget extends HookConsumerWidget {
       return () => scrollController?.removeListener(controllerAtEdge);
     }, [scrollController]);
 
-    return CustomScrollView(
-      controller: scrollController,
-      scrollBehavior: const MouseTouchScrollBehavior(),
-      physics: physics,
-      cacheExtent: MediaQuery.sizeOf(context).height,
-      slivers: [
-        ...leading,
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-            child: Row(
-              children: [
-                if (title != null) title!,
-                const Spacer(),
-                const GridExtentSlider(),
-                if (showToggle)
-                  SegmentedButton<WebMangaListView>(
-                    showSelectedIcon: false,
-                    style: SegmentedButton.styleFrom(shape: const RoundedRectangleBorder()),
-                    segments: const <ButtonSegment<WebMangaListView>>[
-                      ButtonSegment<WebMangaListView>(
-                        value: WebMangaListView.grid,
-                        icon: Icon(Icons.grid_view, size: 24),
-                        tooltip: 'Grid view',
+    return Stack(
+      children: [
+        CustomScrollView(
+          controller: scrollController,
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: physics,
+          cacheExtent: MediaQuery.sizeOf(context).height,
+          slivers: [
+            ...leading,
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+                child: Row(
+                  children: [
+                    if (title != null) title!,
+                    const Spacer(),
+                    const GridExtentSlider(),
+                    if (showToggle)
+                      SegmentedButton<WebMangaListView>(
+                        showSelectedIcon: false,
+                        style: SegmentedButton.styleFrom(shape: const RoundedRectangleBorder()),
+                        segments: const <ButtonSegment<WebMangaListView>>[
+                          ButtonSegment<WebMangaListView>(
+                            value: WebMangaListView.grid,
+                            icon: Icon(Icons.grid_view, size: 24),
+                            tooltip: 'Grid view',
+                          ),
+                          ButtonSegment<WebMangaListView>(
+                            value: WebMangaListView.list,
+                            icon: Icon(Icons.table_rows, size: 24),
+                            tooltip: 'List view',
+                          ),
+                        ],
+                        selected: <WebMangaListView>{view},
+                        onSelectionChanged: (Set<WebMangaListView> newSelection) {
+                          ref.read(_mangaListViewProvider.notifier).state = newSelection.first;
+                        },
                       ),
-                      ButtonSegment<WebMangaListView>(
-                        value: WebMangaListView.list,
-                        icon: Icon(Icons.table_rows, size: 24),
-                        tooltip: 'List view',
-                      ),
-                    ],
-                    selected: <WebMangaListView>{view},
-                    onSelectionChanged: (Set<WebMangaListView> newSelection) {
-                      ref.read(_mangaListViewProvider.notifier).state = newSelection.first;
-                    },
-                  ),
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+            ...children,
+          ],
         ),
-        ...children,
+        if (isLoading) ...Styles.loadingOverlay,
       ],
     );
   }

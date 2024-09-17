@@ -127,6 +127,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
     required this.onRefresh,
     this.controller,
     this.restorationId,
+    this.leading = const [],
   });
 
   final ProviderBase<AsyncValue<List<ChapterFeedItemData>>> provider;
@@ -136,6 +137,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
   final RefreshCallback onRefresh;
   final ScrollController? controller;
   final String? restorationId;
+  final List<Widget> leading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -157,61 +159,64 @@ class ChapterFeedWidget extends HookConsumerWidget {
     }, [scrollController]);
 
     return Center(
-      child: switch (resultProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-            onRefresh: onRefresh,
-            child: ErrorList(
+      child: RefreshIndicator(
+        onRefresh: onRefresh,
+        child: switch (resultProvider) {
+          AsyncValue(:final error?, :final stackTrace?) => ErrorList(
               error: error,
               stackTrace: stackTrace,
               message: "${provider.toString()} failed",
             ),
-          ),
-        AsyncValue(value: final results?) => ScrollConfiguration(
-            behavior: const MouseTouchScrollBehavior(),
-            child: RefreshIndicator(
-              onRefresh: onRefresh,
-              child: results.isEmpty
-                  ? Text(emptyText ?? 'No results!')
-                  : Column(
-                      children: [
-                        if (title != null)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                title!,
-                                style: const TextStyle(fontSize: 24),
-                              ),
-                            ),
-                          ),
-                        Expanded(
-                          child: SuperListView.builder(
-                            controller: scrollController,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            restorationId: restorationId,
-                            itemCount: results.length,
-                            cacheExtent: MediaQuery.sizeOf(context).height,
-                            findChildIndexCallback: (key) {
-                              final valueKey = key as ValueKey<int>;
-                              final val = results.indexWhere((i) => i.id == valueKey.value);
-                              return val >= 0 ? val : null;
-                            },
-                            itemBuilder: (context, index) {
-                              final elem = results.elementAt(index);
-                              return ChapterFeedItem(key: ValueKey(elem.id), state: elem);
-                            },
-                          ),
+          AsyncValue(value: final results?) => CustomScrollView(
+              scrollBehavior: const MouseTouchScrollBehavior(),
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: scrollController,
+              restorationId: restorationId,
+              cacheExtent: MediaQuery.sizeOf(context).height,
+              slivers: [
+                ...leading,
+                if (title != null)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          title!,
+                          style: const TextStyle(fontSize: 24),
                         ),
-                        if (isLoading) const ListSpinner(),
-                      ],
+                      ),
                     ),
+                  ),
+                if (results.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(emptyText ?? 'No results!'),
+                    ),
+                  ),
+                SuperSliverList.builder(
+                  itemCount: results.length,
+                  findChildIndexCallback: (key) {
+                    final valueKey = key as ValueKey<int>;
+                    final val = results.indexWhere((i) => i.id == valueKey.value);
+                    return val >= 0 ? val : null;
+                  },
+                  itemBuilder: (context, index) {
+                    final elem = results.elementAt(index);
+                    return ChapterFeedItem(key: ValueKey(elem.id), state: elem);
+                  },
+                ),
+                if (isLoading)
+                  const SliverToBoxAdapter(
+                    child: ListSpinner(),
+                  ),
+              ],
             ),
-          ),
-        AsyncValue(:final progress) => LoadingOverlayStack(
-            progress: progress?.toDouble(),
-          ),
-      },
+          AsyncValue(:final progress) => LoadingOverlayStack(
+              progress: progress?.toDouble(),
+            ),
+        },
+      ),
     );
   }
 }
@@ -540,6 +545,7 @@ class MangaListWidget extends HookConsumerWidget {
     this.controller,
     this.noController = false,
     this.showToggle = true,
+    this.isLoading = false,
   });
 
   final Widget? title;
@@ -550,6 +556,7 @@ class MangaListWidget extends HookConsumerWidget {
   final ScrollController? controller;
   final bool noController;
   final bool showToggle;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -570,52 +577,57 @@ class MangaListWidget extends HookConsumerWidget {
       return () => scrollController?.removeListener(controllerAtEdge);
     }, [scrollController]);
 
-    return CustomScrollView(
-      controller: scrollController,
-      scrollBehavior: const MouseTouchScrollBehavior(),
-      physics: physics,
-      cacheExtent: MediaQuery.sizeOf(context).height,
-      slivers: [
-        ...leading,
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-            child: Row(
-              children: [
-                if (title != null) title!,
-                const Spacer(),
-                const GridExtentSlider(),
-                if (showToggle)
-                  SegmentedButton<MangaListView>(
-                    showSelectedIcon: false,
-                    style: SegmentedButton.styleFrom(shape: const RoundedRectangleBorder()),
-                    segments: const <ButtonSegment<MangaListView>>[
-                      ButtonSegment<MangaListView>(
-                        value: MangaListView.grid,
-                        icon: Icon(Icons.grid_view, size: 24),
-                        tooltip: 'Grid view',
+    return Stack(
+      children: [
+        CustomScrollView(
+          controller: scrollController,
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: physics,
+          cacheExtent: MediaQuery.sizeOf(context).height,
+          slivers: [
+            ...leading,
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+                child: Row(
+                  children: [
+                    if (title != null) title!,
+                    const Spacer(),
+                    const GridExtentSlider(),
+                    if (showToggle)
+                      SegmentedButton<MangaListView>(
+                        showSelectedIcon: false,
+                        style: SegmentedButton.styleFrom(shape: const RoundedRectangleBorder()),
+                        segments: const <ButtonSegment<MangaListView>>[
+                          ButtonSegment<MangaListView>(
+                            value: MangaListView.grid,
+                            icon: Icon(Icons.grid_view, size: 24),
+                            tooltip: 'Grid view',
+                          ),
+                          ButtonSegment<MangaListView>(
+                            value: MangaListView.list,
+                            icon: Icon(Icons.table_rows, size: 24),
+                            tooltip: 'List view',
+                          ),
+                          ButtonSegment<MangaListView>(
+                            value: MangaListView.detailed,
+                            icon: Icon(Icons.view_list, size: 24),
+                            tooltip: 'Detailed view',
+                          ),
+                        ],
+                        selected: <MangaListView>{view},
+                        onSelectionChanged: (Set<MangaListView> newSelection) {
+                          ref.read(_mangaListViewProvider.notifier).state = newSelection.first;
+                        },
                       ),
-                      ButtonSegment<MangaListView>(
-                        value: MangaListView.list,
-                        icon: Icon(Icons.table_rows, size: 24),
-                        tooltip: 'List view',
-                      ),
-                      ButtonSegment<MangaListView>(
-                        value: MangaListView.detailed,
-                        icon: Icon(Icons.view_list, size: 24),
-                        tooltip: 'Detailed view',
-                      ),
-                    ],
-                    selected: <MangaListView>{view},
-                    onSelectionChanged: (Set<MangaListView> newSelection) {
-                      ref.read(_mangaListViewProvider.notifier).state = newSelection.first;
-                    },
-                  ),
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+            ...children,
+          ],
         ),
-        ...children,
+        if (isLoading) ...Styles.loadingOverlay,
       ],
     );
   }

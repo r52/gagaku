@@ -67,167 +67,164 @@ class MangaDexSearchWidget extends HookConsumerWidget {
     }, [debouncedInput]);
 
     return Scaffold(
-        body: Stack(
-      children: [
-        MangaListWidget(
-          physics: const AlwaysScrollableScrollPhysics(),
-          title: DropdownMenu<FilterOrder>(
-            initialSelection: filter.filter.order,
-            enableFilter: false,
-            enableSearch: false,
-            requestFocusOnTap: false,
-            inputDecorationTheme: InputDecorationTheme(
-              filled: true,
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2.0,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-              ),
-            ),
-            onSelected: (FilterOrder? order) async {
-              if (order != null) {
-                ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
-                  query: filter.query,
-                  filter: filter.filter.copyWith(order: order),
-                );
-              }
-            },
-            dropdownMenuEntries: List<DropdownMenuEntry<FilterOrder>>.generate(
-              FilterOrder.values.length,
-              (int index) => DropdownMenuEntry<FilterOrder>(
-                value: FilterOrder.values.elementAt(index),
-                label: FilterOrder.values.elementAt(index).label,
+      body: MangaListWidget(
+        physics: const AlwaysScrollableScrollPhysics(),
+        title: DropdownMenu<FilterOrder>(
+          initialSelection: filter.filter.order,
+          enableFilter: false,
+          enableSearch: false,
+          requestFocusOnTap: false,
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                width: 2.0,
+                color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
           ),
-          onAtEdge: () {
-            final lt = ref.read(_searchParamsProvider);
-            ref.read(mangaSearchProvider(lt).notifier).getMore();
+          onSelected: (FilterOrder? order) async {
+            if (order != null) {
+              ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
+                query: filter.query,
+                filter: filter.filter.copyWith(order: order),
+              );
+            }
           },
-          showToggle: !selectMode,
-          leading: [
-            SliverAppBar(
-              leading: BackButton(
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop(selectMode ? selected.state : null);
+          dropdownMenuEntries: List<DropdownMenuEntry<FilterOrder>>.generate(
+            FilterOrder.values.length,
+            (int index) => DropdownMenuEntry<FilterOrder>(
+              value: FilterOrder.values.elementAt(index),
+              label: FilterOrder.values.elementAt(index).label,
+            ),
+          ),
+        ),
+        onAtEdge: () {
+          final lt = ref.read(_searchParamsProvider);
+          ref.read(mangaSearchProvider(lt).notifier).getMore();
+        },
+        showToggle: !selectMode,
+        leading: [
+          SliverAppBar(
+            leading: BackButton(
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop(selectMode ? selected.state : null);
+                } else {
+                  context.go('/');
+                }
+              },
+            ),
+            pinned: true,
+            snap: false,
+            floating: false,
+            expandedHeight: 80.0,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      textInputAction: TextInputAction.search,
+                      autofocus: true,
+                      autocorrect: false,
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                      controller: controller,
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.search),
+                        hintText: 'Search MangaDex...',
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final result = await nav.push<MangaFilters>(
+                        SlideTransitionRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) => _MangaDexFilterWidget(
+                            filter: filter.filter,
+                          ),
+                        ),
+                      );
+
+                      if (result != null) {
+                        ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
+                          query: filter.query,
+                          filter: result,
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.filter_list),
+                    label: const Text('Filters'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        isLoading: isLoading,
+        children: [
+          switch (searchProvider) {
+            AsyncValue(:final error?, :final stackTrace?) => SliverToBoxAdapter(
+                child: ErrorColumn(
+                  error: error,
+                  stackTrace: stackTrace,
+                  message: "mangaSearchProvider() failed",
+                ),
+              ),
+            AsyncValue(value: final results?) when results.isNotEmpty => MangaListViewSliver(
+                items: results,
+                selectMode: selectMode,
+                selectButton: (manga) {
+                  if (selected.state.contains(manga.id)) {
+                    return const Icon(Icons.remove);
+                  }
+
+                  return const Icon(Icons.add);
+                },
+                onSelected: (manga) {
+                  if (selected.state.contains(manga.id)) {
+                    selected.dispatch(MangaSetAction(
+                      action: MangaSetActions.remove,
+                      element: manga.id,
+                    ));
                   } else {
-                    context.go('/');
+                    selected.dispatch(MangaSetAction(
+                      action: MangaSetActions.add,
+                      element: manga.id,
+                    ));
                   }
                 },
               ),
-              pinned: true,
-              snap: false,
-              floating: false,
-              expandedHeight: 80.0,
-              flexibleSpace: FlexibleSpaceBar(
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        textInputAction: TextInputAction.search,
-                        autofocus: true,
-                        autocorrect: false,
-                        onTapOutside: (event) {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                        controller: controller,
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.search),
-                          hintText: 'Search MangaDex...',
-                        ),
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final result = await nav.push<MangaFilters>(
-                          SlideTransitionRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => _MangaDexFilterWidget(
-                              filter: filter.filter,
-                            ),
-                          ),
-                        );
-
-                        if (result != null) {
-                          ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
-                            query: filter.query,
-                            filter: result,
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.filter_list),
-                      label: const Text('Filters'),
-                    ),
-                  ],
+            AsyncValue(value: final _?) => const SliverToBoxAdapter(
+                child: Center(
+                  child: Text("No results!"),
+                ),
+              ),
+            _ => const SliverToBoxAdapter(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+          },
+          if (!searchProvider.isLoading && !ref.watch(mangaSearchProvider(filter).notifier).isAtEnd())
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final lt = ref.read(_searchParamsProvider);
+                      ref.read(mangaSearchProvider(lt).notifier).getMore();
+                    },
+                    child: const Text('Load More'),
+                  ),
                 ),
               ),
             ),
-          ],
-          children: [
-            switch (searchProvider) {
-              AsyncValue(:final error?, :final stackTrace?) => SliverToBoxAdapter(
-                  child: ErrorColumn(
-                    error: error,
-                    stackTrace: stackTrace,
-                    message: "mangaSearchProvider() failed",
-                  ),
-                ),
-              AsyncValue(value: final results?) when results.isNotEmpty => MangaListViewSliver(
-                  items: results,
-                  selectMode: selectMode,
-                  selectButton: (manga) {
-                    if (selected.state.contains(manga.id)) {
-                      return const Icon(Icons.remove);
-                    }
-
-                    return const Icon(Icons.add);
-                  },
-                  onSelected: (manga) {
-                    if (selected.state.contains(manga.id)) {
-                      selected.dispatch(MangaSetAction(
-                        action: MangaSetActions.remove,
-                        element: manga.id,
-                      ));
-                    } else {
-                      selected.dispatch(MangaSetAction(
-                        action: MangaSetActions.add,
-                        element: manga.id,
-                      ));
-                    }
-                  },
-                ),
-              AsyncValue(value: final _?) => const SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("No results!"),
-                  ),
-                ),
-              _ => const SliverToBoxAdapter(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-            },
-            if (!searchProvider.isLoading && !ref.watch(mangaSearchProvider(filter).notifier).isAtEnd())
-              SliverToBoxAdapter(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final lt = ref.read(_searchParamsProvider);
-                        ref.read(mangaSearchProvider(lt).notifier).getMore();
-                      },
-                      child: const Text('Load More'),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-        if (isLoading) ...Styles.loadingOverlay,
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
 

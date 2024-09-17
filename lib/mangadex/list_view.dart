@@ -218,47 +218,41 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                       final currentPage = useState(0);
                       final titlesProvider = ref.watch(getMangaListByPageProvider(list.set, currentPage.value));
 
-                      return Stack(
-                        children: [
-                          Column(
-                            children: switch (titlesProvider) {
-                              AsyncValue(:final error?, :final stackTrace?) => [
-                                  RefreshIndicator(
-                                    onRefresh: () async =>
-                                        ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
-                                    child: ErrorList(error: error, stackTrace: stackTrace),
-                                  )
-                                ],
-                              AsyncValue(value: final mangas) => [
-                                  Expanded(
-                                    child: RefreshIndicator(
-                                      onRefresh: () async =>
-                                          ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
-                                      child: MangaListWidget(
-                                        title: Text(
-                                          'Titles (${list.set.length})',
-                                          style: const TextStyle(fontSize: 24),
-                                        ),
-                                        physics: const AlwaysScrollableScrollPhysics(),
-                                        controller: controllers[0],
-                                        children: [
-                                          if (mangas != null) MangaListViewSliver(items: mangas),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  NumberPaginator(
-                                    numberPages: max((list.set.length / MangaDexEndpoints.searchLimit).ceil(), 1),
-                                    onPageChange: (int index) {
-                                      currentPage.value = index;
-                                    },
-                                  ),
-                                ],
-                            },
+                      return switch (titlesProvider) {
+                        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+                            onRefresh: () async =>
+                                ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
+                            child: ErrorList(error: error, stackTrace: stackTrace),
                           ),
-                          if (titlesProvider.isLoading) ...Styles.loadingOverlay
-                        ],
-                      );
+                        AsyncValue(value: final mangas) => Column(
+                            children: [
+                              Expanded(
+                                child: RefreshIndicator(
+                                  onRefresh: () async =>
+                                      ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
+                                  child: MangaListWidget(
+                                    title: Text(
+                                      'Titles (${list.set.length})',
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    controller: controllers[0],
+                                    isLoading: titlesProvider.isLoading,
+                                    children: [
+                                      if (mangas != null) MangaListViewSliver(items: mangas),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              NumberPaginator(
+                                numberPages: max((list.set.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                                onPageChange: (int index) {
+                                  currentPage.value = index;
+                                },
+                              ),
+                            ],
+                          ),
+                      };
                     },
                   ),
                 _ViewType.feed => Consumer(

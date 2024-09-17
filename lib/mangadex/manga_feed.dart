@@ -16,8 +16,7 @@ Future<List<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
 
   final mangaids = chapters.map((e) => e.manga.id).toSet();
 
-  final mangas =
-      await api.fetchManga(ids: mangaids, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(ids: mangaids, limit: MangaDexEndpoints.breakLimit);
 
   await ref.read(statisticsProvider.notifier).get(mangas);
 
@@ -30,9 +29,11 @@ class MangaDexMangaFeed extends ConsumerWidget {
   const MangaDexMangaFeed({
     super.key,
     this.controller,
+    this.leading = const [],
   });
 
   final ScrollController? controller;
+  final List<Widget> leading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,43 +41,42 @@ class MangaDexMangaFeed extends ConsumerWidget {
     final isLoading = feedProvider.isLoading && !feedProvider.isRefreshing;
 
     return Center(
-      child: Stack(
-        children: [
-          switch (feedProvider) {
-            AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                onRefresh: () async {
-                  ref.read(latestChaptersFeedProvider.notifier).clear();
-                  return ref.refresh(_fetchMangaFeedProvider.future);
-                },
-                child: ErrorList(
-                  error: error,
-                  stackTrace: stackTrace,
-                  message: "_fetchMangaFeedProvider failed",
-                ),
-              ),
-            AsyncValue(value: final mangas?) => RefreshIndicator(
-                onRefresh: () async {
-                  ref.read(latestChaptersFeedProvider.notifier).clear();
-                  return ref.refresh(_fetchMangaFeedProvider.future);
-                },
-                child: mangas.isEmpty
-                    ? const Text('Find some manga to follow!')
-                    : MangaListWidget(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        controller: controller,
-                        onAtEdge: () => ref
-                            .read(latestChaptersFeedProvider.notifier)
-                            .getMore(),
-                        children: [
-                          MangaListViewSliver(items: mangas),
-                        ],
-                      ),
-              ),
-            _ => const SizedBox.shrink(),
-          },
-          if (isLoading) ...Styles.loadingOverlay,
-        ],
-      ),
+      child: switch (feedProvider) {
+        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+            onRefresh: () async {
+              ref.read(latestChaptersFeedProvider.notifier).clear();
+              return ref.refresh(_fetchMangaFeedProvider.future);
+            },
+            child: ErrorList(
+              error: error,
+              stackTrace: stackTrace,
+              message: "_fetchMangaFeedProvider failed",
+            ),
+          ),
+        AsyncValue(value: final mangas?) => RefreshIndicator(
+            onRefresh: () async {
+              ref.read(latestChaptersFeedProvider.notifier).clear();
+              return ref.refresh(_fetchMangaFeedProvider.future);
+            },
+            child: MangaListWidget(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: controller,
+              onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
+              leading: leading,
+              isLoading: isLoading,
+              children: [
+                if (mangas.isEmpty)
+                  const SliverToBoxAdapter(
+                    child: Center(
+                      child: Text('Find some manga to follow!'),
+                    ),
+                  ),
+                MangaListViewSliver(items: mangas),
+              ],
+            ),
+          ),
+        _ => const LoadingOverlayStack(),
+      },
     );
   }
 }

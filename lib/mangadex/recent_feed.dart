@@ -63,41 +63,41 @@ class MangaDexRecentFeed extends HookConsumerWidget {
         ),
       ),
       body: Center(
-        child: Stack(
-          children: [
-            switch (feedProvider) {
-              AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(recentlyAddedProvider.notifier).clear();
-                    return ref.refresh(_fetchMangaFeedProvider.future);
-                  },
-                  child: ErrorList(
-                    error: error,
-                    stackTrace: stackTrace,
-                    message: "_fetchMangaFeedProvider failed",
-                  ),
-                ),
-              AsyncValue(value: final mangas?) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(recentlyAddedProvider.notifier).clear();
-                    return ref.refresh(_fetchMangaFeedProvider.future);
-                  },
-                  child: mangas.isEmpty
-                      ? const Text('No results')
-                      : MangaListWidget(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: ctrler,
-                          onAtEdge: () => ref.read(recentlyAddedProvider.notifier).getMore(),
-                          children: [
-                            MangaListViewSliver(items: mangas),
-                          ],
-                        ),
-                ),
-              _ => const SizedBox.shrink(),
-            },
-            if (isLoading) ...Styles.loadingOverlay,
-          ],
-        ),
+        child: switch (feedProvider) {
+          AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+              onRefresh: () async {
+                ref.read(recentlyAddedProvider.notifier).clear();
+                return ref.refresh(_fetchMangaFeedProvider.future);
+              },
+              child: ErrorList(
+                error: error,
+                stackTrace: stackTrace,
+                message: "_fetchMangaFeedProvider failed",
+              ),
+            ),
+          AsyncValue(value: final mangas?) => RefreshIndicator(
+              onRefresh: () async {
+                ref.read(recentlyAddedProvider.notifier).clear();
+                return ref.refresh(_fetchMangaFeedProvider.future);
+              },
+              child: MangaListWidget(
+                physics: const AlwaysScrollableScrollPhysics(),
+                controller: ctrler,
+                onAtEdge: () => ref.read(recentlyAddedProvider.notifier).getMore(),
+                isLoading: isLoading,
+                children: [
+                  if (mangas.isEmpty)
+                    const SliverToBoxAdapter(
+                      child: Center(
+                        child: Text('No results'),
+                      ),
+                    ),
+                  MangaListViewSliver(items: mangas),
+                ],
+              ),
+            ),
+          _ => const LoadingOverlayStack(),
+        },
       ),
     );
   }

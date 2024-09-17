@@ -61,58 +61,53 @@ class MangaDexChapterFeed extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final view = useState(_FeedViewType.chapters);
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-          child: Row(
-            children: [
-              const Text(
-                'Latest Updates',
-                style: TextStyle(fontSize: 24),
-              ),
-              const Spacer(),
-              SegmentedButton<_FeedViewType>(
-                style: SegmentedButton.styleFrom(
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0)))),
-                showSelectedIcon: false,
-                segments: const <ButtonSegment<_FeedViewType>>[
-                  ButtonSegment<_FeedViewType>(
-                    value: _FeedViewType.chapters,
-                    label: Text('By Chapter'),
-                  ),
-                  ButtonSegment<_FeedViewType>(
-                    value: _FeedViewType.manga,
-                    label: Text('By Manga'),
-                  ),
-                ],
-                selected: <_FeedViewType>{view.value},
-                onSelectionChanged: (Set<_FeedViewType> newSelection) {
-                  view.value = newSelection.first;
-                },
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: switch (view.value) {
-            _FeedViewType.chapters => ChapterFeedWidget(
-                provider: _fetchChaptersProvider,
-                emptyText: 'Find some manga to follow!',
-                onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
-                onRefresh: () async {
-                  ref.read(latestChaptersFeedProvider.notifier).clear();
-                  return ref.refresh(_fetchChaptersProvider.future);
-                },
-                controller: controller,
-                restorationId: 'chapter_list_offset',
-              ),
-            _FeedViewType.manga => MangaDexMangaFeed(
-                controller: controller,
-              ),
+    final leading = SliverAppBar(
+      automaticallyImplyLeading: false,
+      pinned: true,
+      title: const Text(
+        'Latest Updates',
+        style: TextStyle(fontSize: 24),
+      ),
+      actions: [
+        SegmentedButton<_FeedViewType>(
+          style: SegmentedButton.styleFrom(
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0)))),
+          showSelectedIcon: false,
+          segments: const <ButtonSegment<_FeedViewType>>[
+            ButtonSegment<_FeedViewType>(
+              value: _FeedViewType.chapters,
+              label: Text('By Chapter'),
+            ),
+            ButtonSegment<_FeedViewType>(
+              value: _FeedViewType.manga,
+              label: Text('By Manga'),
+            ),
+          ],
+          selected: <_FeedViewType>{view.value},
+          onSelectionChanged: (Set<_FeedViewType> newSelection) {
+            view.value = newSelection.first;
           },
-        )
+        ),
       ],
     );
+
+    return switch (view.value) {
+      _FeedViewType.chapters => ChapterFeedWidget(
+          provider: _fetchChaptersProvider,
+          emptyText: 'Find some manga to follow!',
+          onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
+          onRefresh: () async {
+            ref.read(latestChaptersFeedProvider.notifier).clear();
+            return ref.refresh(_fetchChaptersProvider.future);
+          },
+          controller: controller,
+          restorationId: 'chapter_list_offset',
+          leading: [leading],
+        ),
+      _FeedViewType.manga => MangaDexMangaFeed(
+          controller: controller,
+          leading: [leading],
+        ),
+    };
   }
 }

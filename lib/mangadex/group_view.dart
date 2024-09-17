@@ -244,47 +244,47 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
             final titleProvider = ref.watch(_fetchGroupTitlesProvider(group));
             final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
 
-            return Stack(
-              children: [
-                switch (titleProvider) {
-                  AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                      onRefresh: () async {
-                        ref.read(groupTitlesProvider(group).notifier).clear();
-                        return ref.refresh(_fetchGroupTitlesProvider(group).future);
-                      },
-                      child: ErrorList(
-                        error: error,
-                        stackTrace: stackTrace,
-                        message: "_fetchGroupTitlesProvider(${group.id}) failed",
-                      ),
+            return switch (titleProvider) {
+              AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+                  onRefresh: () async {
+                    ref.read(groupTitlesProvider(group).notifier).clear();
+                    return ref.refresh(_fetchGroupTitlesProvider(group).future);
+                  },
+                  child: ErrorList(
+                    error: error,
+                    stackTrace: stackTrace,
+                    message: "_fetchGroupTitlesProvider(${group.id}) failed",
+                  ),
+                ),
+              AsyncValue(value: final mangas?) => RefreshIndicator(
+                  onRefresh: () async {
+                    ref.read(groupTitlesProvider(group).notifier).clear();
+                    return ref.refresh(_fetchGroupTitlesProvider(group).future);
+                  },
+                  child: MangaListWidget(
+                    title: const Text(
+                      'Group Titles',
+                      style: TextStyle(fontSize: 24),
                     ),
-                  AsyncValue(value: final mangas?) => RefreshIndicator(
-                      onRefresh: () async {
-                        ref.read(groupTitlesProvider(group).notifier).clear();
-                        return ref.refresh(_fetchGroupTitlesProvider(group).future);
-                      },
-                      child: mangas.isEmpty
-                          ? const Text('No manga!')
-                          : MangaListWidget(
-                              title: const Text(
-                                'Group Titles',
-                                style: TextStyle(fontSize: 24),
-                              ),
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              controller: controllers[2],
-                              onAtEdge: () => ref.read(groupTitlesProvider(group).notifier).getMore(),
-                              children: [
-                                MangaListViewSliver(items: mangas),
-                              ],
-                            ),
-                    ),
-                  AsyncValue(:final progress) => LoadingOverlayStack(
-                      progress: progress?.toDouble(),
-                    ),
-                },
-                if (isLoading) ...Styles.loadingOverlay,
-              ],
-            );
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: controllers[2],
+                    onAtEdge: () => ref.read(groupTitlesProvider(group).notifier).getMore(),
+                    isLoading: isLoading,
+                    children: [
+                      if (mangas.isEmpty)
+                        const SliverToBoxAdapter(
+                          child: Center(
+                            child: Text('No manga!'),
+                          ),
+                        ),
+                      MangaListViewSliver(items: mangas),
+                    ],
+                  ),
+                ),
+              AsyncValue(:final progress) => LoadingOverlayStack(
+                  progress: progress?.toDouble(),
+                ),
+            };
           },
         ),
     };

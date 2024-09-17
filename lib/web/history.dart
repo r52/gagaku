@@ -51,70 +51,64 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
                   icon: const Icon(
                     Icons.link,
                   ),
-                  label: const Text('Open Web Source'),
+                  label: const Text('Open Link'),
                 ),
               ],
             ),
           ),
-        AsyncValue(value: final history?) => Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                child: Row(
-                  children: [
-                    const Text(
-                      'History',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    const Spacer(),
-                    ElevatedButton.icon(
-                      style: Styles.buttonStyle(),
-                      onPressed: () async {
-                        final result = await showDialog<bool>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Clear History'),
-                              content: const Text('Are you sure you want to remove all history?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('No'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(false);
-                                  },
-                                ),
-                                ElevatedButton(
-                                  child: const Text('Yes'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(true);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
+        AsyncValue(value: final history?) => WebMangaListWidget(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: scrollController,
+            leading: [
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                pinned: true,
+                title: const Text(
+                  'History',
+                  style: TextStyle(fontSize: 24),
+                ),
+                actions: [
+                  ElevatedButton.icon(
+                    style: Styles.buttonStyle(),
+                    onPressed: () async {
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Clear History'),
+                            content: const Text('Are you sure you want to remove all history?'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('No'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                              ),
+                              ElevatedButton(
+                                child: const Text('Yes'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
 
-                        if (result == true) {
-                          ref.read(webSourceHistoryProvider.notifier).clear();
-                        }
-                      },
-                      icon: const Icon(Icons.clear_all),
-                      label: const Text('Clear History'),
-                    ),
-                  ],
-                ),
+                      if (result == true) {
+                        ref.read(webSourceHistoryProvider.notifier).clear();
+                      }
+                    },
+                    icon: const Icon(Icons.clear_all),
+                    label: const Text('Clear History'),
+                  ),
+                ],
               ),
-              Expanded(
-                child: WebMangaListWidget(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: scrollController,
-                  children: [
-                    WebMangaListViewSliver(
-                      items: history.toList(),
-                      favoritesKey: cfg.defaultCategory,
-                    ),
-                  ],
-                ),
+            ],
+            children: [
+              WebMangaListViewSliver(
+                items: history.toList(),
+                favoritesKey: cfg.defaultCategory,
               ),
             ],
           ),

@@ -93,7 +93,6 @@ class MangaDexGlobalFeed extends HookConsumerWidget {
       ),
       body: ChapterFeedWidget(
         provider: _fetchGlobalChaptersProvider,
-        //title: 'Latest Uploads',
         onAtEdge: () => ref.read(latestGlobalFeedProvider.notifier).getMore(),
         onRefresh: () async {
           ref.read(latestGlobalFeedProvider.notifier).clear();

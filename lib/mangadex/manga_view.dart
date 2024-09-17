@@ -820,35 +820,31 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     builder: (context, ref, child) {
                       final relatedProvider = ref.watch(_fetchRelatedMangaProvider(manga));
 
-                      return Stack(
-                        children: [
-                          switch (relatedProvider) {
-                            AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                                error: error,
-                                stackTrace: stackTrace,
-                                message: "_fetchRelatedMangaProvider(${manga.id}) failed",
+                      return switch (relatedProvider) {
+                        AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+                            error: error,
+                            stackTrace: stackTrace,
+                            message: "_fetchRelatedMangaProvider(${manga.id}) failed",
+                          ),
+                        AsyncValue(value: final related?) => MangaListWidget(
+                            title: const Text(
+                              'Related Titles',
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            noController: true,
+                            isLoading: relatedProvider.isLoading,
+                            children: [
+                              MangaListViewSliver(
+                                items: related,
+                                headers: manga.relatedMangas.fold({}, (previousValue, element) {
+                                  previousValue?[element.id] = element.related!.label;
+                                  return previousValue;
+                                }),
                               ),
-                            AsyncValue(value: final related?) => MangaListWidget(
-                                title: const Text(
-                                  'Related Titles',
-                                  style: TextStyle(fontSize: 24),
-                                ),
-                                noController: true,
-                                children: [
-                                  MangaListViewSliver(
-                                    items: related,
-                                    headers: manga.relatedMangas.fold({}, (previousValue, element) {
-                                      previousValue?[element.id] = element.related!.label;
-                                      return previousValue;
-                                    }),
-                                  ),
-                                ],
-                              ),
-                            _ => const SizedBox.shrink(),
-                          },
-                          if (relatedProvider.isLoading) ...Styles.loadingOverlay
-                        ],
-                      );
+                            ],
+                          ),
+                        _ => const LoadingOverlayStack(),
+                      };
                     },
                   ),
               }),
