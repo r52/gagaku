@@ -97,88 +97,93 @@ class MangaDexFrontPage extends ConsumerWidget {
         ref.read(latestGlobalFeedProvider.notifier).clear();
         return ref.refresh(_popularTitlesProvider.future);
       },
-      child: ScrollConfiguration(
-        behavior: const MouseTouchScrollBehavior(),
-        child: ListView(
-          children: [
-            const Center(
-              child: Text(
-                'Popular New Titles',
-                style: style,
+      child: CustomScrollView(
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        slivers: [
+          MangaDexSliverAppBar(
+            controller: controller,
+          ),
+          SliverList.list(
+            children: [
+              const Center(
+                child: Text(
+                  'Popular New Titles',
+                  style: style,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const MangaProviderCarousel(provider: _popularTitlesProvider),
-            const SizedBox(
-              height: 10,
-            ),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/titles/latest');
-              },
-              label: const Text(
-                'Latest Updates',
-                style: style,
+              const SizedBox(
+                height: 10,
               ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const MangaProviderCarousel(provider: _latestUpdatesProvider),
-            const SizedBox(
-              height: 10,
-            ),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/list/$staffPickId');
-              },
-              label: const Text(
-                'Staff Picks',
-                style: style,
+              const MangaProviderCarousel(provider: _popularTitlesProvider),
+              const SizedBox(
+                height: 10,
               ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            MangaProviderCarousel(provider: staffPicks),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/list/$seasonalId');
-              },
-              label: const Text(
-                'Seasonal',
-                style: style,
+              TextButton.icon(
+                onPressed: () {
+                  context.push('/titles/latest');
+                },
+                label: const Text(
+                  'Latest Updates',
+                  style: style,
+                ),
+                icon: const Icon(Icons.arrow_forward),
+                iconAlignment: IconAlignment.end,
               ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            MangaProviderCarousel(provider: seasonal),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/titles/recent');
-              },
-              label: const Text(
-                'Recently Added',
-                style: style,
+              const SizedBox(
+                height: 10,
               ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const MangaProviderCarousel(provider: _recentlyAddedProvider),
-          ],
-        ),
+              const MangaProviderCarousel(provider: _latestUpdatesProvider),
+              const SizedBox(
+                height: 10,
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  context.push('/list/$staffPickId');
+                },
+                label: const Text(
+                  'Staff Picks',
+                  style: style,
+                ),
+                icon: const Icon(Icons.arrow_forward),
+                iconAlignment: IconAlignment.end,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              MangaProviderCarousel(provider: staffPicks),
+              TextButton.icon(
+                onPressed: () {
+                  context.push('/list/$seasonalId');
+                },
+                label: const Text(
+                  'Seasonal',
+                  style: style,
+                ),
+                icon: const Icon(Icons.arrow_forward),
+                iconAlignment: IconAlignment.end,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              MangaProviderCarousel(provider: seasonal),
+              TextButton.icon(
+                onPressed: () {
+                  context.push('/titles/recent');
+                },
+                label: const Text(
+                  'Recently Added',
+                  style: style,
+                ),
+                icon: const Icon(Icons.arrow_forward),
+                iconAlignment: IconAlignment.end,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const MangaProviderCarousel(provider: _recentlyAddedProvider),
+            ],
+          )
+        ],
       ),
     );
   }

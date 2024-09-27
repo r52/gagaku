@@ -61,35 +61,40 @@ class MangaDexChapterFeed extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final view = useState(_FeedViewType.chapters);
 
-    final leading = SliverAppBar(
-      automaticallyImplyLeading: false,
-      pinned: true,
-      title: const Text(
-        'Latest Updates',
-        style: TextStyle(fontSize: 24),
+    final leading = <Widget>[
+      MangaDexSliverAppBar(
+        controller: controller,
       ),
-      actions: [
-        SegmentedButton<_FeedViewType>(
-          style: SegmentedButton.styleFrom(
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0)))),
-          showSelectedIcon: false,
-          segments: const <ButtonSegment<_FeedViewType>>[
-            ButtonSegment<_FeedViewType>(
-              value: _FeedViewType.chapters,
-              label: Text('By Chapter'),
-            ),
-            ButtonSegment<_FeedViewType>(
-              value: _FeedViewType.manga,
-              label: Text('By Manga'),
-            ),
-          ],
-          selected: <_FeedViewType>{view.value},
-          onSelectionChanged: (Set<_FeedViewType> newSelection) {
-            view.value = newSelection.first;
-          },
+      SliverAppBar(
+        automaticallyImplyLeading: false,
+        pinned: true,
+        title: const Text(
+          'Latest Updates',
+          style: TextStyle(fontSize: 24),
         ),
-      ],
-    );
+        actions: [
+          SegmentedButton<_FeedViewType>(
+            style: SegmentedButton.styleFrom(
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0)))),
+            showSelectedIcon: false,
+            segments: const <ButtonSegment<_FeedViewType>>[
+              ButtonSegment<_FeedViewType>(
+                value: _FeedViewType.chapters,
+                label: Text('By Chapter'),
+              ),
+              ButtonSegment<_FeedViewType>(
+                value: _FeedViewType.manga,
+                label: Text('By Manga'),
+              ),
+            ],
+            selected: <_FeedViewType>{view.value},
+            onSelectionChanged: (Set<_FeedViewType> newSelection) {
+              view.value = newSelection.first;
+            },
+          ),
+        ],
+      )
+    ];
 
     return switch (view.value) {
       _FeedViewType.chapters => ChapterFeedWidget(
@@ -102,11 +107,11 @@ class MangaDexChapterFeed extends HookConsumerWidget {
           },
           controller: controller,
           restorationId: 'chapter_list_offset',
-          leading: [leading],
+          leading: leading,
         ),
       _FeedViewType.manga => MangaDexMangaFeed(
           controller: controller,
-          leading: [leading],
+          leading: leading,
         ),
     };
   }

@@ -1,10 +1,14 @@
 // ignore_for_file: unused_element
+import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
+import 'package:gagaku/mangadex/search.dart';
+import 'package:gagaku/mangadex/settings.dart';
+import 'package:gagaku/model.dart';
 import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
@@ -66,6 +70,104 @@ const _iconSetS = {
 };
 
 enum _IconSet { group, circle, person, check, open, schedule }
+
+class MangaDexSliverAppBar extends StatelessWidget {
+  const MangaDexSliverAppBar({
+    super.key,
+    this.controller,
+    this.title,
+  });
+
+  final ScrollController? controller;
+  final String? title;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final flex = GestureDetector(
+      onTap: () {
+        controller?.animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+      },
+      child: TitleFlexBar(title: title ?? 'MangaDex'),
+    );
+
+    final actions = <Widget>[
+      OverflowBar(
+        spacing: 8.0,
+        children: [
+          Tooltip(
+            message: 'Search Manga',
+            child: OpenContainer(
+              closedColor: theme.colorScheme.primaryContainer,
+              closedShape: const CircleBorder(),
+              closedBuilder: (context, openContainer) {
+                return IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    openContainer();
+                  },
+                );
+              },
+              openBuilder: (context, closedContainer) {
+                return const MangaDexSearchWidget();
+              },
+            ),
+          ),
+          Tooltip(
+            message: 'MangaDex Settings',
+            child: OpenContainer<bool>(
+              closedColor: theme.colorScheme.primaryContainer,
+              closedShape: const CircleBorder(),
+              closedBuilder: (context, openContainer) {
+                return IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    openContainer();
+                  },
+                );
+              },
+              openBuilder: (context, closedContainer) {
+                return const MangaDexSettingsWidget();
+              },
+            ),
+          ),
+          Consumer(
+            builder: (context, ref, child) {
+              final auth = ref.watch(authControlProvider);
+
+              switch (auth) {
+                case AsyncValue(value: final loggedin?):
+                  // XXX: This changes when OAuth is released
+                  return IconButton(
+                    color: theme.colorScheme.primary,
+                    tooltip: loggedin ? 'Logout' : 'Login',
+                    icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
+                    onPressed: loggedin
+                        ? () => ref.read(authControlProvider.notifier).logout()
+                        : () => context.push(GagakuRoute.login),
+                  );
+                // ignore: unused_local_variable
+                case AsyncValue(:final error?, :final stackTrace?):
+                  return const Icon(Icons.error);
+                case _:
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+              }
+            },
+          ),
+        ],
+      )
+    ];
+
+    return SliverAppBar(
+      floating: true,
+      flexibleSpace: flex,
+      actions: actions,
+    );
+  }
+}
 
 class MarkReadButton extends ConsumerWidget {
   const MarkReadButton({super.key, required this.chapter, required this.manga});

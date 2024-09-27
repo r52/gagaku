@@ -1,12 +1,8 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/mangadex/search.dart';
-import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/ui.dart';
 import 'package:gagaku/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,7 +15,6 @@ class MangaDexHome extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final lifecycle = useAppLifecycleState();
 
     useEffect(() {
@@ -33,90 +28,6 @@ class MangaDexHome extends HookConsumerWidget {
 
     return Scaffold(
       restorationId: 'md_home_restore',
-      appBar: AppBar(
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
-          },
-          child: const TitleFlexBar(title: 'MangaDex'),
-        ),
-        actions: [
-          OverflowBar(
-            spacing: 8.0,
-            children: [
-              Tooltip(
-                message: 'Search Manga',
-                child: OpenContainer(
-                  closedColor: theme.colorScheme.surface,
-                  closedShape: const CircleBorder(),
-                  closedBuilder: (context, openContainer) {
-                    return IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {
-                        openContainer();
-                      },
-                    );
-                  },
-                  openBuilder: (context, closedContainer) {
-                    return const MangaDexSearchWidget();
-                  },
-                ),
-              ),
-              Tooltip(
-                message: 'MangaDex Settings',
-                child: OpenContainer<bool>(
-                  closedColor: theme.colorScheme.surface,
-                  closedShape: const CircleBorder(),
-                  closedBuilder: (context, openContainer) {
-                    return IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        openContainer();
-                      },
-                    );
-                  },
-                  openBuilder: (context, closedContainer) {
-                    return const MangaDexSettingsWidget();
-                  },
-                ),
-              ),
-              Consumer(
-                builder: (context, ref, child) {
-                  final auth = ref.watch(authControlProvider);
-
-                  switch (auth) {
-                    case AsyncValue(value: final loggedin?):
-                      // XXX: This changes when OAuth is released
-                      return Ink(
-                        decoration: ShapeDecoration(
-                          color: theme.colorScheme.surface,
-                          shape: const CircleBorder(),
-                        ),
-                        child: Tooltip(
-                          message: loggedin ? 'Logout' : 'Login',
-                          child: IconButton(
-                            color: theme.colorScheme.primary,
-                            icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
-                            onPressed: loggedin
-                                ? () => ref.read(authControlProvider.notifier).logout()
-                                : () => context.push(GagakuRoute.login),
-                          ),
-                        ),
-                      );
-                    // ignore: unused_local_variable
-                    case AsyncValue(:final error?, :final stackTrace?):
-                      return const Icon(Icons.error);
-                    case _:
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                  }
-                },
-              ),
-            ],
-          )
-        ],
-      ),
       drawer: const MainDrawer(),
       body: Center(
         child: child,

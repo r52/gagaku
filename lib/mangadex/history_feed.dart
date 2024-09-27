@@ -9,8 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'history_feed.g.dart';
 
 @riverpod
-Future<List<ChapterFeedItemData>> _fetchHistoryFeed(
-    _FetchHistoryFeedRef ref) async {
+Future<List<ChapterFeedItemData>> _fetchHistoryFeed(_FetchHistoryFeedRef ref) async {
   final api = ref.watch(mangadexProvider);
   final loggedin = await ref.watch(authControlProvider.future);
 
@@ -18,8 +17,7 @@ Future<List<ChapterFeedItemData>> _fetchHistoryFeed(
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
 
-  final mangas =
-      await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
   await ref.read(statisticsProvider.notifier).get(mangas);
 
@@ -69,6 +67,11 @@ class MangaDexHistoryFeed extends ConsumerWidget {
       onRefresh: () async => ref.refresh(mangaDexHistoryProvider.future),
       controller: controller,
       restorationId: 'history_list_offset',
+      leading: [
+        MangaDexSliverAppBar(
+          controller: controller,
+        ),
+      ],
     );
   }
 }
