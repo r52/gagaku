@@ -916,7 +916,6 @@ class ReaderWidget extends HookConsumerWidget {
                 ),
               ),
               itemCount: pageCount,
-              wantKeepAlive: true,
               builder: (context, index) {
                 final page = pages.elementAt(index);
                 return PhotoViewGalleryPageOptions(
