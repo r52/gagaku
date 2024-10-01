@@ -90,24 +90,18 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
     final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
 
     return Scaffold(
-      body: switch (titleProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-            onRefresh: () async {
-              ref.read(creatorTitlesProvider(creator).notifier).clear();
-              return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
-            },
-            child: ErrorList(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.read(creatorTitlesProvider(creator).notifier).clear();
+          return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
+        },
+        child: switch (titleProvider) {
+          AsyncValue(:final error?, :final stackTrace?) => ErrorList(
               error: error,
               stackTrace: stackTrace,
               message: "_fetchCreatorTitlesProvider(${creator.id}) failed",
             ),
-          ),
-        AsyncValue(value: final mangas?) => RefreshIndicator(
-            onRefresh: () async {
-              ref.read(creatorTitlesProvider(creator).notifier).clear();
-              return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
-            },
-            child: MangaListWidget(
+          AsyncValue(value: final mangas?) => MangaListWidget(
               leading: [
                 SliverAppBar(
                   pinned: true,
@@ -207,11 +201,11 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                 MangaListViewSliver(items: mangas),
               ],
             ),
-          ),
-        AsyncValue(:final progress) => LoadingOverlayStack(
-            progress: progress?.toDouble(),
-          ),
-      },
+          AsyncValue(:final progress) => LoadingOverlayStack(
+              progress: progress?.toDouble(),
+            ),
+        },
+      ),
     );
   }
 }

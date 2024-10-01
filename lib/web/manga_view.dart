@@ -105,24 +105,12 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
 
     switch (mangaProvider) {
       case AsyncValue(value: final manga?):
-        child = RefreshIndicator(
-          onRefresh: () async {
-            await api.invalidateAll(inf.getKey());
-            return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
-          },
-          child: WebMangaViewWidget(manga: manga, info: inf),
-        );
+        child = WebMangaViewWidget(manga: manga, info: inf);
       case AsyncValue(:final error?, :final stackTrace?):
-        child = RefreshIndicator(
-          onRefresh: () async {
-            await api.invalidateAll(inf.getKey());
-            return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
-          },
-          child: ErrorList(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchWebMangaInfoProvider($proxy/$code) failed",
-          ),
+        child = ErrorList(
+          error: error,
+          stackTrace: stackTrace,
+          message: "_fetchWebMangaInfoProvider($proxy/$code) failed",
         );
 
         appBar = AppBar(
@@ -146,7 +134,13 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
 
     return Scaffold(
       appBar: appBar,
-      body: child,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await api.invalidateAll(inf.getKey());
+          return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
+        },
+        child: child,
+      ),
     );
   }
 }

@@ -41,24 +41,18 @@ class MangaDexMangaFeed extends ConsumerWidget {
     final isLoading = feedProvider.isLoading && !feedProvider.isRefreshing;
 
     return Center(
-      child: switch (feedProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-            onRefresh: () async {
-              ref.read(latestChaptersFeedProvider.notifier).clear();
-              return ref.refresh(_fetchMangaFeedProvider.future);
-            },
-            child: ErrorList(
+      child: RefreshIndicator(
+        onRefresh: () async {
+          ref.read(latestChaptersFeedProvider.notifier).clear();
+          return ref.refresh(_fetchMangaFeedProvider.future);
+        },
+        child: switch (feedProvider) {
+          AsyncValue(:final error?, :final stackTrace?) => ErrorList(
               error: error,
               stackTrace: stackTrace,
               message: "_fetchMangaFeedProvider failed",
             ),
-          ),
-        AsyncValue(value: final mangas?) => RefreshIndicator(
-            onRefresh: () async {
-              ref.read(latestChaptersFeedProvider.notifier).clear();
-              return ref.refresh(_fetchMangaFeedProvider.future);
-            },
-            child: MangaListWidget(
+          AsyncValue(value: final mangas?) => MangaListWidget(
               physics: const AlwaysScrollableScrollPhysics(),
               controller: controller,
               onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
@@ -74,9 +68,9 @@ class MangaDexMangaFeed extends ConsumerWidget {
                 MangaListViewSliver(items: mangas),
               ],
             ),
-          ),
-        _ => const LoadingOverlayStack(),
-      },
+          _ => const LoadingOverlayStack(),
+        },
+      ),
     );
   }
 }

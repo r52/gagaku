@@ -244,24 +244,18 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
             final titleProvider = ref.watch(_fetchGroupTitlesProvider(group));
             final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
 
-            return switch (titleProvider) {
-              AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(groupTitlesProvider(group).notifier).clear();
-                    return ref.refresh(_fetchGroupTitlesProvider(group).future);
-                  },
-                  child: ErrorList(
+            return RefreshIndicator(
+              onRefresh: () async {
+                ref.read(groupTitlesProvider(group).notifier).clear();
+                return ref.refresh(_fetchGroupTitlesProvider(group).future);
+              },
+              child: switch (titleProvider) {
+                AsyncValue(:final error?, :final stackTrace?) => ErrorList(
                     error: error,
                     stackTrace: stackTrace,
                     message: "_fetchGroupTitlesProvider(${group.id}) failed",
                   ),
-                ),
-              AsyncValue(value: final mangas?) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(groupTitlesProvider(group).notifier).clear();
-                    return ref.refresh(_fetchGroupTitlesProvider(group).future);
-                  },
-                  child: MangaListWidget(
+                AsyncValue(value: final mangas?) => MangaListWidget(
                     title: const Text(
                       'Group Titles',
                       style: TextStyle(fontSize: 24),
@@ -280,11 +274,11 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                       MangaListViewSliver(items: mangas),
                     ],
                   ),
-                ),
-              AsyncValue(:final progress) => LoadingOverlayStack(
-                  progress: progress?.toDouble(),
-                ),
-            };
+                AsyncValue(:final progress) => LoadingOverlayStack(
+                    progress: progress?.toDouble(),
+                  ),
+              },
+            );
           },
         ),
     };
