@@ -101,10 +101,7 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
-  final List<ScrollController> _mdcontrollers = [];
-  final List<ScrollController> _proxycontrollers = [];
-
-  late final GoRouter _router = GoRouter(
+  final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     restorationScopeId: 'root_route_restore',
     initialLocation: '/',
@@ -199,7 +196,6 @@ class _AppState extends ConsumerState<App> {
         restorationScopeId: 'md_route_restore',
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return MangaDexHome(
-            controllers: _mdcontrollers,
             child: child,
           );
         },
@@ -208,9 +204,7 @@ class _AppState extends ConsumerState<App> {
             path: '/',
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: MangaDexFrontPage(
-                controller: _mdcontrollers[0],
-              ),
+              child: MangaDexFrontPage(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_main_restore',
             ),
@@ -222,9 +216,7 @@ class _AppState extends ConsumerState<App> {
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.chapterfeed),
                 builder: (context, ref) {
-                  return MangaDexChapterFeed(
-                    controller: _mdcontrollers[1],
-                  );
+                  return MangaDexChapterFeed();
                 },
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
@@ -238,9 +230,7 @@ class _AppState extends ConsumerState<App> {
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.library),
                 builder: (context, ref) {
-                  return MangaDexLibraryView(
-                    controller: _mdcontrollers[2],
-                  );
+                  return MangaDexLibraryView();
                 },
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
@@ -254,9 +244,7 @@ class _AppState extends ConsumerState<App> {
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.lists),
                 builder: (context, ref) {
-                  return MangaDexListsView(
-                    controller: _mdcontrollers[3],
-                  );
+                  return MangaDexListsView();
                 },
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
@@ -267,9 +255,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.history,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: MangaDexHistoryFeed(
-                controller: _mdcontrollers[4],
-              ),
+              child: MangaDexHistoryFeed(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_history_restore',
             ),
@@ -289,7 +275,6 @@ class _AppState extends ConsumerState<App> {
         restorationScopeId: 'proxy_route_restore',
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return WebSourceHome(
-            controllers: _proxycontrollers,
             child: child,
           );
         },
@@ -298,9 +283,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.proxyHome,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: WebSourceHistoryWidget(
-                controller: _proxycontrollers[0],
-              ),
+              child: WebSourceHistoryWidget(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'proxy_home_restore',
             ),
@@ -309,9 +292,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.proxySaved,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: WebSourceFavoritesWidget(
-                controller: _proxycontrollers[1],
-              ),
+              child: WebSourceFavoritesWidget(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'proxy_saved_restore',
             ),
@@ -364,37 +345,6 @@ class _AppState extends ConsumerState<App> {
       ),
     ],
   );
-
-  @override
-  void initState() {
-    super.initState();
-
-    _mdcontrollers.addAll([
-      ScrollController(),
-      ScrollController(),
-      ScrollController(),
-      ScrollController(),
-      ScrollController(),
-    ]);
-
-    _proxycontrollers.addAll([
-      ScrollController(),
-      ScrollController(),
-    ]);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    for (var element in _mdcontrollers) {
-      element.dispose();
-    }
-
-    for (var element in _proxycontrollers) {
-      element.dispose();
-    }
-  }
 
   // This widget is the root of your application.
   @override

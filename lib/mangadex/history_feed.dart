@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -60,16 +61,17 @@ class MangaDexHistoryFeed extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     return ChapterFeedWidget(
       provider: _fetchHistoryFeedProvider,
       title: 'Reading History (local)',
       emptyText: 'No reading history!',
       onRefresh: () async => ref.refresh(mangaDexHistoryProvider.future),
-      controller: controller,
+      controller: scrollController,
       restorationId: 'history_list_offset',
       leading: [
         MangaDexSliverAppBar(
-          controller: controller,
+          controller: scrollController,
         ),
       ],
     );

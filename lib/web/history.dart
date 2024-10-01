@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -20,7 +20,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final cfg = ref.watch(webConfigProvider);
 
-    final scrollController = controller ?? useScrollController();
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final historyProvider = ref.watch(webSourceHistoryProvider);
 
     return Material(

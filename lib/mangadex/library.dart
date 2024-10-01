@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/legacy.dart';
@@ -34,6 +35,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final statuses = useMemoized(() => MangaReadingStatus.values.skip(1).toList());
     final initialtype = ref.read(libraryViewTypeProvider);
     final tabController = useTabController(initialLength: statuses.length, initialIndex: statuses.indexOf(initialtype));
@@ -53,7 +55,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
           MangaDexSliverAppBar(
-            controller: controller,
+            controller: scrollController,
           ),
         ];
       },
@@ -82,7 +84,6 @@ class MangaDexLibraryView extends HookConsumerWidget {
                   HookConsumer(
                     builder: (context, ref, child) {
                       final currentPage = useState(0);
-                      final scrollController = useScrollController();
                       final listProvider = ref.watch(_getLibraryListByTypeProvider(type));
 
                       return RefreshIndicator(

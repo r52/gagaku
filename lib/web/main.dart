@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -12,13 +14,13 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebSourceHome extends HookConsumerWidget {
-  const WebSourceHome({this.controllers, required this.child, super.key});
+  const WebSourceHome({required this.child, super.key});
 
-  final List<ScrollController>? controllers;
   final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final controllers = List.generate(2, (idx) => useScrollController());
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final api = ref.watch(proxyProvider);
@@ -30,7 +32,7 @@ class WebSourceHome extends HookConsumerWidget {
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           },
           child: const TitleFlexBar(title: 'Web Sources'),
         ),
@@ -118,7 +120,10 @@ class WebSourceHome extends HookConsumerWidget {
       ),
       drawer: const MainDrawer(),
       body: Center(
-        child: child,
+        child: DefaultScrollController(
+          controller: controllers[index],
+          child: child,
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         height: 60,
@@ -140,7 +145,7 @@ class WebSourceHome extends HookConsumerWidget {
 
           if (currTab == index) {
             // Scroll to top if on the same tab
-            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           } else {
             // Switch tab
             _onItemTapped(index, context);

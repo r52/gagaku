@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
@@ -87,6 +88,8 @@ class MangaDexFrontPage extends ConsumerWidget {
     final staffPicks = _fetchCustomListMangaProvider(staffPickId);
     final seasonal = _fetchCustomListMangaProvider(seasonalId);
 
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
+
     return RefreshIndicator(
       onRefresh: () {
         ref.invalidate(staffPicks);
@@ -99,9 +102,10 @@ class MangaDexFrontPage extends ConsumerWidget {
       },
       child: CustomScrollView(
         scrollBehavior: const MouseTouchScrollBehavior(),
+        controller: scrollController,
         slivers: [
           MangaDexSliverAppBar(
-            controller: controller,
+            controller: scrollController,
           ),
           SliverList.list(
             children: [

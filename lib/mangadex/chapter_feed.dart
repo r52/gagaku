@@ -4,6 +4,7 @@ import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -59,11 +60,12 @@ class MangaDexChapterFeed extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final view = useState(_FeedViewType.chapters);
 
     final leading = <Widget>[
       MangaDexSliverAppBar(
-        controller: controller,
+        controller: scrollController,
       ),
       SliverAppBar(
         automaticallyImplyLeading: false,
@@ -105,12 +107,12 @@ class MangaDexChapterFeed extends HookConsumerWidget {
             ref.read(latestChaptersFeedProvider.notifier).clear();
             return ref.refresh(_fetchChaptersProvider.future);
           },
-          controller: controller,
+          controller: scrollController,
           restorationId: 'chapter_list_offset',
           leading: leading,
         ),
       _FeedViewType.manga => MangaDexMangaFeed(
-          controller: controller,
+          controller: scrollController,
           leading: leading,
         ),
     };

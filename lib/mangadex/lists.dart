@@ -5,6 +5,7 @@ import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ class MangaDexListsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final scrollController = controller ?? useScrollController();
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
 
@@ -47,7 +48,7 @@ class MangaDexListsView extends HookConsumerWidget {
     }, [scrollController]);
 
     final appbar = MangaDexSliverAppBar(
-      controller: controller,
+      controller: scrollController,
     );
 
     final leading = SliverAppBar(
@@ -118,7 +119,7 @@ class MangaDexListsView extends HookConsumerWidget {
                     ),
                   AsyncValue(value: final lists?) => CustomScrollView(
                       scrollBehavior: const MouseTouchScrollBehavior(),
-                      controller: controller,
+                      controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
                         appbar,
@@ -256,7 +257,7 @@ class MangaDexListsView extends HookConsumerWidget {
                     ),
                   AsyncValue(value: final lists?) => CustomScrollView(
                       scrollBehavior: const MouseTouchScrollBehavior(),
-                      controller: controller,
+                      controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
                         appbar,

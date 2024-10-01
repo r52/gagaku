@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -17,6 +18,7 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final cfg = ref.watch(webConfigProvider);
     final tabController = useTabController(initialLength: cfg.categories.length, keys: [cfg]);
 
@@ -59,7 +61,7 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
 
                       return WebMangaListWidget(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        controller: controller,
+                        controller: scrollController,
                         children: [
                           WebMangaListViewSliver(
                             items: items,

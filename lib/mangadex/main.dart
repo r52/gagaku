@@ -3,18 +3,19 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MangaDexHome extends HookConsumerWidget {
-  const MangaDexHome({this.controllers, required this.child, super.key});
+  const MangaDexHome({required this.child, super.key});
 
-  final List<ScrollController>? controllers;
   final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final controllers = List.generate(5, (idx) => useScrollController());
     final lifecycle = useAppLifecycleState();
 
     useEffect(() {
@@ -30,7 +31,10 @@ class MangaDexHome extends HookConsumerWidget {
       restorationId: 'md_home_restore',
       drawer: const MainDrawer(),
       body: Center(
-        child: child,
+        child: DefaultScrollController(
+          controller: controllers[index],
+          child: child,
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         height: 60,
@@ -63,7 +67,7 @@ class MangaDexHome extends HookConsumerWidget {
 
           if (currTab == index) {
             // Scroll to top if on the same tab
-            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           } else {
             // Switch tab
             _onItemTapped(index, context);
