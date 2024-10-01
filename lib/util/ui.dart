@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/config.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {

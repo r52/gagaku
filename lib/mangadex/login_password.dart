@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -88,9 +88,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                         autofillHints: const [AutofillHints.username],
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? 'Username cannot be empty.'
-                              : null;
+                          return (value == null || value.isEmpty) ? 'Username cannot be empty.' : null;
                         },
                       ),
                       const SizedBox(height: 12.0),
@@ -104,9 +102,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                         autofillHints: const [AutofillHints.password],
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? 'Password cannot be empty.'
-                              : null;
+                          return (value == null || value.isEmpty) ? 'Password cannot be empty.' : null;
                         },
                       ),
                       const SizedBox(height: 12.0),
@@ -118,9 +114,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? 'Client ID cannot be empty.'
-                              : null;
+                          return (value == null || value.isEmpty) ? 'Client ID cannot be empty.' : null;
                         },
                       ),
                       const SizedBox(height: 12.0),
@@ -133,9 +127,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                         obscureText: true,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? 'Client Secret cannot be empty.'
-                              : null;
+                          return (value == null || value.isEmpty) ? 'Client Secret cannot be empty.' : null;
                         },
                       ),
                     ],
@@ -156,42 +148,31 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                       ),
                       HookBuilder(
                         builder: (context) {
-                          final usernameIsEmpty = useListenableSelector(
-                              usernameController,
-                              () => usernameController.text.isEmpty);
-                          final passwordIsEmpty = useListenableSelector(
-                              passwordController,
-                              () => passwordController.text.isEmpty);
-                          final clientIdIsEmpty = useListenableSelector(
-                              clientIdController,
-                              () => clientIdController.text.isEmpty);
-                          final clientSecretIsEmpty = useListenableSelector(
-                              clientSecretController,
-                              () => clientSecretController.text.isEmpty);
+                          final usernameIsEmpty =
+                              useListenableSelector(usernameController, () => usernameController.text.isEmpty);
+                          final passwordIsEmpty =
+                              useListenableSelector(passwordController, () => passwordController.text.isEmpty);
+                          final clientIdIsEmpty =
+                              useListenableSelector(clientIdController, () => clientIdController.text.isEmpty);
+                          final clientSecretIsEmpty =
+                              useListenableSelector(clientSecretController, () => clientSecretController.text.isEmpty);
 
                           return ElevatedButton(
-                            onPressed: (usernameIsEmpty ||
-                                    passwordIsEmpty ||
-                                    clientIdIsEmpty ||
-                                    clientSecretIsEmpty)
+                            onPressed: (usernameIsEmpty || passwordIsEmpty || clientIdIsEmpty || clientSecretIsEmpty)
                                 ? null
                                 : () async {
                                     final router = GoRouter.of(context);
-                                    final messenger =
-                                        ScaffoldMessenger.of(context);
+                                    final messenger = ScaffoldMessenger.of(context);
 
                                     if (usernameController.text.isNotEmpty &&
                                         passwordController.text.isNotEmpty &&
                                         clientIdController.text.isNotEmpty &&
-                                        clientSecretController
-                                            .text.isNotEmpty) {
-                                      final loginSuccess = ref
-                                          .read(authControlProvider.notifier)
-                                          .login(
-                                              usernameController.text,
-                                              passwordController.text,
-                                              clientIdController.text,
-                                              clientSecretController.text);
+                                        clientSecretController.text.isNotEmpty) {
+                                      final loginSuccess = ref.read(authControlProvider.notifier).login(
+                                          usernameController.text,
+                                          passwordController.text,
+                                          clientIdController.text,
+                                          clientSecretController.text);
 
                                       loginSuccess.then((success) {
                                         if (success) {
@@ -202,8 +183,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                             ..removeCurrentSnackBar()
                                             ..showSnackBar(
                                               const SnackBar(
-                                                content:
-                                                    Text('Failed to login.'),
+                                                content: Text('Failed to login.'),
                                                 backgroundColor: Colors.red,
                                               ),
                                             );
@@ -216,8 +196,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                         ..removeCurrentSnackBar()
                                         ..showSnackBar(
                                           const SnackBar(
-                                            content: Text(
-                                                'Username/Password/Client ID/Client Secret cannot be empty.'),
+                                            content: Text('Username/Password/Client ID/Client Secret cannot be empty.'),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
@@ -233,8 +212,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (snapshot.connectionState == ConnectionState.waiting)
-            ...Styles.loadingOverlay
+          if (snapshot.connectionState == ConnectionState.waiting) ...Styles.loadingOverlay
         ],
       ),
     );

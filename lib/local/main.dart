@@ -8,7 +8,7 @@ import 'package:gagaku/local/directory_reader.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class LocalLibraryHome extends StatelessWidget {

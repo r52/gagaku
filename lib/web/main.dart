@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/search.dart';
 import 'package:gagaku/web/settings.dart';

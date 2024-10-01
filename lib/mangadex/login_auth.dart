@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MangaDexLoginWidget extends ConsumerWidget {
@@ -20,8 +20,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
 
         return Center(
           child: ElevatedButton.icon(
-            onPressed: () =>
-                {} /*ref.read(authControlProvider.notifier).login()*/,
+            onPressed: () => {} /*ref.read(authControlProvider.notifier).login()*/,
             label: const Text('Login to MangaDex'),
             icon: const Icon(
               Icons.https,

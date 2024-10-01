@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/types.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingsHome extends HookConsumerWidget {

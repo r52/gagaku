@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/legacy.dart';
 import 'package:number_paginator/number_paginator.dart';
@@ -40,7 +40,9 @@ class MangaDexLibraryView extends HookConsumerWidget {
 
     useEffect(() {
       void tabCallback() {
-        ref.read(libraryViewTypeProvider.notifier).state = statuses.elementAt(tabController.index);
+        if (!tabController.indexIsChanging) {
+          ref.read(libraryViewTypeProvider.notifier).state = statuses.elementAt(tabController.index);
+        }
       }
 
       tabController.addListener(tabCallback);

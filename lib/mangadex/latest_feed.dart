@@ -3,8 +3,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -62,22 +62,17 @@ Future<List<ChapterFeedItemData>> _fetchGlobalChapters(_FetchGlobalChaptersRef r
 }
 
 class MangaDexGlobalFeed extends HookConsumerWidget {
-  const MangaDexGlobalFeed({
-    super.key,
-    this.controller,
-  });
-
-  final ScrollController? controller;
+  const MangaDexGlobalFeed({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ctrler = controller ?? useScrollController();
+    final controller = useScrollController();
 
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            ctrler.animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           },
           child: const TitleFlexBar(title: 'Latest Uploads'),
         ),
@@ -98,7 +93,7 @@ class MangaDexGlobalFeed extends HookConsumerWidget {
           ref.read(latestGlobalFeedProvider.notifier).clear();
           return ref.refresh(_fetchGlobalChaptersProvider.future);
         },
-        controller: ctrler,
+        controller: controller,
         restorationId: 'global_list_offset',
       ),
     );

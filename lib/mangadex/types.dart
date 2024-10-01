@@ -2,7 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/util/util.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
