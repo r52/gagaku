@@ -65,13 +65,14 @@ class MangaDexChapterFeed extends HookConsumerWidget {
 
     final leading = <Widget>[
       MangaDexSliverAppBar(
+        title: 'My Feed',
         controller: scrollController,
       ),
       SliverAppBar(
         automaticallyImplyLeading: false,
         pinned: true,
         title: const Text(
-          'Latest Updates',
+          'Updates',
           style: TextStyle(fontSize: 24),
         ),
         actions: [

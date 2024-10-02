@@ -71,6 +71,7 @@ class MangaDexHistoryFeed extends ConsumerWidget {
       restorationId: 'history_list_offset',
       leading: [
         MangaDexSliverAppBar(
+          title: 'History',
           controller: scrollController,
         ),
       ],

@@ -103,6 +103,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
             child: OpenContainer(
               closedColor: theme.colorScheme.primaryContainer,
               closedShape: const CircleBorder(),
+              closedElevation: 0.0,
               closedBuilder: (context, openContainer) {
                 return IconButton(
                   icon: const Icon(Icons.search),
@@ -121,6 +122,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
             child: OpenContainer<bool>(
               closedColor: theme.colorScheme.primaryContainer,
               closedShape: const CircleBorder(),
+              closedElevation: 0.0,
               closedBuilder: (context, openContainer) {
                 return IconButton(
                   icon: const Icon(Icons.settings),

@@ -56,6 +56,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
           MangaDexSliverAppBar(
+            title: 'Library',
             controller: scrollController,
           ),
           SliverOverlapAbsorber(

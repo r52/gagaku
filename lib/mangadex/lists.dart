@@ -48,16 +48,13 @@ class MangaDexListsView extends HookConsumerWidget {
     }, [scrollController]);
 
     final appbar = MangaDexSliverAppBar(
+      title: 'My Lists',
       controller: scrollController,
     );
 
     final leading = SliverAppBar(
       automaticallyImplyLeading: false,
       pinned: true,
-      title: const Text(
-        'My Lists',
-        style: TextStyle(fontSize: 24),
-      ),
       actions: [
         SegmentedButton<_ListViewType>(
           style: SegmentedButton.styleFrom(

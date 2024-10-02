@@ -74,7 +74,7 @@ class MangaDexGlobalFeed extends HookConsumerWidget {
           onTap: () {
             controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           },
-          child: const TitleFlexBar(title: 'Latest Uploads'),
+          child: const TitleFlexBar(title: 'Latest Updates'),
         ),
         leading: BackButton(
           onPressed: () {
