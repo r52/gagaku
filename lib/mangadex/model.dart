@@ -12,7 +12,6 @@ import 'package:gagaku/mangadex/types.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hooks_riverpod/legacy.dart';
 import 'package:mutex/mutex.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
@@ -1715,7 +1714,15 @@ class CreatorTitles extends _$CreatorTitles with ListBasedInfiniteScrollMix {
   }
 }
 
-final mangaChaptersListSortProvider = StateProvider((ref) => ListSort.descending);
+@Riverpod(keepAlive: true)
+class MangaChaptersListSort extends _$MangaChaptersListSort {
+  @override
+  ListSort build() => ListSort.descending;
+
+  @override
+  set state(ListSort newState) => super.state = newState;
+  ListSort update(ListSort Function(ListSort state) cb) => state = cb(state);
+}
 
 @riverpod
 class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {

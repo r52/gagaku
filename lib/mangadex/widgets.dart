@@ -14,12 +14,14 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hooks_riverpod/legacy.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'types.dart';
+
+part 'widgets.g.dart';
 
 const statsError = 'Error Retrieving Stats';
 
@@ -28,7 +30,15 @@ typedef MangaButtonBuilderCallback = Widget Function(Manga manga);
 
 enum MangaListView { grid, list, detailed }
 
-final _mangaListViewProvider = StateProvider((ref) => MangaListView.grid);
+@Riverpod(keepAlive: true)
+class _MangaListView extends _$MangaListView {
+  @override
+  MangaListView build() => MangaListView.grid;
+
+  @override
+  set state(MangaListView newState) => super.state = newState;
+  MangaListView update(MangaListView Function(MangaListView state) cb) => state = cb(state);
+}
 
 const _rowPadding = SizedBox(
   width: 6.0,

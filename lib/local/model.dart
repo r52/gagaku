@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:gagaku/local/config.dart';
-import 'package:hooks_riverpod/legacy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,7 +24,15 @@ enum LibrarySort {
   final String label;
 }
 
-final librarySortTypeProvider = StateProvider((ref) => LibrarySort.name_desc);
+@Riverpod(keepAlive: true)
+class LibrarySortType extends _$LibrarySortType {
+  @override
+  LibrarySort build() => LibrarySort.name_desc;
+
+  @override
+  set state(LibrarySort newState) => super.state = newState;
+  LibrarySort update(LibrarySort Function(LibrarySort state) cb) => state = cb(state);
+}
 
 int? _standardLocalLibraryItemComp(LocalLibraryItem a, LocalLibraryItem b) {
   if (a.type == b.type && a.path == b.path) {

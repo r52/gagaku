@@ -6,6 +6,76 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(LibrarySortType)
+const librarySortTypeProvider = LibrarySortTypeProvider._();
+
+final class LibrarySortTypeProvider
+    extends $NotifierProvider<LibrarySortType, LibrarySort> {
+  const LibrarySortTypeProvider._(
+      {super.runNotifierBuildOverride, LibrarySortType Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'librarySortTypeProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final LibrarySortType Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$librarySortTypeHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(LibrarySort value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<LibrarySort>(value),
+    );
+  }
+
+  @$internal
+  @override
+  LibrarySortType create() => _createCb?.call() ?? LibrarySortType();
+
+  @$internal
+  @override
+  LibrarySortTypeProvider $copyWithCreate(
+    LibrarySortType Function() create,
+  ) {
+    return LibrarySortTypeProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  LibrarySortTypeProvider $copyWithBuild(
+    LibrarySort Function(
+      Ref<LibrarySort>,
+      LibrarySortType,
+    ) build,
+  ) {
+    return LibrarySortTypeProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<LibrarySortType, LibrarySort> $createElement(
+          $ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
+String _$librarySortTypeHash() => r'884ea733f1009d8831f3a6fd654e2480908cd7d6';
+
+abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
+  LibrarySort build();
+  @$internal
+  @override
+  LibrarySort runBuild() => build();
+}
+
 @ProviderFor(LocalLibrary)
 const localLibraryProvider = LocalLibraryProvider._();
 

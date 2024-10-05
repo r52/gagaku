@@ -6,11 +6,21 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hooks_riverpod/legacy.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'widgets.g.dart';
 
 enum WebMangaListView { grid, list }
 
-final _mangaListViewProvider = StateProvider((ref) => WebMangaListView.grid);
+@Riverpod(keepAlive: true)
+class _MangaListView extends _$MangaListView {
+  @override
+  WebMangaListView build() => WebMangaListView.grid;
+
+  @override
+  set state(WebMangaListView newState) => super.state = newState;
+  WebMangaListView update(WebMangaListView Function(WebMangaListView state) cb) => state = cb(state);
+}
 
 class WebMangaListWidget extends HookConsumerWidget {
   const WebMangaListWidget({

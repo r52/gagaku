@@ -8,13 +8,20 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hooks_riverpod/legacy.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library.g.dart';
 
-final libraryViewTypeProvider = StateProvider((ref) => MangaReadingStatus.reading);
+@Riverpod(keepAlive: true)
+class LibraryViewType extends _$LibraryViewType {
+  @override
+  MangaReadingStatus build() => MangaReadingStatus.reading;
+
+  @override
+  set state(MangaReadingStatus newState) => super.state = newState;
+  MangaReadingStatus update(MangaReadingStatus Function(MangaReadingStatus state) cb) => state = cb(state);
+}
 
 @riverpod
 Future<List<String>> _getLibraryListByType(_GetLibraryListByTypeRef ref, MangaReadingStatus type) async {

@@ -719,6 +719,79 @@ abstract class _$CreatorTitles extends $AsyncNotifier<List<Manga>> {
       );
 }
 
+@ProviderFor(MangaChaptersListSort)
+const mangaChaptersListSortProvider = MangaChaptersListSortProvider._();
+
+final class MangaChaptersListSortProvider
+    extends $NotifierProvider<MangaChaptersListSort, ListSort> {
+  const MangaChaptersListSortProvider._(
+      {super.runNotifierBuildOverride,
+      MangaChaptersListSort Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'mangaChaptersListSortProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final MangaChaptersListSort Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaChaptersListSortHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ListSort value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<ListSort>(value),
+    );
+  }
+
+  @$internal
+  @override
+  MangaChaptersListSort create() =>
+      _createCb?.call() ?? MangaChaptersListSort();
+
+  @$internal
+  @override
+  MangaChaptersListSortProvider $copyWithCreate(
+    MangaChaptersListSort Function() create,
+  ) {
+    return MangaChaptersListSortProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  MangaChaptersListSortProvider $copyWithBuild(
+    ListSort Function(
+      Ref<ListSort>,
+      MangaChaptersListSort,
+    ) build,
+  ) {
+    return MangaChaptersListSortProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<MangaChaptersListSort, ListSort> $createElement(
+          $ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
+String _$mangaChaptersListSortHash() =>
+    r'71b85b6dcf773f1b96a7175794184871a99dc3dc';
+
+abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
+  ListSort build();
+  @$internal
+  @override
+  ListSort runBuild() => build();
+}
+
 @ProviderFor(MangaChapters)
 const mangaChaptersProvider = MangaChaptersFamily._();
 

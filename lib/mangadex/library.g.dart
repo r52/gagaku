@@ -6,6 +6,76 @@ part of 'library.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(LibraryViewType)
+const libraryViewTypeProvider = LibraryViewTypeProvider._();
+
+final class LibraryViewTypeProvider
+    extends $NotifierProvider<LibraryViewType, MangaReadingStatus> {
+  const LibraryViewTypeProvider._(
+      {super.runNotifierBuildOverride, LibraryViewType Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'libraryViewTypeProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final LibraryViewType Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$libraryViewTypeHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MangaReadingStatus value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<MangaReadingStatus>(value),
+    );
+  }
+
+  @$internal
+  @override
+  LibraryViewType create() => _createCb?.call() ?? LibraryViewType();
+
+  @$internal
+  @override
+  LibraryViewTypeProvider $copyWithCreate(
+    LibraryViewType Function() create,
+  ) {
+    return LibraryViewTypeProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  LibraryViewTypeProvider $copyWithBuild(
+    MangaReadingStatus Function(
+      Ref<MangaReadingStatus>,
+      LibraryViewType,
+    ) build,
+  ) {
+    return LibraryViewTypeProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<LibraryViewType, MangaReadingStatus> $createElement(
+          $ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
+String _$libraryViewTypeHash() => r'fa2f63791b8cda5c72e6ee8d27bf417968d97753';
+
+abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
+  MangaReadingStatus build();
+  @$internal
+  @override
+  MangaReadingStatus runBuild() => build();
+}
+
 typedef _GetLibraryListByTypeRef = Ref<AsyncValue<List<String>>>;
 
 @ProviderFor(_getLibraryListByType)
