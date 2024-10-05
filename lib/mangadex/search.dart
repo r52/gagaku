@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -9,11 +7,29 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hooks_riverpod/legacy.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-//part 'search.g.dart';
+part 'search.g.dart';
 
-final _searchParamsProvider = StateProvider((ref) => const MangaSearchParameters(query: '', filter: MangaFilters()));
+@Riverpod(keepAlive: true)
+class _SearchHistory extends _$SearchHistory {
+  @override
+  List<String> build() => [];
+
+  @override
+  set state(List<String> newState) => super.state = newState;
+  List<String> update(List<String> Function(List<String> state) cb) => state = cb(state);
+}
+
+@Riverpod(keepAlive: true)
+class _SearchParams extends _$SearchParams {
+  @override
+  MangaSearchParameters build() => const MangaSearchParameters(query: '', filter: MangaFilters());
+
+  @override
+  set state(MangaSearchParameters newState) => super.state = newState;
+  MangaSearchParameters update(MangaSearchParameters Function(MangaSearchParameters state) cb) => state = cb(state);
+}
 
 Widget buildMDSearchPage(BuildContext context, GoRouterState state) {
   final selectMode = state.uri.queryParameters['selectMode'] == 'true';
@@ -38,12 +54,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
     final filter = ref.watch(_searchParamsProvider);
-    final controller = useTextEditingController();
-    final searchText = useListenableSelector(controller, () => controller.text);
-    final debouncedInput = useDebounced(
-      searchText,
-      const Duration(milliseconds: 1000), // Set your desired timeout
-    );
+    final controller = useSearchController();
 
     final searchProvider = ref.watch(mangaSearchProvider(filter));
     final isLoading = searchProvider.isLoading && searchProvider.isReloading;
@@ -56,49 +67,9 @@ class MangaDexSearchWidget extends HookConsumerWidget {
       return null;
     }, []);
 
-    useEffect(() {
-      if (debouncedInput != null) {
-        Future.delayed(Duration.zero, () {
-          ref.read(_searchParamsProvider.notifier).state =
-              filter.copyWith(query: debouncedInput, filter: filter.filter);
-        });
-      }
-      return null;
-    }, [debouncedInput]);
-
     return Scaffold(
       body: MangaListWidget(
         physics: const AlwaysScrollableScrollPhysics(),
-        title: DropdownMenu<FilterOrder>(
-          initialSelection: filter.filter.order,
-          enableFilter: false,
-          enableSearch: false,
-          requestFocusOnTap: false,
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                width: 2.0,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-            ),
-          ),
-          onSelected: (FilterOrder? order) async {
-            if (order != null) {
-              ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
-                query: filter.query,
-                filter: filter.filter.copyWith(order: order),
-              );
-            }
-          },
-          dropdownMenuEntries: List<DropdownMenuEntry<FilterOrder>>.generate(
-            FilterOrder.values.length,
-            (int index) => DropdownMenuEntry<FilterOrder>(
-              value: FilterOrder.values.elementAt(index),
-              label: FilterOrder.values.elementAt(index).label,
-            ),
-          ),
-        ),
         onAtEdge: () {
           final lt = ref.read(_searchParamsProvider);
           ref.read(mangaSearchProvider(lt).notifier).getMore();
@@ -119,47 +90,130 @@ class MangaDexSearchWidget extends HookConsumerWidget {
             snap: false,
             floating: false,
             expandedHeight: 80.0,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      textInputAction: TextInputAction.search,
-                      autofocus: true,
-                      autocorrect: false,
-                      onTapOutside: (event) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                      },
-                      controller: controller,
-                      decoration: const InputDecoration(
-                        icon: Icon(Icons.search),
-                        hintText: 'Search MangaDex...',
+            title: SearchAnchor(
+              searchController: controller,
+              isFullScreen: false,
+              viewConstraints: BoxConstraints(maxHeight: 400),
+              builder: (context, controller) {
+                return SearchBar(
+                  controller: controller,
+                  hintText: 'Search MangaDex...',
+                  trailing: <Widget>[
+                    Tooltip(
+                      message: 'Search Filters',
+                      child: IconButton(
+                        onPressed: () async {
+                          final result = await nav.push<MangaFilters>(
+                            SlideTransitionRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => _MangaDexFilterWidget(
+                                filter: filter.filter,
+                              ),
+                            ),
+                          );
+
+                          if (result != null) {
+                            ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
+                              query: filter.query,
+                              filter: result,
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.filter_list),
                       ),
+                    )
+                  ],
+                  onTap: () {
+                    controller.openView();
+                  },
+                  onTapOutside: (event) {
+                    unfocusSearchBar();
+                  },
+                  onSubmitted: (value) {
+                    final term = value.trim();
+                    if (term.isNotEmpty) {
+                      final history = ref.read(_searchHistoryProvider);
+                      ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                    }
+
+                    ref.read(_searchParamsProvider.notifier).state =
+                        filter.copyWith(query: term, filter: filter.filter);
+
+                    unfocusSearchBar();
+                  },
+                );
+              },
+              viewOnSubmitted: (value) {
+                final term = value.trim();
+                if (term.isNotEmpty) {
+                  final history = ref.read(_searchHistoryProvider);
+                  ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                }
+
+                controller.closeView(term);
+                ref.read(_searchParamsProvider.notifier).state = filter.copyWith(query: term, filter: filter.filter);
+
+                unfocusSearchBar();
+              },
+              suggestionsBuilder: (BuildContext context, SearchController controller) {
+                final history = ref.read(_searchHistoryProvider);
+                return history
+                    .map((e) => ListTile(
+                          titleAlignment: ListTileTitleAlignment.center,
+                          title: Text(e),
+                          onTap: () {
+                            final term = e.trim();
+                            if (term.isNotEmpty) {
+                              final history = ref.read(_searchHistoryProvider);
+                              ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                            }
+
+                            controller.closeView(term);
+                            ref.read(_searchParamsProvider.notifier).state =
+                                filter.copyWith(query: term, filter: filter.filter);
+
+                            unfocusSearchBar();
+                          },
+                        ))
+                    .toList();
+              },
+            ),
+          ),
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            primary: false,
+            title: const Text('Search'),
+            actions: [
+              DropdownMenu<FilterOrder>(
+                initialSelection: filter.filter.order,
+                enableFilter: false,
+                enableSearch: false,
+                requestFocusOnTap: false,
+                inputDecorationTheme: InputDecorationTheme(
+                  filled: true,
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 2.0,
+                      color: Theme.of(context).colorScheme.inversePrimary,
                     ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      final result = await nav.push<MangaFilters>(
-                        SlideTransitionRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => _MangaDexFilterWidget(
-                            filter: filter.filter,
-                          ),
-                        ),
-                      );
-
-                      if (result != null) {
-                        ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
-                          query: filter.query,
-                          filter: result,
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.filter_list),
-                    label: const Text('Filters'),
+                ),
+                onSelected: (FilterOrder? order) async {
+                  if (order != null) {
+                    ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
+                      query: filter.query,
+                      filter: filter.filter.copyWith(order: order),
+                    );
+                  }
+                },
+                dropdownMenuEntries: List<DropdownMenuEntry<FilterOrder>>.generate(
+                  FilterOrder.values.length,
+                  (int index) => DropdownMenuEntry<FilterOrder>(
+                    value: FilterOrder.values.elementAt(index),
+                    label: FilterOrder.values.elementAt(index).label,
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ],
         isLoading: isLoading,

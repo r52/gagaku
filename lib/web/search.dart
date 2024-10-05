@@ -2,10 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'search.g.dart';
+
+@Riverpod(keepAlive: true)
+class _SearchHistory extends _$SearchHistory {
+  @override
+  List<String> build() => [];
+
+  @override
+  set state(List<String> newState) => super.state = newState;
+  List<String> update(List<String> Function(List<String> state) cb) => state = cb(state);
+}
 
 class WebSourceSearchWidget extends HookConsumerWidget {
   const WebSourceSearchWidget({
@@ -16,7 +30,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gagakucfg = ref.watch(gagakuSettingsProvider);
     final cfg = ref.watch(webConfigProvider);
-    final controller = useTextEditingController();
+    final controller = useSearchController();
     final searchTerm = useState('');
     final sources = ref.watch(webSourceManagerProvider);
     final api = ref.watch(proxyProvider);
@@ -46,6 +60,10 @@ class WebSourceSearchWidget extends HookConsumerWidget {
       body: WebMangaListWidget(
         physics: const AlwaysScrollableScrollPhysics(),
         showToggle: false,
+        title: const Text(
+          'Source Search',
+          style: TextStyle(fontSize: 24),
+        ),
         leading: [
           SliverAppBar(
             leading: const BackButton(),
@@ -53,29 +71,66 @@ class WebSourceSearchWidget extends HookConsumerWidget {
             snap: false,
             floating: false,
             expandedHeight: 80.0,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      textInputAction: TextInputAction.search,
-                      autofocus: true,
-                      autocorrect: false,
-                      onTapOutside: (event) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                      },
-                      controller: controller,
-                      decoration: const InputDecoration(
-                        icon: Icon(Icons.search),
-                        hintText: 'Search Web Sources...',
-                      ),
-                      onSubmitted: (value) {
-                        searchTerm.value = value;
-                      },
-                    ),
-                  ),
-                ],
-              ),
+            title: SearchAnchor(
+              searchController: controller,
+              isFullScreen: false,
+              viewConstraints: BoxConstraints(maxHeight: 400),
+              builder: (context, controller) {
+                return SearchBar(
+                  controller: controller,
+                  hintText: 'Search Web Sources...',
+                  onTap: () {
+                    controller.openView();
+                  },
+                  onTapOutside: (event) {
+                    unfocusSearchBar();
+                  },
+                  onSubmitted: (value) {
+                    final term = value.trim();
+                    if (term.isNotEmpty) {
+                      final history = ref.read(_searchHistoryProvider);
+                      ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                    }
+
+                    searchTerm.value = term;
+
+                    unfocusSearchBar();
+                  },
+                );
+              },
+              viewOnSubmitted: (value) {
+                final term = value.trim();
+                if (term.isNotEmpty) {
+                  final history = ref.read(_searchHistoryProvider);
+                  ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                }
+
+                controller.closeView(term);
+                searchTerm.value = term;
+
+                unfocusSearchBar();
+              },
+              suggestionsBuilder: (BuildContext context, SearchController controller) {
+                final history = ref.read(_searchHistoryProvider);
+                return history
+                    .map((e) => ListTile(
+                          titleAlignment: ListTileTitleAlignment.center,
+                          title: Text(e),
+                          onTap: () {
+                            final term = e.trim();
+                            if (term.isNotEmpty) {
+                              final history = ref.read(_searchHistoryProvider);
+                              ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                            }
+
+                            controller.closeView(term);
+                            searchTerm.value = term;
+
+                            unfocusSearchBar();
+                          },
+                        ))
+                    .toList();
+              },
             ),
           ),
         ],

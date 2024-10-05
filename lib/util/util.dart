@@ -5,6 +5,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 String cleanBaseDomains(String url) {
@@ -229,6 +230,14 @@ extension CacheForExtension on Ref<Object?> {
     onDispose(() {
       logger.d('${runtimeType.toString()}: disposed');
       timer?.cancel();
+    });
+  }
+}
+
+extension SearchUtil on ConsumerWidget {
+  void unfocusSearchBar() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusManager.instance.primaryFocus?.unfocus();
     });
   }
 }
