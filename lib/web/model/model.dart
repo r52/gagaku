@@ -67,7 +67,7 @@ class ProxyHandler {
       if (info.chapter != null) {
         GoRouter.of(context).push('/read/${info.source}/${info.location}/${info.chapter}/1/');
       } else {
-        GoRouter.of(context).push('/read/${info.source}/${info.location}');
+        GoRouter.of(context).push('/read/${info.source}/${info.location}', extra: info);
       }
 
       return true;
@@ -138,45 +138,27 @@ class ProxyHandler {
     }
   }
 
-  Future<ProxyData> handleSource(SourceInfo info) async {
-    ProxyData p = ProxyData();
-
+  Future<WebManga?> handleSource(SourceInfo info) async {
     switch (info.type) {
       case SourceType.source:
         final srcMgr = await ref.watch(webSourceManagerProvider.future);
-        WebManga? manga;
 
         if (srcMgr != null) {
           if (info.parser != null) {
-            manga = await srcMgr.parseManga(info.parser!, Uri.parse(info.location), client);
+            return await srcMgr.parseManga(info.parser!, Uri.parse(info.location), client);
           } else {
             for (final MapEntry(key: key, value: src) in srcMgr.sources.entries) {
               if (info.source == src.name) {
-                manga = await srcMgr.parseManga(key, Uri.parse(info.location), client);
-                break;
+                return await srcMgr.parseManga(key, Uri.parse(info.location), client);
               }
             }
           }
         }
 
-        p.manga = manga;
-        break;
+        return null;
       case SourceType.proxy:
-        switch (info.source) {
-          case 'imgur':
-            final code = '/read/api/imgur/chapter/${info.location}';
-            p.code = code;
-            break;
-          default:
-            // Generic proxy
-            final manga = await _getMangaFromProxy(info);
-            p.manga = manga;
-            break;
-        }
-        break;
+        return await _getMangaFromProxy(info);
     }
-
-    return p;
   }
 
   Future<WebManga> _getMangaFromProxy(SourceInfo info) async {
@@ -194,7 +176,7 @@ class ProxyHandler {
       final body = json.decode(response.body);
       final manga = WebManga.fromJson(body);
 
-      const expiry = Duration(days: 1);
+      const expiry = Duration(minutes: 15);
 
       logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
       _cache.put(key, json.encode(manga.toJson()), manga, true, expiry: expiry);
@@ -204,31 +186,6 @@ class ProxyHandler {
 
     throw Exception(
         "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
-  }
-
-  Future<List<String>> getChapterFromProxy(String code) async {
-    final url = "https://cubari.moe$code";
-
-    final response = await client.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-
-      if (body is List) {
-        if (code.contains('imgur')) {
-          final imgurlist = body.map((e) => ImgurPage.fromJson(e)).toList();
-          final pageList = imgurlist.map((e) => e.src).toList();
-
-          return pageList;
-        }
-
-        final pageList = body.map((e) => e as String).toList();
-        return pageList;
-      }
-    }
-
-    throw Exception(
-        "Failed to download chapter data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
 }
 

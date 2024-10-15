@@ -5,10 +5,10 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: c57b02f47e021c9d7ced6d2e28824b315e0fd585578274bc4c2a5db0626f154a
+      sha256: "16e298750b6d0af7ce8a3ba7c18c69c3785d11b15ec83f6dcd0ad2a0009b3cab"
       url: "https://pub.dev"
     source: hosted
-    version: "75.0.0"
+    version: "76.0.0"
   _macros:
     dependency: transitive
     description: dart
@@ -18,10 +18,10 @@ packages:
     dependency: transitive
     description:
       name: analyzer
-      sha256: ef226c581b7cd875f734125b1b9928df3db08cc85ff87ce7d9be89a677aaee23
+      sha256: "1f14db053a8c23e260789e9b0980fa27f2680dd640932cae5e1137cce0e46e1e"
       url: "https://pub.dev"
     source: hosted
-    version: "6.10.0"
+    version: "6.11.0"
   analyzer_plugin:
     dependency: transitive
     description:
@@ -58,10 +58,10 @@ packages:
     dependency: transitive
     description:
       name: args
-      sha256: "7cf60b9f0cc88203c5a190b4cd62a99feea42759a7fa695010eb5de1c0b2252a"
+      sha256: bf9f5caeea8d8fe6721a9c358dd8a5c1947b27f1cfaa18b39c301273594919e6
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.0"
+    version: "2.6.0"
   asn1lib:
     dependency: transitive
     description:
@@ -306,26 +306,26 @@ packages:
     dependency: "direct dev"
     description:
       name: custom_lint
-      sha256: "18f7982b99c84c10d27280852c7e6efb3cc320b6acd85a922999e9a6bf8c7bea"
+      sha256: "4500e88854e7581ee43586abeaf4443cb22375d6d289241a87b1aadf678d5545"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.9"
+    version: "0.6.10"
   custom_lint_builder:
     dependency: transitive
     description:
       name: custom_lint_builder
-      sha256: "515d42d68e07c0e7764dd62d4bfa0b9c67f9013d86cb2837bdfd731bae1c486a"
+      sha256: "5a95eff100da256fbf086b329c17c8b49058c261cdf56d3a4157d3c31c511d78"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.9"
+    version: "0.6.10"
   custom_lint_core:
     dependency: transitive
     description:
       name: custom_lint_core
-      sha256: "4c8b1931b69aa6b4c5c81eed6f484b9be259d3ae903300ba1fd9f6f4202c0503"
+      sha256: "76a4046cc71d976222a078a8fd4a65e198b70545a8d690a75196dd14f08510f6"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.9"
+    version: "0.6.10"
   dart_eval:
     dependency: "direct main"
     description:
@@ -455,10 +455,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_markdown
-      sha256: e17575ca576a34b46c58c91f9948891117a1bd97815d2e661813c7f90c647a78
+      sha256: bd9c475d9aae256369edacafc29d1e74c81f78a10cdcdacbbbc9e3c43d009e4a
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.3+2"
+    version: "0.7.4"
   flutter_native_splash:
     dependency: "direct dev"
     description:
@@ -1462,10 +1462,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: "4d45dc9069dba4619dc0ebd93c7cec5e66d8482cb625a370ac806dcc8165f2ec"
+      sha256: e5c39a90447e7c81cfec14b041cdbd0d0916bd9ebbc7fe02ab69568be703b9bd
       url: "https://pub.dev"
     source: hosted
-    version: "5.5.5"
+    version: "5.6.0"
   win32_registry:
     dependency: transitive
     description:

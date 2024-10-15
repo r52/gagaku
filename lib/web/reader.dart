@@ -23,7 +23,6 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
   if (data != null) {
     child = WebSourceReaderWidget(
       source: data.source,
-      manga: data.manga,
       title: data.title,
       link: data.link,
       info: data.info,
@@ -47,28 +46,21 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
 @riverpod
 Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
-  final proxy = await api.handleSource(info);
+  final manga = await api.handleSource(info);
 
-  if (proxy.code != null) {
+  if (manga != null) {
     ref
         .read(webSourceHistoryProvider.notifier)
-        .add(HistoryLink(title: '${info.source}: ${info.location}', url: '${info.getURL()}1/1/'));
-    return WebReaderData(source: proxy.code!, info: info);
-  }
+        .add(HistoryLink(title: '${info.source}: ${manga.title}', url: info.getURL(), cover: manga.cover));
 
-  if (proxy.manga != null) {
-    ref.read(webSourceHistoryProvider.notifier).add(
-        HistoryLink(title: '${info.source}: ${proxy.manga?.title}', url: info.getURL(), cover: proxy.manga!.cover));
-
-    final chapter = proxy.manga!.getChapter(info.chapter!);
+    final chapter = manga.getChapter(info.chapter!);
 
     if (chapter != null) {
       return WebReaderData(
         source: chapter.groups.entries.first.value,
         title: chapter.getTitle(info.chapter!),
-        manga: proxy.manga!,
         link: Text(
-          proxy.manga!.title,
+          manga.title,
           style: const TextStyle(fontSize: 24),
         ),
         info: info,
@@ -84,11 +76,15 @@ Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, SourceIn
 Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
   List<String> links;
 
-  if (source is List) {
-    links = List<String>.from(source);
+  if (source is! List) {
+    throw Exception('Unknown source type ($source)');
+  }
+
+  if (source.first is! String) {
+    final imgurlist = source.map((e) => ImgurPage.fromJson(e)).toList();
+    links = imgurlist.map((e) => e.src).toList();
   } else {
-    final api = ref.watch(proxyProvider);
-    links = await api.getChapterFromProxy(source);
+    links = List<String>.from(source);
   }
 
   final pages = links
@@ -166,7 +162,6 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
       case AsyncValue(value: final data?):
         return WebSourceReaderWidget(
           source: data.source,
-          manga: data.manga,
           title: data.title,
           link: data.link,
           info: data.info,
@@ -211,7 +206,6 @@ class WebSourceReaderWidget extends HookConsumerWidget {
     super.key,
     required this.source,
     this.title,
-    this.manga,
     this.link,
     required this.info,
     this.readKey,
@@ -221,7 +215,6 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
   final dynamic source;
   final String? title;
-  final WebManga? manga;
   final Widget? link;
   final SourceInfo info;
   final String? readKey;

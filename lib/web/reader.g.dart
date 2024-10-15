@@ -91,7 +91,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'd958fee26e93d2833118459a5f2db45937416f3a';
+    r'7d50dec0d7c70ae7f68d71bb959d5c9b60e64bdc';
 
 final class _FetchWebChapterInfoFamily extends Family {
   const _FetchWebChapterInfoFamily._()
@@ -220,7 +220,7 @@ final class _GetPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$getPagesHash() => r'aa30fe117016a71670dcc6f2780f8ff2d6a2d7a2';
+String _$getPagesHash() => r'0576ad6f10805e47afb563a706441a14a8104b0f';
 
 final class _GetPagesFamily extends Family {
   const _GetPagesFamily._()

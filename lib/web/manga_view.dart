@@ -47,10 +47,10 @@ Page<dynamic> buildRedirectedWebMangaViewPage(BuildContext context, GoRouterStat
 @riverpod
 Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
-  final proxy = await api.handleSource(info);
+  final manga = await api.handleSource(info);
 
-  if (proxy.manga != null) {
-    return proxy.manga!;
+  if (manga != null) {
+    return manga;
   }
 
   throw Exception('Invalid WebManga link. Data not found.');
@@ -568,7 +568,6 @@ class ChapterButtonWidget extends HookConsumerWidget {
             extra: WebReaderData(
               source: data.chapter.groups.entries.first.value,
               title: title,
-              manga: manga,
               link: link,
               info: info,
               readKey: name,

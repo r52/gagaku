@@ -89,7 +89,7 @@ final class _FetchWebMangaInfoProvider
   }
 }
 
-String _$fetchWebMangaInfoHash() => r'e880e308ab1029ca400c1dc167a841f6d3d4c170';
+String _$fetchWebMangaInfoHash() => r'ce70eb66e98ea4b2e9fbd9f24909520fce129fe3';
 
 final class _FetchWebMangaInfoFamily extends Family {
   const _FetchWebMangaInfoFamily._()

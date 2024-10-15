@@ -13,7 +13,6 @@ class WebReaderData {
   const WebReaderData({
     required this.source,
     this.title,
-    this.manga,
     this.link,
     required this.info,
     this.readKey,
@@ -22,7 +21,6 @@ class WebReaderData {
 
   final dynamic source;
   final String? title;
-  final WebManga? manga;
   final Widget? link;
   final SourceInfo info;
   final String? readKey;
@@ -48,13 +46,6 @@ class SourceInfo with _$SourceInfo {
 
   String getURL() => type == SourceType.proxy ? 'https://cubari.moe/read/$source/$location/' : location;
   String getKey() => '$source/$location';
-}
-
-class ProxyData {
-  ProxyData({this.manga, this.code});
-
-  WebManga? manga;
-  String? code;
 }
 
 class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
