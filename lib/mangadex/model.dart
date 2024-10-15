@@ -2263,10 +2263,6 @@ class MangaSearch extends _$MangaSearch with ListBasedInfiniteScrollMix {
     return fetchData(0);
   }
 
-  bool isAtEnd() {
-    return atEnd;
-  }
-
   @override
   Future<void> clear() async {
     offset = 0;

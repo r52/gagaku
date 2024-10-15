@@ -1954,7 +1954,7 @@ final class MangaSearchProvider
   }
 }
 
-String _$mangaSearchHash() => r'6665657a31d7f907fc6142523de5d0e7a5bb5f21';
+String _$mangaSearchHash() => r'86e80750442f46f879da481d5bb11328f0a3e64a';
 
 final class MangaSearchFamily extends Family {
   const MangaSearchFamily._()
