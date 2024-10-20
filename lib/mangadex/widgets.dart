@@ -14,6 +14,7 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -1214,6 +1215,9 @@ class MangaStatisticsRow extends HookConsumerWidget {
       return null;
     });
 
+    /// TODO: Fix for localization
+    final numFormatter = NumberFormat.compact();
+
     return Wrap(
       runSpacing: 4.0,
       children: [
@@ -1248,7 +1252,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
                   Icons.bookmark_outline,
                   size: 18,
                 ),
-                text: follows.toString(),
+                text: numFormatter.format(follows),
               ),
               const SizedBox(
                 width: 5,
@@ -1354,12 +1358,15 @@ class CommentChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// TODO: Fix for localization
+    final numFormatter = NumberFormat.compact();
+
     return IconTextChip(
       icon: const Icon(
         Icons.chat_bubble_outline,
         size: 18,
       ),
-      text: (comments != null) ? '${comments!.repliesCount}' : 'N/A',
+      text: (comments != null) ? numFormatter.format(comments!.repliesCount) : 'N/A',
       onPressed: (comments != null)
           ? () async {
               final url = 'https://forums.mangadex.org/threads/${comments!.threadId}';
