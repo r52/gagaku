@@ -44,7 +44,7 @@ Page<dynamic> buildRedirectedWebMangaViewPage(BuildContext context, GoRouterStat
   );
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
   final manga = await api.handleSource(info);
@@ -56,7 +56,7 @@ Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, SourceInfo info) 
   throw Exception('Invalid WebManga link. Data not found.');
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<SourceInfo> _fetchWebMangaRedirect(_FetchWebMangaRedirectRef ref, String url) async {
   final api = ref.watch(proxyProvider);
   final proxy = await api.parseUrl(url);

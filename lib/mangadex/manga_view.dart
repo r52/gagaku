@@ -48,7 +48,7 @@ Page<dynamic> buildMangaViewPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<Manga> _fetchMangaFromId(_FetchMangaFromIdRef ref, String mangaId) async {
   final api = ref.watch(mangadexProvider);
   final manga = await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
@@ -60,7 +60,7 @@ Future<Manga> _fetchMangaFromId(_FetchMangaFromIdRef ref, String mangaId) async 
   return manga.first;
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<List<Manga>> _fetchRelatedManga(_FetchRelatedMangaRef ref, Manga manga) async {
   final related = manga.relatedMangas;
 
@@ -91,10 +91,13 @@ class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
 
     return Scaffold(
       body: switch (mangaProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchMangaFromIdProvider($mangaId) failed",
+        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
+            onRefresh: () async => ref.refresh(_fetchMangaFromIdProvider(mangaId).future),
+            child: ErrorList(
+              error: error,
+              stackTrace: stackTrace,
+              message: "_fetchMangaFromIdProvider($mangaId) failed",
+            ),
           ),
         AsyncValue(value: final manga?) => MangaDexMangaViewWidget(
             manga: manga,

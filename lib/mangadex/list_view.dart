@@ -29,7 +29,7 @@ Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<List<ChapterFeedItemData>> _fetchListFeed(_FetchListFeedRef ref, CustomList list) async {
   final loggedin = await ref.watch(authControlProvider.future);
 

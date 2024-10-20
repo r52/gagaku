@@ -19,7 +19,7 @@ Page<dynamic> buildRecentFeedPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<List<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   final mangas = await ref.watch(recentlyAddedProvider.future);
 

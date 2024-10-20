@@ -25,7 +25,7 @@ final class _FetchChapterDataProvider
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterDataProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -89,12 +89,12 @@ final class _FetchChapterDataProvider
   }
 }
 
-String _$fetchChapterDataHash() => r'77340a27fbc2d76f76dd9fe5919792f6454e6223';
+String _$fetchChapterDataHash() => r'0afb8ac4a2b06e3432a58275e73e4b590eec1c3d';
 
 final class _FetchChapterDataFamily extends Family {
   const _FetchChapterDataFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterDataProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -153,7 +153,7 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterPagesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -218,12 +218,12 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchChapterPagesHash() => r'311ed9043598e22995b7b1f22c8beb97421fea35';
+String _$fetchChapterPagesHash() => r'220c447af743547f2b6e2d0111fc913973310465';
 
 final class _FetchChapterPagesFamily extends Family {
   const _FetchChapterPagesFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterPagesProvider',
           dependencies: null,
           allTransitiveDependencies: null,

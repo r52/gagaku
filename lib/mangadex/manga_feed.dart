@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_feed.g.dart';
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<List<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
   final api = ref.watch(mangadexProvider);
   final chapters = await ref.watch(latestChaptersFeedProvider.future);
