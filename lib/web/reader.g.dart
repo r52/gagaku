@@ -25,7 +25,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchWebChapterInfoProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -91,12 +91,12 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'7d50dec0d7c70ae7f68d71bb959d5c9b60e64bdc';
+    r'05b7d9ed3d1c0c7de730589ddefe0ce7d7cac34c';
 
 final class _FetchWebChapterInfoFamily extends Family {
   const _FetchWebChapterInfoFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchWebChapterInfoProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -220,7 +220,7 @@ final class _GetPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$getPagesHash() => r'0576ad6f10805e47afb563a706441a14a8104b0f';
+String _$getPagesHash() => r'3a3e550611619073964e9401f886b40872dac29a';
 
 final class _GetPagesFamily extends Family {
   const _GetPagesFamily._()

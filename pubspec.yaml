@@ -50,7 +50,7 @@ dependencies:
   logger: ^2.0.0
   mutex: ^3.0.1
   package_info_plus: ^8.0.0
-  path: ^1.8.3
+  path: ^1.9.0
   path_provider: ^2.0.15
   photo_view: ^0.15.0
   riverpod_annotation: ^3.0.0-dev.3

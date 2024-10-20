@@ -43,7 +43,7 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
   final manga = await api.handleSource(info);
@@ -75,6 +75,11 @@ Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, SourceIn
 @Riverpod(retry: noRetry)
 Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
   List<String> links;
+
+  if (source is String && source.startsWith('/read/')) {
+    final api = ref.watch(proxyProvider);
+    source = await api.getProxyAPI(source);
+  }
 
   if (source is! List) {
     throw Exception('Unknown source type ($source)');

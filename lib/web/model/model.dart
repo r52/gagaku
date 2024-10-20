@@ -187,6 +187,21 @@ class ProxyHandler {
     throw Exception(
         "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
+
+  Future<dynamic> getProxyAPI(String path) async {
+    final url = "https://cubari.moe$path";
+
+    final response = await client.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+
+      return body;
+    }
+
+    throw Exception(
+        "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
+  }
 }
 
 @Riverpod(keepAlive: true)
