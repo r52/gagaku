@@ -183,7 +183,7 @@ final class LatestChaptersFeedProvider
 }
 
 String _$latestChaptersFeedHash() =>
-    r'df73e072a3355199a967903c61de3bc6cf041f26';
+    r'53278c87aa1e8a62a77dad3274997a236599c0a8';
 
 abstract class _$LatestChaptersFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
@@ -1155,7 +1155,7 @@ final class ReadChaptersProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$readChaptersHash() => r'd3c2327aec85203e6f31291ce1196708a015ee0d';
+String _$readChaptersHash() => r'e237346f223ca3a348f11649b3403965d3c1f135';
 
 abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
   FutureOr<ReadChaptersMap> build();
@@ -2211,7 +2211,7 @@ final class RatingsProvider
           $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$ratingsHash() => r'ad6ba697f430b3b67e013eab9b68cf9cf433b71b';
+String _$ratingsHash() => r'6b900db074480ba33b6ec63df02c3e04710c1db0';
 
 abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
   FutureOr<Map<String, SelfRating>> build();
@@ -2297,7 +2297,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'3303810451b05f8d1d51a65eea1151a432029b5a';
+String _$readingStatusHash() => r'f4a64272b7b4df32e3b54f55c4f2454a49dc77af';
 
 final class ReadingStatusFamily extends Family {
   const ReadingStatusFamily._()
@@ -2454,7 +2454,7 @@ final class FollowingStatusProvider
   }
 }
 
-String _$followingStatusHash() => r'e591bed0b811dd60f962c2f4b7ceba7652323775';
+String _$followingStatusHash() => r'bfee3713458067c2bfd1e60d7675286073c861fa';
 
 final class FollowingStatusFamily extends Family {
   const FollowingStatusFamily._()
@@ -2647,7 +2647,7 @@ final class LoggedUserProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$loggedUserHash() => r'92a0b858ac073648860c2f4d2a832d31d36dec06';
+String _$loggedUserHash() => r'7dddf3c59cd6a5ec70c235eafb8e4873d51c1dfb';
 
 abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
@@ -2709,7 +2709,7 @@ final class AuthControlProvider
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$authControlHash() => r'15553d6b37c81a84a64601e9f345254049a7a952';
+String _$authControlHash() => r'86cd3b7ddaff466942c653fbcbb2485ef7bda871';
 
 abstract class _$AuthControl extends $AsyncNotifier<bool> {
   FutureOr<bool> build();

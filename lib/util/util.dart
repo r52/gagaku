@@ -241,3 +241,32 @@ extension SearchUtil on ConsumerWidget {
     });
   }
 }
+
+extension WidgetRefWorkaround on WidgetRef {
+  void invalidateifExists(ProviderBase<Object?> provider, {bool asReload = false}) {
+    if (exists(provider)) {
+      invalidate(provider, asReload: asReload);
+    }
+  }
+}
+
+extension RefWorkaround on Ref {
+  void invalidateifExists(ProviderBase<Object?> provider, {bool asReload = false}) {
+    if (exists(provider)) {
+      invalidate(provider, asReload: asReload);
+    }
+  }
+
+  T readFuture<T>(ProviderListenable<T> listenable) {
+    T result;
+    final sub = listen(listenable, (_, __) {});
+
+    try {
+      result = sub.read();
+    } finally {
+      sub.close();
+    }
+
+    return result;
+  }
+}
