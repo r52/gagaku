@@ -65,7 +65,7 @@ final class ProxyProvider
   }
 }
 
-String _$proxyHash() => r'9c1283bf072913b04bc06342dad4b6ff01fd1e7e';
+String _$proxyHash() => r'8a4e90bb9775641c76f0be18ce9750786e3b2a4b';
 
 @ProviderFor(WebSourceFavorites)
 const webSourceFavoritesProvider = WebSourceFavoritesProvider._();

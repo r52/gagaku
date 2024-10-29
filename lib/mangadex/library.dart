@@ -24,7 +24,7 @@ class LibraryViewType extends _$LibraryViewType {
 }
 
 @riverpod
-Future<List<String>> _getLibraryListByType(_GetLibraryListByTypeRef ref, MangaReadingStatus type) async {
+Future<List<String>> _getLibraryListByType(Ref ref, MangaReadingStatus type) async {
   final library = await ref.watch(userLibraryProvider.future);
 
   final results = library.entries.where((element) => element.value == type).map((e) => e.key).toList();

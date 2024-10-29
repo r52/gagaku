@@ -23,7 +23,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'model.g.dart';
 
 @Riverpod(keepAlive: true)
-ProxyHandler proxy(ProxyRef ref) {
+ProxyHandler proxy(Ref ref) {
   return ProxyHandler(ref);
 }
 

@@ -49,7 +49,7 @@ Page<dynamic> buildMangaViewPage(BuildContext context, GoRouterState state) {
 }
 
 @Riverpod(retry: noRetry)
-Future<Manga> _fetchMangaFromId(_FetchMangaFromIdRef ref, String mangaId) async {
+Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   final api = ref.watch(mangadexProvider);
   final manga = await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
 
@@ -61,7 +61,7 @@ Future<Manga> _fetchMangaFromId(_FetchMangaFromIdRef ref, String mangaId) async 
 }
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _fetchRelatedManga(_FetchRelatedMangaRef ref, Manga manga) async {
+Future<List<Manga>> _fetchRelatedManga(Ref ref, Manga manga) async {
   final related = manga.relatedMangas;
 
   if (related.isEmpty) {

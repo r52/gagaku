@@ -60,7 +60,7 @@ final class _PopularTitlesProvider
   }
 }
 
-String _$popularTitlesHash() => r'4ffed6976bdb6413ac78d5edbd21d29f2e959fb6';
+String _$popularTitlesHash() => r'3e3dd7db23591547693673d72487f8b5b108fbc6';
 
 typedef _RecentlyAddedRef = Ref<AsyncValue<List<Manga>>>;
 
@@ -116,7 +116,7 @@ final class _RecentlyAddedProvider
   }
 }
 
-String _$recentlyAddedHash() => r'a53c2a21835756b694f6e1347e1c2ea799827897';
+String _$recentlyAddedHash() => r'549bd9c62f2ce2ad5336a6d8e753c7248b7e55c9';
 
 typedef _LatestUpdatesRef = Ref<AsyncValue<List<Manga>>>;
 
@@ -172,7 +172,7 @@ final class _LatestUpdatesProvider
   }
 }
 
-String _$latestUpdatesHash() => r'38f7a13c59ced2ff29acb7d0b5b393c6c7b2db69';
+String _$latestUpdatesHash() => r'ca3c517ed27d802704ceb8b9497617ee4c33da7f';
 
 typedef _FetchCustomListMangaRef = Ref<AsyncValue<List<Manga>>>;
 
@@ -259,7 +259,7 @@ final class _FetchCustomListMangaProvider
 }
 
 String _$fetchCustomListMangaHash() =>
-    r'97909c793849199d48203b7119c487f105a9ce50';
+    r'62a0353c93fce0ca94c66dee7883e3c9e5d7bb90';
 
 final class _FetchCustomListMangaFamily extends Family {
   const _FetchCustomListMangaFamily._()

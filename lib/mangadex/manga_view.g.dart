@@ -87,7 +87,7 @@ final class _FetchMangaFromIdProvider
   }
 }
 
-String _$fetchMangaFromIdHash() => r'd1d5f44a9d560a7dfa6a228ef3c0918b710b03ce';
+String _$fetchMangaFromIdHash() => r'9555570c6c4dd5efdecdd3b31124e25fc5ef9c71';
 
 final class _FetchMangaFromIdFamily extends Family {
   const _FetchMangaFromIdFamily._()
@@ -216,7 +216,7 @@ final class _FetchRelatedMangaProvider
   }
 }
 
-String _$fetchRelatedMangaHash() => r'ccb56a2018d024c015559e92335d0cb7bd743b8a';
+String _$fetchRelatedMangaHash() => r'2a92a517102555d74c0d4da234eba45010e99f25';
 
 final class _FetchRelatedMangaFamily extends Family {
   const _FetchRelatedMangaFamily._()

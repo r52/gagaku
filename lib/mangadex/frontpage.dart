@@ -14,7 +14,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'frontpage.g.dart';
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _popularTitles(_PopularTitlesRef ref) async {
+Future<List<Manga>> _popularTitles(Ref ref) async {
   final api = ref.watch(mangadexProvider);
 
   final format = DateFormat('yyyy-MM-ddT07:00:00');
@@ -38,7 +38,7 @@ Future<List<Manga>> _popularTitles(_PopularTitlesRef ref) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _recentlyAdded(_RecentlyAddedRef ref) async {
+Future<List<Manga>> _recentlyAdded(Ref ref) async {
   final manga = await ref.watch(recentlyAddedProvider.future);
 
   ref.disposeAfter(const Duration(minutes: 10));
@@ -47,7 +47,7 @@ Future<List<Manga>> _recentlyAdded(_RecentlyAddedRef ref) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _latestUpdates(_LatestUpdatesRef ref) async {
+Future<List<Manga>> _latestUpdates(Ref ref) async {
   final api = ref.watch(mangadexProvider);
   final chapters = await ref.watch(latestGlobalFeedProvider.future);
 
@@ -60,7 +60,7 @@ Future<List<Manga>> _latestUpdates(_LatestUpdatesRef ref) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _fetchCustomListManga(_FetchCustomListMangaRef ref, String listid) async {
+Future<List<Manga>> _fetchCustomListManga(Ref ref, String listid) async {
   final api = ref.watch(mangadexProvider);
 
   final list = await ref.watch(listSourceProvider(listid).future);

@@ -20,7 +20,7 @@ Page<dynamic> buildLatestFeedPage(BuildContext context, GoRouterState state) {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ChapterFeedItemData>> _fetchGlobalChapters(_FetchGlobalChaptersRef ref) async {
+Future<List<ChapterFeedItemData>> _fetchGlobalChapters(Ref ref) async {
   final api = ref.watch(mangadexProvider);
 
   final chapters = await ref.watch(latestGlobalFeedProvider.future);

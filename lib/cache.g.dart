@@ -65,7 +65,7 @@ final class CacheProvider
   }
 }
 
-String _$cacheHash() => r'8034060009e61bf983bad09b38587b167ef38b16';
+String _$cacheHash() => r'48a6174c970e2db177c74ed79966f8d5a4210d3e';
 
 // ignore_for_file: type=lint
 // ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

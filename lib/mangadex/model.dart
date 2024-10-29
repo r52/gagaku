@@ -126,7 +126,7 @@ extension TokenHelper on TokenResponse {
 }
 
 @Riverpod(keepAlive: true)
-MangaDexModel mangadex(MangadexRef ref) {
+MangaDexModel mangadex(Ref ref) {
   return MangaDexModel(ref);
 }
 
@@ -2161,7 +2161,7 @@ class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix, ListBas
 }
 
 @riverpod
-Future<List<Manga>> getMangaListByPage(GetMangaListByPageRef ref, Iterable<String> list, int page) async {
+Future<List<Manga>> getMangaListByPage(Ref ref, Iterable<String> list, int page) async {
   final start = page * MangaDexEndpoints.searchLimit;
   final end = min((page + 1) * MangaDexEndpoints.searchLimit, list.length);
 

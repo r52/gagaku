@@ -90,7 +90,7 @@ final class _GetArchivePagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$getArchivePagesHash() => r'8e067b0ef41b21e8601fde9ff2db2cb087b32036';
+String _$getArchivePagesHash() => r'a1e7575662cd6f4c098bd314d1b7308a3e29b50a';
 
 final class _GetArchivePagesFamily extends Family {
   const _GetArchivePagesFamily._()

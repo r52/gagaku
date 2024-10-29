@@ -65,7 +65,7 @@ final class MangadexProvider
   }
 }
 
-String _$mangadexHash() => r'a292b576f657f3f4f75a624bdf14e965c33f39fe';
+String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
 
 @ProviderFor(RecentlyAdded)
 const recentlyAddedProvider = RecentlyAddedProvider._();
@@ -1605,7 +1605,7 @@ final class GetMangaListByPageProvider
 }
 
 String _$getMangaListByPageHash() =>
-    r'287ea8f8be406e7ebefc2ac3b8d47e7e03270f35';
+    r'd38f35b6ded0dd3fdf558b3a8e2c3756ac3c03d0';
 
 final class GetMangaListByPageFamily extends Family {
   const GetMangaListByPageFamily._()

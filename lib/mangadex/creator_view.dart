@@ -34,14 +34,14 @@ Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<CreatorType> _fetchCreatorFromId(_FetchCreatorFromIdRef ref, String creatorId) async {
+Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
   final api = ref.watch(mangadexProvider);
   final creator = await api.fetchCreators([creatorId]);
   return creator.first;
 }
 
 @riverpod
-Future<List<Manga>> _fetchCreatorTitles(_FetchCreatorTitlesRef ref, CreatorType creator) async {
+Future<List<Manga>> _fetchCreatorTitles(Ref ref, CreatorType creator) async {
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
   await ref.read(statisticsProvider.notifier).get(mangas);
 

@@ -87,7 +87,7 @@ final class _FetchGroupFromIdProvider
   }
 }
 
-String _$fetchGroupFromIdHash() => r'e3d4cc80e72975244b843d666e4bc7876ba2132c';
+String _$fetchGroupFromIdHash() => r'a2edf2a8397c422faa6458d9bf2a3ae6bb7ba27d';
 
 final class _FetchGroupFromIdFamily extends Family {
   const _FetchGroupFromIdFamily._()
@@ -152,7 +152,7 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -217,12 +217,12 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchGroupFeedHash() => r'7c30d812393caeb6cd791886a37a318e16b5578f';
+String _$fetchGroupFeedHash() => r'fe654e5e494405aaae63386573f74e7dfe13cb7d';
 
 final class _FetchGroupFeedFamily extends Family {
   const _FetchGroupFeedFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupFeedProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -281,7 +281,7 @@ final class _FetchGroupTitlesProvider
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupTitlesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -346,12 +346,12 @@ final class _FetchGroupTitlesProvider
   }
 }
 
-String _$fetchGroupTitlesHash() => r'43e6496cadc600b08ee40a83485d2d6fe93cc4dd';
+String _$fetchGroupTitlesHash() => r'bd54c2b30846e47ea89cf04079fc9dc29a5d3e9c';
 
 final class _FetchGroupTitlesFamily extends Family {
   const _FetchGroupTitlesFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupTitlesProvider',
           dependencies: null,
           allTransitiveDependencies: null,

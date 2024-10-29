@@ -17,7 +17,7 @@ part 'cache.g.dart';
 typedef UnserializeCallback<T extends Object> = T Function(Map<String, dynamic> json);
 
 @Riverpod(keepAlive: true)
-CacheManager cache(CacheRef ref) {
+CacheManager cache(Ref ref) {
   return CacheManager();
 }
 

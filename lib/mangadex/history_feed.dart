@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'history_feed.g.dart';
 
 @Riverpod(retry: noRetry)
-Future<List<ChapterFeedItemData>> _fetchHistoryFeed(_FetchHistoryFeedRef ref) async {
+Future<List<ChapterFeedItemData>> _fetchHistoryFeed(Ref ref) async {
   final api = ref.watch(mangadexProvider);
   final loggedin = await ref.watch(authControlProvider.future);
 

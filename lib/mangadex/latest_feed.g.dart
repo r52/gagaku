@@ -62,7 +62,7 @@ final class _FetchGlobalChaptersProvider extends $FunctionalProvider<
 }
 
 String _$fetchGlobalChaptersHash() =>
-    r'beb21f31f863413c4cbebf5b9f16da158225b2f3';
+    r'7272922a90fae39a9f9bad842847d5af45538fd8';
 
 // ignore_for_file: type=lint
 // ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member

@@ -89,7 +89,7 @@ final class _FetchGroupDataProvider
   }
 }
 
-String _$fetchGroupDataHash() => r'c9009d905ce312badc17d76d527a3c084ce2dee4';
+String _$fetchGroupDataHash() => r'24d9984bf59cd196477e31f308827f4594f6115a';
 
 final class _FetchGroupDataFamily extends Family {
   const _FetchGroupDataFamily._()

@@ -37,14 +37,14 @@ Page<dynamic> buildGroupViewPage(BuildContext context, GoRouterState state) {
 }
 
 @riverpod
-Future<Group> _fetchGroupFromId(_FetchGroupFromIdRef ref, String groupId) async {
+Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   final api = ref.watch(mangadexProvider);
   final group = await api.fetchGroups([groupId]);
   return group.first;
 }
 
-@riverpod
-Future<List<ChapterFeedItemData>> _fetchGroupFeed(_FetchGroupFeedRef ref, Group group) async {
+@Riverpod(retry: noRetry)
+Future<List<ChapterFeedItemData>> _fetchGroupFeed(Ref ref, Group group) async {
   final loggedin = await ref.watch(authControlProvider.future);
 
   final api = ref.watch(mangadexProvider);
@@ -85,8 +85,8 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(_FetchGroupFeedRef ref, Group 
   return dlist;
 }
 
-@riverpod
-Future<List<Manga>> _fetchGroupTitles(_FetchGroupTitlesRef ref, Group group) async {
+@Riverpod(retry: noRetry)
+Future<List<Manga>> _fetchGroupTitles(Ref ref, Group group) async {
   final mangas = await ref.watch(groupTitlesProvider(group).future);
   await ref.read(statisticsProvider.notifier).get(mangas);
 

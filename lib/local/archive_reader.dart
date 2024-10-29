@@ -45,7 +45,7 @@ class _ExtractInfo {
 }
 
 @riverpod
-Future<List<ReaderPage>> _getArchivePages(_GetArchivePagesRef ref, String path) async {
+Future<List<ReaderPage>> _getArchivePages(Ref ref, String path) async {
   final formats = await ref.watch(supportedFormatsProvider.future);
   var type = ArchiveType.zip;
 

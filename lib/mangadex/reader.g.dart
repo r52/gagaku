@@ -89,7 +89,7 @@ final class _FetchChapterDataProvider
   }
 }
 
-String _$fetchChapterDataHash() => r'0afb8ac4a2b06e3432a58275e73e4b590eec1c3d';
+String _$fetchChapterDataHash() => r'c4909aa08d41ca302c89b1c1394ca421e311a30e';
 
 final class _FetchChapterDataFamily extends Family {
   const _FetchChapterDataFamily._()
@@ -218,7 +218,7 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchChapterPagesHash() => r'220c447af743547f2b6e2d0111fc913973310465';
+String _$fetchChapterPagesHash() => r'3663bdc5e029081976b001c22486f86c43530c38';
 
 final class _FetchChapterPagesFamily extends Family {
   const _FetchChapterPagesFamily._()

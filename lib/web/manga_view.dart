@@ -45,7 +45,7 @@ Page<dynamic> buildRedirectedWebMangaViewPage(BuildContext context, GoRouterStat
 }
 
 @Riverpod(retry: noRetry)
-Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, SourceInfo info) async {
+Future<WebManga> _fetchWebMangaInfo(Ref ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
   final manga = await api.handleSource(info);
 
@@ -57,7 +57,7 @@ Future<WebManga> _fetchWebMangaInfo(_FetchWebMangaInfoRef ref, SourceInfo info) 
 }
 
 @Riverpod(retry: noRetry)
-Future<SourceInfo> _fetchWebMangaRedirect(_FetchWebMangaRedirectRef ref, String url) async {
+Future<SourceInfo> _fetchWebMangaRedirect(Ref ref, String url) async {
   final api = ref.watch(proxyProvider);
   final proxy = await api.parseUrl(url);
 

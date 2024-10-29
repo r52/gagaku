@@ -91,7 +91,7 @@ final class _FetchCreatorFromIdProvider
 }
 
 String _$fetchCreatorFromIdHash() =>
-    r'de996798e5488880f40df3da59b157931b1d0e6d';
+    r'739d4e2f112a3951029eee7567997d3138b42d88';
 
 final class _FetchCreatorFromIdFamily extends Family {
   const _FetchCreatorFromIdFamily._()
@@ -221,7 +221,7 @@ final class _FetchCreatorTitlesProvider
 }
 
 String _$fetchCreatorTitlesHash() =>
-    r'9519b9552042e93cd2dc17173733cd154356c5b4';
+    r'e5ed10a20e42687100df8bf3a6f3ed55ea94e752';
 
 final class _FetchCreatorTitlesFamily extends Family {
   const _FetchCreatorTitlesFamily._()

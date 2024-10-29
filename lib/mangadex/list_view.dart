@@ -30,7 +30,7 @@ Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ChapterFeedItemData>> _fetchListFeed(_FetchListFeedRef ref, CustomList list) async {
+Future<List<ChapterFeedItemData>> _fetchListFeed(Ref ref, CustomList list) async {
   final loggedin = await ref.watch(authControlProvider.future);
 
   final api = ref.watch(mangadexProvider);

@@ -14,7 +14,7 @@ part 'chapter_feed.g.dart';
 enum _FeedViewType { chapters, manga }
 
 @Riverpod(retry: noRetry)
-Future<List<ChapterFeedItemData>> _fetchChapters(_FetchChaptersRef ref) async {
+Future<List<ChapterFeedItemData>> _fetchChapters(Ref ref) async {
   final api = ref.watch(mangadexProvider);
 
   final chapters = await ref.watch(latestChaptersFeedProvider.future);

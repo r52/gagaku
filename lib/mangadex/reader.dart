@@ -55,7 +55,7 @@ Page<dynamic> buildMDReaderPage(BuildContext context, GoRouterState state) {
 }
 
 @Riverpod(retry: noRetry)
-Future<ReaderData> _fetchChapterData(_FetchChapterDataRef ref, String chapterId) async {
+Future<ReaderData> _fetchChapterData(Ref ref, String chapterId) async {
   final api = ref.watch(mangadexProvider);
 
   final chapters = await api.fetchChapters([chapterId]);
@@ -75,7 +75,7 @@ Future<ReaderData> _fetchChapterData(_FetchChapterDataRef ref, String chapterId)
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _fetchChapterPages(_FetchChapterPagesRef ref, Chapter chapter) async {
+Future<List<ReaderPage>> _fetchChapterPages(Ref ref, Chapter chapter) async {
   final api = ref.watch(mangadexProvider);
   final mpages = await api.getChapterServer(chapter);
 

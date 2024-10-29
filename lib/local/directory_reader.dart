@@ -33,7 +33,7 @@ class DirectoryReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
 }
 
 @riverpod
-Future<List<ReaderPage>> _getDirectoryPages(_GetDirectoryPagesRef ref, String path) async {
+Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
   final formats = await ref.watch(supportedFormatsProvider.future);
   final dir = Directory(path);
   final entities = await dir.list().toList();

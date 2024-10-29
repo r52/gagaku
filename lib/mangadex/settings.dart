@@ -11,7 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'settings.g.dart';
 
 @riverpod
-Future<Set<Group>> _fetchGroupData(_FetchGroupDataRef ref, Iterable<String> uuids) async {
+Future<Set<Group>> _fetchGroupData(Ref ref, Iterable<String> uuids) async {
   final api = ref.watch(mangadexProvider);
   final groups = await api.fetchGroups(uuids);
   return groups.toSet();
