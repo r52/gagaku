@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
@@ -39,26 +40,26 @@ class MangaDexHome extends HookConsumerWidget {
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'mangadex.home'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.menu_book),
-            label: 'My Feed',
+            label: 'mangadex.myFeed'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.collections),
-            label: 'Library',
+            label: 'library.text'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.list),
-            label: 'My Lists',
+            label: 'mangadex.myLists'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.history),
-            label: 'History',
+            label: 'history.text'.tr(context: context),
           )
         ],
         selectedIndex: index,

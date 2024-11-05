@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -50,7 +51,7 @@ class MangaDexRecentFeed extends HookConsumerWidget {
           onTap: () {
             ctrler.animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
           },
-          child: const TitleFlexBar(title: 'Recently Added'),
+          child: TitleFlexBar(title: 'mangadex.recentlyAdded'.tr(context: context)),
         ),
         leading: BackButton(
           onPressed: () {
@@ -81,9 +82,9 @@ class MangaDexRecentFeed extends HookConsumerWidget {
                 isLoading: isLoading,
                 children: [
                   if (mangas.isEmpty)
-                    const SliverToBoxAdapter(
+                    SliverToBoxAdapter(
                       child: Center(
-                        child: Text('No results'),
+                        child: Text('errors.noresults'.tr(context: context)),
                       ),
                     ),
                   MangaListViewSliver(items: mangas),

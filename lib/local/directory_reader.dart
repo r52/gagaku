@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/model.dart';
 import 'package:gagaku/reader/main.dart';
@@ -108,8 +109,8 @@ class DirectoryReaderWidget extends ConsumerWidget {
             appBar: AppBar(
               leading: const BackButton(),
             ),
-            body: const Center(
-              child: Text("This directory contains no readable images!"),
+            body: Center(
+              child: Text('localLibrary.dirUnreadableWarning'.tr(context: context)),
             ),
           );
         }
@@ -127,7 +128,7 @@ class DirectoryReaderWidget extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Loading directory...",
+                'localLibrary.loadingDir'.tr(context: context),
                 style: TextStyle(
                   color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.normal,

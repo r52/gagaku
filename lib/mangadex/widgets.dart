@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element
 import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
@@ -9,12 +10,12 @@ import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/model.dart';
+import 'package:gagaku/types.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -110,7 +111,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
         spacing: 8.0,
         children: [
           Tooltip(
-            message: 'Search Manga',
+            message: 'search.arg'.tr(context: context, args: ['MangaDex']),
             child: OpenContainer(
               closedColor: theme.colorScheme.primaryContainer,
               closedShape: const CircleBorder(),
@@ -129,7 +130,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
             ),
           ),
           Tooltip(
-            message: 'MangaDex Settings',
+            message: 'arg_settings'.tr(context: context, args: ['MangaDex']),
             child: OpenContainer<bool>(
               closedColor: theme.colorScheme.primaryContainer,
               closedShape: const CircleBorder(),
@@ -156,7 +157,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                   // XXX: This changes when OAuth is released
                   return IconButton(
                     color: theme.colorScheme.primary,
-                    tooltip: loggedin ? 'Logout' : 'Login',
+                    tooltip: loggedin ? 'auth.logout'.tr(context: context) : 'auth.login'.tr(context: context),
                     icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
                     onPressed: loggedin
                         ? () => ref.read(authControlProvider.notifier).logout()
@@ -223,7 +224,9 @@ class MarkReadButton extends ConsumerWidget {
           padding: const EdgeInsets.only(right: 10.0),
           splashRadius: 15,
           iconSize: 20,
-          tooltip: isRead == true ? 'Unmark as read' : 'Mark as read',
+          tooltip: 'mangaView.markAs'.tr(
+              context: context,
+              args: [isRead == true ? 'mangaView.unread'.tr(context: context) : 'mangaView.read'.tr(context: context)]),
           icon: isRead == true
               ? Icon(Icons.visibility_off, color: theme.disabledColor)
               : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
@@ -308,7 +311,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
                 if (results.isEmpty)
                   SliverToBoxAdapter(
                     child: Center(
-                      child: Text(emptyText ?? 'No results!'),
+                      child: Text(emptyText ?? 'errors.noresults'.tr(context: context)),
                     ),
                   ),
                 SuperSliverList.builder(
@@ -514,7 +517,7 @@ class ChapterButtonWidget extends HookWidget {
     final userChip = IconTextChip(
       key: ValueKey(user?.id),
       icon: !isOfficialPub ? iconSet[_IconSet.person] : iconSet[_IconSet.check],
-      text: !isOfficialPub ? (user?.attributes?.username.crop() ?? '') : 'Official Publisher',
+      text: !isOfficialPub ? (user?.attributes?.username.crop() ?? '') : 'mangadex.officialPub'.tr(context: context),
     );
 
     final statsChip = Consumer(
@@ -715,21 +718,21 @@ class MangaListWidget extends HookConsumerWidget {
                       SegmentedButton<MangaListView>(
                         showSelectedIcon: false,
                         style: SegmentedButton.styleFrom(shape: const RoundedRectangleBorder()),
-                        segments: const <ButtonSegment<MangaListView>>[
+                        segments: <ButtonSegment<MangaListView>>[
                           ButtonSegment<MangaListView>(
                             value: MangaListView.grid,
                             icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: 'Grid view',
+                            tooltip: 'ui.gridView'.tr(context: context),
                           ),
                           ButtonSegment<MangaListView>(
                             value: MangaListView.list,
                             icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: 'List view',
+                            tooltip: 'ui.listView'.tr(context: context),
                           ),
                           ButtonSegment<MangaListView>(
                             value: MangaListView.detailed,
                             icon: Icon(Icons.view_list, size: 24),
-                            tooltip: 'Detailed view',
+                            tooltip: 'ui.detailedView'.tr(context: context),
                           ),
                         ],
                         selected: <MangaListView>{view},
@@ -1215,8 +1218,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
       return null;
     });
 
-    /// TODO: Fix for localization
-    final numFormatter = NumberFormat.compact();
+    final numFormatter = NumberFormat.compact(locale: context.locale.toString());
 
     return Wrap(
       runSpacing: 4.0,
@@ -1260,8 +1262,8 @@ class MangaStatisticsRow extends HookConsumerWidget {
               CommentChip(comments: comments),
             ],
           _ => [
-              const IconTextChip(
-                text: 'Loading...',
+              IconTextChip(
+                text: 'ui.loadingDot'.tr(context: context),
               )
             ],
         },
@@ -1334,9 +1336,12 @@ class _PubTime extends StatelessWidget {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
 
+    final lang = context.locale.languageCode;
+    final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
+
     final pubtime = timeago.format(
       time,
-      locale: screenSizeSmall ? 'en_short' : 'en',
+      locale: locale,
     );
 
     return Text.rich(
@@ -1358,8 +1363,7 @@ class CommentChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// TODO: Fix for localization
-    final numFormatter = NumberFormat.compact();
+    final numFormatter = NumberFormat.compact(locale: context.locale.toString());
 
     return IconTextChip(
       icon: const Icon(
@@ -1394,6 +1398,7 @@ class MangaStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final label = context.tr(status.label);
     return IconTextChip(
       icon: Icon(
         Icons.circle,
@@ -1405,7 +1410,7 @@ class MangaStatusChip extends StatelessWidget {
         },
         size: 10,
       ),
-      text: (year != null && !short) ? "$year, ${status.label}" : status.label,
+      text: (year != null && !short) ? "$year, $label" : label,
     );
   }
 }
@@ -1423,7 +1428,7 @@ class ContentRatingChip extends StatelessWidget {
         ContentRating.suggestive => Colors.orange,
         ContentRating.erotica || ContentRating.pornographic => Colors.red,
       },
-      text: rating.label,
+      text: context.tr(rating.label),
     );
   }
 }
@@ -1450,18 +1455,18 @@ Future<bool?> showDeleteListDialog(BuildContext context, String listName) async 
       builder: (BuildContext context) {
         final nav = Navigator.of(context);
         return AlertDialog(
-          title: const Text('Delete List'),
+          title: Text('mangadex.deleteList'.tr(context: context)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Are you sure you want to permanently delete \'$listName\'?'),
-              const Text('NOTE: THIS ACTION IS IRREVERSIBLE'),
+              Text('mangadex.deleteListWarning'.tr(context: context, args: [listName])),
+              Text('mangadex.irreversibleWarning'.tr(context: context)),
             ],
           ),
           actions: <Widget>[
             ElevatedButton(
-              child: const Text('No'),
+              child: Text('ui.no'.tr(context: context)),
               onPressed: () {
                 nav.pop(null);
               },
@@ -1470,7 +1475,7 @@ Future<bool?> showDeleteListDialog(BuildContext context, String listName) async 
               onPressed: () {
                 nav.pop(true);
               },
-              child: const Text('Yes'),
+              child: Text('ui.yes'.tr(context: context)),
             ),
           ],
         );

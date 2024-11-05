@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -42,7 +43,7 @@ class LocalLibraryHome extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: const TitleFlexBar(title: 'Local Library'),
+        flexibleSpace: TitleFlexBar(title: 'localLibrary.text'.tr(context: context)),
         actions: [
           OverflowBar(
             spacing: 8.0,
@@ -65,14 +66,14 @@ class LocalLibraryHome extends StatelessWidget {
                       await _readArchive(nav);
                     },
                     leadingIcon: const Icon(Icons.folder_open),
-                    child: const Text('Read Archive'),
+                    child: Text('localLibrary.readArchive'.tr(context: context)),
                   ),
                   MenuItemButton(
                     onPressed: () {
                       nav.push(LocalLibrarySettingsRouteBuilder());
                     },
                     leadingIcon: const Icon(Icons.settings),
-                    child: const Text('Settings'),
+                    child: Text('settings'.tr(context: context)),
                   ),
                 ],
               ),
@@ -116,7 +117,7 @@ class LocalLibraryHome extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('No library directory set!'),
+                  Text('localLibrary.noPathWarning'.tr(context: context)),
                   const SizedBox(
                     height: 10,
                   ),
@@ -125,7 +126,7 @@ class LocalLibraryHome extends StatelessWidget {
                       nav.push(LocalLibrarySettingsRouteBuilder());
                     },
                     icon: const Icon(Icons.library_add),
-                    label: const Text('Set Library Directory'),
+                    label: Text('localLibrary.setPath'.tr(context: context)),
                   ),
                   const SizedBox(
                     height: 10,
@@ -139,7 +140,7 @@ class LocalLibraryHome extends StatelessWidget {
                       await _readArchive(nav);
                     },
                     icon: const Icon(Icons.folder_open),
-                    label: const Text('Read Archive'),
+                    label: Text('localLibrary.readArchive'.tr(context: context)),
                   ),
                 ],
               ),
@@ -164,7 +165,7 @@ class LocalLibraryHome extends StatelessWidget {
                           await _readArchive(nav);
                         },
                         icon: const Icon(Icons.folder_open),
-                        label: const Text('Read Archive'),
+                        label: Text('localLibrary.readArchive'.tr(context: context)),
                       ),
                     ],
                   ),
@@ -214,7 +215,7 @@ class LocalLibraryHome extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Scanning library...",
+                      'localLibrary.scanning'.tr(context: context),
                       style: TextStyle(
                         color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.normal,

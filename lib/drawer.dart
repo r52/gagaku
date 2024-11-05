@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/model.dart';
@@ -97,20 +98,20 @@ class MainDrawer extends ConsumerWidget {
           selectedIcon: Icon(Icons.menu_book),
           label: Text('MangaDex'),
         ),
-        const NavigationDrawerDestination(
+        NavigationDrawerDestination(
           icon: Icon(Icons.photo_album_outlined),
           selectedIcon: Icon(Icons.photo_album),
-          label: Text('Local Library'),
+          label: Text('localLibrary.text'.tr(context: context)),
         ),
-        const NavigationDrawerDestination(
+        NavigationDrawerDestination(
           icon: Icon(Icons.language_outlined),
           selectedIcon: Icon(Icons.language),
-          label: Text('Web Sources'),
+          label: Text('webSources.text'.tr(context: context)),
         ),
-        const NavigationDrawerDestination(
+        NavigationDrawerDestination(
           icon: Icon(Icons.settings_outlined),
           selectedIcon: Icon(Icons.settings),
-          label: Text('Settings'),
+          label: Text('settings'.tr(context: context)),
         ),
         const Divider(),
         FutureBuilder(
@@ -122,7 +123,7 @@ class MainDrawer extends ConsumerWidget {
                 applicationIcon: appicon,
                 applicationName: snapshot.data!.appName,
                 applicationVersion: snapshot.data!.version,
-                applicationLegalese: '\u{a9} 2023 r52',
+                applicationLegalese: '\u{a9} 2024 r52',
                 aboutBoxChildren: [
                   const SizedBox(
                     height: 4,

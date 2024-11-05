@@ -1,4 +1,5 @@
 import 'package:archive/archive_io.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/local/model.dart';
@@ -139,8 +140,8 @@ class ArchiveReaderWidget extends ConsumerWidget {
             appBar: AppBar(
               leading: const BackButton(),
             ),
-            body: const Center(
-              child: Text("This archive contains no readable images!"),
+            body: Center(
+              child: Text('localLibrary.archiveUnreadableWarning'.tr(context: context)),
             ),
           );
         }
@@ -158,7 +159,7 @@ class ArchiveReaderWidget extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Extracting archive...",
+                'localLibrary.extractingArchive'.tr(context: context),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.normal,

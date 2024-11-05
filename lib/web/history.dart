@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
@@ -63,8 +64,8 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
               SliverAppBar(
                 automaticallyImplyLeading: false,
                 pinned: true,
-                title: const Text(
-                  'History',
+                title: Text(
+                  'history.text'.tr(context: context),
                   style: TextStyle(fontSize: 24),
                 ),
                 actions: [

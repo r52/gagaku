@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/util/ui.dart';
@@ -21,7 +22,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
         return Center(
           child: ElevatedButton.icon(
             onPressed: () => {} /*ref.read(authControlProvider.notifier).login()*/,
-            label: const Text('Login to MangaDex'),
+            label: Text('mangadex.login'.tr(context: context)),
             icon: const Icon(
               Icons.https,
             ),

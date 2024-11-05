@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
@@ -13,10 +14,11 @@ class SettingsHome extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cfg = ref.watch(gagakuSettingsProvider);
     final config = useState(cfg);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: const TitleFlexBar(title: 'Gagaku Settings'),
+        flexibleSpace: TitleFlexBar(title: 'arg_settings'.tr(context: context, args: ['Gagaku'])),
       ),
       drawer: const MainDrawer(),
       body: SafeArea(
@@ -24,8 +26,8 @@ class SettingsHome extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
-              title: const Text(
-                'Default Theme',
+              title: Text(
+                'theme.mode'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -38,10 +40,10 @@ class SettingsHome extends HookConsumerWidget {
                     requestFocusOnTap: false,
                     enableSearch: false,
                     enableFilter: false,
-                    dropdownMenuEntries: const [
-                      DropdownMenuEntry(value: ThemeMode.light, label: 'Light'),
-                      DropdownMenuEntry(value: ThemeMode.dark, label: 'Dark'),
-                      DropdownMenuEntry(value: ThemeMode.system, label: 'System defined'),
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry(value: ThemeMode.light, label: 'theme.light'.tr(context: context)),
+                      DropdownMenuEntry(value: ThemeMode.dark, label: 'theme.dark'.tr(context: context)),
+                      DropdownMenuEntry(value: ThemeMode.system, label: 'theme.system'.tr(context: context)),
                     ],
                     onSelected: (ThemeMode? value) {
                       if (value != null) {
@@ -55,8 +57,8 @@ class SettingsHome extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Theme Color',
+              title: Text(
+                'theme.color'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -70,7 +72,17 @@ class SettingsHome extends HookConsumerWidget {
                     enableFilter: false,
                     requestFocusOnTap: false,
                     dropdownMenuEntries: [
-                      for (final c in GagakuTheme.values) DropdownMenuEntry(value: c, label: c.label),
+                      for (final c in GagakuTheme.values)
+                        DropdownMenuEntry(
+                          leadingIcon: Container(
+                            width: 15,
+                            height: 15,
+                            decoration:
+                                BoxDecoration(color: c.color, border: Border.all(color: theme.colorScheme.onSurface)),
+                          ),
+                          value: c,
+                          label: context.tr(c.label),
+                        ),
                     ],
                     onSelected: (GagakuTheme? value) {
                       if (value != null) {

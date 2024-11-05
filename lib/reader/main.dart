@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -446,7 +447,7 @@ class ReaderWidget extends HookConsumerWidget {
             builder: (context) => IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () => Scaffold.of(context).openEndDrawer(),
-              tooltip: 'Reader Settings',
+              tooltip: 'reader.settings'.tr(context: context),
             ),
           ),
         ],
@@ -557,8 +558,8 @@ class ReaderWidget extends HookConsumerWidget {
                 ],
               ),
               const Divider(),
-              const Text(
-                'Reader Settings',
+              Text(
+                'reader.settings'.tr(context: context),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10.0),
@@ -571,7 +572,7 @@ class ReaderWidget extends HookConsumerWidget {
                         f.icon,
                         color: theme.iconTheme.color,
                       ),
-                      label: Text(f.label),
+                      label: Text(context.tr(f.label)),
                       selected: settings.format == f,
                       onSelected: (longstrip)
                           ? null
@@ -586,7 +587,7 @@ class ReaderWidget extends HookConsumerWidget {
               const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
-                label: const Text('Toggle Page Size'),
+                label: Text('reader.togglePageSize'.tr(context: context)),
                 onPressed: (format == ReaderFormat.longstrip)
                     ? () {
                         longStripScale.value = toggleLongStripScale(longStripScale.value);
@@ -606,7 +607,7 @@ class ReaderWidget extends HookConsumerWidget {
                         dir.icon,
                         color: theme.iconTheme.color,
                       ),
-                      label: Text(dir.label),
+                      label: Text(context.tr(dir.label)),
                       selected: settings.direction == dir,
                       onSelected: (format == ReaderFormat.longstrip)
                           ? null
@@ -624,7 +625,7 @@ class ReaderWidget extends HookConsumerWidget {
                   settings.showProgressBar ? Icons.donut_small : Icons.donut_small_outlined,
                   color: theme.iconTheme.color,
                 ),
-                label: const Text('Progress Bar'),
+                label: Text('reader.progressBar'.tr(context: context)),
                 onPressed: () {
                   ref
                       .read(readerSettingsProvider.notifier)
@@ -637,7 +638,7 @@ class ReaderWidget extends HookConsumerWidget {
                   Icons.swipe,
                   color: settings.swipeGestures ? theme.iconTheme.color : theme.disabledColor,
                 ),
-                label: const Text('Swipe Gestures'),
+                label: Text('reader.swipeGestures'.tr(context: context)),
                 onPressed: (format == ReaderFormat.longstrip)
                     ? null
                     : () {
@@ -652,7 +653,7 @@ class ReaderWidget extends HookConsumerWidget {
                   Icons.mouse,
                   color: settings.clickToTurn ? theme.iconTheme.color : theme.disabledColor,
                 ),
-                label: const Text('Click/Tap to Turn Page'),
+                label: Text('reader.clickToTurn'.tr(context: context)),
                 onPressed: (format == ReaderFormat.longstrip)
                     ? null
                     : () {
@@ -664,7 +665,7 @@ class ReaderWidget extends HookConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Page Preload'),
+                  Text('reader.precacheCount'.tr(context: context)),
                   const SizedBox(
                     width: 10,
                   ),

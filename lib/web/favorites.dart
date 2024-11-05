@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
@@ -54,8 +55,8 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
                       ));
 
                       if (items.isEmpty) {
-                        return const Center(
-                          child: Text('No items'),
+                        return Center(
+                          child: Text('errors.noitems'.tr(context: context)),
                         );
                       }
 

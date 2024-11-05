@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/config.dart';
@@ -24,6 +25,7 @@ import 'package:gagaku/mangadex/recent_feed.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/model.dart';
 import 'package:gagaku/settings.dart';
+import 'package:gagaku/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/favorites.dart';
@@ -38,6 +40,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:go_router/go_router.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _mdShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'mdshell');
@@ -53,6 +56,11 @@ class _HttpOverrides extends HttpOverrides {
 void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  timeagoLocalesMap.forEach((locale, lookupMessages) {
+    timeago.setLocaleMessages(locale, lookupMessages);
+  });
 
   await Hive.initFlutter();
   Hive.registerAdapter(CacheEntryAdapter());
@@ -90,7 +98,16 @@ void main() async {
   final gdat = GagakuData();
   gdat.gagakuUserAgent = '${pkg.appName}/${pkg.version}';
 
-  runApp(const ProviderScope(child: App()));
+  runApp(
+    ProviderScope(
+      child: EasyLocalization(
+        supportedLocales: [Locale('en')],
+        path: 'assets/translations',
+        fallbackLocale: Locale('en'),
+        child: App(),
+      ),
+    ),
+  );
 }
 
 class App extends ConsumerStatefulWidget {
@@ -353,6 +370,9 @@ class _AppState extends ConsumerState<App> {
 
     return MaterialApp.router(
       title: 'Gagaku',
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       theme: ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(seedColor: config.theme.color, brightness: Brightness.light),
@@ -391,7 +411,7 @@ class NotFoundScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Page Not Found'),
+        title: Text('pageNotFound.header'.tr(context: context)),
         leading: BackButton(
           onPressed: () {
             if (context.canPop()) {
@@ -403,7 +423,7 @@ class NotFoundScreen extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Text("Can't find a page for: $uri"),
+        child: Text('pageNotFound.error'.tr(context: context, args: [uri])),
       ),
     );
   }

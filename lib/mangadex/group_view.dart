@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/config.dart';
@@ -166,7 +167,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               if (group.attributes.description != null)
                 ExpansionTile(
                   initiallyExpanded: true,
-                  title: const Text('Group Description'),
+                  title: Text('mangadex.groupDesc'.tr(context: context)),
                   children: [
                     Container(
                       width: double.infinity,
@@ -180,7 +181,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 ExpansionTile(
                   initiallyExpanded: true,
                   expandedAlignment: Alignment.centerLeft,
-                  title: const Text('Links'),
+                  title: Text('tracking.links'.tr(context: context)),
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8),
@@ -195,7 +196,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch ${group.attributes.website!}';
                                 }
                               },
-                              text: 'Website',
+                              text: 'tracking.website'.tr(context: context),
                             ),
                           if (group.attributes.discord != null)
                             ButtonChip(
@@ -205,7 +206,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: 'Discord',
+                              text: 'tracking.discord'.tr(context: context),
                             ),
                         ],
                       ),
@@ -215,8 +216,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               if (group.attributes.description == null &&
                   group.attributes.website == null &&
                   group.attributes.discord == null)
-                const Center(
-                  child: Text('Nothing here!'),
+                Center(
+                  child: Text('tracking.nothing'.tr(context: context)),
                 ),
             ]),
           ],
@@ -226,8 +227,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
           builder: (context, ref, child) {
             return ChapterFeedWidget(
               provider: _fetchGroupFeedProvider(group),
-              title: 'Group Feed',
-              emptyText: 'No chapters!',
+              title: 'mangadex.groupFeed'.tr(context: context),
+              emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
               onAtEdge: () => ref.read(groupFeedProvider(group).notifier).getMore(),
               onRefresh: () async {
                 ref.read(groupFeedProvider(group).notifier).clear();
@@ -256,8 +257,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                     message: "_fetchGroupTitlesProvider(${group.id}) failed",
                   ),
                 AsyncValue(value: final mangas?) => MangaListWidget(
-                    title: const Text(
-                      'Group Titles',
+                    title: Text(
+                      'mangadex.groupTitles'.tr(context: context),
                       style: TextStyle(fontSize: 24),
                     ),
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -266,9 +267,9 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                     isLoading: isLoading,
                     children: [
                       if (mangas.isEmpty)
-                        const SliverToBoxAdapter(
+                        SliverToBoxAdapter(
                           child: Center(
-                            child: Text('No manga!'),
+                            child: Text('errors.notitles'.tr(context: context)),
                           ),
                         ),
                       MangaListViewSliver(items: mangas),
@@ -317,7 +318,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               ref.read(mdConfigProvider.notifier).save(cfg.value);
             },
             icon: const Icon(Icons.block),
-            label: Text(isBlacklisted ? 'Unblock' : 'Block'),
+            label: Text(isBlacklisted ? 'ui.unblock'.tr(context: context) : 'ui.block'.tr(context: context)),
           ),
         ],
       ),

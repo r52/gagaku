@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -64,14 +65,14 @@ class MangaDexHistoryFeed extends ConsumerWidget {
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     return ChapterFeedWidget(
       provider: _fetchHistoryFeedProvider,
-      title: 'Reading History (local)',
-      emptyText: 'No reading history!',
+      title: 'mangadex.localHistory'.tr(context: context),
+      emptyText: 'mangadex.noHistoryMsg'.tr(context: context),
       onRefresh: () async => ref.refresh(mangaDexHistoryProvider.future),
       controller: scrollController,
       restorationId: 'history_list_offset',
       leading: [
         MangaDexSliverAppBar(
-          title: 'History',
+          title: 'history.text'.tr(context: context),
           controller: scrollController,
         ),
       ],

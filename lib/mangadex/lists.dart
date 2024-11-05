@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
@@ -48,7 +49,7 @@ class MangaDexListsView extends HookConsumerWidget {
     }, [scrollController]);
 
     final appbar = MangaDexSliverAppBar(
-      title: 'My Lists',
+      title: 'mangadex.myLists'.tr(context: context),
       controller: scrollController,
     );
 
@@ -60,14 +61,14 @@ class MangaDexListsView extends HookConsumerWidget {
           style: SegmentedButton.styleFrom(
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0)))),
           showSelectedIcon: false,
-          segments: const <ButtonSegment<_ListViewType>>[
+          segments: <ButtonSegment<_ListViewType>>[
             ButtonSegment<_ListViewType>(
               value: _ListViewType.self,
-              label: Text('My Lists'),
+              label: Text('mangadex.myLists'.tr(context: context)),
             ),
             ButtonSegment<_ListViewType>(
               value: _ListViewType.followed,
-              label: Text('Followed Lists'),
+              label: Text('mangadex.followedLists'.tr(context: context)),
             ),
           ],
           selected: <_ListViewType>{view.value},
@@ -81,18 +82,19 @@ class MangaDexListsView extends HookConsumerWidget {
     return Scaffold(
       drawer: const MainDrawer(),
       floatingActionButton: FloatingActionButton.extended(
-          tooltip: 'New List',
+          tooltip: 'mangadex.newList'.tr(context: context),
           icon: const Icon(Icons.playlist_add),
-          label: const Text('New List'),
+          label: Text('mangadex.newList'.tr(context: context)),
           onPressed: () {
             final messenger = ScaffoldMessenger.of(context);
             context.push<bool>(GagakuRoute.listCreate).then((success) {
+              if (!context.mounted) return;
               if (success == true) {
                 messenger
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
-                    const SnackBar(
-                      content: Text('New list created.'),
+                    SnackBar(
+                      content: Text('mangadex.newListOk'.tr(context: context)),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -122,8 +124,8 @@ class MangaDexListsView extends HookConsumerWidget {
                         appbar,
                         leading,
                         if (lists.isEmpty)
-                          const SliverToBoxAdapter(
-                            child: Text('No lists!'),
+                          SliverToBoxAdapter(
+                            child: Text('errors.nolists'.tr(context: context)),
                           ),
                         SliverList.builder(
                           itemCount: lists.length,
@@ -152,7 +154,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                           : Colors.green,
                                     )),
                                 title: Text(item.attributes.name),
-                                subtitle: Text('${item.set.length} items'),
+                                subtitle: Text('num_items'.plural(item.set.length)),
                                 trailing: MenuAnchor(
                                   builder: (context, controller, child) => IconButton(
                                     onPressed: () {
@@ -177,7 +179,9 @@ class MangaDexListsView extends HookConsumerWidget {
                                         return MenuItemButton(
                                           onPressed: () =>
                                               ref.read(followedListsProvider.notifier).setFollow(item, idx == -1),
-                                          child: Text(idx == -1 ? 'Follow' : 'Unfollow'),
+                                          child: Text(idx == -1
+                                              ? 'ui.follow'.tr(context: context)
+                                              : 'ui.unfollow'.tr(context: context)),
                                         );
                                       },
                                     ),
@@ -186,12 +190,13 @@ class MangaDexListsView extends HookConsumerWidget {
                                         final result = await showDeleteListDialog(context, item.attributes.name);
                                         if (result == true) {
                                           ref.read(userListsProvider.notifier).deleteList(item).then((success) {
+                                            if (!context.mounted) return;
                                             if (success == true) {
                                               messenger
                                                 ..removeCurrentSnackBar()
                                                 ..showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('List deleted.'),
+                                                  SnackBar(
+                                                    content: Text('mangadex.deleteListOk'.tr(context: context)),
                                                     backgroundColor: Colors.green,
                                                   ),
                                                 );
@@ -199,8 +204,8 @@ class MangaDexListsView extends HookConsumerWidget {
                                               messenger
                                                 ..removeCurrentSnackBar()
                                                 ..showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Failed to delete list.'),
+                                                  SnackBar(
+                                                    content: Text('mangadex.deleteListError'.tr(context: context)),
                                                     backgroundColor: Colors.red,
                                                   ),
                                                 );
@@ -208,17 +213,13 @@ class MangaDexListsView extends HookConsumerWidget {
                                           });
                                         }
                                       },
-                                      child: const Text(
-                                        'Delete',
-                                      ),
+                                      child: Text('ui.delete'.tr(context: context)),
                                     ),
                                     MenuItemButton(
                                       onPressed: () {
                                         context.push('/list/edit/${item.id}', extra: item);
                                       },
-                                      child: const Text(
-                                        'Edit',
-                                      ),
+                                      child: Text('ui.edit'.tr(context: context)),
                                     ),
                                   ],
                                 ),
@@ -260,8 +261,8 @@ class MangaDexListsView extends HookConsumerWidget {
                         appbar,
                         leading,
                         if (lists.isEmpty)
-                          const SliverToBoxAdapter(
-                            child: Text('No lists!'),
+                          SliverToBoxAdapter(
+                            child: Text('errors.nolists'.tr(context: context)),
                           ),
                         SliverList.builder(
                           itemCount: lists.length,
@@ -290,7 +291,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                           : Colors.green,
                                     )),
                                 title: Text(item.attributes.name),
-                                subtitle: Text('${item.set.length} items'),
+                                subtitle: Text('num_items'.plural(item.set.length)),
                                 trailing: MenuAnchor(
                                   builder: (context, controller, child) => IconButton(
                                     onPressed: () {
@@ -307,9 +308,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                       onPressed: () async {
                                         ref.read(followedListsProvider.notifier).setFollow(item, false);
                                       },
-                                      child: const Text(
-                                        'Unfollow',
-                                      ),
+                                      child: Text('ui.unfollow'.tr(context: context)),
                                     ),
                                     if (item.user != null && me != null && item.user!.id == me.id)
                                       MenuItemButton(
@@ -317,12 +316,13 @@ class MangaDexListsView extends HookConsumerWidget {
                                           final result = await showDeleteListDialog(context, item.attributes.name);
                                           if (result == true) {
                                             ref.read(userListsProvider.notifier).deleteList(item).then((success) {
+                                              if (!context.mounted) return;
                                               if (success == true) {
                                                 messenger
                                                   ..removeCurrentSnackBar()
                                                   ..showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text('List deleted.'),
+                                                    SnackBar(
+                                                      content: Text('mangadex.deleteListOk'.tr(context: context)),
                                                       backgroundColor: Colors.green,
                                                     ),
                                                   );
@@ -330,8 +330,8 @@ class MangaDexListsView extends HookConsumerWidget {
                                                 messenger
                                                   ..removeCurrentSnackBar()
                                                   ..showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text('Failed to delete list.'),
+                                                    SnackBar(
+                                                      content: Text('mangadex.deleteListError'.tr(context: context)),
                                                       backgroundColor: Colors.red,
                                                     ),
                                                   );
@@ -339,18 +339,14 @@ class MangaDexListsView extends HookConsumerWidget {
                                             });
                                           }
                                         },
-                                        child: const Text(
-                                          'Delete',
-                                        ),
+                                        child: Text('ui.delete'.tr(context: context)),
                                       ),
                                     if (item.user != null && me != null && item.user!.id == me.id)
                                       MenuItemButton(
                                         onPressed: () {
                                           context.push('/list/edit/${item.id}', extra: item);
                                         },
-                                        child: const Text(
-                                          'Edit',
-                                        ),
+                                        child: Text('ui.edit'.tr(context: context)),
                                       ),
                                   ],
                                 ),

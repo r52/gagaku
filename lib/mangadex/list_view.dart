@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:animations/animations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -83,14 +84,14 @@ class MangaDexListViewWidget extends HookConsumerWidget {
     final me = ref.watch(loggedUserProvider).value;
     final listProvider = ref.watch(listSourceProvider(listId));
 
-    const bottomNavigationBarItems = <Widget>[
+    final bottomNavigationBarItems = <Widget>[
       NavigationDestination(
         icon: Icon(Icons.menu_book),
-        label: 'Titles',
+        label: 'titles'.tr(context: context),
       ),
       NavigationDestination(
         icon: Icon(Icons.feed),
-        label: 'Feed',
+        label: 'feed'.tr(context: context),
       ),
     ];
 
@@ -151,7 +152,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                           idx == -1 ? Icons.bookmark_border : Icons.bookmark,
                           color: idx == -1 ? null : theme.colorScheme.primary,
                         ),
-                        tooltip: idx == -1 ? 'Follow' : 'Unfollow',
+                        tooltip: idx == -1 ? 'ui.follow'.tr(context: context) : 'ui.unfollow'.tr(context: context),
                       );
                     },
                   ),
@@ -162,7 +163,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                         context.push('/list/edit/${list.id}', extra: list);
                       },
                       icon: const Icon(Icons.edit),
-                      tooltip: 'Edit',
+                      tooltip: 'ui.edit'.tr(context: context),
                     ),
                   const SizedBox.shrink(),
                   // if (list.user != null && me != null && list.user!.id == me.id)
@@ -229,7 +230,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                                 Expanded(
                                   child: MangaListWidget(
                                     title: Text(
-                                      'Titles (${list.set.length})',
+                                      '${'titles'.tr(context: context)} (${list.set.length})',
                                       style: const TextStyle(fontSize: 24),
                                     ),
                                     physics: const AlwaysScrollableScrollPhysics(),
@@ -257,8 +258,8 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                     builder: (context, ref, child) {
                       return ChapterFeedWidget(
                         provider: _fetchListFeedProvider(list),
-                        title: 'List Feed',
-                        emptyText: 'No chapters!',
+                        title: 'mangadex.listFeed'.tr(context: context),
+                        emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
                         onAtEdge: () => ref.read(customListFeedProvider(list).notifier).getMore(),
                         onRefresh: () async {
                           ref.read(customListFeedProvider(list).notifier).clear();
@@ -294,7 +295,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
         return Scaffold(
           appBar: AppBar(),
           body: Center(
-            child: Text('List with ID $listId does not exist!'),
+            child: Text('mangadex.listNotExistError'.tr(context: context, args: [listId])),
           ),
         );
       case AsyncValue(:final progress):

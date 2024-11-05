@@ -2,27 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 enum ReaderDirection {
-  leftToRight('Left to Right', Icons.arrow_forward),
-  rightToLeft('Right to Left', Icons.arrow_back);
+  leftToRight(Icons.arrow_forward),
+  rightToLeft(Icons.arrow_back);
 
-  const ReaderDirection(this.label, this.icon);
-  final String label;
+  const ReaderDirection(this.icon);
   final IconData icon;
+
+  static const _key = 'reader.direction.';
+  String get label => '$_key$name';
 }
 
 enum ReaderFormat {
-  single(
-    'Single',
-    Icons.note,
-  ),
-  longstrip(
-    'Long Strip',
-    Icons.view_stream,
-  );
+  single(Icons.note),
+  longstrip(Icons.view_stream);
 
-  const ReaderFormat(this.label, this.icon);
-  final String label;
+  const ReaderFormat(this.icon);
   final IconData icon;
+
+  static const _key = 'reader.format.';
+  String get label => '$_key$name';
 }
 
 class ReaderPage {

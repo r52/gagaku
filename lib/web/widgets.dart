@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
@@ -86,16 +87,16 @@ class WebMangaListWidget extends HookConsumerWidget {
                       SegmentedButton<WebMangaListView>(
                         showSelectedIcon: false,
                         style: SegmentedButton.styleFrom(shape: const RoundedRectangleBorder()),
-                        segments: const <ButtonSegment<WebMangaListView>>[
+                        segments: <ButtonSegment<WebMangaListView>>[
                           ButtonSegment<WebMangaListView>(
                             value: WebMangaListView.grid,
                             icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: 'Grid view',
+                            tooltip: 'ui.gridView'.tr(context: context),
                           ),
                           ButtonSegment<WebMangaListView>(
                             value: WebMangaListView.list,
                             icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: 'List view',
+                            tooltip: 'ui.listView'.tr(context: context),
                           ),
                         ],
                         selected: <WebMangaListView>{view},
@@ -173,7 +174,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           }
 
                           return IconButton(
-                            tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
+                            tooltip: favorited
+                                ? 'mangaActions.unfavorite'.tr(context: context)
+                                : 'mangaActions.favorite'.tr(context: context),
                             icon: Icon(favorited ? Icons.favorite : Icons.favorite_border),
                             color: favorited ? theme.colorScheme.primary : null,
                             onPressed: () async {
@@ -192,11 +195,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         final messenger = ScaffoldMessenger.of(context);
                         final parseResult = await api.handleUrl(url: item.url, context: context);
 
+                        if (!context.mounted) return;
                         if (!parseResult) {
                           messenger
                             ..removeCurrentSnackBar()
-                            ..showSnackBar(const SnackBar(
-                              content: Text('Unsupported URL'),
+                            ..showSnackBar(SnackBar(
+                              content: Text('ui.unsupportedUrl'.tr(context: context)),
                               backgroundColor: Colors.red,
                             ));
                         }
@@ -231,7 +235,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         }
 
                         return IconButton(
-                          tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
+                          tooltip: favorited
+                              ? 'mangaActions.unfavorite'.tr(context: context)
+                              : 'mangaActions.favorite'.tr(context: context),
                           icon: Icon(favorited ? Icons.favorite : Icons.favorite_border),
                           color: favorited ? theme.colorScheme.primary : null,
                           onPressed: () async {
@@ -245,7 +251,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       },
                     ),
                     trailing: IconButton(
-                      tooltip: 'Remove from History',
+                      tooltip: 'mangaActions.removeHistory'.tr(context: context),
                       icon: const Icon(
                         Icons.delete,
                         color: Colors.red,
@@ -260,11 +266,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       final messenger = ScaffoldMessenger.of(context);
                       final parseResult = await api.handleUrl(url: item.url, context: context);
 
+                      if (!context.mounted) return;
                       if (!parseResult) {
                         messenger
                           ..removeCurrentSnackBar()
-                          ..showSnackBar(const SnackBar(
-                            content: Text('Unsupported URL'),
+                          ..showSnackBar(SnackBar(
+                            content: Text('ui.unsupportedUrl'.tr(context: context)),
                             backgroundColor: Colors.red,
                           ));
                       }
@@ -341,11 +348,12 @@ class GridMangaItem extends HookConsumerWidget {
         final messenger = ScaffoldMessenger.of(context);
         final parseResult = await api.handleUrl(url: link.url, context: context);
 
+        if (!context.mounted) return;
         if (!parseResult) {
           messenger
             ..removeCurrentSnackBar()
-            ..showSnackBar(const SnackBar(
-              content: Text('Unsupported URL'),
+            ..showSnackBar(SnackBar(
+              content: Text('ui.unsupportedUrl'.tr(context: context)),
               backgroundColor: Colors.red,
             ));
         }
@@ -386,7 +394,9 @@ class GridMangaItem extends HookConsumerWidget {
                     heroTag: UniqueKey(),
                     mini: true,
                     shape: const CircleBorder(),
-                    tooltip: favorited ? 'Remove from Favorites' : 'Add to Favorites',
+                    tooltip: favorited
+                        ? 'mangaActions.unfavorite'.tr(context: context)
+                        : 'mangaActions.favorite'.tr(context: context),
                     onPressed: () async {
                       if (favorited) {
                         ref.read(webSourceFavoritesProvider.notifier).remove(favoritesKey, link);
@@ -408,7 +418,7 @@ class GridMangaItem extends HookConsumerWidget {
                 heroTag: UniqueKey(),
                 mini: true,
                 shape: const CircleBorder(),
-                tooltip: 'Remove from History',
+                tooltip: 'mangaActions.removeHistory'.tr(context: context),
                 onPressed: () async {
                   ref.read(webSourceHistoryProvider.notifier).remove(link);
                 },

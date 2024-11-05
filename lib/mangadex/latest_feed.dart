@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -74,7 +75,7 @@ class MangaDexGlobalFeed extends HookConsumerWidget {
           onTap: () {
             controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           },
-          child: const TitleFlexBar(title: 'Latest Updates'),
+          child: TitleFlexBar(title: 'mangadex.latestUpdates'.tr(context: context)),
         ),
         leading: BackButton(
           onPressed: () {

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -97,10 +98,10 @@ class MangaDexSearchWidget extends HookConsumerWidget {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: 'Search MangaDex...',
+                  hintText: 'search.arg'.tr(context: context, args: ['MangaDex']),
                   trailing: <Widget>[
                     Tooltip(
-                      message: 'Search Filters',
+                      message: 'search.filters'.tr(context: context),
                       child: IconButton(
                         onPressed: () async {
                           final result = await nav.push<MangaFilters>(
@@ -181,7 +182,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
           SliverAppBar(
             automaticallyImplyLeading: false,
             primary: false,
-            title: const Text('Search'),
+            title: Text('search.text'.tr(context: context)),
             actions: [
               DropdownMenu<FilterOrder>(
                 initialSelection: filter.filter.order,
@@ -209,7 +210,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                   FilterOrder.values.length,
                   (int index) => DropdownMenuEntry<FilterOrder>(
                     value: FilterOrder.values.elementAt(index),
-                    label: FilterOrder.values.elementAt(index).label,
+                    label: context.tr(FilterOrder.values.elementAt(index).label),
                   ),
                 ),
               ),
@@ -250,9 +251,9 @@ class MangaDexSearchWidget extends HookConsumerWidget {
                   }
                 },
               ),
-            AsyncValue(value: final _?) => const SliverToBoxAdapter(
+            AsyncValue(value: final _?) => SliverToBoxAdapter(
                 child: Center(
-                  child: Text("No results!"),
+                  child: Text('errors.noresults'.tr(context: context)),
                 ),
               ),
             _ => const SliverToBoxAdapter(
@@ -291,13 +292,13 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
             nav.pop(null);
           },
         ),
-        title: const Text('Search Filters'),
+        title: Text('search.filters'.tr(context: context)),
         actions: [
           OverflowBar(
             spacing: 8.0,
             children: [
               Tooltip(
-                message: 'Reset Filters',
+                message: 'search.resetFilters'.tr(context: context),
                 child: ElevatedButton.icon(
                   onPressed: () {
                     fil.value = MangaFilterAction.action(
@@ -310,17 +311,17 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                     );
                   },
                   icon: const Icon(Icons.clear_all),
-                  label: const Text('Reset Filters'),
+                  label: Text('search.resetFilters'.tr(context: context)),
                 ),
               ),
               Tooltip(
-                message: 'Apply Filters',
+                message: 'search.applyFilters'.tr(context: context),
                 child: ElevatedButton.icon(
                   onPressed: () {
                     nav.pop(fil.value);
                   },
                   icon: const Icon(Icons.filter_list),
-                  label: const Text('Apply Filters'),
+                  label: Text('search.applyFilters'.tr(context: context)),
                 ),
               ),
             ],
@@ -332,9 +333,9 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               children: [
-                const _SectionHeader(
-                  key: ValueKey('Selected Tag Filters'),
-                  header: 'Selected Tag Filters',
+                _SectionHeader(
+                  key: ValueKey('_selectedTagFilters'),
+                  header: 'search.selectedTagFilters'.tr(context: context),
                 ),
                 HookBuilder(
                   builder: (context) {
@@ -374,8 +375,10 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                             ]);
 
                     return _SectionChildren(
-                      key: const ValueKey("selectedFilters"),
-                      children: selectedFilters.isNotEmpty ? selectedFilters : [const InputChip(label: Text('None'))],
+                      key: const ValueKey("_selectedFilters"),
+                      children: selectedFilters.isNotEmpty
+                          ? selectedFilters
+                          : [InputChip(label: Text('ui.none'.tr(context: context)))],
                     );
                   },
                 ),
@@ -383,12 +386,12 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 const Divider(),
 
                 /// ContentRating
-                const _SectionHeader(
-                  key: ValueKey("Content Rating"),
-                  header: 'Content Rating',
+                _SectionHeader(
+                  key: ValueKey("_contentRating"),
+                  header: 'mangadex.contentRating'.tr(context: context),
                 ),
                 _SectionChildren(
-                  key: const ValueKey("Content children"),
+                  key: const ValueKey("_contentChildren"),
                   children: ContentRating.values
                       .map(
                         (e) => HookBuilder(
@@ -396,7 +399,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                             final selected = useListenableSelector(fil, () => fil.value.contentRating.contains(e));
 
                             return FilterChip(
-                              label: Text(e.label),
+                              label: Text(context.tr(e.label)),
                               selectedColor: selectedChipColor,
                               selected: selected,
                               onSelected: (bool value) {
@@ -420,12 +423,12 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 ),
 
                 /// Demographic
-                const _SectionHeader(
-                  key: ValueKey("Demographic"),
-                  header: 'Demographic',
+                _SectionHeader(
+                  key: ValueKey("_demographic"),
+                  header: 'mangadex.demographic'.tr(context: context),
                 ),
                 _SectionChildren(
-                  key: const ValueKey("Demographic children"),
+                  key: const ValueKey("_demographicChildren"),
                   children: MangaDemographic.values
                       .map(
                         (e) => HookBuilder(
@@ -459,12 +462,12 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 ),
 
                 /// Pub status
-                const _SectionHeader(
-                  key: ValueKey("Publication Status"),
-                  header: 'Publication Status',
+                _SectionHeader(
+                  key: ValueKey("_pubStatus"),
+                  header: 'mangadex.pubStatus'.tr(context: context),
                 ),
                 _SectionChildren(
-                  key: const ValueKey("Pub children"),
+                  key: const ValueKey("_pubChildren"),
                   children: MangaStatus.values
                       .map(
                         (e) => HookBuilder(
@@ -472,7 +475,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                             final selected = useListenableSelector(fil, () => fil.value.status.contains(e));
 
                             return FilterChip(
-                              label: Text(e.label),
+                              label: Text(context.tr(e.label)),
                               selectedColor: selectedChipColor,
                               selected: selected,
                               onSelected: (bool value) {
@@ -503,7 +506,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                     header: group.label,
                   ),
                   _SectionChildren(
-                    key: ValueKey("${group.label} children"),
+                    key: ValueKey("_${group.label}Children"),
                     children: tags
                         .where((element) => element.attributes.group == group)
                         .map(
@@ -553,15 +556,15 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                 ],
 
                 // Modes
-                const _SectionHeader(
+                _SectionHeader(
                   key: ValueKey("Modes"),
-                  header: 'Other Options',
+                  header: 'search.otherOptions'.tr(context: context),
                 ),
                 _SectionChildren(
-                  key: const ValueKey("Modes children"),
+                  key: const ValueKey("_modesChildren"),
                   children: [
                     DropdownMenu<TagMode>(
-                      label: const Text('Inclusion Mode'),
+                      label: Text('search.inclusion'.tr(context: context)),
                       initialSelection: fil.value.includedTagsMode,
                       requestFocusOnTap: false,
                       enableSearch: false,
@@ -579,7 +582,7 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
                       },
                     ),
                     DropdownMenu<TagMode>(
-                      label: const Text('Exclusion Mode'),
+                      label: Text('search.exclusion'.tr(context: context)),
                       initialSelection: fil.value.excludedTagsMode,
                       requestFocusOnTap: false,
                       enableSearch: false,

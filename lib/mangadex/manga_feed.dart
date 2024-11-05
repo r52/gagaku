@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -60,9 +61,9 @@ class MangaDexMangaFeed extends ConsumerWidget {
               isLoading: isLoading,
               children: [
                 if (mangas.isEmpty)
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Center(
-                      child: Text('Find some manga to follow!'),
+                      child: Text('mangadex.noFollowsMsg'.tr(context: context)),
                     ),
                   ),
                 MangaListViewSliver(items: mangas),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
@@ -34,7 +35,7 @@ class WebSourceHome extends HookConsumerWidget {
           onTap: () {
             controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           },
-          child: const TitleFlexBar(title: 'Web Sources'),
+          child: TitleFlexBar(title: 'webSources.text'.tr(context: context)),
         ),
         actions: [
           OverflowBar(
@@ -46,13 +47,13 @@ class WebSourceHome extends HookConsumerWidget {
                 onPressed: () => nav.push(SlideTransitionRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) => const WebSourceSearchWidget(),
                 )),
-                tooltip: 'Search Web Sources',
+                tooltip: 'search.arg'.tr(context: context, args: ['webSources.text'.tr(context: context)]),
               ),
               IconButton(
                 color: theme.colorScheme.onPrimaryContainer,
                 onPressed: () => openLinkDialog(context, api),
                 icon: const Icon(Icons.open_in_browser),
-                tooltip: 'Open Link',
+                tooltip: 'mangaActions.openLink'.tr(context: context),
               ),
               MenuAnchor(
                 builder: (context, controller, child) => IconButton(
@@ -73,17 +74,17 @@ class WebSourceHome extends HookConsumerWidget {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Reset all Read Markers'),
+                            title: Text('webSources.resetAllRead'.tr(context: context)),
                             content: const Text('Are you sure you want to reset all read markers?'),
                             actions: <Widget>[
                               TextButton(
-                                child: const Text('No'),
+                                child: Text('ui.no'.tr(context: context)),
                                 onPressed: () {
                                   Navigator.of(context).pop(false);
                                 },
                               ),
                               ElevatedButton(
-                                child: const Text('Yes'),
+                                child: Text('ui.yes'.tr(context: context)),
                                 onPressed: () {
                                   Navigator.of(context).pop(true);
                                 },
@@ -98,19 +99,19 @@ class WebSourceHome extends HookConsumerWidget {
                       }
                     },
                     leadingIcon: const Icon(Icons.restore),
-                    child: const Text('Reset All Read Markers'),
+                    child: Text('webSources.resetAllRead'.tr(context: context)),
                   ),
                   MenuItemButton(
                     onPressed: () => nav.push(SlideTransitionRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) => const SourceManager(),
                     )),
                     leadingIcon: const Icon(Icons.collections_bookmark),
-                    child: const Text('Source Manager'),
+                    child: Text('webSources.source.manager'.tr(context: context)),
                   ),
                   MenuItemButton(
                     onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
                     leadingIcon: const Icon(Icons.settings),
-                    child: const Text('Web Source Settings'),
+                    child: Text('arg_settings'.tr(context: context, args: ['webSources.text'.tr(context: context)])),
                   ),
                 ],
               ),
@@ -128,15 +129,15 @@ class WebSourceHome extends HookConsumerWidget {
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.history),
-            label: 'History',
+            label: 'history.text'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.favorite_border),
             selectedIcon: Icon(Icons.favorite),
-            label: 'Favorites',
+            label: 'webSources.favorites'.tr(context: context),
           ),
         ],
         selectedIndex: index,

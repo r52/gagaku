@@ -43,7 +43,8 @@ enum ContentRating {
   erotica,
   pornographic;
 
-  String get label => name.capitalize();
+  static const _key = 'contentRating.';
+  String get label => '$_key$name';
 }
 
 enum MangaDemographic {
@@ -61,20 +62,21 @@ enum MangaStatus {
   cancelled,
   hiatus;
 
-  String get label => name.capitalize();
+  static const _key = 'mangaStatus.';
+  String get label => '$_key$name';
 }
 
 enum MangaReadingStatus {
-  remove('Remove'),
-  reading('Reading'),
-  on_hold('On Hold'),
-  plan_to_read('Plan to Read'),
-  dropped('Dropped'),
-  re_reading('Re-reading'),
-  completed('Completed');
+  remove,
+  reading,
+  on_hold,
+  plan_to_read,
+  dropped,
+  re_reading,
+  completed;
 
-  const MangaReadingStatus(this.label);
-  final String label;
+  static const _key = 'readingStatus.';
+  String get label => '$_key$name';
 }
 
 const RatingLabel = [
@@ -103,48 +105,56 @@ enum TagGroup {
 enum CoverArtQuality { best, medium, small }
 
 enum FilterOrder {
-  relevance_asc('Worst Match', MapEntry('order[relevance]', 'asc')),
-  relevance_desc('Best Match', MapEntry('order[relevance]', 'desc')),
-  followedCount_asc('Fewest Follows', MapEntry('order[followedCount]', 'asc')),
-  followedCount_desc('Most Follows', MapEntry('order[followedCount]', 'desc')),
-  latestUploadedChapter_asc('Oldest Upload', MapEntry('order[latestUploadedChapter]', 'asc')),
-  latestUploadedChapter_desc('Latest Upload', MapEntry('order[latestUploadedChapter]', 'desc')),
-  updatedAt_asc('Oldest Update', MapEntry('order[updatedAt]', 'asc')),
-  updatedAt_desc('Latest Update', MapEntry('order[updatedAt]', 'desc')),
-  createdAt_asc('Oldest Added', MapEntry('order[createdAt]', 'asc')),
-  createdAt_desc('Recently Added', MapEntry('order[createdAt]', 'desc')),
-  year_asc('Year Ascending', MapEntry('order[year]', 'asc')),
-  year_desc('Year Descending', MapEntry('order[year]', 'desc')),
-  title_asc('Title Ascending', MapEntry('order[title]', 'asc')),
-  title_desc('Title Descending', MapEntry('order[title]', 'desc'));
+  relevance_asc(MapEntry('order[relevance]', 'asc')),
+  relevance_desc(MapEntry('order[relevance]', 'desc')),
+  followedCount_asc(MapEntry('order[followedCount]', 'asc')),
+  followedCount_desc(MapEntry('order[followedCount]', 'desc')),
+  latestUploadedChapter_asc(MapEntry('order[latestUploadedChapter]', 'asc')),
+  latestUploadedChapter_desc(MapEntry('order[latestUploadedChapter]', 'desc')),
+  updatedAt_asc(MapEntry('order[updatedAt]', 'asc')),
+  updatedAt_desc(MapEntry('order[updatedAt]', 'desc')),
+  createdAt_asc(MapEntry('order[createdAt]', 'asc')),
+  createdAt_desc(MapEntry('order[createdAt]', 'desc')),
+  year_asc(MapEntry('order[year]', 'asc')),
+  year_desc(MapEntry('order[year]', 'desc')),
+  title_asc(MapEntry('order[title]', 'asc')),
+  title_desc(MapEntry('order[title]', 'desc'));
 
-  const FilterOrder(this.label, this.json);
-  final String label;
+  const FilterOrder(this.json);
   final MapEntry<String, dynamic> json;
+
+  static const _key = 'mangadex.sort.';
+  String get label => '$_key$name';
 }
 
-enum CustomListVisibility { private, public }
+enum CustomListVisibility {
+  private,
+  public;
+
+  static const _key = 'mangadex.listVisibility.';
+  String get label => '$_key$name';
+}
 
 enum MangaRelations {
-  monochrome('Monochrome'),
-  main_story('Main Story'),
-  adapted_from('Adapted from'),
-  based_on('Based on'),
-  prequel('Prequel'),
-  side_story('Side story'),
-  doujinshi('Doujinshi'),
-  same_franchise('Same franchise'),
-  shared_universe('Shared universe'),
-  sequel('Sequel'),
-  spin_off('Spinoff'),
-  alternate_story('Alternate story'),
-  alternate_version('Alternate version'),
-  preserialization('Pre-serialization'),
-  colored('Colored'),
-  serialization('Serialization');
+  monochrome,
+  main_story,
+  adapted_from,
+  based_on,
+  prequel,
+  side_story,
+  doujinshi,
+  same_franchise,
+  shared_universe,
+  sequel,
+  spin_off,
+  alternate_story,
+  alternate_version,
+  preserialization,
+  colored,
+  serialization;
 
-  const MangaRelations(this.label);
-  final String label;
+  static const _key = 'mangaRelations.';
+  String get label => '$_key$name';
 }
 
 enum TagMode {
@@ -265,69 +275,72 @@ class LanguageConverter implements JsonConverter<Language, dynamic> {
 }
 
 enum Language {
-  en('English', 'en', '🇬🇧'),
-  ar('Arabic', 'ar', '🇸🇦'),
-  az('Azerbaijani', 'az', '🇦🇿'),
-  bn('Bengali', 'bn', '🇧🇩'),
-  bg('Bulgarian', 'bg', '🇧🇬'),
-  my('Burmese', 'my', '🇲🇲'),
-  ca('Catalan', 'ca', '🇦🇩'),
-  zh('Chinese (Simp.)', 'zh', '🇨🇳'),
-  zh_hk('Chinese (Trad.)', 'zh-hk', '🇭🇰'),
-  hr('Croatian', 'hr', '🇭🇷'),
-  cs('Czech', 'cs', '🇨🇿'),
-  da('Danish', 'da', '🇩🇰'),
-  nl('Dutch', 'nl', '🇳🇱'),
-  eo('Esperanto', 'eo', '🇺🇳'),
-  et('Estonian', 'et', '🇪🇪'),
-  tl('Filipino', 'tl', '🇵🇭'),
-  fi('Finnish', 'fi', '🇫🇮'),
-  fr('French', 'fr', '🇫🇷'),
-  ka('Georgian', 'ka', '🇬🇪'),
-  de('German', 'de', '🇩🇪'),
-  el('Greek', 'el', '🇬🇷'),
-  he('Hebrew', 'he', '🇮🇱'),
-  hi('Hindi', 'hi', '🇮🇳'),
-  hu('Hungarian', 'hu', '🇭🇺'),
-  id('Indonesian', 'id', '🇮🇩'),
-  it('Italian', 'it', '🇮🇹'),
-  ja('Japanese', 'ja', '🇯🇵'),
-  kk('Kazakh', 'kk', '🇰🇿'),
-  ko('Korean', 'ko', '🇰🇷'),
-  la('Latin', 'la', '🇻🇦'),
-  lt('Lithuanian', 'lt', '🇱🇹'),
-  ms('Malay', 'ms', '🇲🇾'),
-  mn('Mongolian', 'mn', '🇲🇳'),
-  ne('Nepali', 'ne', '🇳🇵'),
-  no('Norwegian', 'no', '🇳🇴'),
-  fa('Persian', 'fa', '🇮🇷'),
-  pl('Polish', 'pl', '🇵🇱'),
-  pt_br('Portuguese (BR)', 'pt-br', '🇧🇷'),
-  pt('Portuguese', 'pt', '🇵🇹'),
-  ro('Romanian', 'ro', '🇷🇴'),
-  ru('Russian', 'ru', '🇷🇺'),
-  sr('Serbian', 'sr', '🇷🇸'),
-  sk('Slovak', 'sk', '🇸🇰'),
-  es('Spanish', 'es', '🇪🇸'),
-  es_la('Spanish (LATAM)', 'es-la', '🇲🇽'),
-  sv('Swedish', 'sv', '🇸🇪'),
-  ta('Tamil', 'ta', '🇱🇰'),
-  th('Thai', 'th', '🇹🇭'),
-  tr('Turkish', 'tr', '🇹🇷'),
-  uk('Ukrainian', 'uk', '🇺🇦'),
-  vi('Vietnam', 'vi', '🇻🇳'),
+  en('en', '🇬🇧'),
+  ar('ar', '🇸🇦'),
+  az('az', '🇦🇿'),
+  bn('bn', '🇧🇩'),
+  bg('bg', '🇧🇬'),
+  my('my', '🇲🇲'),
+  ca('ca', '🇦🇩'),
+  zh('zh', '🇨🇳'),
+  zh_hk('zh-hk', '🇭🇰'),
+  hr('hr', '🇭🇷'),
+  cs('cs', '🇨🇿'),
+  da('da', '🇩🇰'),
+  nl('nl', '🇳🇱'),
+  eo('eo', '🇺🇳'),
+  et('et', '🇪🇪'),
+  tl('tl', '🇵🇭'),
+  fi('fi', '🇫🇮'),
+  fr('fr', '🇫🇷'),
+  ka('ka', '🇬🇪'),
+  de('de', '🇩🇪'),
+  el('el', '🇬🇷'),
+  he('he', '🇮🇱'),
+  hi('hi', '🇮🇳'),
+  hu('hu', '🇭🇺'),
+  id('id', '🇮🇩'),
+  it('it', '🇮🇹'),
+  ja('ja', '🇯🇵'),
+  kk('kk', '🇰🇿'),
+  ko('ko', '🇰🇷'),
+  la('la', '🇻🇦'),
+  lt('lt', '🇱🇹'),
+  ms('ms', '🇲🇾'),
+  mn('mn', '🇲🇳'),
+  ne('ne', '🇳🇵'),
+  no('no', '🇳🇴'),
+  fa('fa', '🇮🇷'),
+  pl('pl', '🇵🇱'),
+  pt_br('pt-br', '🇧🇷'),
+  pt('pt', '🇵🇹'),
+  ro('ro', '🇷🇴'),
+  ru('ru', '🇷🇺'),
+  sr('sr', '🇷🇸'),
+  sk('sk', '🇸🇰'),
+  es('es', '🇪🇸'),
+  es_la('es-la', '🇲🇽'),
+  sv('sv', '🇸🇪'),
+  ta('ta', '🇱🇰'),
+  th('th', '🇹🇭'),
+  tr('tr', '🇹🇷'),
+  uk('uk', '🇺🇦'),
+  vi('vi', '🇻🇳'),
 
   // Non-standard
-  ja_ro('Japanese (Romanized)', 'ja-ro', 'jp', true),
-  ko_ro('Korean (Romanized)', 'ko-ro', 'ko', true),
-  zh_ro('Chinese (Romanized)', 'zh-ro', 'zh', true),
-  other('Other', 'NULL', '🇺🇳', true);
+  ja_ro('ja-ro', 'jp', true),
+  ko_ro('ko-ro', 'ko', true),
+  zh_ro('zh-ro', 'zh', true),
+  other('NULL', '🇺🇳', true);
 
-  const Language(this.label, this.code, this.flag, [this.nonStandard = false]);
-  final String label;
+  const Language(this.code, this.flag, [this.nonStandard = false]);
+
   final String code;
   final String flag;
   final bool nonStandard;
+
+  static const _key = 'language.';
+  String get label => '$_key$name';
 }
 
 class Languages {

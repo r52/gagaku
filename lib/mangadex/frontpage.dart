@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model.dart';
 import 'package:gagaku/mangadex/types.dart';
@@ -8,7 +9,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'frontpage.g.dart';
@@ -109,9 +109,9 @@ class MangaDexFrontPage extends ConsumerWidget {
           ),
           SliverList.list(
             children: [
-              const Center(
+              Center(
                 child: Text(
-                  'Popular New Titles',
+                  'mangadex.popularNewTitles'.tr(context: context),
                   style: style,
                 ),
               ),
@@ -126,8 +126,8 @@ class MangaDexFrontPage extends ConsumerWidget {
                 onPressed: () {
                   context.push('/titles/latest');
                 },
-                label: const Text(
-                  'Latest Updates',
+                label: Text(
+                  'mangadex.latestUpdates'.tr(context: context),
                   style: style,
                 ),
                 icon: const Icon(Icons.arrow_forward),
@@ -144,8 +144,8 @@ class MangaDexFrontPage extends ConsumerWidget {
                 onPressed: () {
                   context.push('/list/$staffPickId');
                 },
-                label: const Text(
-                  'Staff Picks',
+                label: Text(
+                  'mangadex.staffPicks'.tr(context: context),
                   style: style,
                 ),
                 icon: const Icon(Icons.arrow_forward),
@@ -159,8 +159,8 @@ class MangaDexFrontPage extends ConsumerWidget {
                 onPressed: () {
                   context.push('/list/$seasonalId');
                 },
-                label: const Text(
-                  'Seasonal',
+                label: Text(
+                  'mangadex.seasonal'.tr(context: context),
                   style: style,
                 ),
                 icon: const Icon(Icons.arrow_forward),
@@ -174,8 +174,8 @@ class MangaDexFrontPage extends ConsumerWidget {
                 onPressed: () {
                   context.push('/titles/recent');
                 },
-                label: const Text(
-                  'Recently Added',
+                label: Text(
+                  'mangadex.recentlyAdded'.tr(context: context),
                   style: style,
                 ),
                 icon: const Icon(Icons.arrow_forward),

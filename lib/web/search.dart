@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/config.dart';
@@ -44,9 +45,9 @@ class WebSourceSearchWidget extends HookConsumerWidget {
           ),
         ),
       AsyncData(value: final src) when src != null && src.sources.isNotEmpty => null,
-      AsyncData(value: final src) when src == null || src.sources.isEmpty => const SliverToBoxAdapter(
+      AsyncData(value: final src) when src == null || src.sources.isEmpty => SliverToBoxAdapter(
           child: Center(
-            child: Text("No sources installed!"),
+            child: Text("webSources.noSourcesWarning".tr(context: context)),
           ),
         ),
       _ => const SliverToBoxAdapter(
@@ -60,9 +61,9 @@ class WebSourceSearchWidget extends HookConsumerWidget {
       body: WebMangaListWidget(
         physics: const AlwaysScrollableScrollPhysics(),
         showToggle: false,
-        title: const Text(
-          'Source Search',
-          style: TextStyle(fontSize: 24),
+        title: Text(
+          'webSources.sourceSearch'.tr(context: context),
+          style: const TextStyle(fontSize: 24),
         ),
         leading: [
           SliverAppBar(
@@ -78,7 +79,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: 'Search Web Sources...',
+                  hintText: 'search.arg'.tr(context: context, args: ['webSources.text'.tr(context: context)]),
                   onTap: () {
                     controller.openView();
                   },

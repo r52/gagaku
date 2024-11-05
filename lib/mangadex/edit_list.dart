@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -97,7 +98,9 @@ class MangaDexEditListScreen extends HookConsumerWidget {
             }
           },
         ),
-        flexibleSpace: TitleFlexBar(title: '${list != null ? 'Edit' : 'Create'} List'),
+        flexibleSpace: TitleFlexBar(
+            title:
+                list != null ? 'mangadex.editList'.tr(context: context) : 'mangadex.createList'.tr(context: context)),
         actions: [
           OverflowBar(
             spacing: 8.0,
@@ -140,15 +143,17 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                               }
 
                               success.then((success) {
+                                if (!context.mounted) return;
                                 if (success) {
-                                  if (!context.mounted) return;
                                   context.pop(true);
                                 } else {
                                   messenger
                                     ..removeCurrentSnackBar()
                                     ..showSnackBar(
                                       SnackBar(
-                                        content: Text('Failed to ${list != null ? 'edit' : 'create'} list.'),
+                                        content: Text(list != null
+                                            ? 'mangadex.editListError'.tr(context: context)
+                                            : 'mangadex.newListError'.tr(context: context)),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -160,15 +165,15 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                               messenger
                                 ..removeCurrentSnackBar()
                                 ..showSnackBar(
-                                  const SnackBar(
-                                    content: Text('List name cannot be empty.'),
+                                  SnackBar(
+                                    content: Text('mangadex.listNameEmptyWarning'.tr(context: context)),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
                             }
                           }
                         : null,
-                    child: Text(list != null ? 'Save' : 'Create'),
+                    child: Text(list != null ? 'ui.save'.tr(context: context) : 'ui.create'.tr(context: context)),
                   );
                 },
               ),
@@ -188,19 +193,21 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                     Expanded(
                       child: TextFormField(
                         controller: listNameController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'List Name',
+                          labelText: 'mangadex.listName'.tr(context: context),
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty) ? 'List Name cannot be empty.' : null;
+                          return (value == null || value.isEmpty)
+                              ? 'mangadex.listNameEmptyWarning'.tr(context: context)
+                              : null;
                         },
                       ),
                     ),
                     const SizedBox(width: 12.0),
                     DropdownMenu<CustomListVisibility>(
-                      label: const Text('Visibility'),
+                      label: Text('mangadex.visibility'.tr(context: context)),
                       initialSelection: visibility.value,
                       enableFilter: false,
                       enableSearch: false,
@@ -210,14 +217,14 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                           visibility.value = v;
                         }
                       },
-                      dropdownMenuEntries: const [
+                      dropdownMenuEntries: [
                         DropdownMenuEntry<CustomListVisibility>(
                           value: CustomListVisibility.private,
-                          label: 'Private',
+                          label: context.tr(CustomListVisibility.private.label),
                         ),
                         DropdownMenuEntry<CustomListVisibility>(
                           value: CustomListVisibility.public,
-                          label: 'Public',
+                          label: context.tr(CustomListVisibility.public.label),
                         ),
                       ],
                     ),
@@ -238,13 +245,13 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                       }
                     });
                   },
-                  child: const Text('Add Titles'),
+                  child: Text('mangadex.addTitles'.tr(context: context)),
                 ),
                 const SizedBox(height: 12.0),
                 Expanded(
                   child: MangaListWidget(
                     title: Text(
-                      'Titles ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
+                      '${'titles'.tr(context: context)} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
                       style: const TextStyle(fontSize: 24),
                     ),
                     physics: const AlwaysScrollableScrollPhysics(),

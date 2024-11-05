@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -303,14 +304,16 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         ref.read(followingStatusProvider(manga).notifier).set(result.$2);
                                       }
                                     },
-                                    child: const Text('Add to Library'),
+                                    child: Text('mangaActions.addToLibrary'.tr(context: context)),
                                   );
                                 }
 
                                 if (reading != null) {
                                   return IconButton(
                                     padding: EdgeInsets.zero,
-                                    tooltip: following ? 'Unfollow Manga' : 'Follow Manga',
+                                    tooltip: following
+                                        ? 'mangaActions.unfollow'.tr(context: context)
+                                        : 'mangaActions.follow'.tr(context: context),
                                     style: Styles.squareIconButtonStyle(
                                         backgroundColor: theme.colorScheme.surface.withAlpha(200)),
                                     color: theme.colorScheme.primary,
@@ -375,11 +378,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   ),
                   if (manga.attributes!.altTitles.isNotEmpty)
                     ExpansionTile(
-                      title: const Text('Alt. Titles'),
+                      title: Text('mangaView.altTitles'.tr(context: context)),
                       children: [
                         for (final Map(entries: entry) in manga.attributes!.altTitles)
                           ExpansionTile(
-                            title: Text(Languages.get(entry.first.key).label),
+                            title: Text(context.tr(Languages.get(entry.first.key).label)),
                             children: [
                               SizedBox(
                                 width: double.infinity,
@@ -388,8 +391,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   child: InkWell(
                                     onTap: () => Clipboard.setData(ClipboardData(text: entry.first.value)).then((_) {
                                       if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(content: Text('Copied to clipboard!')));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('ui.copyClipboard'.tr(context: context))));
                                     }),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
@@ -404,11 +407,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     ),
                   if (manga.attributes!.description.isNotEmpty)
                     ExpansionTile(
-                      title: const Text('Synopsis'),
+                      title: Text('mangaView.synopsis'.tr(context: context)),
                       children: [
                         for (final MapEntry(key: lang, value: desc) in manga.attributes!.description.entries)
                           ExpansionTile(
-                            title: Text(Languages.get(lang).label),
+                            title: Text(context.tr(Languages.get(lang).label)),
                             children: [
                               Container(
                                 width: double.infinity,
@@ -430,11 +433,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                       ],
                     ),
                   ExpansionTile(
-                    title: const Text('Info'),
+                    title: Text('mangaView.info'.tr(context: context)),
                     children: [
                       if (manga.author != null)
                         MultiChildExpansionTile(
-                          title: 'Author',
+                          title: 'mangaView.author'.tr(context: context),
                           children: manga.author!
                               .map((e) => ButtonChip(
                                     text: e.attributes.name,
@@ -446,7 +449,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                       if (manga.artist != null)
                         MultiChildExpansionTile(
-                          title: 'Artist',
+                          title: 'mangaView.artist'.tr(context: context),
                           children: manga.artist!
                               .map((e) => ButtonChip(
                                     text: e.attributes.name,
@@ -458,7 +461,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                       if (manga.attributes!.publicationDemographic != null)
                         ExpansionTile(
-                          title: const Text('Demograhic'),
+                          title: Text('mangaView.demographic'.tr(context: context)),
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8),
@@ -473,21 +476,21 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                       if (mangaTagChips[TagGroup.genre] != null)
                         MultiChildExpansionTile(
-                          title: 'Genres',
+                          title: 'mangaView.genre'.tr(context: context),
                           children: mangaTagChips[TagGroup.genre]!,
                         ),
                       if (mangaTagChips[TagGroup.theme] != null)
                         MultiChildExpansionTile(
-                          title: 'Themes',
+                          title: 'mangaView.theme'.tr(context: context),
                           children: mangaTagChips[TagGroup.theme]!,
                         ),
                       if (mangaTagChips[TagGroup.format] != null)
                         MultiChildExpansionTile(
-                          title: 'Format',
+                          title: 'mangaView.format'.tr(context: context),
                           children: mangaTagChips[TagGroup.format]!,
                         ),
                       MultiChildExpansionTile(
-                        title: 'Track',
+                        title: 'mangaView.track'.tr(context: context),
                         children: [
                           if (manga.attributes!.links?.raw != null)
                             ButtonChip(
@@ -497,7 +500,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: 'Official Raw',
+                              text: 'mangaView.officialRaw'.tr(context: context),
                             ),
                           if (manga.attributes!.links?.mu != null)
                             ButtonChip(
@@ -544,13 +547,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 throw 'Could not launch $url';
                               }
                             },
-                            text: 'Open on MangaDex',
+                            text: 'mangaView.openOn'.tr(context: context, args: ['MangaDex']),
                           ),
                         ],
                       ),
                       if (lastvolchap != null)
                         ExpansionTile(
-                          title: const Text('Final Volume/Chapter'),
+                          title: Text('mangaView.finalChapter'.tr(context: context)),
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8),
@@ -566,15 +569,15 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   TabBar(
                     controller: tabController,
                     tabs: [
-                      const Tab(
-                        text: 'Chapters',
+                      Tab(
+                        text: 'mangaView.chapters'.tr(context: context),
                       ),
-                      const Tab(
-                        text: 'Art',
+                      Tab(
+                        text: 'mangaView.art'.tr(context: context),
                       ),
                       if (hasRelated)
-                        const Tab(
-                          text: 'Related',
+                        Tab(
+                          text: 'mangaView.related'.tr(context: context),
                         ),
                     ],
                   ),
@@ -612,7 +615,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                       }))
                                   : false;
 
-                              final opt = allRead ? 'unread' : 'read';
+                              final opt = allRead
+                                  ? 'mangaView.unread'.tr(context: context)
+                                  : 'mangaView.read'.tr(context: context);
 
                               return ElevatedButton(
                                 style: Styles.buttonStyle(padding: const EdgeInsets.symmetric(horizontal: 8.0)),
@@ -622,17 +627,17 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     builder: (BuildContext context) {
                                       final nav = Navigator.of(context);
                                       return AlertDialog(
-                                        title: Text('Mark all as $opt'),
+                                        title: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text('Are you sure you want to mark all visible chapters as $opt?'),
+                                            Text('mangaView.markAllWarning'.tr(context: context, args: [opt])),
                                           ],
                                         ),
                                         actions: <Widget>[
                                           ElevatedButton(
-                                            child: const Text('No'),
+                                            child: Text('ui.no'.tr(context: context)),
                                             onPressed: () {
                                               nav.pop(false);
                                             },
@@ -641,7 +646,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                             onPressed: () {
                                               nav.pop(true);
                                             },
-                                            child: const Text('Yes'),
+                                            child: Text('ui.yes'.tr(context: context)),
                                           ),
                                         ],
                                       );
@@ -653,7 +658,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                         read: !allRead ? chapters : null, unread: allRead ? chapters : null);
                                   }
                                 },
-                                child: Text('Mark all visible as $opt'),
+                                child: Text('mangaView.markAllVisibleAs'.tr(context: context, args: [opt])),
                               );
                             },
                           ),
@@ -840,7 +845,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               MangaListViewSliver(
                                 items: related,
                                 headers: manga.relatedMangas.fold({}, (previousValue, element) {
-                                  previousValue?[element.id] = element.related!.label;
+                                  previousValue?[element.id] = context.tr(element.related!.label);
                                   return previousValue;
                                 }),
                               ),
@@ -888,9 +893,9 @@ class _ChapterListSliver extends HookConsumerWidget {
     });
 
     if (chapters.isEmpty) {
-      return const SliverToBoxAdapter(
+      return SliverToBoxAdapter(
         child: Center(
-          child: Text('No Chapters'),
+          child: Text('mangaView.noChaptersMsg'.tr(context: context)),
         ),
       );
     }
@@ -1115,7 +1120,7 @@ class _ReadingStatusDropdown extends ConsumerWidget {
         MangaReadingStatus.values.length,
         (int index) => DropdownMenuEntry<MangaReadingStatus>(
           value: MangaReadingStatus.values.elementAt(index),
-          label: MangaReadingStatus.values.elementAt(index).label,
+          label: context.tr(MangaReadingStatus.values.elementAt(index).label),
         ),
       ),
     );
@@ -1253,7 +1258,7 @@ class _UserListsMenu extends ConsumerWidget {
             ),
           ),
         MenuItemButton(
-          child: const Text('+ Create new list'),
+          child: Text('mangadex.createNewListBtn'.tr(context: context)),
           onPressed: () async {
             final messenger = ScaffoldMessenger.of(context);
 
@@ -1267,19 +1272,21 @@ class _UserListsMenu extends ConsumerWidget {
                       final nprivate = useValueNotifier(CustomListVisibility.private);
 
                       return AlertDialog(
-                        title: const Text('Create New List'),
+                        title: Text('mangadex.createNewList'.tr(context: context)),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             TextFormField(
                               controller: nameController,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 filled: true,
-                                labelText: 'List Name',
+                                labelText: 'mangadex.listName'.tr(context: context),
                               ),
                               autovalidateMode: AutovalidateMode.onUserInteraction,
                               validator: (String? value) {
-                                return (value == null || value.isEmpty) ? 'List name cannot be empty.' : null;
+                                return (value == null || value.isEmpty)
+                                    ? 'mangadex.listNameEmptyWarning'.tr(context: context)
+                                    : null;
                               },
                             ),
                             HookBuilder(
@@ -1287,7 +1294,7 @@ class _UserListsMenu extends ConsumerWidget {
                                 final private = useValueListenable(nprivate);
                                 return CheckboxListTile(
                                   controlAffinity: ListTileControlAffinity.leading,
-                                  title: const Text('Private list'),
+                                  title: Text('mangadex.privateList'.tr(context: context)),
                                   value: private == CustomListVisibility.private,
                                   onChanged: (bool? value) async {
                                     nprivate.value =
@@ -1300,7 +1307,7 @@ class _UserListsMenu extends ConsumerWidget {
                         ),
                         actions: <Widget>[
                           TextButton(
-                            child: const Text('Cancel'),
+                            child: Text('ui.cancel'.tr(context: context)),
                             onPressed: () {
                               nav.pop(null);
                             },
@@ -1317,7 +1324,7 @@ class _UserListsMenu extends ConsumerWidget {
                                           nav.pop((nameController.text, nprivate.value));
                                         }
                                       },
-                                child: const Text('Create'),
+                                child: Text('ui.create'.tr(context: context)),
                               );
                             },
                           ),
@@ -1330,12 +1337,13 @@ class _UserListsMenu extends ConsumerWidget {
             if (result != null) {
               final success = await ref.read(userListsProvider.notifier).newList(result.$1, result.$2, []);
 
+              if (!context.mounted) return;
               if (success) {
                 messenger
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
-                    const SnackBar(
-                      content: Text('New list created.'),
+                    SnackBar(
+                      content: Text('mangadex.newListOk'.tr(context: context)),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -1343,8 +1351,8 @@ class _UserListsMenu extends ConsumerWidget {
                 messenger
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
-                    const SnackBar(
-                      content: Text('Failed to create list.'),
+                    SnackBar(
+                      content: Text('mangadex.newListError'.tr(context: context)),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -1370,12 +1378,12 @@ class _AddToLibraryDialog extends HookWidget {
     final nfollowing = useValueNotifier(true);
 
     return AlertDialog(
-      title: const Text('Add to Library'),
+      title: Text('mangaActions.addToLibrary'.tr(context: context)),
       content: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           HookBuilder(
-            builder: (_) {
+            builder: (context) {
               final reading = useValueListenable(nreading);
               return DropdownMenu<MangaReadingStatus>(
                 initialSelection: reading,
@@ -1399,7 +1407,7 @@ class _AddToLibraryDialog extends HookWidget {
                   MangaReadingStatus.values.length - 1,
                   (int index) => DropdownMenuEntry<MangaReadingStatus>(
                     value: MangaReadingStatus.values.elementAt(index + 1),
-                    label: MangaReadingStatus.values.elementAt(index + 1).label,
+                    label: context.tr(MangaReadingStatus.values.elementAt(index + 1).label),
                   ),
                 ),
               );

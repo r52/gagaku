@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:gagaku/local/config.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,13 +16,13 @@ enum LibraryItemType { directory, archive }
 typedef LibraryItemCompare = int Function(LocalLibraryItem, LocalLibraryItem);
 
 enum LibrarySort {
-  name_desc('Name descending'),
-  name_asc('Name ascending'),
-  modified_desc('Modified descending'),
-  modified_asc('Modified ascending');
+  name_desc,
+  name_asc,
+  modified_desc,
+  modified_asc;
 
-  const LibrarySort(this.label);
-  final String label;
+  static const _key = 'localLibrary.sort.';
+  String get label => '$_key$name';
 }
 
 @Riverpod(keepAlive: true)
@@ -214,7 +215,7 @@ class LocalLibrary extends _$LocalLibrary {
         path: '',
         type: LibraryItemType.directory,
         modified: DateTime.now(),
-        error: 'Permissions denied',
+        error: 'localLibrary.errors.permissionDenied'.tr(),
       );
     }
 
@@ -251,7 +252,7 @@ class LocalLibrary extends _$LocalLibrary {
       state = const AsyncValue.loading(progress: 1);
 
       if (top.children.isEmpty) {
-        top.error = 'Library is empty!';
+        top.error = 'localLibrary.errors.emptyLibrary'.tr();
       }
 
       return top;
@@ -261,7 +262,7 @@ class LocalLibrary extends _$LocalLibrary {
       path: '',
       type: LibraryItemType.directory,
       modified: DateTime.now(),
-      error: 'Library directory not set!',
+      error: 'localLibrary.errors.pathNotSet'.tr(),
     );
   }
 

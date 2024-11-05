@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -128,7 +129,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                   children: [
                     if (creator.attributes.biography.isNotEmpty)
                       ExpansionTile(
-                        title: const Text('Biography'),
+                        title: Text('mangadex.creator.biography'.tr(context: context)),
                         children: [
                           for (final MapEntry(key: prop, value: desc) in creator.attributes.biography.entries)
                             ExpansionTile(
@@ -159,7 +160,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                         creator.attributes.website != null)
                       ExpansionTile(
                         expandedAlignment: Alignment.centerLeft,
-                        title: const Text('Follow'),
+                        title: Text('mangadex.creator.follow'.tr(context: context)),
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8),
@@ -183,8 +184,8 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                   ],
                 ),
               ],
-              title: const Text(
-                'Works',
+              title: Text(
+                'mangadex.creator.works'.tr(context: context),
                 style: TextStyle(fontSize: 24),
               ),
               physics: const AlwaysScrollableScrollPhysics(),
@@ -193,9 +194,9 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
               isLoading: isLoading,
               children: [
                 if (mangas.isEmpty)
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Center(
-                      child: Text('No manga!'),
+                      child: Text('errors.notitles'.tr(context: context)),
                     ),
                   ),
                 MangaListViewSliver(items: mangas),

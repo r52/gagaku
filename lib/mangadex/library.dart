@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model.dart';
@@ -63,7 +64,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
           MangaDexSliverAppBar(
-            title: 'Library',
+            title: 'library'.tr(context: context),
             controller: scrollController,
           ),
           SliverOverlapAbsorber(
@@ -80,7 +81,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                 tabs: List<Tab>.generate(
                   statuses.length,
                   (int index) => Tab(
-                    text: statuses.elementAt(index).label,
+                    text: context.tr(statuses.elementAt(index).label),
                   ),
                 ),
               ),
@@ -119,7 +120,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                                     ),
                                   AsyncValue(value: final mangas) => MangaListWidget(
                                       title: Text(
-                                        '${list.length} Mangas',
+                                        'num_manga'.plural(list.length),
                                         style: const TextStyle(fontSize: 24),
                                       ),
                                       physics: const AlwaysScrollableScrollPhysics(),
@@ -134,7 +135,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                                         if (mangas == null || mangas.isEmpty)
                                           SliverToBoxAdapter(
                                             child: Center(
-                                              child: Text('No Titles'),
+                                              child: Text('errors.notitles'.tr(context: context)),
                                             ),
                                           ),
                                         if (mangas != null) MangaListViewSliver(items: mangas),
