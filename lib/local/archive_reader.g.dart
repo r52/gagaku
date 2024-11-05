@@ -6,21 +6,17 @@ part of 'archive_reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _GetArchivePagesRef = Ref<AsyncValue<List<ReaderPage>>>;
-
 @ProviderFor(_getArchivePages)
 const _getArchivePagesProvider = _GetArchivePagesFamily._();
 
 final class _GetArchivePagesProvider extends $FunctionalProvider<
         AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
-    with
-        $FutureModifier<List<ReaderPage>>,
-        $FutureProvider<List<ReaderPage>, _GetArchivePagesRef> {
+    with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
   const _GetArchivePagesProvider._(
       {required _GetArchivePagesFamily super.from,
       required String super.argument,
       FutureOr<List<ReaderPage>> Function(
-        _GetArchivePagesRef ref,
+        Ref ref,
         String path,
       )? create})
       : _createCb = create,
@@ -33,7 +29,7 @@ final class _GetArchivePagesProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ReaderPage>> Function(
-    _GetArchivePagesRef ref,
+    Ref ref,
     String path,
   )? _createCb;
 
@@ -56,7 +52,7 @@ final class _GetArchivePagesProvider extends $FunctionalProvider<
   @override
   _GetArchivePagesProvider $copyWithCreate(
     FutureOr<List<ReaderPage>> Function(
-      _GetArchivePagesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _GetArchivePagesProvider._(
@@ -70,7 +66,7 @@ final class _GetArchivePagesProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<ReaderPage>> create(_GetArchivePagesRef ref) {
+  FutureOr<List<ReaderPage>> create(Ref ref) {
     final _$cb = _createCb ?? _getArchivePages;
     final argument = this.argument as String;
     return _$cb(
@@ -116,7 +112,7 @@ final class _GetArchivePagesFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<ReaderPage>> Function(
-      _GetArchivePagesRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -135,4 +131,4 @@ final class _GetArchivePagesFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

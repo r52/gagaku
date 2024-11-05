@@ -6,8 +6,6 @@ part of 'list_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchListFeedRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
-
 @ProviderFor(_fetchListFeed)
 const _fetchListFeedProvider = _FetchListFeedFamily._();
 
@@ -16,12 +14,12 @@ final class _FetchListFeedProvider extends $FunctionalProvider<
         FutureOr<List<ChapterFeedItemData>>>
     with
         $FutureModifier<List<ChapterFeedItemData>>,
-        $FutureProvider<List<ChapterFeedItemData>, _FetchListFeedRef> {
+        $FutureProvider<List<ChapterFeedItemData>> {
   const _FetchListFeedProvider._(
       {required _FetchListFeedFamily super.from,
       required CustomList super.argument,
       FutureOr<List<ChapterFeedItemData>> Function(
-        _FetchListFeedRef ref,
+        Ref ref,
         CustomList list,
       )? create})
       : _createCb = create,
@@ -34,7 +32,7 @@ final class _FetchListFeedProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ChapterFeedItemData>> Function(
-    _FetchListFeedRef ref,
+    Ref ref,
     CustomList list,
   )? _createCb;
 
@@ -57,7 +55,7 @@ final class _FetchListFeedProvider extends $FunctionalProvider<
   @override
   _FetchListFeedProvider $copyWithCreate(
     FutureOr<List<ChapterFeedItemData>> Function(
-      _FetchListFeedRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchListFeedProvider._(
@@ -71,7 +69,7 @@ final class _FetchListFeedProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<ChapterFeedItemData>> create(_FetchListFeedRef ref) {
+  FutureOr<List<ChapterFeedItemData>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchListFeed;
     final argument = this.argument as CustomList;
     return _$cb(
@@ -117,7 +115,7 @@ final class _FetchListFeedFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<ChapterFeedItemData>> Function(
-      _FetchListFeedRef ref,
+      Ref ref,
       CustomList args,
     ) create,
   ) {
@@ -136,4 +134,4 @@ final class _FetchListFeedFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

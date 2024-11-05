@@ -6,17 +6,15 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef MangadexRef = Ref<MangaDexModel>;
-
 @ProviderFor(mangadex)
 const mangadexProvider = MangadexProvider._();
 
 final class MangadexProvider
     extends $FunctionalProvider<MangaDexModel, MangaDexModel>
-    with $Provider<MangaDexModel, MangadexRef> {
+    with $Provider<MangaDexModel> {
   const MangadexProvider._(
       {MangaDexModel Function(
-        MangadexRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -30,7 +28,7 @@ final class MangadexProvider
         );
 
   final MangaDexModel Function(
-    MangadexRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -52,14 +50,14 @@ final class MangadexProvider
   @override
   MangadexProvider $copyWithCreate(
     MangaDexModel Function(
-      MangadexRef ref,
+      Ref ref,
     ) create,
   ) {
     return MangadexProvider._(create: create);
   }
 
   @override
-  MangaDexModel create(MangadexRef ref) {
+  MangaDexModel create(Ref ref) {
     final _$cb = _createCb ?? mangadex;
     return _$cb(ref);
   }
@@ -106,7 +104,7 @@ final class RecentlyAddedProvider
   @override
   RecentlyAddedProvider $copyWithBuild(
     FutureOr<List<Manga>> Function(
-      Ref<AsyncValue<List<Manga>>>,
+      Ref,
       RecentlyAdded,
     ) build,
   ) {
@@ -168,7 +166,7 @@ final class LatestChaptersFeedProvider
   @override
   LatestChaptersFeedProvider $copyWithBuild(
     FutureOr<List<Chapter>> Function(
-      Ref<AsyncValue<List<Chapter>>>,
+      Ref,
       LatestChaptersFeed,
     ) build,
   ) {
@@ -231,7 +229,7 @@ final class LatestGlobalFeedProvider
   @override
   LatestGlobalFeedProvider $copyWithBuild(
     FutureOr<List<Chapter>> Function(
-      Ref<AsyncValue<List<Chapter>>>,
+      Ref,
       LatestGlobalFeed,
     ) build,
   ) {
@@ -304,7 +302,7 @@ final class GroupFeedProvider
   @override
   GroupFeedProvider $copyWithBuild(
     FutureOr<List<Chapter>> Function(
-      Ref<AsyncValue<List<Chapter>>>,
+      Ref,
       GroupFeed,
     ) build,
   ) {
@@ -376,8 +374,8 @@ final class GroupFeedFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<List<Chapter>> Function(Ref<AsyncValue<List<Chapter>>> ref,
-            GroupFeed notifier, Group argument)
+    FutureOr<List<Chapter>> Function(
+            Ref ref, GroupFeed notifier, Group argument)
         build,
   ) {
     return $FamilyOverride(
@@ -459,7 +457,7 @@ final class GroupTitlesProvider
   @override
   GroupTitlesProvider $copyWithBuild(
     FutureOr<List<Manga>> Function(
-      Ref<AsyncValue<List<Manga>>>,
+      Ref,
       GroupTitles,
     ) build,
   ) {
@@ -531,8 +529,8 @@ final class GroupTitlesFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<List<Manga>> Function(Ref<AsyncValue<List<Manga>>> ref,
-            GroupTitles notifier, Group argument)
+    FutureOr<List<Manga>> Function(
+            Ref ref, GroupTitles notifier, Group argument)
         build,
   ) {
     return $FamilyOverride(
@@ -614,7 +612,7 @@ final class CreatorTitlesProvider
   @override
   CreatorTitlesProvider $copyWithBuild(
     FutureOr<List<Manga>> Function(
-      Ref<AsyncValue<List<Manga>>>,
+      Ref,
       CreatorTitles,
     ) build,
   ) {
@@ -686,8 +684,8 @@ final class CreatorTitlesFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<List<Manga>> Function(Ref<AsyncValue<List<Manga>>> ref,
-            CreatorTitles notifier, CreatorType argument)
+    FutureOr<List<Manga>> Function(
+            Ref ref, CreatorTitles notifier, CreatorType argument)
         build,
   ) {
     return $FamilyOverride(
@@ -768,7 +766,7 @@ final class MangaChaptersListSortProvider
   @override
   MangaChaptersListSortProvider $copyWithBuild(
     ListSort Function(
-      Ref<ListSort>,
+      Ref,
       MangaChaptersListSort,
     ) build,
   ) {
@@ -842,7 +840,7 @@ final class MangaChaptersProvider
   @override
   MangaChaptersProvider $copyWithBuild(
     FutureOr<List<Chapter>> Function(
-      Ref<AsyncValue<List<Chapter>>>,
+      Ref,
       MangaChapters,
     ) build,
   ) {
@@ -914,8 +912,8 @@ final class MangaChaptersFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<List<Chapter>> Function(Ref<AsyncValue<List<Chapter>>> ref,
-            MangaChapters notifier, Manga argument)
+    FutureOr<List<Chapter>> Function(
+            Ref ref, MangaChapters notifier, Manga argument)
         build,
   ) {
     return $FamilyOverride(
@@ -997,7 +995,7 @@ final class MangaCoversProvider
   @override
   MangaCoversProvider $copyWithBuild(
     FutureOr<List<CoverArt>> Function(
-      Ref<AsyncValue<List<CoverArt>>>,
+      Ref,
       MangaCovers,
     ) build,
   ) {
@@ -1069,8 +1067,8 @@ final class MangaCoversFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<List<CoverArt>> Function(Ref<AsyncValue<List<CoverArt>>> ref,
-            MangaCovers notifier, Manga argument)
+    FutureOr<List<CoverArt>> Function(
+            Ref ref, MangaCovers notifier, Manga argument)
         build,
   ) {
     return $FamilyOverride(
@@ -1141,7 +1139,7 @@ final class ReadChaptersProvider
   @override
   ReadChaptersProvider $copyWithBuild(
     FutureOr<ReadChaptersMap> Function(
-      Ref<AsyncValue<ReadChaptersMap>>,
+      Ref,
       ReadChapters,
     ) build,
   ) {
@@ -1203,7 +1201,7 @@ final class UserLibraryProvider extends $AsyncNotifierProvider<UserLibrary,
   @override
   UserLibraryProvider $copyWithBuild(
     FutureOr<Map<String, MangaReadingStatus>> Function(
-      Ref<AsyncValue<Map<String, MangaReadingStatus>>>,
+      Ref,
       UserLibrary,
     ) build,
   ) {
@@ -1266,7 +1264,7 @@ final class UserListsProvider
   @override
   UserListsProvider $copyWithBuild(
     FutureOr<List<CustomList>> Function(
-      Ref<AsyncValue<List<CustomList>>>,
+      Ref,
       UserLists,
     ) build,
   ) {
@@ -1328,7 +1326,7 @@ final class FollowedListsProvider
   @override
   FollowedListsProvider $copyWithBuild(
     FutureOr<List<CustomList>> Function(
-      Ref<AsyncValue<List<CustomList>>>,
+      Ref,
       FollowedLists,
     ) build,
   ) {
@@ -1401,7 +1399,7 @@ final class CustomListFeedProvider
   @override
   CustomListFeedProvider $copyWithBuild(
     FutureOr<List<Chapter>> Function(
-      Ref<AsyncValue<List<Chapter>>>,
+      Ref,
       CustomListFeed,
     ) build,
   ) {
@@ -1473,8 +1471,8 @@ final class CustomListFeedFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<List<Chapter>> Function(Ref<AsyncValue<List<Chapter>>> ref,
-            CustomListFeed notifier, CustomList argument)
+    FutureOr<List<Chapter>> Function(
+            Ref ref, CustomListFeed notifier, CustomList argument)
         build,
   ) {
     return $FamilyOverride(
@@ -1506,16 +1504,12 @@ abstract class _$CustomListFeed extends $AsyncNotifier<List<Chapter>> {
       );
 }
 
-typedef GetMangaListByPageRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(getMangaListByPage)
 const getMangaListByPageProvider = GetMangaListByPageFamily._();
 
 final class GetMangaListByPageProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, GetMangaListByPageRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const GetMangaListByPageProvider._(
       {required GetMangaListByPageFamily super.from,
       required (
@@ -1524,7 +1518,7 @@ final class GetMangaListByPageProvider
       )
           super.argument,
       FutureOr<List<Manga>> Function(
-        GetMangaListByPageRef ref,
+        Ref ref,
         Iterable<String> list,
         int page,
       )? create})
@@ -1538,7 +1532,7 @@ final class GetMangaListByPageProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    GetMangaListByPageRef ref,
+    Ref ref,
     Iterable<String> list,
     int page,
   )? _createCb;
@@ -1562,7 +1556,7 @@ final class GetMangaListByPageProvider
   @override
   GetMangaListByPageProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      GetMangaListByPageRef ref,
+      Ref ref,
     ) create,
   ) {
     return GetMangaListByPageProvider._(
@@ -1580,7 +1574,7 @@ final class GetMangaListByPageProvider
   }
 
   @override
-  FutureOr<List<Manga>> create(GetMangaListByPageRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? getMangaListByPage;
     final argument = this.argument as (
       Iterable<String>,
@@ -1635,7 +1629,7 @@ final class GetMangaListByPageFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<Manga>> Function(
-      GetMangaListByPageRef ref,
+      Ref ref,
       (
         Iterable<String>,
         int,
@@ -1710,7 +1704,7 @@ final class ListSourceProvider
   @override
   ListSourceProvider $copyWithBuild(
     FutureOr<CustomList?> Function(
-      Ref<AsyncValue<CustomList?>>,
+      Ref,
       ListSource,
     ) build,
   ) {
@@ -1782,8 +1776,8 @@ final class ListSourceFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<CustomList?> Function(Ref<AsyncValue<CustomList?>> ref,
-            ListSource notifier, String argument)
+    FutureOr<CustomList?> Function(
+            Ref ref, ListSource notifier, String argument)
         build,
   ) {
     return $FamilyOverride(
@@ -1854,7 +1848,7 @@ final class TagListProvider
   @override
   TagListProvider $copyWithBuild(
     FutureOr<Iterable<Tag>> Function(
-      Ref<AsyncValue<Iterable<Tag>>>,
+      Ref,
       TagList,
     ) build,
   ) {
@@ -1927,7 +1921,7 @@ final class MangaSearchProvider
   @override
   MangaSearchProvider $copyWithBuild(
     FutureOr<List<Manga>> Function(
-      Ref<AsyncValue<List<Manga>>>,
+      Ref,
       MangaSearch,
     ) build,
   ) {
@@ -1999,8 +1993,8 @@ final class MangaSearchFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<List<Manga>> Function(Ref<AsyncValue<List<Manga>>> ref,
-            MangaSearch notifier, MangaSearchParameters argument)
+    FutureOr<List<Manga>> Function(
+            Ref ref, MangaSearch notifier, MangaSearchParameters argument)
         build,
   ) {
     return $FamilyOverride(
@@ -2071,7 +2065,7 @@ final class StatisticsProvider
   @override
   StatisticsProvider $copyWithBuild(
     FutureOr<Map<String, MangaStatistics>> Function(
-      Ref<AsyncValue<Map<String, MangaStatistics>>>,
+      Ref,
       Statistics,
     ) build,
   ) {
@@ -2134,7 +2128,7 @@ final class ChapterStatsProvider extends $AsyncNotifierProvider<ChapterStats,
   @override
   ChapterStatsProvider $copyWithBuild(
     FutureOr<Map<String, ChapterStatistics>> Function(
-      Ref<AsyncValue<Map<String, ChapterStatistics>>>,
+      Ref,
       ChapterStats,
     ) build,
   ) {
@@ -2197,7 +2191,7 @@ final class RatingsProvider
   @override
   RatingsProvider $copyWithBuild(
     FutureOr<Map<String, SelfRating>> Function(
-      Ref<AsyncValue<Map<String, SelfRating>>>,
+      Ref,
       Ratings,
     ) build,
   ) {
@@ -2270,7 +2264,7 @@ final class ReadingStatusProvider
   @override
   ReadingStatusProvider $copyWithBuild(
     FutureOr<MangaReadingStatus?> Function(
-      Ref<AsyncValue<MangaReadingStatus?>>,
+      Ref,
       ReadingStatus,
     ) build,
   ) {
@@ -2343,9 +2337,7 @@ final class ReadingStatusFamily extends Family {
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
     FutureOr<MangaReadingStatus?> Function(
-            Ref<AsyncValue<MangaReadingStatus?>> ref,
-            ReadingStatus notifier,
-            Manga argument)
+            Ref ref, ReadingStatus notifier, Manga argument)
         build,
   ) {
     return $FamilyOverride(
@@ -2427,7 +2419,7 @@ final class FollowingStatusProvider
   @override
   FollowingStatusProvider $copyWithBuild(
     FutureOr<bool> Function(
-      Ref<AsyncValue<bool>>,
+      Ref,
       FollowingStatus,
     ) build,
   ) {
@@ -2499,8 +2491,7 @@ final class FollowingStatusFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<bool> Function(
-            Ref<AsyncValue<bool>> ref, FollowingStatus notifier, Manga argument)
+    FutureOr<bool> Function(Ref ref, FollowingStatus notifier, Manga argument)
         build,
   ) {
     return $FamilyOverride(
@@ -2571,7 +2562,7 @@ final class MangaDexHistoryProvider
   @override
   MangaDexHistoryProvider $copyWithBuild(
     FutureOr<Queue<Chapter>> Function(
-      Ref<AsyncValue<Queue<Chapter>>>,
+      Ref,
       MangaDexHistory,
     ) build,
   ) {
@@ -2633,7 +2624,7 @@ final class LoggedUserProvider
   @override
   LoggedUserProvider $copyWithBuild(
     FutureOr<User?> Function(
-      Ref<AsyncValue<User?>>,
+      Ref,
       LoggedUser,
     ) build,
   ) {
@@ -2695,7 +2686,7 @@ final class AuthControlProvider
   @override
   AuthControlProvider $copyWithBuild(
     FutureOr<bool> Function(
-      Ref<AsyncValue<bool>>,
+      Ref,
       AuthControl,
     ) build,
   ) {
@@ -2719,4 +2710,4 @@ abstract class _$AuthControl extends $AsyncNotifier<bool> {
 }
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

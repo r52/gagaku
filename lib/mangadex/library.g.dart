@@ -53,7 +53,7 @@ final class LibraryViewTypeProvider
   @override
   LibraryViewTypeProvider $copyWithBuild(
     MangaReadingStatus Function(
-      Ref<MangaReadingStatus>,
+      Ref,
       LibraryViewType,
     ) build,
   ) {
@@ -76,21 +76,17 @@ abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
   MangaReadingStatus runBuild() => build();
 }
 
-typedef _GetLibraryListByTypeRef = Ref<AsyncValue<List<String>>>;
-
 @ProviderFor(_getLibraryListByType)
 const _getLibraryListByTypeProvider = _GetLibraryListByTypeFamily._();
 
 final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
         AsyncValue<List<String>>, FutureOr<List<String>>>
-    with
-        $FutureModifier<List<String>>,
-        $FutureProvider<List<String>, _GetLibraryListByTypeRef> {
+    with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
   const _GetLibraryListByTypeProvider._(
       {required _GetLibraryListByTypeFamily super.from,
       required MangaReadingStatus super.argument,
       FutureOr<List<String>> Function(
-        _GetLibraryListByTypeRef ref,
+        Ref ref,
         MangaReadingStatus type,
       )? create})
       : _createCb = create,
@@ -103,7 +99,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<String>> Function(
-    _GetLibraryListByTypeRef ref,
+    Ref ref,
     MangaReadingStatus type,
   )? _createCb;
 
@@ -126,7 +122,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
   @override
   _GetLibraryListByTypeProvider $copyWithCreate(
     FutureOr<List<String>> Function(
-      _GetLibraryListByTypeRef ref,
+      Ref ref,
     ) create,
   ) {
     return _GetLibraryListByTypeProvider._(
@@ -140,7 +136,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<String>> create(_GetLibraryListByTypeRef ref) {
+  FutureOr<List<String>> create(Ref ref) {
     final _$cb = _createCb ?? _getLibraryListByType;
     final argument = this.argument as MangaReadingStatus;
     return _$cb(
@@ -187,7 +183,7 @@ final class _GetLibraryListByTypeFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<String>> Function(
-      _GetLibraryListByTypeRef ref,
+      Ref ref,
       MangaReadingStatus args,
     ) create,
   ) {
@@ -206,4 +202,4 @@ final class _GetLibraryListByTypeFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

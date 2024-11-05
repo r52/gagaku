@@ -199,7 +199,7 @@ mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>, FutureOr<T>> {
 }
 
 // From riverpod doc https://riverpod.dev/docs/essentials/auto_dispose
-extension CacheForExtension on Ref<Object?> {
+extension CacheForExtension on Ref {
   /// Keeps the provider alive for [duration].
   void cacheFor(Duration duration) {
     // Immediately prevent the state from getting destroyed.

@@ -6,8 +6,6 @@ part of 'history_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchHistoryFeedRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
-
 @ProviderFor(_fetchHistoryFeed)
 const _fetchHistoryFeedProvider = _FetchHistoryFeedProvider._();
 
@@ -16,10 +14,10 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
         FutureOr<List<ChapterFeedItemData>>>
     with
         $FutureModifier<List<ChapterFeedItemData>>,
-        $FutureProvider<List<ChapterFeedItemData>, _FetchHistoryFeedRef> {
+        $FutureProvider<List<ChapterFeedItemData>> {
   const _FetchHistoryFeedProvider._(
       {FutureOr<List<ChapterFeedItemData>> Function(
-        _FetchHistoryFeedRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -33,7 +31,7 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ChapterFeedItemData>> Function(
-    _FetchHistoryFeedRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -48,14 +46,14 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
   @override
   _FetchHistoryFeedProvider $copyWithCreate(
     FutureOr<List<ChapterFeedItemData>> Function(
-      _FetchHistoryFeedRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchHistoryFeedProvider._(create: create);
   }
 
   @override
-  FutureOr<List<ChapterFeedItemData>> create(_FetchHistoryFeedRef ref) {
+  FutureOr<List<ChapterFeedItemData>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchHistoryFeed;
     return _$cb(ref);
   }
@@ -64,4 +62,4 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
 String _$fetchHistoryFeedHash() => r'6c2d139f80e07200aa3a00307070a72d8313c1aa';
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

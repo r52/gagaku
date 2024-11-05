@@ -6,21 +6,17 @@ part of 'reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchWebChapterInfoRef = Ref<AsyncValue<WebReaderData>>;
-
 @ProviderFor(_fetchWebChapterInfo)
 const _fetchWebChapterInfoProvider = _FetchWebChapterInfoFamily._();
 
 final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
         AsyncValue<WebReaderData>, FutureOr<WebReaderData>>
-    with
-        $FutureModifier<WebReaderData>,
-        $FutureProvider<WebReaderData, _FetchWebChapterInfoRef> {
+    with $FutureModifier<WebReaderData>, $FutureProvider<WebReaderData> {
   const _FetchWebChapterInfoProvider._(
       {required _FetchWebChapterInfoFamily super.from,
       required SourceInfo super.argument,
       FutureOr<WebReaderData> Function(
-        _FetchWebChapterInfoRef ref,
+        Ref ref,
         SourceInfo info,
       )? create})
       : _createCb = create,
@@ -33,7 +29,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
         );
 
   final FutureOr<WebReaderData> Function(
-    _FetchWebChapterInfoRef ref,
+    Ref ref,
     SourceInfo info,
   )? _createCb;
 
@@ -56,7 +52,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
   @override
   _FetchWebChapterInfoProvider $copyWithCreate(
     FutureOr<WebReaderData> Function(
-      _FetchWebChapterInfoRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchWebChapterInfoProvider._(
@@ -70,7 +66,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<WebReaderData> create(_FetchWebChapterInfoRef ref) {
+  FutureOr<WebReaderData> create(Ref ref) {
     final _$cb = _createCb ?? _fetchWebChapterInfo;
     final argument = this.argument as SourceInfo;
     return _$cb(
@@ -117,7 +113,7 @@ final class _FetchWebChapterInfoFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<WebReaderData> Function(
-      _FetchWebChapterInfoRef ref,
+      Ref ref,
       SourceInfo args,
     ) create,
   ) {
@@ -136,21 +132,17 @@ final class _FetchWebChapterInfoFamily extends Family {
   }
 }
 
-typedef _GetPagesRef = Ref<AsyncValue<List<ReaderPage>>>;
-
 @ProviderFor(_getPages)
 const _getPagesProvider = _GetPagesFamily._();
 
 final class _GetPagesProvider extends $FunctionalProvider<
         AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
-    with
-        $FutureModifier<List<ReaderPage>>,
-        $FutureProvider<List<ReaderPage>, _GetPagesRef> {
+    with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
   const _GetPagesProvider._(
       {required _GetPagesFamily super.from,
       required dynamic super.argument,
       FutureOr<List<ReaderPage>> Function(
-        _GetPagesRef ref,
+        Ref ref,
         dynamic source,
       )? create})
       : _createCb = create,
@@ -163,7 +155,7 @@ final class _GetPagesProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ReaderPage>> Function(
-    _GetPagesRef ref,
+    Ref ref,
     dynamic source,
   )? _createCb;
 
@@ -186,7 +178,7 @@ final class _GetPagesProvider extends $FunctionalProvider<
   @override
   _GetPagesProvider $copyWithCreate(
     FutureOr<List<ReaderPage>> Function(
-      _GetPagesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _GetPagesProvider._(
@@ -200,7 +192,7 @@ final class _GetPagesProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<ReaderPage>> create(_GetPagesRef ref) {
+  FutureOr<List<ReaderPage>> create(Ref ref) {
     final _$cb = _createCb ?? _getPages;
     final argument = this.argument as dynamic;
     return _$cb(
@@ -246,7 +238,7 @@ final class _GetPagesFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<ReaderPage>> Function(
-      _GetPagesRef ref,
+      Ref ref,
       dynamic args,
     ) create,
   ) {
@@ -265,16 +257,12 @@ final class _GetPagesFamily extends Family {
   }
 }
 
-typedef _GetSourcePagesRef = Ref<AsyncValue<List<ReaderPage>>>;
-
 @ProviderFor(_getSourcePages)
 const _getSourcePagesProvider = _GetSourcePagesFamily._();
 
 final class _GetSourcePagesProvider extends $FunctionalProvider<
         AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
-    with
-        $FutureModifier<List<ReaderPage>>,
-        $FutureProvider<List<ReaderPage>, _GetSourcePagesRef> {
+    with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
   const _GetSourcePagesProvider._(
       {required _GetSourcePagesFamily super.from,
       required (
@@ -283,7 +271,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
       )
           super.argument,
       FutureOr<List<ReaderPage>> Function(
-        _GetSourcePagesRef ref,
+        Ref ref,
         dynamic source,
         SourceInfo info,
       )? create})
@@ -297,7 +285,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ReaderPage>> Function(
-    _GetSourcePagesRef ref,
+    Ref ref,
     dynamic source,
     SourceInfo info,
   )? _createCb;
@@ -321,7 +309,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
   @override
   _GetSourcePagesProvider $copyWithCreate(
     FutureOr<List<ReaderPage>> Function(
-      _GetSourcePagesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _GetSourcePagesProvider._(
@@ -339,7 +327,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<ReaderPage>> create(_GetSourcePagesRef ref) {
+  FutureOr<List<ReaderPage>> create(Ref ref) {
     final _$cb = _createCb ?? _getSourcePages;
     final argument = this.argument as (
       dynamic,
@@ -393,7 +381,7 @@ final class _GetSourcePagesFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<ReaderPage>> Function(
-      _GetSourcePagesRef ref,
+      Ref ref,
       (
         dynamic,
         SourceInfo,
@@ -418,4 +406,4 @@ final class _GetSourcePagesFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

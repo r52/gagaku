@@ -6,19 +6,15 @@ part of 'recent_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchMangaFeedRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_fetchMangaFeed)
 const _fetchMangaFeedProvider = _FetchMangaFeedProvider._();
 
 final class _FetchMangaFeedProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _FetchMangaFeedRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _FetchMangaFeedProvider._(
       {FutureOr<List<Manga>> Function(
-        _FetchMangaFeedRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -32,7 +28,7 @@ final class _FetchMangaFeedProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _FetchMangaFeedRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -47,14 +43,14 @@ final class _FetchMangaFeedProvider
   @override
   _FetchMangaFeedProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _FetchMangaFeedRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchMangaFeedProvider._(create: create);
   }
 
   @override
-  FutureOr<List<Manga>> create(_FetchMangaFeedRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchMangaFeed;
     return _$cb(ref);
   }
@@ -63,4 +59,4 @@ final class _FetchMangaFeedProvider
 String _$fetchMangaFeedHash() => r'44ca19b3dcea9ba580d55bbce060ec6e56029f05';
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

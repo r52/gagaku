@@ -53,7 +53,7 @@ final class _SearchHistoryProvider
   @override
   _SearchHistoryProvider $copyWithBuild(
     List<String> Function(
-      Ref<List<String>>,
+      Ref,
       _SearchHistory,
     ) build,
   ) {
@@ -123,7 +123,7 @@ final class _SearchParamsProvider
   @override
   _SearchParamsProvider $copyWithBuild(
     MangaSearchParameters Function(
-      Ref<MangaSearchParameters>,
+      Ref,
       _SearchParams,
     ) build,
   ) {
@@ -147,4 +147,4 @@ abstract class _$SearchParams extends $Notifier<MangaSearchParameters> {
 }
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

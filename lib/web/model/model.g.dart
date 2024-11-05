@@ -6,17 +6,15 @@ part of 'model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef ProxyRef = Ref<ProxyHandler>;
-
 @ProviderFor(proxy)
 const proxyProvider = ProxyProvider._();
 
 final class ProxyProvider
     extends $FunctionalProvider<ProxyHandler, ProxyHandler>
-    with $Provider<ProxyHandler, ProxyRef> {
+    with $Provider<ProxyHandler> {
   const ProxyProvider._(
       {ProxyHandler Function(
-        ProxyRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -30,7 +28,7 @@ final class ProxyProvider
         );
 
   final ProxyHandler Function(
-    ProxyRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -52,14 +50,14 @@ final class ProxyProvider
   @override
   ProxyProvider $copyWithCreate(
     ProxyHandler Function(
-      ProxyRef ref,
+      Ref ref,
     ) create,
   ) {
     return ProxyProvider._(create: create);
   }
 
   @override
-  ProxyHandler create(ProxyRef ref) {
+  ProxyHandler create(Ref ref) {
     final _$cb = _createCb ?? proxy;
     return _$cb(ref);
   }
@@ -106,7 +104,7 @@ final class WebSourceFavoritesProvider extends $AsyncNotifierProvider<
   @override
   WebSourceFavoritesProvider $copyWithBuild(
     FutureOr<Map<String, List<HistoryLink>>> Function(
-      Ref<AsyncValue<Map<String, List<HistoryLink>>>>,
+      Ref,
       WebSourceFavorites,
     ) build,
   ) {
@@ -171,7 +169,7 @@ final class WebSourceHistoryProvider
   @override
   WebSourceHistoryProvider $copyWithBuild(
     FutureOr<Queue<HistoryLink>> Function(
-      Ref<AsyncValue<Queue<HistoryLink>>>,
+      Ref,
       WebSourceHistory,
     ) build,
   ) {
@@ -233,7 +231,7 @@ final class WebReadMarkersProvider
   @override
   WebReadMarkersProvider $copyWithBuild(
     FutureOr<Map<String, Set<String>>> Function(
-      Ref<AsyncValue<Map<String, Set<String>>>>,
+      Ref,
       WebReadMarkers,
     ) build,
   ) {
@@ -296,7 +294,7 @@ final class WebSourceManagerProvider
   @override
   WebSourceManagerProvider $copyWithBuild(
     FutureOr<WebSource?> Function(
-      Ref<AsyncValue<WebSource?>>,
+      Ref,
       WebSourceManager,
     ) build,
   ) {
@@ -320,4 +318,4 @@ abstract class _$WebSourceManager extends $AsyncNotifier<WebSource?> {
 }
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

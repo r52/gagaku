@@ -6,19 +6,15 @@ part of 'frontpage.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _PopularTitlesRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_popularTitles)
 const _popularTitlesProvider = _PopularTitlesProvider._();
 
 final class _PopularTitlesProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _PopularTitlesRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _PopularTitlesProvider._(
       {FutureOr<List<Manga>> Function(
-        _PopularTitlesRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -32,7 +28,7 @@ final class _PopularTitlesProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _PopularTitlesRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -47,14 +43,14 @@ final class _PopularTitlesProvider
   @override
   _PopularTitlesProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _PopularTitlesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _PopularTitlesProvider._(create: create);
   }
 
   @override
-  FutureOr<List<Manga>> create(_PopularTitlesRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _popularTitles;
     return _$cb(ref);
   }
@@ -62,19 +58,15 @@ final class _PopularTitlesProvider
 
 String _$popularTitlesHash() => r'3e3dd7db23591547693673d72487f8b5b108fbc6';
 
-typedef _RecentlyAddedRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_recentlyAdded)
 const _recentlyAddedProvider = _RecentlyAddedProvider._();
 
 final class _RecentlyAddedProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _RecentlyAddedRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _RecentlyAddedProvider._(
       {FutureOr<List<Manga>> Function(
-        _RecentlyAddedRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -88,7 +80,7 @@ final class _RecentlyAddedProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _RecentlyAddedRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -103,14 +95,14 @@ final class _RecentlyAddedProvider
   @override
   _RecentlyAddedProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _RecentlyAddedRef ref,
+      Ref ref,
     ) create,
   ) {
     return _RecentlyAddedProvider._(create: create);
   }
 
   @override
-  FutureOr<List<Manga>> create(_RecentlyAddedRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _recentlyAdded;
     return _$cb(ref);
   }
@@ -118,19 +110,15 @@ final class _RecentlyAddedProvider
 
 String _$recentlyAddedHash() => r'549bd9c62f2ce2ad5336a6d8e753c7248b7e55c9';
 
-typedef _LatestUpdatesRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_latestUpdates)
 const _latestUpdatesProvider = _LatestUpdatesProvider._();
 
 final class _LatestUpdatesProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _LatestUpdatesRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _LatestUpdatesProvider._(
       {FutureOr<List<Manga>> Function(
-        _LatestUpdatesRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -144,7 +132,7 @@ final class _LatestUpdatesProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _LatestUpdatesRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -159,14 +147,14 @@ final class _LatestUpdatesProvider
   @override
   _LatestUpdatesProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _LatestUpdatesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _LatestUpdatesProvider._(create: create);
   }
 
   @override
-  FutureOr<List<Manga>> create(_LatestUpdatesRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _latestUpdates;
     return _$cb(ref);
   }
@@ -174,21 +162,17 @@ final class _LatestUpdatesProvider
 
 String _$latestUpdatesHash() => r'ca3c517ed27d802704ceb8b9497617ee4c33da7f';
 
-typedef _FetchCustomListMangaRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_fetchCustomListManga)
 const _fetchCustomListMangaProvider = _FetchCustomListMangaFamily._();
 
 final class _FetchCustomListMangaProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _FetchCustomListMangaRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _FetchCustomListMangaProvider._(
       {required _FetchCustomListMangaFamily super.from,
       required String super.argument,
       FutureOr<List<Manga>> Function(
-        _FetchCustomListMangaRef ref,
+        Ref ref,
         String listid,
       )? create})
       : _createCb = create,
@@ -201,7 +185,7 @@ final class _FetchCustomListMangaProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _FetchCustomListMangaRef ref,
+    Ref ref,
     String listid,
   )? _createCb;
 
@@ -224,7 +208,7 @@ final class _FetchCustomListMangaProvider
   @override
   _FetchCustomListMangaProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _FetchCustomListMangaRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchCustomListMangaProvider._(
@@ -238,7 +222,7 @@ final class _FetchCustomListMangaProvider
   }
 
   @override
-  FutureOr<List<Manga>> create(_FetchCustomListMangaRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchCustomListManga;
     final argument = this.argument as String;
     return _$cb(
@@ -285,7 +269,7 @@ final class _FetchCustomListMangaFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<Manga>> Function(
-      _FetchCustomListMangaRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -304,4 +288,4 @@ final class _FetchCustomListMangaFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

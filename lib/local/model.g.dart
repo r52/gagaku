@@ -53,7 +53,7 @@ final class LibrarySortTypeProvider
   @override
   LibrarySortTypeProvider $copyWithBuild(
     LibrarySort Function(
-      Ref<LibrarySort>,
+      Ref,
       LibrarySortType,
     ) build,
   ) {
@@ -115,7 +115,7 @@ final class LocalLibraryProvider
   @override
   LocalLibraryProvider $copyWithBuild(
     FutureOr<LocalLibraryItem> Function(
-      Ref<AsyncValue<LocalLibraryItem>>,
+      Ref,
       LocalLibrary,
     ) build,
   ) {
@@ -177,7 +177,7 @@ final class SupportedFormatsProvider
   @override
   SupportedFormatsProvider $copyWithBuild(
     FutureOr<FormatInfo> Function(
-      Ref<AsyncValue<FormatInfo>>,
+      Ref,
       SupportedFormats,
     ) build,
   ) {
@@ -201,4 +201,4 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
 }
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

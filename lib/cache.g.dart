@@ -6,17 +6,15 @@ part of 'cache.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef CacheRef = Ref<CacheManager>;
-
 @ProviderFor(cache)
 const cacheProvider = CacheProvider._();
 
 final class CacheProvider
     extends $FunctionalProvider<CacheManager, CacheManager>
-    with $Provider<CacheManager, CacheRef> {
+    with $Provider<CacheManager> {
   const CacheProvider._(
       {CacheManager Function(
-        CacheRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -30,7 +28,7 @@ final class CacheProvider
         );
 
   final CacheManager Function(
-    CacheRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -52,14 +50,14 @@ final class CacheProvider
   @override
   CacheProvider $copyWithCreate(
     CacheManager Function(
-      CacheRef ref,
+      Ref ref,
     ) create,
   ) {
     return CacheProvider._(create: create);
   }
 
   @override
-  CacheManager create(CacheRef ref) {
+  CacheManager create(Ref ref) {
     final _$cb = _createCb ?? cache;
     return _$cb(ref);
   }
@@ -68,4 +66,4 @@ final class CacheProvider
 String _$cacheHash() => r'48a6174c970e2db177c74ed79966f8d5a4210d3e';
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
