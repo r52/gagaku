@@ -74,6 +74,7 @@ class GridAlbumImage extends StatelessWidget {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
       clipBehavior: Clip.antiAlias,
       child: Stack(
+        fit: StackFit.passthrough,
         children: [
           child,
           SizedBox.expand(
