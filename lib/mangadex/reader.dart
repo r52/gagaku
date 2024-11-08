@@ -100,35 +100,27 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dataProvider = ref.watch(_fetchChapterDataProvider(chapterId));
-
-    return Scaffold(
-      body: switch (dataProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchChapterDataProvider($chapterId) failed",
-          ),
-        AsyncValue(value: final data?) => MangaDexReaderWidget(
-            chapter: data.chapter,
-            manga: data.manga,
-            title: data.title,
-            link: Text(
-              data.manga.attributes!.title.get('en'),
-              style: const TextStyle(fontSize: 18),
-            ),
-            onLinkPressed: () async {
-              ref.read(readChaptersProvider.notifier).get([data.manga]);
-              ref.read(ratingsProvider.notifier).get([data.manga]);
-              ref.read(statisticsProvider.notifier).get([data.manga]);
-              context.go('/title/${data.manga.id}', extra: data.manga);
-            },
-            backRoute: '/',
-          ),
-        AsyncValue(:final progress) => ListSpinner(
-            progress: progress?.toDouble(),
-          ),
-      },
+    return DataProviderWhenWidget(
+      provider: _fetchChapterDataProvider(chapterId),
+      errorBuilder: (context, child) => Scaffold(
+        body: child,
+      ),
+      builder: (context, data) => MangaDexReaderWidget(
+        chapter: data.chapter,
+        manga: data.manga,
+        title: data.title,
+        link: Text(
+          data.manga.attributes!.title.get('en'),
+          style: const TextStyle(fontSize: 18),
+        ),
+        onLinkPressed: () async {
+          ref.read(readChaptersProvider.notifier).get([data.manga]);
+          ref.read(ratingsProvider.notifier).get([data.manga]);
+          ref.read(statisticsProvider.notifier).get([data.manga]);
+          context.go('/title/${data.manga.id}', extra: data.manga);
+        },
+        backRoute: '/',
+      ),
     );
   }
 }
@@ -153,7 +145,6 @@ class MangaDexReaderWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pageProvider = ref.watch(_fetchChapterPagesProvider(chapter));
     final timer = useRef<Timer?>(null);
 
     useEffect(() {
@@ -179,33 +170,27 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       return () => timer.value?.cancel();
     }, [chapter]);
 
-    switch (pageProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
-          ),
-          body: ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchChapterPagesProvider(${chapter.id}) failed",
-          ),
-        );
-      case AsyncValue(value: final pages?):
-        return ReaderWidget(
-          pages: pages,
-          title: title,
-          subtitle: manga.attributes!.title.get('en'),
-          longstrip: manga.longStrip,
-          link: link,
-          onLinkPressed: onLinkPressed,
-          externalUrl: chapter.attributes.externalUrl,
-          backRoute: backRoute,
-        );
-      case _:
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-    }
+    return DataProviderWhenWidget(
+      provider: _fetchChapterPagesProvider(chapter),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+        ),
+        body: child,
+      ),
+      builder: (context, pages) => ReaderWidget(
+        pages: pages,
+        title: title,
+        subtitle: manga.attributes!.title.get('en'),
+        longstrip: manga.longStrip,
+        link: link,
+        onLinkPressed: onLinkPressed,
+        externalUrl: chapter.attributes.externalUrl,
+        backRoute: backRoute,
+      ),
+      loadingWidget: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }

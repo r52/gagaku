@@ -8,19 +8,18 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class MangaDexLoginWidget extends ConsumerWidget {
+class MangaDexLoginWidget extends StatelessWidget {
   const MangaDexLoginWidget({required this.builder, super.key});
 
-  final Widget Function(BuildContext context, WidgetRef ref) builder;
+  final Widget Function(BuildContext context) builder;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authControlProvider);
-
-    switch (auth) {
-      case AsyncValue(value: final loggedin?):
+  Widget build(BuildContext context) {
+    return DataProviderWhenWidget(
+      provider: authControlProvider,
+      builder: (context, loggedin) {
         if (loggedin) {
-          return builder(context, ref);
+          return builder(context);
         }
 
         return Center(
@@ -28,23 +27,17 @@ class MangaDexLoginWidget extends ConsumerWidget {
             onPressed: () async {
               context.push(GagakuRoute.login);
             },
-            label: const Text('Login to MangaDex'),
+            label: Text('mangadex.login'.tr(context: context)),
             icon: const Icon(
               Icons.https,
             ),
           ),
         );
-      case AsyncValue(:final error?, :final stackTrace?):
-        return ErrorColumn(
-          error: error,
-          stackTrace: stackTrace,
-          message: "authControlProvider failed",
-        );
-      case _:
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-    }
+      },
+      loadingWidget: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }
 
@@ -82,53 +75,61 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                     children: [
                       TextFormField(
                         controller: usernameController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Username',
+                          labelText: 'auth.username'.tr(context: context),
                         ),
                         autofillHints: const [AutofillHints.username],
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty) ? 'Username cannot be empty.' : null;
+                          return (value == null || value.isEmpty)
+                              ? 'auth.usernameEmptyWarning'.tr(context: context)
+                              : null;
                         },
                       ),
                       const SizedBox(height: 12.0),
                       TextFormField(
                         controller: passwordController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Password',
+                          labelText: 'auth.password'.tr(context: context),
                         ),
                         obscureText: true,
                         autofillHints: const [AutofillHints.password],
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty) ? 'Password cannot be empty.' : null;
+                          return (value == null || value.isEmpty)
+                              ? 'auth.passwordEmptyWarning'.tr(context: context)
+                              : null;
                         },
                       ),
                       const SizedBox(height: 12.0),
                       TextFormField(
                         controller: clientIdController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Client ID',
+                          labelText: 'auth.clientId'.tr(context: context),
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty) ? 'Client ID cannot be empty.' : null;
+                          return (value == null || value.isEmpty)
+                              ? 'auth.clientIdEmptyWarning'.tr(context: context)
+                              : null;
                         },
                       ),
                       const SizedBox(height: 12.0),
                       TextFormField(
                         controller: clientSecretController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Client Secret',
+                          labelText: 'auth.clientSecret'.tr(context: context),
                         ),
                         obscureText: true,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          return (value == null || value.isEmpty) ? 'Client Secret cannot be empty.' : null;
+                          return (value == null || value.isEmpty)
+                              ? 'auth.clientSecretEmptyWarning'.tr(context: context)
+                              : null;
                         },
                       ),
                     ],
@@ -141,7 +142,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                     spacing: 8.0,
                     children: <Widget>[
                       TextButton(
-                        child: const Text('CANCEL'),
+                        child: Text('ui.cancel'.tr(context: context)),
                         onPressed: () {
                           passwordController.clear();
                           context.pop();
@@ -176,6 +177,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                           clientSecretController.text);
 
                                       loginSuccess.then((success) {
+                                        if (!context.mounted) return;
                                         if (success) {
                                           router.pop();
                                           passwordController.clear();
@@ -183,8 +185,8 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                           messenger
                                             ..removeCurrentSnackBar()
                                             ..showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Failed to login.'),
+                                              SnackBar(
+                                                content: Text('errors.loginFail'.tr(context: context)),
                                                 backgroundColor: Colors.red,
                                               ),
                                             );
@@ -196,14 +198,14 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                       messenger
                                         ..removeCurrentSnackBar()
                                         ..showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Username/Password/Client ID/Client Secret cannot be empty.'),
+                                          SnackBar(
+                                            content: Text('auth.fieldsEmptyWarning'.tr(context: context)),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
                                     }
                                   },
-                            child: const Text('LOGIN'),
+                            child: Text('auth.login'.tr(context: context)),
                           );
                         },
                       ),

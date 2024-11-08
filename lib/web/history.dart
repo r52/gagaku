@@ -113,7 +113,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
               ),
             ],
           ),
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(error: error, stackTrace: stackTrace),
+        AsyncValue(:final error?, :final stackTrace?) => ErrorList(error: error, stackTrace: stackTrace),
         _ => const Center(
             child: CircularProgressIndicator(),
           ),

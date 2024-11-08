@@ -96,28 +96,20 @@ Future<List<Manga>> _fetchGroupTitles(Ref ref, Group group) async {
   return mangas;
 }
 
-class QueriedMangaDexGroupViewWidget extends ConsumerWidget {
+class QueriedMangaDexGroupViewWidget extends StatelessWidget {
   const QueriedMangaDexGroupViewWidget({super.key, required this.groupId});
 
   final String groupId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final groupProvider = ref.watch(_fetchGroupFromIdProvider(groupId));
-
-    return Scaffold(
-      body: switch (groupProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchGroupFromIdProvider($groupId) failed",
-          ),
-        AsyncValue(value: final group?) => MangaDexGroupViewWidget(
-            group: group,
-          ),
-        AsyncValue(:final progress) => ListSpinner(
-            progress: progress?.toDouble(),
-          ),
+  Widget build(BuildContext context) {
+    return DataProviderWhenWidget(
+      provider: _fetchGroupFromIdProvider(groupId),
+      errorBuilder: (context, child) => Scaffold(body: child),
+      builder: (context, group) {
+        return MangaDexGroupViewWidget(
+          group: group,
+        );
       },
     );
   }
@@ -250,35 +242,32 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 ref.read(groupTitlesProvider(group).notifier).clear();
                 return ref.refresh(_fetchGroupTitlesProvider(group).future);
               },
-              child: switch (titleProvider) {
-                AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                    error: error,
-                    stackTrace: stackTrace,
-                    message: "_fetchGroupTitlesProvider(${group.id}) failed",
+              child: DataProviderWhenWidget(
+                provider: _fetchGroupTitlesProvider(group),
+                data: titleProvider,
+                builder: (context, mangas) => MangaListWidget(
+                  title: Text(
+                    'mangadex.groupTitles'.tr(context: context),
+                    style: TextStyle(fontSize: 24),
                   ),
-                AsyncValue(value: final mangas?) => MangaListWidget(
-                    title: Text(
-                      'mangadex.groupTitles'.tr(context: context),
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: controllers[2],
-                    onAtEdge: () => ref.read(groupTitlesProvider(group).notifier).getMore(),
-                    isLoading: isLoading,
-                    children: [
-                      if (mangas.isEmpty)
-                        SliverToBoxAdapter(
-                          child: Center(
-                            child: Text('errors.notitles'.tr(context: context)),
-                          ),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: controllers[2],
+                  onAtEdge: () => ref.read(groupTitlesProvider(group).notifier).getMore(),
+                  isLoading: isLoading,
+                  children: [
+                    if (mangas.isEmpty)
+                      SliverToBoxAdapter(
+                        child: Center(
+                          child: Text('errors.notitles'.tr(context: context)),
                         ),
-                      MangaListViewSliver(items: mangas),
-                    ],
-                  ),
-                AsyncValue(:final progress) => LoadingOverlayStack(
-                    progress: progress?.toDouble(),
-                  ),
-              },
+                      ),
+                    MangaListViewSliver(items: mangas),
+                  ],
+                ),
+                loadingBuilder: (_, progress) => LoadingOverlayStack(
+                  progress: progress?.toDouble(),
+                ),
+              ),
             );
           },
         ),

@@ -7,7 +7,6 @@ import 'package:gagaku/local/types.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'archive_reader.g.dart';
@@ -98,7 +97,7 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
   return pages;
 }
 
-class ArchiveReaderWidget extends ConsumerWidget {
+class ArchiveReaderWidget extends StatelessWidget {
   const ArchiveReaderWidget({
     super.key,
     required this.path,
@@ -113,28 +112,22 @@ class ArchiveReaderWidget extends ConsumerWidget {
   final VoidCallback? onLinkPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pageProvider = ref.watch(_getArchivePagesProvider(path));
-
+  Widget build(BuildContext context) {
     String strtitle = path;
 
     if (title != null) {
       strtitle = title!;
     }
 
-    switch (pageProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
-          ),
-          body: ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_getArchivePagesProvider($path) failed",
-          ),
-        );
-      case AsyncValue(value: final pages?):
+    return DataProviderWhenWidget(
+      provider: _getArchivePagesProvider(path),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+        ),
+        body: child,
+      ),
+      builder: (context, pages) {
         if (pages.isEmpty) {
           return Scaffold(
             appBar: AppBar(
@@ -153,27 +146,27 @@ class ArchiveReaderWidget extends ConsumerWidget {
           link: link,
           onLinkPressed: onLinkPressed,
         );
-      case _:
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'localLibrary.extractingArchive'.tr(context: context),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 18,
-                  decoration: TextDecoration.none,
-                ),
+      },
+      loadingWidget: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'localLibrary.extractingArchive'.tr(context: context),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.normal,
+                fontSize: 18,
+                decoration: TextDecoration.none,
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              const CircularProgressIndicator()
-            ],
-          ),
-        );
-    }
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const CircularProgressIndicator()
+          ],
+        ),
+      ),
+    );
   }
 }

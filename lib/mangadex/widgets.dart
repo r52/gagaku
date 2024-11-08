@@ -281,61 +281,58 @@ class ChapterFeedWidget extends HookConsumerWidget {
     return Center(
       child: RefreshIndicator(
         onRefresh: onRefresh,
-        child: switch (resultProvider) {
-          AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-              error: error,
-              stackTrace: stackTrace,
-              message: "${provider.toString()} failed",
-            ),
-          AsyncValue(value: final results?) => CustomScrollView(
-              scrollBehavior: const MouseTouchScrollBehavior(),
-              physics: const AlwaysScrollableScrollPhysics(),
-              controller: scrollController,
-              restorationId: restorationId,
-              cacheExtent: MediaQuery.sizeOf(context).height,
-              slivers: [
-                ...leading,
-                if (title != null)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          title!,
-                          style: const TextStyle(fontSize: 24),
-                        ),
+        child: DataProviderWhenWidget(
+          provider: provider,
+          data: resultProvider,
+          builder: (context, results) => CustomScrollView(
+            scrollBehavior: const MouseTouchScrollBehavior(),
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: scrollController,
+            restorationId: restorationId,
+            cacheExtent: MediaQuery.sizeOf(context).height,
+            slivers: [
+              ...leading,
+              if (title != null)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        title!,
+                        style: const TextStyle(fontSize: 24),
                       ),
                     ),
                   ),
-                if (results.isEmpty)
-                  SliverToBoxAdapter(
-                    child: Center(
-                      child: Text(emptyText ?? 'errors.noresults'.tr(context: context)),
-                    ),
-                  ),
-                SuperSliverList.builder(
-                  itemCount: results.length,
-                  findChildIndexCallback: (key) {
-                    final valueKey = key as ValueKey<int>;
-                    final val = results.indexWhere((i) => i.id == valueKey.value);
-                    return val >= 0 ? val : null;
-                  },
-                  itemBuilder: (context, index) {
-                    final elem = results.elementAt(index);
-                    return ChapterFeedItem(key: ValueKey(elem.id), state: elem);
-                  },
                 ),
-                if (isLoading)
-                  const SliverToBoxAdapter(
-                    child: ListSpinner(),
+              if (results.isEmpty)
+                SliverToBoxAdapter(
+                  child: Center(
+                    child: Text(emptyText ?? 'errors.noresults'.tr(context: context)),
                   ),
-              ],
-            ),
-          AsyncValue(:final progress) => LoadingOverlayStack(
-              progress: progress?.toDouble(),
-            ),
-        },
+                ),
+              SuperSliverList.builder(
+                itemCount: results.length,
+                findChildIndexCallback: (key) {
+                  final valueKey = key as ValueKey<int>;
+                  final val = results.indexWhere((i) => i.id == valueKey.value);
+                  return val >= 0 ? val : null;
+                },
+                itemBuilder: (context, index) {
+                  final elem = results.elementAt(index);
+                  return ChapterFeedItem(key: ValueKey(elem.id), state: elem);
+                },
+              ),
+              if (isLoading)
+                const SliverToBoxAdapter(
+                  child: ListSpinner(),
+                ),
+            ],
+          ),
+          loadingBuilder: (context, progress) => LoadingOverlayStack(
+            progress: progress?.toDouble(),
+          ),
+        ),
       ),
     );
   }

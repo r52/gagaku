@@ -38,7 +38,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
 
     Widget? sourcesResult = switch (sources) {
       AsyncError(:final error, :final stackTrace) => SliverToBoxAdapter(
-          child: ErrorColumn(
+          child: ErrorList(
             error: error,
             stackTrace: stackTrace,
             message: "webSourceManagerProvider() failed",
@@ -157,7 +157,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
 
                   if (future.hasError) {
                     return SliverToBoxAdapter(
-                      child: ErrorColumn(
+                      child: ErrorList(
                         error: future.error!,
                         stackTrace: future.stackTrace!,
                         message: "WebSource($src).searchManga() failed",

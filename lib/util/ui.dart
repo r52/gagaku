@@ -529,42 +529,17 @@ class TitleFlexBar extends StatelessWidget {
   }
 }
 
-class ErrorColumn extends StatelessWidget {
-  final Object error;
-  final StackTrace stackTrace;
-  final String message;
-
-  const ErrorColumn({
-    super.key,
-    required this.error,
-    required this.stackTrace,
-    String? message,
-  }) : message = message ?? "Build error";
-
-  @override
-  Widget build(BuildContext context) {
-    final messenger = ScaffoldMessenger.of(context);
-    Styles.showErrorSnackBar(messenger, '$error');
-    logger.e(message, error: error, stackTrace: stackTrace);
-
-    return Center(
-      child: Column(
-        children: [
-          Text('$error'),
-          Text(stackTrace.toString()),
-        ],
-      ),
-    );
-  }
-}
-
 class ErrorList extends StatelessWidget {
   final Object error;
   final StackTrace stackTrace;
   final String message;
 
-  const ErrorList({super.key, required this.error, required this.stackTrace, String? message})
-      : message = message ?? "Build error";
+  const ErrorList({
+    super.key,
+    required this.error,
+    required this.stackTrace,
+    String? message,
+  }) : message = message ?? "Build error";
 
   @override
   Widget build(BuildContext context) {
@@ -628,6 +603,58 @@ class ListSpinner extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+typedef DataProviderOrBuilder<T> = Widget Function(BuildContext context, T data);
+typedef LoadingBuilder = Widget Function(BuildContext context, num? progress);
+typedef ErrorWrapperBuilder = Widget Function(BuildContext context, Widget child);
+
+class DataProviderWhenWidget<T> extends ConsumerWidget {
+  const DataProviderWhenWidget({
+    super.key,
+    required this.provider,
+    this.data,
+    required this.builder,
+    this.errorBuilder,
+    this.loadingBuilder,
+    this.loadingWidget,
+  });
+
+  final ProviderListenable<AsyncValue<T>> provider;
+  final AsyncValue<T>? data;
+  final DataProviderOrBuilder<T> builder;
+  final ErrorWrapperBuilder? errorBuilder;
+  final Widget? loadingWidget;
+  final LoadingBuilder? loadingBuilder;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dataProvider = (data != null) ? data! : ref.watch(provider);
+
+    switch (dataProvider) {
+      case AsyncValue(:final error?, :final stackTrace?):
+        final errorlist = ErrorList(
+          error: error,
+          stackTrace: stackTrace,
+          message: "${provider.toString()} failed",
+        );
+
+        if (errorBuilder != null) {
+          return errorBuilder!(context, errorlist);
+        }
+
+        return errorlist;
+      // ignore: async_value_nullable_pattern
+      case AsyncValue(value: final data?):
+        return builder(context, data);
+      case AsyncValue(:final progress):
+        if (loadingBuilder != null) {
+          return loadingBuilder!(context, progress);
+        }
+
+        return loadingWidget ?? ListSpinner(progress: progress?.toDouble());
+    }
   }
 }
 

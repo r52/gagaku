@@ -51,28 +51,18 @@ Future<List<Manga>> _fetchCreatorTitles(Ref ref, CreatorType creator) async {
   return mangas;
 }
 
-class QueriedMangaDexCreatorViewWidget extends ConsumerWidget {
+class QueriedMangaDexCreatorViewWidget extends StatelessWidget {
   const QueriedMangaDexCreatorViewWidget({super.key, required this.creatorId});
 
   final String creatorId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final creatorProvider = ref.watch(_fetchCreatorFromIdProvider(creatorId));
-
-    return Scaffold(
-      body: switch (creatorProvider) {
-        AsyncValue(value: final creator?) => MangaDexCreatorViewWidget(
-            creator: creator,
-          ),
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchCreatorFromIdProvider($creatorId) failed",
-          ),
-        AsyncValue(:final progress) => ListSpinner(
-            progress: progress?.toDouble(),
-          ),
+  Widget build(BuildContext context) {
+    return DataProviderWhenWidget(
+      provider: _fetchCreatorFromIdProvider(creatorId),
+      errorBuilder: (context, child) => Scaffold(body: child),
+      builder: (context, creator) {
+        return MangaDexCreatorViewWidget(creator: creator);
       },
     );
   }
@@ -96,13 +86,11 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
           ref.read(creatorTitlesProvider(creator).notifier).clear();
           return ref.refresh(_fetchCreatorTitlesProvider(creator).future);
         },
-        child: switch (titleProvider) {
-          AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-              error: error,
-              stackTrace: stackTrace,
-              message: "_fetchCreatorTitlesProvider(${creator.id}) failed",
-            ),
-          AsyncValue(value: final mangas?) => MangaListWidget(
+        child: DataProviderWhenWidget(
+          provider: _fetchCreatorTitlesProvider(creator),
+          data: titleProvider,
+          builder: (context, mangas) {
+            return MangaListWidget(
               leading: [
                 SliverAppBar(
                   pinned: true,
@@ -201,11 +189,12 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                   ),
                 MangaListViewSliver(items: mangas),
               ],
-            ),
-          AsyncValue(:final progress) => LoadingOverlayStack(
-              progress: progress?.toDouble(),
-            ),
-        },
+            );
+          },
+          loadingBuilder: (_, progress) => LoadingOverlayStack(
+            progress: progress?.toDouble(),
+          ),
+        ),
       ),
     );
   }

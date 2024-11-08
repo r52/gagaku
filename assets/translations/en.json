@@ -42,11 +42,21 @@
     "nolists": "No lists",
     "norepos": "No repos",
     "noitems": "No items",
-    "unsupportedUrl": "Unsupported URL"
+    "unsupportedUrl": "Unsupported URL",
+    "loginFail": "Failed to login"
   },
   "auth": {
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "usernameEmptyWarning": "Username cannot be empty",
+    "passwordEmptyWarning": "Password cannot be empty",
+    "clientId": "Client ID",
+    "clientSecret": "Client Secret",
+    "clientIdEmptyWarning": "Client ID cannot be empty",
+    "clientSecretEmptyWarning": "Client Secret cannot be empty",
+    "fieldsEmptyWarning": "Username/Password/Client ID/Client Secret cannot be empty"
   },
   "sort": {
     "desc": "Descending",
@@ -283,6 +293,7 @@
     "chapters": "Chapters",
     "art": "Art",
     "related": "Related",
+    "relatedTitles": "Related Titles",
     "volume": "Volume {}",
     "chapter": "Chapter {}",
     "officialRaw": "Official Raw",

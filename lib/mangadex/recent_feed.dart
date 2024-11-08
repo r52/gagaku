@@ -69,29 +69,26 @@ class MangaDexRecentFeed extends HookConsumerWidget {
             ref.read(recentlyAddedProvider.notifier).clear();
             return ref.refresh(_fetchMangaFeedProvider.future);
           },
-          child: switch (feedProvider) {
-            AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                error: error,
-                stackTrace: stackTrace,
-                message: "_fetchMangaFeedProvider failed",
-              ),
-            AsyncValue(value: final mangas?) => MangaListWidget(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: ctrler,
-                onAtEdge: () => ref.read(recentlyAddedProvider.notifier).getMore(),
-                isLoading: isLoading,
-                children: [
-                  if (mangas.isEmpty)
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Text('errors.noresults'.tr(context: context)),
-                      ),
+          child: DataProviderWhenWidget(
+            provider: _fetchMangaFeedProvider,
+            data: feedProvider,
+            builder: (context, mangas) => MangaListWidget(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: ctrler,
+              onAtEdge: () => ref.read(recentlyAddedProvider.notifier).getMore(),
+              isLoading: isLoading,
+              children: [
+                if (mangas.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Text('errors.noresults'.tr(context: context)),
                     ),
-                  MangaListViewSliver(items: mangas),
-                ],
-              ),
-            _ => const LoadingOverlayStack(),
-          },
+                  ),
+                MangaListViewSliver(items: mangas),
+              ],
+            ),
+            loadingWidget: const LoadingOverlayStack(),
+          ),
         ),
       ),
     );

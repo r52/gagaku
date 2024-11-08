@@ -221,7 +221,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
         children: [
           switch (searchProvider) {
             AsyncValue(:final error?, :final stackTrace?) => SliverToBoxAdapter(
-                child: ErrorColumn(
+                child: ErrorList(
                   error: error,
                   stackTrace: stackTrace,
                   message: "mangaSearchProvider() failed",
@@ -268,7 +268,7 @@ class MangaDexSearchWidget extends HookConsumerWidget {
   }
 }
 
-class _MangaDexFilterWidget extends HookConsumerWidget {
+class _MangaDexFilterWidget extends HookWidget {
   const _MangaDexFilterWidget({
     required this.filter,
   });
@@ -276,12 +276,10 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
   final MangaFilters filter;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final fil = useValueNotifier(filter);
-
-    final tagsProvider = ref.watch(tagListProvider);
 
     final selectedChipColor = theme.colorScheme.tertiaryContainer;
 
@@ -328,291 +326,287 @@ class _MangaDexFilterWidget extends HookConsumerWidget {
           )
         ],
       ),
-      body: switch (tagsProvider) {
-        AsyncValue(value: final tags?) => SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              children: [
+      body: DataProviderWhenWidget(
+        provider: tagListProvider,
+        builder: (context, tags) => SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            children: [
+              _SectionHeader(
+                key: ValueKey('_selectedTagFilters'),
+                header: 'search.selectedTagFilters'.tr(context: context),
+              ),
+              HookBuilder(
+                builder: (context) {
+                  final selectedFilters = useListenableSelector(
+                      fil,
+                      () => [
+                            ...fil.value.includedTags.map(
+                              (e) => InputChip(
+                                label: Text(e.attributes.name.get('en')),
+                                showCheckmark: true,
+                                selected: true,
+                                onDeleted: () {
+                                  fil.value = MangaFilterAction.action(
+                                    fil.value,
+                                    includedTags: fil.value.includedTags.where((element) => element != e).toSet(),
+                                  );
+                                },
+                                selectedColor: selectedChipColor,
+                              ),
+                            ),
+                            ...fil.value.excludedTags.map(
+                              (e) => InputChip(
+                                label: Text(e.attributes.name.get('en')),
+                                avatar: Icon(
+                                  Icons.remove,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                onDeleted: () {
+                                  fil.value = MangaFilterAction.action(
+                                    fil.value,
+                                    excludedTags: fil.value.excludedTags.where((element) => element != e).toSet(),
+                                  );
+                                },
+                                side: BorderSide(color: selectedChipColor),
+                              ),
+                            )
+                          ]);
+
+                  return _SectionChildren(
+                    key: const ValueKey("_selectedFilters"),
+                    children: selectedFilters.isNotEmpty
+                        ? selectedFilters
+                        : [InputChip(label: Text('ui.none'.tr(context: context)))],
+                  );
+                },
+              ),
+
+              const Divider(),
+
+              /// ContentRating
+              _SectionHeader(
+                key: ValueKey("_contentRating"),
+                header: 'mangadex.contentRating'.tr(context: context),
+              ),
+              _SectionChildren(
+                key: const ValueKey("_contentChildren"),
+                children: ContentRating.values
+                    .map(
+                      (e) => HookBuilder(
+                        builder: (context) {
+                          final selected = useListenableSelector(fil, () => fil.value.contentRating.contains(e));
+
+                          return FilterChip(
+                            label: Text(context.tr(e.label)),
+                            selectedColor: selectedChipColor,
+                            selected: selected,
+                            onSelected: (bool value) {
+                              if (value) {
+                                fil.value = MangaFilterAction.action(
+                                  fil.value,
+                                  contentRating: {...fil.value.contentRating, e},
+                                );
+                              } else {
+                                fil.value = MangaFilterAction.action(
+                                  fil.value,
+                                  contentRating: fil.value.contentRating.where((element) => element != e).toSet(),
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+
+              /// Demographic
+              _SectionHeader(
+                key: ValueKey("_demographic"),
+                header: 'mangadex.demographic'.tr(context: context),
+              ),
+              _SectionChildren(
+                key: const ValueKey("_demographicChildren"),
+                children: MangaDemographic.values
+                    .map(
+                      (e) => HookBuilder(
+                        builder: (context) {
+                          final selected =
+                              useListenableSelector(fil, () => fil.value.publicationDemographic.contains(e));
+
+                          return FilterChip(
+                            label: Text(e.label),
+                            selectedColor: selectedChipColor,
+                            selected: selected,
+                            onSelected: (bool value) {
+                              if (value) {
+                                fil.value = MangaFilterAction.action(
+                                  fil.value,
+                                  publicationDemographic: {...fil.value.publicationDemographic, e},
+                                );
+                              } else {
+                                fil.value = MangaFilterAction.action(
+                                  fil.value,
+                                  publicationDemographic:
+                                      fil.value.publicationDemographic.where((element) => element != e).toSet(),
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+
+              /// Pub status
+              _SectionHeader(
+                key: ValueKey("_pubStatus"),
+                header: 'mangadex.pubStatus'.tr(context: context),
+              ),
+              _SectionChildren(
+                key: const ValueKey("_pubChildren"),
+                children: MangaStatus.values
+                    .map(
+                      (e) => HookBuilder(
+                        builder: (context) {
+                          final selected = useListenableSelector(fil, () => fil.value.status.contains(e));
+
+                          return FilterChip(
+                            label: Text(context.tr(e.label)),
+                            selectedColor: selectedChipColor,
+                            selected: selected,
+                            onSelected: (bool value) {
+                              if (value) {
+                                fil.value = MangaFilterAction.action(
+                                  fil.value,
+                                  status: {...fil.value.status, e},
+                                );
+                              } else {
+                                fil.value = MangaFilterAction.action(
+                                  fil.value,
+                                  status: fil.value.status.where((element) => element != e).toSet(),
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+              const Divider(),
+
+              /// Tags
+              for (final group in TagGroup.values) ...[
                 _SectionHeader(
-                  key: ValueKey('_selectedTagFilters'),
-                  header: 'search.selectedTagFilters'.tr(context: context),
+                  key: ValueKey(group.label),
+                  header: group.label,
                 ),
-                HookBuilder(
-                  builder: (context) {
-                    final selectedFilters = useListenableSelector(
-                        fil,
-                        () => [
-                              ...fil.value.includedTags.map(
-                                (e) => InputChip(
-                                  label: Text(e.attributes.name.get('en')),
-                                  showCheckmark: true,
-                                  selected: true,
-                                  onDeleted: () {
+                _SectionChildren(
+                  key: ValueKey("_${group.label}Children"),
+                  children: tags
+                      .where((element) => element.attributes.group == group)
+                      .map(
+                        (e) => HookBuilder(
+                          builder: (context) {
+                            final value = useListenableSelector(
+                                fil,
+                                () => fil.value.includedTags.contains(e)
+                                    ? true
+                                    : (fil.value.excludedTags.contains(e) ? false : null));
+
+                            return TriStateChip(
+                              label: Text(e.attributes.name.get('en')),
+                              selectedColor: selectedChipColor,
+                              onChanged: (bool? value) {
+                                switch (value) {
+                                  case null:
                                     fil.value = MangaFilterAction.action(
                                       fil.value,
                                       includedTags: fil.value.includedTags.where((element) => element != e).toSet(),
-                                    );
-                                  },
-                                  selectedColor: selectedChipColor,
-                                ),
-                              ),
-                              ...fil.value.excludedTags.map(
-                                (e) => InputChip(
-                                  label: Text(e.attributes.name.get('en')),
-                                  avatar: Icon(
-                                    Icons.remove,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                  onDeleted: () {
-                                    fil.value = MangaFilterAction.action(
-                                      fil.value,
                                       excludedTags: fil.value.excludedTags.where((element) => element != e).toSet(),
                                     );
-                                  },
-                                  side: BorderSide(color: selectedChipColor),
-                                ),
-                              )
-                            ]);
-
-                    return _SectionChildren(
-                      key: const ValueKey("_selectedFilters"),
-                      children: selectedFilters.isNotEmpty
-                          ? selectedFilters
-                          : [InputChip(label: Text('ui.none'.tr(context: context)))],
-                    );
-                  },
-                ),
-
-                const Divider(),
-
-                /// ContentRating
-                _SectionHeader(
-                  key: ValueKey("_contentRating"),
-                  header: 'mangadex.contentRating'.tr(context: context),
-                ),
-                _SectionChildren(
-                  key: const ValueKey("_contentChildren"),
-                  children: ContentRating.values
-                      .map(
-                        (e) => HookBuilder(
-                          builder: (context) {
-                            final selected = useListenableSelector(fil, () => fil.value.contentRating.contains(e));
-
-                            return FilterChip(
-                              label: Text(context.tr(e.label)),
-                              selectedColor: selectedChipColor,
-                              selected: selected,
-                              onSelected: (bool value) {
-                                if (value) {
-                                  fil.value = MangaFilterAction.action(
-                                    fil.value,
-                                    contentRating: {...fil.value.contentRating, e},
-                                  );
-                                } else {
-                                  fil.value = MangaFilterAction.action(
-                                    fil.value,
-                                    contentRating: fil.value.contentRating.where((element) => element != e).toSet(),
-                                  );
+                                    break;
+                                  case true:
+                                    fil.value = MangaFilterAction.action(
+                                      fil.value,
+                                      includedTags: {...fil.value.includedTags, e},
+                                      excludedTags: fil.value.excludedTags.where((element) => element != e).toSet(),
+                                    );
+                                    break;
+                                  case false:
+                                    fil.value = MangaFilterAction.action(
+                                      fil.value,
+                                      includedTags: fil.value.includedTags.where((element) => element != e).toSet(),
+                                      excludedTags: {...fil.value.excludedTags, e},
+                                    );
+                                    break;
                                 }
                               },
+                              value: value,
                             );
                           },
                         ),
                       )
                       .toList(),
-                ),
-
-                /// Demographic
-                _SectionHeader(
-                  key: ValueKey("_demographic"),
-                  header: 'mangadex.demographic'.tr(context: context),
-                ),
-                _SectionChildren(
-                  key: const ValueKey("_demographicChildren"),
-                  children: MangaDemographic.values
-                      .map(
-                        (e) => HookBuilder(
-                          builder: (context) {
-                            final selected =
-                                useListenableSelector(fil, () => fil.value.publicationDemographic.contains(e));
-
-                            return FilterChip(
-                              label: Text(e.label),
-                              selectedColor: selectedChipColor,
-                              selected: selected,
-                              onSelected: (bool value) {
-                                if (value) {
-                                  fil.value = MangaFilterAction.action(
-                                    fil.value,
-                                    publicationDemographic: {...fil.value.publicationDemographic, e},
-                                  );
-                                } else {
-                                  fil.value = MangaFilterAction.action(
-                                    fil.value,
-                                    publicationDemographic:
-                                        fil.value.publicationDemographic.where((element) => element != e).toSet(),
-                                  );
-                                }
-                              },
-                            );
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-
-                /// Pub status
-                _SectionHeader(
-                  key: ValueKey("_pubStatus"),
-                  header: 'mangadex.pubStatus'.tr(context: context),
-                ),
-                _SectionChildren(
-                  key: const ValueKey("_pubChildren"),
-                  children: MangaStatus.values
-                      .map(
-                        (e) => HookBuilder(
-                          builder: (context) {
-                            final selected = useListenableSelector(fil, () => fil.value.status.contains(e));
-
-                            return FilterChip(
-                              label: Text(context.tr(e.label)),
-                              selectedColor: selectedChipColor,
-                              selected: selected,
-                              onSelected: (bool value) {
-                                if (value) {
-                                  fil.value = MangaFilterAction.action(
-                                    fil.value,
-                                    status: {...fil.value.status, e},
-                                  );
-                                } else {
-                                  fil.value = MangaFilterAction.action(
-                                    fil.value,
-                                    status: fil.value.status.where((element) => element != e).toSet(),
-                                  );
-                                }
-                              },
-                            );
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-                const Divider(),
-
-                /// Tags
-                for (final group in TagGroup.values) ...[
-                  _SectionHeader(
-                    key: ValueKey(group.label),
-                    header: group.label,
-                  ),
-                  _SectionChildren(
-                    key: ValueKey("_${group.label}Children"),
-                    children: tags
-                        .where((element) => element.attributes.group == group)
-                        .map(
-                          (e) => HookBuilder(
-                            builder: (context) {
-                              final value = useListenableSelector(
-                                  fil,
-                                  () => fil.value.includedTags.contains(e)
-                                      ? true
-                                      : (fil.value.excludedTags.contains(e) ? false : null));
-
-                              return TriStateChip(
-                                label: Text(e.attributes.name.get('en')),
-                                selectedColor: selectedChipColor,
-                                onChanged: (bool? value) {
-                                  switch (value) {
-                                    case null:
-                                      fil.value = MangaFilterAction.action(
-                                        fil.value,
-                                        includedTags: fil.value.includedTags.where((element) => element != e).toSet(),
-                                        excludedTags: fil.value.excludedTags.where((element) => element != e).toSet(),
-                                      );
-                                      break;
-                                    case true:
-                                      fil.value = MangaFilterAction.action(
-                                        fil.value,
-                                        includedTags: {...fil.value.includedTags, e},
-                                        excludedTags: fil.value.excludedTags.where((element) => element != e).toSet(),
-                                      );
-                                      break;
-                                    case false:
-                                      fil.value = MangaFilterAction.action(
-                                        fil.value,
-                                        includedTags: fil.value.includedTags.where((element) => element != e).toSet(),
-                                        excludedTags: {...fil.value.excludedTags, e},
-                                      );
-                                      break;
-                                  }
-                                },
-                                value: value,
-                              );
-                            },
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-
-                // Modes
-                _SectionHeader(
-                  key: ValueKey("Modes"),
-                  header: 'search.otherOptions'.tr(context: context),
-                ),
-                _SectionChildren(
-                  key: const ValueKey("_modesChildren"),
-                  children: [
-                    DropdownMenu<TagMode>(
-                      label: Text('search.inclusion'.tr(context: context)),
-                      initialSelection: fil.value.includedTagsMode,
-                      requestFocusOnTap: false,
-                      enableSearch: false,
-                      enableFilter: false,
-                      dropdownMenuEntries: [
-                        for (final mode in TagMode.values) DropdownMenuEntry(value: mode, label: mode.label),
-                      ],
-                      onSelected: (value) {
-                        if (value != null) {
-                          fil.value = MangaFilterAction.action(
-                            fil.value,
-                            includedTagsMode: value,
-                          );
-                        }
-                      },
-                    ),
-                    DropdownMenu<TagMode>(
-                      label: Text('search.exclusion'.tr(context: context)),
-                      initialSelection: fil.value.excludedTagsMode,
-                      requestFocusOnTap: false,
-                      enableSearch: false,
-                      enableFilter: false,
-                      dropdownMenuEntries: [
-                        for (final mode in TagMode.values) DropdownMenuEntry(value: mode, label: mode.label),
-                      ],
-                      onSelected: (value) {
-                        if (value != null) {
-                          fil.value = MangaFilterAction.action(
-                            fil.value,
-                            excludedTagsMode: value,
-                          );
-                        }
-                      },
-                    ),
-                  ],
                 ),
               ],
-            ),
+
+              // Modes
+              _SectionHeader(
+                key: ValueKey("Modes"),
+                header: 'search.otherOptions'.tr(context: context),
+              ),
+              _SectionChildren(
+                key: const ValueKey("_modesChildren"),
+                children: [
+                  DropdownMenu<TagMode>(
+                    label: Text('search.inclusion'.tr(context: context)),
+                    initialSelection: fil.value.includedTagsMode,
+                    requestFocusOnTap: false,
+                    enableSearch: false,
+                    enableFilter: false,
+                    dropdownMenuEntries: [
+                      for (final mode in TagMode.values) DropdownMenuEntry(value: mode, label: mode.label),
+                    ],
+                    onSelected: (value) {
+                      if (value != null) {
+                        fil.value = MangaFilterAction.action(
+                          fil.value,
+                          includedTagsMode: value,
+                        );
+                      }
+                    },
+                  ),
+                  DropdownMenu<TagMode>(
+                    label: Text('search.exclusion'.tr(context: context)),
+                    initialSelection: fil.value.excludedTagsMode,
+                    requestFocusOnTap: false,
+                    enableSearch: false,
+                    enableFilter: false,
+                    dropdownMenuEntries: [
+                      for (final mode in TagMode.values) DropdownMenuEntry(value: mode, label: mode.label),
+                    ],
+                    onSelected: (value) {
+                      if (value != null) {
+                        fil.value = MangaFilterAction.action(
+                          fil.value,
+                          excludedTagsMode: value,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "tagListProvider failed",
-          ),
-        _ => const Center(
-            child: CircularProgressIndicator(),
-          ),
-      },
+        ),
+        loadingWidget: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
     );
   }
 }

@@ -142,7 +142,7 @@ Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic source, SourceInfo inf
   return pages;
 }
 
-class QueriedWebSourceReaderWidget extends ConsumerWidget {
+class QueriedWebSourceReaderWidget extends StatelessWidget {
   const QueriedWebSourceReaderWidget({
     super.key,
     required this.proxy,
@@ -155,32 +155,14 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
   final String chapter;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final info =
         SourceInfo(type: SourceType.proxy, source: proxy, location: code, chapter: chapter.replaceFirst('-', '.'));
-    final dataProvider = ref.watch(_fetchWebChapterInfoProvider(info));
 
-    Widget child;
-    PreferredSizeWidget? appBar;
-
-    switch (dataProvider) {
-      case AsyncValue(value: final data?):
-        return WebSourceReaderWidget(
-          source: data.source,
-          title: data.title,
-          link: data.link,
-          info: data.info,
-          readKey: data.readKey,
-          onLinkPressed: data.onLinkPressed,
-          backRoute: GagakuRoute.proxyHome,
-        );
-      case AsyncValue(:final error?, :final stackTrace?):
-        child = ErrorColumn(
-          error: error,
-          stackTrace: stackTrace,
-          message: "_fetchWebChapterInfoProvider($proxy/$code/$chapter) failed",
-        );
-        appBar = AppBar(
+    return DataProviderWhenWidget(
+      provider: _fetchWebChapterInfoProvider(info),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
           leading: BackButton(
             onPressed: () {
               if (context.canPop()) {
@@ -190,18 +172,18 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
               }
             },
           ),
-        );
-        break;
-      case AsyncValue(:final progress):
-        child = ListSpinner(
-          progress: progress?.toDouble(),
-        );
-        break;
-    }
-
-    return Scaffold(
-      appBar: appBar,
-      body: child,
+        ),
+        body: child,
+      ),
+      builder: (context, data) => WebSourceReaderWidget(
+        source: data.source,
+        title: data.title,
+        link: data.link,
+        info: data.info,
+        readKey: data.readKey,
+        onLinkPressed: data.onLinkPressed,
+        backRoute: GagakuRoute.proxyHome,
+      ),
     );
   }
 }
@@ -237,10 +219,6 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       name = source;
     }
 
-    final pageProvider = info.type == SourceType.proxy
-        ? ref.watch(_getPagesProvider(source))
-        : ref.watch(_getSourcePagesProvider(source, info));
-
     useEffect(() {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
 
@@ -253,39 +231,30 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       return () => timer.value?.cancel();
     }, []);
 
-    switch (pageProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(
-            leading: BackButton(
-              onPressed: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go(backRoute ?? GagakuRoute.proxyHome);
-                }
-              },
-            ),
+    return DataProviderWhenWidget(
+      provider: info.type == SourceType.proxy ? _getPagesProvider(source) : _getSourcePagesProvider(source, info),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(backRoute ?? GagakuRoute.proxyHome);
+              }
+            },
           ),
-          body: ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_getPagesProvider($source) failed",
-          ),
-        );
-      case AsyncValue(value: final pages?):
-        return ReaderWidget(
-          pages: pages,
-          title: name,
-          longstrip: false,
-          link: link,
-          onLinkPressed: onLinkPressed,
-          backRoute: backRoute,
-        );
-      case AsyncValue(:final progress):
-        return ListSpinner(
-          progress: progress?.toDouble(),
-        );
-    }
+        ),
+        body: child,
+      ),
+      builder: (context, pages) => ReaderWidget(
+        pages: pages,
+        title: name,
+        longstrip: false,
+        link: link,
+        onLinkPressed: onLinkPressed,
+        backRoute: backRoute,
+      ),
+    );
   }
 }

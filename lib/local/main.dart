@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -147,12 +149,15 @@ class LocalLibraryHome extends StatelessWidget {
             );
           }
 
-          switch (libraryProvider) {
-            case AsyncValue(value: final top?):
-              Widget child;
-
-              if (top.error != null) {
-                child = Center(
+          return RefreshIndicator(
+            onRefresh: () async => ref.refresh(localLibraryProvider.future),
+            child: switch (libraryProvider) {
+              AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+                  error: error,
+                  stackTrace: stackTrace,
+                  message: "localLibraryProvider failed",
+                ),
+              AsyncValue(value: final top?) when top.error != null => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -169,9 +174,8 @@ class LocalLibraryHome extends StatelessWidget {
                       ),
                     ],
                   ),
-                );
-              } else if (currentItem.value != null) {
-                child = LibraryListWidget(
+                ),
+              AsyncValue(value: final top?) when currentItem.value != null => LibraryListWidget(
                   title: Text(
                     currentItem.value!.path,
                     style: const TextStyle(fontSize: 24),
@@ -191,56 +195,40 @@ class LocalLibraryHome extends StatelessWidget {
                       currentItem.value = item;
                     }
                   },
-                );
-              } else {
-                return const ListSpinner();
-              }
-
-              return RefreshIndicator(
-                onRefresh: () async => ref.refresh(localLibraryProvider.future),
-                child: child,
-              );
-            case AsyncValue(:final error?, :final stackTrace?):
-              return RefreshIndicator(
-                onRefresh: () async => ref.refresh(localLibraryProvider.future),
-                child: ErrorList(
-                  error: error,
-                  stackTrace: stackTrace,
-                  message: "localLibraryProvider failed",
                 ),
-              );
-            case AsyncValue(:final progress):
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'localLibrary.scanning'.tr(context: context),
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 18,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    CircularProgressIndicator(value: progress?.toDouble()),
-                    if (progress != null)
+              AsyncValue(value: final top?) => const ListSpinner(),
+              AsyncValue(:final progress) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Text(
-                        '${(progress * 100).floor()}%',
+                        'localLibrary.scanning'.tr(context: context),
                         style: TextStyle(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.normal,
                           fontSize: 18,
                           decoration: TextDecoration.none,
                         ),
-                      )
-                  ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CircularProgressIndicator(value: progress?.toDouble()),
+                      if (progress != null)
+                        Text(
+                          '${(progress * 100).floor()}%',
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            decoration: TextDecoration.none,
+                          ),
+                        )
+                    ],
+                  ),
                 ),
-              );
-          }
+            },
+          );
         },
       ),
     );

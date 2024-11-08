@@ -88,25 +88,17 @@ class QueriedMangaDexMangaViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mangaProvider = ref.watch(_fetchMangaFromIdProvider(mangaId));
-
-    return Scaffold(
-      body: switch (mangaProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-            onRefresh: () async => ref.refresh(_fetchMangaFromIdProvider(mangaId).future),
-            child: ErrorList(
-              error: error,
-              stackTrace: stackTrace,
-              message: "_fetchMangaFromIdProvider($mangaId) failed",
-            ),
-          ),
-        AsyncValue(value: final manga?) => MangaDexMangaViewWidget(
-            manga: manga,
-          ),
-        AsyncValue(:final progress) => ListSpinner(
-            progress: progress?.toDouble(),
-          ),
-      },
+    return DataProviderWhenWidget(
+      provider: _fetchMangaFromIdProvider(mangaId),
+      errorBuilder: (context, child) => Scaffold(
+        body: RefreshIndicator(
+          onRefresh: () async => ref.refresh(_fetchMangaFromIdProvider(mangaId).future),
+          child: child,
+        ),
+      ),
+      builder: (context, manga) => MangaDexMangaViewWidget(
+        manga: manga,
+      ),
     );
   }
 }
@@ -679,26 +671,23 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                       return Stack(
                         children: [
-                          switch (chapterProvider) {
-                            AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                                error: error,
-                                stackTrace: stackTrace,
-                                message: "mangaChaptersProvider(${manga.id}) failed",
+                          DataProviderWhenWidget(
+                            provider: mangaChaptersProvider(manga),
+                            data: chapterProvider,
+                            builder: (context, chapters) => NotificationListener<ScrollEndNotification>(
+                              onNotification: onScrollNotification,
+                              child: CustomScrollView(
+                                cacheExtent: MediaQuery.sizeOf(context).height,
+                                slivers: [
+                                  _ChapterListSliver(
+                                    chapters: chapters,
+                                    manga: manga,
+                                  ),
+                                ],
                               ),
-                            AsyncValue(value: final chapters?) => NotificationListener<ScrollEndNotification>(
-                                onNotification: onScrollNotification,
-                                child: CustomScrollView(
-                                  cacheExtent: MediaQuery.sizeOf(context).height,
-                                  slivers: [
-                                    _ChapterListSliver(
-                                      chapters: chapters,
-                                      manga: manga,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            _ => const SizedBox.shrink(),
-                          },
+                            ),
+                            loadingWidget: const SizedBox.shrink(),
+                          ),
                           if (chapterProvider.isLoading) ...Styles.loadingOverlay
                         ],
                       );
@@ -710,115 +699,112 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                       return Stack(
                         children: [
-                          switch (coverProvider) {
-                            AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                                error: error,
-                                stackTrace: stackTrace,
-                                message: "mangaCoversProvider(${manga.id}) failed",
-                              ),
-                            AsyncValue(value: final covers?) => NotificationListener<ScrollEndNotification>(
-                                onNotification: onScrollNotification,
-                                child: CustomScrollView(
-                                  slivers: [
-                                    SliverGrid.builder(
-                                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                                        maxCrossAxisExtent: 256,
-                                        mainAxisSpacing: 8,
-                                        crossAxisSpacing: 8,
-                                        childAspectRatio: 0.7,
-                                      ),
-                                      findChildIndexCallback: (key) {
-                                        final valueKey = key as ValueKey<String>;
-                                        final val = covers.indexWhere((i) => i.id == valueKey.value);
-                                        return val >= 0 ? val : null;
-                                      },
-                                      itemBuilder: (context, index) {
-                                        final cover = covers.elementAt(index);
-                                        return _CoverArtItem(
-                                          key: ValueKey(cover.id),
-                                          cover: cover,
-                                          manga: manga,
-                                          page: index,
-                                          onTap: () async {
-                                            Navigator.push(context, TransparentOverlay(
-                                              builder: (context) {
-                                                return HookBuilder(
-                                                  builder: (context) {
-                                                    final controller = usePageController(initialPage: index);
-                                                    return Scaffold(
-                                                      appBar: AppBar(
-                                                        backgroundColor: Colors.transparent,
-                                                        leading: CloseButton(
-                                                          style: IconButton.styleFrom(backgroundColor: Colors.black),
-                                                        ),
-                                                      ),
+                          DataProviderWhenWidget(
+                            provider: mangaCoversProvider(manga),
+                            data: coverProvider,
+                            builder: (context, covers) => NotificationListener<ScrollEndNotification>(
+                              onNotification: onScrollNotification,
+                              child: CustomScrollView(
+                                slivers: [
+                                  SliverGrid.builder(
+                                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 256,
+                                      mainAxisSpacing: 8,
+                                      crossAxisSpacing: 8,
+                                      childAspectRatio: 0.7,
+                                    ),
+                                    findChildIndexCallback: (key) {
+                                      final valueKey = key as ValueKey<String>;
+                                      final val = covers.indexWhere((i) => i.id == valueKey.value);
+                                      return val >= 0 ? val : null;
+                                    },
+                                    itemBuilder: (context, index) {
+                                      final cover = covers.elementAt(index);
+                                      return _CoverArtItem(
+                                        key: ValueKey(cover.id),
+                                        cover: cover,
+                                        manga: manga,
+                                        page: index,
+                                        onTap: () async {
+                                          Navigator.push(context, TransparentOverlay(
+                                            builder: (context) {
+                                              return HookBuilder(
+                                                builder: (context) {
+                                                  final controller = usePageController(initialPage: index);
+                                                  return Scaffold(
+                                                    appBar: AppBar(
                                                       backgroundColor: Colors.transparent,
-                                                      extendBody: true,
-                                                      extendBodyBehindAppBar: true,
-                                                      body: PageView.builder(
-                                                        scrollBehavior: const MouseTouchScrollBehavior(),
-                                                        findChildIndexCallback: (key) {
-                                                          final valueKey = key as ValueKey<String>;
-                                                          final val = covers.indexWhere((i) => i.id == valueKey.value);
-                                                          return val >= 0 ? val : null;
-                                                        },
-                                                        itemBuilder: (BuildContext context, int id) {
-                                                          final item = covers.elementAt(id);
-                                                          final url = manga.getUrlFromCover(item);
+                                                      leading: CloseButton(
+                                                        style: IconButton.styleFrom(backgroundColor: Colors.black),
+                                                      ),
+                                                    ),
+                                                    backgroundColor: Colors.transparent,
+                                                    extendBody: true,
+                                                    extendBodyBehindAppBar: true,
+                                                    body: PageView.builder(
+                                                      scrollBehavior: const MouseTouchScrollBehavior(),
+                                                      findChildIndexCallback: (key) {
+                                                        final valueKey = key as ValueKey<String>;
+                                                        final val = covers.indexWhere((i) => i.id == valueKey.value);
+                                                        return val >= 0 ? val : null;
+                                                      },
+                                                      itemBuilder: (BuildContext context, int id) {
+                                                        final item = covers.elementAt(id);
+                                                        final url = manga.getUrlFromCover(item);
 
-                                                          return Hero(
-                                                            key: ValueKey(item.id),
-                                                            tag: item.id,
-                                                            child: Container(
-                                                              padding: const EdgeInsets.all(10.0),
-                                                              color: Colors.transparent,
-                                                              child: GestureDetector(
-                                                                onTap: () {
-                                                                  Navigator.pop(context);
+                                                        return Hero(
+                                                          key: ValueKey(item.id),
+                                                          tag: item.id,
+                                                          child: Container(
+                                                            padding: const EdgeInsets.all(10.0),
+                                                            color: Colors.transparent,
+                                                            child: GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.pop(context);
+                                                              },
+                                                              child: CachedNetworkImage(
+                                                                imageUrl: url,
+                                                                imageBuilder: (context, imageProvider) {
+                                                                  return PhotoView(
+                                                                    backgroundDecoration:
+                                                                        const BoxDecoration(color: Colors.transparent),
+                                                                    imageProvider: imageProvider,
+                                                                    minScale: PhotoViewComputedScale.contained * 0.8,
+                                                                    maxScale: PhotoViewComputedScale.covered * 5.0,
+                                                                    initialScale: PhotoViewComputedScale.contained,
+                                                                  );
                                                                 },
-                                                                child: CachedNetworkImage(
-                                                                  imageUrl: url,
-                                                                  imageBuilder: (context, imageProvider) {
-                                                                    return PhotoView(
-                                                                      backgroundDecoration: const BoxDecoration(
-                                                                          color: Colors.transparent),
-                                                                      imageProvider: imageProvider,
-                                                                      minScale: PhotoViewComputedScale.contained * 0.8,
-                                                                      maxScale: PhotoViewComputedScale.covered * 5.0,
-                                                                      initialScale: PhotoViewComputedScale.contained,
-                                                                    );
-                                                                  },
-                                                                  fit: BoxFit.contain,
-                                                                  progressIndicatorBuilder:
-                                                                      (context, url, downloadProgress) => Center(
-                                                                          child: CircularProgressIndicator(
-                                                                              value: downloadProgress.progress)),
-                                                                  errorWidget: (context, url, error) =>
-                                                                      const Icon(Icons.error),
-                                                                ),
+                                                                fit: BoxFit.contain,
+                                                                progressIndicatorBuilder:
+                                                                    (context, url, downloadProgress) => Center(
+                                                                        child: CircularProgressIndicator(
+                                                                            value: downloadProgress.progress)),
+                                                                errorWidget: (context, url, error) =>
+                                                                    const Icon(Icons.error),
                                                               ),
                                                             ),
-                                                          );
-                                                        },
-                                                        itemCount: covers.length,
-                                                        controller: controller,
-                                                        scrollDirection: Axis.horizontal,
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ));
-                                          },
-                                        );
-                                      },
-                                      itemCount: covers.length,
-                                    ),
-                                  ],
-                                ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      itemCount: covers.length,
+                                                      controller: controller,
+                                                      scrollDirection: Axis.horizontal,
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ));
+                                        },
+                                      );
+                                    },
+                                    itemCount: covers.length,
+                                  ),
+                                ],
                               ),
-                            _ => const SizedBox.shrink(),
-                          },
+                            ),
+                            loadingWidget: const SizedBox.shrink(),
+                          ),
                           if (coverProvider.isLoading) ...Styles.loadingOverlay
                         ],
                       );
@@ -828,31 +814,28 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     builder: (context, ref, child) {
                       final relatedProvider = ref.watch(_fetchRelatedMangaProvider(manga));
 
-                      return switch (relatedProvider) {
-                        AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                            error: error,
-                            stackTrace: stackTrace,
-                            message: "_fetchRelatedMangaProvider(${manga.id}) failed",
+                      return DataProviderWhenWidget(
+                        provider: _fetchRelatedMangaProvider(manga),
+                        data: relatedProvider,
+                        builder: (context, related) => MangaListWidget(
+                          title: Text(
+                            'mangaView.relatedTitles'.tr(context: context),
+                            style: TextStyle(fontSize: 24),
                           ),
-                        AsyncValue(value: final related?) => MangaListWidget(
-                            title: const Text(
-                              'Related Titles',
-                              style: TextStyle(fontSize: 24),
+                          noController: true,
+                          isLoading: relatedProvider.isLoading,
+                          children: [
+                            MangaListViewSliver(
+                              items: related,
+                              headers: manga.relatedMangas.fold({}, (previousValue, element) {
+                                previousValue?[element.id] = context.tr(element.related!.label);
+                                return previousValue;
+                              }),
                             ),
-                            noController: true,
-                            isLoading: relatedProvider.isLoading,
-                            children: [
-                              MangaListViewSliver(
-                                items: related,
-                                headers: manga.relatedMangas.fold({}, (previousValue, element) {
-                                  previousValue?[element.id] = context.tr(element.related!.label);
-                                  return previousValue;
-                                }),
-                              ),
-                            ],
-                          ),
-                        _ => const LoadingOverlayStack(),
-                      };
+                          ],
+                        ),
+                        loadingWidget: const LoadingOverlayStack(),
+                      );
                     },
                   ),
               }),

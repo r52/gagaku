@@ -193,53 +193,45 @@ class MangaDexFrontPage extends ConsumerWidget {
   }
 }
 
-class MangaProviderCarousel extends ConsumerWidget {
+class MangaProviderCarousel extends StatelessWidget {
   const MangaProviderCarousel({
     super.key,
     required this.provider,
   });
 
-  final ProviderBase<AsyncValue<List<Manga>>> provider;
+  final ProviderListenable<AsyncValue<List<Manga>>> provider;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final results = ref.watch(provider);
-
+  Widget build(BuildContext context) {
     return Center(
-      child: switch (results) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-            error: error,
-            stackTrace: stackTrace,
-            message: "${provider.toString()} failed",
+      child: DataProviderWhenWidget(
+        provider: provider,
+        builder: (context, items) => CarouselSlider.builder(
+          options: CarouselOptions(
+            height: 256,
+            viewportFraction: 192 / MediaQuery.sizeOf(context).width,
+            initialPage: 0,
+            enableInfiniteScroll: true,
+            reverse: false,
+            pageSnapping: false,
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 10),
+            autoPlayAnimationDuration: const Duration(milliseconds: 800),
+            autoPlayCurve: Curves.fastOutSlowIn,
+            enlargeCenterPage: true,
+            enlargeFactor: 0.1,
+            scrollDirection: Axis.horizontal,
           ),
-        AsyncValue(value: final items?) => CarouselSlider.builder(
-            options: CarouselOptions(
-              height: 256,
-              viewportFraction: 192 / MediaQuery.sizeOf(context).width,
-              initialPage: 0,
-              enableInfiniteScroll: true,
-              reverse: false,
-              pageSnapping: false,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 10),
-              autoPlayAnimationDuration: const Duration(milliseconds: 800),
-              autoPlayCurve: Curves.fastOutSlowIn,
-              enlargeCenterPage: true,
-              enlargeFactor: 0.1,
-              scrollDirection: Axis.horizontal,
-            ),
-            itemCount: items.length,
-            itemBuilder: (BuildContext context, int index, int pageViewIndex) {
-              final manga = items.elementAt(index);
-              return GridMangaItem(
-                key: ValueKey(manga.id),
-                manga: manga,
-              );
-            }),
-        AsyncValue(:final progress) => ListSpinner(
-            progress: progress?.toDouble(),
-          ),
-      },
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index, int pageViewIndex) {
+            final manga = items.elementAt(index);
+            return GridMangaItem(
+              key: ValueKey(manga.id),
+              manga: manga,
+            );
+          },
+        ),
+      ),
     );
   }
 }

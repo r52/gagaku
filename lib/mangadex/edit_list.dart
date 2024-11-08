@@ -44,7 +44,7 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
 
     return Scaffold(
       body: switch (listProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
+        AsyncValue(:final error?, :final stackTrace?) => ErrorList(
             error: error,
             stackTrace: stackTrace,
             message: "_fetchListFromIdProvider($listId) failed",

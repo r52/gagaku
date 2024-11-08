@@ -232,9 +232,7 @@ class _AppState extends ConsumerState<App> {
               key: state.pageKey,
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.chapterfeed),
-                builder: (context, ref) {
-                  return MangaDexChapterFeed();
-                },
+                builder: (_) => MangaDexChapterFeed(),
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_chapterfeed_restore',
@@ -246,9 +244,7 @@ class _AppState extends ConsumerState<App> {
               key: state.pageKey,
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.library),
-                builder: (context, ref) {
-                  return MangaDexLibraryView();
-                },
+                builder: (_) => MangaDexLibraryView(),
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_library_restore',
@@ -260,9 +256,7 @@ class _AppState extends ConsumerState<App> {
               key: state.pageKey,
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.lists),
-                builder: (context, ref) {
-                  return MangaDexListsView();
-                },
+                builder: (_) => MangaDexListsView(),
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_lists_restore',

@@ -7,7 +7,6 @@ import 'package:gagaku/local/model.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/types.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'directory_reader.g.dart';
@@ -66,7 +65,7 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
   return pages;
 }
 
-class DirectoryReaderWidget extends ConsumerWidget {
+class DirectoryReaderWidget extends StatelessWidget {
   const DirectoryReaderWidget({
     super.key,
     required this.path,
@@ -81,8 +80,7 @@ class DirectoryReaderWidget extends ConsumerWidget {
   final VoidCallback? onLinkPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pageProvider = ref.watch(_getDirectoryPagesProvider(path));
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     String strtitle = path;
@@ -91,19 +89,15 @@ class DirectoryReaderWidget extends ConsumerWidget {
       strtitle = title!;
     }
 
-    switch (pageProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
-          ),
-          body: ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_getDirectoryPagesProvider($path) failed",
-          ),
-        );
-      case AsyncValue(value: final pages?):
+    return DataProviderWhenWidget(
+      provider: _getDirectoryPagesProvider(path),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+        ),
+        body: child,
+      ),
+      builder: (context, pages) {
         if (pages.isEmpty) {
           return Scaffold(
             appBar: AppBar(
@@ -122,27 +116,27 @@ class DirectoryReaderWidget extends ConsumerWidget {
           link: link,
           onLinkPressed: onLinkPressed,
         );
-      case _:
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'localLibrary.loadingDir'.tr(context: context),
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 18,
-                  decoration: TextDecoration.none,
-                ),
+      },
+      loadingWidget: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'localLibrary.loadingDir'.tr(context: context),
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.normal,
+                fontSize: 18,
+                decoration: TextDecoration.none,
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              const CircularProgressIndicator()
-            ],
-          ),
-        );
-    }
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const CircularProgressIndicator()
+          ],
+        ),
+      ),
+    );
   }
 }
