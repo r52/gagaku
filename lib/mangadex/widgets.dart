@@ -10,7 +10,6 @@ import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/types.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -47,6 +46,7 @@ const _rowPadding = SizedBox(
 );
 
 const _endChip = IconTextChip(
+  key: ValueKey('END'),
   color: Colors.blue,
   text: 'END',
 );
@@ -221,7 +221,7 @@ class MarkReadButton extends ConsumerWidget {
                 .read(readChaptersProvider.notifier)
                 .set(manga, read: set ? [chapter] : null, unread: !set ? [chapter] : null);
           },
-          padding: const EdgeInsets.only(right: 10.0),
+          padding: EdgeInsets.zero,
           splashRadius: 15,
           iconSize: 20,
           tooltip: 'mangaView.markAs'.tr(
@@ -230,7 +230,7 @@ class MarkReadButton extends ConsumerWidget {
           icon: isRead == true
               ? Icon(Icons.visibility_off, color: theme.disabledColor)
               : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
-          constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
+          constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0, maxWidth: 24.0, maxHeight: 24.0),
           visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
         ),
     };
@@ -349,8 +349,14 @@ class ChapterFeedItem extends HookConsumerWidget {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
 
-    final chapterBtns = useMemoized<List<Widget>>(() {
-      return state.chapters.map((e) {
+    final listsliver = SliverList.separated(
+      findChildIndexCallback: (key) {
+        final valueKey = key as ValueKey<String>;
+        final val = state.chapters.indexWhere((i) => i.id == valueKey.value);
+        return val >= 0 ? val : null;
+      },
+      itemBuilder: (context, index) {
+        final e = state.chapters.elementAt(index);
         return ChapterButtonWidget(
           key: ValueKey(e.id),
           chapter: e,
@@ -366,15 +372,11 @@ class ChapterFeedItem extends HookConsumerWidget {
             context.push('/title/${state.manga.id}', extra: state.manga);
           },
         );
-      }).toList();
-    }, [state]);
-
-    final listsliver = SliverList.separated(
-      itemBuilder: (context, index) => chapterBtns.elementAt(index),
+      },
       separatorBuilder: (context, index) => const SizedBox(
         height: 4,
       ),
-      itemCount: chapterBtns.length,
+      itemCount: state.chapters.length,
     );
 
     final titleBtn = TextButton.icon(
@@ -393,6 +395,7 @@ class ChapterFeedItem extends HookConsumerWidget {
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       icon: CountryFlag(
+        key: ValueKey('CountryFlag(${state.manga.attributes!.originalLanguage.code})'),
         flag: state.manga.attributes!.originalLanguage.flag,
       ),
       label: Text(
@@ -401,33 +404,32 @@ class ChapterFeedItem extends HookConsumerWidget {
       ),
     );
 
-    final coverBtn = TextButton(
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-        shape: const RoundedRectangleBorder(),
-      ),
-      onPressed: () async {
+    final coverBtn = InkWell(
+      onTap: () async {
         ref.read(readChaptersProvider.notifier).get([state.manga]);
         ref.read(ratingsProvider.notifier).get([state.manga]);
         ref.read(statisticsProvider.notifier).get([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
-      child: CachedNetworkImage(
-        imageUrl: state.coverArt,
-        imageBuilder: (context, imageProvider) => Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: imageProvider,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+        child: CachedNetworkImage(
+          imageUrl: state.coverArt,
+          imageBuilder: (context, imageProvider) => Ink(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: imageProvider,
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(4.0)),
             ),
-            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
           ),
+          width: screenSizeSmall ? 64.0 : 128.0,
+          height: screenSizeSmall ? 91.0 : 182.0,
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+          fit: BoxFit.cover,
         ),
-        width: screenSizeSmall ? 64.0 : 128.0,
-        height: screenSizeSmall ? 91.0 : 182.0,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
-        fit: BoxFit.cover,
       ),
     );
 
@@ -439,9 +441,7 @@ class ChapterFeedItem extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   titleBtn,
-                  const Divider(
-                    height: 4.0,
-                  ),
+                  const Divider(height: 4.0),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -469,9 +469,7 @@ class ChapterFeedItem extends HookConsumerWidget {
                         SliverList.list(
                           children: [
                             titleBtn,
-                            const Divider(
-                              height: 10.0,
-                            ),
+                            const Divider(height: 10.0),
                           ],
                         ),
                         listsliver,
@@ -503,7 +501,7 @@ class ChapterButtonWidget extends HookWidget {
   Widget build(BuildContext context) {
     useAutomaticKeepAlive();
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
+    const iconSet = _iconSetB;
 
     final isEndChapter = manga.attributes!.lastChapter != null &&
         manga.attributes!.lastChapter?.isNotEmpty == true &&
@@ -513,7 +511,7 @@ class ChapterButtonWidget extends HookWidget {
     final user = chapter.uploadUser;
     final userChip = IconTextChip(
       key: ValueKey(user?.id),
-      icon: !isOfficialPub ? iconSet[_IconSet.person] : iconSet[_IconSet.check],
+      icon: isOfficialPub ? iconSet[_IconSet.check] : null,
       text: !isOfficialPub ? (user?.attributes?.username.crop() ?? '') : 'mangadex.officialPub'.tr(context: context),
     );
 
@@ -527,75 +525,153 @@ class ChapterButtonWidget extends HookWidget {
         ));
 
         return CommentChip(
-          key: ValueKey(chapter.id),
+          key: ValueKey('CommentChip(${chapter.id})'),
           comments: comments,
         );
       },
     );
 
-    final tile = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final statsChipRow = Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            MarkReadButton(
-              key: ValueKey(chapter.id),
-              chapter: chapter,
-              manga: manga,
-            ),
-            CountryFlag(
-              flag: chapter.attributes.translatedLanguage.flag,
-              size: screenSizeSmall ? 15 : 18,
-            ),
-            _rowPadding,
-            if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
-            Expanded(
-              child: Row(
-                children: [
-                  Flexible(
-                    child: ChapterTitle(
-                      key: ValueKey(chapter.id),
-                      chapter: chapter,
-                      manga: manga,
-                    ),
-                  ),
-                  if (isEndChapter) ...[_rowPadding, _endChip, _rowPadding],
-                ],
-              ),
-            ),
-            _PubTime(time: chapter.attributes.publishAt),
-          ],
-        ),
-        if (!screenSizeSmall) const SizedBox(height: 2.0),
-        Row(
-          children: [
-            // Flex group chips
-            _GroupRow(
-              key: ValueKey(Object.hashAll(chapter.groups)),
-              chapter: chapter,
-            ),
-            // Fixed user/stat chip
-            if (!screenSizeSmall) ...[
-              userChip,
-              _rowPadding,
-              statsChip,
-            ]
-          ],
-        ),
-        if (screenSizeSmall) ...[
-          const SizedBox(
-            height: 4.0,
-          ),
-          Row(
-            children: [
-              userChip,
-              const Spacer(),
-              statsChip,
-            ],
-          ),
-        ],
+        Flexible(child: statsChip),
       ],
     );
+
+    final pubtime = _PubTime(
+      key: ValueKey(chapter.attributes.publishAt.millisecondsSinceEpoch),
+      time: chapter.attributes.publishAt,
+    );
+
+    final markReadButton = MarkReadButton(
+      key: ValueKey('MarkReadButton(${chapter.id})'),
+      chapter: chapter,
+      manga: manga,
+    );
+
+    final title = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _rowPadding,
+        CountryFlag(
+          key: ValueKey('CountryFlag(${chapter.attributes.translatedLanguage.code})'),
+          flag: chapter.attributes.translatedLanguage.flag,
+        ),
+        _rowPadding,
+        if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
+        Expanded(
+          child: Row(
+            children: [
+              Flexible(
+                child: ChapterTitle(
+                  key: ValueKey('ChapterTitle(${chapter.id})'),
+                  chapter: chapter,
+                  manga: manga,
+                ),
+              ),
+              if (isEndChapter) ...[_rowPadding, _endChip, _rowPadding],
+            ],
+          ),
+        ),
+        if (screenSizeSmall) statsChipRow
+      ],
+    );
+
+    final groups = _GroupRow(
+      key: ValueKey('_GroupRow(${chapter.id})'),
+      chapter: chapter,
+    );
+
+    final tile = screenSizeSmall
+        ? Table(
+            columnWidths: const <int, TableColumnWidth>{
+              0: FixedColumnWidth(24),
+              1: FlexColumnWidth(),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: <TableRow>[
+              TableRow(
+                children: <Widget>[
+                  markReadButton,
+                  title,
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  iconSet[_IconSet.group]!,
+                  groups,
+                ],
+              ),
+              TableRow(
+                children: [
+                  iconSet[_IconSet.person]!,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(child: userChip),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          iconSet[_IconSet.schedule]!,
+                          const SizedBox(width: 2.0),
+                          pubtime,
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          )
+        : Table(
+            columnWidths: const <int, TableColumnWidth>{
+              0: FixedColumnWidth(24),
+              1: FlexColumnWidth(),
+              2: FixedColumnWidth(24),
+              3: FixedColumnWidth(145),
+              4: FixedColumnWidth(60),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: <TableRow>[
+              TableRow(
+                children: <Widget>[
+                  markReadButton,
+                  title,
+                  iconSet[_IconSet.schedule]!,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(width: 2.0),
+                      pubtime,
+                    ],
+                  ),
+                  const SizedBox.shrink(),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  iconSet[_IconSet.group]!,
+                  groups,
+                  iconSet[_IconSet.person]!,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(child: userChip),
+                    ],
+                  ),
+                  statsChipRow,
+                ],
+              ),
+            ],
+          );
 
     return InkWell(
       onTap: () {
@@ -1166,12 +1242,12 @@ class MangaGenreRow extends HookWidget {
     final contentTagChips = useMemoized(() {
       return manga.attributes!.tags
           .where((tag) => tag.attributes.group == TagGroup.content)
-          .map((e) => ContentChip(content: e.attributes.name.get('en')));
+          .map((e) => ContentChip(key: ValueKey(e.id), content: e.attributes.name.get('en')));
     }, [manga]);
 
     final genreTagChips = useMemoized(() {
       return manga.attributes!.tags.where((tag) => tag.attributes.group != TagGroup.content).map(
-            (e) => IconTextChip(text: e.attributes.name.get('en')),
+            (e) => IconTextChip(key: ValueKey(e.id), text: e.attributes.name.get('en')),
           );
     }, [manga]);
 
@@ -1213,9 +1289,11 @@ class MangaStatisticsRow extends HookConsumerWidget {
         await ref.read(statisticsProvider.notifier).get([manga]);
       });
       return null;
-    });
+    }, []);
 
-    final numFormatter = NumberFormat.compact(locale: context.locale.toString());
+    final numFormatter = useMemoized(() {
+      return NumberFormat.compact(locale: context.locale.toString());
+    }, [context.locale]);
 
     return Wrap(
       runSpacing: 4.0,
@@ -1223,6 +1301,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
         ...switch (statsProvider) {
           MangaStatistics(:final rating, :final follows, :final comments) => [
               IconTextChip(
+                key: ValueKey('_RatingChip(${manga.id})'),
                 icon: const Icon(
                   Icons.star_border,
                   color: Colors.amber,
@@ -1247,6 +1326,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
                 width: 5,
               ),
               IconTextChip(
+                key: ValueKey('_FollowsChip(${manga.id})'),
                 icon: const Icon(
                   Icons.bookmark_outline,
                   size: 18,
@@ -1256,7 +1336,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
               const SizedBox(
                 width: 5,
               ),
-              CommentChip(comments: comments),
+              CommentChip(key: ValueKey('CommentChip(${manga.id})'), comments: comments),
             ],
           _ => [
               IconTextChip(
@@ -1266,6 +1346,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
         },
         const SizedBox(width: 10),
         MangaStatusChip(
+          key: ValueKey('MangaStatusChip(${manga.id})'),
           status: manga.attributes!.status,
           year: manga.attributes!.year,
           short: shortStatus,
@@ -1293,7 +1374,7 @@ class _GroupRow extends HookWidget {
         chips.add(Flexible(
             child: IconTextChip(
           key: ValueKey(g.id),
-          icon: isOfficialPub ? iconSet[_IconSet.circle] : iconSet[_IconSet.group],
+          icon: isOfficialPub ? iconSet[_IconSet.circle] : null,
           text: g.attributes.name,
           onPressed: () {
             context.push('/group/${g.id}', extra: g);
@@ -1305,7 +1386,7 @@ class _GroupRow extends HookWidget {
       if (chips.isEmpty) {
         chips.add(Flexible(
             child: IconTextChip(
-          icon: iconSet[_IconSet.group],
+          key: const ValueKey('nogroup'),
           text: 'No Group',
         )));
         chips.add(_rowPadding);
@@ -1314,10 +1395,9 @@ class _GroupRow extends HookWidget {
       return chips;
     }, [chapter, screenSizeSmall]);
 
-    return Expanded(
-      child: Row(
-        children: groupChips,
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: groupChips,
     );
   }
 }
@@ -1330,37 +1410,33 @@ class _PubTime extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
+    //final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final lang = context.locale.languageCode;
-    final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
+    //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
     final pubtime = timeago.format(
       time,
-      locale: locale,
+      locale: lang,
     );
 
-    return Text.rich(
+    return Text(
+      pubtime,
       style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
-      TextSpan(
-        children: [
-          WidgetSpan(alignment: PlaceholderAlignment.middle, child: iconSet[_IconSet.schedule]!),
-          TextSpan(text: ' $pubtime'),
-        ],
-      ),
     );
   }
 }
 
-class CommentChip extends StatelessWidget {
+class CommentChip extends HookWidget {
   final StatisticsDetailsComments? comments;
 
   const CommentChip({super.key, this.comments});
 
   @override
   Widget build(BuildContext context) {
-    final numFormatter = NumberFormat.compact(locale: context.locale.toString());
+    final numFormatter = useMemoized(() {
+      return NumberFormat.compact(locale: context.locale.toString());
+    }, [context.locale]);
 
     return IconTextChip(
       icon: const Icon(

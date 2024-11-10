@@ -332,6 +332,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                                 if (reading != null) {
                                   return _ReadingStatusDropdown(
+                                    key: ValueKey('_ReadingStatusDropdown(${manga.id})'),
                                     initial: reading,
                                     manga: manga,
                                   );
@@ -341,9 +342,11 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               },
                             ),
                             _RatingMenu(
+                              key: ValueKey('_RatingMenu(${manga.id})'),
                               manga: manga,
                             ),
                             _UserListsMenu(
+                              key: ValueKey('_UserListsMenu(${manga.id})'),
                               manga: manga,
                             ),
                             const SizedBox(width: 2),
@@ -873,7 +876,7 @@ class _ChapterListSliver extends HookConsumerWidget {
         await ref.read(readChaptersProvider.notifier).get([manga]);
       });
       return null;
-    });
+    }, []);
 
     if (chapters.isEmpty) {
       return SliverToBoxAdapter(
@@ -1063,6 +1066,7 @@ class _CoverArtItem extends HookWidget {
 
 class _ReadingStatusDropdown extends ConsumerWidget {
   const _ReadingStatusDropdown({
+    super.key,
     required this.initial,
     required this.manga,
   });
@@ -1112,6 +1116,7 @@ class _ReadingStatusDropdown extends ConsumerWidget {
 
 class _RatingMenu extends HookConsumerWidget {
   const _RatingMenu({
+    super.key,
     required this.manga,
   });
 
@@ -1130,7 +1135,7 @@ class _RatingMenu extends HookConsumerWidget {
         await ref.read(ratingsProvider.notifier).get([manga]);
       });
       return null;
-    });
+    }, []);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -1197,6 +1202,7 @@ class _RatingMenu extends HookConsumerWidget {
 
 class _UserListsMenu extends ConsumerWidget {
   const _UserListsMenu({
+    super.key,
     required this.manga,
   });
 

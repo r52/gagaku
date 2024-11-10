@@ -308,31 +308,37 @@ class IconTextChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final child = Padding(
+    Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-      child: Text.rich(
-        style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
-        overflow: TextOverflow.ellipsis,
-        TextSpan(
-          children: [
-            if (icon != null) WidgetSpan(alignment: PlaceholderAlignment.middle, child: icon!),
-            TextSpan(text: '${icon != null ? ' ' : ''}$text'),
-          ],
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) icon!,
+          if (icon != null) const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              text,
+              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
+              overflow: TextOverflow.ellipsis,
+            ),
+          )
+        ],
       ),
     );
+
+    if (onPressed != null) {
+      child = InkWell(
+        onTap: onPressed,
+        child: child,
+      );
+    }
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 24.0),
       child: Material(
         borderRadius: const BorderRadius.all(Radius.circular(6.0)),
         color: color ?? theme.colorScheme.tertiaryContainer,
-        child: (onPressed != null)
-            ? InkWell(
-                onTap: onPressed,
-                child: child,
-              )
-            : child,
+        child: child,
       ),
     );
   }
