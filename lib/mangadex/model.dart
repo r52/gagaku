@@ -2176,6 +2176,78 @@ Future<List<Manga>> getMangaListByPage(Ref ref, Iterable<String> list, int page)
 }
 
 @riverpod
+class PersistentMangaListPaginator extends _$PersistentMangaListPaginator {
+  Iterable<String>? _list;
+  int _currentPage = 0;
+
+  Future<List<Manga>> fetchData(int page) async {
+    if (_list == null) {
+      return [];
+    }
+
+    final start = page * MangaDexEndpoints.searchLimit;
+    final end = min((page + 1) * MangaDexEndpoints.searchLimit, _list!.length);
+
+    final range = _list!.toList().getRange(start, end);
+
+    final api = ref.watch(mangadexProvider);
+    final mangas = await api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
+
+    await ref.read(statisticsProvider.notifier).get(mangas);
+
+    return mangas;
+  }
+
+  @override
+  FutureOr<List<Manga>> build(String id) {
+    return fetchData(_currentPage);
+  }
+
+  Future<void> getPage(int page) async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final result = await fetchData(page);
+      _currentPage = page;
+
+      return [...result];
+    });
+  }
+
+  Future<void> updateList(Iterable<String> list) async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      _list = list;
+      final result = await fetchData(_currentPage);
+
+      return [...result];
+    });
+  }
+
+  Future<void> updateListPage(Iterable<String> list, int page) async {
+    if (state.isLoading || state.isReloading) {
+      return;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      _list = list;
+      final result = await fetchData(page);
+      _currentPage = page;
+
+      return [...result];
+    });
+  }
+}
+
+@riverpod
 class ListSource extends _$ListSource {
   @override
   Future<CustomList?> build(String listId) async {

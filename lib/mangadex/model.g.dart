@@ -1654,6 +1654,166 @@ final class GetMangaListByPageFamily extends Family {
   }
 }
 
+@ProviderFor(PersistentMangaListPaginator)
+const persistentMangaListPaginatorProvider =
+    PersistentMangaListPaginatorFamily._();
+
+final class PersistentMangaListPaginatorProvider
+    extends $AsyncNotifierProvider<PersistentMangaListPaginator, List<Manga>> {
+  const PersistentMangaListPaginatorProvider._(
+      {required PersistentMangaListPaginatorFamily super.from,
+      required String super.argument,
+      super.runNotifierBuildOverride,
+      PersistentMangaListPaginator Function()? create})
+      : _createCb = create,
+        super(
+          retry: null,
+          name: r'persistentMangaListPaginatorProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final PersistentMangaListPaginator Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$persistentMangaListPaginatorHash();
+
+  @override
+  String toString() {
+    return r'persistentMangaListPaginatorProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  PersistentMangaListPaginator create() =>
+      _createCb?.call() ?? PersistentMangaListPaginator();
+
+  @$internal
+  @override
+  PersistentMangaListPaginatorProvider $copyWithCreate(
+    PersistentMangaListPaginator Function() create,
+  ) {
+    return PersistentMangaListPaginatorProvider._(
+        argument: argument as String,
+        from: from! as PersistentMangaListPaginatorFamily,
+        create: create);
+  }
+
+  @$internal
+  @override
+  PersistentMangaListPaginatorProvider $copyWithBuild(
+    FutureOr<List<Manga>> Function(
+      Ref,
+      PersistentMangaListPaginator,
+    ) build,
+  ) {
+    return PersistentMangaListPaginatorProvider._(
+        argument: argument as String,
+        from: from! as PersistentMangaListPaginatorFamily,
+        runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $AsyncNotifierProviderElement<PersistentMangaListPaginator, List<Manga>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
+
+  @override
+  bool operator ==(Object other) {
+    return other is PersistentMangaListPaginatorProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$persistentMangaListPaginatorHash() =>
+    r'dc45b9b98ca370b67860d1b2cde7f4ddc8a92c56';
+
+final class PersistentMangaListPaginatorFamily extends Family {
+  const PersistentMangaListPaginatorFamily._()
+      : super(
+          retry: null,
+          name: r'persistentMangaListPaginatorProvider',
+          dependencies: null,
+          allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  PersistentMangaListPaginatorProvider call(
+    String id,
+  ) =>
+      PersistentMangaListPaginatorProvider._(argument: id, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$persistentMangaListPaginatorHash();
+
+  @override
+  String toString() => r'persistentMangaListPaginatorProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    PersistentMangaListPaginator Function(
+      String args,
+    ) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as PersistentMangaListPaginatorProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate(() => create(argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+
+  /// {@macro riverpod.override_with_build}
+  Override overrideWithBuild(
+    FutureOr<List<Manga>> Function(
+            Ref ref, PersistentMangaListPaginator notifier, String argument)
+        build,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as PersistentMangaListPaginatorProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
+            .$createElement(pointer);
+      },
+    );
+  }
+}
+
+abstract class _$PersistentMangaListPaginator
+    extends $AsyncNotifier<List<Manga>> {
+  late final _$args = ref.$arg as String;
+  String get id => _$args;
+
+  FutureOr<List<Manga>> build(
+    String id,
+  );
+  @$internal
+  @override
+  FutureOr<List<Manga>> runBuild() => build(
+        _$args,
+      );
+}
+
 @ProviderFor(ListSource)
 const listSourceProvider = ListSourceFamily._();
 

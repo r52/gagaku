@@ -12,6 +12,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
+import 'package:uuid/uuid.dart';
 
 Page<dynamic> buildListEditPage(BuildContext context, GoRouterState state) {
   final list = state.extra.asOrNull<CustomList>();
@@ -70,6 +71,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final id = useRef(list?.id ?? const Uuid().v4());
     final listNameController = useTextEditingController(text: list?.attributes.name);
 
     final visibility = useValueNotifier(list != null ? list!.attributes.visibility : CustomListVisibility.private);
@@ -80,12 +82,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final selected = useReducer(MangaSetAction.modify,
         initialState: list != null ? {...list!.set} : <String>{},
         initialAction: MangaSetAction(action: MangaSetActions.none));
-    final currentPage = useState(0);
-
-    final titlesProvider = ref.watch(getMangaListByPageProvider(selected.state, currentPage.value));
-    final titles = titlesProvider.value;
-
-    final isLoading = titlesProvider.isLoading;
 
     return Scaffold(
       appBar: AppBar(
@@ -242,6 +238,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                           action: MangaSetActions.replace,
                           replacement: result,
                         ));
+                        ref.read(persistentMangaListPaginatorProvider(id.value).notifier).updateList(selected.state);
                       }
                     });
                   },
@@ -249,41 +246,71 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 ),
                 const SizedBox(height: 12.0),
                 Expanded(
-                  child: MangaListWidget(
-                    title: Text(
-                      '${'titles'.tr(context: context)} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    showToggle: false,
-                    children: [
-                      if (titles != null)
-                        MangaListViewSliver(
-                          items: titles,
-                          selectMode: true,
-                          selectButton: (manga) {
-                            return const Icon(Icons.remove);
-                          },
-                          onSelected: (manga) {
-                            selected.dispatch(MangaSetAction(
-                              action: MangaSetActions.remove,
-                              element: manga.id,
-                            ));
-                          },
+                  child: HookConsumer(
+                    builder: (context, ref, child) {
+                      final titlesProvider = ref.watch(persistentMangaListPaginatorProvider(id.value));
+
+                      useEffect(() {
+                        Future.delayed(
+                            Duration.zero,
+                            () => ref
+                                .read(persistentMangaListPaginatorProvider(id.value).notifier)
+                                .updateList(selected.state));
+
+                        return null;
+                      }, []);
+
+                      return DataProviderWhenWidget(
+                        provider: persistentMangaListPaginatorProvider(id.value),
+                        data: titlesProvider,
+                        builder: (context, mangas) => MangaListWidget(
+                          title: Text(
+                            '${'titles'.tr(context: context)} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          showToggle: false,
+                          isLoading: titlesProvider.isLoading,
+                          children: [
+                            MangaListViewSliver(
+                              items: mangas,
+                              selectMode: true,
+                              selectButton: (manga) {
+                                return const Icon(Icons.remove);
+                              },
+                              onSelected: (manga) {
+                                selected.dispatch(MangaSetAction(
+                                  action: MangaSetActions.remove,
+                                  element: manga.id,
+                                ));
+                                ref
+                                    .read(persistentMangaListPaginatorProvider(id.value).notifier)
+                                    .updateList(selected.state);
+                              },
+                            ),
+                          ],
                         ),
-                    ],
+                        loadingWidget: const LoadingOverlayStack(),
+                      );
+                    },
                   ),
                 ),
-                NumberPaginator(
-                  numberPages: max((selected.state.length / MangaDexEndpoints.searchLimit).ceil(), 1),
-                  onPageChange: (int index) {
-                    currentPage.value = index;
+                HookBuilder(
+                  builder: (context) {
+                    final currentPage = useState(0);
+                    return NumberPaginator(
+                      numberPages: max((selected.state.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                      onPageChange: (int index) {
+                        currentPage.value = index;
+                        ref.read(persistentMangaListPaginatorProvider(id.value).notifier).getPage(index);
+                      },
+                    );
                   },
                 ),
               ],
             ),
           ),
-          if (snapshot.connectionState == ConnectionState.waiting || isLoading) ...Styles.loadingOverlay
+          if (snapshot.connectionState == ConnectionState.waiting) ...Styles.loadingOverlay
         ],
       ),
     );
