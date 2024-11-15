@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gagaku/model.dart';
-import 'package:gagaku/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -238,7 +237,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
             },
           ),
           flexibleSpace: FlexibleSpaceBar(
-            expandedTitleScale: 3.0,
+            expandedTitleScale: 2.0,
             title: Text(
               manga.title,
               style: const TextStyle(
@@ -530,14 +529,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
     String group = data.chapter.groups.entries.first.key;
 
     final lang = context.locale.languageCode;
-    final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
+    //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
     String? timestamp;
 
     if (data.chapter.lastUpdated != null) {
-      timestamp = timeago.format(data.chapter.lastUpdated!, locale: locale);
+      timestamp = timeago.format(data.chapter.lastUpdated!, locale: lang);
     } else if (data.chapter.releaseDate != null) {
-      timestamp = timeago.format(data.chapter.releaseDate!, locale: locale);
+      timestamp = timeago.format(data.chapter.releaseDate!, locale: lang);
     }
 
     final border = Border(
@@ -593,32 +592,22 @@ class ChapterButtonWidget extends HookConsumerWidget {
         title,
         style: textstyle,
       ),
-      trailing: !screenSizeSmall
-          ? FittedBox(
-              fit: BoxFit.fill,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconTextChip(
-                    icon: const Icon(Icons.group, size: 20),
-                    text: manga.groups != null && manga.groups?.containsKey(group) == true
-                        ? manga.groups![group]!
-                        : group,
-                  ),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.schedule, size: 20),
-                  if (timestamp != null) Text(' $timestamp'),
-                ],
+      trailing: FittedBox(
+        fit: BoxFit.fill,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!screenSizeSmall)
+              IconTextChip(
+                icon: const Icon(Icons.group, size: 20),
+                text: manga.groups != null && manga.groups?.containsKey(group) == true ? manga.groups![group]! : group,
               ),
-            )
-          : Text.rich(
-              TextSpan(
-                children: [
-                  const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.schedule, size: 15)),
-                  if (timestamp != null) TextSpan(text: ' $timestamp'),
-                ],
-              ),
-            ),
+            if (!screenSizeSmall) const SizedBox(width: 10),
+            const Icon(Icons.schedule, size: 20),
+            if (timestamp != null) Text(' $timestamp'),
+          ],
+        ),
+      ),
     );
   }
 }

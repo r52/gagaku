@@ -218,49 +218,44 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                   },
                 ),
                 flexibleSpace: FlexibleSpaceBar(
-                  expandedTitleScale: 3.0,
-                  title: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: manga.attributes!.originalLanguage.flag,
-                          style: const TextStyle(
-                            fontFamily: 'Twemoji',
-                            fontSize: 10,
-                            shadows: <Shadow>[
-                              Shadow(
-                                offset: Offset(0.5, 0.5),
-                                color: Color.fromARGB(255, 0, 0, 0),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const TextSpan(text: ' '),
-                        TextSpan(
-                          text: manga.attributes!.title.get('en'),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            shadows: <Shadow>[
-                              Shadow(
-                                offset: Offset(1.0, 1.0),
-                                color: Color.fromARGB(255, 0, 0, 0),
-                              ),
-                            ],
-                          ),
+                  expandedTitleScale: 2.0,
+                  title: Text(
+                    manga.attributes!.title.get('en'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      shadows: <Shadow>[
+                        Shadow(
+                          offset: Offset(1.0, 1.0),
+                          color: Color.fromARGB(255, 0, 0, 0),
                         ),
                       ],
                     ),
                   ),
-                  background: CachedNetworkImage(
-                    imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-                    colorBlendMode: BlendMode.modulate,
-                    color: Colors.grey,
-                    fit: BoxFit.cover,
-                    progressIndicatorBuilder: (context, url, downloadProgress) =>
-                        Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
-                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                  background: Stack(
+                    fit: StackFit.passthrough,
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+                        colorBlendMode: BlendMode.modulate,
+                        color: Colors.grey,
+                        fit: BoxFit.cover,
+                        progressIndicatorBuilder: (context, url, downloadProgress) =>
+                            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
+                          child: CountryFlag(
+                            flag: manga.attributes!.originalLanguage.flag,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 actions: !loggedin
@@ -1176,24 +1171,22 @@ class _RatingMenu extends HookConsumerWidget {
       ],
       child: Padding(
         padding: const EdgeInsets.all(6.0),
-        child: Text.rich(
-          TextSpan(
-            children: [
-              WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: Icon(
-                    Icons.star_border,
-                    color: hasRating ? theme.colorScheme.onPrimaryContainer : null,
-                  )),
-              if (hasRating)
-                TextSpan(
-                  text: ' ${ratings[manga.id]!.rating}',
-                  style: TextStyle(
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
-                )
-            ],
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 4.0,
+          children: [
+            Icon(
+              Icons.star_border,
+              color: hasRating ? theme.colorScheme.onPrimaryContainer : null,
+            ),
+            if (hasRating)
+              Text(
+                '${ratings[manga.id]!.rating}',
+                style: TextStyle(
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -1370,6 +1363,7 @@ class _AddToLibraryDialog extends HookWidget {
       title: Text('mangaActions.addToLibrary'.tr(context: context)),
       content: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 10.0,
         children: [
           HookBuilder(
             builder: (context) {
@@ -1401,9 +1395,6 @@ class _AddToLibraryDialog extends HookWidget {
                 ),
               );
             },
-          ),
-          const SizedBox(
-            width: 10,
           ),
           HookBuilder(
             builder: (_) {

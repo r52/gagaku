@@ -120,6 +120,7 @@ class DirectoryReaderWidget extends StatelessWidget {
       loadingWidget: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 20.0,
           children: [
             Text(
               'localLibrary.loadingDir'.tr(context: context),
@@ -129,9 +130,6 @@ class DirectoryReaderWidget extends StatelessWidget {
                 fontSize: 18,
                 decoration: TextDecoration.none,
               ),
-            ),
-            const SizedBox(
-              height: 20,
             ),
             const CircularProgressIndicator()
           ],

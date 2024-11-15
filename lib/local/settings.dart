@@ -63,11 +63,9 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                 return Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10.0,
                     children: [
                       Text(config.value.libraryDirectory),
-                      const SizedBox(
-                        width: 10,
-                      ),
                       ElevatedButton.icon(
                         onPressed: () async {
                           final perms = await Permission.manageExternalStorage.request();

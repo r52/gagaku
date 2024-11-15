@@ -72,6 +72,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                 const SizedBox(height: 200.0),
                 AutofillGroup(
                   child: Column(
+                    spacing: 12.0,
                     children: [
                       TextFormField(
                         controller: usernameController,
@@ -87,7 +88,6 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                               : null;
                         },
                       ),
-                      const SizedBox(height: 12.0),
                       TextFormField(
                         controller: passwordController,
                         decoration: InputDecoration(
@@ -103,7 +103,6 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                               : null;
                         },
                       ),
-                      const SizedBox(height: 12.0),
                       TextFormField(
                         controller: clientIdController,
                         decoration: InputDecoration(
@@ -117,7 +116,6 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                               : null;
                         },
                       ),
-                      const SizedBox(height: 12.0),
                       TextFormField(
                         controller: clientSecretController,
                         decoration: InputDecoration(

@@ -90,6 +90,64 @@ class MangaDexFrontPage extends ConsumerWidget {
 
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
 
+    final frontPageWidgets = [
+      Center(
+        child: Text(
+          'mangadex.popularNewTitles'.tr(context: context),
+          style: style,
+        ),
+      ),
+      const MangaProviderCarousel(provider: _popularTitlesProvider),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/titles/latest');
+        },
+        label: Text(
+          'mangadex.latestUpdates'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      const MangaProviderCarousel(provider: _latestUpdatesProvider),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/list/$staffPickId');
+        },
+        label: Text(
+          'mangadex.staffPicks'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      MangaProviderCarousel(provider: staffPicks),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/list/$seasonalId');
+        },
+        label: Text(
+          'mangadex.seasonal'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      MangaProviderCarousel(provider: seasonal),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/titles/recent');
+        },
+        label: Text(
+          'mangadex.recentlyAdded'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      const MangaProviderCarousel(provider: _recentlyAddedProvider),
+    ];
+
     return RefreshIndicator(
       onRefresh: () {
         ref.invalidate(staffPicks);
@@ -107,85 +165,14 @@ class MangaDexFrontPage extends ConsumerWidget {
           MangaDexSliverAppBar(
             controller: scrollController,
           ),
-          SliverList.list(
-            children: [
-              Center(
-                child: Text(
-                  'mangadex.popularNewTitles'.tr(context: context),
-                  style: style,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const MangaProviderCarousel(provider: _popularTitlesProvider),
-              const SizedBox(
-                height: 10,
-              ),
-              TextButton.icon(
-                onPressed: () {
-                  context.push('/titles/latest');
-                },
-                label: Text(
-                  'mangadex.latestUpdates'.tr(context: context),
-                  style: style,
-                ),
-                icon: const Icon(Icons.arrow_forward),
-                iconAlignment: IconAlignment.end,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const MangaProviderCarousel(provider: _latestUpdatesProvider),
-              const SizedBox(
-                height: 10,
-              ),
-              TextButton.icon(
-                onPressed: () {
-                  context.push('/list/$staffPickId');
-                },
-                label: Text(
-                  'mangadex.staffPicks'.tr(context: context),
-                  style: style,
-                ),
-                icon: const Icon(Icons.arrow_forward),
-                iconAlignment: IconAlignment.end,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              MangaProviderCarousel(provider: staffPicks),
-              TextButton.icon(
-                onPressed: () {
-                  context.push('/list/$seasonalId');
-                },
-                label: Text(
-                  'mangadex.seasonal'.tr(context: context),
-                  style: style,
-                ),
-                icon: const Icon(Icons.arrow_forward),
-                iconAlignment: IconAlignment.end,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              MangaProviderCarousel(provider: seasonal),
-              TextButton.icon(
-                onPressed: () {
-                  context.push('/titles/recent');
-                },
-                label: Text(
-                  'mangadex.recentlyAdded'.tr(context: context),
-                  style: style,
-                ),
-                icon: const Icon(Icons.arrow_forward),
-                iconAlignment: IconAlignment.end,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const MangaProviderCarousel(provider: _recentlyAddedProvider),
-            ],
+          SliverList.separated(
+            itemCount: frontPageWidgets.length,
+            itemBuilder: (context, index) {
+              return frontPageWidgets.elementAt(index);
+            },
+            separatorBuilder: (context, index) => const SizedBox(
+              height: 10.0,
+            ),
           )
         ],
       ),

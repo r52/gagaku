@@ -312,9 +312,9 @@ class IconTextChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        spacing: 4.0,
         children: [
           if (icon != null) icon!,
-          if (icon != null) const SizedBox(width: 4),
           Flexible(
             child: Text(
               text,
@@ -491,12 +491,10 @@ class SettingCardWidget extends StatelessWidget {
           children: [
             Expanded(
               child: Column(
+                spacing: 10.0,
                 children: [
                   title,
-                  SizedBox(
-                    height: (subtitle != null ? 10 : 0),
-                  ),
-                  subtitle ?? const SizedBox(),
+                  if (subtitle != null) subtitle!,
                 ],
               ),
             ),

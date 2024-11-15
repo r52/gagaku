@@ -83,7 +83,7 @@ class MainDrawer extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                     shadows: <Shadow>[
                       Shadow(
-                        offset: Offset(1.5, 1.5),
+                        offset: Offset(1.0, 1.0),
                         color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ],

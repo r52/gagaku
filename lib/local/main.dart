@@ -118,11 +118,9 @@ class LocalLibraryHome extends StatelessWidget {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 10.0,
                 children: [
                   Text('localLibrary.noPathWarning'.tr(context: context)),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   ElevatedButton.icon(
                     onPressed: () {
                       nav.push(LocalLibrarySettingsRouteBuilder());
@@ -130,13 +128,7 @@ class LocalLibraryHome extends StatelessWidget {
                     icon: const Icon(Icons.library_add),
                     label: Text('localLibrary.setPath'.tr(context: context)),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   const Divider(),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   ElevatedButton.icon(
                     onPressed: () async {
                       await _readArchive(nav);
@@ -160,11 +152,9 @@ class LocalLibraryHome extends StatelessWidget {
               AsyncValue(value: final top?) when top.error != null => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10.0,
                     children: [
                       Text(top.error!),
-                      const SizedBox(
-                        height: 10,
-                      ),
                       ElevatedButton.icon(
                         onPressed: () async {
                           await _readArchive(nav);

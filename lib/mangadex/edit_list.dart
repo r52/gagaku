@@ -182,9 +182,11 @@ class MangaDexEditListScreen extends HookConsumerWidget {
         children: [
           SafeArea(
             child: Column(
+              spacing: 12.0,
               children: [
-                const SizedBox(height: 12.0),
+                const SizedBox.shrink(),
                 Row(
+                  spacing: 12.0,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -201,7 +203,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         },
                       ),
                     ),
-                    const SizedBox(width: 12.0),
                     DropdownMenu<CustomListVisibility>(
                       label: Text('mangadex.visibility'.tr(context: context)),
                       initialSelection: visibility.value,
@@ -226,7 +227,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12.0),
                 ElevatedButton(
                   style: Styles.buttonStyle(
                     backgroundColor: Theme.of(context).colorScheme.primaryContainer,
@@ -244,7 +244,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   },
                   child: Text('mangadex.addTitles'.tr(context: context)),
                 ),
-                const SizedBox(height: 12.0),
                 Expanded(
                   child: HookConsumer(
                     builder: (context, ref, child) {

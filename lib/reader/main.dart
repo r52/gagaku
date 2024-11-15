@@ -457,10 +457,9 @@ class ReaderWidget extends HookConsumerWidget {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
+            spacing: 10.0,
             children: <Widget>[
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox.shrink(),
               (link != null
                   ? TextButton(
                       onPressed: () {
@@ -482,6 +481,7 @@ class ReaderWidget extends HookConsumerWidget {
                   : const SizedBox.shrink()),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 10.0,
                 children: [
                   HookBuilder(
                     builder: (_) {
@@ -499,9 +499,6 @@ class ReaderWidget extends HookConsumerWidget {
                         child: const Icon(Icons.arrow_back_ios_new),
                       );
                     },
-                  ),
-                  const SizedBox(
-                    width: 10,
                   ),
                   HookBuilder(
                     builder: (_) {
@@ -535,9 +532,6 @@ class ReaderWidget extends HookConsumerWidget {
                       );
                     },
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
                   HookBuilder(
                     builder: (_) {
                       final value = useValueListenable(currentPage);
@@ -562,7 +556,6 @@ class ReaderWidget extends HookConsumerWidget {
                 'reader.settings'.tr(context: context),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10.0),
               Wrap(
                 alignment: WrapAlignment.center,
                 children: [
@@ -584,7 +577,6 @@ class ReaderWidget extends HookConsumerWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
                 label: Text('reader.togglePageSize'.tr(context: context)),
@@ -597,7 +589,6 @@ class ReaderWidget extends HookConsumerWidget {
                             defaultScaleStateCycle(scaleStateController[currentPage.value].scaleState);
                       },
               ),
-              const SizedBox(height: 10.0),
               Wrap(
                 alignment: WrapAlignment.center,
                 children: [
@@ -619,7 +610,6 @@ class ReaderWidget extends HookConsumerWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(
                   settings.showProgressBar ? Icons.donut_small : Icons.donut_small_outlined,
@@ -632,7 +622,6 @@ class ReaderWidget extends HookConsumerWidget {
                       .save(settings.copyWith(showProgressBar: !settings.showProgressBar));
                 },
               ),
-              const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(
                   Icons.swipe,
@@ -647,7 +636,6 @@ class ReaderWidget extends HookConsumerWidget {
                             .save(settings.copyWith(swipeGestures: !settings.swipeGestures));
                       },
               ),
-              const SizedBox(height: 10.0),
               ActionChip(
                 avatar: Icon(
                   Icons.mouse,
@@ -664,11 +652,9 @@ class ReaderWidget extends HookConsumerWidget {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 10.0,
                 children: [
                   Text('reader.precacheCount'.tr(context: context)),
-                  const SizedBox(
-                    width: 10,
-                  ),
                   DropdownMenu<int>(
                     initialSelection: settings.precacheCount,
                     width: 160.0,
@@ -835,11 +821,9 @@ class ReaderWidget extends HookConsumerWidget {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10.0,
                   children: [
                     const Text('Read on external site:'),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
                     ElevatedButton(
                       onPressed: () async {
                         if (!await launchUrl(Uri.parse(externalUrl!))) {

@@ -41,10 +41,6 @@ class _MangaListView extends _$MangaListView {
   MangaListView update(MangaListView Function(MangaListView state) cb) => state = cb(state);
 }
 
-const _rowPadding = SizedBox(
-  width: 6.0,
-);
-
 const _endChip = IconTextChip(
   key: ValueKey('END'),
   color: Colors.blue,
@@ -501,7 +497,6 @@ class ChapterButtonWidget extends HookWidget {
   Widget build(BuildContext context) {
     useAutomaticKeepAlive();
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    const iconSet = _iconSetB;
 
     final isEndChapter = manga.attributes!.lastChapter != null &&
         manga.attributes!.lastChapter?.isNotEmpty == true &&
@@ -511,7 +506,7 @@ class ChapterButtonWidget extends HookWidget {
     final user = chapter.uploadUser;
     final userChip = IconTextChip(
       key: ValueKey(user?.id),
-      icon: isOfficialPub ? iconSet[_IconSet.check] : null,
+      icon: isOfficialPub ? _checkIconB : null,
       text: !isOfficialPub ? (user?.attributes?.username.crop() ?? '') : 'mangadex.officialPub'.tr(context: context),
     );
 
@@ -552,16 +547,17 @@ class ChapterButtonWidget extends HookWidget {
 
     final title = Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: 6.0,
       children: [
-        _rowPadding,
+        const SizedBox.shrink(),
         CountryFlag(
           key: ValueKey('CountryFlag(${chapter.attributes.translatedLanguage.code})'),
           flag: chapter.attributes.translatedLanguage.flag,
         ),
-        _rowPadding,
-        if (isOfficialPub) ...[iconSet[_IconSet.open]!, _rowPadding],
+        if (isOfficialPub) _openIconB,
         Expanded(
           child: Row(
+            spacing: 6.0,
             children: [
               Flexible(
                 child: ChapterTitle(
@@ -570,7 +566,7 @@ class ChapterButtonWidget extends HookWidget {
                   manga: manga,
                 ),
               ),
-              if (isEndChapter) ...[_rowPadding, _endChip, _rowPadding],
+              if (isEndChapter) _endChip,
             ],
           ),
         ),
@@ -599,13 +595,13 @@ class ChapterButtonWidget extends HookWidget {
               ),
               TableRow(
                 children: <Widget>[
-                  iconSet[_IconSet.group]!,
+                  _groupIconB,
                   groups,
                 ],
               ),
               TableRow(
                 children: [
-                  iconSet[_IconSet.person]!,
+                  _personIconB,
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -619,9 +615,9 @@ class ChapterButtonWidget extends HookWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
+                        spacing: 4.0,
                         children: [
-                          iconSet[_IconSet.schedule]!,
-                          const SizedBox(width: 2.0),
+                          _scheduleIconB,
                           pubtime,
                         ],
                       ),
@@ -645,7 +641,7 @@ class ChapterButtonWidget extends HookWidget {
                 children: <Widget>[
                   markReadButton,
                   title,
-                  iconSet[_IconSet.schedule]!,
+                  _scheduleIconB,
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -658,9 +654,9 @@ class ChapterButtonWidget extends HookWidget {
               ),
               TableRow(
                 children: <Widget>[
-                  iconSet[_IconSet.group]!,
+                  _groupIconB,
                   groups,
-                  iconSet[_IconSet.person]!,
+                  _personIconB,
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -1015,6 +1011,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8.0,
           children: [
             TextButton.icon(
               style: TextButton.styleFrom(
@@ -1034,9 +1031,6 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                 manga.attributes!.title.get('en'),
                 overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(
-              height: 8,
             ),
             Expanded(
               child: Row(
@@ -1061,19 +1055,12 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4.0,
                       children: [
-                        if (header != null) ...[
-                          IconTextChip(text: header!),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                        ],
+                        if (header != null) IconTextChip(text: header!),
                         MangaStatisticsRow(
                           key: ValueKey('MangaStatisticsRow(${manga.id})'),
                           manga: manga,
-                        ),
-                        const SizedBox(
-                          height: 4.0,
                         ),
                         MangaGenreRow(
                           key: ValueKey('MangaGenreRow(${manga.id})'),
@@ -1081,12 +1068,9 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                         ),
                         if (manga.attributes!.description.isNotEmpty)
                           Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text(
-                                manga.attributes!.description.get('en'),
-                                overflow: TextOverflow.clip,
-                              ),
+                            child: Text(
+                              manga.attributes!.description.get('en'),
+                              overflow: TextOverflow.clip,
                             ),
                           ),
                       ],
@@ -1142,6 +1126,7 @@ class _ListMangaItem extends HookConsumerWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 10.0,
                 children: [
                   TextButton.icon(
                     style: TextButton.styleFrom(
@@ -1163,21 +1148,10 @@ class _ListMangaItem extends HookConsumerWidget {
                     ),
                     label: Text(manga.attributes!.title.get('en')),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  if (header != null) ...[
-                    IconTextChip(text: header!),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ],
+                  if (header != null) IconTextChip(text: header!),
                   MangaGenreRow(
                     key: ValueKey('MangaGenreRow(${manga.id})'),
                     manga: manga,
-                  ),
-                  const SizedBox(
-                    height: 10,
                   ),
                   MangaStatisticsRow(
                     key: ValueKey('MangaStatisticsRow(${manga.id})'),
@@ -1297,6 +1271,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
 
     return Wrap(
       runSpacing: 4.0,
+      spacing: 5.0,
       children: [
         ...switch (statsProvider) {
           MangaStatistics(:final rating, :final follows, :final comments) => [
@@ -1322,9 +1297,6 @@ class MangaStatisticsRow extends HookConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(
-                width: 5,
-              ),
               IconTextChip(
                 key: ValueKey('_FollowsChip(${manga.id})'),
                 icon: const Icon(
@@ -1332,9 +1304,6 @@ class MangaStatisticsRow extends HookConsumerWidget {
                   size: 18,
                 ),
                 text: numFormatter.format(follows),
-              ),
-              const SizedBox(
-                width: 5,
               ),
               CommentChip(key: ValueKey('CommentChip(${manga.id})'), comments: comments),
             ],
@@ -1344,7 +1313,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
               )
             ],
         },
-        const SizedBox(width: 10),
+        const SizedBox.shrink(),
         MangaStatusChip(
           key: ValueKey('MangaStatusChip(${manga.id})'),
           status: manga.attributes!.status,
@@ -1380,7 +1349,6 @@ class _GroupRow extends HookWidget {
             context.push('/group/${g.id}', extra: g);
           },
         )));
-        chips.add(_rowPadding);
       }
 
       if (chips.isEmpty) {
@@ -1389,7 +1357,6 @@ class _GroupRow extends HookWidget {
           key: const ValueKey('nogroup'),
           text: 'No Group',
         )));
-        chips.add(_rowPadding);
       }
 
       return chips;
@@ -1397,6 +1364,7 @@ class _GroupRow extends HookWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: 6.0,
       children: groupChips,
     );
   }
