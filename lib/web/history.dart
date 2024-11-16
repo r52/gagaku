@@ -29,6 +29,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
         AsyncValue(value: final history?) when history.isEmpty => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10.0,
               children: [
                 const Tooltip(
                   message: 'Supported URLs:\ncubari.moe\nimgur.com',
@@ -43,9 +44,6 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
                 ),
                 ElevatedButton.icon(
                   onPressed: () => openLinkDialog(context, api),

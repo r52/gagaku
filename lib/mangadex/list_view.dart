@@ -166,38 +166,6 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                       tooltip: 'ui.edit'.tr(context: context),
                     ),
                   const SizedBox.shrink(),
-                  // if (list.user != null && me != null && list.user!.id == me.id)
-                  //   ElevatedButton(
-                  //     style: Styles.buttonStyle(backgroundColor: Colors.red),
-                  //     onPressed: () async {
-                  //       final result = await showDeleteListDialog(
-                  //           context, list.attributes.name);
-                  //       if (result == true) {
-                  //         ref
-                  //             .read(userListsProvider.notifier)
-                  //             .deleteList(list)
-                  //             .then((success) {
-                  //           if (success == true) {
-                  //             if (!context.mounted) return;
-                  //             context.pop();
-                  //           } else {
-                  //             messenger
-                  //               ..removeCurrentSnackBar()
-                  //               ..showSnackBar(
-                  //                 const SnackBar(
-                  //                   content: Text('Failed to delete list.'),
-                  //                   backgroundColor: Colors.red,
-                  //                 ),
-                  //               );
-                  //           }
-                  //         });
-                  //       }
-                  //     },
-                  //     child: const Text('Delete'),
-                  //   ),
-                  // const SizedBox(
-                  //   width: 4,
-                  // ),
                 ],
               ),
             ],

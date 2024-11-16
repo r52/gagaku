@@ -24,8 +24,6 @@ import 'types.dart';
 
 part 'widgets.g.dart';
 
-const statsError = 'Error Retrieving Stats';
-
 typedef MangaSelectCallback = void Function(Manga manga);
 typedef MangaButtonBuilderCallback = Widget Function(Manga manga);
 
@@ -59,26 +57,6 @@ const _openIconB = Icon(Icons.open_in_new, size: 20.0);
 const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
-
-const _iconSetB = {
-  _IconSet.group: _groupIconB,
-  _IconSet.circle: _circleIconB,
-  _IconSet.person: _personIconB,
-  _IconSet.check: _checkIconB,
-  _IconSet.open: _openIconB,
-  _IconSet.schedule: _scheduleIconB,
-};
-
-const _iconSetS = {
-  _IconSet.group: _groupIconS,
-  _IconSet.circle: _circleIconS,
-  _IconSet.person: _personIconS,
-  _IconSet.check: _checkIconS,
-  _IconSet.open: _openIconS,
-  _IconSet.schedule: _scheduleIconS,
-};
-
-enum _IconSet { group, circle, person, check, open, schedule }
 
 class MangaDexSliverAppBar extends StatelessWidget {
   const MangaDexSliverAppBar({
@@ -148,25 +126,21 @@ class MangaDexSliverAppBar extends StatelessWidget {
             builder: (context, ref, child) {
               final auth = ref.watch(authControlProvider);
 
-              switch (auth) {
-                case AsyncValue(value: final loggedin?):
+              return switch (auth) {
+                AsyncValue(value: final loggedin?) =>
                   // XXX: This changes when OAuth is released
-                  return IconButton(
+                  IconButton(
                     color: theme.colorScheme.primary,
                     tooltip: loggedin ? 'auth.logout'.tr(context: context) : 'auth.login'.tr(context: context),
                     icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
                     onPressed: loggedin
                         ? () => ref.read(authControlProvider.notifier).logout()
                         : () => context.push(GagakuRoute.login),
-                  );
+                  ),
                 // ignore: unused_local_variable
-                case AsyncValue(:final error?, :final stackTrace?):
-                  return const Icon(Icons.error);
-                case _:
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-              }
+                AsyncValue(:final error?, :final stackTrace?) => const Icon(Icons.error),
+                _ => const Center(child: CircularProgressIndicator()),
+              };
             },
           ),
         ],
@@ -1333,7 +1307,7 @@ class _GroupRow extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final iconSet = screenSizeSmall ? _iconSetS : _iconSetB;
+    final pubIcon = screenSizeSmall ? _circleIconS : _circleIconB;
     final isOfficialPub = chapter.attributes.externalUrl != null;
 
     final groupChips = useMemoized(() {
@@ -1343,7 +1317,7 @@ class _GroupRow extends HookWidget {
         chips.add(Flexible(
             child: IconTextChip(
           key: ValueKey(g.id),
-          icon: isOfficialPub ? iconSet[_IconSet.circle] : null,
+          icon: isOfficialPub ? pubIcon : null,
           text: g.attributes.name,
           onPressed: () {
             context.push('/group/${g.id}', extra: g);
