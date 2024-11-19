@@ -8774,3 +8774,183 @@ abstract class _ErrorResponse implements ErrorResponse {
   _$$ErrorResponseImplCopyWith<_$ErrorResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+FrontPageData _$FrontPageDataFromJson(Map<String, dynamic> json) {
+  return _FrontPageData.fromJson(json);
+}
+
+/// @nodoc
+mixin _$FrontPageData {
+  String get staffPicks => throw _privateConstructorUsedError;
+  String get seasonal => throw _privateConstructorUsedError;
+
+  /// Serializes this FrontPageData to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of FrontPageData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $FrontPageDataCopyWith<FrontPageData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $FrontPageDataCopyWith<$Res> {
+  factory $FrontPageDataCopyWith(
+          FrontPageData value, $Res Function(FrontPageData) then) =
+      _$FrontPageDataCopyWithImpl<$Res, FrontPageData>;
+  @useResult
+  $Res call({String staffPicks, String seasonal});
+}
+
+/// @nodoc
+class _$FrontPageDataCopyWithImpl<$Res, $Val extends FrontPageData>
+    implements $FrontPageDataCopyWith<$Res> {
+  _$FrontPageDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of FrontPageData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? staffPicks = null,
+    Object? seasonal = null,
+  }) {
+    return _then(_value.copyWith(
+      staffPicks: null == staffPicks
+          ? _value.staffPicks
+          : staffPicks // ignore: cast_nullable_to_non_nullable
+              as String,
+      seasonal: null == seasonal
+          ? _value.seasonal
+          : seasonal // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$FrontPageDataImplCopyWith<$Res>
+    implements $FrontPageDataCopyWith<$Res> {
+  factory _$$FrontPageDataImplCopyWith(
+          _$FrontPageDataImpl value, $Res Function(_$FrontPageDataImpl) then) =
+      __$$FrontPageDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String staffPicks, String seasonal});
+}
+
+/// @nodoc
+class __$$FrontPageDataImplCopyWithImpl<$Res>
+    extends _$FrontPageDataCopyWithImpl<$Res, _$FrontPageDataImpl>
+    implements _$$FrontPageDataImplCopyWith<$Res> {
+  __$$FrontPageDataImplCopyWithImpl(
+      _$FrontPageDataImpl _value, $Res Function(_$FrontPageDataImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of FrontPageData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? staffPicks = null,
+    Object? seasonal = null,
+  }) {
+    return _then(_$FrontPageDataImpl(
+      staffPicks: null == staffPicks
+          ? _value.staffPicks
+          : staffPicks // ignore: cast_nullable_to_non_nullable
+              as String,
+      seasonal: null == seasonal
+          ? _value.seasonal
+          : seasonal // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$FrontPageDataImpl
+    with DiagnosticableTreeMixin
+    implements _FrontPageData {
+  const _$FrontPageDataImpl({required this.staffPicks, required this.seasonal});
+
+  factory _$FrontPageDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$FrontPageDataImplFromJson(json);
+
+  @override
+  final String staffPicks;
+  @override
+  final String seasonal;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'FrontPageData(staffPicks: $staffPicks, seasonal: $seasonal)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'FrontPageData'))
+      ..add(DiagnosticsProperty('staffPicks', staffPicks))
+      ..add(DiagnosticsProperty('seasonal', seasonal));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FrontPageDataImpl &&
+            (identical(other.staffPicks, staffPicks) ||
+                other.staffPicks == staffPicks) &&
+            (identical(other.seasonal, seasonal) ||
+                other.seasonal == seasonal));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, staffPicks, seasonal);
+
+  /// Create a copy of FrontPageData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FrontPageDataImplCopyWith<_$FrontPageDataImpl> get copyWith =>
+      __$$FrontPageDataImplCopyWithImpl<_$FrontPageDataImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$FrontPageDataImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _FrontPageData implements FrontPageData {
+  const factory _FrontPageData(
+      {required final String staffPicks,
+      required final String seasonal}) = _$FrontPageDataImpl;
+
+  factory _FrontPageData.fromJson(Map<String, dynamic> json) =
+      _$FrontPageDataImpl.fromJson;
+
+  @override
+  String get staffPicks;
+  @override
+  String get seasonal;
+
+  /// Create a copy of FrontPageData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$FrontPageDataImplCopyWith<_$FrontPageDataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

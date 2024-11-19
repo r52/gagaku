@@ -334,6 +334,31 @@ class MangaDexModel {
     return ex;
   }
 
+  /// Fetches MangaDex frontpage data
+  Future<FrontPageData> fetchFrontPageData() async {
+    final key = 'FrontPageData';
+
+    if (await _cache.exists(key)) {
+      return _cache.get(key, FrontPageData.fromJson).get<FrontPageData>();
+    }
+
+    final uri = Uri.parse('https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/mangadex.json');
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      final result = FrontPageData.fromJson(body);
+
+      // Cache the data
+      await _cache.put(key, response.body, result, true);
+
+      return result;
+    }
+
+    // Throw if failure
+    throw createException("fetchFrontPageData() failed.", response);
+  }
+
   /// Fetches a generic [ChapterList] feed based on given parameters, respecting
   /// user settings.
   ///

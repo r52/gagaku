@@ -887,6 +887,16 @@ class ErrorResponse with _$ErrorResponse {
   factory ErrorResponse.fromJson(Map<String, dynamic> json) => _$ErrorResponseFromJson(json);
 }
 
+@freezed
+class FrontPageData with _$FrontPageData {
+  const factory FrontPageData({
+    required String staffPicks,
+    required String seasonal,
+  }) = _FrontPageData;
+
+  factory FrontPageData.fromJson(Map<String, dynamic> json) => _$FrontPageDataFromJson(json);
+}
+
 class MangaDexException implements Exception {
   final String message;
   final List<MDError>? errors;

@@ -287,5 +287,59 @@ final class _FetchCustomListMangaFamily extends Family {
     );
   }
 }
+
+@ProviderFor(_fetchFrontPageData)
+const _fetchFrontPageDataProvider = _FetchFrontPageDataProvider._();
+
+final class _FetchFrontPageDataProvider extends $FunctionalProvider<
+        AsyncValue<FrontPageData>, FutureOr<FrontPageData>>
+    with $FutureModifier<FrontPageData>, $FutureProvider<FrontPageData> {
+  const _FetchFrontPageDataProvider._(
+      {FutureOr<FrontPageData> Function(
+        Ref ref,
+      )? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: noRetry,
+          name: r'_fetchFrontPageDataProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final FutureOr<FrontPageData> Function(
+    Ref ref,
+  )? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchFrontPageDataHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<FrontPageData> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(this, pointer);
+
+  @override
+  _FetchFrontPageDataProvider $copyWithCreate(
+    FutureOr<FrontPageData> Function(
+      Ref ref,
+    ) create,
+  ) {
+    return _FetchFrontPageDataProvider._(create: create);
+  }
+
+  @override
+  FutureOr<FrontPageData> create(Ref ref) {
+    final _$cb = _createCb ?? _fetchFrontPageData;
+    return _$cb(ref);
+  }
+}
+
+String _$fetchFrontPageDataHash() =>
+    r'245417f155ec4ebbefb21699348d9bf828acaeff';
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

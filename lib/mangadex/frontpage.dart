@@ -75,6 +75,15 @@ Future<List<Manga>> _fetchCustomListManga(Ref ref, String listid) async {
   return mangas;
 }
 
+@Riverpod(retry: noRetry)
+Future<FrontPageData> _fetchFrontPageData(Ref ref) async {
+  final api = ref.watch(mangadexProvider);
+  final data = await api.fetchFrontPageData();
+  ref.disposeAfter(const Duration(minutes: 60));
+
+  return data;
+}
+
 class MangaDexFrontPage extends ConsumerWidget {
   const MangaDexFrontPage({super.key, this.controller});
 
@@ -83,10 +92,30 @@ class MangaDexFrontPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     const style = TextStyle(fontSize: 24);
-    const staffPickId = '805ba886-dd99-4aa4-b460-4bd7c7b71352';
-    const seasonalId = '54736a5c-eb7f-4844-971b-80ee171cdf29';
-    final staffPicks = _fetchCustomListMangaProvider(staffPickId);
-    final seasonal = _fetchCustomListMangaProvider(seasonalId);
+    FrontPageData fpdata;
+
+    final fpdataProvider = ref.watch(_fetchFrontPageDataProvider);
+    switch (fpdataProvider) {
+      case AsyncValue(:final error?, :final stackTrace?):
+        return RefreshIndicator(
+          onRefresh: () {
+            return ref.refresh(_fetchFrontPageDataProvider.future);
+          },
+          child: ErrorList(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchFrontPageDataProvider() failed",
+          ),
+        );
+      case AsyncValue(value: final data?):
+        fpdata = data;
+        break;
+      case AsyncValue(:final progress):
+        return ListSpinner(progress: progress?.toDouble());
+    }
+
+    final staffPicks = _fetchCustomListMangaProvider(fpdata.staffPicks);
+    final seasonal = _fetchCustomListMangaProvider(fpdata.seasonal);
 
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
 
@@ -112,7 +141,7 @@ class MangaDexFrontPage extends ConsumerWidget {
       const MangaProviderCarousel(provider: _latestUpdatesProvider),
       TextButton.icon(
         onPressed: () {
-          context.push('/list/$staffPickId');
+          context.push('/list/${fpdata.staffPicks}');
         },
         label: Text(
           'mangadex.staffPicks'.tr(context: context),
@@ -124,7 +153,7 @@ class MangaDexFrontPage extends ConsumerWidget {
       MangaProviderCarousel(provider: staffPicks),
       TextButton.icon(
         onPressed: () {
-          context.push('/list/$seasonalId');
+          context.push('/list/${fpdata.seasonal}');
         },
         label: Text(
           'mangadex.seasonal'.tr(context: context),

@@ -693,3 +693,15 @@ Map<String, dynamic> _$$ErrorResponseImplToJson(_$ErrorResponseImpl instance) =>
       'result': instance.result,
       'errors': instance.errors,
     };
+
+_$FrontPageDataImpl _$$FrontPageDataImplFromJson(Map<String, dynamic> json) =>
+    _$FrontPageDataImpl(
+      staffPicks: json['staffPicks'] as String,
+      seasonal: json['seasonal'] as String,
+    );
+
+Map<String, dynamic> _$$FrontPageDataImplToJson(_$FrontPageDataImpl instance) =>
+    <String, dynamic>{
+      'staffPicks': instance.staffPicks,
+      'seasonal': instance.seasonal,
+    };
