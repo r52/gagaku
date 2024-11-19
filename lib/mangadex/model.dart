@@ -343,7 +343,7 @@ class MangaDexModel {
     }
 
     final uri = Uri.parse('https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/mangadex.json');
-    final response = await _client.get(uri);
+    final response = await http.get(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.body);
