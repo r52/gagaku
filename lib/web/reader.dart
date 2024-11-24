@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/reader/main.dart';
-import 'package:gagaku/reader/types.dart';
+import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';

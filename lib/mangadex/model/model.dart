@@ -5,11 +5,11 @@ import 'dart:math';
 
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/cache.dart';
-import 'package:gagaku/mangadex/cache.dart';
-import 'package:gagaku/mangadex/config.dart';
-import 'package:gagaku/mangadex/types.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/mangadex/model/cache.dart';
+import 'package:gagaku/mangadex/model/config.dart';
+import 'package:gagaku/mangadex/model/types.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mutex/mutex.dart';

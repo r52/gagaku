@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

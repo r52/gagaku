@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:gagaku/mangadex/types.dart';
+import 'package:gagaku/mangadex/model/types.dart';
 
 part 'config.freezed.dart';
 part 'config.g.dart';
@@ -14,15 +14,12 @@ class MangaDexConfig with _$MangaDexConfig {
   factory MangaDexConfig({
     @Default({}) @LanguageConverter() Set<Language> translatedLanguages,
     @Default({}) @LanguageConverter() Set<Language> originalLanguage,
-    @Default(
-        {ContentRating.safe, ContentRating.suggestive, ContentRating.erotica})
-    Set<ContentRating> contentRating,
+    @Default({ContentRating.safe, ContentRating.suggestive, ContentRating.erotica}) Set<ContentRating> contentRating,
     @Default(false) bool dataSaver,
     @Default({}) Set<String> groupBlacklist,
   }) = _MangaDexConfig;
 
-  factory MangaDexConfig.fromJson(Map<String, dynamic> json) =>
-      _$MangaDexConfigFromJson(json);
+  factory MangaDexConfig.fromJson(Map<String, dynamic> json) => _$MangaDexConfigFromJson(json);
 }
 
 @riverpod

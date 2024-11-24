@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:gagaku/cache.dart';
+import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/mangadex/types.dart';
+import 'package:gagaku/mangadex/model/types.dart';
 
 extension MDCacheManagerExt on CacheManager {
   /// Adds all API data from a [list] into the cache, resolving its ids automatically

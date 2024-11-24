@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:gagaku/mangadex/model.dart';
+import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 
 class MangaDexLoginWidget extends StatelessWidget {

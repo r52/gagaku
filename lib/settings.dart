@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/config.dart';
+import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
-import 'package:gagaku/types.dart';
+import 'package:gagaku/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

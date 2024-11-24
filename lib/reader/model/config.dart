@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gagaku/model.dart';
-import 'package:gagaku/reader/types.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/reader/model/types.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -31,8 +31,7 @@ class ReaderConfig with _$ReaderConfig {
     @Default(3) int precacheCount,
   }) = _ReaderConfig;
 
-  factory ReaderConfig.fromJson(Map<String, dynamic> json) =>
-      _$ReaderConfigFromJson(json);
+  factory ReaderConfig.fromJson(Map<String, dynamic> json) => _$ReaderConfigFromJson(json);
 }
 
 @riverpod

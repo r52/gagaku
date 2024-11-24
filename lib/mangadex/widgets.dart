@@ -4,12 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/config.dart';
-import 'package:gagaku/mangadex/model.dart';
+import 'package:gagaku/model/config.dart';
+import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -20,7 +20,7 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
-import 'types.dart';
+import 'model/types.dart';
 
 part 'widgets.g.dart';
 

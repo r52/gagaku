@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cronet_http/cronet_http.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:http/retry.dart';

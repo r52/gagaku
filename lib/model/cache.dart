@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
