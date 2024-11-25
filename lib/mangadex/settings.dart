@@ -375,8 +375,6 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                     Styles.showErrorSnackBar(messenger, '$error');
                     logger.e("_fetchGroupDataProvider failed", error: error, stackTrace: stackTrace);
 
-                    final children = <Widget>[];
-
                     for (final group in config.value.groupBlacklist) {
                       children.add(InputChip(
                         label: Text(group),

@@ -92,29 +92,17 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final api = ref.watch(proxyProvider);
     final inf = info ??
         SourceInfo(
           type: SourceType.proxy,
           source: proxy!,
           location: code!,
         );
-    final mangaProvider = ref.watch(_fetchWebMangaInfoProvider(inf));
 
-    Widget child;
-    PreferredSizeWidget? appBar;
-
-    switch (mangaProvider) {
-      case AsyncValue(value: final manga?):
-        child = WebMangaViewWidget(manga: manga, info: inf);
-      case AsyncValue(:final error?, :final stackTrace?):
-        child = ErrorList(
-          error: error,
-          stackTrace: stackTrace,
-          message: "_fetchWebMangaInfoProvider($proxy/$code) failed",
-        );
-
-        appBar = AppBar(
+    return DataProviderWhenWidget(
+      provider: _fetchWebMangaInfoProvider(inf),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
           leading: BackButton(
             onPressed: () {
               if (context.canPop()) {
@@ -124,75 +112,58 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
               }
             },
           ),
-        );
-        break;
-      case AsyncValue(:final progress):
-        child = ListSpinner(
-          progress: progress?.toDouble(),
-        );
-        break;
-    }
-
-    return Scaffold(
-      appBar: appBar,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await api.invalidateAll(inf.getKey());
-          return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
-        },
-        child: child,
+        ),
+        body: Consumer(
+          child: child,
+          builder: (context, ref, child) {
+            final api = ref.watch(proxyProvider);
+            return RefreshIndicator(
+              onRefresh: () async {
+                await api.invalidateAll(inf.getKey());
+                return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
+              },
+              child: child!,
+            );
+          },
+        ),
       ),
+      builder: (context, data) => WebMangaViewWidget(manga: data, info: inf),
     );
   }
 }
 
-class RedirectedWebMangaViewWidget extends ConsumerWidget {
+class RedirectedWebMangaViewWidget extends StatelessWidget {
   const RedirectedWebMangaViewWidget({super.key, required this.url});
 
   final String url;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final infoProvider = ref.watch(_fetchWebMangaRedirectProvider(url));
-
-    Widget child;
-    PreferredSizeWidget? appBar;
-
-    switch (infoProvider) {
-      case AsyncValue(value: final info?):
-        return QueriedWebMangaViewWidget(info: info);
-      case AsyncValue(:final error?, :final stackTrace?):
-        child = RefreshIndicator(
-          onRefresh: () async => ref.refresh(_fetchWebMangaRedirectProvider(url).future),
-          child: ErrorList(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchWebMangaRedirectProvider($url) failed",
+  Widget build(BuildContext context) {
+    return DataProviderWhenWidget(
+      provider: _fetchWebMangaRedirectProvider(url),
+      errorBuilder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(
+            leading: BackButton(
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(GagakuRoute.proxyHome);
+                }
+              },
+            ),
+          ),
+          body: Consumer(
+            child: child,
+            builder: (context, ref, child) => RefreshIndicator(
+              onRefresh: () async => ref.refresh(_fetchWebMangaRedirectProvider(url).future),
+              child: child!,
+            ),
           ),
         );
-
-        appBar = AppBar(
-          leading: BackButton(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(GagakuRoute.proxyHome);
-              }
-            },
-          ),
-        );
-        break;
-      case AsyncValue(:final progress):
-        child = ListSpinner(
-          progress: progress?.toDouble(),
-        );
-        break;
-    }
-
-    return Scaffold(
-      appBar: appBar,
-      body: child,
+      },
+      builder: (context, data) => QueriedWebMangaViewWidget(info: data),
     );
   }
 }
@@ -205,6 +176,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
     final link = HistoryLink(title: '${info.source}: ${manga.title}', url: info.getURL(), cover: manga.cover);
     final chapterlist = manga.chapters.entries.map((e) => ChapterEntry(e.key, e.value)).toList();
@@ -219,278 +191,287 @@ class WebMangaViewWidget extends HookConsumerWidget {
       return null;
     }, []);
 
-    return CustomScrollView(
-      scrollBehavior: const MouseTouchScrollBehavior(),
-      slivers: <Widget>[
-        SliverAppBar(
-          pinned: true,
-          snap: false,
-          floating: false,
-          expandedHeight: 250.0,
-          leading: BackButton(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(GagakuRoute.proxyHome);
-              }
-            },
-          ),
-          flexibleSpace: FlexibleSpaceBar(
-            expandedTitleScale: 2.0,
-            title: Text(
-              manga.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                shadows: <Shadow>[
-                  Shadow(
-                    offset: Offset(1.0, 1.0),
-                    color: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                ],
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await api.invalidateAll(info.getKey());
+          return ref.refresh(_fetchWebMangaInfoProvider(info).future);
+        },
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              snap: false,
+              floating: false,
+              expandedHeight: 250.0,
+              leading: BackButton(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go(GagakuRoute.proxyHome);
+                  }
+                },
               ),
-            ),
-            background: CachedNetworkImage(
-              imageUrl: manga.cover,
-              colorBlendMode: BlendMode.modulate,
-              color: Colors.grey,
-              fit: BoxFit.cover,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-          ),
-          actions: [
-            OverflowBar(
-              spacing: 8.0,
-              children: [
-                _FavoritesMenu(link: link, info: info),
-                Consumer(
-                  builder: (context, ref, child) {
-                    final key = info.getKey();
-
-                    return IconButton(
-                      tooltip: 'webSources.resetRead'.tr(context: context),
-                      style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surface.withAlpha(200)),
-                      onPressed: () async {
-                        final result = await showDialog<bool>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            final nav = Navigator.of(context);
-                            return AlertDialog(
-                              title: Text('webSources.resetRead'.tr(context: context)),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('webSources.resetReadWarning'.tr(context: context)),
-                                ],
-                              ),
-                              actions: <Widget>[
-                                ElevatedButton(
-                                  child: Text('ui.no'.tr(context: context)),
-                                  onPressed: () {
-                                    nav.pop(false);
-                                  },
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    nav.pop(true);
-                                  },
-                                  child: Text('ui.yes'.tr(context: context)),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-
-                        if (result == true) {
-                          ref.read(webReadMarkersProvider.notifier).deleteKey(key);
-                        }
-                      },
-                      icon: const Icon(Icons.restore),
-                    );
-                  },
+              flexibleSpace: FlexibleSpaceBar(
+                expandedTitleScale: 2.0,
+                title: Text(
+                  manga.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(1.0, 1.0),
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 2),
-              ],
-            ),
-          ],
-        ),
-        SliverList.list(
-          children: [
-            if (manga.description.isNotEmpty)
-              ExpansionTile(
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                title: Text('mangaView.synopsis'.tr(context: context)),
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8),
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    child: MarkdownBody(
-                      data: manga.description,
-                      onTapLink: (text, url, title) async {
-                        if (url != null) {
-                          if (!await launchUrl(Uri.parse(url))) {
-                            throw 'Could not launch $url';
-                          }
-                        }
+                background: CachedNetworkImage(
+                  imageUrl: manga.cover,
+                  colorBlendMode: BlendMode.modulate,
+                  color: Colors.grey,
+                  fit: BoxFit.cover,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              ),
+              actions: [
+                OverflowBar(
+                  spacing: 8.0,
+                  children: [
+                    _FavoritesMenu(link: link, info: info),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final key = info.getKey();
+
+                        return IconButton(
+                          tooltip: 'webSources.resetRead'.tr(context: context),
+                          style:
+                              Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surface.withAlpha(200)),
+                          onPressed: () async {
+                            final result = await showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                final nav = Navigator.of(context);
+                                return AlertDialog(
+                                  title: Text('webSources.resetRead'.tr(context: context)),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('webSources.resetReadWarning'.tr(context: context)),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text('ui.no'.tr(context: context)),
+                                      onPressed: () {
+                                        nav.pop(false);
+                                      },
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        nav.pop(true);
+                                      },
+                                      child: Text('ui.yes'.tr(context: context)),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (result == true) {
+                              ref.read(webReadMarkersProvider.notifier).deleteKey(key);
+                            }
+                          },
+                          icon: const Icon(Icons.restore),
+                        );
                       },
                     ),
-                  ),
-                ],
-              ),
-            ExpansionTile(
-              title: Text('mangaView.info'.tr(context: context)),
-              children: [
-                MultiChildExpansionTile(
-                  title: 'mangaView.author'.tr(context: context),
-                  children: [
-                    IconTextChip(
-                      text: manga.author,
-                    )
-                  ],
-                ),
-                MultiChildExpansionTile(
-                  title: 'mangaView.artist'.tr(context: context),
-                  children: [
-                    IconTextChip(
-                      text: manga.artist,
-                    )
-                  ],
-                ),
-                MultiChildExpansionTile(
-                  title: 'tracking.links'.tr(context: context),
-                  children: [
-                    if (info.type == SourceType.proxy)
-                      ButtonChip(
-                        onPressed: () async {
-                          final route = cleanBaseDomains(GoRouterState.of(context).uri.toString());
-                          final url = Uri.parse('http://cubari.moe$route');
-
-                          if (!await launchUrl(url)) {
-                            throw 'Could not launch $url';
-                          }
-                        },
-                        text: 'mangaView.openOn'.tr(context: context, args: ['cubari.moe']),
-                      ),
-                    if (info.type == SourceType.source)
-                      ButtonChip(
-                        onPressed: () async {
-                          final url = Uri.parse(info.location);
-
-                          if (!await launchUrl(url)) {
-                            throw 'Could not launch $url';
-                          }
-                        },
-                        text: 'mangaView.openOn'.tr(context: context, args: [info.source]),
-                      ),
+                    const SizedBox(width: 2),
                   ],
                 ),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Text(
-                'mangaView.chapters'.tr(context: context),
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Row(
-                children: [
-                  const Spacer(),
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final key = info.getKey();
-                      final names = chapterlist.map((e) => e.name);
-                      final allRead = ref.watch(webReadMarkersProvider.select((value) => switch (value) {
-                            AsyncValue(value: final data?) => data[key]?.containsAll(names) ?? false,
-                            _ => false,
-                          }));
-
-                      final opt =
-                          allRead ? 'mangaView.unread'.tr(context: context) : 'mangaView.read'.tr(context: context);
-
-                      return ElevatedButton(
-                        style: Styles.buttonStyle(padding: const EdgeInsets.symmetric(horizontal: 8.0)),
-                        onPressed: () async {
-                          final result = await showDialog<bool>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              final nav = Navigator.of(context);
-                              return AlertDialog(
-                                title: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('mangaView.markAllWarning'.tr(context: context, args: [opt])),
-                                  ],
-                                ),
-                                actions: <Widget>[
-                                  ElevatedButton(
-                                    child: Text('ui.no'.tr(context: context)),
-                                    onPressed: () {
-                                      nav.pop(false);
-                                    },
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      nav.pop(true);
-                                    },
-                                    child: Text('ui.yes'.tr(context: context)),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-
-                          if (result == true) {
-                            ref
-                                .read(webReadMarkersProvider.notifier)
-                                .setBulk(key, read: !allRead ? names : null, unread: allRead ? names : null);
-                          }
-                        },
-                        child: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
-                      );
-                    },
+            SliverList.list(
+              children: [
+                if (manga.description.isNotEmpty)
+                  ExpansionTile(
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    title: Text('mangaView.synopsis'.tr(context: context)),
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8),
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        child: MarkdownBody(
+                          data: manga.description,
+                          onTapLink: (text, url, title) async {
+                            if (url != null) {
+                              if (!await launchUrl(Uri.parse(url))) {
+                                throw 'Could not launch $url';
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ExpansionTile(
+                  title: Text('mangaView.info'.tr(context: context)),
+                  children: [
+                    MultiChildExpansionTile(
+                      title: 'mangaView.author'.tr(context: context),
+                      children: [
+                        IconTextChip(
+                          text: manga.author,
+                        )
+                      ],
+                    ),
+                    MultiChildExpansionTile(
+                      title: 'mangaView.artist'.tr(context: context),
+                      children: [
+                        IconTextChip(
+                          text: manga.artist,
+                        )
+                      ],
+                    ),
+                    MultiChildExpansionTile(
+                      title: 'tracking.links'.tr(context: context),
+                      children: [
+                        if (info.type == SourceType.proxy)
+                          ButtonChip(
+                            onPressed: () async {
+                              final route = cleanBaseDomains(GoRouterState.of(context).uri.toString());
+                              final url = Uri.parse('http://cubari.moe$route');
+
+                              if (!await launchUrl(url)) {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            text: 'mangaView.openOn'.tr(context: context, args: ['cubari.moe']),
+                          ),
+                        if (info.type == SourceType.source)
+                          ButtonChip(
+                            onPressed: () async {
+                              final url = Uri.parse(info.location);
+
+                              if (!await launchUrl(url)) {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            text: 'mangaView.openOn'.tr(context: context, args: [info.source]),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    'mangaView.chapters'.tr(context: context),
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final key = info.getKey();
+                          final names = chapterlist.map((e) => e.name);
+                          final allRead = ref.watch(webReadMarkersProvider.select((value) => switch (value) {
+                                AsyncValue(value: final data?) => data[key]?.containsAll(names) ?? false,
+                                _ => false,
+                              }));
+
+                          final opt =
+                              allRead ? 'mangaView.unread'.tr(context: context) : 'mangaView.read'.tr(context: context);
+
+                          return ElevatedButton(
+                            style: Styles.buttonStyle(padding: const EdgeInsets.symmetric(horizontal: 8.0)),
+                            onPressed: () async {
+                              final result = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  final nav = Navigator.of(context);
+                                  return AlertDialog(
+                                    title: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('mangaView.markAllWarning'.tr(context: context, args: [opt])),
+                                      ],
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: Text('ui.no'.tr(context: context)),
+                                        onPressed: () {
+                                          nav.pop(false);
+                                        },
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          nav.pop(true);
+                                        },
+                                        child: Text('ui.yes'.tr(context: context)),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (result == true) {
+                                ref
+                                    .read(webReadMarkersProvider.notifier)
+                                    .setBulk(key, read: !allRead ? names : null, unread: allRead ? names : null);
+                              }
+                            },
+                            child: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SliverList.separated(
+              findChildIndexCallback: (key) {
+                final valueKey = key as ValueKey<int>;
+                final val = chapterlist.indexWhere((i) => i.id == valueKey.value);
+                return val >= 0 ? val : null;
+              },
+              separatorBuilder: (_, __) => const SizedBox(
+                height: 4.0,
               ),
+              itemBuilder: (BuildContext context, int index) {
+                final e = chapterlist.elementAt(index);
+
+                return ChapterButtonWidget(
+                  key: ValueKey(e.id),
+                  data: e,
+                  manga: manga,
+                  info: info,
+                  link: Text(
+                    manga.title,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                );
+              },
+              itemCount: manga.chapters.length,
             ),
           ],
         ),
-        SliverList.separated(
-          findChildIndexCallback: (key) {
-            final valueKey = key as ValueKey<int>;
-            final val = chapterlist.indexWhere((i) => i.id == valueKey.value);
-            return val >= 0 ? val : null;
-          },
-          separatorBuilder: (_, __) => const SizedBox(
-            height: 4.0,
-          ),
-          itemBuilder: (BuildContext context, int index) {
-            final e = chapterlist.elementAt(index);
-
-            return ChapterButtonWidget(
-              key: ValueKey(e.id),
-              data: e,
-              manga: manga,
-              info: info,
-              link: Text(
-                manga.title,
-                style: const TextStyle(fontSize: 24),
-              ),
-            );
-          },
-          itemCount: manga.chapters.length,
-        ),
-      ],
+      ),
     );
   }
 }

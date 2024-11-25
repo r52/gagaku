@@ -84,38 +84,45 @@ Future<FrontPageData> _fetchFrontPageData(Ref ref) async {
   return data;
 }
 
-class MangaDexFrontPage extends ConsumerWidget {
+class MangaDexFrontPage extends StatelessWidget {
   const MangaDexFrontPage({super.key, this.controller});
 
   final ScrollController? controller;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    const style = TextStyle(fontSize: 24);
-    FrontPageData fpdata;
-
-    final fpdataProvider = ref.watch(_fetchFrontPageDataProvider);
-    switch (fpdataProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return RefreshIndicator(
+  Widget build(BuildContext context) {
+    return DataProviderWhenWidget(
+      provider: _fetchFrontPageDataProvider,
+      errorBuilder: (context, child) => Consumer(
+        child: child,
+        builder: (context, ref, child) => RefreshIndicator(
           onRefresh: () {
             return ref.refresh(_fetchFrontPageDataProvider.future);
           },
-          child: ErrorList(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchFrontPageDataProvider() failed",
-          ),
-        );
-      case AsyncValue(value: final data?):
-        fpdata = data;
-        break;
-      case AsyncValue(:final progress):
-        return ListSpinner(progress: progress?.toDouble());
-    }
+          child: child!,
+        ),
+      ),
+      builder: (context, data) => _FrontPageWidget(
+        key: ValueKey('_FrontPageWidget'),
+        data: data,
+        controller: controller,
+      ),
+    );
+  }
+}
 
-    final staffPicks = _fetchCustomListMangaProvider(fpdata.staffPicks);
-    final seasonal = _fetchCustomListMangaProvider(fpdata.seasonal);
+class _FrontPageWidget extends ConsumerWidget {
+  const _FrontPageWidget({super.key, required this.data, this.controller});
+
+  final FrontPageData data;
+  final ScrollController? controller;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    const style = TextStyle(fontSize: 24);
+
+    final staffPicks = _fetchCustomListMangaProvider(data.staffPicks);
+    final seasonal = _fetchCustomListMangaProvider(data.seasonal);
 
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
 
@@ -141,7 +148,7 @@ class MangaDexFrontPage extends ConsumerWidget {
       const MangaProviderCarousel(provider: _latestUpdatesProvider),
       TextButton.icon(
         onPressed: () {
-          context.push('/list/${fpdata.staffPicks}');
+          context.push('/list/${data.staffPicks}');
         },
         label: Text(
           'mangadex.staffPicks'.tr(context: context),
@@ -153,7 +160,7 @@ class MangaDexFrontPage extends ConsumerWidget {
       MangaProviderCarousel(provider: staffPicks),
       TextButton.icon(
         onPressed: () {
-          context.push('/list/${fpdata.seasonal}');
+          context.push('/list/${data.seasonal}');
         },
         label: Text(
           'mangadex.seasonal'.tr(context: context),
