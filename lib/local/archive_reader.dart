@@ -70,10 +70,10 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
 
   switch (info.type) {
     case ArchiveType.tar:
-      archive = TarDecoder().decodeBuffer(file);
+      archive = TarDecoder().decodeStream(file);
       break;
     case ArchiveType.zip:
-      archive = ZipDecoder().decodeBuffer(file);
+      archive = ZipDecoder().decodeStream(file);
       break;
   }
 
@@ -86,7 +86,7 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
             file.name.endsWith(".jpeg") ||
             (info.formats.avif && file.name.endsWith(".avif")))) {
       pages.add(ReaderPage(
-        provider: MemoryImage(file.content as Uint8List),
+        provider: MemoryImage(file.content),
         sortKey: file.name,
       ));
     }
