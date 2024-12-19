@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -194,23 +193,26 @@ class _FrontPageWidget extends ConsumerWidget {
         ref.read(latestGlobalFeedProvider.notifier).clear();
         return ref.refresh(_popularTitlesProvider.future);
       },
-      child: CustomScrollView(
-        scrollBehavior: const MouseTouchScrollBehavior(),
-        controller: scrollController,
-        slivers: [
-          MangaDexSliverAppBar(
-            controller: scrollController,
-          ),
-          SliverList.separated(
-            itemCount: frontPageWidgets.length,
-            itemBuilder: (context, index) {
-              return frontPageWidgets.elementAt(index);
-            },
-            separatorBuilder: (context, index) => const SizedBox(
-              height: 10.0,
+      child: ScrollConfiguration(
+        behavior: const MouseTouchScrollBehavior(),
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          controller: scrollController,
+          slivers: [
+            MangaDexSliverAppBar(
+              controller: scrollController,
             ),
-          )
-        ],
+            SliverList.separated(
+              itemCount: frontPageWidgets.length,
+              itemBuilder: (context, index) {
+                return frontPageWidgets.elementAt(index);
+              },
+              separatorBuilder: (context, index) => const SizedBox(
+                height: 10.0,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -229,30 +231,21 @@ class MangaProviderCarousel extends StatelessWidget {
     return Center(
       child: DataProviderWhenWidget(
         provider: provider,
-        builder: (context, items) => CarouselSlider.builder(
-          options: CarouselOptions(
-            height: 256,
-            viewportFraction: 192 / MediaQuery.sizeOf(context).width,
-            initialPage: 0,
-            enableInfiniteScroll: true,
-            reverse: false,
-            pageSnapping: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 10),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            autoPlayCurve: Curves.fastOutSlowIn,
-            enlargeCenterPage: true,
-            enlargeFactor: 0.1,
-            scrollDirection: Axis.horizontal,
+        builder: (context, items) => ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 256),
+          child: CarouselView(
+            itemExtent: 180,
+            shrinkExtent: 180,
+            enableSplash: false,
+            children: items
+                .map(
+                  (e) => GridMangaItem(
+                    key: ValueKey(e.id),
+                    manga: e,
+                  ),
+                )
+                .toList(),
           ),
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int index, int pageViewIndex) {
-            final manga = items.elementAt(index);
-            return GridMangaItem(
-              key: ValueKey(manga.id),
-              manga: manga,
-            );
-          },
         ),
       ),
     );

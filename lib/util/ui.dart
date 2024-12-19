@@ -126,7 +126,7 @@ class GridAlbumTextBar extends StatelessWidget {
                 color: Color.fromARGB(255, 0, 0, 0),
               ),
             ],
-            overflow: TextOverflow.fade,
+            overflow: TextOverflow.clip,
           ),
         ),
       ),
@@ -233,9 +233,11 @@ class CountryFlag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       flag,
+      softWrap: false,
       style: TextStyle(
         fontFamily: 'Twemoji',
         fontSize: size,
+        overflow: TextOverflow.clip,
       ),
     );
   }
