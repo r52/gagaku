@@ -12,6 +12,7 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:meta/meta.dart';
 import 'package:mutex/mutex.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
@@ -117,7 +118,7 @@ abstract class MangaDexEndpoints {
 }
 
 abstract class CacheLists {
-  static const library = 'userLibrary';
+  static const library = 'UserLibrary({id})';
   static const tags = 'tags';
 }
 
@@ -850,16 +851,18 @@ class MangaDexModel {
   }
 
   /// Fetches the user's manga library
-  Future<LibraryMap?> fetchUserLibrary() async {
+  Future<LibraryMap?> fetchUserLibrary(String userId) async {
     if (!await loggedIn()) {
       throw StateError("fetchUserLibrary() called on invalid token/login. Shouldn't ever get here");
     }
 
     decoder(String key, value) => MapEntry(key, MangaReadingStatus.values.byName(value));
 
-    if (await _cache.exists(CacheLists.library)) {
-      logger.d("Retrieving cached user library");
-      final libMap = _cache.get(CacheLists.library, (decoded) {
+    final cachekey = CacheLists.library.replaceFirst('{id}', userId);
+
+    if (await _cache.exists(cachekey)) {
+      logger.d("Retrieving cached user library of user $userId");
+      final libMap = _cache.get(cachekey, (decoded) {
         return decoded.map(decoder);
       }).get<LibraryMap>();
       return libMap;
@@ -881,8 +884,8 @@ class MangaDexModel {
 
       final libMap = mlist.map(decoder);
 
-      logger.d("Caching user library");
-      await _cache.put(CacheLists.library, json.encode(mlist), libMap, true);
+      logger.d("Caching user library of user $userId");
+      await _cache.put(cachekey, json.encode(mlist), libMap, true);
 
       return libMap;
     }
@@ -1397,12 +1400,11 @@ class MangaDexModel {
 
     // Log the failure
     logger.w("deleteList($id) returned code ${response.statusCode}", error: response.body);
-
-    return false;
+    throw createException("deleteList($id) failed.", response);
   }
 
   /// Creates a new [CustomList]
-  Future<CustomList?> createNewList(String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
+  Future<CustomList> createNewList(String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
     if (!await loggedIn()) {
       throw StateError("createNewList() called on invalid token/login. Shouldn't ever get here");
     }
@@ -1432,8 +1434,7 @@ class MangaDexModel {
 
     // Log the failure
     logger.w("createNewList($name, ${visibility.name}) returned code ${response.statusCode}", error: response.body);
-
-    return null;
+    throw createException("createNewList($name, ${visibility.name}) failed.", response);
   }
 
   /// Edits an existing [CustomList]
@@ -1507,9 +1508,11 @@ class MangaDexModel {
 class RecentlyAdded extends _$RecentlyAdded with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -1548,37 +1551,40 @@ class RecentlyAdded extends _$RecentlyAdded with AutoDisposeExpiryMix, ListBased
 }
 
 @riverpod
-class LatestChaptersFeed extends _$LatestChaptersFeed with ListBasedInfiniteScrollMix {
+class LatestChaptersFeed extends _$LatestChaptersFeed with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const feedKey = 'LatestChaptersFeed';
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
   ///Fetch the latest chapters list based on offset
+  @protected
   @override
   Future<List<Chapter>> fetchData(int offset) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
-
-    if (!loggedin) {
-      return [];
-    }
-
+    final key = '$feedKey[$userId]';
     final api = ref.watch(mangadexProvider);
     final chapters = await api.fetchFeed(
       path: MangaDexEndpoints.feed,
-      feedKey: feedKey,
+      feedKey: key,
       limit: limit,
       offset: offset,
     );
 
-    await ref.read(chapterStatsProvider.notifier).get(chapters);
+    await ref.read(chapterStatsProvider.get)(chapters);
+
+    disposeAfter(const Duration(minutes: 15));
 
     return chapters.toList();
   }
 
   @override
-  Future<List<Chapter>> build() async {
+  Future<List<Chapter>> build(String? userId) async {
+    if (userId == null) {
+      return [];
+    }
+
     return fetchData(0);
   }
 
@@ -1594,14 +1600,16 @@ class LatestChaptersFeed extends _$LatestChaptersFeed with ListBasedInfiniteScro
 }
 
 @riverpod
-class LatestGlobalFeed extends _$LatestGlobalFeed with ListBasedInfiniteScrollMix {
+class LatestGlobalFeed extends _$LatestGlobalFeed with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const feedKey = 'LatestGlobalFeed';
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
   ///Fetch the latest chapters list based on offset
+  @protected
   @override
   Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -1612,7 +1620,9 @@ class LatestGlobalFeed extends _$LatestGlobalFeed with ListBasedInfiniteScrollMi
       offset: offset,
     );
 
-    await ref.read(chapterStatsProvider.notifier).get(chapters);
+    await ref.read(chapterStatsProvider.get)(chapters);
+
+    disposeAfter(const Duration(minutes: 15));
 
     return chapters.toList();
   }
@@ -1638,9 +1648,11 @@ class GroupFeed extends _$GroupFeed with AutoDisposeExpiryMix, ListBasedInfinite
   static const feedKey = 'GroupFeed';
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -1652,7 +1664,7 @@ class GroupFeed extends _$GroupFeed with AutoDisposeExpiryMix, ListBasedInfinite
       entity: group,
     );
 
-    await ref.read(chapterStatsProvider.notifier).get(chapters);
+    await ref.read(chapterStatsProvider.get)(chapters);
 
     disposeAfter(const Duration(minutes: 5));
 
@@ -1679,9 +1691,11 @@ class GroupFeed extends _$GroupFeed with AutoDisposeExpiryMix, ListBasedInfinite
 class GroupTitles extends _$GroupTitles with ListBasedInfiniteScrollMix {
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -1708,9 +1722,11 @@ class GroupTitles extends _$GroupTitles with ListBasedInfiniteScrollMix {
 class CreatorTitles extends _$CreatorTitles with ListBasedInfiniteScrollMix {
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -1747,9 +1763,11 @@ class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix, ListBased
   static const feedKey = 'MangaChapters';
   static const _limit = MangaDexEndpoints.chapterLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -1765,7 +1783,7 @@ class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix, ListBased
       ignoreOriginalLanguage: true,
     );
 
-    await ref.read(chapterStatsProvider.notifier).get(chapters);
+    await ref.read(chapterStatsProvider.get)(chapters);
 
     disposeAfter(const Duration(minutes: 5));
 
@@ -1791,9 +1809,11 @@ class MangaChapters extends _$MangaChapters with AutoDisposeExpiryMix, ListBased
 class MangaCovers extends _$MangaCovers with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<CoverArt>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -1821,12 +1841,6 @@ class MangaCovers extends _$MangaCovers with AutoDisposeExpiryMix, ListBasedInfi
 @Riverpod(keepAlive: true)
 class ReadChapters extends _$ReadChapters {
   Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
-
-    if (!loggedin) {
-      return {};
-    }
-
     if (mangas.isEmpty) {
       return {};
     }
@@ -1837,91 +1851,86 @@ class ReadChapters extends _$ReadChapters {
   }
 
   @override
-  Future<ReadChaptersMap> build() async {
-    return {};
+  Future<ReadChaptersMap> build(String? userId) async {
+    if (userId == null) {
+      return {};
+    }
+
+    return _fetchReadChapters([]);
   }
 
   /// Fetch read chapters for the provided list of mangas
-  Future<void> get(Iterable<Manga> mangas) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
-
-    if (!loggedin) {
-      return;
+  @mutation
+  Future<ReadChaptersMap> get(Iterable<Manga> mangas) async {
+    if (userId == null) {
+      return {};
     }
 
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+    final mg = mangas.where((m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
 
-      if (mg.isEmpty) {
-        // No change
-        return oldstate;
-      }
+    if (mg.isEmpty) {
+      // No change
+      return oldstate;
+    }
 
-      final map = await _fetchReadChapters(mg);
-      return {...oldstate, ...map};
-    });
+    final map = await _fetchReadChapters(mg);
+    return {...oldstate, ...map};
   }
 
   /// Sets a list of chapters for a manga read or unread
-  Future<void> set(
+  @mutation
+  Future<ReadChaptersMap> set(
     Manga manga, {
     Iterable<Chapter>? read,
     Iterable<Chapter>? unread,
   }) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
-
-    if (!loggedin) {
-      return;
+    if (userId == null) {
+      throw StateError('User not logged in');
     }
 
     final api = ref.watch(mangadexProvider);
     final oldstate = await future;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      bool result = await api.setChaptersRead(manga, read: read, unread: unread);
+    bool result = await api.setChaptersRead(manga, read: read, unread: unread);
 
-      if (result) {
-        final keyExists = oldstate.containsKey(manga.id);
+    if (result) {
+      final keyExists = oldstate.containsKey(manga.id);
 
-        // Refresh
-        if (keyExists) {
-          if (read != null) {
-            oldstate[manga.id]?.addAll(read.map((e) => e.id));
-          }
+      // Refresh
+      if (keyExists) {
+        if (read != null) {
+          oldstate[manga.id]?.addAll(read.map((e) => e.id));
+        }
 
-          if (unread != null) {
-            oldstate[manga.id]?.removeAll(unread.map((e) => e.id));
-          }
-        } else {
-          if (read != null) {
-            oldstate[manga.id] = ReadChapterSet(manga.id, read.map((e) => e.id).toSet());
-          }
+        if (unread != null) {
+          oldstate[manga.id]?.removeAll(unread.map((e) => e.id));
+        }
+      } else {
+        if (read != null) {
+          oldstate[manga.id] = ReadChapterSet(manga.id, read.map((e) => e.id).toSet());
+        }
 
-          if (unread != null) {
-            oldstate[manga.id] = ReadChapterSet(manga.id, {});
-          }
+        if (unread != null) {
+          oldstate[manga.id] = ReadChapterSet(manga.id, {});
         }
       }
+    }
 
-      return {...oldstate};
-    });
+    return {...oldstate};
   }
 }
 
 @riverpod
 class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
   @override
-  Future<Map<String, MangaReadingStatus>> build() async {
-    final loggedin = await ref.watch(authControlProvider.future);
-    if (!loggedin) {
+  Future<Map<String, MangaReadingStatus>> build(String? userId) async {
+    if (userId == null) {
       return {};
     }
 
     final api = ref.watch(mangadexProvider);
-    final library = await api.fetchUserLibrary();
+    final library = await api.fetchUserLibrary(userId);
 
     if (library == null) {
       return {};
@@ -1932,25 +1941,23 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
     return library;
   }
 
-  Future<void> set(Manga manga, MangaReadingStatus? status) async {
+  @mutation
+  Future<Map<String, MangaReadingStatus>> set(Manga manga, MangaReadingStatus? status) async {
     final oldstate = await future;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      if (status == null) {
-        oldstate.remove(manga.id);
-      } else {
-        oldstate[manga.id] = status;
-      }
+    if (status == null) {
+      oldstate.remove(manga.id);
+    } else {
+      oldstate[manga.id] = status;
+    }
 
-      return {...oldstate};
-    });
+    return {...oldstate};
   }
 
   /// Clears the list and refetch from the beginning
   Future<void> clear() async {
     final api = ref.watch(mangadexProvider);
-    await api.invalidateCacheItem(CacheLists.library);
+    await api.invalidateAll('UserLibrary');
 
     ref.invalidateSelf();
   }
@@ -1960,16 +1967,13 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
 class UserLists extends _$UserLists with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const _limit = MangaDexEndpoints.breakLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<CustomList>> fetchData(int offset) async {
-    final loggedin = await ref.watch(authControlProvider.future);
-    if (!loggedin) {
-      return [];
-    }
-
     final api = ref.watch(mangadexProvider);
     final lists = await api.fetchUserList(limit: limit, offset: offset);
 
@@ -1979,98 +1983,68 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix, ListBasedInfinite
   }
 
   @override
-  Future<List<CustomList>> build() async {
+  Future<List<CustomList>> build(String? userId) async {
+    if (userId == null) {
+      return [];
+    }
+
     return fetchData(0);
   }
 
-  Future<void> updateList(CustomList list, Manga manga, bool add) async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
+  @mutation
+  Future<List<CustomList>> updateList(CustomList list, Manga manga, bool add) async {
     final api = ref.watch(mangadexProvider);
 
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final result = await api.updateMangaInCustomList(list, manga, add);
+    final result = await api.updateMangaInCustomList(list, manga, add);
 
-      if (result != null) {
-        final idx = oldstate.indexWhere((e) => e.id == result.id);
-        if (idx >= 0) {
-          oldstate[idx] = result;
-        }
-      }
-
-      return [...oldstate];
-    });
-  }
-
-  Future<bool> editList(
-      CustomList list, String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
-    if (state.isLoading || state.isReloading) {
-      return false;
-    }
-
-    final api = ref.watch(mangadexProvider);
-
-    final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final result = await api.editList(list, name, visibility, mangaIds);
+    if (result != null) {
       final idx = oldstate.indexWhere((e) => e.id == result.id);
       if (idx >= 0) {
         oldstate[idx] = result;
       }
-
-      return [...oldstate];
-    });
-
-    return !state.hasError;
-  }
-
-  Future<bool> deleteList(CustomList list) async {
-    if (state.isLoading || state.isReloading) {
-      return false;
     }
 
+    return [...oldstate];
+  }
+
+  @mutation
+  Future<List<CustomList>> editList(
+      CustomList list, String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
     final api = ref.watch(mangadexProvider);
 
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final result = await api.deleteList(list);
-
-      if (result) {
-        oldstate.removeWhere((e) => e.id == list.id);
-      }
-
-      return [...oldstate];
-    });
-
-    return (state.value ?? []).indexWhere((e) => e.id == list.id) == -1;
-  }
-
-  Future<bool> newList(String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
-    if (state.isLoading || state.isReloading) {
-      return false;
+    final result = await api.editList(list, name, visibility, mangaIds);
+    final idx = oldstate.indexWhere((e) => e.id == result.id);
+    if (idx >= 0) {
+      oldstate[idx] = result;
     }
 
+    return [...oldstate];
+  }
+
+  @mutation
+  Future<List<CustomList>> deleteList(CustomList list) async {
     final api = ref.watch(mangadexProvider);
 
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final result = await api.createNewList(name, visibility, mangaIds);
+    final result = await api.deleteList(list);
 
-      if (result != null) {
-        return [...oldstate, result];
-      }
+    if (result) {
+      oldstate.removeWhere((e) => e.id == list.id);
+    }
 
-      return [...oldstate];
-    });
+    return [...oldstate];
+  }
 
-    return (state.value ?? []).length != oldstate.length;
+  @mutation
+  Future<List<CustomList>> newList(String name, CustomListVisibility visibility, Iterable<String> mangaIds) async {
+    final api = ref.watch(mangadexProvider);
+
+    final oldstate = await future;
+    final result = await api.createNewList(name, visibility, mangaIds);
+
+    return [...oldstate, result];
   }
 
   /// Clears the list and refetch from the beginning
@@ -2085,16 +2059,13 @@ class UserLists extends _$UserLists with AutoDisposeExpiryMix, ListBasedInfinite
 class FollowedLists extends _$FollowedLists with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const _limit = MangaDexEndpoints.breakLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<CustomList>> fetchData(int offset) async {
-    final loggedin = await ref.watch(authControlProvider.future);
-    if (!loggedin) {
-      return [];
-    }
-
     final api = ref.watch(mangadexProvider);
     final lists = await api.fetchFollowedList(limit: limit, offset: offset);
 
@@ -2104,35 +2075,33 @@ class FollowedLists extends _$FollowedLists with AutoDisposeExpiryMix, ListBased
   }
 
   @override
-  Future<List<CustomList>> build() async {
+  Future<List<CustomList>> build(String? userId) async {
+    if (userId == null) {
+      return [];
+    }
+
     return fetchData(0);
   }
 
-  Future<void> setFollow(CustomList list, bool follow) async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
+  @mutation
+  Future<List<CustomList>> setFollow(CustomList list, bool follow) async {
     final api = ref.watch(mangadexProvider);
 
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final result = await api.setFollowList(list, follow);
+    final result = await api.setFollowList(list, follow);
 
-      if (result) {
-        if (follow) {
-          final idx = oldstate.indexWhere((e) => e.id == list.id);
-          if (idx == -1) {
-            oldstate.add(list);
-          }
-        } else {
-          oldstate.removeWhere((e) => e.id == list.id);
+    if (result) {
+      if (follow) {
+        final idx = oldstate.indexWhere((e) => e.id == list.id);
+        if (idx == -1) {
+          oldstate.add(list);
         }
+      } else {
+        oldstate.removeWhere((e) => e.id == list.id);
       }
+    }
 
-      return [...oldstate];
-    });
+    return [...oldstate];
   }
 
   /// Clears the list and refetch from the beginning
@@ -2148,9 +2117,11 @@ class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix, ListBas
   static const feedKey = 'CustomListFeed';
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<Chapter>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -2162,7 +2133,7 @@ class CustomListFeed extends _$CustomListFeed with AutoDisposeExpiryMix, ListBas
       entity: list,
     );
 
-    await ref.read(chapterStatsProvider.notifier).get(chapters);
+    await ref.read(chapterStatsProvider.get)(chapters);
 
     disposeAfter(const Duration(minutes: 5));
 
@@ -2195,7 +2166,7 @@ Future<List<Manga>> getMangaListByPage(Ref ref, Iterable<String> list, int page)
   final api = ref.watch(mangadexProvider);
   final mangas = await api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
 
   return mangas;
 }
@@ -2218,7 +2189,7 @@ class PersistentMangaListPaginator extends _$PersistentMangaListPaginator {
     final api = ref.watch(mangadexProvider);
     final mangas = await api.fetchManga(limit: MangaDexEndpoints.searchLimit, ids: range);
 
-    await ref.read(statisticsProvider.notifier).get(mangas);
+    await ref.read(statisticsProvider.get)(mangas);
 
     return mangas;
   }
@@ -2228,47 +2199,29 @@ class PersistentMangaListPaginator extends _$PersistentMangaListPaginator {
     return fetchData(_currentPage);
   }
 
-  Future<void> getPage(int page) async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
+  @mutation
+  Future<List<Manga>> getPage(int page) async {
+    final result = await fetchData(page);
+    _currentPage = page;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final result = await fetchData(page);
-      _currentPage = page;
-
-      return [...result];
-    });
+    return [...result];
   }
 
-  Future<void> updateList(Iterable<String> list) async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
+  @mutation
+  Future<List<Manga>> updateList(Iterable<String> list) async {
+    _list = list;
+    final result = await fetchData(_currentPage);
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _list = list;
-      final result = await fetchData(_currentPage);
-
-      return [...result];
-    });
+    return [...result];
   }
 
-  Future<void> updateListPage(Iterable<String> list, int page) async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
+  @mutation
+  Future<List<Manga>> updateListPage(Iterable<String> list, int page) async {
+    _list = list;
+    final result = await fetchData(page);
+    _currentPage = page;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      _list = list;
-      final result = await fetchData(page);
-      _currentPage = page;
-
-      return [...result];
-    });
+    return [...result];
   }
 }
 
@@ -2276,16 +2229,6 @@ class PersistentMangaListPaginator extends _$PersistentMangaListPaginator {
 class ListSource extends _$ListSource {
   @override
   Future<CustomList?> build(String listId) async {
-    final loggedin = await ref.watch(authControlProvider.future);
-
-    if (loggedin) {
-      final userlists = await ref.watch(userListsProvider.future);
-      final found = userlists.indexWhere((e) => e.id == listId);
-      if (found >= 0) {
-        return userlists.elementAt(found);
-      }
-    }
-
     final api = ref.watch(mangadexProvider);
     final list = await api.fetchListById(listId);
     return list;
@@ -2311,9 +2254,11 @@ class TagList extends _$TagList with AutoDisposeExpiryMix {
 class MangaSearch extends _$MangaSearch with ListBasedInfiniteScrollMix {
   static const _limit = MangaDexEndpoints.searchLimit;
 
+  @protected
   @override
   get limit => _limit;
 
+  @protected
   @override
   Future<List<Manga>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
@@ -2321,7 +2266,7 @@ class MangaSearch extends _$MangaSearch with ListBasedInfiniteScrollMix {
     final manga = await api.searchManga(params.query, limit: limit, filter: params.filter, offset: offset);
 
     if (manga.isNotEmpty) {
-      await ref.read(statisticsProvider.notifier).get(manga);
+      await ref.read(statisticsProvider.get)(manga);
     }
 
     return manga;
@@ -2359,20 +2304,18 @@ class Statistics extends _$Statistics {
   }
 
   /// Fetch statistics for the provided list of mangas
-  Future<void> get(Iterable<Manga> mangas) async {
+  @mutation
+  Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+    final mg = mangas.where((m) => !oldstate.containsKey(m.id));
 
-      if (mg.isEmpty) {
-        // No change
-        return oldstate;
-      }
+    if (mg.isEmpty) {
+      // No change
+      return oldstate;
+    }
 
-      final map = await _fetchStatistics(mg);
-      return {...oldstate, ...map};
-    });
+    final map = await _fetchStatistics(mg);
+    return {...oldstate, ...map};
   }
 }
 
@@ -2395,32 +2338,24 @@ class ChapterStats extends _$ChapterStats {
   }
 
   /// Fetch statistics for the provided list of mangas
-  Future<void> get(Iterable<Chapter> chapters) async {
+  @mutation
+  Future<Map<String, ChapterStatistics>> get(Iterable<Chapter> chapters) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final mg = chapters.where((c) => !oldstate.containsKey(c.id));
+    final mg = chapters.where((c) => !oldstate.containsKey(c.id));
 
-      if (mg.isEmpty) {
-        // No change
-        return oldstate;
-      }
+    if (mg.isEmpty) {
+      // No change
+      return oldstate;
+    }
 
-      final map = await _fetchStatistics(mg);
-      return {...oldstate, ...map};
-    });
+    final map = await _fetchStatistics(mg);
+    return {...oldstate, ...map};
   }
 }
 
 @Riverpod(keepAlive: true)
 class Ratings extends _$Ratings {
   Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
-
-    if (!loggedin) {
-      return {};
-    }
-
     if (mangas.isEmpty) {
       return {};
     }
@@ -2431,61 +2366,57 @@ class Ratings extends _$Ratings {
   }
 
   @override
-  Future<Map<String, SelfRating>> build() async {
-    return {};
+  Future<Map<String, SelfRating>> build(String? userId) async {
+    if (userId == null) {
+      return {};
+    }
+
+    return _fetchRatings([]);
   }
 
   /// Fetch user's self-ratings for the provided list of mangas
-  Future<void> get(Iterable<Manga> mangas) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
-
-    if (!loggedin) {
-      return;
+  @mutation
+  Future<Map<String, SelfRating>> get(Iterable<Manga> mangas) async {
+    if (userId == null) {
+      return {};
     }
 
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
+    final mg = mangas.where((m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true);
 
-      if (mg.isEmpty) {
-        // No change
-        return oldstate;
-      }
+    if (mg.isEmpty) {
+      // No change
+      return oldstate;
+    }
 
-      final map = await _fetchRatings(mg);
-      return {...oldstate, ...map};
-    });
+    final map = await _fetchRatings(mg);
+    return {...oldstate, ...map};
   }
 
   /// Sets a self-rating for a manga
-  Future<void> set(Manga manga, int? rating) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
-
-    if (!loggedin) {
-      return;
+  @mutation
+  Future<Map<String, SelfRating>> set(Manga manga, int? rating) async {
+    if (userId == null) {
+      throw StateError('User not logged in');
     }
 
     final api = ref.watch(mangadexProvider);
     final oldstate = await future;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      bool result = await api.setMangaRating(manga, rating);
+    bool result = await api.setMangaRating(manga, rating);
 
-      if (result) {
-        switch (rating) {
-          case null:
-            oldstate[manga.id] = SelfRating(rating: -1, createdAt: DateTime.now());
-            break;
-          case _:
-            oldstate[manga.id] = SelfRating(rating: rating, createdAt: DateTime.now());
-            break;
-        }
+    if (result) {
+      switch (rating) {
+        case null:
+          oldstate[manga.id] = SelfRating(rating: -1, createdAt: DateTime.now());
+          break;
+        case _:
+          oldstate[manga.id] = SelfRating(rating: rating, createdAt: DateTime.now());
+          break;
       }
+    }
 
-      return {...oldstate};
-    });
+    return {...oldstate};
   }
 }
 
@@ -2493,9 +2424,9 @@ class Ratings extends _$Ratings {
 class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
   @override
   Future<MangaReadingStatus?> build(Manga manga) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
+    final me = await ref.watch(loggedUserProvider.future);
 
-    if (!loggedin) {
+    if (me == null) {
       return null;
     }
 
@@ -2507,29 +2438,28 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
     return status;
   }
 
-  Future<void> set(MangaReadingStatus? status) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
+  @mutation
+  Future<MangaReadingStatus?> set(MangaReadingStatus? status) async {
+    final me = await ref.readFuture(loggedUserProvider.future);
 
-    if (!loggedin) {
-      return;
+    if (me == null) {
+      throw StateError('User not logged in');
     }
 
     final api = ref.watch(mangadexProvider);
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      MangaReadingStatus? resolved = status == MangaReadingStatus.remove ? null : status;
-      bool success = await api.setMangaReadingStatus(manga, resolved);
-      if (success) {
-        if (ref.exists(userLibraryProvider)) {
-          await ref.read(userLibraryProvider.notifier).set(manga, resolved);
-        }
 
-        return resolved;
+    MangaReadingStatus? resolved = status == MangaReadingStatus.remove ? null : status;
+    bool success = await api.setMangaReadingStatus(manga, resolved);
+    if (success) {
+      if (ref.exists(userLibraryProvider(me.id))) {
+        await ref.read(userLibraryProvider(me.id).set)(manga, resolved);
       }
 
-      return oldstate;
-    });
+      return resolved;
+    }
+
+    return oldstate;
   }
 }
 
@@ -2537,9 +2467,9 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
 class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
   @override
   Future<bool> build(Manga manga) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
+    final me = await ref.watch(loggedUserProvider.future);
 
-    if (!loggedin) {
+    if (me == null) {
       return false;
     }
 
@@ -2551,24 +2481,23 @@ class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
     return status;
   }
 
-  Future<void> set(bool following) async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
+  @mutation
+  Future<bool> set(bool following) async {
+    final me = await ref.readFuture(loggedUserProvider.future);
 
-    if (!loggedin) {
-      return;
+    if (me == null) {
+      throw StateError('User not logged in');
     }
 
     final api = ref.watch(mangadexProvider);
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      bool success = await api.setMangaFollowing(manga, following);
-      if (success) {
-        return following;
-      }
 
-      return oldstate;
-    });
+    bool success = await api.setMangaFollowing(manga, following);
+    if (success) {
+      return following;
+    }
+
+    return oldstate;
   }
 }
 
@@ -2591,34 +2520,32 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final chapters = await api.fetchChapters(uuids);
 
-    await ref.read(chapterStatsProvider.notifier).get(chapters);
+    await ref.read(chapterStatsProvider.get)(chapters);
 
     return Queue.of(chapters);
   }
 
-  Future<void> add(Chapter chapter) async {
+  @mutation
+  Future<Queue<Chapter>> add(Chapter chapter) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final cpy = Queue.of(oldstate);
+    final cpy = Queue.of(oldstate);
 
-      while (cpy.contains(chapter)) {
-        cpy.remove(chapter);
-      }
+    while (cpy.contains(chapter)) {
+      cpy.remove(chapter);
+    }
 
-      cpy.addFirst(chapter);
+    cpy.addFirst(chapter);
 
-      while (cpy.length > _numItems) {
-        cpy.removeLast();
-      }
+    while (cpy.length > _numItems) {
+      cpy.removeLast();
+    }
 
-      final uuids = cpy.map((e) => e.id).toList();
+    final uuids = cpy.map((e) => e.id).toList();
 
-      final box = Hive.box(gagakuBox);
-      await box.put('mangadex_history', json.encode(uuids));
+    final box = Hive.box(gagakuBox);
+    await box.put('mangadex_history', json.encode(uuids));
 
-      return cpy;
-    });
+    return cpy;
   }
 }
 
@@ -2626,7 +2553,7 @@ class MangaDexHistory extends _$MangaDexHistory {
 class LoggedUser extends _$LoggedUser {
   @override
   Future<User?> build() async {
-    final loggedin = await ref.readFuture(authControlProvider.future);
+    final loggedin = await ref.watch(authControlProvider.future);
 
     if (!loggedin) {
       return null;
@@ -2681,39 +2608,32 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
     return api.loggedIn();
   }
 
+  @mutation
   Future<bool> login(String user, String pass, String clientId, String clientSecret) async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.authenticate(user, pass, clientId, clientSecret);
-      await _setStaleTime();
-      ref.invalidateifExists(loggedUserProvider);
-      return await api.loggedIn();
-    });
-
+    await api.authenticate(user, pass, clientId, clientSecret);
+    await _setStaleTime();
     return await api.loggedIn();
   }
 
-  Future<void> logout() async {
+  @mutation
+  Future<bool> logout() async {
     final api = ref.watch(mangadexProvider);
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await api.logout();
-      await _setStaleTime();
-      return await api.loggedIn();
-    });
 
     // Invalidate stuff
-    ref.invalidateifExists(loggedUserProvider);
     await api.invalidateCacheItem(CacheLists.library);
-    ref.invalidateifExists(userLibraryProvider);
-    ref.invalidateifExists(readChaptersProvider);
-    ref.invalidateifExists(ratingsProvider);
-    ref.invalidateifExists(userListsProvider);
-    ref.invalidateifExists(followedListsProvider);
+    ref.invalidate(userLibraryProvider);
+    ref.invalidate(readChaptersProvider);
+    ref.invalidate(ratingsProvider);
+    ref.invalidate(userListsProvider);
+    ref.invalidate(followedListsProvider);
     ref.invalidate(readingStatusProvider);
     ref.invalidate(followingStatusProvider);
     await api.invalidateAll(LatestChaptersFeed.feedKey);
-    ref.invalidateifExists(latestChaptersFeedProvider);
+    ref.invalidate(latestChaptersFeedProvider);
+
+    await api.logout();
+    await _setStaleTime();
+    return await api.loggedIn();
   }
 }

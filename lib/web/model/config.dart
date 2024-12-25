@@ -56,7 +56,8 @@ class WebConfig extends _$WebConfig {
     return _fetch();
   }
 
-  void saveWith({
+  @mutation
+  FutureOr<WebSourceConfig> saveWith({
     String? sourceDirectory,
     List<String>? repoList,
     List<WebSourceCategory>? categories,
@@ -80,16 +81,17 @@ class WebConfig extends _$WebConfig {
       update = update.copyWith(defaultCategory: defaultCategory);
     }
 
-    state = update;
-
     final box = Hive.box(gagakuBox);
-    box.put('websource', json.encode(state.toJson()));
+    box.put('websource', json.encode(update.toJson()));
+
+    return update;
   }
 
-  void save(WebSourceConfig update) {
-    state = update;
-
+  @mutation
+  FutureOr<WebSourceConfig> save(WebSourceConfig update) {
     final box = Hive.box(gagakuBox);
-    box.put('websource', json.encode(state.toJson()));
+    box.put('websource', json.encode(update.toJson()));
+
+    return update;
   }
 }

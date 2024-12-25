@@ -49,9 +49,8 @@ Future<WebReaderData> _fetchWebChapterInfo(Ref ref, SourceInfo info) async {
   final manga = await api.handleSource(info);
 
   if (manga != null) {
-    ref
-        .read(webSourceHistoryProvider.notifier)
-        .add(HistoryLink(title: '${info.source}: ${manga.title}', url: info.getURL(), cover: manga.cover));
+    ref.read(webSourceHistoryProvider.add)(
+        HistoryLink(title: '${info.source}: ${manga.title}', url: info.getURL(), cover: manga.cover));
 
     final chapter = manga.getChapter(info.chapter!);
 
@@ -224,7 +223,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
         if (readKey != null) {
-          ref.read(webReadMarkersProvider.notifier).set(info.getKey(), readKey!, true);
+          ref.read(webReadMarkersProvider.set)(info.getKey(), readKey!, true);
         }
       });
 

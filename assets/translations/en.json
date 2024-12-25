@@ -43,7 +43,8 @@
     "norepos": "No repos",
     "noitems": "No items",
     "unsupportedUrl": "Unsupported URL",
-    "loginFail": "Failed to login"
+    "loginFail": "Failed to login: {}",
+    "notLoggedIn": "Operation failed. User not logged in"
   },
   "auth": {
     "login": "Login",
@@ -56,7 +57,8 @@
     "clientSecret": "Client Secret",
     "clientIdEmptyWarning": "Client ID cannot be empty",
     "clientSecretEmptyWarning": "Client Secret cannot be empty",
-    "fieldsEmptyWarning": "Username/Password/Client ID/Client Secret cannot be empty"
+    "fieldsEmptyWarning": "Username/Password/Client ID/Client Secret cannot be empty",
+    "loggedInAs": "Logged in as: {}"
   },
   "sort": {
     "desc": "Descending",
@@ -221,17 +223,17 @@
     "listNameEmptyWarning": "List name cannot be empty",
     "listNotExistError": "List with ID {} does not exist!",
     "editList": "@:ui.edit List",
-    "editListError": "Failed to edit list",
+    "editListError": "Failed to edit list: {}",
     "createList": "@:ui.create List",
     "deleteList": "@:ui.delete List",
     "deleteListOk": "List deleted",
-    "deleteListError": "Failed to delete list",
+    "deleteListError": "Failed to delete list: {}",
     "deleteListWarning": "Are you sure you want to permanently delete '{}'?",
     "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
     "privateList": "Private list",
     "newList": "New List",
     "newListOk": "New list created",
-    "newListError": "Failed to create list",
+    "newListError": "Failed to create list: {}",
     "officialPub": "Official Publisher",
     "noGroup": "No Group",
     "groupDesc": "Group Description",

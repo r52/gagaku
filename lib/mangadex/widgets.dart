@@ -124,19 +124,53 @@ class MangaDexSliverAppBar extends StatelessWidget {
           ),
           Consumer(
             builder: (context, ref, child) {
-              final auth = ref.watch(authControlProvider);
+              final auth = ref.watch(loggedUserProvider);
 
               return switch (auth) {
-                AsyncValue(value: final loggedin?) =>
+                AsyncValue(hasValue: true, value: final me) =>
                   // XXX: This changes when OAuth is released
-                  IconButton(
-                    color: theme.colorScheme.primary,
-                    tooltip: loggedin ? 'auth.logout'.tr(context: context) : 'auth.login'.tr(context: context),
-                    icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
-                    onPressed: loggedin
-                        ? () => ref.read(authControlProvider.notifier).logout()
-                        : () => context.push(GagakuRoute.login),
-                  ),
+                  me == null
+                      ? IconButton(
+                          color: theme.colorScheme.primary,
+                          tooltip: 'auth.login'.tr(context: context),
+                          icon: const Icon(Icons.login),
+                          onPressed: () => context.push(GagakuRoute.login),
+                        )
+                      : MenuAnchor(
+                          builder: (context, controller, child) => IconButton(
+                            color: theme.colorScheme.primary,
+                            onPressed: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                              } else {
+                                controller.open();
+                              }
+                            },
+                            icon: const Icon(Icons.person),
+                          ),
+                          menuChildren: [
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  spacing: 10.0,
+                                  children: [
+                                    CircleAvatar(
+                                      child: const Icon(Icons.person),
+                                    ),
+                                    Text('auth.loggedInAs'
+                                        .tr(context: context, args: [me.attributes?.username ?? 'null'])),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            MenuItemButton(
+                              onPressed: () => ref.read(authControlProvider.logout)(),
+                              leadingIcon: const Icon(Icons.logout),
+                              child: Text('auth.logout'.tr(context: context)),
+                            ),
+                          ],
+                        ),
                 // ignore: unused_local_variable
                 AsyncValue(:final error?, :final stackTrace?) => const Icon(Icons.error),
                 _ => const Center(child: CircularProgressIndicator()),
@@ -163,15 +197,15 @@ class MarkReadButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final loggedin = ref.watch(authControlProvider).value ?? false;
+    final me = ref.watch(loggedUserProvider).value;
 
-    if (!loggedin) {
+    if (me == null) {
       return const SizedBox.shrink();
     }
 
     final theme = Theme.of(context);
 
-    bool? isRead = ref.watch(readChaptersProvider.select(
+    bool? isRead = ref.watch(readChaptersProvider(me.id).select(
       (value) => switch (value) {
         AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
         _ => null,
@@ -187,9 +221,8 @@ class MarkReadButton extends ConsumerWidget {
       true || false => IconButton(
           onPressed: () async {
             bool set = !isRead;
-            ref
-                .read(readChaptersProvider.notifier)
-                .set(manga, read: set ? [chapter] : null, unread: !set ? [chapter] : null);
+            ref.read(readChaptersProvider(me.id).set)(manga,
+                read: set ? [chapter] : null, unread: !set ? [chapter] : null);
           },
           padding: EdgeInsets.zero,
           splashRadius: 15,
@@ -220,7 +253,7 @@ class ChapterFeedWidget extends HookConsumerWidget {
     this.leading = const [],
   });
 
-  final ProviderBase<AsyncValue<List<ChapterFeedItemData>>> provider;
+  final Refreshable<AsyncValue<List<ChapterFeedItemData>>> provider;
   final String? title;
   final String? emptyText;
   final VoidCallback? onAtEdge;
@@ -316,8 +349,12 @@ class ChapterFeedItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
+    final me = ref.watch(loggedUserProvider).value;
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
 
     final listsliver = SliverList.separated(
       findChildIndexCallback: (key) {
@@ -336,9 +373,9 @@ class ChapterFeedItem extends HookConsumerWidget {
             style: const TextStyle(fontSize: 18),
           ),
           onLinkPressed: () async {
-            ref.read(readChaptersProvider.notifier).get([state.manga]);
-            ref.read(ratingsProvider.notifier).get([state.manga]);
-            ref.read(statisticsProvider.notifier).get([state.manga]);
+            getReadChapters([state.manga]);
+            getRatings([state.manga]);
+            getStats([state.manga]);
             context.push('/title/${state.manga.id}', extra: state.manga);
           },
         );
@@ -359,9 +396,9 @@ class ChapterFeedItem extends HookConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
-        ref.read(readChaptersProvider.notifier).get([state.manga]);
-        ref.read(ratingsProvider.notifier).get([state.manga]);
-        ref.read(statisticsProvider.notifier).get([state.manga]);
+        getReadChapters([state.manga]);
+        getRatings([state.manga]);
+        getStats([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       icon: CountryFlag(
@@ -376,9 +413,9 @@ class ChapterFeedItem extends HookConsumerWidget {
 
     final coverBtn = InkWell(
       onTap: () async {
-        ref.read(readChaptersProvider.notifier).get([state.manga]);
-        ref.read(ratingsProvider.notifier).get([state.manga]);
-        ref.read(statisticsProvider.notifier).get([state.manga]);
+        getReadChapters([state.manga]);
+        getRatings([state.manga]);
+        getStats([state.manga]);
         context.push('/title/${state.manga.id}', extra: state.manga);
       },
       child: Padding(
@@ -661,16 +698,16 @@ class ChapterButtonWidget extends HookWidget {
         builder: (context, ref, child) {
           final theme = Theme.of(context);
           final tileColor = theme.colorScheme.primaryContainer;
-          final loggedin = ref.watch(authControlProvider).value ?? false;
+          final me = ref.watch(loggedUserProvider).value;
 
           Border border;
 
-          if (!loggedin) {
+          if (me == null) {
             border = Border(
               left: BorderSide(color: tileColor, width: 4.0),
             );
           } else {
-            bool? isRead = ref.watch(readChaptersProvider.select(
+            bool? isRead = ref.watch(readChaptersProvider(me.id).select(
               (value) => switch (value) {
                 AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
                 _ => null,
@@ -902,8 +939,12 @@ class GridMangaItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
+    final me = ref.watch(loggedUserProvider).value;
     final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
     final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
 
     final image = GridAlbumImage(
       gradient: gradient,
@@ -919,9 +960,9 @@ class GridMangaItem extends HookConsumerWidget {
 
     return InkWell(
       onTap: () async {
-        ref.read(readChaptersProvider.notifier).get([manga]);
-        ref.read(ratingsProvider.notifier).get([manga]);
-        ref.read(statisticsProvider.notifier).get([manga]);
+        getReadChapters([manga]);
+        getRatings([manga]);
+        getStats([manga]);
         context.push('/title/${manga.id}', extra: manga);
       },
       onHover: (hovering) {
@@ -977,8 +1018,12 @@ class GridMangaDetailedItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
+    final me = ref.watch(loggedUserProvider).value;
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
 
     return Card(
       child: Padding(
@@ -992,9 +1037,9 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                   foregroundColor: theme.colorScheme.onSurface,
                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               onPressed: () async {
-                ref.read(readChaptersProvider.notifier).get([manga]);
-                ref.read(ratingsProvider.notifier).get([manga]);
-                ref.read(statisticsProvider.notifier).get([manga]);
+                getReadChapters([manga]);
+                getRatings([manga]);
+                getStats([manga]);
                 context.push('/title/${manga.id}', extra: manga);
               },
               icon: CountryFlag(
@@ -1012,9 +1057,9 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      ref.read(readChaptersProvider.notifier).get([manga]);
-                      ref.read(ratingsProvider.notifier).get([manga]);
-                      ref.read(statisticsProvider.notifier).get([manga]);
+                      getReadChapters([manga]);
+                      getRatings([manga]);
+                      getStats([manga]);
                       context.push('/title/${manga.id}', extra: manga);
                     },
                     child: CachedNetworkImage(
@@ -1073,7 +1118,11 @@ class _ListMangaItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
+    final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
 
     return Card(
       child: Padding(
@@ -1083,9 +1132,9 @@ class _ListMangaItem extends HookConsumerWidget {
           children: [
             TextButton(
               onPressed: () async {
-                ref.read(readChaptersProvider.notifier).get([manga]);
-                ref.read(ratingsProvider.notifier).get([manga]);
-                ref.read(statisticsProvider.notifier).get([manga]);
+                getReadChapters([manga]);
+                getRatings([manga]);
+                getStats([manga]);
                 context.push('/title/${manga.id}', extra: manga);
               },
               child: CachedNetworkImage(
@@ -1111,9 +1160,9 @@ class _ListMangaItem extends HookConsumerWidget {
                       ),
                     ),
                     onPressed: () async {
-                      ref.read(readChaptersProvider.notifier).get([manga]);
-                      ref.read(ratingsProvider.notifier).get([manga]);
-                      ref.read(statisticsProvider.notifier).get([manga]);
+                      getReadChapters([manga]);
+                      getRatings([manga]);
+                      getStats([manga]);
                       context.push('/title/${manga.id}', extra: manga);
                     },
                     icon: CountryFlag(
@@ -1150,16 +1199,16 @@ class ChapterTitle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final loggedin = ref.watch(authControlProvider).value ?? false;
+    final me = ref.watch(loggedUserProvider).value;
 
     TextStyle textstyle;
 
-    if (!loggedin) {
+    if (me == null) {
       textstyle = TextStyle(
         color: theme.colorScheme.onPrimaryContainer,
       );
     } else {
-      bool? isRead = ref.watch(readChaptersProvider.select(
+      bool? isRead = ref.watch(readChaptersProvider(me.id).select(
         (value) => switch (value) {
           AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
           _ => null,
@@ -1234,7 +1283,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        await ref.read(statisticsProvider.notifier).get([manga]);
+        await ref.read(statisticsProvider.get)([manga]);
       });
       return null;
     }, []);

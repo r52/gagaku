@@ -12,14 +12,15 @@ part 'manga_feed.g.dart';
 
 @Riverpod(retry: noRetry)
 Future<List<Manga>> _fetchMangaFeed(Ref ref) async {
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
-  final chapters = await ref.watch(latestChaptersFeedProvider.future);
+  final chapters = await ref.watch(latestChaptersFeedProvider(me?.id).future);
 
   final mangaids = chapters.map((e) => e.manga.id).toSet();
 
   final mangas = await api.fetchManga(ids: mangaids, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 
@@ -38,22 +39,25 @@ class MangaDexMangaFeed extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(loggedUserProvider).value;
     final feedProvider = ref.watch(_fetchMangaFeedProvider);
     final isLoading = feedProvider.isLoading && !feedProvider.isRefreshing;
 
     return Center(
       child: RefreshIndicator(
+        key: ValueKey('MangaDexMangaFeed_L1(${me?.id})'),
         onRefresh: () async {
-          ref.read(latestChaptersFeedProvider.notifier).clear();
+          ref.read(latestChaptersFeedProvider(me?.id).notifier).clear();
           return ref.refresh(_fetchMangaFeedProvider.future);
         },
         child: DataProviderWhenWidget(
           provider: _fetchMangaFeedProvider,
           data: feedProvider,
           builder: (context, mangas) => MangaListWidget(
+            key: ValueKey('MangaDexMangaFeed_L2(${me?.id})'),
             physics: const AlwaysScrollableScrollPhysics(),
             controller: controller,
-            onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
+            onAtEdge: () => ref.read(latestChaptersFeedProvider(me?.id).notifier).getMore(),
             leading: leading,
             isLoading: isLoading,
             children: [

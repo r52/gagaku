@@ -59,7 +59,7 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchHistoryFeedHash() => r'6c2d139f80e07200aa3a00307070a72d8313c1aa';
+String _$fetchHistoryFeedHash() => r'83dc5ca66eb07364432d0fdcee800d9f1505d2eb';
 
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

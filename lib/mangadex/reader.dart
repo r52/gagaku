@@ -100,6 +100,11 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(loggedUserProvider).value;
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
+
     return DataProviderWhenWidget(
       provider: _fetchChapterDataProvider(chapterId),
       errorBuilder: (context, child) => Scaffold(
@@ -114,9 +119,9 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
           style: const TextStyle(fontSize: 18),
         ),
         onLinkPressed: () async {
-          ref.read(readChaptersProvider.notifier).get([data.manga]);
-          ref.read(ratingsProvider.notifier).get([data.manga]);
-          ref.read(statisticsProvider.notifier).get([data.manga]);
+          getReadChapters([data.manga]);
+          getRatings([data.manga]);
+          getStats([data.manga]);
           context.go('/title/${data.manga.id}', extra: data.manga);
         },
         backRoute: '/',
@@ -151,20 +156,20 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
-        final loggedin = await ref.read(authControlProvider.future);
+        final me = await ref.watch(loggedUserProvider.future);
 
-        if (loggedin) {
+        if (me != null) {
           // One more redundant read here for direct-linked chapters
-          await ref.read(readChaptersProvider.notifier).get([manga]);
+          await ref.read(readChaptersProvider(me.id).get)([manga]);
 
-          final readData = await ref.read(readChaptersProvider.future);
+          final readData = await ref.read(readChaptersProvider(me.id).future);
 
           if (readData[manga.id]?.contains(chapter.id) != true) {
-            ref.read(readChaptersProvider.notifier).set(manga, read: [chapter]);
+            ref.read(readChaptersProvider(me.id).set)(manga, read: [chapter]);
           }
         }
 
-        ref.read(mangaDexHistoryProvider.notifier).add(chapter);
+        ref.read(mangaDexHistoryProvider.add)(chapter);
       });
 
       return () => timer.value?.cancel();

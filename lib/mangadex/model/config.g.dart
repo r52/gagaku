@@ -114,18 +114,104 @@ final class MdConfigProvider
 
   @$internal
   @override
-  $NotifierProviderElement<MdConfig, MangaDexConfig> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+  _$MdConfigElement $createElement($ProviderPointer pointer) =>
+      _$MdConfigElement(this, pointer);
+
+  ProviderListenable<MdConfig$Save> get save =>
+      $LazyProxyListenable<MdConfig$Save, MangaDexConfig>(
+        this,
+        (element) {
+          element as _$MdConfigElement;
+
+          return element._$save;
+        },
+      );
 }
 
-String _$mdConfigHash() => r'422f9d65f920b9d170177915dd44611f9081332b';
+String _$mdConfigHash() => r'1adb0a68f5f631151a2d471a52904ab2fbeedba5';
 
 abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   MangaDexConfig build();
   @$internal
   @override
   MangaDexConfig runBuild() => build();
+}
+
+class _$MdConfigElement
+    extends $NotifierProviderElement<MdConfig, MangaDexConfig> {
+  _$MdConfigElement(super.provider, super.pointer) {
+    _$save.result = $Result.data(_$MdConfig$Save(this));
+  }
+  final _$save = $ElementLense<_$MdConfig$Save>();
+  @override
+  void mount() {
+    super.mount();
+    _$save.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitChildren({
+    required void Function(ProviderElement element) elementVisitor,
+    required void Function($ElementLense element) listenableVisitor,
+  }) {
+    super.visitChildren(
+      elementVisitor: elementVisitor,
+      listenableVisitor: listenableVisitor,
+    );
+
+    listenableVisitor(_$save);
+  }
+}
+
+sealed class MdConfig$Save extends MutationBase<MangaDexConfig> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [MdConfig.save] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// Lastly, if the method completes without throwing, the Notifier's state
+  /// will be updated with the new value.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<MangaDexConfig> call(MangaDexConfig update);
+}
+
+final class _$MdConfig$Save
+    extends $SyncMutationBase<MangaDexConfig, _$MdConfig$Save, MdConfig>
+    implements MdConfig$Save {
+  _$MdConfig$Save(this.element, {super.state, super.key});
+
+  @override
+  final _$MdConfigElement element;
+
+  @override
+  $ElementLense<_$MdConfig$Save> get listenable => element._$save;
+
+  @override
+  Future<MangaDexConfig> call(MangaDexConfig update) {
+    return mutateAsync(
+      Invocation.method(
+        #save,
+        [update],
+      ),
+      ($notifier) => $notifier.save(
+        update,
+      ),
+    );
+  }
+
+  @override
+  _$MdConfig$Save copyWith(MutationState<MangaDexConfig> state,
+          {Object? key}) =>
+      _$MdConfig$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

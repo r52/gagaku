@@ -68,7 +68,7 @@ class MangaDexHome extends HookConsumerWidget {
 
           if (currTab == index) {
             // Scroll to top if on the same tab
-            controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
+            controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 500), curve: Curves.easeOutCirc);
           } else {
             // Switch tab
             _onItemTapped(index, context);

@@ -37,7 +37,7 @@ class GridExtentSlider extends ConsumerWidget {
           label: cfg.gridAlbumExtent.name.capitalize(),
           onChanged: (double value) {
             final c = cfg.copyWith(gridAlbumExtent: GridAlbumExtent.values.elementAt(value.toInt()));
-            ref.read(gagakuSettingsProvider.notifier).save(c);
+            ref.read(gagakuSettingsProvider.save)(c);
           },
         ),
       ],
@@ -627,7 +627,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
     this.loadingWidget,
   });
 
-  final ProviderListenable<AsyncValue<T>> provider;
+  final Refreshable<AsyncValue<T>> provider;
   final AsyncValue<T>? data;
   final DataProviderOrBuilder<T> builder;
   final ErrorWrapperBuilder? errorBuilder;

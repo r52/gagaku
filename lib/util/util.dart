@@ -6,6 +6,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:gagaku/log.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 String cleanBaseDomains(String url) {
@@ -107,9 +108,16 @@ class DeviceContext {
 mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   int offset = 0;
   bool atEnd = false;
+
+  @protected
+  @mustBeOverridden
   int get limit;
 
+  @protected
+  @mustBeOverridden
   Future<List<T>> fetchData(int offset);
+
+  @mustBeOverridden
   Future<void> clear();
 
   Future<void> getMore() async {
@@ -257,7 +265,7 @@ extension RefWorkaround on Ref {
     }
   }
 
-  T readFuture<T>(ProviderListenable<T> listenable) {
+  T readFuture<T>(Refreshable<T> listenable) {
     T result;
     final sub = listen(listenable, (_, __) {});
 

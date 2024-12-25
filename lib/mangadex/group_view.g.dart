@@ -213,7 +213,7 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchGroupFeedHash() => r'fe654e5e494405aaae63386573f74e7dfe13cb7d';
+String _$fetchGroupFeedHash() => r'681aa76684c27e291675cae6deee7a3bf5a6ec6d';
 
 final class _FetchGroupFeedFamily extends Family {
   const _FetchGroupFeedFamily._()
@@ -338,7 +338,7 @@ final class _FetchGroupTitlesProvider
   }
 }
 
-String _$fetchGroupTitlesHash() => r'bd54c2b30846e47ea89cf04079fc9dc29a5d3e9c';
+String _$fetchGroupTitlesHash() => r'e9a011eafdbef0469f5f18d2d7e4a5c52cff881a';
 
 final class _FetchGroupTitlesFamily extends Family {
   const _FetchGroupTitlesFamily._()

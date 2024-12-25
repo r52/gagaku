@@ -95,7 +95,7 @@ class WebSourceHome extends HookConsumerWidget {
                       );
 
                       if (result == true) {
-                        ref.read(webReadMarkersProvider.notifier).clear();
+                        ref.read(webReadMarkersProvider.clear)();
                       }
                     },
                     leadingIcon: const Icon(Icons.restore),

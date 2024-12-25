@@ -24,7 +24,7 @@ Page<dynamic> buildRecentFeedPage(BuildContext context, GoRouterState state) {
 Future<List<Manga>> _fetchMangaFeed(Ref ref) async {
   final mangas = await ref.watch(recentlyAddedProvider.future);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
 
   ref.disposeAfter(const Duration(minutes: 10));
 

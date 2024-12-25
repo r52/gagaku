@@ -571,7 +571,7 @@ class ReaderWidget extends HookConsumerWidget {
                           ? null
                           : (value) {
                               if (value) {
-                                ref.read(readerSettingsProvider.notifier).save(settings.copyWith(format: f));
+                                ref.read(readerSettingsProvider.save)(settings.copyWith(format: f));
                               }
                             },
                     ),
@@ -604,7 +604,7 @@ class ReaderWidget extends HookConsumerWidget {
                           ? null
                           : (value) {
                               if (value) {
-                                ref.read(readerSettingsProvider.notifier).save(settings.copyWith(direction: dir));
+                                ref.read(readerSettingsProvider.save)(settings.copyWith(direction: dir));
                               }
                             },
                     ),
@@ -617,9 +617,7 @@ class ReaderWidget extends HookConsumerWidget {
                 ),
                 label: Text('reader.progressBar'.tr(context: context)),
                 onPressed: () {
-                  ref
-                      .read(readerSettingsProvider.notifier)
-                      .save(settings.copyWith(showProgressBar: !settings.showProgressBar));
+                  ref.read(readerSettingsProvider.save)(settings.copyWith(showProgressBar: !settings.showProgressBar));
                 },
               ),
               ActionChip(
@@ -631,9 +629,8 @@ class ReaderWidget extends HookConsumerWidget {
                 onPressed: (format == ReaderFormat.longstrip)
                     ? null
                     : () {
-                        ref
-                            .read(readerSettingsProvider.notifier)
-                            .save(settings.copyWith(swipeGestures: !settings.swipeGestures));
+                        ref.read(readerSettingsProvider.save)(
+                            settings.copyWith(swipeGestures: !settings.swipeGestures));
                       },
               ),
               ActionChip(
@@ -645,9 +642,7 @@ class ReaderWidget extends HookConsumerWidget {
                 onPressed: (format == ReaderFormat.longstrip)
                     ? null
                     : () {
-                        ref
-                            .read(readerSettingsProvider.notifier)
-                            .save(settings.copyWith(clickToTurn: !settings.clickToTurn));
+                        ref.read(readerSettingsProvider.save)(settings.copyWith(clickToTurn: !settings.clickToTurn));
                       },
               ),
               Row(
@@ -671,7 +666,7 @@ class ReaderWidget extends HookConsumerWidget {
                     ),
                     onSelected: (int? value) {
                       if (value != null) {
-                        ref.read(readerSettingsProvider.notifier).save(settings.copyWith(precacheCount: value));
+                        ref.read(readerSettingsProvider.save)(settings.copyWith(precacheCount: value));
                       }
                     },
                     dropdownMenuEntries: List<DropdownMenuEntry<int>>.generate(

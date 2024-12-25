@@ -56,7 +56,7 @@ final class _FetchMangaFeedProvider
   }
 }
 
-String _$fetchMangaFeedHash() => r'5be0cc45249c11aa4e2dc0244deae4a475205d5e';
+String _$fetchMangaFeedHash() => r'c8fa93483b00fa30d67b0efa74c346e4b20325b8';
 
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

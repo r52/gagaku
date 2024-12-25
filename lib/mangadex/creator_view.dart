@@ -44,7 +44,7 @@ Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
 @riverpod
 Future<List<Manga>> _fetchCreatorTitles(Ref ref, CreatorType creator) async {
   final mangas = await ref.watch(creatorTitlesProvider(creator).future);
-  await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 

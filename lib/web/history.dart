@@ -95,7 +95,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
                       );
 
                       if (result == true) {
-                        ref.read(webSourceHistoryProvider.notifier).clear();
+                        ref.read(webSourceHistoryProvider.clear)();
                       }
                     },
                     icon: const Icon(Icons.clear_all),

@@ -12,6 +12,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 Page<dynamic> buildListEditPage(BuildContext context, GoRouterState state) {
@@ -71,17 +72,51 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(loggedUserProvider).value;
     final id = useRef(list?.id ?? const Uuid().v4());
     final listNameController = useTextEditingController(text: list?.attributes.name);
 
     final visibility = useValueNotifier(list != null ? list!.attributes.visibility : CustomListVisibility.private);
 
-    final pendingAction = useState<Future<bool>?>(null);
-    final snapshot = useFuture(pendingAction.value);
+    final editList = ref.watch(userListsProvider(me?.id).editList);
+    final newList = ref.watch(userListsProvider(me?.id).newList);
+    final isLoading = editList.state is PendingMutationState || newList.state is PendingMutationState;
 
     final selected = useReducer(MangaSetAction.modify,
         initialState: list != null ? {...list!.set} : <String>{},
         initialAction: MangaSetAction(action: MangaSetActions.none));
+
+    ref.listen(userListsProvider(me?.id).editList, (_, edit) {
+      if (edit.state is ErrorMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('mangadex.editListError'
+                  .tr(context: context, args: [(edit.state as ErrorMutationState).error.toString()])),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+
+      return;
+    });
+
+    ref.listen(userListsProvider(me?.id).newList, (_, state) {
+      if (state.state is ErrorMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('mangadex.newListError'
+                  .tr(context: context, args: [(state.state as ErrorMutationState).error.toString()])),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+
+      return;
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -126,37 +161,18 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                             final messenger = ScaffoldMessenger.of(context);
 
                             if (listNameController.text.isNotEmpty) {
-                              Future<bool> success;
+                              Future<List<CustomList>> success;
 
                               if (list != null) {
-                                success = ref
-                                    .read(userListsProvider.notifier)
-                                    .editList(list!, listNameController.text, vis, selected.state);
+                                success = editList(list!, listNameController.text, vis, selected.state);
                               } else {
-                                success = ref
-                                    .read(userListsProvider.notifier)
-                                    .newList(listNameController.text, vis, selected.state);
+                                success = newList(listNameController.text, vis, selected.state);
                               }
 
-                              success.then((success) {
+                              success.then((_) {
                                 if (!context.mounted) return;
-                                if (success) {
-                                  context.pop(true);
-                                } else {
-                                  messenger
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(
-                                        content: Text(list != null
-                                            ? 'mangadex.editListError'.tr(context: context)
-                                            : 'mangadex.newListError'.tr(context: context)),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                }
+                                context.pop(true);
                               });
-
-                              pendingAction.value = success;
                             } else {
                               messenger
                                 ..removeCurrentSnackBar()
@@ -238,7 +254,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                           action: MangaSetActions.replace,
                           replacement: result,
                         ));
-                        ref.read(persistentMangaListPaginatorProvider(id.value).notifier).updateList(selected.state);
+                        ref.read(persistentMangaListPaginatorProvider(id.value).updateList)(selected.state);
                       }
                     });
                   },
@@ -248,13 +264,12 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   child: HookConsumer(
                     builder: (context, ref, child) {
                       final titlesProvider = ref.watch(persistentMangaListPaginatorProvider(id.value));
+                      final updateList = ref.watch(persistentMangaListPaginatorProvider(id.value).updateList);
+                      final getPage = ref.watch(persistentMangaListPaginatorProvider(id.value).getPage);
 
                       useEffect(() {
-                        Future.delayed(
-                            Duration.zero,
-                            () => ref
-                                .read(persistentMangaListPaginatorProvider(id.value).notifier)
-                                .updateList(selected.state));
+                        Future.delayed(Duration.zero,
+                            () => ref.read(persistentMangaListPaginatorProvider(id.value).updateList)(selected.state));
 
                         return null;
                       }, []);
@@ -269,7 +284,9 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                           ),
                           physics: const AlwaysScrollableScrollPhysics(),
                           showToggle: false,
-                          isLoading: titlesProvider.isLoading,
+                          isLoading: titlesProvider.isLoading ||
+                              updateList.state is PendingMutationState ||
+                              getPage.state is PendingMutationState,
                           children: [
                             MangaListViewSliver(
                               items: mangas,
@@ -282,9 +299,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                   action: MangaSetActions.remove,
                                   element: manga.id,
                                 ));
-                                ref
-                                    .read(persistentMangaListPaginatorProvider(id.value).notifier)
-                                    .updateList(selected.state);
+                                ref.read(persistentMangaListPaginatorProvider(id.value).updateList)(selected.state);
                               },
                             ),
                           ],
@@ -301,7 +316,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                       numberPages: max((selected.state.length / MangaDexEndpoints.searchLimit).ceil(), 1),
                       onPageChange: (int index) {
                         currentPage.value = index;
-                        ref.read(persistentMangaListPaginatorProvider(id.value).notifier).getPage(index);
+                        ref.read(persistentMangaListPaginatorProvider(id.value).getPage)(index);
                       },
                     );
                   },
@@ -309,7 +324,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (snapshot.connectionState == ConnectionState.waiting) ...Styles.loadingOverlay
+          if (isLoading) ...Styles.loadingOverlay
         ],
       ),
     );

@@ -54,10 +54,11 @@ class ReaderSettings extends _$ReaderSettings {
     return _fetch();
   }
 
-  void save(ReaderConfig update) {
-    state = update;
-
+  @mutation
+  FutureOr<ReaderConfig> save(ReaderConfig update) {
     final box = Hive.box(gagakuBox);
-    box.put('reader', json.encode(state.toJson()));
+    box.put('reader', json.encode(update.toJson()));
+
+    return update;
   }
 }

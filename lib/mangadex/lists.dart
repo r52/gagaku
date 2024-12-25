@@ -11,6 +11,7 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 enum _ListViewType { self, followed }
 
@@ -28,6 +29,33 @@ class MangaDexListsView extends HookConsumerWidget {
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
+    final deleteList = ref.watch(userListsProvider(me?.id).deleteList);
+    final followList = ref.watch(followedListsProvider(me?.id).setFollow);
+
+    ref.listen(userListsProvider(me?.id).deleteList, (_, state) {
+      if (state.state is ErrorMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('mangadex.deleteListError'
+                  .tr(context: context, args: [(state.state as ErrorMutationState).error.toString()])),
+              backgroundColor: Colors.red,
+            ),
+          );
+      } else if (state.state is SuccessMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('mangadex.deleteListOk'.tr(context: context)),
+              backgroundColor: Colors.green,
+            ),
+          );
+      }
+
+      return;
+    });
 
     useEffect(() {
       void controllerAtEdge() {
@@ -35,10 +63,10 @@ class MangaDexListsView extends HookConsumerWidget {
             scrollController.position.pixels == scrollController.position.maxScrollExtent) {
           switch (view.value) {
             case _ListViewType.self:
-              ref.read(userListsProvider.notifier).getMore();
+              ref.read(userListsProvider(me?.id).notifier).getMore();
               break;
             case _ListViewType.followed:
-              ref.read(followedListsProvider.notifier).getMore();
+              ref.read(followedListsProvider(me?.id).notifier).getMore();
               break;
           }
         }
@@ -46,7 +74,7 @@ class MangaDexListsView extends HookConsumerWidget {
 
       scrollController.addListener(controllerAtEdge);
       return () => scrollController.removeListener(controllerAtEdge);
-    }, [scrollController]);
+    }, [scrollController, me]);
 
     final appbar = MangaDexSliverAppBar(
       title: 'mangadex.myLists'.tr(context: context),
@@ -105,12 +133,13 @@ class MangaDexListsView extends HookConsumerWidget {
         _ListViewType.self => Consumer(
             builder: (context, ref, child) {
               return RefreshIndicator(
+                key: ValueKey('_ListViewType.self(${me?.id})'),
                 onRefresh: () async {
-                  ref.read(userListsProvider.notifier).clear();
-                  return ref.refresh(userListsProvider.future);
+                  ref.read(userListsProvider(me?.id).notifier).clear();
+                  return ref.refresh(userListsProvider(me?.id).future);
                 },
                 child: DataProviderWhenWidget(
-                  provider: userListsProvider,
+                  provider: userListsProvider(me?.id),
                   builder: (context, lists) => CustomScrollView(
                     scrollBehavior: const MouseTouchScrollBehavior(),
                     controller: scrollController,
@@ -130,7 +159,6 @@ class MangaDexListsView extends HookConsumerWidget {
                           return val >= 0 ? val : null;
                         },
                         itemBuilder: (BuildContext context, int index) {
-                          final messenger = ScaffoldMessenger.of(context);
                           final item = lists.elementAt(index);
 
                           return Card(
@@ -164,7 +192,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                 menuChildren: [
                                   Consumer(
                                     builder: (context, refx, child) {
-                                      final followedLists = refx.watch(followedListsProvider).value;
+                                      final followedLists = refx.watch(followedListsProvider(me?.id)).value;
                                       final idx = followedLists?.indexWhere((e) => e.id == item.id);
 
                                       if (idx == null) {
@@ -172,8 +200,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                       }
 
                                       return MenuItemButton(
-                                        onPressed: () =>
-                                            ref.read(followedListsProvider.notifier).setFollow(item, idx == -1),
+                                        onPressed: () => followList(item, idx == -1),
                                         child: Text(idx == -1
                                             ? 'ui.follow'.tr(context: context)
                                             : 'ui.unfollow'.tr(context: context)),
@@ -184,28 +211,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                     onPressed: () async {
                                       final result = await showDeleteListDialog(context, item.attributes.name);
                                       if (result == true) {
-                                        ref.read(userListsProvider.notifier).deleteList(item).then((success) {
-                                          if (!context.mounted) return;
-                                          if (success == true) {
-                                            messenger
-                                              ..removeCurrentSnackBar()
-                                              ..showSnackBar(
-                                                SnackBar(
-                                                  content: Text('mangadex.deleteListOk'.tr(context: context)),
-                                                  backgroundColor: Colors.green,
-                                                ),
-                                              );
-                                          } else {
-                                            messenger
-                                              ..removeCurrentSnackBar()
-                                              ..showSnackBar(
-                                                SnackBar(
-                                                  content: Text('mangadex.deleteListError'.tr(context: context)),
-                                                  backgroundColor: Colors.red,
-                                                ),
-                                              );
-                                          }
-                                        });
+                                        deleteList(item);
                                       }
                                     },
                                     child: Text('ui.delete'.tr(context: context)),
@@ -237,12 +243,13 @@ class MangaDexListsView extends HookConsumerWidget {
         _ListViewType.followed => Consumer(
             builder: (context, ref, child) {
               return RefreshIndicator(
+                key: ValueKey('_ListViewType.followed(${me?.id})'),
                 onRefresh: () async {
-                  ref.read(followedListsProvider.notifier).clear();
-                  return ref.refresh(followedListsProvider.future);
+                  ref.read(followedListsProvider(me?.id).notifier).clear();
+                  return ref.refresh(followedListsProvider(me?.id).future);
                 },
                 child: DataProviderWhenWidget(
-                  provider: followedListsProvider,
+                  provider: followedListsProvider(me?.id),
                   builder: (context, lists) => CustomScrollView(
                     scrollBehavior: const MouseTouchScrollBehavior(),
                     controller: scrollController,
@@ -262,7 +269,6 @@ class MangaDexListsView extends HookConsumerWidget {
                           return val >= 0 ? val : null;
                         },
                         itemBuilder: (BuildContext context, int index) {
-                          final messenger = ScaffoldMessenger.of(context);
                           final item = lists.elementAt(index);
 
                           return Card(
@@ -296,7 +302,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                 menuChildren: [
                                   MenuItemButton(
                                     onPressed: () async {
-                                      ref.read(followedListsProvider.notifier).setFollow(item, false);
+                                      followList(item, false);
                                     },
                                     child: Text('ui.unfollow'.tr(context: context)),
                                   ),
@@ -305,28 +311,7 @@ class MangaDexListsView extends HookConsumerWidget {
                                       onPressed: () async {
                                         final result = await showDeleteListDialog(context, item.attributes.name);
                                         if (result == true) {
-                                          ref.read(userListsProvider.notifier).deleteList(item).then((success) {
-                                            if (!context.mounted) return;
-                                            if (success == true) {
-                                              messenger
-                                                ..removeCurrentSnackBar()
-                                                ..showSnackBar(
-                                                  SnackBar(
-                                                    content: Text('mangadex.deleteListOk'.tr(context: context)),
-                                                    backgroundColor: Colors.green,
-                                                  ),
-                                                );
-                                            } else {
-                                              messenger
-                                                ..removeCurrentSnackBar()
-                                                ..showSnackBar(
-                                                  SnackBar(
-                                                    content: Text('mangadex.deleteListError'.tr(context: context)),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                            }
-                                          });
+                                          deleteList(item);
                                         }
                                       },
                                       child: Text('ui.delete'.tr(context: context)),

@@ -1,19 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SettingsHome extends HookConsumerWidget {
+class SettingsHome extends ConsumerWidget {
   const SettingsHome({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cfg = ref.watch(gagakuSettingsProvider);
-    final config = useState(cfg);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -36,7 +34,7 @@ class SettingsHome extends HookConsumerWidget {
               builder: (context) {
                 return Center(
                   child: DropdownMenu<ThemeMode>(
-                    initialSelection: config.value.themeMode,
+                    initialSelection: cfg.themeMode,
                     requestFocusOnTap: false,
                     enableSearch: false,
                     enableFilter: false,
@@ -47,9 +45,8 @@ class SettingsHome extends HookConsumerWidget {
                     ],
                     onSelected: (ThemeMode? value) {
                       if (value != null) {
-                        final cfg = config.value.copyWith(themeMode: value);
-                        ref.read(gagakuSettingsProvider.notifier).save(cfg);
-                        config.value = cfg;
+                        final c = cfg.copyWith(themeMode: value);
+                        ref.read(gagakuSettingsProvider.save)(c);
                       }
                     },
                   ),
@@ -67,7 +64,7 @@ class SettingsHome extends HookConsumerWidget {
               builder: (context) {
                 return Center(
                   child: DropdownMenu<GagakuTheme>(
-                    initialSelection: config.value.theme,
+                    initialSelection: cfg.theme,
                     enableSearch: false,
                     enableFilter: false,
                     requestFocusOnTap: false,
@@ -86,9 +83,8 @@ class SettingsHome extends HookConsumerWidget {
                     ],
                     onSelected: (GagakuTheme? value) {
                       if (value != null) {
-                        final cfg = config.value.copyWith(theme: value);
-                        ref.read(gagakuSettingsProvider.notifier).save(cfg);
-                        config.value = cfg;
+                        final c = cfg.copyWith(theme: value);
+                        ref.read(gagakuSettingsProvider.save)(c);
                       }
                     },
                   ),

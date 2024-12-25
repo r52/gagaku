@@ -99,18 +99,103 @@ final class ReaderSettingsProvider
 
   @$internal
   @override
-  $NotifierProviderElement<ReaderSettings, ReaderConfig> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+  _$ReaderSettingsElement $createElement($ProviderPointer pointer) =>
+      _$ReaderSettingsElement(this, pointer);
+
+  ProviderListenable<ReaderSettings$Save> get save =>
+      $LazyProxyListenable<ReaderSettings$Save, ReaderConfig>(
+        this,
+        (element) {
+          element as _$ReaderSettingsElement;
+
+          return element._$save;
+        },
+      );
 }
 
-String _$readerSettingsHash() => r'32da40797d96254b0532f7dd2f50636d78121465';
+String _$readerSettingsHash() => r'68769a15ea11239838033d69fa771a6dfdeac160';
 
 abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   ReaderConfig build();
   @$internal
   @override
   ReaderConfig runBuild() => build();
+}
+
+class _$ReaderSettingsElement
+    extends $NotifierProviderElement<ReaderSettings, ReaderConfig> {
+  _$ReaderSettingsElement(super.provider, super.pointer) {
+    _$save.result = $Result.data(_$ReaderSettings$Save(this));
+  }
+  final _$save = $ElementLense<_$ReaderSettings$Save>();
+  @override
+  void mount() {
+    super.mount();
+    _$save.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitChildren({
+    required void Function(ProviderElement element) elementVisitor,
+    required void Function($ElementLense element) listenableVisitor,
+  }) {
+    super.visitChildren(
+      elementVisitor: elementVisitor,
+      listenableVisitor: listenableVisitor,
+    );
+
+    listenableVisitor(_$save);
+  }
+}
+
+sealed class ReaderSettings$Save extends MutationBase<ReaderConfig> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [ReaderSettings.save] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// Lastly, if the method completes without throwing, the Notifier's state
+  /// will be updated with the new value.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<ReaderConfig> call(ReaderConfig update);
+}
+
+final class _$ReaderSettings$Save extends $SyncMutationBase<ReaderConfig,
+    _$ReaderSettings$Save, ReaderSettings> implements ReaderSettings$Save {
+  _$ReaderSettings$Save(this.element, {super.state, super.key});
+
+  @override
+  final _$ReaderSettingsElement element;
+
+  @override
+  $ElementLense<_$ReaderSettings$Save> get listenable => element._$save;
+
+  @override
+  Future<ReaderConfig> call(ReaderConfig update) {
+    return mutateAsync(
+      Invocation.method(
+        #save,
+        [update],
+      ),
+      ($notifier) => $notifier.save(
+        update,
+      ),
+    );
+  }
+
+  @override
+  _$ReaderSettings$Save copyWith(MutationState<ReaderConfig> state,
+          {Object? key}) =>
+      _$ReaderSettings$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

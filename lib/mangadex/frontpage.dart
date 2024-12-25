@@ -224,7 +224,7 @@ class MangaProviderCarousel extends StatelessWidget {
     required this.provider,
   });
 
-  final ProviderListenable<AsyncValue<List<Manga>>> provider;
+  final Refreshable<AsyncValue<List<Manga>>> provider;
 
   @override
   Widget build(BuildContext context) {

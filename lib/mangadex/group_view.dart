@@ -46,20 +46,16 @@ Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
 
 @Riverpod(retry: noRetry)
 Future<List<ChapterFeedItemData>> _fetchGroupFeed(Ref ref, Group group) async {
-  final loggedin = await ref.watch(authControlProvider.future);
-
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
+
   final chapters = await ref.watch(groupFeedProvider(group).future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-
   final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
-
-  if (loggedin) {
-    await ref.read(readChaptersProvider.notifier).get(mangas);
-  }
+  await ref.read(statisticsProvider.get)(mangas);
+  await ref.read(readChaptersProvider(me?.id).get)(mangas);
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
@@ -89,7 +85,7 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(Ref ref, Group group) async {
 @Riverpod(retry: noRetry)
 Future<List<Manga>> _fetchGroupTitles(Ref ref, Group group) async {
   final mangas = await ref.watch(groupTitlesProvider(group).future);
-  await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 
@@ -304,7 +300,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 cfg.value = settings.copyWith(groupBlacklist: {...settings.groupBlacklist, group.id});
               }
 
-              ref.read(mdConfigProvider.notifier).save(cfg.value);
+              ref.read(mdConfigProvider.save)(cfg.value);
             },
             icon: const Icon(Icons.block),
             label: Text(isBlacklisted ? 'ui.unblock'.tr(context: context) : 'ui.block'.tr(context: context)),

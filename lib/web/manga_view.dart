@@ -185,8 +185,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
-        ref.read(webSourceHistoryProvider.notifier).add(link);
-        ref.read(webSourceFavoritesProvider.notifier).updateAll(link);
+        ref.read(webSourceHistoryProvider.add)(link);
+        ref.read(webSourceFavoritesProvider.updateAll)(link);
       });
       return null;
     }, []);
@@ -286,7 +286,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             );
 
                             if (result == true) {
-                              ref.read(webReadMarkersProvider.notifier).deleteKey(key);
+                              ref.read(webReadMarkersProvider.deleteKey)(key);
                             }
                           },
                           icon: const Icon(Icons.restore),
@@ -430,9 +430,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               );
 
                               if (result == true) {
-                                ref
-                                    .read(webReadMarkersProvider.notifier)
-                                    .setBulk(key, read: !allRead ? names : null, unread: allRead ? names : null);
+                                ref.read(webReadMarkersProvider.setBulk)(key,
+                                    read: !allRead ? names : null, unread: allRead ? names : null);
                               }
                             },
                             child: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
@@ -530,7 +529,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       onPressed: () async {
         bool set = !isRead;
 
-        ref.read(webReadMarkersProvider.notifier).set(key, name, set);
+        ref.read(webReadMarkersProvider.set)(key, name, set);
       },
       padding: const EdgeInsets.all(0.0),
       splashRadius: 15,
@@ -655,9 +654,9 @@ class _FavoritesMenu extends HookConsumerWidget {
                     value: favorites[cat.id]?.contains(link) ?? false,
                     onChanged: (bool? value) async {
                       if (value == true) {
-                        await ref.read(webSourceFavoritesProvider.notifier).add(cat.id, link);
+                        await ref.read(webSourceFavoritesProvider.add)(cat.id, link);
                       } else {
-                        await ref.read(webSourceFavoritesProvider.notifier).remove(cat.id, link);
+                        await ref.read(webSourceFavoritesProvider.remove)(cat.id, link);
                       }
                     },
                   );

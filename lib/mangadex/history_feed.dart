@@ -12,20 +12,16 @@ part 'history_feed.g.dart';
 
 @Riverpod(retry: noRetry)
 Future<List<ChapterFeedItemData>> _fetchHistoryFeed(Ref ref) async {
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
-  final loggedin = await ref.watch(authControlProvider.future);
 
   final chapters = await ref.watch(mangaDexHistoryProvider.future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-
   final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
-
-  if (loggedin) {
-    await ref.read(readChaptersProvider.notifier).get(mangas);
-  }
+  await ref.read(statisticsProvider.get)(mangas);
+  await ref.read(readChaptersProvider(me?.id).get)(mangas);
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 

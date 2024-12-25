@@ -60,10 +60,11 @@ class GagakuSettings extends _$GagakuSettings {
     return _fetch();
   }
 
-  void save(GagakuConfig update) {
-    state = update;
-
+  @mutation
+  FutureOr<GagakuConfig> save(GagakuConfig update) async {
     final box = Hive.box(gagakuBox);
     box.put('gagaku', json.encode(update.toJson()));
+
+    return update;
   }
 }

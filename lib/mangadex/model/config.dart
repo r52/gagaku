@@ -42,10 +42,11 @@ class MdConfig extends _$MdConfig {
     return _fetch();
   }
 
-  void save(MangaDexConfig update) {
-    state = update;
-
+  @mutation
+  FutureOr<MangaDexConfig> save(MangaDexConfig update) {
     final box = Hive.box(gagakuBox);
-    box.put('mangadex', json.encode(state.toJson()));
+    box.put('mangadex', json.encode(update.toJson()));
+
+    return update;
   }
 }

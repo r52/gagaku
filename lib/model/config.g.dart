@@ -112,18 +112,103 @@ final class GagakuSettingsProvider
 
   @$internal
   @override
-  $NotifierProviderElement<GagakuSettings, GagakuConfig> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+  _$GagakuSettingsElement $createElement($ProviderPointer pointer) =>
+      _$GagakuSettingsElement(this, pointer);
+
+  ProviderListenable<GagakuSettings$Save> get save =>
+      $LazyProxyListenable<GagakuSettings$Save, GagakuConfig>(
+        this,
+        (element) {
+          element as _$GagakuSettingsElement;
+
+          return element._$save;
+        },
+      );
 }
 
-String _$gagakuSettingsHash() => r'9a86d3ab2de272269cf61bf2eb0c64e22ae2b701';
+String _$gagakuSettingsHash() => r'b43e7e7daea8164a9d7496099356031f7735f0a2';
 
 abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();
   @$internal
   @override
   GagakuConfig runBuild() => build();
+}
+
+class _$GagakuSettingsElement
+    extends $NotifierProviderElement<GagakuSettings, GagakuConfig> {
+  _$GagakuSettingsElement(super.provider, super.pointer) {
+    _$save.result = $Result.data(_$GagakuSettings$Save(this));
+  }
+  final _$save = $ElementLense<_$GagakuSettings$Save>();
+  @override
+  void mount() {
+    super.mount();
+    _$save.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitChildren({
+    required void Function(ProviderElement element) elementVisitor,
+    required void Function($ElementLense element) listenableVisitor,
+  }) {
+    super.visitChildren(
+      elementVisitor: elementVisitor,
+      listenableVisitor: listenableVisitor,
+    );
+
+    listenableVisitor(_$save);
+  }
+}
+
+sealed class GagakuSettings$Save extends MutationBase<GagakuConfig> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [GagakuSettings.save] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// Lastly, if the method completes without throwing, the Notifier's state
+  /// will be updated with the new value.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<GagakuConfig> call(GagakuConfig update);
+}
+
+final class _$GagakuSettings$Save extends $SyncMutationBase<GagakuConfig,
+    _$GagakuSettings$Save, GagakuSettings> implements GagakuSettings$Save {
+  _$GagakuSettings$Save(this.element, {super.state, super.key});
+
+  @override
+  final _$GagakuSettingsElement element;
+
+  @override
+  $ElementLense<_$GagakuSettings$Save> get listenable => element._$save;
+
+  @override
+  Future<GagakuConfig> call(GagakuConfig update) {
+    return mutateAsync(
+      Invocation.method(
+        #save,
+        [update],
+      ),
+      ($notifier) => $notifier.save(
+        update,
+      ),
+    );
+  }
+
+  @override
+  _$GagakuSettings$Save copyWith(MutationState<GagakuConfig> state,
+          {Object? key}) =>
+      _$GagakuSettings$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

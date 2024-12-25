@@ -16,15 +16,16 @@ enum _FeedViewType { chapters, manga }
 
 @Riverpod(retry: noRetry)
 Future<List<ChapterFeedItemData>> _fetchChapters(Ref ref) async {
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
 
-  final chapters = await ref.watch(latestChaptersFeedProvider.future);
+  final chapters = await ref.watch(latestChaptersFeedProvider(me?.id).future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
   final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
-  await ref.read(readChaptersProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
+  await ref.read(readChaptersProvider(me?.id).get)(mangas);
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
@@ -51,7 +52,7 @@ Future<List<ChapterFeedItemData>> _fetchChapters(Ref ref) async {
   return dlist;
 }
 
-class MangaDexChapterFeed extends HookConsumerWidget {
+class MangaDexChapterFeed extends HookWidget {
   const MangaDexChapterFeed({
     super.key,
     this.controller,
@@ -60,7 +61,7 @@ class MangaDexChapterFeed extends HookConsumerWidget {
   final ScrollController? controller;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final view = useState(_FeedViewType.chapters);
 
@@ -101,17 +102,24 @@ class MangaDexChapterFeed extends HookConsumerWidget {
     ];
 
     return switch (view.value) {
-      _FeedViewType.chapters => ChapterFeedWidget(
-          provider: _fetchChaptersProvider,
-          emptyText: 'mangadex.noFollowsMsg'.tr(context: context),
-          onAtEdge: () => ref.read(latestChaptersFeedProvider.notifier).getMore(),
-          onRefresh: () async {
-            ref.read(latestChaptersFeedProvider.notifier).clear();
-            return ref.refresh(_fetchChaptersProvider.future);
+      _FeedViewType.chapters => Consumer(
+          builder: (context, ref, child) {
+            final me = ref.watch(loggedUserProvider).value;
+
+            return ChapterFeedWidget(
+              key: ValueKey('ChapterFeedWidget(${me?.id})'),
+              provider: _fetchChaptersProvider,
+              emptyText: 'mangadex.noFollowsMsg'.tr(context: context),
+              onAtEdge: () => ref.read(latestChaptersFeedProvider(me?.id).notifier).getMore(),
+              onRefresh: () async {
+                ref.read(latestChaptersFeedProvider(me?.id).notifier).clear();
+                return ref.refresh(_fetchChaptersProvider.future);
+              },
+              controller: scrollController,
+              restorationId: 'chapter_list_offset',
+              leading: leading,
+            );
           },
-          controller: scrollController,
-          restorationId: 'chapter_list_offset',
-          leading: leading,
         ),
       _FeedViewType.manga => MangaDexMangaFeed(
           controller: scrollController,

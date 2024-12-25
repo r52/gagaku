@@ -44,7 +44,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text('saveSettings'.tr(context: context)),
                   onPressed: () {
-                    ref.read(mdConfigProvider.notifier).save(config.value);
+                    ref.read(mdConfigProvider.save)(config.value);
                     nav.pop();
                   },
                 ),

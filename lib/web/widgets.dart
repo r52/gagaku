@@ -144,12 +144,15 @@ class WebMangaListViewSliver extends ConsumerWidget {
     final gcfg = ref.watch(gagakuSettingsProvider);
     final theme = Theme.of(context);
 
+    final addFavorite = ref.watch(webSourceFavoritesProvider.add);
+    final removeFavorite = ref.watch(webSourceFavoritesProvider.remove);
+
     switch (view) {
       case WebMangaListView.list:
         return reorderable
             ? SliverReorderableList(
                 onReorder: (int oldIndex, int newIndex) =>
-                    ref.read(webSourceFavoritesProvider.notifier).updateList(favoritesKey, oldIndex, newIndex),
+                    ref.read(webSourceFavoritesProvider.updateList)(favoritesKey, oldIndex, newIndex),
                 itemCount: items.length,
                 findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
@@ -181,9 +184,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             color: favorited ? theme.colorScheme.primary : null,
                             onPressed: () async {
                               if (favorited) {
-                                ref.read(webSourceFavoritesProvider.notifier).remove(favoritesKey, item);
+                                removeFavorite(favoritesKey, item);
                               } else {
-                                ref.read(webSourceFavoritesProvider.notifier).add(favoritesKey, item);
+                                addFavorite(favoritesKey, item);
                               }
                             },
                           );
@@ -242,9 +245,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           color: favorited ? theme.colorScheme.primary : null,
                           onPressed: () async {
                             if (favorited) {
-                              ref.read(webSourceFavoritesProvider.notifier).remove(favoritesKey, item);
+                              removeFavorite(favoritesKey, item);
                             } else {
-                              ref.read(webSourceFavoritesProvider.notifier).add(favoritesKey, item);
+                              addFavorite(favoritesKey, item);
                             }
                           },
                         );
@@ -257,7 +260,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         color: Colors.red,
                       ),
                       onPressed: () async {
-                        ref.read(webSourceHistoryProvider.notifier).remove(item);
+                        ref.read(webSourceHistoryProvider.remove)(item);
                       },
                     ),
                     title: Text(item.title),
@@ -399,9 +402,9 @@ class GridMangaItem extends HookConsumerWidget {
                         : 'mangaActions.favorite'.tr(context: context),
                     onPressed: () async {
                       if (favorited) {
-                        ref.read(webSourceFavoritesProvider.notifier).remove(favoritesKey, link);
+                        ref.read(webSourceFavoritesProvider.remove)(favoritesKey, link);
                       } else {
-                        ref.read(webSourceFavoritesProvider.notifier).add(favoritesKey, link);
+                        ref.read(webSourceFavoritesProvider.add)(favoritesKey, link);
                       }
                     },
                     child: Icon(
@@ -420,7 +423,7 @@ class GridMangaItem extends HookConsumerWidget {
                 shape: const CircleBorder(),
                 tooltip: 'mangaActions.removeHistory'.tr(context: context),
                 onPressed: () async {
-                  ref.read(webSourceHistoryProvider.notifier).remove(link);
+                  ref.read(webSourceHistoryProvider.remove)(link);
                 },
                 backgroundColor: theme.colorScheme.errorContainer,
                 child: Icon(

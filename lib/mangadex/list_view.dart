@@ -32,20 +32,16 @@ Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
 
 @Riverpod(retry: noRetry)
 Future<List<ChapterFeedItemData>> _fetchListFeed(Ref ref, CustomList list) async {
-  final loggedin = await ref.watch(authControlProvider.future);
-
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
+
   final chapters = await ref.watch(customListFeedProvider(list).future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-
   final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
-
-  if (loggedin) {
-    await ref.read(readChaptersProvider.notifier).get(mangas);
-  }
+  await ref.read(statisticsProvider.get)(mangas);
+  await ref.read(readChaptersProvider(me?.id).get)(mangas);
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
@@ -72,6 +68,22 @@ Future<List<ChapterFeedItemData>> _fetchListFeed(Ref ref, CustomList list) async
   return dlist;
 }
 
+@Riverpod(retry: noRetry)
+Future<CustomList?> _getList(Ref ref, String listId) async {
+  final me = await ref.watch(loggedUserProvider.future);
+
+  if (me != null) {
+    final userlists = await ref.watch(userListsProvider(me.id).future);
+    final found = userlists.indexWhere((e) => e.id == listId);
+    if (found >= 0) {
+      return userlists.elementAt(found);
+    }
+  }
+
+  final list = await ref.watch(listSourceProvider(listId).future);
+  return list;
+}
+
 class MangaDexListViewWidget extends HookConsumerWidget {
   const MangaDexListViewWidget({super.key, required this.listId});
 
@@ -82,7 +94,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
     final theme = Theme.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).value;
-    final listProvider = ref.watch(listSourceProvider(listId));
+    final listProvider = ref.watch(_getListProvider(listId));
 
     final bottomNavigationBarItems = <Widget>[
       NavigationDestination(
@@ -138,7 +150,8 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 children: [
                   Consumer(
                     builder: (context, ref, child) {
-                      final followedLists = ref.watch(followedListsProvider).value;
+                      final followedLists = ref.watch(followedListsProvider(me?.id)).value;
+                      final followList = ref.watch(followedListsProvider(me?.id).setFollow);
                       final idx = followedLists?.indexWhere((e) => e.id == list.id);
 
                       if (idx == null) {
@@ -147,7 +160,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
 
                       return IconButton(
                         style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
-                        onPressed: () => ref.read(followedListsProvider.notifier).setFollow(list, idx == -1),
+                        onPressed: () => followList(list, idx == -1),
                         icon: Icon(
                           idx == -1 ? Icons.bookmark_border : Icons.bookmark,
                           color: idx == -1 ? null : theme.colorScheme.primary,

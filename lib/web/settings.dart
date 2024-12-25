@@ -37,14 +37,13 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text('saveSettings'.tr(context: context)),
                   onPressed: () {
-                    ref.read(webConfigProvider.notifier).saveWith(
-                          sourceDirectory: config.value.sourceDirectory,
-                          categories: config.value.categories,
-                          defaultCategory: config.value.defaultCategory,
-                        );
-                    ref
-                        .read(webSourceFavoritesProvider.notifier)
-                        .reconfigureCategories(config.value.categories, config.value.defaultCategory);
+                    ref.read(webConfigProvider.saveWith)(
+                      sourceDirectory: config.value.sourceDirectory,
+                      categories: config.value.categories,
+                      defaultCategory: config.value.defaultCategory,
+                    );
+                    ref.read(webSourceFavoritesProvider.reconfigureCategories)(
+                        config.value.categories, config.value.defaultCategory);
                     nav.pop();
                   },
                 ),

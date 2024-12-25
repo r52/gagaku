@@ -26,7 +26,8 @@ class LibraryViewType extends _$LibraryViewType {
 
 @riverpod
 Future<List<String>> _getLibraryListByType(Ref ref, MangaReadingStatus type) async {
-  final library = await ref.watch(userLibraryProvider.future);
+  final me = await ref.watch(loggedUserProvider.future);
+  final library = await ref.watch(userLibraryProvider(me?.id).future);
 
   final results = library.entries.where((element) => element.value == type).map((e) => e.key).toList();
 
@@ -43,6 +44,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(loggedUserProvider).value;
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final statuses = useMemoized(() => MangaReadingStatus.values.skip(1).toList());
     final initialtype = ref.read(libraryViewTypeProvider);
@@ -98,8 +100,9 @@ class MangaDexLibraryView extends HookConsumerWidget {
                 final currentPage = useState(0);
 
                 return RefreshIndicator(
+                  key: ValueKey('LibraryTab(${me?.id}, $type)'),
                   onRefresh: () async {
-                    ref.read(userLibraryProvider.notifier).clear();
+                    ref.read(userLibraryProvider(me?.id).notifier).clear();
                     return ref.refresh(_getLibraryListByTypeProvider(type).future);
                   },
                   child: DataProviderWhenWidget(

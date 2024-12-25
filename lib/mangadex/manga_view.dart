@@ -51,12 +51,13 @@ Page<dynamic> buildMangaViewPage(BuildContext context, GoRouterState state) {
 
 @Riverpod(retry: noRetry)
 Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
   final manga = await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(manga);
-  await ref.read(readChaptersProvider.notifier).get(manga);
-  await ref.read(ratingsProvider.notifier).get(manga);
+  await ref.read(statisticsProvider.get)(manga);
+  await ref.read(readChaptersProvider(me?.id).get)(manga);
+  await ref.read(ratingsProvider(me?.id).get)(manga);
 
   return manga.first;
 }
@@ -69,12 +70,13 @@ Future<List<Manga>> _fetchRelatedManga(Ref ref, Manga manga) async {
     return [];
   }
 
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
   final ids = related.map((e) => e.id);
   final mangas = await api.fetchManga(ids: ids, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
-  await ref.read(readChaptersProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
+  await ref.read(readChaptersProvider(me?.id).get)(mangas);
 
   ref.disposeAfter(const Duration(minutes: 5));
 
@@ -110,7 +112,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final loggedin = ref.watch(authControlProvider).value ?? false;
+    final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
 
     final hasRelated = manga.relatedMangas.isNotEmpty;
@@ -166,6 +168,31 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
       return false;
     }
+
+    ref.listen(userListsProvider(me?.id).newList, (_, state) {
+      if (state.state is ErrorMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('mangadex.newListError'
+                  .tr(context: context, args: [(state.state as ErrorMutationState).error.toString()])),
+              backgroundColor: Colors.red,
+            ),
+          );
+      } else if (state.state is SuccessMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('mangadex.newListOk'.tr(context: context)),
+              backgroundColor: Colors.green,
+            ),
+          );
+      }
+
+      return;
+    });
 
     return Scaffold(
       body: RefreshIndicator(
@@ -258,7 +285,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                actions: !loggedin
+                actions: me == null
                     ? null
                     : [
                         OverflowBar(
@@ -268,10 +295,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               builder: (context, ref, child) {
                                 final followProvider = ref.watch(followingStatusProvider(manga));
                                 final following = followProvider.value;
+                                final setFollowing = ref.watch(followingStatusProvider(manga).set);
                                 final statusProvider = ref.watch(readingStatusProvider(manga));
                                 final reading = statusProvider.value;
 
-                                if (following == null || statusProvider.isLoading) {
+                                if (following == null ||
+                                    statusProvider.isLoading ||
+                                    setFollowing.state is PendingMutationState) {
                                   return _loadingAction;
                                 }
 
@@ -286,9 +316,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                           });
 
                                       if (result != null) {
-                                        ref.read(readingStatusProvider(manga).notifier).set(result.$1);
+                                        ref.read(readingStatusProvider(manga).set)(result.$1);
 
-                                        ref.read(followingStatusProvider(manga).notifier).set(result.$2);
+                                        setFollowing(result.$2);
                                       }
                                     },
                                     child: Text('mangaActions.addToLibrary'.tr(context: context)),
@@ -306,7 +336,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                     color: theme.colorScheme.primary,
                                     onPressed: () async {
                                       bool set = !following;
-                                      ref.read(followingStatusProvider(manga).notifier).set(set);
+                                      setFollowing(set);
                                     },
                                     icon:
                                         Icon(following ? Icons.notifications_active : Icons.notifications_off_outlined),
@@ -320,8 +350,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               builder: (context, ref, child) {
                                 final readProvider = ref.watch(readingStatusProvider(manga));
                                 final reading = readProvider.value;
+                                final setReadingStatus = ref.watch(readingStatusProvider(manga).set);
 
-                                if (readProvider.isLoading) {
+                                if (readProvider.isLoading || setReadingStatus.state is PendingMutationState) {
                                   return _loadingAction;
                                 }
 
@@ -571,7 +602,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         ),
                     ],
                   ),
-                  if (_ViewType.values.elementAt(tabview) == _ViewType.chapters && loggedin)
+                  if (_ViewType.values.elementAt(tabview) == _ViewType.chapters && me != null)
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: Row(
@@ -598,7 +629,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                               final chapters = ref.watch(mangaChaptersProvider(manga)).value;
 
                               final allRead = chapters != null
-                                  ? ref.watch(readChaptersProvider.select((value) => switch (value) {
+                                  ? ref.watch(readChaptersProvider(me.id).select((value) => switch (value) {
                                         AsyncValue(value: final data?) =>
                                           data[manga.id]?.containsAll(chapters.map((e) => e.id)) == true,
                                         _ => false,
@@ -644,7 +675,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                   );
 
                                   if (chapters != null && result == true) {
-                                    ref.read(readChaptersProvider.notifier).set(manga,
+                                    ref.read(readChaptersProvider(me.id).set)(manga,
                                         read: !allRead ? chapters : null, unread: allRead ? chapters : null);
                                   }
                                 },
@@ -858,6 +889,8 @@ class _ChapterListSliver extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(loggedUserProvider).value;
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
     // final sort = ref.watch(mangaChaptersListSortProvider);
     // final sortfunc = sort == ListSort.ascending
     //     ? compareNatural
@@ -868,10 +901,10 @@ class _ChapterListSliver extends HookConsumerWidget {
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        await ref.read(readChaptersProvider.notifier).get([manga]);
+        await getReadChapters([manga]);
       });
       return null;
-    }, []);
+    }, [manga, me]);
 
     if (chapters.isEmpty) {
       return SliverToBoxAdapter(
@@ -1092,10 +1125,10 @@ class _ReadingStatusDropdown extends ConsumerWidget {
         ),
       ),
       onSelected: (MangaReadingStatus? status) async {
-        ref.read(readingStatusProvider(manga).notifier).set(status);
+        ref.read(readingStatusProvider(manga).set)(status);
 
         if (status == null || status == MangaReadingStatus.remove) {
-          ref.read(followingStatusProvider(manga).notifier).set(false);
+          ref.read(followingStatusProvider(manga).set)(false);
         }
       },
       dropdownMenuEntries: List<DropdownMenuEntry<MangaReadingStatus>>.generate(
@@ -1120,24 +1153,29 @@ class _RatingMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final ratingProv = ref.watch(ratingsProvider);
+    final me = ref.watch(loggedUserProvider).value;
+    final ratingProv = ref.watch(ratingsProvider(me?.id));
     final ratings = ratingProv.value;
+    final getRating = ref.watch(ratingsProvider(me?.id).get);
+    final setRating = ref.watch(ratingsProvider(me?.id).set);
     final hasRating = (ratings != null && ratings.containsKey(manga.id) && ratings[manga.id]!.rating > 0);
+    final isLoading =
+        getRating.state is PendingMutationState || setRating.state is PendingMutationState || ratingProv.isLoading;
 
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        await ref.read(ratingsProvider.notifier).get([manga]);
+        await getRating([manga]);
       });
       return null;
-    }, []);
+    }, [manga, me]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
         return Material(
           color: hasRating ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceContainerHighest,
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child: (ratingProv.isLoading || ratings == null)
+          child: (isLoading || ratings == null)
               ? _loadingAction
               : InkWell(
                   onTap: () {
@@ -1155,17 +1193,13 @@ class _RatingMenu extends HookConsumerWidget {
         ...List.generate(
           10,
           (index) => MenuItemButton(
-            onPressed: () {
-              ref.read(ratingsProvider.notifier).set(manga, index + 1);
-            },
+            onPressed: () => setRating(manga, index + 1),
             child: Text(RatingLabel[index + 1]),
           ),
         ).reversed,
         if (hasRating)
           MenuItemButton(
-            onPressed: () {
-              ref.read(ratingsProvider.notifier).set(manga, null);
-            },
+            onPressed: () => setRating(manga, null),
             child: const Text('Remove Rating'),
           )
       ],
@@ -1204,15 +1238,19 @@ class _UserListsMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final userListsProv = ref.watch(userListsProvider);
+    final me = ref.watch(loggedUserProvider).value;
+    final userListsProv = ref.watch(userListsProvider(me?.id));
+    final updateList = ref.watch(userListsProvider(me?.id).updateList);
+    final newList = ref.watch(userListsProvider(me?.id).newList);
     final userLists = userListsProv.value;
+    final isLoading = updateList.state is PendingMutationState || userListsProv.isLoading || userLists == null;
 
     return MenuAnchor(
       builder: (context, controller, child) {
         return Material(
           color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child: (userListsProv.isLoading || userLists == null)
+          child: isLoading
               ? _loadingAction
               : InkWell(
                   onTap: () {
@@ -1235,15 +1273,13 @@ class _UserListsMenu extends ConsumerWidget {
               title: Text(userLists.elementAt(index).attributes.name),
               value: userLists.elementAt(index).set.contains(manga.id),
               onChanged: (bool? value) async {
-                await ref.read(userListsProvider.notifier).updateList(userLists.elementAt(index), manga, value == true);
+                await updateList(userLists.elementAt(index), manga, value == true);
               },
             ),
           ),
         MenuItemButton(
           child: Text('mangadex.createNewListBtn'.tr(context: context)),
           onPressed: () async {
-            final messenger = ScaffoldMessenger.of(context);
-
             final result = await showDialog<(String, CustomListVisibility)>(
                 context: context,
                 builder: (BuildContext context) {
@@ -1317,28 +1353,7 @@ class _UserListsMenu extends ConsumerWidget {
                 });
 
             if (result != null) {
-              final success = await ref.read(userListsProvider.notifier).newList(result.$1, result.$2, []);
-
-              if (!context.mounted) return;
-              if (success) {
-                messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('mangadex.newListOk'.tr(context: context)),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-              } else {
-                messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('mangadex.newListError'.tr(context: context)),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-              }
+              await newList(result.$1, result.$2, []);
             }
           },
         )

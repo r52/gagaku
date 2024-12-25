@@ -37,10 +37,11 @@ class LocalConfig extends _$LocalConfig {
     return _fetch();
   }
 
-  void save(LocalLibConfig update) {
-    state = update;
-
+  @mutation
+  FutureOr<LocalLibConfig> save(LocalLibConfig update) async {
     final box = Hive.box(gagakuBox);
-    box.put('locallib', json.encode(state.toJson()));
+    box.put('locallib', json.encode(update.toJson()));
+
+    return update;
   }
 }

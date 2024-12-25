@@ -7,22 +7,25 @@ import 'package:gagaku/util/ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class MangaDexLoginWidget extends StatelessWidget {
+class MangaDexLoginWidget extends ConsumerWidget {
   const MangaDexLoginWidget({required this.builder, super.key});
 
   final Widget Function(BuildContext context) builder;
 
   @override
-  Widget build(BuildContext context) {
-    return DataProviderWhenWidget(
-      provider: authControlProvider,
-      builder: (context, loggedin) {
-        if (loggedin) {
-          return builder(context);
-        }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final meProvider = ref.watch(loggedUserProvider);
 
-        return Center(
+    return switch (meProvider) {
+      AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+          error: error,
+          stackTrace: stackTrace,
+          message: "loggedUserProvider failed",
+        ),
+      AsyncValue(hasValue: true, value: final me) when me != null => builder(context),
+      AsyncValue(hasValue: true, value: final me) when me == null => Center(
           child: ElevatedButton.icon(
             onPressed: () async {
               context.push(GagakuRoute.login);
@@ -32,12 +35,11 @@ class MangaDexLoginWidget extends StatelessWidget {
               Icons.https,
             ),
           ),
-        );
-      },
-      loadingWidget: const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+        ),
+      AsyncValue(:final progress) => Center(
+          child: CircularProgressIndicator(value: progress?.toDouble()),
+        ),
+    };
   }
 }
 
@@ -55,8 +57,24 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final passwordController = useTextEditingController();
     final clientIdController = useTextEditingController(text: clientId);
     final clientSecretController = useTextEditingController(text: clientSecret);
-    final pendingLogin = useState<Future<bool>?>(null);
-    final snapshot = useFuture(pendingLogin.value);
+
+    final login = ref.watch(authControlProvider.login);
+
+    ref.listen(authControlProvider.login, (_, login) {
+      if (login.state is ErrorMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('errors.loginFail'
+                  .tr(context: context, args: [(login.state as ErrorMutationState).error.toString()])),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+
+      return;
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -158,7 +176,11 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                               useListenableSelector(clientSecretController, () => clientSecretController.text.isEmpty);
 
                           return ElevatedButton(
-                            onPressed: (usernameIsEmpty || passwordIsEmpty || clientIdIsEmpty || clientSecretIsEmpty)
+                            onPressed: (usernameIsEmpty ||
+                                    passwordIsEmpty ||
+                                    clientIdIsEmpty ||
+                                    clientSecretIsEmpty ||
+                                    login.state is PendingMutationState)
                                 ? null
                                 : () async {
                                     final router = GoRouter.of(context);
@@ -168,30 +190,16 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                         passwordController.text.isNotEmpty &&
                                         clientIdController.text.isNotEmpty &&
                                         clientSecretController.text.isNotEmpty) {
-                                      final loginSuccess = ref.read(authControlProvider.notifier).login(
-                                          usernameController.text,
-                                          passwordController.text,
-                                          clientIdController.text,
-                                          clientSecretController.text);
+                                      final loginSuccess = login(usernameController.text, passwordController.text,
+                                          clientIdController.text, clientSecretController.text);
 
                                       loginSuccess.then((success) {
                                         if (!context.mounted) return;
                                         if (success) {
                                           router.pop();
                                           passwordController.clear();
-                                        } else {
-                                          messenger
-                                            ..removeCurrentSnackBar()
-                                            ..showSnackBar(
-                                              SnackBar(
-                                                content: Text('errors.loginFail'.tr(context: context)),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
                                         }
                                       });
-
-                                      pendingLogin.value = loginSuccess;
                                     } else {
                                       messenger
                                         ..removeCurrentSnackBar()
@@ -213,7 +221,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (snapshot.connectionState == ConnectionState.waiting) ...Styles.loadingOverlay
+          if (login.state is PendingMutationState) ...Styles.loadingOverlay
         ],
       ),
     );
