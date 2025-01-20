@@ -14,7 +14,7 @@ part 'directory_reader.g.dart';
 class DirectoryReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
   final String path;
   final String? title;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 
   DirectoryReaderRouteBuilder({
@@ -76,7 +76,7 @@ class DirectoryReaderWidget extends StatelessWidget {
 
   final String path;
   final String? title;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 
   @override
@@ -113,8 +113,8 @@ class DirectoryReaderWidget extends StatelessWidget {
           pages: pages,
           title: strtitle,
           longstrip: false,
-          link: link,
-          onLinkPressed: onLinkPressed,
+          drawerHeader: link,
+          onHeaderPressed: onLinkPressed,
         );
       },
       loadingWidget: Center(

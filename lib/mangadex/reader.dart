@@ -26,7 +26,7 @@ class ReaderData {
   final String title;
   final Chapter chapter;
   final Manga manga;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 }
 
@@ -114,10 +114,7 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
         chapter: data.chapter,
         manga: data.manga,
         title: data.title,
-        link: Text(
-          data.manga.attributes!.title.get('en'),
-          style: const TextStyle(fontSize: 18),
-        ),
+        link: data.manga.attributes!.title.get('en'),
         onLinkPressed: () async {
           getReadChapters([data.manga]);
           getRatings([data.manga]);
@@ -144,7 +141,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   final String title;
   final Chapter chapter;
   final Manga manga;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
   final String? backRoute;
 
@@ -188,8 +185,8 @@ class MangaDexReaderWidget extends HookConsumerWidget {
         title: title,
         subtitle: manga.attributes!.title.get('en'),
         longstrip: manga.longStrip,
-        link: link,
-        onLinkPressed: onLinkPressed,
+        drawerHeader: link,
+        onHeaderPressed: onLinkPressed,
         externalUrl: chapter.attributes.externalUrl,
         backRoute: backRoute,
       ),

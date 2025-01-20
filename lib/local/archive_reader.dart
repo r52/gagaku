@@ -14,7 +14,7 @@ part 'archive_reader.g.dart';
 class ArchiveReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
   final String path;
   final String? title;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 
   ArchiveReaderRouteBuilder({
@@ -108,7 +108,7 @@ class ArchiveReaderWidget extends StatelessWidget {
 
   final String path;
   final String? title;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 
   @override
@@ -143,8 +143,8 @@ class ArchiveReaderWidget extends StatelessWidget {
           pages: pages,
           title: strtitle,
           longstrip: false,
-          link: link,
-          onLinkPressed: onLinkPressed,
+          drawerHeader: link,
+          onHeaderPressed: onLinkPressed,
         );
       },
       loadingWidget: Center(

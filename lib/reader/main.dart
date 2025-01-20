@@ -33,8 +33,8 @@ class ReaderWidget extends HookConsumerWidget {
     required this.title,
     this.subtitle,
     this.longstrip = false,
-    this.link,
-    this.onLinkPressed,
+    this.drawerHeader,
+    this.onHeaderPressed,
     this.externalUrl,
     this.backRoute,
   });
@@ -43,8 +43,8 @@ class ReaderWidget extends HookConsumerWidget {
   final String title;
   final String? subtitle;
   final bool longstrip;
-  final Widget? link;
-  final VoidCallback? onLinkPressed;
+  final String? drawerHeader;
+  final VoidCallback? onHeaderPressed;
   final String? externalUrl;
 
   // Backup route for BackButton if nav stack cannot pop
@@ -455,231 +455,242 @@ class ReaderWidget extends HookConsumerWidget {
       endDrawer: Drawer(
         width: 320,
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            spacing: 10.0,
-            children: <Widget>[
-              const SizedBox.shrink(),
-              (link != null
-                  ? TextButton(
-                      onPressed: () {
-                        // First one pops the drawer
-                        if (context.canPop()) {
-                          context.pop();
-                        }
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              spacing: 10.0,
+              children: <Widget>[
+                if (onHeaderPressed != null && drawerHeader != null)
+                  TextButton(
+                    onPressed: () {
+                      // First one pops the drawer
+                      if (context.canPop()) {
+                        context.pop();
+                      }
 
-                        // Second one pops the reader
-                        if (context.canPop()) {
-                          context.pop();
-                        }
+                      // Second one pops the reader
+                      if (context.canPop()) {
+                        context.pop();
+                      }
 
-                        if (onLinkPressed != null) {
-                          onLinkPressed!();
-                        }
-                      },
-                      child: link!)
-                  : const SizedBox.shrink()),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 10.0,
-                children: [
-                  HookBuilder(
-                    builder: (_) {
-                      final value = useValueListenable(currentPage);
-                      return OutlinedButton(
-                        onPressed: (value > 0)
-                            ? () => jumpToPreviousPage(
-                                  currentPage,
-                                  format: format,
-                                  pageController: pageController,
-                                  listController: listController,
-                                  scrollController: scrollController,
-                                )
-                            : null,
-                        child: const Icon(Icons.arrow_back_ios_new),
-                      );
+                      onHeaderPressed!();
                     },
+                    child: Text(
+                      drawerHeader!,
+                      style: const TextStyle(fontSize: 18),
+                    ),
                   ),
-                  HookBuilder(
-                    builder: (_) {
-                      final value = useValueListenable(currentPage);
-                      return DropdownMenu<int>(
-                        initialSelection: value,
-                        width: 80.0,
-                        enableFilter: false,
-                        enableSearch: false,
-                        requestFocusOnTap: false,
-                        inputDecorationTheme: InputDecorationTheme(
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 2.0,
-                              color: theme.colorScheme.inversePrimary,
+                if (drawerHeader != null && onHeaderPressed == null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      drawerHeader!,
+                      style: theme.textTheme.labelLarge?.copyWith(fontSize: 18),
+                    ),
+                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10.0,
+                  children: [
+                    HookBuilder(
+                      builder: (_) {
+                        final value = useValueListenable(currentPage);
+                        return OutlinedButton(
+                          onPressed: (value > 0)
+                              ? () => jumpToPreviousPage(
+                                    currentPage,
+                                    format: format,
+                                    pageController: pageController,
+                                    listController: listController,
+                                    scrollController: scrollController,
+                                  )
+                              : null,
+                          child: const Icon(Icons.arrow_back_ios_new),
+                        );
+                      },
+                    ),
+                    HookBuilder(
+                      builder: (_) {
+                        final value = useValueListenable(currentPage);
+                        return DropdownMenu<int>(
+                          initialSelection: value,
+                          width: 80.0,
+                          enableFilter: false,
+                          enableSearch: false,
+                          requestFocusOnTap: false,
+                          inputDecorationTheme: InputDecorationTheme(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 2.0,
+                                color: theme.colorScheme.inversePrimary,
+                              ),
                             ),
                           ),
+                          onSelected: (int? index) {
+                            if (index != null) {
+                              jumpToPage(
+                                index,
+                                format: format,
+                                pageController: pageController,
+                                listController: listController,
+                                scrollController: scrollController,
+                              );
+                            }
+                          },
+                          dropdownMenuEntries: pageDropdownItems,
+                        );
+                      },
+                    ),
+                    HookBuilder(
+                      builder: (_) {
+                        final value = useValueListenable(currentPage);
+                        return OutlinedButton(
+                          onPressed: (value < pageCount - 1)
+                              ? () => jumpToNextPage(
+                                    currentPage,
+                                    format: format,
+                                    pageController: pageController,
+                                    listController: listController,
+                                    scrollController: scrollController,
+                                  )
+                              : null,
+                          child: const Icon(Icons.arrow_forward_ios),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const Divider(),
+                Text(
+                  'reader.settings'.tr(context: context),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  children: [
+                    for (final f in ReaderFormat.values)
+                      ChoiceChip(
+                        avatar: Icon(
+                          f.icon,
+                          color: theme.iconTheme.color,
                         ),
-                        onSelected: (int? index) {
-                          if (index != null) {
-                            jumpToPage(
-                              index,
-                              format: format,
-                              pageController: pageController,
-                              listController: listController,
-                              scrollController: scrollController,
-                            );
-                          }
+                        label: Text(context.tr(f.label)),
+                        selected: settings.format == f,
+                        onSelected: (longstrip)
+                            ? null
+                            : (value) {
+                                if (value) {
+                                  ref.read(readerSettingsProvider.save)(settings.copyWith(format: f));
+                                }
+                              },
+                      ),
+                  ],
+                ),
+                ActionChip(
+                  avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
+                  label: Text('reader.togglePageSize'.tr(context: context)),
+                  onPressed: (format == ReaderFormat.longstrip)
+                      ? () {
+                          longStripScale.value = toggleLongStripScale(longStripScale.value);
+                        }
+                      : () {
+                          scaleStateController[currentPage.value].scaleState =
+                              defaultScaleStateCycle(scaleStateController[currentPage.value].scaleState);
                         },
-                        dropdownMenuEntries: pageDropdownItems,
-                      );
-                    },
-                  ),
-                  HookBuilder(
-                    builder: (_) {
-                      final value = useValueListenable(currentPage);
-                      return OutlinedButton(
-                        onPressed: (value < pageCount - 1)
-                            ? () => jumpToNextPage(
-                                  currentPage,
-                                  format: format,
-                                  pageController: pageController,
-                                  listController: listController,
-                                  scrollController: scrollController,
-                                )
-                            : null,
-                        child: const Icon(Icons.arrow_forward_ios),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const Divider(),
-              Text(
-                'reader.settings'.tr(context: context),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  for (final f in ReaderFormat.values)
-                    ChoiceChip(
-                      avatar: Icon(
-                        f.icon,
-                        color: theme.iconTheme.color,
+                ),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  children: [
+                    for (final dir in ReaderDirection.values)
+                      ChoiceChip(
+                        avatar: Icon(
+                          dir.icon,
+                          color: theme.iconTheme.color,
+                        ),
+                        label: Text(context.tr(dir.label)),
+                        selected: settings.direction == dir,
+                        onSelected: (format == ReaderFormat.longstrip)
+                            ? null
+                            : (value) {
+                                if (value) {
+                                  ref.read(readerSettingsProvider.save)(settings.copyWith(direction: dir));
+                                }
+                              },
                       ),
-                      label: Text(context.tr(f.label)),
-                      selected: settings.format == f,
-                      onSelected: (longstrip)
-                          ? null
-                          : (value) {
-                              if (value) {
-                                ref.read(readerSettingsProvider.save)(settings.copyWith(format: f));
-                              }
-                            },
-                    ),
-                ],
-              ),
-              ActionChip(
-                avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
-                label: Text('reader.togglePageSize'.tr(context: context)),
-                onPressed: (format == ReaderFormat.longstrip)
-                    ? () {
-                        longStripScale.value = toggleLongStripScale(longStripScale.value);
-                      }
-                    : () {
-                        scaleStateController[currentPage.value].scaleState =
-                            defaultScaleStateCycle(scaleStateController[currentPage.value].scaleState);
-                      },
-              ),
-              Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  for (final dir in ReaderDirection.values)
-                    ChoiceChip(
-                      avatar: Icon(
-                        dir.icon,
-                        color: theme.iconTheme.color,
+                  ],
+                ),
+                ActionChip(
+                  avatar: Icon(
+                    settings.showProgressBar ? Icons.donut_small : Icons.donut_small_outlined,
+                    color: theme.iconTheme.color,
+                  ),
+                  label: Text('reader.progressBar'.tr(context: context)),
+                  onPressed: () {
+                    ref.read(readerSettingsProvider.save)(
+                        settings.copyWith(showProgressBar: !settings.showProgressBar));
+                  },
+                ),
+                ActionChip(
+                  avatar: Icon(
+                    Icons.swipe,
+                    color: settings.swipeGestures ? theme.iconTheme.color : theme.disabledColor,
+                  ),
+                  label: Text('reader.swipeGestures'.tr(context: context)),
+                  onPressed: (format == ReaderFormat.longstrip)
+                      ? null
+                      : () {
+                          ref.read(readerSettingsProvider.save)(
+                              settings.copyWith(swipeGestures: !settings.swipeGestures));
+                        },
+                ),
+                ActionChip(
+                  avatar: Icon(
+                    Icons.mouse,
+                    color: settings.clickToTurn ? theme.iconTheme.color : theme.disabledColor,
+                  ),
+                  label: Text('reader.clickToTurn'.tr(context: context)),
+                  onPressed: (format == ReaderFormat.longstrip)
+                      ? null
+                      : () {
+                          ref.read(readerSettingsProvider.save)(settings.copyWith(clickToTurn: !settings.clickToTurn));
+                        },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10.0,
+                  children: [
+                    Text('reader.precacheCount'.tr(context: context)),
+                    DropdownMenu<int>(
+                      initialSelection: settings.precacheCount,
+                      width: 160.0,
+                      enableFilter: false,
+                      enableSearch: false,
+                      requestFocusOnTap: false,
+                      inputDecorationTheme: InputDecorationTheme(
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            width: 2.0,
+                            color: theme.colorScheme.inversePrimary,
+                          ),
+                        ),
                       ),
-                      label: Text(context.tr(dir.label)),
-                      selected: settings.direction == dir,
-                      onSelected: (format == ReaderFormat.longstrip)
-                          ? null
-                          : (value) {
-                              if (value) {
-                                ref.read(readerSettingsProvider.save)(settings.copyWith(direction: dir));
-                              }
-                            },
-                    ),
-                ],
-              ),
-              ActionChip(
-                avatar: Icon(
-                  settings.showProgressBar ? Icons.donut_small : Icons.donut_small_outlined,
-                  color: theme.iconTheme.color,
-                ),
-                label: Text('reader.progressBar'.tr(context: context)),
-                onPressed: () {
-                  ref.read(readerSettingsProvider.save)(settings.copyWith(showProgressBar: !settings.showProgressBar));
-                },
-              ),
-              ActionChip(
-                avatar: Icon(
-                  Icons.swipe,
-                  color: settings.swipeGestures ? theme.iconTheme.color : theme.disabledColor,
-                ),
-                label: Text('reader.swipeGestures'.tr(context: context)),
-                onPressed: (format == ReaderFormat.longstrip)
-                    ? null
-                    : () {
-                        ref.read(readerSettingsProvider.save)(
-                            settings.copyWith(swipeGestures: !settings.swipeGestures));
+                      onSelected: (int? value) {
+                        if (value != null) {
+                          ref.read(readerSettingsProvider.save)(settings.copyWith(precacheCount: value));
+                        }
                       },
-              ),
-              ActionChip(
-                avatar: Icon(
-                  Icons.mouse,
-                  color: settings.clickToTurn ? theme.iconTheme.color : theme.disabledColor,
-                ),
-                label: Text('reader.clickToTurn'.tr(context: context)),
-                onPressed: (format == ReaderFormat.longstrip)
-                    ? null
-                    : () {
-                        ref.read(readerSettingsProvider.save)(settings.copyWith(clickToTurn: !settings.clickToTurn));
-                      },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 10.0,
-                children: [
-                  Text('reader.precacheCount'.tr(context: context)),
-                  DropdownMenu<int>(
-                    initialSelection: settings.precacheCount,
-                    width: 160.0,
-                    enableFilter: false,
-                    enableSearch: false,
-                    requestFocusOnTap: false,
-                    inputDecorationTheme: InputDecorationTheme(
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2.0,
-                          color: theme.colorScheme.inversePrimary,
+                      dropdownMenuEntries: List<DropdownMenuEntry<int>>.generate(
+                        10,
+                        (int index) => DropdownMenuEntry<int>(
+                          value: index + 1,
+                          label: (index + 1 > 9) ? 'Max (not recommended)' : (index + 1).toString(),
                         ),
                       ),
                     ),
-                    onSelected: (int? value) {
-                      if (value != null) {
-                        ref.read(readerSettingsProvider.save)(settings.copyWith(precacheCount: value));
-                      }
-                    },
-                    dropdownMenuEntries: List<DropdownMenuEntry<int>>.generate(
-                      10,
-                      (int index) => DropdownMenuEntry<int>(
-                        value: index + 1,
-                        label: (index + 1 > 9) ? 'Max (not recommended)' : (index + 1).toString(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

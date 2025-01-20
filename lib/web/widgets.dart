@@ -336,7 +336,7 @@ class GridMangaItem extends HookConsumerWidget {
               imageUrl: link.cover!,
               width: 256.0,
               progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                  const Center(child: CircularProgressIndicator()),
               errorWidget: (context, url, error) => const Icon(Icons.error),
               fit: BoxFit.cover,
             )

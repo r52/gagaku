@@ -236,7 +236,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   color: Colors.grey,
                   fit: BoxFit.cover,
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
@@ -460,10 +460,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   data: e,
                   manga: manga,
                   info: info,
-                  link: Text(
-                    manga.title,
-                    style: const TextStyle(fontSize: 24),
-                  ),
                 );
               },
               itemCount: manga.chapters.length,
@@ -481,14 +477,12 @@ class ChapterButtonWidget extends HookConsumerWidget {
     required this.data,
     required this.manga,
     required this.info,
-    this.link,
     this.onLinkPressed,
   });
 
   final ChapterEntry data;
   final WebManga manga;
   final SourceInfo info;
-  final Widget? link;
   final VoidCallback? onLinkPressed;
 
   @override
@@ -555,7 +549,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
             extra: WebReaderData(
               source: data.chapter.groups.entries.first.value,
               title: title,
-              link: link,
+              link: manga.title,
               info: info,
               readKey: name,
               onLinkPressed: onLinkPressed,

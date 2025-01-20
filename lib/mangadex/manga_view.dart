@@ -269,7 +269,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                         color: Colors.grey,
                         fit: BoxFit.cover,
                         progressIndicatorBuilder: (context, url, downloadProgress) =>
-                            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                            const Center(child: CircularProgressIndicator()),
                         errorWidget: (context, url, error) => const Icon(Icons.error),
                       ),
                       Align(
@@ -804,10 +804,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                                                   );
                                                                 },
                                                                 fit: BoxFit.contain,
-                                                                progressIndicatorBuilder:
-                                                                    (context, url, downloadProgress) => Center(
-                                                                        child: CircularProgressIndicator(
-                                                                            value: downloadProgress.progress)),
+                                                                progressIndicatorBuilder: (context, url,
+                                                                        downloadProgress) =>
+                                                                    const Center(child: CircularProgressIndicator()),
                                                                 errorWidget: (context, url, error) =>
                                                                     const Icon(Icons.error),
                                                               ),
@@ -975,10 +974,6 @@ class _ChapterListSliver extends HookConsumerWidget {
           key: ValueKey(thischap.id),
           chapter: thischap,
           manga: manga,
-          link: Text(
-            manga.attributes!.title.get('en'),
-            style: const TextStyle(fontSize: 24),
-          ),
         );
 
         if (chapid > 0) {
@@ -1057,8 +1052,7 @@ class _CoverArtItem extends HookWidget {
       child: CachedNetworkImage(
         imageUrl: url.quality(quality: CoverArtQuality.medium),
         width: 256.0,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+        progressIndicatorBuilder: (context, url, downloadProgress) => const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),
         fit: BoxFit.cover,
       ),

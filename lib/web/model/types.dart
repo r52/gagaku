@@ -21,7 +21,7 @@ class WebReaderData {
 
   final dynamic source;
   final String? title;
-  final Widget? link;
+  final String? link;
   final SourceInfo info;
   final String? readKey;
   final VoidCallback? onLinkPressed;

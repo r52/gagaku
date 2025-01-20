@@ -58,10 +58,7 @@ Future<WebReaderData> _fetchWebChapterInfo(Ref ref, SourceInfo info) async {
       return WebReaderData(
         source: chapter.groups.entries.first.value,
         title: chapter.getTitle(info.chapter!),
-        link: Text(
-          manga.title,
-          style: const TextStyle(fontSize: 24),
-        ),
+        link: manga.title,
         info: info,
         readKey: info.chapter,
       );
@@ -201,7 +198,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
   final dynamic source;
   final String? title;
-  final Widget? link;
+  final String? link;
   final SourceInfo info;
   final String? readKey;
   final VoidCallback? onLinkPressed;
@@ -250,8 +247,8 @@ class WebSourceReaderWidget extends HookConsumerWidget {
         pages: pages,
         title: name,
         longstrip: false,
-        link: link,
-        onLinkPressed: onLinkPressed,
+        drawerHeader: link,
+        onHeaderPressed: onLinkPressed,
         backRoute: backRoute,
       ),
     );

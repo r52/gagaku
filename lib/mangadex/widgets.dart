@@ -190,7 +190,11 @@ class MangaDexSliverAppBar extends StatelessWidget {
 }
 
 class MarkReadButton extends ConsumerWidget {
-  const MarkReadButton({super.key, required this.chapter, required this.manga});
+  const MarkReadButton({
+    super.key,
+    required this.chapter,
+    required this.manga,
+  });
 
   final Chapter chapter;
   final Manga manga;
@@ -341,52 +345,69 @@ class ChapterFeedWidget extends HookConsumerWidget {
   }
 }
 
-class ChapterFeedItem extends HookConsumerWidget {
-  const ChapterFeedItem({super.key, required this.state});
+class _CoverButton extends ConsumerWidget {
+  const _CoverButton({
+    super.key,
+    required this.manga,
+  });
 
-  final ChapterFeedItemData state;
+  final Manga manga;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
+
+    return TextButton(
+      onPressed: () async {
+        getReadChapters([manga]);
+        getRatings([manga]);
+        getStats([manga]);
+        context.push('/title/${manga.id}', extra: manga);
+      },
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      ),
+      child: CachedNetworkImage(
+        imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.small),
+        imageBuilder: (context, imageProvider) => DecoratedBox(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: imageProvider,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          ),
+        ),
+        width: screenSizeSmall ? 64.0 : 128.0,
+        height: screenSizeSmall ? 91.0 : 182.0,
+        progressIndicatorBuilder: (context, url, downloadProgress) => const Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+}
+
+class _MangaTitle extends ConsumerWidget {
+  final Manga manga;
+
+  const _MangaTitle({
+    super.key,
+    required this.manga,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
     final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
     final getRatings = ref.watch(ratingsProvider(me?.id).get);
     final getStats = ref.watch(statisticsProvider.get);
 
-    final listsliver = SliverList.separated(
-      findChildIndexCallback: (key) {
-        final valueKey = key as ValueKey<String>;
-        final val = state.chapters.indexWhere((i) => i.id == valueKey.value);
-        return val >= 0 ? val : null;
-      },
-      itemBuilder: (context, index) {
-        final e = state.chapters.elementAt(index);
-        return ChapterButtonWidget(
-          key: ValueKey(e.id),
-          chapter: e,
-          manga: state.manga,
-          link: Text(
-            state.manga.attributes!.title.get('en'),
-            style: const TextStyle(fontSize: 18),
-          ),
-          onLinkPressed: () async {
-            getReadChapters([state.manga]);
-            getRatings([state.manga]);
-            getStats([state.manga]);
-            context.push('/title/${state.manga.id}', extra: state.manga);
-          },
-        );
-      },
-      separatorBuilder: (context, index) => const SizedBox(
-        height: 4,
-      ),
-      itemCount: state.chapters.length,
-    );
-
-    final titleBtn = TextButton.icon(
+    return TextButton.icon(
       style: TextButton.styleFrom(
         alignment: Alignment.centerLeft,
         minimumSize: const Size(0.0, 24.0),
@@ -396,48 +417,67 @@ class ChapterFeedItem extends HookConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
-        getReadChapters([state.manga]);
-        getRatings([state.manga]);
-        getStats([state.manga]);
-        context.push('/title/${state.manga.id}', extra: state.manga);
+        getReadChapters([manga]);
+        getRatings([manga]);
+        getStats([manga]);
+        context.push('/title/${manga.id}', extra: manga);
       },
       icon: CountryFlag(
-        key: ValueKey('CountryFlag(${state.manga.attributes!.originalLanguage.code})'),
-        flag: state.manga.attributes!.originalLanguage.flag,
+        key: ValueKey('CountryFlag(${manga.attributes!.originalLanguage.code})'),
+        flag: manga.attributes!.originalLanguage.flag,
       ),
       label: Text(
-        state.manga.attributes!.title.get('en'),
+        manga.attributes!.title.get('en'),
         overflow: TextOverflow.ellipsis,
       ),
     );
+  }
+}
 
-    final coverBtn = InkWell(
-      onTap: () async {
-        getReadChapters([state.manga]);
-        getRatings([state.manga]);
-        getStats([state.manga]);
-        context.push('/title/${state.manga.id}', extra: state.manga);
+class _BackLinkedChapterButton extends ConsumerWidget {
+  const _BackLinkedChapterButton({super.key, required this.chapter, required this.manga});
+
+  final Chapter chapter;
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(loggedUserProvider).value;
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
+
+    return ChapterButtonWidget(
+      chapter: chapter,
+      manga: manga,
+      onLinkPressed: () async {
+        getReadChapters([manga]);
+        getRatings([manga]);
+        getStats([manga]);
+        context.push('/title/${manga.id}', extra: manga);
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-        child: CachedNetworkImage(
-          imageUrl: state.coverArt,
-          imageBuilder: (context, imageProvider) => Ink(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: imageProvider,
-              ),
-              borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-            ),
-          ),
-          width: screenSizeSmall ? 64.0 : 128.0,
-          height: screenSizeSmall ? 91.0 : 182.0,
-          progressIndicatorBuilder: (context, url, downloadProgress) =>
-              Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-          fit: BoxFit.cover,
-        ),
-      ),
+    );
+  }
+}
+
+class ChapterFeedItem extends HookWidget {
+  const ChapterFeedItem({super.key, required this.state});
+
+  final ChapterFeedItemData state;
+
+  @override
+  Widget build(BuildContext context) {
+    useAutomaticKeepAlive();
+    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+
+    final titleBtn = _MangaTitle(
+      key: ValueKey('_MangaTitle(${state.manga.id})'),
+      manga: state.manga,
+    );
+
+    final coverBtn = _CoverButton(
+      key: ValueKey('_CoverButton(${state.manga.id})'),
+      manga: state.manga,
     );
 
     return Card(
@@ -454,10 +494,16 @@ class ChapterFeedItem extends HookConsumerWidget {
                     children: [
                       coverBtn,
                       Expanded(
-                        child: CustomScrollView(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          slivers: [listsliver],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 4.0,
+                          children: state.chapters
+                              .map((e) => _BackLinkedChapterButton(
+                                    key: ValueKey(e.id),
+                                    chapter: e,
+                                    manga: state.manga,
+                                  ))
+                              .toList(),
                         ),
                       ),
                     ],
@@ -469,17 +515,17 @@ class ChapterFeedItem extends HookConsumerWidget {
                 children: [
                   coverBtn,
                   Expanded(
-                    child: CustomScrollView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      slivers: [
-                        SliverList.list(
-                          children: [
-                            titleBtn,
-                            const Divider(height: 10.0),
-                          ],
-                        ),
-                        listsliver,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4.0,
+                      children: [
+                        titleBtn,
+                        const Divider(height: 10.0),
+                        ...state.chapters.map((e) => _BackLinkedChapterButton(
+                              key: ValueKey(e.id),
+                              chapter: e,
+                              manga: state.manga,
+                            )),
                       ],
                     ),
                   )
@@ -490,18 +536,66 @@ class ChapterFeedItem extends HookConsumerWidget {
   }
 }
 
+class _ChapterButtonCard extends ConsumerWidget {
+  final Chapter chapter;
+  final Manga manga;
+  final Widget child;
+
+  const _ChapterButtonCard({
+    super.key,
+    required this.chapter,
+    required this.manga,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final theme = Theme.of(context);
+    final tileColor = theme.colorScheme.primaryContainer;
+    final me = ref.watch(loggedUserProvider).value;
+
+    Border border;
+
+    if (me == null) {
+      border = Border(
+        left: BorderSide(color: tileColor, width: 4.0),
+      );
+    } else {
+      bool? isRead = ref.watch(readChaptersProvider(me.id).select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
+          _ => null,
+        },
+      ));
+
+      border = Border(
+        left: BorderSide(color: isRead == true ? tileColor : Colors.blue, width: 4.0),
+      );
+    }
+
+    return Ink(
+      padding: EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 6.0 : 10.0), vertical: 4.0),
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        color: tileColor,
+        border: border,
+      ),
+      child: child,
+    );
+  }
+}
+
 class ChapterButtonWidget extends HookWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
     required this.manga,
-    this.link,
     this.onLinkPressed,
   });
 
   final Chapter chapter;
   final Manga manga;
-  final Widget? link;
   final VoidCallback? onLinkPressed;
 
   @override
@@ -688,47 +782,16 @@ class ChapterButtonWidget extends HookWidget {
             title: chapter.title,
             chapter: chapter,
             manga: manga,
-            link: link,
+            link: manga.attributes!.title.get('en'),
             onLinkPressed: onLinkPressed,
           ),
         );
       },
-      child: Consumer(
+      child: _ChapterButtonCard(
+        key: ValueKey('_ChapterButtonCard(${chapter.id})'),
+        manga: manga,
+        chapter: chapter,
         child: tile,
-        builder: (context, ref, child) {
-          final theme = Theme.of(context);
-          final tileColor = theme.colorScheme.primaryContainer;
-          final me = ref.watch(loggedUserProvider).value;
-
-          Border border;
-
-          if (me == null) {
-            border = Border(
-              left: BorderSide(color: tileColor, width: 4.0),
-            );
-          } else {
-            bool? isRead = ref.watch(readChaptersProvider(me.id).select(
-              (value) => switch (value) {
-                AsyncValue(value: final data?) => data[manga.id]?.contains(chapter.id) == true,
-                _ => null,
-              },
-            ));
-
-            border = Border(
-              left: BorderSide(color: isRead == true ? tileColor : Colors.blue, width: 4.0),
-            );
-          }
-
-          return Ink(
-            padding: EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 6.0 : 10.0), vertical: 4.0),
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(4)),
-              color: tileColor,
-              border: border,
-            ),
-            child: child,
-          );
-        },
       ),
     );
   }
@@ -952,8 +1015,7 @@ class GridMangaItem extends HookConsumerWidget {
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
         width: 256.0,
         fit: BoxFit.cover,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+        progressIndicatorBuilder: (context, url, downloadProgress) => const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
@@ -1063,10 +1125,10 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                       context.push('/title/${manga.id}', extra: manga);
                     },
                     child: CachedNetworkImage(
-                      imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+                      imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.small),
                       width: screenSizeSmall ? 80.0 : 128.0,
                       progressIndicatorBuilder: (context, url, downloadProgress) =>
-                          Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                          const Center(child: CircularProgressIndicator()),
                       errorWidget: (context, url, error) => const Icon(Icons.error),
                       fit: BoxFit.cover,
                     ),
@@ -1138,10 +1200,10 @@ class _ListMangaItem extends HookConsumerWidget {
                 context.push('/title/${manga.id}', extra: manga);
               },
               child: CachedNetworkImage(
-                imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+                imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.small),
                 width: 80.0,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 fit: BoxFit.cover,
               ),
@@ -1355,40 +1417,34 @@ class _GroupRow extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final pubIcon = screenSizeSmall ? _circleIconS : _circleIconB;
     final isOfficialPub = chapter.attributes.externalUrl != null;
 
-    final groupChips = useMemoized(() {
-      final chips = <Widget>[];
+    final chips = <Widget>[];
 
-      for (final g in chapter.groups) {
-        chips.add(Flexible(
-            child: IconTextChip(
-          key: ValueKey(g.id),
-          icon: isOfficialPub ? pubIcon : null,
-          text: g.attributes.name,
-          onPressed: () {
-            context.push('/group/${g.id}', extra: g);
-          },
-        )));
-      }
+    for (final g in chapter.groups) {
+      chips.add(Flexible(
+          child: IconTextChip(
+        key: ValueKey(g.id),
+        icon: isOfficialPub ? _circleIconB : null,
+        text: g.attributes.name,
+        onPressed: () {
+          context.push('/group/${g.id}', extra: g);
+        },
+      )));
+    }
 
-      if (chips.isEmpty) {
-        chips.add(Flexible(
-            child: IconTextChip(
-          key: const ValueKey('nogroup'),
-          text: 'No Group',
-        )));
-      }
-
-      return chips;
-    }, [chapter, screenSizeSmall]);
+    if (chips.isEmpty) {
+      chips.add(Flexible(
+          child: IconTextChip(
+        key: const ValueKey('nogroup'),
+        text: 'No Group',
+      )));
+    }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 6.0,
-      children: groupChips,
+      children: chips,
     );
   }
 }

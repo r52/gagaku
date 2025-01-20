@@ -939,7 +939,6 @@ class ChapterFeedItemData {
   final Manga manga;
 
   String get mangaId => manga.id;
-  String get coverArt => manga.getFirstCoverUrl(quality: CoverArtQuality.medium);
   late final id = generateKey();
 
   final List<Chapter> chapters = [];
