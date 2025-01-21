@@ -1,7 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,7 +23,7 @@ class RepoListManager extends HookConsumerWidget {
         flexibleSpace: const TitleFlexBar(title: 'Repo List'),
         actions: [
           IconButton(
-            tooltip: 'Add New Repo',
+            tooltip: 'webSources.repo.newRepo'.tr(context: context),
             onPressed: () async {
               final result = await showDialog<String>(
                   context: context,
@@ -37,9 +38,9 @@ class RepoListManager extends HookConsumerWidget {
             icon: const Icon(Icons.add),
           ),
           IconButton(
-            tooltip: 'Save',
+            tooltip: 'ui.save'.tr(context: context),
             onPressed: () {
-              ref.read(webConfigProvider.notifier).saveWith(repoList: list.value);
+              ref.read(webConfigProvider.saveWith)(repoList: list.value);
               nav.pop();
             },
             icon: const Icon(Icons.save),
@@ -48,7 +49,7 @@ class RepoListManager extends HookConsumerWidget {
       ),
       body: Center(
         child: list.value.isEmpty
-            ? const Text('No repos')
+            ? Text('errors.norepos'.tr(context: context))
             : ListView.builder(
                 itemCount: list.value.length,
                 itemBuilder: (context, index) {
@@ -60,7 +61,7 @@ class RepoListManager extends HookConsumerWidget {
                       trailing: OverflowBar(
                         children: [
                           IconButton(
-                            tooltip: 'View in browser',
+                            tooltip: 'webSources.repo.browser'.tr(context: context),
                             onPressed: () async {
                               if (!await launchUrl(Uri.parse(item))) {
                                 throw 'Could not launch $item';
@@ -69,7 +70,7 @@ class RepoListManager extends HookConsumerWidget {
                             icon: const Icon(Icons.open_in_new),
                           ),
                           IconButton(
-                            tooltip: 'Delete',
+                            tooltip: 'ui.delete'.tr(context: context),
                             onPressed: () {
                               list.value.remove(item);
                               list.value = [...list.value];
@@ -95,28 +96,28 @@ class NewRepoDialog extends HookWidget {
     final urlFieldController = useTextEditingController();
 
     return AlertDialog(
-      title: const Text('Add Repo'),
+      title: Text('webSources.repo.add'.tr(context: context)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Ensure that you are only adding trusted sources!'),
+          Text('webSources.repo.addWarning'.tr(context: context)),
           TextFormField(
             controller: urlFieldController,
-            decoration: const InputDecoration(hintText: '.json repo URL'),
+            decoration: InputDecoration(hintText: 'webSources.repo.urlHint'.tr(context: context)),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (String? value) {
-              if (value == null || value.isEmpty) return 'URL cannot be empty.';
+              if (value == null || value.isEmpty) return 'webSources.repo.urlEmptyWarning'.tr(context: context);
 
               return value.startsWith(_urlStartValidation) && value.endsWith(_urlEndValidation)
                   ? null
-                  : 'URL must be a .json file.';
+                  : 'webSources.repo.urlInvalidWarning'.tr(context: context);
             },
           )
         ],
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('Paste from Clipboard'),
+          child: Text('ui.pasteClipboard'.tr(context: context)),
           onPressed: () async {
             var result = await Clipboard.getData('text/plain');
             if (result != null) {
@@ -125,7 +126,7 @@ class NewRepoDialog extends HookWidget {
           },
         ),
         TextButton(
-          child: const Text('CANCEL'),
+          child: Text('ui.cancel'.tr(context: context)),
           onPressed: () {
             Navigator.of(context).pop();
             urlFieldController.clear();
@@ -146,7 +147,7 @@ class NewRepoDialog extends HookWidget {
                       urlFieldController.clear();
                     }
                   : null,
-              child: const Text('Add'),
+              child: Text('ui.add'.tr(context: context)),
             );
           },
         ),

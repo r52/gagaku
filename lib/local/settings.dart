@@ -1,8 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/local/config.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/local/model/config.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -20,21 +21,23 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
     final cfg = ref.watch(localConfigProvider);
     final config = useState(cfg);
 
+    final saveSettings = 'saveSettings'.tr(context: context);
+
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text('Library Settings'),
+        title: Text('arg_settings'.tr(context: context, args: ['library'.tr(context: context)])),
         actions: [
           OverflowBar(
             spacing: 8.0,
             children: [
               Tooltip(
-                message: 'Save Settings',
+                message: saveSettings,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.save),
-                  label: const Text('Save Settings'),
+                  label: Text(saveSettings),
                   onPressed: () {
-                    ref.read(localConfigProvider.notifier).save(config.value);
+                    ref.read(localConfigProvider.save)(config.value);
                     nav.pop();
                   },
                 ),
@@ -48,23 +51,21 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
-              title: const Text(
-                'Manga Library Path',
+              title: Text(
+                'localLibrary.settings.libraryPath'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Text('Choose where to search for your manga library'),
+              subtitle: Text('localLibrary.settings.libraryPathDesc'.tr(context: context)),
               builder: (context) {
                 return Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10.0,
                     children: [
                       Text(config.value.libraryDirectory),
-                      const SizedBox(
-                        width: 10,
-                      ),
                       ElevatedButton.icon(
                         onPressed: () async {
                           final perms = await Permission.manageExternalStorage.request();
@@ -78,7 +79,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                           }
                         },
                         icon: const Icon(Icons.folder_open),
-                        label: const Text('Browse'),
+                        label: Text('ui.browse'.tr(context: context)),
                       ),
                     ],
                   ),

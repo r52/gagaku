@@ -6,19 +6,17 @@ part of 'group_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchGroupFromIdRef = Ref<AsyncValue<Group>>;
-
 @ProviderFor(_fetchGroupFromId)
 const _fetchGroupFromIdProvider = _FetchGroupFromIdFamily._();
 
 final class _FetchGroupFromIdProvider
     extends $FunctionalProvider<AsyncValue<Group>, FutureOr<Group>>
-    with $FutureModifier<Group>, $FutureProvider<Group, _FetchGroupFromIdRef> {
+    with $FutureModifier<Group>, $FutureProvider<Group> {
   const _FetchGroupFromIdProvider._(
       {required _FetchGroupFromIdFamily super.from,
       required String super.argument,
       FutureOr<Group> Function(
-        _FetchGroupFromIdRef ref,
+        Ref ref,
         String groupId,
       )? create})
       : _createCb = create,
@@ -31,7 +29,7 @@ final class _FetchGroupFromIdProvider
         );
 
   final FutureOr<Group> Function(
-    _FetchGroupFromIdRef ref,
+    Ref ref,
     String groupId,
   )? _createCb;
 
@@ -53,7 +51,7 @@ final class _FetchGroupFromIdProvider
   @override
   _FetchGroupFromIdProvider $copyWithCreate(
     FutureOr<Group> Function(
-      _FetchGroupFromIdRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchGroupFromIdProvider._(
@@ -67,7 +65,7 @@ final class _FetchGroupFromIdProvider
   }
 
   @override
-  FutureOr<Group> create(_FetchGroupFromIdRef ref) {
+  FutureOr<Group> create(Ref ref) {
     final _$cb = _createCb ?? _fetchGroupFromId;
     final argument = this.argument as String;
     return _$cb(
@@ -87,7 +85,7 @@ final class _FetchGroupFromIdProvider
   }
 }
 
-String _$fetchGroupFromIdHash() => r'e3d4cc80e72975244b843d666e4bc7876ba2132c';
+String _$fetchGroupFromIdHash() => r'a2edf2a8397c422faa6458d9bf2a3ae6bb7ba27d';
 
 final class _FetchGroupFromIdFamily extends Family {
   const _FetchGroupFromIdFamily._()
@@ -113,7 +111,7 @@ final class _FetchGroupFromIdFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<Group> Function(
-      _FetchGroupFromIdRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -132,8 +130,6 @@ final class _FetchGroupFromIdFamily extends Family {
   }
 }
 
-typedef _FetchGroupFeedRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
-
 @ProviderFor(_fetchGroupFeed)
 const _fetchGroupFeedProvider = _FetchGroupFeedFamily._();
 
@@ -142,17 +138,17 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
         FutureOr<List<ChapterFeedItemData>>>
     with
         $FutureModifier<List<ChapterFeedItemData>>,
-        $FutureProvider<List<ChapterFeedItemData>, _FetchGroupFeedRef> {
+        $FutureProvider<List<ChapterFeedItemData>> {
   const _FetchGroupFeedProvider._(
       {required _FetchGroupFeedFamily super.from,
       required Group super.argument,
       FutureOr<List<ChapterFeedItemData>> Function(
-        _FetchGroupFeedRef ref,
+        Ref ref,
         Group group,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -160,7 +156,7 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ChapterFeedItemData>> Function(
-    _FetchGroupFeedRef ref,
+    Ref ref,
     Group group,
   )? _createCb;
 
@@ -183,7 +179,7 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
   @override
   _FetchGroupFeedProvider $copyWithCreate(
     FutureOr<List<ChapterFeedItemData>> Function(
-      _FetchGroupFeedRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchGroupFeedProvider._(
@@ -197,7 +193,7 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<ChapterFeedItemData>> create(_FetchGroupFeedRef ref) {
+  FutureOr<List<ChapterFeedItemData>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchGroupFeed;
     final argument = this.argument as Group;
     return _$cb(
@@ -217,12 +213,12 @@ final class _FetchGroupFeedProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchGroupFeedHash() => r'7c30d812393caeb6cd791886a37a318e16b5578f';
+String _$fetchGroupFeedHash() => r'681aa76684c27e291675cae6deee7a3bf5a6ec6d';
 
 final class _FetchGroupFeedFamily extends Family {
   const _FetchGroupFeedFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupFeedProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -243,7 +239,7 @@ final class _FetchGroupFeedFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<ChapterFeedItemData>> Function(
-      _FetchGroupFeedRef ref,
+      Ref ref,
       Group args,
     ) create,
   ) {
@@ -262,26 +258,22 @@ final class _FetchGroupFeedFamily extends Family {
   }
 }
 
-typedef _FetchGroupTitlesRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_fetchGroupTitles)
 const _fetchGroupTitlesProvider = _FetchGroupTitlesFamily._();
 
 final class _FetchGroupTitlesProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _FetchGroupTitlesRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _FetchGroupTitlesProvider._(
       {required _FetchGroupTitlesFamily super.from,
       required Group super.argument,
       FutureOr<List<Manga>> Function(
-        _FetchGroupTitlesRef ref,
+        Ref ref,
         Group group,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupTitlesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -289,7 +281,7 @@ final class _FetchGroupTitlesProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _FetchGroupTitlesRef ref,
+    Ref ref,
     Group group,
   )? _createCb;
 
@@ -312,7 +304,7 @@ final class _FetchGroupTitlesProvider
   @override
   _FetchGroupTitlesProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _FetchGroupTitlesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchGroupTitlesProvider._(
@@ -326,7 +318,7 @@ final class _FetchGroupTitlesProvider
   }
 
   @override
-  FutureOr<List<Manga>> create(_FetchGroupTitlesRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchGroupTitles;
     final argument = this.argument as Group;
     return _$cb(
@@ -346,12 +338,12 @@ final class _FetchGroupTitlesProvider
   }
 }
 
-String _$fetchGroupTitlesHash() => r'43e6496cadc600b08ee40a83485d2d6fe93cc4dd';
+String _$fetchGroupTitlesHash() => r'e9a011eafdbef0469f5f18d2d7e4a5c52cff881a';
 
 final class _FetchGroupTitlesFamily extends Family {
   const _FetchGroupTitlesFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchGroupTitlesProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -372,7 +364,7 @@ final class _FetchGroupTitlesFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<Manga>> Function(
-      _FetchGroupTitlesRef ref,
+      Ref ref,
       Group args,
     ) create,
   ) {
@@ -391,4 +383,4 @@ final class _FetchGroupTitlesFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,17 +1,18 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/mangadex/config.dart';
-import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/mangadex/types.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/mangadex/model/config.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/mangadex/model/types.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings.g.dart';
 
 @riverpod
-Future<Set<Group>> _fetchGroupData(_FetchGroupDataRef ref, Iterable<String> uuids) async {
+Future<Set<Group>> _fetchGroupData(Ref ref, Iterable<String> uuids) async {
   final api = ref.watch(mangadexProvider);
   final groups = await api.fetchGroups(uuids);
   return groups.toSet();
@@ -32,18 +33,18 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MangaDex Settings'),
+        title: Text('arg_settings'.tr(context: context, args: ['MangaDex'])),
         actions: [
           OverflowBar(
             spacing: 8.0,
             children: [
               Tooltip(
-                message: 'Save Settings',
+                message: 'saveSettings'.tr(context: context),
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.save),
-                  label: const Text('Save Settings'),
+                  label: Text('saveSettings'.tr(context: context)),
                   onPressed: () {
-                    ref.read(mdConfigProvider.notifier).save(config.value);
+                    ref.read(mdConfigProvider.save)(config.value);
                     nav.pop();
                   },
                 ),
@@ -57,14 +58,14 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
-              title: const Text(
-                'Chapter Language Filter',
+              title: Text(
+                'mangadex.settings.translatedLanguages'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Text('Show only chapters from these languages.'),
+              subtitle: Text('mangadex.settings.translatedLanguagesDesc'.tr(context: context)),
               builder: (context) {
                 return Center(
                   child: MenuAnchor(
@@ -95,7 +96,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           final lang = Languages.languages.elementAt(index);
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(lang.label),
+                            title: Text(context.tr(lang.label)),
                             secondary: CountryFlag(
                               flag: lang.flag,
                               size: 15,
@@ -130,7 +131,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                                           config.value.translatedLanguages.where((element) => element != lang).toSet());
                                 },
                                 icon: const Icon(Icons.close),
-                                label: Text(lang.label),
+                                label: Text(context.tr(lang.label)),
                               ),
                           ],
                         ),
@@ -142,15 +143,14 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Original Language Filter',
+              title: Text(
+                'mangadex.settings.originalLanguage'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Text(
-                  'Only show titles originally published in these languages. If no languages are selected, no filter will be applied.'),
+              subtitle: Text('mangadex.settings.originalLanguageDesc'.tr(context: context)),
               builder: (context) {
                 return Center(
                   child: MenuAnchor(
@@ -181,7 +181,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           final lang = Languages.languages.elementAt(index);
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(lang.label),
+                            title: Text(context.tr(lang.label)),
                             secondary: CountryFlag(
                               flag: lang.flag,
                               size: 15,
@@ -216,7 +216,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                                           config.value.originalLanguage.where((element) => element != lang).toSet());
                                 },
                                 icon: const Icon(Icons.close),
-                                label: Text(lang.label),
+                                label: Text(context.tr(lang.label)),
                               ),
                           ],
                         ),
@@ -228,8 +228,8 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Content Filter',
+              title: Text(
+                'mangadex.settings.contentRating'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -265,7 +265,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           final content = ContentRating.values.elementAt(index);
                           return CheckboxListTile(
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(content.label),
+                            title: Text(context.tr(content.label)),
                             value: config.value.contentRating.contains(content),
                             onChanged: (bool? value) async {
                               if (value == true) {
@@ -296,7 +296,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                                           config.value.contentRating.where((element) => element != content).toSet());
                                 },
                                 icon: const Icon(Icons.close),
-                                label: Text(content.label),
+                                label: Text(context.tr(content.label)),
                               ),
                           ],
                         ),
@@ -308,8 +308,8 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Data Saver',
+              title: Text(
+                'mangadex.settings.dataSaver'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -320,22 +320,22 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Off'),
+                      Text('ui.off'.tr(context: context)),
                       Switch(
                         value: config.value.dataSaver,
                         onChanged: (value) {
                           config.value = config.value.copyWith(dataSaver: value);
                         },
                       ),
-                      const Text('On'),
+                      Text('ui.on'.tr(context: context)),
                     ],
                   ),
                 );
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Blocked Groups',
+              title: Text(
+                'mangadex.settings.groupBlacklist'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -343,11 +343,11 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               ),
               builder: (context) {
                 if (config.value.groupBlacklist.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Wrap(
                       children: [
                         InputChip(
-                          label: Text('None'),
+                          label: Text('ui.none'.tr(context: context)),
                         ),
                       ],
                     ),
@@ -374,8 +374,6 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                     final messenger = ScaffoldMessenger.of(context);
                     Styles.showErrorSnackBar(messenger, '$error');
                     logger.e("_fetchGroupDataProvider failed", error: error, stackTrace: stackTrace);
-
-                    final children = <Widget>[];
 
                     for (final group in config.value.groupBlacklist) {
                       children.add(InputChip(

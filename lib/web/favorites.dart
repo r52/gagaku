@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -17,6 +19,7 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final cfg = ref.watch(webConfigProvider);
     final tabController = useTabController(initialLength: cfg.categories.length, keys: [cfg]);
 
@@ -52,14 +55,14 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
                       ));
 
                       if (items.isEmpty) {
-                        return const Center(
-                          child: Text('No items'),
+                        return Center(
+                          child: Text('errors.noitems'.tr(context: context)),
                         );
                       }
 
                       return WebMangaListWidget(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        controller: controller,
+                        controller: scrollController,
                         children: [
                           WebMangaListViewSliver(
                             items: items,

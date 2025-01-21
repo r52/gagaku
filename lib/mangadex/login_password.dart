@@ -1,49 +1,45 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/model.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 class MangaDexLoginWidget extends ConsumerWidget {
   const MangaDexLoginWidget({required this.builder, super.key});
 
-  final Widget Function(BuildContext context, WidgetRef ref) builder;
+  final Widget Function(BuildContext context) builder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authControlProvider);
+    final meProvider = ref.watch(loggedUserProvider);
 
-    switch (auth) {
-      case AsyncValue(value: final loggedin?):
-        if (loggedin) {
-          return builder(context, ref);
-        }
-
-        return Center(
+    return switch (meProvider) {
+      AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+          error: error,
+          stackTrace: stackTrace,
+          message: "loggedUserProvider failed",
+        ),
+      AsyncValue(hasValue: true, value: final me) when me != null => builder(context),
+      AsyncValue(hasValue: true, value: final me) when me == null => Center(
           child: ElevatedButton.icon(
             onPressed: () async {
               context.push(GagakuRoute.login);
             },
-            label: const Text('Login to MangaDex'),
+            label: Text('mangadex.login'.tr(context: context)),
             icon: const Icon(
               Icons.https,
             ),
           ),
-        );
-      case AsyncValue(:final error?, :final stackTrace?):
-        return ErrorColumn(
-          error: error,
-          stackTrace: stackTrace,
-          message: "authControlProvider failed",
-        );
-      case _:
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-    }
+        ),
+      AsyncValue(:final progress) => Center(
+          child: CircularProgressIndicator(value: progress?.toDouble()),
+        ),
+    };
   }
 }
 
@@ -61,13 +57,29 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final passwordController = useTextEditingController();
     final clientIdController = useTextEditingController(text: clientId);
     final clientSecretController = useTextEditingController(text: clientSecret);
-    final pendingLogin = useState<Future<bool>?>(null);
-    final snapshot = useFuture(pendingLogin.value);
+
+    final login = ref.watch(authControlProvider.login);
+
+    ref.listen(authControlProvider.login, (_, login) {
+      if (login.state is ErrorMutationState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('errors.loginFail'
+                  .tr(context: context, args: [(login.state as ErrorMutationState).error.toString()])),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+
+      return;
+    });
 
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text('Login to MangaDex'),
+        title: Text('mangadex.login'.tr(context: context)),
       ),
       body: Stack(
         children: [
@@ -78,63 +90,61 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                 const SizedBox(height: 200.0),
                 AutofillGroup(
                   child: Column(
+                    spacing: 12.0,
                     children: [
                       TextFormField(
                         controller: usernameController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Username',
+                          labelText: 'auth.username'.tr(context: context),
                         ),
                         autofillHints: const [AutofillHints.username],
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           return (value == null || value.isEmpty)
-                              ? 'Username cannot be empty.'
+                              ? 'auth.usernameEmptyWarning'.tr(context: context)
                               : null;
                         },
                       ),
-                      const SizedBox(height: 12.0),
                       TextFormField(
                         controller: passwordController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Password',
+                          labelText: 'auth.password'.tr(context: context),
                         ),
                         obscureText: true,
                         autofillHints: const [AutofillHints.password],
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           return (value == null || value.isEmpty)
-                              ? 'Password cannot be empty.'
+                              ? 'auth.passwordEmptyWarning'.tr(context: context)
                               : null;
                         },
                       ),
-                      const SizedBox(height: 12.0),
                       TextFormField(
                         controller: clientIdController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Client ID',
+                          labelText: 'auth.clientId'.tr(context: context),
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           return (value == null || value.isEmpty)
-                              ? 'Client ID cannot be empty.'
+                              ? 'auth.clientIdEmptyWarning'.tr(context: context)
                               : null;
                         },
                       ),
-                      const SizedBox(height: 12.0),
                       TextFormField(
                         controller: clientSecretController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           filled: true,
-                          labelText: 'Client Secret',
+                          labelText: 'auth.clientSecret'.tr(context: context),
                         ),
                         obscureText: true,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           return (value == null || value.isEmpty)
-                              ? 'Client Secret cannot be empty.'
+                              ? 'auth.clientSecretEmptyWarning'.tr(context: context)
                               : null;
                         },
                       ),
@@ -148,7 +158,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                     spacing: 8.0,
                     children: <Widget>[
                       TextButton(
-                        child: const Text('CANCEL'),
+                        child: Text('ui.cancel'.tr(context: context)),
                         onPressed: () {
                           passwordController.clear();
                           context.pop();
@@ -156,74 +166,52 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                       ),
                       HookBuilder(
                         builder: (context) {
-                          final usernameIsEmpty = useListenableSelector(
-                              usernameController,
-                              () => usernameController.text.isEmpty);
-                          final passwordIsEmpty = useListenableSelector(
-                              passwordController,
-                              () => passwordController.text.isEmpty);
-                          final clientIdIsEmpty = useListenableSelector(
-                              clientIdController,
-                              () => clientIdController.text.isEmpty);
-                          final clientSecretIsEmpty = useListenableSelector(
-                              clientSecretController,
-                              () => clientSecretController.text.isEmpty);
+                          final usernameIsEmpty =
+                              useListenableSelector(usernameController, () => usernameController.text.isEmpty);
+                          final passwordIsEmpty =
+                              useListenableSelector(passwordController, () => passwordController.text.isEmpty);
+                          final clientIdIsEmpty =
+                              useListenableSelector(clientIdController, () => clientIdController.text.isEmpty);
+                          final clientSecretIsEmpty =
+                              useListenableSelector(clientSecretController, () => clientSecretController.text.isEmpty);
 
                           return ElevatedButton(
                             onPressed: (usernameIsEmpty ||
                                     passwordIsEmpty ||
                                     clientIdIsEmpty ||
-                                    clientSecretIsEmpty)
+                                    clientSecretIsEmpty ||
+                                    login.state is PendingMutationState)
                                 ? null
                                 : () async {
                                     final router = GoRouter.of(context);
-                                    final messenger =
-                                        ScaffoldMessenger.of(context);
+                                    final messenger = ScaffoldMessenger.of(context);
 
                                     if (usernameController.text.isNotEmpty &&
                                         passwordController.text.isNotEmpty &&
                                         clientIdController.text.isNotEmpty &&
-                                        clientSecretController
-                                            .text.isNotEmpty) {
-                                      final loginSuccess = ref
-                                          .read(authControlProvider.notifier)
-                                          .login(
-                                              usernameController.text,
-                                              passwordController.text,
-                                              clientIdController.text,
-                                              clientSecretController.text);
+                                        clientSecretController.text.isNotEmpty) {
+                                      final loginSuccess = login(usernameController.text, passwordController.text,
+                                          clientIdController.text, clientSecretController.text);
 
                                       loginSuccess.then((success) {
+                                        if (!context.mounted) return;
                                         if (success) {
                                           router.pop();
                                           passwordController.clear();
-                                        } else {
-                                          messenger
-                                            ..removeCurrentSnackBar()
-                                            ..showSnackBar(
-                                              const SnackBar(
-                                                content:
-                                                    Text('Failed to login.'),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
                                         }
                                       });
-
-                                      pendingLogin.value = loginSuccess;
                                     } else {
                                       messenger
                                         ..removeCurrentSnackBar()
                                         ..showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'Username/Password/Client ID/Client Secret cannot be empty.'),
+                                          SnackBar(
+                                            content: Text('auth.fieldsEmptyWarning'.tr(context: context)),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
                                     }
                                   },
-                            child: const Text('LOGIN'),
+                            child: Text('auth.login'.tr(context: context)),
                           );
                         },
                       ),
@@ -233,8 +221,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (snapshot.connectionState == ConnectionState.waiting)
-            ...Styles.loadingOverlay
+          if (login.state is PendingMutationState) ...Styles.loadingOverlay
         ],
       ),
     );

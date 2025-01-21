@@ -7,7 +7,7 @@ import 'package:dart_eval/src/eval/utils/wap_helper.dart';
 import 'package:dart_eval/stdlib/core.dart';
 import 'package:dart_eval/stdlib/typed_data.dart';
 import 'package:dart_eval/stdlib/convert.dart';
-import 'package:gagaku/http.dart';
+import 'package:gagaku/util/http.dart';
 import 'package:gagaku/web/eval/util.dart';
 import 'package:http/http.dart';
 

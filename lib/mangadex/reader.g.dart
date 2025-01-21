@@ -6,26 +6,22 @@ part of 'reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchChapterDataRef = Ref<AsyncValue<ReaderData>>;
-
 @ProviderFor(_fetchChapterData)
 const _fetchChapterDataProvider = _FetchChapterDataFamily._();
 
 final class _FetchChapterDataProvider
     extends $FunctionalProvider<AsyncValue<ReaderData>, FutureOr<ReaderData>>
-    with
-        $FutureModifier<ReaderData>,
-        $FutureProvider<ReaderData, _FetchChapterDataRef> {
+    with $FutureModifier<ReaderData>, $FutureProvider<ReaderData> {
   const _FetchChapterDataProvider._(
       {required _FetchChapterDataFamily super.from,
       required String super.argument,
       FutureOr<ReaderData> Function(
-        _FetchChapterDataRef ref,
+        Ref ref,
         String chapterId,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterDataProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -33,7 +29,7 @@ final class _FetchChapterDataProvider
         );
 
   final FutureOr<ReaderData> Function(
-    _FetchChapterDataRef ref,
+    Ref ref,
     String chapterId,
   )? _createCb;
 
@@ -55,7 +51,7 @@ final class _FetchChapterDataProvider
   @override
   _FetchChapterDataProvider $copyWithCreate(
     FutureOr<ReaderData> Function(
-      _FetchChapterDataRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchChapterDataProvider._(
@@ -69,7 +65,7 @@ final class _FetchChapterDataProvider
   }
 
   @override
-  FutureOr<ReaderData> create(_FetchChapterDataRef ref) {
+  FutureOr<ReaderData> create(Ref ref) {
     final _$cb = _createCb ?? _fetchChapterData;
     final argument = this.argument as String;
     return _$cb(
@@ -89,12 +85,12 @@ final class _FetchChapterDataProvider
   }
 }
 
-String _$fetchChapterDataHash() => r'77340a27fbc2d76f76dd9fe5919792f6454e6223';
+String _$fetchChapterDataHash() => r'c4909aa08d41ca302c89b1c1394ca421e311a30e';
 
 final class _FetchChapterDataFamily extends Family {
   const _FetchChapterDataFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterDataProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -115,7 +111,7 @@ final class _FetchChapterDataFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<ReaderData> Function(
-      _FetchChapterDataRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -134,26 +130,22 @@ final class _FetchChapterDataFamily extends Family {
   }
 }
 
-typedef _FetchChapterPagesRef = Ref<AsyncValue<List<ReaderPage>>>;
-
 @ProviderFor(_fetchChapterPages)
 const _fetchChapterPagesProvider = _FetchChapterPagesFamily._();
 
 final class _FetchChapterPagesProvider extends $FunctionalProvider<
         AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
-    with
-        $FutureModifier<List<ReaderPage>>,
-        $FutureProvider<List<ReaderPage>, _FetchChapterPagesRef> {
+    with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
   const _FetchChapterPagesProvider._(
       {required _FetchChapterPagesFamily super.from,
       required Chapter super.argument,
       FutureOr<List<ReaderPage>> Function(
-        _FetchChapterPagesRef ref,
+        Ref ref,
         Chapter chapter,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterPagesProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -161,7 +153,7 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ReaderPage>> Function(
-    _FetchChapterPagesRef ref,
+    Ref ref,
     Chapter chapter,
   )? _createCb;
 
@@ -184,7 +176,7 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
   @override
   _FetchChapterPagesProvider $copyWithCreate(
     FutureOr<List<ReaderPage>> Function(
-      _FetchChapterPagesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchChapterPagesProvider._(
@@ -198,7 +190,7 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<ReaderPage>> create(_FetchChapterPagesRef ref) {
+  FutureOr<List<ReaderPage>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchChapterPages;
     final argument = this.argument as Chapter;
     return _$cb(
@@ -218,12 +210,12 @@ final class _FetchChapterPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchChapterPagesHash() => r'311ed9043598e22995b7b1f22c8beb97421fea35';
+String _$fetchChapterPagesHash() => r'3663bdc5e029081976b001c22486f86c43530c38';
 
 final class _FetchChapterPagesFamily extends Family {
   const _FetchChapterPagesFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchChapterPagesProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -244,7 +236,7 @@ final class _FetchChapterPagesFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<ReaderPage>> Function(
-      _FetchChapterPagesRef ref,
+      Ref ref,
       Chapter args,
     ) create,
   ) {
@@ -263,4 +255,4 @@ final class _FetchChapterPagesFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

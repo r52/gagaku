@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gagaku/config.dart';
+import 'package:gagaku/model/config.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/cache.dart';
+import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
 import 'package:gagaku/mangadex/creator_view.dart';
 import 'package:gagaku/mangadex/edit_list.dart';
@@ -22,10 +23,11 @@ import 'package:gagaku/mangadex/manga_view.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/recent_feed.dart';
 import 'package:gagaku/mangadex/search.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/settings.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/model/types.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/favorites.dart';
 import 'package:gagaku/web/history.dart';
 import 'package:gagaku/web/main.dart';
@@ -38,6 +40,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:go_router/go_router.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _mdShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'mdshell');
@@ -53,6 +56,11 @@ class _HttpOverrides extends HttpOverrides {
 void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  timeagoLocalesMap.forEach((locale, lookupMessages) {
+    timeago.setLocaleMessages(locale, lookupMessages);
+  });
 
   await Hive.initFlutter();
   Hive.registerAdapter(CacheEntryAdapter());
@@ -90,7 +98,16 @@ void main() async {
   final gdat = GagakuData();
   gdat.gagakuUserAgent = '${pkg.appName}/${pkg.version}';
 
-  runApp(const ProviderScope(child: App()));
+  runApp(
+    ProviderScope(
+      child: EasyLocalization(
+        supportedLocales: [Locale('en')],
+        path: 'assets/translations',
+        fallbackLocale: Locale('en'),
+        child: App(),
+      ),
+    ),
+  );
 }
 
 class App extends ConsumerStatefulWidget {
@@ -101,10 +118,7 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
-  final List<ScrollController> _mdcontrollers = [];
-  final List<ScrollController> _proxycontrollers = [];
-
-  late final GoRouter _router = GoRouter(
+  final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     restorationScopeId: 'root_route_restore',
     initialLocation: '/',
@@ -199,7 +213,6 @@ class _AppState extends ConsumerState<App> {
         restorationScopeId: 'md_route_restore',
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return MangaDexHome(
-            controllers: _mdcontrollers,
             child: child,
           );
         },
@@ -208,9 +221,7 @@ class _AppState extends ConsumerState<App> {
             path: '/',
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: MangaDexFrontPage(
-                controller: _mdcontrollers[0],
-              ),
+              child: MangaDexFrontPage(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_main_restore',
             ),
@@ -221,11 +232,7 @@ class _AppState extends ConsumerState<App> {
               key: state.pageKey,
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.chapterfeed),
-                builder: (context, ref) {
-                  return MangaDexChapterFeed(
-                    controller: _mdcontrollers[1],
-                  );
-                },
+                builder: (_) => MangaDexChapterFeed(),
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_chapterfeed_restore',
@@ -237,11 +244,7 @@ class _AppState extends ConsumerState<App> {
               key: state.pageKey,
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.library),
-                builder: (context, ref) {
-                  return MangaDexLibraryView(
-                    controller: _mdcontrollers[2],
-                  );
-                },
+                builder: (_) => MangaDexLibraryView(),
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_library_restore',
@@ -253,11 +256,7 @@ class _AppState extends ConsumerState<App> {
               key: state.pageKey,
               child: MangaDexLoginWidget(
                 key: const Key(GagakuRoute.lists),
-                builder: (context, ref) {
-                  return MangaDexListsView(
-                    controller: _mdcontrollers[3],
-                  );
-                },
+                builder: (_) => MangaDexListsView(),
               ),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_lists_restore',
@@ -267,9 +266,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.history,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: MangaDexHistoryFeed(
-                controller: _mdcontrollers[4],
-              ),
+              child: MangaDexHistoryFeed(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'md_history_restore',
             ),
@@ -289,7 +286,6 @@ class _AppState extends ConsumerState<App> {
         restorationScopeId: 'proxy_route_restore',
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return WebSourceHome(
-            controllers: _proxycontrollers,
             child: child,
           );
         },
@@ -298,9 +294,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.proxyHome,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: WebSourceHistoryWidget(
-                controller: _proxycontrollers[0],
-              ),
+              child: WebSourceHistoryWidget(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'proxy_home_restore',
             ),
@@ -309,9 +303,7 @@ class _AppState extends ConsumerState<App> {
             path: GagakuRoute.proxySaved,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: WebSourceFavoritesWidget(
-                controller: _proxycontrollers[1],
-              ),
+              child: WebSourceFavoritesWidget(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
               restorationId: 'proxy_saved_restore',
             ),
@@ -365,37 +357,6 @@ class _AppState extends ConsumerState<App> {
     ],
   );
 
-  @override
-  void initState() {
-    super.initState();
-
-    _mdcontrollers.addAll([
-      ScrollController(),
-      ScrollController(),
-      ScrollController(),
-      ScrollController(),
-      ScrollController(),
-    ]);
-
-    _proxycontrollers.addAll([
-      ScrollController(),
-      ScrollController(),
-    ]);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    for (var element in _mdcontrollers) {
-      element.dispose();
-    }
-
-    for (var element in _proxycontrollers) {
-      element.dispose();
-    }
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -403,9 +364,12 @@ class _AppState extends ConsumerState<App> {
 
     return MaterialApp.router(
       title: 'Gagaku',
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       theme: ThemeData(
         brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(seedColor: config.theme, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(seedColor: config.theme.color, brightness: Brightness.light),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
@@ -415,7 +379,9 @@ class _AppState extends ConsumerState<App> {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: config.theme, brightness: Brightness.dark, dynamicSchemeVariant: DynamicSchemeVariant.content),
+            seedColor: config.theme.color,
+            brightness: Brightness.dark,
+            dynamicSchemeVariant: DynamicSchemeVariant.content),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: Colors.transparent,
@@ -439,7 +405,7 @@ class NotFoundScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Page Not Found'),
+        title: Text('pageNotFound.header'.tr(context: context)),
         leading: BackButton(
           onPressed: () {
             if (context.canPop()) {
@@ -451,7 +417,7 @@ class NotFoundScreen extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Text("Can't find a page for: $uri"),
+        child: Text('pageNotFound.error'.tr(context: context, args: [uri])),
       ),
     );
   }

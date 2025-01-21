@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -14,11 +15,12 @@ Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
   if (result != null && context.mounted) {
     final parseResult = await api.handleUrl(url: result, context: context);
 
+    if (!context.mounted) return;
     if (!parseResult) {
       messenger
         ..removeCurrentSnackBar()
-        ..showSnackBar(const SnackBar(
-          content: Text('Unsupported URL'),
+        ..showSnackBar(SnackBar(
+          content: Text('ui.unsupportedUrl'.tr(context: context)),
           backgroundColor: Colors.red,
         ));
     }
@@ -33,15 +35,14 @@ class OpenLinkDialog extends HookWidget {
     final urlFieldController = useTextEditingController();
 
     return AlertDialog(
-      title: const Text('Open URL'),
+      title: Text('webSources.openUrl'.tr(context: context)),
       content: TextField(
         controller: urlFieldController,
-        decoration:
-            const InputDecoration(hintText: 'cubari.moe, imgur.com etc.'),
+        decoration: const InputDecoration(hintText: 'cubari.moe, imgur.com etc.'),
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('Paste from Clipboard'),
+          child: Text('ui.pasteClipboard'.tr(context: context)),
           onPressed: () async {
             var result = await Clipboard.getData('text/plain');
             if (result != null) {
@@ -50,14 +51,14 @@ class OpenLinkDialog extends HookWidget {
           },
         ),
         TextButton(
-          child: const Text('CANCEL'),
+          child: Text('ui.cancel'.tr(context: context)),
           onPressed: () {
             Navigator.of(context).pop();
             urlFieldController.clear();
           },
         ),
         ElevatedButton(
-          child: const Text('OK'),
+          child: Text('ui.go'.tr(context: context)),
           onPressed: () {
             Navigator.of(context).pop(urlFieldController.text);
             urlFieldController.clear();

@@ -6,26 +6,22 @@ part of 'manga_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchWebMangaInfoRef = Ref<AsyncValue<WebManga>>;
-
 @ProviderFor(_fetchWebMangaInfo)
 const _fetchWebMangaInfoProvider = _FetchWebMangaInfoFamily._();
 
 final class _FetchWebMangaInfoProvider
     extends $FunctionalProvider<AsyncValue<WebManga>, FutureOr<WebManga>>
-    with
-        $FutureModifier<WebManga>,
-        $FutureProvider<WebManga, _FetchWebMangaInfoRef> {
+    with $FutureModifier<WebManga>, $FutureProvider<WebManga> {
   const _FetchWebMangaInfoProvider._(
       {required _FetchWebMangaInfoFamily super.from,
       required SourceInfo super.argument,
       FutureOr<WebManga> Function(
-        _FetchWebMangaInfoRef ref,
+        Ref ref,
         SourceInfo info,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchWebMangaInfoProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -33,7 +29,7 @@ final class _FetchWebMangaInfoProvider
         );
 
   final FutureOr<WebManga> Function(
-    _FetchWebMangaInfoRef ref,
+    Ref ref,
     SourceInfo info,
   )? _createCb;
 
@@ -55,7 +51,7 @@ final class _FetchWebMangaInfoProvider
   @override
   _FetchWebMangaInfoProvider $copyWithCreate(
     FutureOr<WebManga> Function(
-      _FetchWebMangaInfoRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchWebMangaInfoProvider._(
@@ -69,7 +65,7 @@ final class _FetchWebMangaInfoProvider
   }
 
   @override
-  FutureOr<WebManga> create(_FetchWebMangaInfoRef ref) {
+  FutureOr<WebManga> create(Ref ref) {
     final _$cb = _createCb ?? _fetchWebMangaInfo;
     final argument = this.argument as SourceInfo;
     return _$cb(
@@ -89,12 +85,12 @@ final class _FetchWebMangaInfoProvider
   }
 }
 
-String _$fetchWebMangaInfoHash() => r'e880e308ab1029ca400c1dc167a841f6d3d4c170';
+String _$fetchWebMangaInfoHash() => r'de355fd84a63a4346a5a310266b8e59e4dfb512c';
 
 final class _FetchWebMangaInfoFamily extends Family {
   const _FetchWebMangaInfoFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchWebMangaInfoProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -115,7 +111,7 @@ final class _FetchWebMangaInfoFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<WebManga> Function(
-      _FetchWebMangaInfoRef ref,
+      Ref ref,
       SourceInfo args,
     ) create,
   ) {
@@ -134,26 +130,22 @@ final class _FetchWebMangaInfoFamily extends Family {
   }
 }
 
-typedef _FetchWebMangaRedirectRef = Ref<AsyncValue<SourceInfo>>;
-
 @ProviderFor(_fetchWebMangaRedirect)
 const _fetchWebMangaRedirectProvider = _FetchWebMangaRedirectFamily._();
 
 final class _FetchWebMangaRedirectProvider
     extends $FunctionalProvider<AsyncValue<SourceInfo>, FutureOr<SourceInfo>>
-    with
-        $FutureModifier<SourceInfo>,
-        $FutureProvider<SourceInfo, _FetchWebMangaRedirectRef> {
+    with $FutureModifier<SourceInfo>, $FutureProvider<SourceInfo> {
   const _FetchWebMangaRedirectProvider._(
       {required _FetchWebMangaRedirectFamily super.from,
       required String super.argument,
       FutureOr<SourceInfo> Function(
-        _FetchWebMangaRedirectRef ref,
+        Ref ref,
         String url,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchWebMangaRedirectProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -161,7 +153,7 @@ final class _FetchWebMangaRedirectProvider
         );
 
   final FutureOr<SourceInfo> Function(
-    _FetchWebMangaRedirectRef ref,
+    Ref ref,
     String url,
   )? _createCb;
 
@@ -183,7 +175,7 @@ final class _FetchWebMangaRedirectProvider
   @override
   _FetchWebMangaRedirectProvider $copyWithCreate(
     FutureOr<SourceInfo> Function(
-      _FetchWebMangaRedirectRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchWebMangaRedirectProvider._(
@@ -197,7 +189,7 @@ final class _FetchWebMangaRedirectProvider
   }
 
   @override
-  FutureOr<SourceInfo> create(_FetchWebMangaRedirectRef ref) {
+  FutureOr<SourceInfo> create(Ref ref) {
     final _$cb = _createCb ?? _fetchWebMangaRedirect;
     final argument = this.argument as String;
     return _$cb(
@@ -219,12 +211,12 @@ final class _FetchWebMangaRedirectProvider
 }
 
 String _$fetchWebMangaRedirectHash() =>
-    r'93dc2153b52380e943e7ad406d4b06b709ffd4a3';
+    r'fbc7fe3c4db83257e6e51a5a1e6c3a0039f29797';
 
 final class _FetchWebMangaRedirectFamily extends Family {
   const _FetchWebMangaRedirectFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchWebMangaRedirectProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -245,7 +237,7 @@ final class _FetchWebMangaRedirectFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<SourceInfo> Function(
-      _FetchWebMangaRedirectRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -264,4 +256,4 @@ final class _FetchWebMangaRedirectFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

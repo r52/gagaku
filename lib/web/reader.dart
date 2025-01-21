@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/model.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/reader/main.dart';
-import 'package:gagaku/reader/types.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/reader/model/types.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +23,6 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
   if (data != null) {
     child = WebSourceReaderWidget(
       source: data.source,
-      manga: data.manga,
       title: data.title,
       link: data.link,
       info: data.info,
@@ -44,33 +43,22 @@ Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
-Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, SourceInfo info) async {
+@Riverpod(retry: noRetry)
+Future<WebReaderData> _fetchWebChapterInfo(Ref ref, SourceInfo info) async {
   final api = ref.watch(proxyProvider);
-  final proxy = await api.handleSource(info);
+  final manga = await api.handleSource(info);
 
-  if (proxy.code != null) {
-    ref
-        .read(webSourceHistoryProvider.notifier)
-        .add(HistoryLink(title: '${info.source}: ${info.location}', url: '${info.getURL()}1/1/'));
-    return WebReaderData(source: proxy.code!, info: info);
-  }
+  if (manga != null) {
+    ref.read(webSourceHistoryProvider.add)(
+        HistoryLink(title: '${info.source}: ${manga.title}', url: info.getURL(), cover: manga.cover));
 
-  if (proxy.manga != null) {
-    ref.read(webSourceHistoryProvider.notifier).add(
-        HistoryLink(title: '${info.source}: ${proxy.manga?.title}', url: info.getURL(), cover: proxy.manga!.cover));
-
-    final chapter = proxy.manga!.getChapter(info.chapter!);
+    final chapter = manga.getChapter(info.chapter!);
 
     if (chapter != null) {
       return WebReaderData(
         source: chapter.groups.entries.first.value,
         title: chapter.getTitle(info.chapter!),
-        manga: proxy.manga!,
-        link: Text(
-          proxy.manga!.title,
-          style: const TextStyle(fontSize: 24),
-        ),
+        link: manga.title,
         info: info,
         readKey: info.chapter,
       );
@@ -81,14 +69,23 @@ Future<WebReaderData> _fetchWebChapterInfo(_FetchWebChapterInfoRef ref, SourceIn
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
+Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
   List<String> links;
 
-  if (source is List) {
-    links = List<String>.from(source);
-  } else {
+  if (source is String && source.startsWith('/read/')) {
     final api = ref.watch(proxyProvider);
-    links = await api.getChapterFromProxy(source);
+    source = await api.getProxyAPI(source);
+  }
+
+  if (source is! List) {
+    throw Exception('Unknown source type ($source)');
+  }
+
+  if (source.first is! String) {
+    final imgurlist = source.map((e) => ImgurPage.fromJson(e)).toList();
+    links = imgurlist.map((e) => e.src).toList();
+  } else {
+    links = List<String>.from(source);
   }
 
   final pages = links
@@ -105,7 +102,7 @@ Future<List<ReaderPage>> _getPages(_GetPagesRef ref, dynamic source) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _getSourcePages(_GetSourcePagesRef ref, dynamic source, SourceInfo info) async {
+Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic source, SourceInfo info) async {
   List<String>? links;
 
   final srcMgr = await ref.watch(webSourceManagerProvider.future);
@@ -141,7 +138,7 @@ Future<List<ReaderPage>> _getSourcePages(_GetSourcePagesRef ref, dynamic source,
   return pages;
 }
 
-class QueriedWebSourceReaderWidget extends ConsumerWidget {
+class QueriedWebSourceReaderWidget extends StatelessWidget {
   const QueriedWebSourceReaderWidget({
     super.key,
     required this.proxy,
@@ -154,33 +151,14 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
   final String chapter;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final info =
         SourceInfo(type: SourceType.proxy, source: proxy, location: code, chapter: chapter.replaceFirst('-', '.'));
-    final dataProvider = ref.watch(_fetchWebChapterInfoProvider(info));
 
-    Widget child;
-    PreferredSizeWidget? appBar;
-
-    switch (dataProvider) {
-      case AsyncValue(value: final data?):
-        return WebSourceReaderWidget(
-          source: data.source,
-          manga: data.manga,
-          title: data.title,
-          link: data.link,
-          info: data.info,
-          readKey: data.readKey,
-          onLinkPressed: data.onLinkPressed,
-          backRoute: GagakuRoute.proxyHome,
-        );
-      case AsyncValue(:final error?, :final stackTrace?):
-        child = ErrorColumn(
-          error: error,
-          stackTrace: stackTrace,
-          message: "_fetchWebChapterInfoProvider($proxy/$code/$chapter) failed",
-        );
-        appBar = AppBar(
+    return DataProviderWhenWidget(
+      provider: _fetchWebChapterInfoProvider(info),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
           leading: BackButton(
             onPressed: () {
               if (context.canPop()) {
@@ -190,18 +168,18 @@ class QueriedWebSourceReaderWidget extends ConsumerWidget {
               }
             },
           ),
-        );
-        break;
-      case AsyncValue(:final progress):
-        child = ListSpinner(
-          progress: progress?.toDouble(),
-        );
-        break;
-    }
-
-    return Scaffold(
-      appBar: appBar,
-      body: child,
+        ),
+        body: child,
+      ),
+      builder: (context, data) => WebSourceReaderWidget(
+        source: data.source,
+        title: data.title,
+        link: data.link,
+        info: data.info,
+        readKey: data.readKey,
+        onLinkPressed: data.onLinkPressed,
+        backRoute: GagakuRoute.proxyHome,
+      ),
     );
   }
 }
@@ -211,7 +189,6 @@ class WebSourceReaderWidget extends HookConsumerWidget {
     super.key,
     required this.source,
     this.title,
-    this.manga,
     this.link,
     required this.info,
     this.readKey,
@@ -221,8 +198,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
   final dynamic source;
   final String? title;
-  final WebManga? manga;
-  final Widget? link;
+  final String? link;
   final SourceInfo info;
   final String? readKey;
   final VoidCallback? onLinkPressed;
@@ -239,55 +215,42 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       name = source;
     }
 
-    final pageProvider = info.type == SourceType.proxy
-        ? ref.watch(_getPagesProvider(source))
-        : ref.watch(_getSourcePagesProvider(source, info));
-
     useEffect(() {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
         if (readKey != null) {
-          ref.read(webReadMarkersProvider.notifier).set(info.getKey(), readKey!, true);
+          ref.read(webReadMarkersProvider.set)(info.getKey(), readKey!, true);
         }
       });
 
       return () => timer.value?.cancel();
     }, []);
 
-    switch (pageProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(
-            leading: BackButton(
-              onPressed: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go(backRoute ?? GagakuRoute.proxyHome);
-                }
-              },
-            ),
+    return DataProviderWhenWidget(
+      provider: info.type == SourceType.proxy ? _getPagesProvider(source) : _getSourcePagesProvider(source, info),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(backRoute ?? GagakuRoute.proxyHome);
+              }
+            },
           ),
-          body: ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_getPagesProvider($source) failed",
-          ),
-        );
-      case AsyncValue(value: final pages?):
-        return ReaderWidget(
-          pages: pages,
-          title: name,
-          longstrip: false,
-          link: link,
-          onLinkPressed: onLinkPressed,
-          backRoute: backRoute,
-        );
-      case AsyncValue(:final progress):
-        return ListSpinner(
-          progress: progress?.toDouble(),
-        );
-    }
+        ),
+        body: child,
+      ),
+      builder: (context, pages) => ReaderWidget(
+        pages: pages,
+        title: name,
+        longstrip: false,
+        drawerHeader: link,
+        onHeaderPressed: onLinkPressed,
+        backRoute: backRoute,
+      ),
+    );
   }
 }

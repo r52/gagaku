@@ -1,12 +1,12 @@
 import 'package:archive/archive_io.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gagaku/local/model.dart';
-import 'package:gagaku/local/types.dart';
+import 'package:gagaku/local/model/model.dart';
+import 'package:gagaku/local/model/types.dart';
 import 'package:gagaku/reader/main.dart';
-import 'package:gagaku/reader/types.dart';
-import 'package:gagaku/ui.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:gagaku/reader/model/types.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'archive_reader.g.dart';
@@ -14,7 +14,7 @@ part 'archive_reader.g.dart';
 class ArchiveReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
   final String path;
   final String? title;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 
   ArchiveReaderRouteBuilder({
@@ -23,8 +23,7 @@ class ArchiveReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
     this.link,
     this.onLinkPressed,
   }) : super(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              ArchiveReaderWidget(
+          pageBuilder: (context, animation, secondaryAnimation) => ArchiveReaderWidget(
             path: path,
             title: title,
             link: link,
@@ -46,8 +45,7 @@ class _ExtractInfo {
 }
 
 @riverpod
-Future<List<ReaderPage>> _getArchivePages(
-    _GetArchivePagesRef ref, String path) async {
+Future<List<ReaderPage>> _getArchivePages(Ref ref, String path) async {
   final formats = await ref.watch(supportedFormatsProvider.future);
   var type = ArchiveType.zip;
 
@@ -55,8 +53,7 @@ Future<List<ReaderPage>> _getArchivePages(
     type = ArchiveType.tar;
   }
 
-  final pages = await compute(
-      _extractArchive, _ExtractInfo(type: type, formats: formats, path: path));
+  final pages = await compute(_extractArchive, _ExtractInfo(type: type, formats: formats, path: path));
 
   /// pages MUST be cleared on dispose otherwise MemoryImage and its
   /// accompanying Uint8List buffer won't get GC'd for whatever reason
@@ -73,11 +70,10 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
 
   switch (info.type) {
     case ArchiveType.tar:
-      archive = TarDecoder().decodeBuffer(file);
+      archive = TarDecoder().decodeStream(file);
       break;
     case ArchiveType.zip:
-    default:
-      archive = ZipDecoder().decodeBuffer(file);
+      archive = ZipDecoder().decodeStream(file);
       break;
   }
 
@@ -90,7 +86,7 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
             file.name.endsWith(".jpeg") ||
             (info.formats.avif && file.name.endsWith(".avif")))) {
       pages.add(ReaderPage(
-        provider: MemoryImage(file.content as Uint8List),
+        provider: MemoryImage(file.content),
         sortKey: file.name,
       ));
     }
@@ -101,7 +97,7 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
   return pages;
 }
 
-class ArchiveReaderWidget extends ConsumerWidget {
+class ArchiveReaderWidget extends StatelessWidget {
   const ArchiveReaderWidget({
     super.key,
     required this.path,
@@ -112,39 +108,33 @@ class ArchiveReaderWidget extends ConsumerWidget {
 
   final String path;
   final String? title;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pageProvider = ref.watch(_getArchivePagesProvider(path));
-
+  Widget build(BuildContext context) {
     String strtitle = path;
 
     if (title != null) {
       strtitle = title!;
     }
 
-    switch (pageProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
-          ),
-          body: ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_getArchivePagesProvider($path) failed",
-          ),
-        );
-      case AsyncValue(value: final pages?):
+    return DataProviderWhenWidget(
+      provider: _getArchivePagesProvider(path),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+        ),
+        body: child,
+      ),
+      builder: (context, pages) {
         if (pages.isEmpty) {
           return Scaffold(
             appBar: AppBar(
               leading: const BackButton(),
             ),
-            body: const Center(
-              child: Text("This archive contains no readable images!"),
+            body: Center(
+              child: Text('localLibrary.archiveUnreadableWarning'.tr(context: context)),
             ),
           );
         }
@@ -153,30 +143,28 @@ class ArchiveReaderWidget extends ConsumerWidget {
           pages: pages,
           title: strtitle,
           longstrip: false,
-          link: link,
-          onLinkPressed: onLinkPressed,
+          drawerHeader: link,
+          onHeaderPressed: onLinkPressed,
         );
-      case _:
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Extracting archive...",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 18,
-                  decoration: TextDecoration.none,
-                ),
+      },
+      loadingWidget: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 20.0,
+          children: [
+            Text(
+              'localLibrary.extractingArchive'.tr(context: context),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.normal,
+                fontSize: 18,
+                decoration: TextDecoration.none,
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              const CircularProgressIndicator()
-            ],
-          ),
-        );
-    }
+            ),
+            const CircularProgressIndicator()
+          ],
+        ),
+      ),
+    );
   }
 }

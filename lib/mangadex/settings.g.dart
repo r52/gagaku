@@ -6,21 +6,17 @@ part of 'settings.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchGroupDataRef = Ref<AsyncValue<Set<Group>>>;
-
 @ProviderFor(_fetchGroupData)
 const _fetchGroupDataProvider = _FetchGroupDataFamily._();
 
 final class _FetchGroupDataProvider
     extends $FunctionalProvider<AsyncValue<Set<Group>>, FutureOr<Set<Group>>>
-    with
-        $FutureModifier<Set<Group>>,
-        $FutureProvider<Set<Group>, _FetchGroupDataRef> {
+    with $FutureModifier<Set<Group>>, $FutureProvider<Set<Group>> {
   const _FetchGroupDataProvider._(
       {required _FetchGroupDataFamily super.from,
       required Iterable<String> super.argument,
       FutureOr<Set<Group>> Function(
-        _FetchGroupDataRef ref,
+        Ref ref,
         Iterable<String> uuids,
       )? create})
       : _createCb = create,
@@ -33,7 +29,7 @@ final class _FetchGroupDataProvider
         );
 
   final FutureOr<Set<Group>> Function(
-    _FetchGroupDataRef ref,
+    Ref ref,
     Iterable<String> uuids,
   )? _createCb;
 
@@ -55,7 +51,7 @@ final class _FetchGroupDataProvider
   @override
   _FetchGroupDataProvider $copyWithCreate(
     FutureOr<Set<Group>> Function(
-      _FetchGroupDataRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchGroupDataProvider._(
@@ -69,7 +65,7 @@ final class _FetchGroupDataProvider
   }
 
   @override
-  FutureOr<Set<Group>> create(_FetchGroupDataRef ref) {
+  FutureOr<Set<Group>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchGroupData;
     final argument = this.argument as Iterable<String>;
     return _$cb(
@@ -89,7 +85,7 @@ final class _FetchGroupDataProvider
   }
 }
 
-String _$fetchGroupDataHash() => r'c9009d905ce312badc17d76d527a3c084ce2dee4';
+String _$fetchGroupDataHash() => r'24d9984bf59cd196477e31f308827f4594f6115a';
 
 final class _FetchGroupDataFamily extends Family {
   const _FetchGroupDataFamily._()
@@ -115,7 +111,7 @@ final class _FetchGroupDataFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<Set<Group>> Function(
-      _FetchGroupDataRef ref,
+      Ref ref,
       Iterable<String> args,
     ) create,
   ) {
@@ -134,4 +130,4 @@ final class _FetchGroupDataFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

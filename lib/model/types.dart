@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart';
+
+enum GagakuTheme {
+  lime(Color(0xFF827717)),
+  grey(Color(0xFF424242)),
+  amber(Color(0xFFFFAB00)),
+  blue(Color(0xFF1565C0)),
+  teal(Color(0xFF00695C)),
+  green(Color(0xFF2E7D32)),
+  lightgreen(Color(0xFF558B2F)),
+  red(Color(0xFFC62828)),
+  orange(Color(0xFFEF6C00)),
+  yellow(Color(0xFFF9A825)),
+  purple(Color(0xFF6A1B9A));
+
+  const GagakuTheme(this.color);
+  final Color color;
+
+  static const _key = 'colors.';
+  String get label => '$_key$name';
+}
+
+final timeagoLocalesMap = <String, LookupMessages>{
+  'am': AmMessages(),
+  'ar': ArMessages(),
+  'ar_short': ArShortMessages(),
+  'az': AzMessages(),
+  'be': BeMessages(),
+  'bn': BnMessages(),
+  'bn_short': BnShortMessages(),
+  'bs': BsMessages(),
+  'ca': CaMessages(),
+  'cs': CsMessages(),
+  'da': DaMessages(),
+  'de': DeMessages(),
+  'dv': DvMessages(),
+  'es': EsMessages(),
+  'et': EtMessages(),
+  'et_short': EtShortMessages(),
+  'fa': FaMessages(),
+  'fi': FiMessages(),
+  'fi_short': FiShortMessages(),
+  'fr': FrMessages(),
+  'gr': GrMessages(),
+  'he': HeMessages(),
+  'hi': HiShortMessages(),
+  'hr': HrMessages(),
+  'hu': HuMessages(),
+  'id': IdMessages(),
+  'id_short': IdShortMessages(),
+  'it': ItMessages(),
+  'ja': JaMessages(),
+  'km': KmMessages(),
+  'ko': KoMessages(),
+  'ku': KuMessages(),
+  'ku_short': KuShortMessages(),
+  'lv': LvMessages(),
+  'mn': MnMessages(),
+  'mn_MY': MsMyMessages(),
+  'ms_MY': MsMyMessages(),
+  'my': MyMessages(),
+  'nb_NO': NbNoMessages(),
+  'nb_NO_short': NbNoShortMessages(),
+  'nl': NlMessages(),
+  'nn_NO': NnNoMessages(),
+  'nn_NO_short': NnNoShortMessages(),
+  'pl': PlMessages(),
+  'pt_BR': PtBrMessages(),
+  'pt_BR_short': PtBrShortMessages(),
+  'ro': RoMessages(),
+  'ro_short': RoShortMessages(),
+  'ru': RuMessages(),
+  'rw': RwMessages(),
+  'sr': SrMessages(),
+  'sv': SvMessages(),
+  'ta': TaMessages(),
+  'th': ThMessages(),
+  'th_short': ThShortMessages(),
+  'tk': TkMessages(),
+  'tr': TrMessages(),
+  'tr_short': TrShortMessages(),
+  'uk': UkMessages(),
+  'uk_short': UkShortMessages(),
+  'ur': UrMessages(),
+  'vi': ViMessages(),
+  'zh': ZhMessages(),
+  'zh_CN': ZhCnMessages(),
+};
+
+final timeagoLocaleList = ['en', 'en_short', 'es', 'es_short', ...timeagoLocalesMap.keys];

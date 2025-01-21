@@ -6,21 +6,17 @@ part of 'creator_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchCreatorFromIdRef = Ref<AsyncValue<CreatorType>>;
-
 @ProviderFor(_fetchCreatorFromId)
 const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily._();
 
 final class _FetchCreatorFromIdProvider
     extends $FunctionalProvider<AsyncValue<CreatorType>, FutureOr<CreatorType>>
-    with
-        $FutureModifier<CreatorType>,
-        $FutureProvider<CreatorType, _FetchCreatorFromIdRef> {
+    with $FutureModifier<CreatorType>, $FutureProvider<CreatorType> {
   const _FetchCreatorFromIdProvider._(
       {required _FetchCreatorFromIdFamily super.from,
       required String super.argument,
       FutureOr<CreatorType> Function(
-        _FetchCreatorFromIdRef ref,
+        Ref ref,
         String creatorId,
       )? create})
       : _createCb = create,
@@ -33,7 +29,7 @@ final class _FetchCreatorFromIdProvider
         );
 
   final FutureOr<CreatorType> Function(
-    _FetchCreatorFromIdRef ref,
+    Ref ref,
     String creatorId,
   )? _createCb;
 
@@ -56,7 +52,7 @@ final class _FetchCreatorFromIdProvider
   @override
   _FetchCreatorFromIdProvider $copyWithCreate(
     FutureOr<CreatorType> Function(
-      _FetchCreatorFromIdRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchCreatorFromIdProvider._(
@@ -70,7 +66,7 @@ final class _FetchCreatorFromIdProvider
   }
 
   @override
-  FutureOr<CreatorType> create(_FetchCreatorFromIdRef ref) {
+  FutureOr<CreatorType> create(Ref ref) {
     final _$cb = _createCb ?? _fetchCreatorFromId;
     final argument = this.argument as String;
     return _$cb(
@@ -91,7 +87,7 @@ final class _FetchCreatorFromIdProvider
 }
 
 String _$fetchCreatorFromIdHash() =>
-    r'de996798e5488880f40df3da59b157931b1d0e6d';
+    r'739d4e2f112a3951029eee7567997d3138b42d88';
 
 final class _FetchCreatorFromIdFamily extends Family {
   const _FetchCreatorFromIdFamily._()
@@ -117,7 +113,7 @@ final class _FetchCreatorFromIdFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<CreatorType> Function(
-      _FetchCreatorFromIdRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -136,21 +132,17 @@ final class _FetchCreatorFromIdFamily extends Family {
   }
 }
 
-typedef _FetchCreatorTitlesRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_fetchCreatorTitles)
 const _fetchCreatorTitlesProvider = _FetchCreatorTitlesFamily._();
 
 final class _FetchCreatorTitlesProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _FetchCreatorTitlesRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _FetchCreatorTitlesProvider._(
       {required _FetchCreatorTitlesFamily super.from,
       required CreatorType super.argument,
       FutureOr<List<Manga>> Function(
-        _FetchCreatorTitlesRef ref,
+        Ref ref,
         CreatorType creator,
       )? create})
       : _createCb = create,
@@ -163,7 +155,7 @@ final class _FetchCreatorTitlesProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _FetchCreatorTitlesRef ref,
+    Ref ref,
     CreatorType creator,
   )? _createCb;
 
@@ -186,7 +178,7 @@ final class _FetchCreatorTitlesProvider
   @override
   _FetchCreatorTitlesProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _FetchCreatorTitlesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchCreatorTitlesProvider._(
@@ -200,7 +192,7 @@ final class _FetchCreatorTitlesProvider
   }
 
   @override
-  FutureOr<List<Manga>> create(_FetchCreatorTitlesRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchCreatorTitles;
     final argument = this.argument as CreatorType;
     return _$cb(
@@ -221,7 +213,7 @@ final class _FetchCreatorTitlesProvider
 }
 
 String _$fetchCreatorTitlesHash() =>
-    r'9519b9552042e93cd2dc17173733cd154356c5b4';
+    r'352f73e5aaa9c2dff3bb3722647ba959e0903099';
 
 final class _FetchCreatorTitlesFamily extends Family {
   const _FetchCreatorTitlesFamily._()
@@ -247,7 +239,7 @@ final class _FetchCreatorTitlesFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<Manga>> Function(
-      _FetchCreatorTitlesRef ref,
+      Ref ref,
       CreatorType args,
     ) create,
   ) {
@@ -266,4 +258,4 @@ final class _FetchCreatorTitlesFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

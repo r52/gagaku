@@ -6,8 +6,6 @@ part of 'chapter_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchChaptersRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
-
 @ProviderFor(_fetchChapters)
 const _fetchChaptersProvider = _FetchChaptersProvider._();
 
@@ -16,10 +14,10 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
         FutureOr<List<ChapterFeedItemData>>>
     with
         $FutureModifier<List<ChapterFeedItemData>>,
-        $FutureProvider<List<ChapterFeedItemData>, _FetchChaptersRef> {
+        $FutureProvider<List<ChapterFeedItemData>> {
   const _FetchChaptersProvider._(
       {FutureOr<List<ChapterFeedItemData>> Function(
-        _FetchChaptersRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
@@ -33,7 +31,7 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ChapterFeedItemData>> Function(
-    _FetchChaptersRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -48,20 +46,20 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
   @override
   _FetchChaptersProvider $copyWithCreate(
     FutureOr<List<ChapterFeedItemData>> Function(
-      _FetchChaptersRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchChaptersProvider._(create: create);
   }
 
   @override
-  FutureOr<List<ChapterFeedItemData>> create(_FetchChaptersRef ref) {
+  FutureOr<List<ChapterFeedItemData>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchChapters;
     return _$cb(ref);
   }
 }
 
-String _$fetchChaptersHash() => r'4e7e78b20393a8e82977b8f310ca9688cd913e49';
+String _$fetchChaptersHash() => r'695efe30f9ecca3c7c4dda33e3007c9820b9c902';
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

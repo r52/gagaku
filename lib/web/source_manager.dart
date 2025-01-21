@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/settings.dart';
@@ -54,7 +55,7 @@ class SourceManager extends HookConsumerWidget {
     Widget body;
 
     if (cfg.sourceDirectory.isEmpty) {
-      body = const Text('Please set a directory for source storage.');
+      body = Text('webSources.source.noDirWarning'.tr(context: context));
     } else if (sources is AsyncLoading ||
         availableSources.connectionState == ConnectionState.waiting ||
         !availableSources.hasData) {
@@ -69,10 +70,10 @@ class SourceManager extends HookConsumerWidget {
       if (srcMgr != null && availableSources.data!.isEmpty) {
         body = Column(
           children: [
-            const Text('No repo data. Showing installed sources only'),
+            Text('webSources.source.noRepoDataWarning'.tr(context: context)),
             Expanded(
               child: srcMgr.sources.isEmpty
-                  ? const Center(child: Text('No installed sources'))
+                  ? Center(child: Text('webSources.noSourcesWarning'.tr(context: context)))
                   : ListView.builder(
                       itemCount: srcMgr.sources.length,
                       itemBuilder: (context, index) {
@@ -80,15 +81,16 @@ class SourceManager extends HookConsumerWidget {
 
                         final actions = <Widget>[
                           IconButton(
-                            tooltip: 'Delete ${item.value.name}',
+                            tooltip: 'webSources.source.delete'.tr(context: context, args: [item.value.name]),
                             onPressed: () {
                               final messenger = ScaffoldMessenger.of(context);
                               ref.read(webSourceManagerProvider.notifier).removeSource(item.key).then((_) {
+                                if (!context.mounted) return;
                                 messenger
                                   ..removeCurrentSnackBar()
                                   ..showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Source deleted'),
+                                    SnackBar(
+                                      content: Text('webSources.source.sourceDeleteOK'.tr(context: context)),
                                       backgroundColor: Colors.green,
                                     ),
                                   );
@@ -130,15 +132,16 @@ class SourceManager extends HookConsumerWidget {
             if (srcMgr != null && srcMgr.sources.containsKey(item.key)) {
               actions.addAll([
                 IconButton(
-                  tooltip: 'Update/Replace ${item.value.name}',
+                  tooltip: 'webSources.source.update'.tr(context: context, args: [item.value.name]),
                   onPressed: () {
                     final messenger = ScaffoldMessenger.of(context);
                     ref.read(webSourceManagerProvider.notifier).updateSource(item.key, item.value).then((_) {
+                      if (!context.mounted) return;
                       messenger
                         ..removeCurrentSnackBar()
                         ..showSnackBar(
-                          const SnackBar(
-                            content: Text('Source updated'),
+                          SnackBar(
+                            content: Text('webSources.source.sourceUpdateOK'.tr(context: context)),
                             backgroundColor: Colors.green,
                           ),
                         );
@@ -150,15 +153,16 @@ class SourceManager extends HookConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Delete ${item.value.name}',
+                  tooltip: 'webSources.source.delete'.tr(context: context, args: [item.value.name]),
                   onPressed: () {
                     final messenger = ScaffoldMessenger.of(context);
                     ref.read(webSourceManagerProvider.notifier).removeSource(item.key).then((_) {
+                      if (!context.mounted) return;
                       messenger
                         ..removeCurrentSnackBar()
                         ..showSnackBar(
-                          const SnackBar(
-                            content: Text('Source deleted'),
+                          SnackBar(
+                            content: Text('webSources.source.sourceDeleteOK'.tr(context: context)),
                             backgroundColor: Colors.green,
                           ),
                         );
@@ -173,15 +177,16 @@ class SourceManager extends HookConsumerWidget {
             } else {
               actions.addAll([
                 IconButton(
-                  tooltip: 'Add ${item.value.name}',
+                  tooltip: 'webSources.source.add'.tr(context: context, args: [item.value.name]),
                   onPressed: () {
                     final messenger = ScaffoldMessenger.of(context);
                     ref.read(webSourceManagerProvider.notifier).addSource(item.key, item.value).then((_) {
+                      if (!context.mounted) return;
                       messenger
                         ..removeCurrentSnackBar()
                         ..showSnackBar(
-                          const SnackBar(
-                            content: Text('Source added'),
+                          SnackBar(
+                            content: Text('webSources.source.sourceAddOK'.tr(context: context)),
                             backgroundColor: Colors.green,
                           ),
                         );
@@ -197,7 +202,8 @@ class SourceManager extends HookConsumerWidget {
 
             String version = 'v${item.value.version}';
             if (srcMgr != null && srcMgr.sources.containsKey(item.key)) {
-              version += ' (installed: v${srcMgr.sources[item.key]!.version})';
+              version +=
+                  'webSources.source.installedVersion'.tr(context: context, args: [srcMgr.sources[item.key]!.version]);
             }
 
             return Card(
@@ -218,19 +224,19 @@ class SourceManager extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: const TitleFlexBar(title: 'Source Manager'),
+        flexibleSpace: TitleFlexBar(title: 'webSources.source.manager'.tr(context: context)),
         actions: [
           IconButton(
             onPressed: () {
               forceRefresh.value += 1;
             },
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh repos',
+            tooltip: 'webSources.source.refresh'.tr(context: context),
           ),
           IconButton(
             onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
             icon: const Icon(Icons.settings),
-            tooltip: 'Web Source Settings',
+            tooltip: 'arg_settings'.tr(context: context, args: ['webSources.text'.tr(context: context)]),
           ),
         ],
       ),

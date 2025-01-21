@@ -6,21 +6,87 @@ part of 'library.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _GetLibraryListByTypeRef = Ref<AsyncValue<List<String>>>;
+@ProviderFor(LibraryViewType)
+const libraryViewTypeProvider = LibraryViewTypeProvider._();
+
+final class LibraryViewTypeProvider
+    extends $NotifierProvider<LibraryViewType, MangaReadingStatus> {
+  const LibraryViewTypeProvider._(
+      {super.runNotifierBuildOverride, LibraryViewType Function()? create})
+      : _createCb = create,
+        super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'libraryViewTypeProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          allTransitiveDependencies: null,
+        );
+
+  final LibraryViewType Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$libraryViewTypeHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MangaReadingStatus value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<MangaReadingStatus>(value),
+    );
+  }
+
+  @$internal
+  @override
+  LibraryViewType create() => _createCb?.call() ?? LibraryViewType();
+
+  @$internal
+  @override
+  LibraryViewTypeProvider $copyWithCreate(
+    LibraryViewType Function() create,
+  ) {
+    return LibraryViewTypeProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  LibraryViewTypeProvider $copyWithBuild(
+    MangaReadingStatus Function(
+      Ref,
+      LibraryViewType,
+    ) build,
+  ) {
+    return LibraryViewTypeProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<LibraryViewType, MangaReadingStatus> $createElement(
+          $ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
+String _$libraryViewTypeHash() => r'fa2f63791b8cda5c72e6ee8d27bf417968d97753';
+
+abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
+  MangaReadingStatus build();
+  @$internal
+  @override
+  MangaReadingStatus runBuild() => build();
+}
 
 @ProviderFor(_getLibraryListByType)
 const _getLibraryListByTypeProvider = _GetLibraryListByTypeFamily._();
 
 final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
         AsyncValue<List<String>>, FutureOr<List<String>>>
-    with
-        $FutureModifier<List<String>>,
-        $FutureProvider<List<String>, _GetLibraryListByTypeRef> {
+    with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
   const _GetLibraryListByTypeProvider._(
       {required _GetLibraryListByTypeFamily super.from,
       required MangaReadingStatus super.argument,
       FutureOr<List<String>> Function(
-        _GetLibraryListByTypeRef ref,
+        Ref ref,
         MangaReadingStatus type,
       )? create})
       : _createCb = create,
@@ -33,7 +99,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<String>> Function(
-    _GetLibraryListByTypeRef ref,
+    Ref ref,
     MangaReadingStatus type,
   )? _createCb;
 
@@ -56,7 +122,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
   @override
   _GetLibraryListByTypeProvider $copyWithCreate(
     FutureOr<List<String>> Function(
-      _GetLibraryListByTypeRef ref,
+      Ref ref,
     ) create,
   ) {
     return _GetLibraryListByTypeProvider._(
@@ -70,7 +136,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<String>> create(_GetLibraryListByTypeRef ref) {
+  FutureOr<List<String>> create(Ref ref) {
     final _$cb = _createCb ?? _getLibraryListByType;
     final argument = this.argument as MangaReadingStatus;
     return _$cb(
@@ -91,7 +157,7 @@ final class _GetLibraryListByTypeProvider extends $FunctionalProvider<
 }
 
 String _$getLibraryListByTypeHash() =>
-    r'576bfd0924e507660e503b96beb1a2bfc76b8e6f';
+    r'748e235cf8af47055ca070f34f55bd5c07d82229';
 
 final class _GetLibraryListByTypeFamily extends Family {
   const _GetLibraryListByTypeFamily._()
@@ -117,7 +183,7 @@ final class _GetLibraryListByTypeFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<String>> Function(
-      _GetLibraryListByTypeRef ref,
+      Ref ref,
       MangaReadingStatus args,
     ) create,
   ) {
@@ -136,4 +202,4 @@ final class _GetLibraryListByTypeFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -6,21 +6,17 @@ part of 'directory_reader.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _GetDirectoryPagesRef = Ref<AsyncValue<List<ReaderPage>>>;
-
 @ProviderFor(_getDirectoryPages)
 const _getDirectoryPagesProvider = _GetDirectoryPagesFamily._();
 
 final class _GetDirectoryPagesProvider extends $FunctionalProvider<
         AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
-    with
-        $FutureModifier<List<ReaderPage>>,
-        $FutureProvider<List<ReaderPage>, _GetDirectoryPagesRef> {
+    with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
   const _GetDirectoryPagesProvider._(
       {required _GetDirectoryPagesFamily super.from,
       required String super.argument,
       FutureOr<List<ReaderPage>> Function(
-        _GetDirectoryPagesRef ref,
+        Ref ref,
         String path,
       )? create})
       : _createCb = create,
@@ -33,7 +29,7 @@ final class _GetDirectoryPagesProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ReaderPage>> Function(
-    _GetDirectoryPagesRef ref,
+    Ref ref,
     String path,
   )? _createCb;
 
@@ -56,7 +52,7 @@ final class _GetDirectoryPagesProvider extends $FunctionalProvider<
   @override
   _GetDirectoryPagesProvider $copyWithCreate(
     FutureOr<List<ReaderPage>> Function(
-      _GetDirectoryPagesRef ref,
+      Ref ref,
     ) create,
   ) {
     return _GetDirectoryPagesProvider._(
@@ -70,7 +66,7 @@ final class _GetDirectoryPagesProvider extends $FunctionalProvider<
   }
 
   @override
-  FutureOr<List<ReaderPage>> create(_GetDirectoryPagesRef ref) {
+  FutureOr<List<ReaderPage>> create(Ref ref) {
     final _$cb = _createCb ?? _getDirectoryPages;
     final argument = this.argument as String;
     return _$cb(
@@ -90,7 +86,7 @@ final class _GetDirectoryPagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$getDirectoryPagesHash() => r'9abbc559ffe1f52639956e7f09aecb4c4fa56913';
+String _$getDirectoryPagesHash() => r'599be990d7fb9529e4c9f52cd1d9057e839a3eab';
 
 final class _GetDirectoryPagesFamily extends Family {
   const _GetDirectoryPagesFamily._()
@@ -116,7 +112,7 @@ final class _GetDirectoryPagesFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<ReaderPage>> Function(
-      _GetDirectoryPagesRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -135,4 +131,4 @@ final class _GetDirectoryPagesFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

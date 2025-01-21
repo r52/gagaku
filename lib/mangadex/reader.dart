@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/mangadex/types.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/reader/main.dart';
-import 'package:gagaku/reader/types.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/reader/model/types.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -26,7 +26,7 @@ class ReaderData {
   final String title;
   final Chapter chapter;
   final Manga manga;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
 }
 
@@ -54,8 +54,8 @@ Page<dynamic> buildMDReaderPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
-Future<ReaderData> _fetchChapterData(_FetchChapterDataRef ref, String chapterId) async {
+@Riverpod(retry: noRetry)
+Future<ReaderData> _fetchChapterData(Ref ref, String chapterId) async {
   final api = ref.watch(mangadexProvider);
 
   final chapters = await api.fetchChapters([chapterId]);
@@ -74,8 +74,8 @@ Future<ReaderData> _fetchChapterData(_FetchChapterDataRef ref, String chapterId)
   return data;
 }
 
-@riverpod
-Future<List<ReaderPage>> _fetchChapterPages(_FetchChapterPagesRef ref, Chapter chapter) async {
+@Riverpod(retry: noRetry)
+Future<List<ReaderPage>> _fetchChapterPages(Ref ref, Chapter chapter) async {
   final api = ref.watch(mangadexProvider);
   final mpages = await api.getChapterServer(chapter);
 
@@ -100,35 +100,29 @@ class QueriedMangaDexReaderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dataProvider = ref.watch(_fetchChapterDataProvider(chapterId));
+    final me = ref.watch(loggedUserProvider).value;
+    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
+    final getRatings = ref.watch(ratingsProvider(me?.id).get);
+    final getStats = ref.watch(statisticsProvider.get);
 
-    return Scaffold(
-      body: switch (dataProvider) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchChapterDataProvider($chapterId) failed",
-          ),
-        AsyncValue(value: final data?) => MangaDexReaderWidget(
-            chapter: data.chapter,
-            manga: data.manga,
-            title: data.title,
-            link: Text(
-              data.manga.attributes!.title.get('en'),
-              style: const TextStyle(fontSize: 18),
-            ),
-            onLinkPressed: () async {
-              ref.read(readChaptersProvider.notifier).get([data.manga]);
-              ref.read(ratingsProvider.notifier).get([data.manga]);
-              ref.read(statisticsProvider.notifier).get([data.manga]);
-              context.go('/title/${data.manga.id}', extra: data.manga);
-            },
-            backRoute: '/',
-          ),
-        AsyncValue(:final progress) => ListSpinner(
-            progress: progress?.toDouble(),
-          ),
-      },
+    return DataProviderWhenWidget(
+      provider: _fetchChapterDataProvider(chapterId),
+      errorBuilder: (context, child) => Scaffold(
+        body: child,
+      ),
+      builder: (context, data) => MangaDexReaderWidget(
+        chapter: data.chapter,
+        manga: data.manga,
+        title: data.title,
+        link: data.manga.attributes!.title.get('en'),
+        onLinkPressed: () async {
+          getReadChapters([data.manga]);
+          getRatings([data.manga]);
+          getStats([data.manga]);
+          context.go('/title/${data.manga.id}', extra: data.manga);
+        },
+        backRoute: '/',
+      ),
     );
   }
 }
@@ -147,65 +141,58 @@ class MangaDexReaderWidget extends HookConsumerWidget {
   final String title;
   final Chapter chapter;
   final Manga manga;
-  final Widget? link;
+  final String? link;
   final VoidCallback? onLinkPressed;
   final String? backRoute;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pageProvider = ref.watch(_fetchChapterPagesProvider(chapter));
     final timer = useRef<Timer?>(null);
 
     useEffect(() {
       if (timer.value?.isActive ?? false) timer.value?.cancel();
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
-        final loggedin = await ref.read(authControlProvider.future);
+        final me = await ref.watch(loggedUserProvider.future);
 
-        if (loggedin) {
+        if (me != null) {
           // One more redundant read here for direct-linked chapters
-          await ref.read(readChaptersProvider.notifier).get([manga]);
+          await ref.read(readChaptersProvider(me.id).get)([manga]);
 
-          final readData = await ref.read(readChaptersProvider.future);
+          final readData = await ref.read(readChaptersProvider(me.id).future);
 
           if (readData[manga.id]?.contains(chapter.id) != true) {
-            ref.read(readChaptersProvider.notifier).set(manga, read: [chapter]);
+            ref.read(readChaptersProvider(me.id).set)(manga, read: [chapter]);
           }
         }
 
-        ref.read(mangaDexHistoryProvider.notifier).add(chapter);
+        ref.read(mangaDexHistoryProvider.add)(chapter);
       });
 
       return () => timer.value?.cancel();
     }, [chapter]);
 
-    switch (pageProvider) {
-      case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
-          ),
-          body: ErrorColumn(
-            error: error,
-            stackTrace: stackTrace,
-            message: "_fetchChapterPagesProvider(${chapter.id}) failed",
-          ),
-        );
-      case AsyncValue(value: final pages?):
-        return ReaderWidget(
-          pages: pages,
-          title: title,
-          subtitle: manga.attributes!.title.get('en'),
-          longstrip: manga.longStrip,
-          link: link,
-          onLinkPressed: onLinkPressed,
-          externalUrl: chapter.attributes.externalUrl,
-          backRoute: backRoute,
-        );
-      case _:
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-    }
+    return DataProviderWhenWidget(
+      provider: _fetchChapterPagesProvider(chapter),
+      errorBuilder: (context, child) => Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+        ),
+        body: child,
+      ),
+      builder: (context, pages) => ReaderWidget(
+        pages: pages,
+        title: title,
+        subtitle: manga.attributes!.title.get('en'),
+        longstrip: manga.longStrip,
+        drawerHeader: link,
+        onHeaderPressed: onLinkPressed,
+        externalUrl: chapter.attributes.externalUrl,
+        backRoute: backRoute,
+      ),
+      loadingWidget: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }

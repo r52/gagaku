@@ -1,10 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/mangadex/types.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,11 +20,11 @@ Page<dynamic> buildRecentFeedPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
-Future<List<Manga>> _fetchMangaFeed(_FetchMangaFeedRef ref) async {
+@Riverpod(retry: noRetry)
+Future<List<Manga>> _fetchMangaFeed(Ref ref) async {
   final mangas = await ref.watch(recentlyAddedProvider.future);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
+  await ref.read(statisticsProvider.get)(mangas);
 
   ref.disposeAfter(const Duration(minutes: 10));
 
@@ -50,7 +51,7 @@ class MangaDexRecentFeed extends HookConsumerWidget {
           onTap: () {
             ctrler.animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
           },
-          child: const TitleFlexBar(title: 'Recently Added'),
+          child: TitleFlexBar(title: 'mangadex.recentlyAdded'.tr(context: context)),
         ),
         leading: BackButton(
           onPressed: () {
@@ -63,40 +64,31 @@ class MangaDexRecentFeed extends HookConsumerWidget {
         ),
       ),
       body: Center(
-        child: Stack(
-          children: [
-            switch (feedProvider) {
-              AsyncValue(:final error?, :final stackTrace?) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(recentlyAddedProvider.notifier).clear();
-                    return ref.refresh(_fetchMangaFeedProvider.future);
-                  },
-                  child: ErrorList(
-                    error: error,
-                    stackTrace: stackTrace,
-                    message: "_fetchMangaFeedProvider failed",
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.read(recentlyAddedProvider.notifier).clear();
+            return ref.refresh(_fetchMangaFeedProvider.future);
+          },
+          child: DataProviderWhenWidget(
+            provider: _fetchMangaFeedProvider,
+            data: feedProvider,
+            builder: (context, mangas) => MangaListWidget(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: ctrler,
+              onAtEdge: () => ref.read(recentlyAddedProvider.notifier).getMore(),
+              isLoading: isLoading,
+              children: [
+                if (mangas.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Text('errors.noresults'.tr(context: context)),
+                    ),
                   ),
-                ),
-              AsyncValue(value: final mangas?) => RefreshIndicator(
-                  onRefresh: () async {
-                    ref.read(recentlyAddedProvider.notifier).clear();
-                    return ref.refresh(_fetchMangaFeedProvider.future);
-                  },
-                  child: mangas.isEmpty
-                      ? const Text('No results')
-                      : MangaListWidget(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: ctrler,
-                          onAtEdge: () => ref.read(recentlyAddedProvider.notifier).getMore(),
-                          children: [
-                            MangaListViewSliver(items: mangas),
-                          ],
-                        ),
-                ),
-              _ => const SizedBox.shrink(),
-            },
-            if (isLoading) ...Styles.loadingOverlay,
-          ],
+                MangaListViewSliver(items: mangas),
+              ],
+            ),
+            loadingWidget: const LoadingOverlayStack(),
+          ),
         ),
       ),
     );

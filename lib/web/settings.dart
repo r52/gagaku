@@ -1,7 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/repo_list.dart';
@@ -25,25 +26,24 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text('Web Source Settings'),
+        title: Text('arg_settings'.tr(context: context, args: ['webSources.text'.tr(context: context)])),
         actions: [
           OverflowBar(
             spacing: 8.0,
             children: [
               Tooltip(
-                message: 'Save Settings',
+                message: 'saveSettings'.tr(context: context),
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.save),
-                  label: const Text('Save Settings'),
+                  label: Text('saveSettings'.tr(context: context)),
                   onPressed: () {
-                    ref.read(webConfigProvider.notifier).saveWith(
-                          sourceDirectory: config.value.sourceDirectory,
-                          categories: config.value.categories,
-                          defaultCategory: config.value.defaultCategory,
-                        );
-                    ref
-                        .read(webSourceFavoritesProvider.notifier)
-                        .reconfigureCategories(config.value.categories, config.value.defaultCategory);
+                    ref.read(webConfigProvider.saveWith)(
+                      sourceDirectory: config.value.sourceDirectory,
+                      categories: config.value.categories,
+                      defaultCategory: config.value.defaultCategory,
+                    );
+                    ref.read(webSourceFavoritesProvider.reconfigureCategories)(
+                        config.value.categories, config.value.defaultCategory);
                     nav.pop();
                   },
                 ),
@@ -57,23 +57,21 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
-              title: const Text(
-                'Sources Path',
+              title: Text(
+                'webSources.settings.sourcePath'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Text('Choose where to store your downloaded sources'),
+              subtitle: Text('webSources.settings.sourcePathDesc'.tr(context: context)),
               builder: (context) {
                 return Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10.0,
                     children: [
                       Text(config.value.sourceDirectory),
-                      const SizedBox(
-                        width: 10,
-                      ),
                       ElevatedButton.icon(
                         onPressed: () async {
                           final perms = await Permission.manageExternalStorage.request();
@@ -87,7 +85,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                           }
                         },
                         icon: const Icon(Icons.folder_open),
-                        label: const Text('Browse'),
+                        label: Text('ui.browse'.tr(context: context)),
                       ),
                     ],
                   ),
@@ -95,14 +93,14 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Repos',
+              title: Text(
+                'webSources.settings.repos'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Text('Configure source repos'),
+              subtitle: Text('webSources.settings.reposDesc'.tr(context: context)),
               builder: (context) {
                 return Center(
                   child: ElevatedButton.icon(
@@ -112,20 +110,20 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       ));
                     },
                     icon: const Icon(Icons.library_add),
-                    label: const Text('Manage'),
+                    label: Text('ui.manage'.tr(context: context)),
                   ),
                 );
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Categories',
+              title: Text(
+                'webSources.settings.categories'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Text('Set up categories'),
+              subtitle: Text('webSources.settings.categoriesDesc'.tr(context: context)),
               builder: (context) {
                 return Center(
                   child: ElevatedButton.icon(
@@ -143,7 +141,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       }
                     },
                     icon: const Icon(Icons.library_add),
-                    label: const Text('Manage'),
+                    label: Text('ui.manage'.tr(context: context)),
                   ),
                 );
               },
@@ -169,10 +167,10 @@ class CategoryManager extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: const TitleFlexBar(title: 'Categories'),
+        flexibleSpace: TitleFlexBar(title: 'webSources.settings.categories'.tr(context: context)),
         actions: [
           IconButton(
-            tooltip: 'Add New Category',
+            tooltip: 'webSources.settings.newCategory'.tr(context: context),
             onPressed: () async {
               final result = await showDialog<String>(
                   context: context,
@@ -191,7 +189,7 @@ class CategoryManager extends HookConsumerWidget {
             icon: const Icon(Icons.add),
           ),
           IconButton(
-            tooltip: 'Save',
+            tooltip: 'ui.save'.tr(context: context),
             onPressed: () {
               nav.pop((list.value, defaultCat.value));
             },
@@ -203,7 +201,7 @@ class CategoryManager extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Hint: Drag to reorder'),
+            Text('ui.dragHint'.tr(context: context)),
             Expanded(
               child: ReorderableListView.builder(
                 onReorder: (oldIndex, newIndex) {
@@ -234,10 +232,10 @@ class CategoryManager extends HookConsumerWidget {
                                 : () {
                                     defaultCat.value = item.id;
                                   },
-                            child: const Text('Make Default'),
+                            child: Text('ui.makeDefault'.tr(context: context)),
                           ),
                           IconButton(
-                            tooltip: 'Rename',
+                            tooltip: 'ui.rename'.tr(context: context),
                             onPressed: () async {
                               final result = await showDialog<String>(
                                   context: context,
@@ -259,7 +257,7 @@ class CategoryManager extends HookConsumerWidget {
                             icon: const Icon(Icons.edit),
                           ),
                           IconButton(
-                            tooltip: 'Delete',
+                            tooltip: 'ui.delete'.tr(context: context),
                             color: Colors.red,
                             onPressed: list.value.length != 1
                                 ? () {
@@ -298,21 +296,25 @@ class NewCategoryDialog extends HookWidget {
     final fieldController = useTextEditingController(text: rename);
 
     return AlertDialog(
-      title: Text('${rename == null ? 'Add' : 'Rename'} Category'),
+      title: Text(rename == null
+          ? 'webSources.settings.addCategory'.tr(context: context)
+          : 'webSources.settings.renameCategory'.tr(context: context)),
       content: TextFormField(
         controller: fieldController,
-        decoration: const InputDecoration(hintText: 'Category name'),
+        decoration: InputDecoration(hintText: 'webSources.settings.categoryName'.tr(context: context)),
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (String? value) {
-          if (value == null || value.isEmpty) return 'Category name cannot be empty.';
-          if (list.indexWhere((e) => e.name == value) != -1) return 'Category name already used.';
+          if (value == null || value.isEmpty) return 'webSources.settings.emptyCategoryWarning'.tr(context: context);
+          if (list.indexWhere((e) => e.name == value) != -1) {
+            return 'webSources.settings.usedCategoryWarning'.tr(context: context);
+          }
 
           return null;
         },
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('CANCEL'),
+          child: Text('ui.cancel'.tr(context: context)),
           onPressed: () {
             Navigator.of(context).pop();
             fieldController.clear();
@@ -329,7 +331,7 @@ class NewCategoryDialog extends HookWidget {
                       fieldController.clear();
                     }
                   : null,
-              child: Text(rename == null ? 'Add' : 'Rename'),
+              child: Text(rename == null ? 'ui.add'.tr(context: context) : 'ui.rename'.tr(context: context)),
             );
           },
         ),

@@ -1,19 +1,19 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/mangadex/types.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'frontpage.g.dart';
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _popularTitles(_PopularTitlesRef ref) async {
+Future<List<Manga>> _popularTitles(Ref ref) async {
   final api = ref.watch(mangadexProvider);
 
   final format = DateFormat('yyyy-MM-ddT07:00:00');
@@ -37,7 +37,7 @@ Future<List<Manga>> _popularTitles(_PopularTitlesRef ref) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _recentlyAdded(_RecentlyAddedRef ref) async {
+Future<List<Manga>> _recentlyAdded(Ref ref) async {
   final manga = await ref.watch(recentlyAddedProvider.future);
 
   ref.disposeAfter(const Duration(minutes: 10));
@@ -46,7 +46,7 @@ Future<List<Manga>> _recentlyAdded(_RecentlyAddedRef ref) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _latestUpdates(_LatestUpdatesRef ref) async {
+Future<List<Manga>> _latestUpdates(Ref ref) async {
   final api = ref.watch(mangadexProvider);
   final chapters = await ref.watch(latestGlobalFeedProvider.future);
 
@@ -59,7 +59,7 @@ Future<List<Manga>> _latestUpdates(_LatestUpdatesRef ref) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<Manga>> _fetchCustomListManga(_FetchCustomListMangaRef ref, String listid) async {
+Future<List<Manga>> _fetchCustomListManga(Ref ref, String listid) async {
   final api = ref.watch(mangadexProvider);
 
   final list = await ref.watch(listSourceProvider(listid).future);
@@ -74,18 +74,114 @@ Future<List<Manga>> _fetchCustomListManga(_FetchCustomListMangaRef ref, String l
   return mangas;
 }
 
-class MangaDexFrontPage extends ConsumerWidget {
+@Riverpod(retry: noRetry)
+Future<FrontPageData> _fetchFrontPageData(Ref ref) async {
+  final api = ref.watch(mangadexProvider);
+  final data = await api.fetchFrontPageData();
+  ref.disposeAfter(const Duration(minutes: 60));
+
+  return data;
+}
+
+class MangaDexFrontPage extends StatelessWidget {
   const MangaDexFrontPage({super.key, this.controller});
 
   final ScrollController? controller;
 
   @override
+  Widget build(BuildContext context) {
+    return DataProviderWhenWidget(
+      provider: _fetchFrontPageDataProvider,
+      errorBuilder: (context, child) => Consumer(
+        child: child,
+        builder: (context, ref, child) => RefreshIndicator(
+          onRefresh: () {
+            return ref.refresh(_fetchFrontPageDataProvider.future);
+          },
+          child: child!,
+        ),
+      ),
+      builder: (context, data) => _FrontPageWidget(
+        key: ValueKey('_FrontPageWidget'),
+        data: data,
+        controller: controller,
+      ),
+    );
+  }
+}
+
+class _FrontPageWidget extends ConsumerWidget {
+  const _FrontPageWidget({super.key, required this.data, this.controller});
+
+  final FrontPageData data;
+  final ScrollController? controller;
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     const style = TextStyle(fontSize: 24);
-    const staffPickId = '805ba886-dd99-4aa4-b460-4bd7c7b71352';
-    const seasonalId = '54736a5c-eb7f-4844-971b-80ee171cdf29';
-    final staffPicks = _fetchCustomListMangaProvider(staffPickId);
-    final seasonal = _fetchCustomListMangaProvider(seasonalId);
+
+    final staffPicks = _fetchCustomListMangaProvider(data.staffPicks);
+    final seasonal = _fetchCustomListMangaProvider(data.seasonal);
+
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
+
+    final frontPageWidgets = [
+      Center(
+        child: Text(
+          'mangadex.popularNewTitles'.tr(context: context),
+          style: style,
+        ),
+      ),
+      const MangaProviderCarousel(provider: _popularTitlesProvider),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/titles/latest');
+        },
+        label: Text(
+          'mangadex.latestUpdates'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      const MangaProviderCarousel(provider: _latestUpdatesProvider),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/list/${data.staffPicks}');
+        },
+        label: Text(
+          'mangadex.staffPicks'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      MangaProviderCarousel(provider: staffPicks),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/list/${data.seasonal}');
+        },
+        label: Text(
+          'mangadex.seasonal'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      MangaProviderCarousel(provider: seasonal),
+      TextButton.icon(
+        onPressed: () {
+          context.push('/titles/recent');
+        },
+        label: Text(
+          'mangadex.recentlyAdded'.tr(context: context),
+          style: style,
+        ),
+        icon: const Icon(Icons.arrow_forward),
+        iconAlignment: IconAlignment.end,
+      ),
+      const MangaProviderCarousel(provider: _recentlyAddedProvider),
+    ];
 
     return RefreshIndicator(
       onRefresh: () {
@@ -99,84 +195,22 @@ class MangaDexFrontPage extends ConsumerWidget {
       },
       child: ScrollConfiguration(
         behavior: const MouseTouchScrollBehavior(),
-        child: ListView(
-          children: [
-            const Center(
-              child: Text(
-                'Popular New Titles',
-                style: style,
-              ),
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          controller: scrollController,
+          slivers: [
+            MangaDexSliverAppBar(
+              controller: scrollController,
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            const MangaProviderCarousel(provider: _popularTitlesProvider),
-            const SizedBox(
-              height: 10,
-            ),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/titles/latest');
+            SliverList.separated(
+              itemCount: frontPageWidgets.length,
+              itemBuilder: (context, index) {
+                return frontPageWidgets.elementAt(index);
               },
-              label: const Text(
-                'Latest Updates',
-                style: style,
+              separatorBuilder: (context, index) => const SizedBox(
+                height: 10.0,
               ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const MangaProviderCarousel(provider: _latestUpdatesProvider),
-            const SizedBox(
-              height: 10,
-            ),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/list/$staffPickId');
-              },
-              label: const Text(
-                'Staff Picks',
-                style: style,
-              ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            MangaProviderCarousel(provider: staffPicks),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/list/$seasonalId');
-              },
-              label: const Text(
-                'Seasonal',
-                style: style,
-              ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            MangaProviderCarousel(provider: seasonal),
-            TextButton.icon(
-              onPressed: () {
-                context.push('/titles/recent');
-              },
-              label: const Text(
-                'Recently Added',
-                style: style,
-              ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const MangaProviderCarousel(provider: _recentlyAddedProvider),
+            )
           ],
         ),
       ),
@@ -184,53 +218,36 @@ class MangaDexFrontPage extends ConsumerWidget {
   }
 }
 
-class MangaProviderCarousel extends ConsumerWidget {
+class MangaProviderCarousel extends StatelessWidget {
   const MangaProviderCarousel({
     super.key,
     required this.provider,
   });
 
-  final ProviderBase<AsyncValue<List<Manga>>> provider;
+  final Refreshable<AsyncValue<List<Manga>>> provider;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final results = ref.watch(provider);
-
+  Widget build(BuildContext context) {
     return Center(
-      child: switch (results) {
-        AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-            error: error,
-            stackTrace: stackTrace,
-            message: "${provider.toString()} failed",
+      child: DataProviderWhenWidget(
+        provider: provider,
+        builder: (context, items) => ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 256),
+          child: CarouselView(
+            itemExtent: 180,
+            shrinkExtent: 180,
+            enableSplash: false,
+            children: items
+                .map(
+                  (e) => GridMangaItem(
+                    key: ValueKey(e.id),
+                    manga: e,
+                  ),
+                )
+                .toList(),
           ),
-        AsyncValue(value: final items?) => CarouselSlider.builder(
-            options: CarouselOptions(
-              height: 256,
-              viewportFraction: 192 / MediaQuery.sizeOf(context).width,
-              initialPage: 0,
-              enableInfiniteScroll: true,
-              reverse: false,
-              pageSnapping: false,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 10),
-              autoPlayAnimationDuration: const Duration(milliseconds: 800),
-              autoPlayCurve: Curves.fastOutSlowIn,
-              enlargeCenterPage: true,
-              enlargeFactor: 0.1,
-              scrollDirection: Axis.horizontal,
-            ),
-            itemCount: items.length,
-            itemBuilder: (BuildContext context, int index, int pageViewIndex) {
-              final manga = items.elementAt(index);
-              return GridMangaItem(
-                key: ValueKey(manga.id),
-                manga: manga,
-              );
-            }),
-        AsyncValue(:final progress) => ListSpinner(
-            progress: progress?.toDouble(),
-          ),
-      },
+        ),
+      ),
     );
   }
 }

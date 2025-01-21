@@ -1,14 +1,17 @@
+// ignore_for_file: unused_local_variable
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/local/archive_reader.dart';
-import 'package:gagaku/local/config.dart';
+import 'package:gagaku/local/model/config.dart';
 import 'package:gagaku/local/directory_reader.dart';
-import 'package:gagaku/local/model.dart';
+import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class LocalLibraryHome extends StatelessWidget {
@@ -42,7 +45,7 @@ class LocalLibraryHome extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: const TitleFlexBar(title: 'Local Library'),
+        flexibleSpace: TitleFlexBar(title: 'localLibrary.text'.tr(context: context)),
         actions: [
           OverflowBar(
             spacing: 8.0,
@@ -65,14 +68,14 @@ class LocalLibraryHome extends StatelessWidget {
                       await _readArchive(nav);
                     },
                     leadingIcon: const Icon(Icons.folder_open),
-                    child: const Text('Read Archive'),
+                    child: Text('localLibrary.readArchive'.tr(context: context)),
                   ),
                   MenuItemButton(
                     onPressed: () {
                       nav.push(LocalLibrarySettingsRouteBuilder());
                     },
                     leadingIcon: const Icon(Icons.settings),
-                    child: const Text('Settings'),
+                    child: Text('settings'.tr(context: context)),
                   ),
                 ],
               ),
@@ -115,62 +118,54 @@ class LocalLibraryHome extends StatelessWidget {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 10.0,
                 children: [
-                  const Text('No library directory set!'),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  Text('localLibrary.noPathWarning'.tr(context: context)),
                   ElevatedButton.icon(
                     onPressed: () {
                       nav.push(LocalLibrarySettingsRouteBuilder());
                     },
                     icon: const Icon(Icons.library_add),
-                    label: const Text('Set Library Directory'),
-                  ),
-                  const SizedBox(
-                    height: 10,
+                    label: Text('localLibrary.setPath'.tr(context: context)),
                   ),
                   const Divider(),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   ElevatedButton.icon(
                     onPressed: () async {
                       await _readArchive(nav);
                     },
                     icon: const Icon(Icons.folder_open),
-                    label: const Text('Read Archive'),
+                    label: Text('localLibrary.readArchive'.tr(context: context)),
                   ),
                 ],
               ),
             );
           }
 
-          switch (libraryProvider) {
-            case AsyncValue(value: final top?):
-              Widget child;
-
-              if (top.error != null) {
-                child = Center(
+          return RefreshIndicator(
+            onRefresh: () async => ref.refresh(localLibraryProvider.future),
+            child: switch (libraryProvider) {
+              AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+                  error: error,
+                  stackTrace: stackTrace,
+                  message: "localLibraryProvider failed",
+                ),
+              AsyncValue(value: final top?) when top.error != null => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10.0,
                     children: [
                       Text(top.error!),
-                      const SizedBox(
-                        height: 10,
-                      ),
                       ElevatedButton.icon(
                         onPressed: () async {
                           await _readArchive(nav);
                         },
                         icon: const Icon(Icons.folder_open),
-                        label: const Text('Read Archive'),
+                        label: Text('localLibrary.readArchive'.tr(context: context)),
                       ),
                     ],
                   ),
-                );
-              } else if (currentItem.value != null) {
-                child = LibraryListWidget(
+                ),
+              AsyncValue(value: final top?) when currentItem.value != null => LibraryListWidget(
                   title: Text(
                     currentItem.value!.path,
                     style: const TextStyle(fontSize: 24),
@@ -185,63 +180,45 @@ class LocalLibraryHome extends StatelessWidget {
                         case LibraryItemType.archive:
                           nav.push(ArchiveReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
                           break;
-                        default:
-                          break;
                       }
                     } else {
                       currentItem.value = item;
                     }
                   },
-                );
-              } else {
-                return const ListSpinner();
-              }
-
-              return RefreshIndicator(
-                onRefresh: () async => ref.refresh(localLibraryProvider.future),
-                child: child,
-              );
-            case AsyncValue(:final error?, :final stackTrace?):
-              return RefreshIndicator(
-                onRefresh: () async => ref.refresh(localLibraryProvider.future),
-                child: ErrorList(
-                  error: error,
-                  stackTrace: stackTrace,
-                  message: "localLibraryProvider failed",
                 ),
-              );
-            case AsyncValue(:final progress):
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Scanning library...",
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 18,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    CircularProgressIndicator(value: progress?.toDouble()),
-                    if (progress != null)
+              AsyncValue(value: final top?) => const ListSpinner(),
+              AsyncValue(:final progress) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Text(
-                        '${(progress * 100).floor()}%',
+                        'localLibrary.scanning'.tr(context: context),
                         style: TextStyle(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.normal,
                           fontSize: 18,
                           decoration: TextDecoration.none,
                         ),
-                      )
-                  ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CircularProgressIndicator(value: progress?.toDouble()),
+                      if (progress != null)
+                        Text(
+                          '${(progress * 100).floor()}%',
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            decoration: TextDecoration.none,
+                          ),
+                        )
+                    ],
+                  ),
                 ),
-              );
-          }
+            },
+          );
         },
       ),
     );

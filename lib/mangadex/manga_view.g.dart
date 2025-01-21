@@ -6,24 +6,22 @@ part of 'manga_view.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchMangaFromIdRef = Ref<AsyncValue<Manga>>;
-
 @ProviderFor(_fetchMangaFromId)
 const _fetchMangaFromIdProvider = _FetchMangaFromIdFamily._();
 
 final class _FetchMangaFromIdProvider
     extends $FunctionalProvider<AsyncValue<Manga>, FutureOr<Manga>>
-    with $FutureModifier<Manga>, $FutureProvider<Manga, _FetchMangaFromIdRef> {
+    with $FutureModifier<Manga>, $FutureProvider<Manga> {
   const _FetchMangaFromIdProvider._(
       {required _FetchMangaFromIdFamily super.from,
       required String super.argument,
       FutureOr<Manga> Function(
-        _FetchMangaFromIdRef ref,
+        Ref ref,
         String mangaId,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchMangaFromIdProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -31,7 +29,7 @@ final class _FetchMangaFromIdProvider
         );
 
   final FutureOr<Manga> Function(
-    _FetchMangaFromIdRef ref,
+    Ref ref,
     String mangaId,
   )? _createCb;
 
@@ -53,7 +51,7 @@ final class _FetchMangaFromIdProvider
   @override
   _FetchMangaFromIdProvider $copyWithCreate(
     FutureOr<Manga> Function(
-      _FetchMangaFromIdRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchMangaFromIdProvider._(
@@ -67,7 +65,7 @@ final class _FetchMangaFromIdProvider
   }
 
   @override
-  FutureOr<Manga> create(_FetchMangaFromIdRef ref) {
+  FutureOr<Manga> create(Ref ref) {
     final _$cb = _createCb ?? _fetchMangaFromId;
     final argument = this.argument as String;
     return _$cb(
@@ -87,12 +85,12 @@ final class _FetchMangaFromIdProvider
   }
 }
 
-String _$fetchMangaFromIdHash() => r'79d90b7cdd1dd49486089e586547e5a1b5d4caa5';
+String _$fetchMangaFromIdHash() => r'5f218415f58bf606f6f13af5263acf96c372c70e';
 
 final class _FetchMangaFromIdFamily extends Family {
   const _FetchMangaFromIdFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchMangaFromIdProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -113,7 +111,7 @@ final class _FetchMangaFromIdFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<Manga> Function(
-      _FetchMangaFromIdRef ref,
+      Ref ref,
       String args,
     ) create,
   ) {
@@ -132,26 +130,22 @@ final class _FetchMangaFromIdFamily extends Family {
   }
 }
 
-typedef _FetchRelatedMangaRef = Ref<AsyncValue<List<Manga>>>;
-
 @ProviderFor(_fetchRelatedManga)
 const _fetchRelatedMangaProvider = _FetchRelatedMangaFamily._();
 
 final class _FetchRelatedMangaProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
-    with
-        $FutureModifier<List<Manga>>,
-        $FutureProvider<List<Manga>, _FetchRelatedMangaRef> {
+    with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _FetchRelatedMangaProvider._(
       {required _FetchRelatedMangaFamily super.from,
       required Manga super.argument,
       FutureOr<List<Manga>> Function(
-        _FetchRelatedMangaRef ref,
+        Ref ref,
         Manga manga,
       )? create})
       : _createCb = create,
         super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchRelatedMangaProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -159,7 +153,7 @@ final class _FetchRelatedMangaProvider
         );
 
   final FutureOr<List<Manga>> Function(
-    _FetchRelatedMangaRef ref,
+    Ref ref,
     Manga manga,
   )? _createCb;
 
@@ -182,7 +176,7 @@ final class _FetchRelatedMangaProvider
   @override
   _FetchRelatedMangaProvider $copyWithCreate(
     FutureOr<List<Manga>> Function(
-      _FetchRelatedMangaRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchRelatedMangaProvider._(
@@ -196,7 +190,7 @@ final class _FetchRelatedMangaProvider
   }
 
   @override
-  FutureOr<List<Manga>> create(_FetchRelatedMangaRef ref) {
+  FutureOr<List<Manga>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchRelatedManga;
     final argument = this.argument as Manga;
     return _$cb(
@@ -216,12 +210,12 @@ final class _FetchRelatedMangaProvider
   }
 }
 
-String _$fetchRelatedMangaHash() => r'de89eeee3bdb66f8f011bcf4315e59ce0c4f683c';
+String _$fetchRelatedMangaHash() => r'bb0918db37e1e1aae9a23ed5c99a7cbea7ed422a';
 
 final class _FetchRelatedMangaFamily extends Family {
   const _FetchRelatedMangaFamily._()
       : super(
-          retry: null,
+          retry: noRetry,
           name: r'_fetchRelatedMangaProvider',
           dependencies: null,
           allTransitiveDependencies: null,
@@ -242,7 +236,7 @@ final class _FetchRelatedMangaFamily extends Family {
   /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<List<Manga>> Function(
-      _FetchRelatedMangaRef ref,
+      Ref ref,
       Manga args,
     ) create,
   ) {
@@ -261,4 +255,4 @@ final class _FetchRelatedMangaFamily extends Family {
   }
 }
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

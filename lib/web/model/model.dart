@@ -6,11 +6,11 @@ import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_security.dart';
 import 'package:dart_eval/stdlib/core.dart';
 import 'package:flutter/material.dart';
-import 'package:gagaku/cache.dart';
-import 'package:gagaku/http.dart';
+import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/eval/plugin.dart';
 import 'package:gagaku/web/eval/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -23,7 +23,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'model.g.dart';
 
 @Riverpod(keepAlive: true)
-ProxyHandler proxy(ProxyRef ref) {
+ProxyHandler proxy(Ref ref) {
   return ProxyHandler(ref);
 }
 
@@ -52,7 +52,7 @@ class ProxyHandler {
       final code = '/read/api/imgur/chapter/$src';
       GoRouter.of(context).push('/read/imgur/$src/1/1/',
           extra: WebReaderData(source: code, info: SourceInfo(type: SourceType.proxy, source: 'imgur', location: src)));
-      ref.read(webSourceHistoryProvider.notifier).add(HistoryLink(title: url, url: url));
+      ref.read(webSourceHistoryProvider.add)(HistoryLink(title: url, url: url));
       return true;
     }
 
@@ -67,7 +67,7 @@ class ProxyHandler {
       if (info.chapter != null) {
         GoRouter.of(context).push('/read/${info.source}/${info.location}/${info.chapter}/1/');
       } else {
-        GoRouter.of(context).push('/read/${info.source}/${info.location}');
+        GoRouter.of(context).push('/read/${info.source}/${info.location}', extra: info);
       }
 
       return true;
@@ -138,46 +138,27 @@ class ProxyHandler {
     }
   }
 
-  Future<ProxyData> handleSource(SourceInfo info) async {
-    ProxyData p = ProxyData();
-
+  Future<WebManga?> handleSource(SourceInfo info) async {
     switch (info.type) {
       case SourceType.source:
         final srcMgr = await ref.watch(webSourceManagerProvider.future);
-        WebManga? manga;
 
         if (srcMgr != null) {
           if (info.parser != null) {
-            manga = await srcMgr.parseManga(info.parser!, Uri.parse(info.location), client);
+            return await srcMgr.parseManga(info.parser!, Uri.parse(info.location), client);
           } else {
             for (final MapEntry(key: key, value: src) in srcMgr.sources.entries) {
               if (info.source == src.name) {
-                manga = await srcMgr.parseManga(key, Uri.parse(info.location), client);
-                break;
+                return await srcMgr.parseManga(key, Uri.parse(info.location), client);
               }
             }
           }
         }
 
-        p.manga = manga;
-        break;
+        return null;
       case SourceType.proxy:
-      default:
-        switch (info.source) {
-          case 'imgur':
-            final code = '/read/api/imgur/chapter/${info.location}';
-            p.code = code;
-            break;
-          default:
-            // Generic proxy
-            final manga = await _getMangaFromProxy(info);
-            p.manga = manga;
-            break;
-        }
-        break;
+        return await _getMangaFromProxy(info);
     }
-
-    return p;
   }
 
   Future<WebManga> _getMangaFromProxy(SourceInfo info) async {
@@ -195,7 +176,7 @@ class ProxyHandler {
       final body = json.decode(response.body);
       final manga = WebManga.fromJson(body);
 
-      const expiry = Duration(days: 1);
+      const expiry = Duration(minutes: 15);
 
       logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
       _cache.put(key, json.encode(manga.toJson()), manga, true, expiry: expiry);
@@ -207,29 +188,19 @@ class ProxyHandler {
         "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
 
-  Future<List<String>> getChapterFromProxy(String code) async {
-    final url = "https://cubari.moe$code";
+  Future<dynamic> getProxyAPI(String path) async {
+    final url = "https://cubari.moe$path";
 
     final response = await client.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
 
-      if (body is List) {
-        if (code.contains('imgur')) {
-          final imgurlist = body.map((e) => ImgurPage.fromJson(e)).toList();
-          final pageList = imgurlist.map((e) => e.src).toList();
-
-          return pageList;
-        }
-
-        final pageList = body.map((e) => e as String).toList();
-        return pageList;
-      }
+      return body;
     }
 
     throw Exception(
-        "Failed to download chapter data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
+        "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
   }
 }
 
@@ -276,124 +247,116 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return _fetch();
   }
 
-  Future<void> clear() async {
+  @mutation
+  Future<Map<String, List<HistoryLink>>> clear() async {
     await future;
+    final empty = <String, List<HistoryLink>>{};
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final empty = <String, List<HistoryLink>>{};
+    final box = Hive.box(gagakuBox);
+    await box.put('web_favorites', json.encode(empty));
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(empty));
-
-      return empty;
-    });
+    return empty;
   }
 
-  Future<void> add(String category, HistoryLink link) async {
+  @mutation
+  Future<Map<String, List<HistoryLink>>> add(String category, HistoryLink link) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final list = oldstate[category];
+    final list = oldstate[category];
 
-      while (list?.contains(link) ?? false) {
-        list?.remove(link);
-      }
+    while (list?.contains(link) ?? false) {
+      list?.remove(link);
+    }
 
-      oldstate[category] = [link, ...?list];
+    oldstate[category] = [link, ...?list];
 
-      final udp = {...oldstate};
+    final udp = {...oldstate};
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(udp));
+    final box = Hive.box(gagakuBox);
+    await box.put('web_favorites', json.encode(udp));
 
-      return udp;
-    });
+    return udp;
   }
 
-  Future<void> updateAll(HistoryLink link) async {
+  @mutation
+  Future<Map<String, List<HistoryLink>>> updateAll(HistoryLink link) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      for (final cat in oldstate.keys) {
-        final idx = oldstate[cat]!.indexOf(link);
+    for (final cat in oldstate.keys) {
+      final idx = oldstate[cat]!.indexOf(link);
 
-        if (idx != -1) {
-          oldstate[cat]![idx] = link;
-        }
+      if (idx != -1) {
+        oldstate[cat]![idx] = link;
       }
+    }
 
-      final udp = {...oldstate};
+    final udp = {...oldstate};
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(udp));
+    final box = Hive.box(gagakuBox);
+    await box.put('web_favorites', json.encode(udp));
 
-      return udp;
-    });
+    return udp;
   }
 
-  Future<void> remove(String category, HistoryLink link) async {
+  @mutation
+  Future<Map<String, List<HistoryLink>>> remove(String category, HistoryLink link) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final list = oldstate[category];
 
-      while (list?.contains(link) ?? false) {
-        list?.remove(link);
-      }
+    final list = oldstate[category];
 
-      oldstate[category] = [...?list];
+    while (list?.contains(link) ?? false) {
+      list?.remove(link);
+    }
 
-      final udp = {...oldstate};
+    oldstate[category] = [...?list];
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(udp));
+    final udp = {...oldstate};
 
-      return udp;
-    });
+    final box = Hive.box(gagakuBox);
+    await box.put('web_favorites', json.encode(udp));
+
+    return udp;
   }
 
-  Future<void> updateList(String category, int oldIndex, int newIndex) async {
+  @mutation
+  Future<Map<String, List<HistoryLink>>> updateList(String category, int oldIndex, int newIndex) async {
     final oldstate = await future;
-    state = await AsyncValue.guard(() async {
-      if (oldIndex < newIndex) {
-        // removing the item at oldIndex will shorten the list by 1.
-        newIndex -= 1;
-      }
+    if (oldIndex < newIndex) {
+      // removing the item at oldIndex will shorten the list by 1.
+      newIndex -= 1;
+    }
 
-      if (oldstate.containsKey(category)) {
-        final element = oldstate[category]!.removeAt(oldIndex);
-        oldstate[category]!.insert(newIndex, element);
-      }
+    if (oldstate.containsKey(category)) {
+      final element = oldstate[category]!.removeAt(oldIndex);
+      oldstate[category]!.insert(newIndex, element);
+    }
 
-      final udp = {...oldstate};
+    final udp = {...oldstate};
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(udp));
+    final box = Hive.box(gagakuBox);
+    await box.put('web_favorites', json.encode(udp));
 
-      return udp;
-    });
+    return udp;
   }
 
-  Future<void> reconfigureCategories(List<WebSourceCategory> categories, String defaultCategory) async {
+  @mutation
+  Future<Map<String, List<HistoryLink>>> reconfigureCategories(
+      List<WebSourceCategory> categories, String defaultCategory) async {
     final oldstate = await future;
-    state = await AsyncValue.guard(() async {
-      // Move all deleted category lists to default
-      final oldkeys = oldstate.keys.toList();
-      for (final oldcat in oldkeys) {
-        if (categories.indexWhere((e) => e.id == oldcat) == -1) {
-          final list = oldstate.remove(oldcat);
-          oldstate[defaultCategory] = [...?oldstate[defaultCategory], ...?list];
-        }
+
+    // Move all deleted category lists to default
+    final oldkeys = oldstate.keys.toList();
+    for (final oldcat in oldkeys) {
+      if (categories.indexWhere((e) => e.id == oldcat) == -1) {
+        final list = oldstate.remove(oldcat);
+        oldstate[defaultCategory] = [...?oldstate[defaultCategory], ...?list];
       }
+    }
 
-      final udp = {...oldstate};
+    final udp = {...oldstate};
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_favorites', json.encode(udp));
+    final box = Hive.box(gagakuBox);
+    await box.put('web_favorites', json.encode(udp));
 
-      return udp;
-    });
+    return udp;
   }
 }
 
@@ -420,67 +383,61 @@ class WebSourceHistory extends _$WebSourceHistory {
     return _fetch();
   }
 
-  Future<void> clear() async {
+  @mutation
+  Future<Queue<HistoryLink>> clear() async {
     await future;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final empty = Queue<HistoryLink>();
-      final links = empty.toList();
+    final empty = Queue<HistoryLink>();
+    final links = empty.toList();
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_history', json.encode(links));
+    final box = Hive.box(gagakuBox);
+    await box.put('web_history', json.encode(links));
 
-      return empty;
-    });
+    return empty;
   }
 
-  Future<void> add(HistoryLink link) async {
+  @mutation
+  Future<Queue<HistoryLink>> add(HistoryLink link) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final cpy = Queue.of(oldstate);
+    final cpy = Queue.of(oldstate);
 
-      while (cpy.contains(link)) {
-        cpy.remove(link);
-      }
+    while (cpy.contains(link)) {
+      cpy.remove(link);
+    }
 
-      cpy.addFirst(link);
+    cpy.addFirst(link);
 
-      while (cpy.length > _numItems) {
-        cpy.removeLast();
-      }
+    while (cpy.length > _numItems) {
+      cpy.removeLast();
+    }
 
-      final links = cpy.map((e) => e.toJson()).toList();
+    final links = cpy.map((e) => e.toJson()).toList();
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_history', json.encode(links));
+    final box = Hive.box(gagakuBox);
+    await box.put('web_history', json.encode(links));
 
-      return cpy;
-    });
+    return cpy;
   }
 
-  Future<void> remove(HistoryLink link) async {
+  @mutation
+  Future<Queue<HistoryLink>> remove(HistoryLink link) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final cpy = Queue.of(oldstate);
+    final cpy = Queue.of(oldstate);
 
-      while (cpy.contains(link)) {
-        cpy.remove(link);
-      }
+    while (cpy.contains(link)) {
+      cpy.remove(link);
+    }
 
-      while (cpy.length > _numItems) {
-        cpy.removeLast();
-      }
+    while (cpy.length > _numItems) {
+      cpy.removeLast();
+    }
 
-      final links = cpy.map((e) => e.toJson()).toList();
+    final links = cpy.map((e) => e.toJson()).toList();
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_history', json.encode(links));
+    final box = Hive.box(gagakuBox);
+    await box.put('web_history', json.encode(links));
 
-      return cpy;
-    });
+    return cpy;
   }
 }
 
@@ -505,115 +462,106 @@ class WebReadMarkers extends _$WebReadMarkers {
     return _fetch();
   }
 
-  Future<void> clear() async {
+  @mutation
+  Future<Map<String, Set<String>>> clear() async {
     await future;
+    final empty = <String, Set<String>>{};
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final empty = <String, Set<String>>{};
+    final box = Hive.box(gagakuBox);
+    await box.put('web_read_history', json.encode({}));
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_read_history', json.encode({}));
-
-      return empty;
-    });
+    return empty;
   }
 
-  Future<void> set(String manga, String chapter, bool setRead) async {
+  @mutation
+  Future<Map<String, Set<String>>> set(String manga, String chapter, bool setRead) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final keyExists = oldstate.containsKey(manga);
+    final keyExists = oldstate.containsKey(manga);
 
-      // Refresh
-      if (keyExists) {
-        switch (setRead) {
-          case true:
-            oldstate[manga]?.add(chapter);
-            break;
-          case false:
-            oldstate[manga]?.remove(chapter);
-            break;
-        }
-
-        if (oldstate[manga]!.isEmpty) {
-          oldstate.remove(manga);
-        }
-      } else {
-        if (setRead) {
-          oldstate[manga] = {chapter};
-        }
+    // Refresh
+    if (keyExists) {
+      switch (setRead) {
+        case true:
+          oldstate[manga]?.add(chapter);
+          break;
+        case false:
+          oldstate[manga]?.remove(chapter);
+          break;
       }
 
-      final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+      if (oldstate[manga]!.isEmpty) {
+        oldstate.remove(manga);
+      }
+    } else {
+      if (setRead) {
+        oldstate[manga] = {chapter};
+      }
+    }
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_read_history', json.encode(converted));
+    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
 
-      return {...oldstate};
-    });
+    final box = Hive.box(gagakuBox);
+    await box.put('web_read_history', json.encode(converted));
+
+    return {...oldstate};
   }
 
-  Future<void> setBulk(
+  @mutation
+  Future<Map<String, Set<String>>> setBulk(
     String manga, {
     Iterable<String>? read,
     Iterable<String>? unread,
   }) async {
     final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final keyExists = oldstate.containsKey(manga);
+    final keyExists = oldstate.containsKey(manga);
 
-      // Refresh
-      if (keyExists) {
-        if (read != null) {
-          oldstate[manga]?.addAll(read);
-        }
-
-        if (unread != null) {
-          oldstate[manga]?.removeAll(unread);
-        }
-
-        if (oldstate[manga]!.isEmpty) {
-          oldstate.remove(manga);
-        }
-      } else {
-        if (read != null) {
-          oldstate[manga] = {...read};
-        }
-
-        if (unread != null) {
-          oldstate[manga] = {};
-        }
+    // Refresh
+    if (keyExists) {
+      if (read != null) {
+        oldstate[manga]?.addAll(read);
       }
 
-      final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+      if (unread != null) {
+        oldstate[manga]?.removeAll(unread);
+      }
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_read_history', json.encode(converted));
-
-      return {...oldstate};
-    });
-  }
-
-  Future<void> deleteKey(String manga) async {
-    final oldstate = await future;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final keyExists = oldstate.containsKey(manga);
-
-      // Refresh
-      if (keyExists) {
+      if (oldstate[manga]!.isEmpty) {
         oldstate.remove(manga);
       }
+    } else {
+      if (read != null) {
+        oldstate[manga] = {...read};
+      }
 
-      final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+      if (unread != null) {
+        oldstate[manga] = {};
+      }
+    }
 
-      final box = Hive.box(gagakuBox);
-      await box.put('web_read_history', json.encode(converted));
+    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
 
-      return {...oldstate};
-    });
+    final box = Hive.box(gagakuBox);
+    await box.put('web_read_history', json.encode(converted));
+
+    return {...oldstate};
+  }
+
+  @mutation
+  Future<Map<String, Set<String>>> deleteKey(String manga) async {
+    final oldstate = await future;
+    final keyExists = oldstate.containsKey(manga);
+
+    // Refresh
+    if (keyExists) {
+      oldstate.remove(manga);
+    }
+
+    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+
+    final box = Hive.box(gagakuBox);
+    await box.put('web_read_history', json.encode(converted));
+
+    return {...oldstate};
   }
 }
 

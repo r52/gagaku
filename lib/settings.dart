@@ -1,21 +1,22 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/config.dart';
+import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/model/types.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SettingsHome extends HookConsumerWidget {
+class SettingsHome extends ConsumerWidget {
   const SettingsHome({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cfg = ref.watch(gagakuSettingsProvider);
-    final config = useState(cfg);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: const TitleFlexBar(title: 'Gagaku Settings'),
+        flexibleSpace: TitleFlexBar(title: 'arg_settings'.tr(context: context, args: ['Gagaku'])),
       ),
       drawer: const MainDrawer(),
       body: SafeArea(
@@ -23,8 +24,8 @@ class SettingsHome extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
-              title: const Text(
-                'Default Theme',
+              title: Text(
+                'theme.mode'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -33,20 +34,19 @@ class SettingsHome extends HookConsumerWidget {
               builder: (context) {
                 return Center(
                   child: DropdownMenu<ThemeMode>(
-                    initialSelection: config.value.themeMode,
+                    initialSelection: cfg.themeMode,
                     requestFocusOnTap: false,
                     enableSearch: false,
                     enableFilter: false,
-                    dropdownMenuEntries: const [
-                      DropdownMenuEntry(value: ThemeMode.light, label: 'Light'),
-                      DropdownMenuEntry(value: ThemeMode.dark, label: 'Dark'),
-                      DropdownMenuEntry(value: ThemeMode.system, label: 'System defined'),
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry(value: ThemeMode.light, label: 'theme.light'.tr(context: context)),
+                      DropdownMenuEntry(value: ThemeMode.dark, label: 'theme.dark'.tr(context: context)),
+                      DropdownMenuEntry(value: ThemeMode.system, label: 'theme.system'.tr(context: context)),
                     ],
                     onSelected: (ThemeMode? value) {
                       if (value != null) {
-                        final cfg = config.value.copyWith(themeMode: value);
-                        ref.read(gagakuSettingsProvider.notifier).save(cfg);
-                        config.value = cfg;
+                        final c = cfg.copyWith(themeMode: value);
+                        ref.read(gagakuSettingsProvider.save)(c);
                       }
                     },
                   ),
@@ -54,8 +54,8 @@ class SettingsHome extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: const Text(
-                'Theme Color',
+              title: Text(
+                'theme.color'.tr(context: context),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -63,29 +63,28 @@ class SettingsHome extends HookConsumerWidget {
               ),
               builder: (context) {
                 return Center(
-                  child: DropdownMenu<Color>(
-                    initialSelection: config.value.theme,
+                  child: DropdownMenu<GagakuTheme>(
+                    initialSelection: cfg.theme,
                     enableSearch: false,
                     enableFilter: false,
                     requestFocusOnTap: false,
                     dropdownMenuEntries: [
-                      DropdownMenuEntry(value: Colors.lime.shade900, label: 'Lime'),
-                      DropdownMenuEntry(value: Colors.grey.shade800, label: 'Grey'),
-                      DropdownMenuEntry(value: Colors.amberAccent.shade700, label: 'Amber'),
-                      DropdownMenuEntry(value: Colors.blue.shade800, label: 'Blue'),
-                      DropdownMenuEntry(value: Colors.teal.shade800, label: 'Teal'),
-                      DropdownMenuEntry(value: Colors.green.shade800, label: 'Green'),
-                      DropdownMenuEntry(value: Colors.lightGreen.shade800, label: 'Light Green'),
-                      DropdownMenuEntry(value: Colors.red.shade800, label: 'Red'),
-                      DropdownMenuEntry(value: Colors.orange.shade800, label: 'Orange'),
-                      DropdownMenuEntry(value: Colors.yellow.shade800, label: 'Yellow'),
-                      DropdownMenuEntry(value: Colors.purple.shade800, label: 'Purple'),
+                      for (final c in GagakuTheme.values)
+                        DropdownMenuEntry(
+                          leadingIcon: Container(
+                            width: 15,
+                            height: 15,
+                            decoration:
+                                BoxDecoration(color: c.color, border: Border.all(color: theme.colorScheme.onSurface)),
+                          ),
+                          value: c,
+                          label: context.tr(c.label),
+                        ),
                     ],
-                    onSelected: (Color? value) {
+                    onSelected: (GagakuTheme? value) {
                       if (value != null) {
-                        final cfg = config.value.copyWith(theme: value);
-                        ref.read(gagakuSettingsProvider.notifier).save(cfg);
-                        config.value = cfg;
+                        final c = cfg.copyWith(theme: value);
+                        ref.read(gagakuSettingsProvider.save)(c);
                       }
                     },
                   ),

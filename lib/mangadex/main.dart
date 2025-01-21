@@ -1,25 +1,22 @@
-import 'package:animations/animations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
-import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/mangadex/search.dart';
-import 'package:gagaku/mangadex/settings.dart';
-import 'package:gagaku/model.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MangaDexHome extends HookConsumerWidget {
-  const MangaDexHome({this.controllers, required this.child, super.key});
+  const MangaDexHome({required this.child, super.key});
 
-  final List<ScrollController>? controllers;
   final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
+    final controllers = List.generate(5, (idx) => useScrollController());
     final lifecycle = useAppLifecycleState();
 
     useEffect(() {
@@ -33,117 +30,36 @@ class MangaDexHome extends HookConsumerWidget {
 
     return Scaffold(
       restorationId: 'md_home_restore',
-      appBar: AppBar(
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
-          },
-          child: const TitleFlexBar(title: 'MangaDex'),
-        ),
-        actions: [
-          OverflowBar(
-            spacing: 8.0,
-            children: [
-              Tooltip(
-                message: 'Search Manga',
-                child: OpenContainer(
-                  closedColor: theme.colorScheme.surface,
-                  closedShape: const CircleBorder(),
-                  closedBuilder: (context, openContainer) {
-                    return IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {
-                        openContainer();
-                      },
-                    );
-                  },
-                  openBuilder: (context, closedContainer) {
-                    return const MangaDexSearchWidget();
-                  },
-                ),
-              ),
-              Tooltip(
-                message: 'MangaDex Settings',
-                child: OpenContainer<bool>(
-                  closedColor: theme.colorScheme.surface,
-                  closedShape: const CircleBorder(),
-                  closedBuilder: (context, openContainer) {
-                    return IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        openContainer();
-                      },
-                    );
-                  },
-                  openBuilder: (context, closedContainer) {
-                    return const MangaDexSettingsWidget();
-                  },
-                ),
-              ),
-              Consumer(
-                builder: (context, ref, child) {
-                  final auth = ref.watch(authControlProvider);
-
-                  switch (auth) {
-                    case AsyncValue(value: final loggedin?):
-                      // XXX: This changes when OAuth is released
-                      return Ink(
-                        decoration: ShapeDecoration(
-                          color: theme.colorScheme.surface,
-                          shape: const CircleBorder(),
-                        ),
-                        child: Tooltip(
-                          message: loggedin ? 'Logout' : 'Login',
-                          child: IconButton(
-                            color: theme.colorScheme.primary,
-                            icon: loggedin ? const Icon(Icons.logout) : const Icon(Icons.login),
-                            onPressed: loggedin
-                                ? () => ref.read(authControlProvider.notifier).logout()
-                                : () => context.push(GagakuRoute.login),
-                          ),
-                        ),
-                      );
-                    // ignore: unused_local_variable
-                    case AsyncValue(:final error?, :final stackTrace?):
-                      return const Icon(Icons.error);
-                    case _:
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                  }
-                },
-              ),
-            ],
-          )
-        ],
-      ),
       drawer: const MainDrawer(),
       body: Center(
-        child: child,
+        child: DefaultScrollController(
+          controller: controllers[index],
+          child: child,
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'mangadex.home'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.menu_book),
-            label: 'My Feed',
+            label: 'mangadex.myFeed'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.collections),
-            label: 'Library',
+            label: 'library.text'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.list),
-            label: 'My Lists',
+            label: 'mangadex.myLists'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.history),
-            label: 'History',
+            label: 'history.text'.tr(context: context),
           )
         ],
         selectedIndex: index,
@@ -152,7 +68,7 @@ class MangaDexHome extends HookConsumerWidget {
 
           if (currTab == index) {
             // Scroll to top if on the same tab
-            controllers?[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 500), curve: Curves.easeOutCirc);
           } else {
             // Switch tab
             _onItemTapped(index, context);

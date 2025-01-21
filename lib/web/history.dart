@@ -1,6 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/ui.dart';
+import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/ui.dart';
@@ -20,7 +21,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final cfg = ref.watch(webConfigProvider);
 
-    final scrollController = controller ?? useScrollController();
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final historyProvider = ref.watch(webSourceHistoryProvider);
 
     return Material(
@@ -28,6 +29,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
         AsyncValue(value: final history?) when history.isEmpty => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10.0,
               children: [
                 const Tooltip(
                   message: 'Supported URLs:\ncubari.moe\nimgur.com',
@@ -43,82 +45,73 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
                 ElevatedButton.icon(
                   onPressed: () => openLinkDialog(context, api),
                   icon: const Icon(
                     Icons.link,
                   ),
-                  label: const Text('Open Web Source'),
+                  label: const Text('Open Link'),
                 ),
               ],
             ),
           ),
-        AsyncValue(value: final history?) => Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                child: Row(
-                  children: [
-                    const Text(
-                      'History',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    const Spacer(),
-                    ElevatedButton.icon(
-                      style: Styles.buttonStyle(),
-                      onPressed: () async {
-                        final result = await showDialog<bool>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Clear History'),
-                              content: const Text('Are you sure you want to remove all history?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('No'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(false);
-                                  },
-                                ),
-                                ElevatedButton(
-                                  child: const Text('Yes'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(true);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
+        AsyncValue(value: final history?) => WebMangaListWidget(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: scrollController,
+            leading: [
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                pinned: true,
+                title: Text(
+                  'history.text'.tr(context: context),
+                  style: TextStyle(fontSize: 24),
+                ),
+                actions: [
+                  ElevatedButton.icon(
+                    style: Styles.buttonStyle(),
+                    onPressed: () async {
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Clear History'),
+                            content: const Text('Are you sure you want to remove all history?'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('No'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                              ),
+                              ElevatedButton(
+                                child: const Text('Yes'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
 
-                        if (result == true) {
-                          ref.read(webSourceHistoryProvider.notifier).clear();
-                        }
-                      },
-                      icon: const Icon(Icons.clear_all),
-                      label: const Text('Clear History'),
-                    ),
-                  ],
-                ),
+                      if (result == true) {
+                        ref.read(webSourceHistoryProvider.clear)();
+                      }
+                    },
+                    icon: const Icon(Icons.clear_all),
+                    label: const Text('Clear History'),
+                  ),
+                ],
               ),
-              Expanded(
-                child: WebMangaListWidget(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: scrollController,
-                  children: [
-                    WebMangaListViewSliver(
-                      items: history.toList(),
-                      favoritesKey: cfg.defaultCategory,
-                    ),
-                  ],
-                ),
+            ],
+            children: [
+              WebMangaListViewSliver(
+                items: history.toList(),
+                favoritesKey: cfg.defaultCategory,
               ),
             ],
           ),
-        AsyncValue(:final error?, :final stackTrace?) => ErrorColumn(error: error, stackTrace: stackTrace),
+        AsyncValue(:final error?, :final stackTrace?) => ErrorList(error: error, stackTrace: stackTrace),
         _ => const Center(
             child: CircularProgressIndicator(),
           ),

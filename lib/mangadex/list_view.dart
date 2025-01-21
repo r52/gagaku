@@ -1,13 +1,14 @@
 import 'dart:math';
 
 import 'package:animations/animations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/mangadex/model.dart';
-import 'package:gagaku/mangadex/types.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/ui.dart';
-import 'package:gagaku/util.dart';
+import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
@@ -29,22 +30,18 @@ Page<dynamic> buildListViewPage(BuildContext context, GoRouterState state) {
   );
 }
 
-@riverpod
-Future<List<ChapterFeedItemData>> _fetchListFeed(_FetchListFeedRef ref, CustomList list) async {
-  final loggedin = await ref.watch(authControlProvider.future);
-
+@Riverpod(retry: noRetry)
+Future<List<ChapterFeedItemData>> _fetchListFeed(Ref ref, CustomList list) async {
+  final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
+
   final chapters = await ref.watch(customListFeedProvider(list).future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-
   final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
 
-  await ref.read(statisticsProvider.notifier).get(mangas);
-
-  if (loggedin) {
-    await ref.read(readChaptersProvider.notifier).get(mangas);
-  }
+  await ref.read(statisticsProvider.get)(mangas);
+  await ref.read(readChaptersProvider(me?.id).get)(mangas);
 
   final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
 
@@ -71,6 +68,22 @@ Future<List<ChapterFeedItemData>> _fetchListFeed(_FetchListFeedRef ref, CustomLi
   return dlist;
 }
 
+@Riverpod(retry: noRetry)
+Future<CustomList?> _getList(Ref ref, String listId) async {
+  final me = await ref.watch(loggedUserProvider.future);
+
+  if (me != null) {
+    final userlists = await ref.watch(userListsProvider(me.id).future);
+    final found = userlists.indexWhere((e) => e.id == listId);
+    if (found >= 0) {
+      return userlists.elementAt(found);
+    }
+  }
+
+  final list = await ref.watch(listSourceProvider(listId).future);
+  return list;
+}
+
 class MangaDexListViewWidget extends HookConsumerWidget {
   const MangaDexListViewWidget({super.key, required this.listId});
 
@@ -81,16 +94,16 @@ class MangaDexListViewWidget extends HookConsumerWidget {
     final theme = Theme.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).value;
-    final listProvider = ref.watch(listSourceProvider(listId));
+    final listProvider = ref.watch(_getListProvider(listId));
 
-    const bottomNavigationBarItems = <Widget>[
+    final bottomNavigationBarItems = <Widget>[
       NavigationDestination(
         icon: Icon(Icons.menu_book),
-        label: 'Titles',
+        label: 'titles'.tr(context: context),
       ),
       NavigationDestination(
         icon: Icon(Icons.feed),
-        label: 'Feed',
+        label: 'feed'.tr(context: context),
       ),
     ];
 
@@ -137,7 +150,8 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                 children: [
                   Consumer(
                     builder: (context, ref, child) {
-                      final followedLists = ref.watch(followedListsProvider).value;
+                      final followedLists = ref.watch(followedListsProvider(me?.id)).value;
+                      final followList = ref.watch(followedListsProvider(me?.id).setFollow);
                       final idx = followedLists?.indexWhere((e) => e.id == list.id);
 
                       if (idx == null) {
@@ -146,12 +160,12 @@ class MangaDexListViewWidget extends HookConsumerWidget {
 
                       return IconButton(
                         style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
-                        onPressed: () => ref.read(followedListsProvider.notifier).setFollow(list, idx == -1),
+                        onPressed: () => followList(list, idx == -1),
                         icon: Icon(
                           idx == -1 ? Icons.bookmark_border : Icons.bookmark,
                           color: idx == -1 ? null : theme.colorScheme.primary,
                         ),
-                        tooltip: idx == -1 ? 'Follow' : 'Unfollow',
+                        tooltip: idx == -1 ? 'ui.follow'.tr(context: context) : 'ui.unfollow'.tr(context: context),
                       );
                     },
                   ),
@@ -162,41 +176,9 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                         context.push('/list/edit/${list.id}', extra: list);
                       },
                       icon: const Icon(Icons.edit),
-                      tooltip: 'Edit',
+                      tooltip: 'ui.edit'.tr(context: context),
                     ),
                   const SizedBox.shrink(),
-                  // if (list.user != null && me != null && list.user!.id == me.id)
-                  //   ElevatedButton(
-                  //     style: Styles.buttonStyle(backgroundColor: Colors.red),
-                  //     onPressed: () async {
-                  //       final result = await showDeleteListDialog(
-                  //           context, list.attributes.name);
-                  //       if (result == true) {
-                  //         ref
-                  //             .read(userListsProvider.notifier)
-                  //             .deleteList(list)
-                  //             .then((success) {
-                  //           if (success == true) {
-                  //             if (!context.mounted) return;
-                  //             context.pop();
-                  //           } else {
-                  //             messenger
-                  //               ..removeCurrentSnackBar()
-                  //               ..showSnackBar(
-                  //                 const SnackBar(
-                  //                   content: Text('Failed to delete list.'),
-                  //                   backgroundColor: Colors.red,
-                  //                 ),
-                  //               );
-                  //           }
-                  //         });
-                  //       }
-                  //     },
-                  //     child: const Text('Delete'),
-                  //   ),
-                  // const SizedBox(
-                  //   width: 4,
-                  // ),
                 ],
               ),
             ],
@@ -218,46 +200,37 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                       final currentPage = useState(0);
                       final titlesProvider = ref.watch(getMangaListByPageProvider(list.set, currentPage.value));
 
-                      return Stack(
-                        children: [
-                          Column(
-                            children: switch (titlesProvider) {
-                              AsyncValue(:final error?, :final stackTrace?) => [
-                                  RefreshIndicator(
-                                    onRefresh: () async =>
-                                        ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
-                                    child: ErrorList(error: error, stackTrace: stackTrace),
-                                  )
-                                ],
-                              AsyncValue(value: final mangas) => [
-                                  Expanded(
-                                    child: RefreshIndicator(
-                                      onRefresh: () async =>
-                                          ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
-                                      child: MangaListWidget(
-                                        title: Text(
-                                          'Titles (${list.set.length})',
-                                          style: const TextStyle(fontSize: 24),
-                                        ),
-                                        physics: const AlwaysScrollableScrollPhysics(),
-                                        controller: controllers[0],
-                                        children: [
-                                          if (mangas != null) MangaListViewSliver(items: mangas),
-                                        ],
-                                      ),
+                      return RefreshIndicator(
+                        onRefresh: () async =>
+                            ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
+                        child: switch (titlesProvider) {
+                          AsyncValue(:final error?, :final stackTrace?) =>
+                            ErrorList(error: error, stackTrace: stackTrace),
+                          AsyncValue(value: final mangas) => Column(
+                              children: [
+                                Expanded(
+                                  child: MangaListWidget(
+                                    title: Text(
+                                      '${'titles'.tr(context: context)} (${list.set.length})',
+                                      style: const TextStyle(fontSize: 24),
                                     ),
+                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    controller: controllers[0],
+                                    isLoading: titlesProvider.isLoading,
+                                    children: [
+                                      if (mangas != null) MangaListViewSliver(items: mangas),
+                                    ],
                                   ),
-                                  NumberPaginator(
-                                    numberPages: max((list.set.length / MangaDexEndpoints.searchLimit).ceil(), 1),
-                                    onPageChange: (int index) {
-                                      currentPage.value = index;
-                                    },
-                                  ),
-                                ],
-                            },
-                          ),
-                          if (titlesProvider.isLoading) ...Styles.loadingOverlay
-                        ],
+                                ),
+                                NumberPaginator(
+                                  numberPages: max((list.set.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                                  onPageChange: (int index) {
+                                    currentPage.value = index;
+                                  },
+                                ),
+                              ],
+                            ),
+                        },
                       );
                     },
                   ),
@@ -266,8 +239,8 @@ class MangaDexListViewWidget extends HookConsumerWidget {
                     builder: (context, ref, child) {
                       return ChapterFeedWidget(
                         provider: _fetchListFeedProvider(list),
-                        title: 'List Feed',
-                        emptyText: 'No chapters!',
+                        title: 'mangadex.listFeed'.tr(context: context),
+                        emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
                         onAtEdge: () => ref.read(customListFeedProvider(list).notifier).getMore(),
                         onRefresh: () async {
                           ref.read(customListFeedProvider(list).notifier).clear();
@@ -303,7 +276,7 @@ class MangaDexListViewWidget extends HookConsumerWidget {
         return Scaffold(
           appBar: AppBar(),
           body: Center(
-            child: Text('List with ID $listId does not exist!'),
+            child: Text('mangadex.listNotExistError'.tr(context: context, args: [listId])),
           ),
         );
       case AsyncValue(:final progress):

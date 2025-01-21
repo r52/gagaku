@@ -6,8 +6,6 @@ part of 'history_feed.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-typedef _FetchHistoryFeedRef = Ref<AsyncValue<List<ChapterFeedItemData>>>;
-
 @ProviderFor(_fetchHistoryFeed)
 const _fetchHistoryFeedProvider = _FetchHistoryFeedProvider._();
 
@@ -16,16 +14,16 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
         FutureOr<List<ChapterFeedItemData>>>
     with
         $FutureModifier<List<ChapterFeedItemData>>,
-        $FutureProvider<List<ChapterFeedItemData>, _FetchHistoryFeedRef> {
+        $FutureProvider<List<ChapterFeedItemData>> {
   const _FetchHistoryFeedProvider._(
       {FutureOr<List<ChapterFeedItemData>> Function(
-        _FetchHistoryFeedRef ref,
+        Ref ref,
       )? create})
       : _createCb = create,
         super(
           from: null,
           argument: null,
-          retry: null,
+          retry: noRetry,
           name: r'_fetchHistoryFeedProvider',
           isAutoDispose: true,
           dependencies: null,
@@ -33,7 +31,7 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
         );
 
   final FutureOr<List<ChapterFeedItemData>> Function(
-    _FetchHistoryFeedRef ref,
+    Ref ref,
   )? _createCb;
 
   @override
@@ -48,20 +46,20 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
   @override
   _FetchHistoryFeedProvider $copyWithCreate(
     FutureOr<List<ChapterFeedItemData>> Function(
-      _FetchHistoryFeedRef ref,
+      Ref ref,
     ) create,
   ) {
     return _FetchHistoryFeedProvider._(create: create);
   }
 
   @override
-  FutureOr<List<ChapterFeedItemData>> create(_FetchHistoryFeedRef ref) {
+  FutureOr<List<ChapterFeedItemData>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchHistoryFeed;
     return _$cb(ref);
   }
 }
 
-String _$fetchHistoryFeedHash() => r'4dd56fd463930deeaefceae0e803cfc1c2a6e115';
+String _$fetchHistoryFeedHash() => r'83dc5ca66eb07364432d0fdcee800d9f1505d2eb';
 
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use_from_same_package, unreachable_from_main, invalid_use_of_internal_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
