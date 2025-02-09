@@ -24,6 +24,9 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final historyProvider = ref.watch(webSourceHistoryProvider);
 
+    // Pre-initialize sources
+    final _ = ref.watch(webSourceManagerProvider);
+
     return Material(
       child: switch (historyProvider) {
         AsyncValue(value: final history?) when history.isEmpty => Center(
@@ -108,6 +111,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
               WebMangaListViewSliver(
                 items: history.toList(),
                 favoritesKey: cfg.defaultCategory,
+                removeFromAll: true,
               ),
             ],
           ),

@@ -102,27 +102,24 @@ Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic source, SourceInfo info) async {
-  List<String>? links;
+Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic chapter, SourceInfo info) async {
+  List<String>? links = [];
 
   final srcMgr = await ref.watch(webSourceManagerProvider.future);
-  final api = ref.watch(proxyProvider);
 
-  if (srcMgr != null) {
-    if (info.parser != null) {
-      links = await srcMgr.parsePages(info.parser!, Uri.parse(source), api.client);
-    } else {
-      for (final MapEntry(key: key, value: src) in srcMgr.sources.entries) {
-        if (info.source == src.name) {
-          links = await srcMgr.parsePages(key, Uri.parse(source), api.client);
-          break;
-        }
+  if (info.parser != null) {
+    links = await ref.read(webSourceManagerProvider.notifier).getChapterPages(info.parser!.id, info.location, chapter);
+  } else {
+    for (final src in srcMgr) {
+      if (info.source == src.id) {
+        links = await ref.read(webSourceManagerProvider.notifier).getChapterPages(src.id, info.location, chapter);
+        break;
       }
     }
   }
 
   if (links == null) {
-    throw Exception('Failed to download pages from $source');
+    throw Exception('Failed to download pages from source ${info.source}, chapter id $chapter');
   }
 
   final pages = links

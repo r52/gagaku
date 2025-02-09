@@ -22,7 +22,7 @@ Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
   final info = state.extra.asOrNull<SourceInfo>();
 
   final proxy = state.pathParameters['proxy'] ?? state.pathParameters['source'];
-  final code = state.pathParameters['code'] ?? state.pathParameters['url'];
+  final code = state.pathParameters['code'] ?? state.pathParameters['mangaId'];
 
   return CustomTransitionPage<void>(
     key: state.pageKey,
@@ -359,9 +359,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         if (info.type == SourceType.source)
                           ButtonChip(
                             onPressed: () async {
-                              final url = Uri.parse(info.location);
+                              final url = await ref
+                                  .read(webSourceManagerProvider.notifier)
+                                  .getMangaURL(info.source, info.location);
+                              final uri = Uri.parse(url);
 
-                              if (!await launchUrl(url)) {
+                              if (!await launchUrl(uri)) {
                                 throw 'Could not launch $url';
                               }
                             },
@@ -540,7 +543,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     var url = '/read/${info.source}/${info.location}/$name/1/';
 
     if (info.type == SourceType.source) {
-      url = '/read-chapter/${info.source}/${data.chapter.groups.entries.first.value}';
+      url = '/read-chapter/${info.source}/${info.location}/${data.chapter.groups.entries.first.value}';
     }
 
     return ListTile(

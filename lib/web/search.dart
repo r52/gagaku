@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -34,7 +36,6 @@ class WebSourceSearchWidget extends HookConsumerWidget {
     final controller = useSearchController();
     final searchTerm = useState('');
     final sources = ref.watch(webSourceManagerProvider);
-    final api = ref.watch(proxyProvider);
 
     Widget? sourcesResult = switch (sources) {
       AsyncError(:final error, :final stackTrace) => SliverToBoxAdapter(
@@ -44,8 +45,8 @@ class WebSourceSearchWidget extends HookConsumerWidget {
             message: "webSourceManagerProvider() failed",
           ),
         ),
-      AsyncData(value: final src) when src != null && src.sources.isNotEmpty => null,
-      AsyncData(value: final src) when src == null || src.sources.isEmpty => SliverToBoxAdapter(
+      AsyncData(value: final src) when src.isNotEmpty => null,
+      AsyncData(value: final src) when src.isEmpty => SliverToBoxAdapter(
           child: Center(
             child: Text("webSources.noSourcesWarning".tr(context: context)),
           ),
@@ -138,7 +139,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
         children: [
           if (sourcesResult != null) sourcesResult,
           if (sourcesResult == null)
-            for (var MapEntry(key: key, value: src) in sources.value!.sources.entries) ...[
+            for (final src in sources.value!) ...[
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 10.0),
@@ -151,18 +152,25 @@ class WebSourceSearchWidget extends HookConsumerWidget {
               HookBuilder(
                 builder: (context) {
                   final results = useMemoized(
-                      () => sources.value!.searchManga(key, searchTerm.value.toLowerCase(), api.client),
+                      () => ref
+                          .read(webSourceManagerProvider.notifier)
+                          .searchManga(src.id, SearchRequest(title: searchTerm.value.toLowerCase())),
                       [searchTerm.value]);
                   final future = useFuture(results);
 
                   if (future.hasError) {
-                    return SliverToBoxAdapter(
-                      child: ErrorList(
-                        error: future.error!,
-                        stackTrace: future.stackTrace!,
-                        message: "WebSource($src).searchManga() failed",
-                      ),
-                    );
+                    final error = future.error!;
+                    final stackTrace = future.stackTrace!;
+                    final msg = "WebSource($src).searchManga() failed";
+
+                    final messenger = ScaffoldMessenger.of(context);
+                    Styles.showErrorSnackBar(messenger, '$error');
+                    logger.e(msg, error: error, stackTrace: stackTrace);
+
+                    return SliverList.list(children: [
+                      Text('$error'),
+                      Text(stackTrace.toString()),
+                    ]);
                   }
 
                   if (future.connectionState == ConnectionState.waiting || !future.hasData) {

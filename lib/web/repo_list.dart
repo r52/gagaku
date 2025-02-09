@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/model/types.dart' show RepoInfo;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const _urlStartValidation = 'http';
-const _urlEndValidation = '.json';
 
 class RepoListManager extends HookConsumerWidget {
   const RepoListManager({super.key});
@@ -25,7 +25,7 @@ class RepoListManager extends HookConsumerWidget {
           IconButton(
             tooltip: 'webSources.repo.newRepo'.tr(context: context),
             onPressed: () async {
-              final result = await showDialog<String>(
+              final result = await showDialog<RepoInfo>(
                   context: context,
                   builder: (BuildContext context) {
                     return const NewRepoDialog();
@@ -57,13 +57,14 @@ class RepoListManager extends HookConsumerWidget {
                   return Card(
                     child: ListTile(
                       leading: const Icon(Icons.cloud_download),
-                      title: Text(item),
+                      title: Text(item.name),
+                      subtitle: Text(item.url),
                       trailing: OverflowBar(
                         children: [
                           IconButton(
                             tooltip: 'webSources.repo.browser'.tr(context: context),
                             onPressed: () async {
-                              if (!await launchUrl(Uri.parse(item))) {
+                              if (!await launchUrl(Uri.parse(item.url))) {
                                 throw 'Could not launch $item';
                               }
                             },
@@ -72,7 +73,7 @@ class RepoListManager extends HookConsumerWidget {
                           IconButton(
                             tooltip: 'ui.delete'.tr(context: context),
                             onPressed: () {
-                              list.value.remove(item);
+                              list.value.removeWhere((e) => e.url == item.url);
                               list.value = [...list.value];
                             },
                             icon: const Icon(Icons.delete),
@@ -93,6 +94,7 @@ class NewRepoDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final nameFieldController = useTextEditingController();
     final urlFieldController = useTextEditingController();
 
     return AlertDialog(
@@ -102,13 +104,23 @@ class NewRepoDialog extends HookWidget {
         children: [
           Text('webSources.repo.addWarning'.tr(context: context)),
           TextFormField(
+            controller: nameFieldController,
+            decoration: InputDecoration(hintText: 'webSources.repo.nameHint'.tr(context: context)),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (String? value) {
+              if (value == null || value.isEmpty) return 'webSources.repo.nameEmptyWarning'.tr(context: context);
+
+              return null;
+            },
+          ),
+          TextFormField(
             controller: urlFieldController,
             decoration: InputDecoration(hintText: 'webSources.repo.urlHint'.tr(context: context)),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (String? value) {
               if (value == null || value.isEmpty) return 'webSources.repo.urlEmptyWarning'.tr(context: context);
 
-              return value.startsWith(_urlStartValidation) && value.endsWith(_urlEndValidation)
+              return value.startsWith(_urlStartValidation)
                   ? null
                   : 'webSources.repo.urlInvalidWarning'.tr(context: context);
             },
@@ -134,16 +146,14 @@ class NewRepoDialog extends HookWidget {
         ),
         HookBuilder(
           builder: (_) {
-            final urlIsValid = useListenableSelector(
-                urlFieldController,
-                () =>
-                    urlFieldController.text.isNotEmpty &&
-                    urlFieldController.text.startsWith(_urlStartValidation) &&
-                    urlFieldController.text.endsWith(_urlEndValidation));
+            final nameIsValid = useListenableSelector(nameFieldController, () => nameFieldController.text.isNotEmpty);
+            final urlIsValid = useListenableSelector(urlFieldController,
+                () => urlFieldController.text.isNotEmpty && urlFieldController.text.startsWith(_urlStartValidation));
             return ElevatedButton(
-              onPressed: urlIsValid
+              onPressed: urlIsValid && nameIsValid
                   ? () {
-                      Navigator.of(context).pop(urlFieldController.text);
+                      Navigator.of(context).pop(RepoInfo(name: nameFieldController.text, url: urlFieldController.text));
+                      nameFieldController.clear();
                       urlFieldController.clear();
                     }
                   : null,

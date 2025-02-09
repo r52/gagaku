@@ -124,12 +124,14 @@ class WebMangaListViewSliver extends ConsumerWidget {
     required this.favoritesKey,
     this.reorderable = false,
     this.showRemoveButton = true,
+    this.removeFromAll = false,
   });
 
   final String favoritesKey;
   final List<HistoryLink> items;
   final bool reorderable;
   final bool showRemoveButton;
+  final bool removeFromAll; // Unfavoriting an item removes the item from all categories?
 
   int? _findChildIndexCb(Key? key) {
     final valueKey = key as ValueKey<int>;
@@ -184,7 +186,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             color: favorited ? theme.colorScheme.primary : null,
                             onPressed: () async {
                               if (favorited) {
-                                removeFavorite(favoritesKey, item);
+                                removeFavorite(removeFromAll ? 'all' : favoritesKey, item);
                               } else {
                                 addFavorite(favoritesKey, item);
                               }
@@ -203,7 +205,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           messenger
                             ..removeCurrentSnackBar()
                             ..showSnackBar(SnackBar(
-                              content: Text('ui.unsupportedUrl'.tr(context: context)),
+                              content: Text('errors.unsupportedUrl'.tr(context: context)),
                               backgroundColor: Colors.red,
                             ));
                         }
@@ -245,7 +247,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           color: favorited ? theme.colorScheme.primary : null,
                           onPressed: () async {
                             if (favorited) {
-                              removeFavorite(favoritesKey, item);
+                              removeFavorite(removeFromAll ? 'all' : favoritesKey, item);
                             } else {
                               addFavorite(favoritesKey, item);
                             }
@@ -274,7 +276,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         messenger
                           ..removeCurrentSnackBar()
                           ..showSnackBar(SnackBar(
-                            content: Text('ui.unsupportedUrl'.tr(context: context)),
+                            content: Text('errors.unsupportedUrl'.tr(context: context)),
                             backgroundColor: Colors.red,
                           ));
                       }
@@ -299,6 +301,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
               link: item,
               favoritesKey: favoritesKey,
               showRemoveButton: showRemoveButton,
+              removeFromAll: removeFromAll,
             );
           },
           itemCount: items.length,
@@ -314,12 +317,14 @@ class GridMangaItem extends HookConsumerWidget {
     required this.favoritesKey,
     this.showFavoriteButton = true,
     this.showRemoveButton = true,
+    this.removeFromAll = false,
   });
 
   final String favoritesKey;
   final HistoryLink link;
   final bool showFavoriteButton;
   final bool showRemoveButton;
+  final bool removeFromAll; // Unfavoriting an item removes the item from all categories?
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -356,7 +361,7 @@ class GridMangaItem extends HookConsumerWidget {
           messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(SnackBar(
-              content: Text('ui.unsupportedUrl'.tr(context: context)),
+              content: Text('errors.unsupportedUrl'.tr(context: context)),
               backgroundColor: Colors.red,
             ));
         }
@@ -402,7 +407,7 @@ class GridMangaItem extends HookConsumerWidget {
                         : 'mangaActions.favorite'.tr(context: context),
                     onPressed: () async {
                       if (favorited) {
-                        ref.read(webSourceFavoritesProvider.remove)(favoritesKey, link);
+                        ref.read(webSourceFavoritesProvider.remove)(removeFromAll ? 'all' : favoritesKey, link);
                       } else {
                         ref.read(webSourceFavoritesProvider.add)(favoritesKey, link);
                       }

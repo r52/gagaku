@@ -1,10 +1,6 @@
-import 'package:dart_eval/dart_eval_bridge.dart';
-import 'package:dart_eval/stdlib/core.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gagaku/web/eval/http.dart';
-import 'package:gagaku/web/eval/util.dart';
-import 'package:http/http.dart' as http;
+import 'package:gagaku/util/freezed.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
@@ -41,10 +37,10 @@ class SourceInfo with _$SourceInfo {
     required String source,
     required String location,
     String? chapter,
-    String? parser,
+    WebSourceInfo? parser,
   }) = _SourceInfo;
 
-  String getURL() => type == SourceType.proxy ? 'https://cubari.moe/read/$source/$location/' : location;
+  String getURL() => type == SourceType.proxy ? 'https://cubari.moe/read/$source/$location/' : '$source/$location';
   String getKey() => '$source/$location';
 }
 
@@ -199,94 +195,220 @@ class ImgurPage with _$ImgurPage {
   factory ImgurPage.fromJson(Map<String, dynamic> json) => _$ImgurPageFromJson(json);
 }
 
-class WebSource {
-  WebSource({
-    required this.runtime,
-  });
-
-  final Runtime runtime;
-  final Map<String, WebSourceInfo> sources = {};
-
-  Future<List<HistoryLink>> searchManga(String key, String searchTerm, http.Client client) async {
-    if (!sources.containsKey(key)) {
-      throw Exception('Source $key not found');
-    }
-
-    if (searchTerm.isEmpty) {
-      return [];
-    }
-
-    final info = sources[key]!;
-
-    final fut = (runtime.executeLib(
-                '${GagakuWebSources.getPackagePath}/$key', info.search, [$String(searchTerm), $Client.wrap(client)])
-            as $Future)
-        .$reified;
-    final vlist = (await fut) as List<$Value>;
-    final list = vlist.map((e) => e.$value as HistoryLink).toList();
-
-    return list;
-  }
-
-  Future<WebManga?> parseManga(String key, Uri url, http.Client client) async {
-    if (!sources.containsKey(key)) {
-      throw Exception('Source $key not found');
-    }
-
-    final info = sources[key]!;
-
-    final fut = (runtime.executeLib(
-            '${GagakuWebSources.getPackagePath}/$key', info.manga, [$Uri.wrap(url), $Client.wrap(client)]) as $Future)
-        .$reified;
-    final manga = (await fut) as WebManga?;
-
-    return manga;
-  }
-
-  Future<List<String>> parsePages(String key, Uri url, http.Client client) async {
-    if (!sources.containsKey(key)) {
-      throw Exception('Source $key not found');
-    }
-
-    final info = sources[key]!;
-
-    final fut = (runtime.executeLib(
-            '${GagakuWebSources.getPackagePath}/$key', info.pages, [$Uri.wrap(url), $Client.wrap(client)]) as $Future)
-        .$reified;
-    final data = await fut;
-
-    if (data is! List) {
-      throw Exception('Data returned by ${GagakuWebSources.getPackagePath}/$key: ${info.pages} is not a List');
-    }
-
-    final list = data.map((e) => e is $Value ? e.$value as String : e.toString()).toList();
-
-    return list;
-  }
-}
-
 @freezed
 class WebSourceInfo with _$WebSourceInfo {
   const factory WebSourceInfo({
+    required String id,
     required String name,
-    required String version,
-    required String baseUrl,
-    required String mangaPath,
-    required String search,
-    required String manga,
-    required String pages,
+    required String repo,
+    String? icon,
   }) = _WebSourceInfo;
 
   factory WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
+}
+
+///////////////////////////////////////////////////////////////////// PB types
+
+enum SourceIntents {
+  mangaChapters(1 << 0),
+  mangaTracking(1 << 1),
+  homepageSections(1 << 2),
+  collectionManagement(1 << 3),
+  cloudflareBypassRequired(1 << 4),
+  settingsUI(1 << 5);
+
+  final int flag;
+  const SourceIntents(this.flag);
+}
+
+// ignore: constant_identifier_names
+enum ContentRating { EVERYONE, MATURE, ADULT }
+
+@freezed
+class Badge with _$Badge {
+  const factory Badge({
+    required String text,
+    required BadgeColor type,
+  }) = _Badge;
+
+  factory Badge.fromJson(Map<String, dynamic> json) => _$BadgeFromJson(json);
+}
+
+enum BadgeColor {
+  //default(Colors.blue),
+  success(Colors.green),
+  info(Colors.grey),
+  warning(Color.fromARGB(255, 230, 162, 60)),
+  danger(Color.fromARGB(255, 245, 108, 108));
+
+  final Color color;
+  const BadgeColor(this.color);
+}
+
+@freezed
+class SourceVersion with _$SourceVersion {
+  const factory SourceVersion({
+    required String id,
+    required String name,
+    required String author,
+    required String desc,
+    String? website,
+    required ContentRating contentRating,
+    required String version,
+    required String icon,
+    required String websiteBaseURL,
+    String? authorWebsite,
+    String? language,
+    List<Badge>? tags,
+    int? intents,
+  }) = _SourceVersion;
+
+  factory SourceVersion.fromJson(Map<String, dynamic> json) => _$SourceVersionFromJson(json);
+}
+
+@freezed
+class BuiltWith with _$BuiltWith {
+  const factory BuiltWith({
+    required String toolchain,
+    required String types,
+  }) = _BuiltWith;
+
+  factory BuiltWith.fromJson(Map<String, dynamic> json) => _$BuiltWithFromJson(json);
+}
+
+@freezed
+class Versioning with _$Versioning {
+  const factory Versioning({
+    required String buildTime,
+    required List<SourceVersion> sources,
+    required BuiltWith builtWith,
+  }) = _Versioning;
+
+  factory Versioning.fromJson(Map<String, dynamic> json) => _$VersioningFromJson(json);
 }
 
 @freezed
 class RepoInfo with _$RepoInfo {
   const factory RepoInfo({
     required String name,
-    required String version,
     required String url,
   }) = _RepoInfo;
 
   factory RepoInfo.fromJson(Map<String, dynamic> json) => _$RepoInfoFromJson(json);
+}
+
+@freezed
+class PartialSourceManga with _$PartialSourceManga {
+  const factory PartialSourceManga({
+    required String mangaId,
+    required String image,
+    required String title,
+    String? subtitle,
+  }) = _PartialSourceManga;
+
+  factory PartialSourceManga.fromJson(Map<String, dynamic> json) => _$PartialSourceMangaFromJson(json);
+}
+
+@freezed
+class PagedResults with _$PagedResults {
+  const factory PagedResults({
+    List<PartialSourceManga>? results,
+    dynamic metadata,
+  }) = _PagedResults;
+
+  factory PagedResults.fromJson(Map<String, dynamic> json) => _$PagedResultsFromJson(json);
+}
+
+@freezed
+class MangaInfo with _$MangaInfo {
+  const factory MangaInfo({
+    required String image,
+    String? artist,
+    String? author,
+    required String desc,
+    required String status,
+    bool? hentai,
+    required List<String> titles,
+    String? banner,
+    num? rating,
+    List<TagSection>? tags,
+    List<String>? covers,
+    // required num avgRating,
+    // required num follows,
+    // required String langFlag,
+    // required String langName,
+    // required num users,
+    // required num views,
+  }) = _MangaInfo;
+
+  factory MangaInfo.fromJson(Map<String, dynamic> json) => _$MangaInfoFromJson(json);
+}
+
+@freezed
+class Tag with _$Tag {
+  const factory Tag({
+    required String id,
+    required String label,
+  }) = _Tag;
+
+  factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
+}
+
+@freezed
+class TagSection with _$TagSection {
+  const factory TagSection({
+    required String id,
+    required String label,
+    required List<Tag> tags,
+  }) = _TagSection;
+
+  factory TagSection.fromJson(Map<String, dynamic> json) => _$TagSectionFromJson(json);
+}
+
+@freezed
+class SourceManga with _$SourceManga {
+  const factory SourceManga({
+    required String id,
+    required MangaInfo mangaInfo,
+  }) = _SourceManga;
+
+  factory SourceManga.fromJson(Map<String, dynamic> json) => _$SourceMangaFromJson(json);
+}
+
+@freezed
+class Chapter with _$Chapter {
+  const factory Chapter({
+    required String id,
+    required num chapNum,
+    String? langCode,
+    String? name,
+    num? volume,
+    String? group,
+    @TimestampSerializer() DateTime? time,
+    num? sortingIndex,
+  }) = _Chapter;
+
+  factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
+}
+
+@freezed
+class ChapterDetails with _$ChapterDetails {
+  const factory ChapterDetails({
+    required String id,
+    required String mangaId,
+    required List<String> pages,
+  }) = _ChapterDetails;
+
+  factory ChapterDetails.fromJson(Map<String, dynamic> json) => _$ChapterDetailsFromJson(json);
+}
+
+@freezed
+class SearchRequest with _$SearchRequest {
+  const factory SearchRequest({
+    String? title,
+    List<Tag>? includedTags,
+    List<Tag>? excludedTags,
+  }) = _SearchRequest;
+
+  factory SearchRequest.fromJson(Map<String, dynamic> json) => _$SearchRequestFromJson(json);
 }

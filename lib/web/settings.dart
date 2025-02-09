@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/ui.dart';
@@ -7,7 +6,6 @@ import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/repo_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class WebSourceSettingsRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
   WebSourceSettingsRouteBuilder()
@@ -38,7 +36,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                   label: Text('saveSettings'.tr(context: context)),
                   onPressed: () {
                     ref.read(webConfigProvider.saveWith)(
-                      sourceDirectory: config.value.sourceDirectory,
+                      installedSources: config.value.installedSources,
                       categories: config.value.categories,
                       defaultCategory: config.value.defaultCategory,
                     );
@@ -56,42 +54,6 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-            SettingCardWidget(
-              title: Text(
-                'webSources.settings.sourcePath'.tr(context: context),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Text('webSources.settings.sourcePathDesc'.tr(context: context)),
-              builder: (context) {
-                return Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10.0,
-                    children: [
-                      Text(config.value.sourceDirectory),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final perms = await Permission.manageExternalStorage.request();
-
-                          if (perms.isGranted) {
-                            String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-
-                            if (selectedDirectory != null) {
-                              config.value = config.value.copyWith(sourceDirectory: selectedDirectory);
-                            }
-                          }
-                        },
-                        icon: const Icon(Icons.folder_open),
-                        label: Text('ui.browse'.tr(context: context)),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
             SettingCardWidget(
               title: Text(
                 'webSources.settings.repos'.tr(context: context),

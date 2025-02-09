@@ -184,7 +184,7 @@ final class WebSourceFavoritesProvider extends $AsyncNotifierProvider<
 }
 
 String _$webSourceFavoritesHash() =>
-    r'57e0afb1025e5fe404107a9dd2e947afd881d469';
+    r'872e17a8ff4f3bed3264af2c2b7abbc2779ea9bb';
 
 abstract class _$WebSourceFavorites
     extends $AsyncNotifier<Map<String, List<HistoryLink>>> {
@@ -224,14 +224,10 @@ class _$WebSourceFavoritesElement extends $AsyncNotifierProviderElement<
   }
 
   @override
-  void visitChildren({
-    required void Function(ProviderElement element) elementVisitor,
-    required void Function($ElementLense element) listenableVisitor,
-  }) {
-    super.visitChildren(
-      elementVisitor: elementVisitor,
-      listenableVisitor: listenableVisitor,
-    );
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$clear);
     listenableVisitor(_$add);
@@ -693,14 +689,10 @@ class _$WebSourceHistoryElement extends $AsyncNotifierProviderElement<
   }
 
   @override
-  void visitChildren({
-    required void Function(ProviderElement element) elementVisitor,
-    required void Function($ElementLense element) listenableVisitor,
-  }) {
-    super.visitChildren(
-      elementVisitor: elementVisitor,
-      listenableVisitor: listenableVisitor,
-    );
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$clear);
     listenableVisitor(_$add);
@@ -988,14 +980,10 @@ class _$WebReadMarkersElement extends $AsyncNotifierProviderElement<
   }
 
   @override
-  void visitChildren({
-    required void Function(ProviderElement element) elementVisitor,
-    required void Function($ElementLense element) listenableVisitor,
-  }) {
-    super.visitChildren(
-      elementVisitor: elementVisitor,
-      listenableVisitor: listenableVisitor,
-    );
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$clear);
     listenableVisitor(_$set);
@@ -1225,7 +1213,7 @@ final class _$WebReadMarkers$DeleteKey extends $AsyncMutationBase<
 const webSourceManagerProvider = WebSourceManagerProvider._();
 
 final class WebSourceManagerProvider
-    extends $AsyncNotifierProvider<WebSourceManager, WebSource?> {
+    extends $AsyncNotifierProvider<WebSourceManager, List<WebSourceInfo>> {
   const WebSourceManagerProvider._(
       {super.runNotifierBuildOverride, WebSourceManager Function()? create})
       : _createCb = create,
@@ -1259,7 +1247,7 @@ final class WebSourceManagerProvider
   @$internal
   @override
   WebSourceManagerProvider $copyWithBuild(
-    FutureOr<WebSource?> Function(
+    FutureOr<List<WebSourceInfo>> Function(
       Ref,
       WebSourceManager,
     ) build,
@@ -1269,18 +1257,18 @@ final class WebSourceManagerProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<WebSourceManager, WebSource?> $createElement(
-          $ProviderPointer pointer) =>
-      $AsyncNotifierProviderElement(this, pointer);
+  $AsyncNotifierProviderElement<WebSourceManager, List<WebSourceInfo>>
+      $createElement($ProviderPointer pointer) =>
+          $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$webSourceManagerHash() => r'e323b9fdc5ff416f2c734bd52a39d1bc512fa80d';
+String _$webSourceManagerHash() => r'df39e17480168b014f18a1a6924ff1188dcf90b0';
 
-abstract class _$WebSourceManager extends $AsyncNotifier<WebSource?> {
-  FutureOr<WebSource?> build();
+abstract class _$WebSourceManager extends $AsyncNotifier<List<WebSourceInfo>> {
+  FutureOr<List<WebSourceInfo>> build();
   @$internal
   @override
-  FutureOr<WebSource?> runBuild() => build();
+  FutureOr<List<WebSourceInfo>> runBuild() => build();
 }
 
 // ignore_for_file: type=lint

@@ -1,20 +1,18 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:dart_eval/dart_eval.dart';
-import 'package:dart_eval/dart_eval_security.dart';
-import 'package:dart_eval/stdlib/core.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/eval/plugin.dart';
-import 'package:gagaku/web/eval/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:gagaku/web/server.dart' show port;
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -74,14 +72,17 @@ class ProxyHandler {
     }
 
     final sourceMgr = await ref.watch(webSourceManagerProvider.future);
-    if (sourceMgr != null) {
-      for (final MapEntry(key: key, value: src) in sourceMgr.sources.entries) {
-        if (url.startsWith('${src.baseUrl}${src.mangaPath}')) {
-          if (!context.mounted) return false;
-          GoRouter.of(context).push('/read/${src.name}/$url',
-              extra: SourceInfo(type: SourceType.source, source: src.name, location: url, parser: key));
-          return true;
+    for (final src in sourceMgr) {
+      if (url.startsWith('${src.id}/')) {
+        final parts = url.split('/');
+        if (parts.length != 2) {
+          continue;
         }
+        final loc = parts[1];
+        if (!context.mounted) return false;
+        GoRouter.of(context).push('/read/${src.id}/$loc',
+            extra: SourceInfo(type: SourceType.source, source: src.id, location: loc, parser: src));
+        return true;
       }
     }
 
@@ -143,14 +144,12 @@ class ProxyHandler {
       case SourceType.source:
         final srcMgr = await ref.watch(webSourceManagerProvider.future);
 
-        if (srcMgr != null) {
-          if (info.parser != null) {
-            return await srcMgr.parseManga(info.parser!, Uri.parse(info.location), client);
-          } else {
-            for (final MapEntry(key: key, value: src) in srcMgr.sources.entries) {
-              if (info.source == src.name) {
-                return await srcMgr.parseManga(key, Uri.parse(info.location), client);
-              }
+        if (info.parser != null) {
+          return await ref.read(webSourceManagerProvider.notifier).getManga(info.parser!.id, info.location);
+        } else {
+          for (final src in srcMgr) {
+            if (info.source == src.id) {
+              return await ref.read(webSourceManagerProvider.notifier).getManga(src.id, info.location);
             }
           }
         }
@@ -300,13 +299,17 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   Future<Map<String, List<HistoryLink>>> remove(String category, HistoryLink link) async {
     final oldstate = await future;
 
-    final list = oldstate[category];
+    final categoriesToEdit = category == 'all' ? oldstate.keys.toList() : [category];
 
-    while (list?.contains(link) ?? false) {
-      list?.remove(link);
+    for (final c in categoriesToEdit) {
+      final list = oldstate[c];
+
+      while (list?.contains(link) ?? false) {
+        list?.remove(link);
+      }
+
+      oldstate[c] = [...?list];
     }
-
-    oldstate[category] = [...?list];
 
     final udp = {...oldstate};
 
@@ -567,97 +570,169 @@ class WebReadMarkers extends _$WebReadMarkers {
 
 @Riverpod(keepAlive: true)
 class WebSourceManager extends _$WebSourceManager {
-  Future<WebSource?> fetchData() async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
-
-    if (path.isNotEmpty && dir.existsSync()) {
-      final plugin = WebSourcePlugin();
-      final compiler = Compiler();
-      compiler.addPlugin(plugin);
-
-      final entities = await dir.list().toList();
-      final sourcefiles = <String, String>{};
-
-      for (final e in entities) {
-        if (e is File && e.path.endsWith('.dart')) {
-          final filename = e.uri.pathSegments.last;
-          String dat = await e.readAsString();
-
-          sourcefiles.putIfAbsent(filename, () => dat);
-          compiler.entrypoints.add('${GagakuWebSources.getPackagePath}/$filename');
-        }
-      }
-
-      final program = compiler.compile({GagakuWebSources.packageName: sourcefiles});
-      final runtime = Runtime.ofProgram(program);
-      runtime.addPlugin(plugin);
-
-      final source = WebSource(runtime: runtime);
-
-      for (final key in sourcefiles.keys) {
-        final result =
-            (runtime.executeLib('${GagakuWebSources.getPackagePath}/$key', 'getSourceInfo') as $String).$value;
-
-        final Map<String, dynamic> dat = json.decode(result);
-        final info = WebSourceInfo.fromJson(dat);
-
-        source.sources.putIfAbsent(key, () => info);
-        runtime.grant(NetworkPermission.url(info.baseUrl));
-      }
-
-      return source;
-    }
-
-    return null;
-  }
+  HeadlessInAppWebView? _view;
+  InAppWebViewController? _controller;
 
   @override
-  FutureOr<WebSource?> build() async {
-    return fetchData();
+  Future<List<WebSourceInfo>> build() async {
+    final completer = Completer<void>();
+    final cfg = ref.watch(webConfigProvider);
+    final installed = cfg.installedSources;
+
+    _view = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
+      initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
+      onWebViewCreated: (controller) {},
+      onConsoleMessage: (controller, consoleMessage) {
+        logger.d('Console Message: ${consoleMessage.message}');
+      },
+      onLoadStop: (controller, url) async {
+        for (final source in installed) {
+          final scriptUrl = '${source.repo}/${source.id}/source.js';
+          final response = await http.get(Uri.parse(scriptUrl));
+
+          if (response.statusCode != 200) {
+            logger.d("Failed to load $scriptUrl");
+            continue;
+          }
+
+          final script = response.body;
+          await controller.evaluateJavascript(source: script);
+
+          await controller.evaluateJavascript(
+              source: "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);");
+        }
+
+        _controller = controller;
+        logger.d("Extension host ready");
+        completer.complete();
+      },
+    );
+
+    ref.onDispose(() {
+      _view?.dispose();
+      _controller = null;
+    });
+
+    await _view?.run();
+    await completer.future;
+
+    return installed;
   }
 
-  Future<void> addSource(String key, RepoInfo value) async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
+  Future<List<HistoryLink>> searchManga(String sourceId, SearchRequest query) async {
+    await future;
 
-    if (path.isNotEmpty && dir.existsSync()) {
-      final api = ref.watch(proxyProvider);
-      final url = Uri.parse(value.url);
-
-      final response = await api.client.get(url);
-      await File('${dir.path}${Platform.pathSeparator}$key').writeAsBytes(response.bodyBytes, flush: true);
+    if ((query.title == null || query.title!.isEmpty) && query.includedTags == null) {
+      return [];
     }
 
-    ref.invalidateSelf();
-  }
+    if (_controller != null) {
+      String q = json.encode(query.toJson());
+      final result = await _controller!.callAsyncJavaScript(functionBody: """
+var query = $q;
+return await $sourceId.getSearchResults(query, undefined)
+""");
 
-  Future<void> removeSource(String key) async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
+      final pmangas = PagedResults.fromJson(result!.value);
 
-    if (path.isNotEmpty && dir.existsSync()) {
-      final file = File('${dir.path}${Platform.pathSeparator}$key');
-      if (file.existsSync()) {
-        await file.delete();
+      if (pmangas.results == null) {
+        return [];
       }
+
+      final links = pmangas.results!
+          .map((e) => HistoryLink(title: e.title, url: '$sourceId/${e.mangaId}', cover: e.image))
+          .toList();
+
+      // logger.d(result);
+
+      return links;
     }
 
-    ref.invalidateSelf();
+    throw Exception("Uninitialized view controller");
   }
 
-  Future<void> updateSource(String key, RepoInfo value) async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
+  Future<WebManga?> getManga(String sourceId, String mangaId) async {
+    await future;
 
-    if (path.isNotEmpty && dir.existsSync()) {
-      final api = ref.watch(proxyProvider);
-      final url = Uri.parse(value.url);
-
-      final response = await api.client.get(url);
-      await File('${dir.path}${Platform.pathSeparator}$key').writeAsBytes(response.bodyBytes, flush: true);
+    if (mangaId.isEmpty) {
+      return null;
     }
 
-    ref.invalidateSelf();
+    if (_controller != null) {
+      final mdeets =
+          await _controller!.callAsyncJavaScript(functionBody: "return await $sourceId.getMangaDetails('$mangaId')");
+
+      final smanga = SourceManga.fromJson(mdeets!.value);
+
+      final chaps = await _controller!.callAsyncJavaScript(
+        functionBody: """
+var p = await $sourceId.getChapters('$mangaId');
+p.forEach((e) => e.time = e.time.toISOString());
+return p;
+""",
+      );
+
+      final clist = chaps!.value as List<dynamic>;
+      final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
+      final chapmap = Map.fromEntries(chapters.map((e) => MapEntry(
+          e.chapNum.toString(),
+          WebChapter(
+            title: e.name,
+            volume: e.volume?.toString(),
+            groups: {e.group ?? sourceId: e.id},
+            releaseDate: e.time,
+          ))));
+
+      final manga = WebManga(
+        title: smanga.mangaInfo.titles.first,
+        description: smanga.mangaInfo.desc,
+        artist: smanga.mangaInfo.artist ?? 'Unknown',
+        author: smanga.mangaInfo.author ?? 'Unknown',
+        cover: smanga.mangaInfo.image,
+        chapters: chapmap,
+      );
+
+      // logger.d(result);
+
+      return manga;
+    }
+
+    throw Exception("Uninitialized view controller");
+  }
+
+  Future<List<String>> getChapterPages(String sourceId, String mangaId, String chapterId) async {
+    await future;
+
+    if (mangaId.isEmpty || chapterId.isEmpty) {
+      return [];
+    }
+
+    if (_controller != null) {
+      final cdeets = await _controller!
+          .callAsyncJavaScript(functionBody: "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')");
+
+      final chapterd = ChapterDetails.fromJson(cdeets!.value);
+
+      return chapterd.pages;
+    }
+
+    throw Exception("Uninitialized view controller");
+  }
+
+  Future<String> getMangaURL(String sourceId, String mangaId) async {
+    await future;
+
+    if (mangaId.isEmpty) {
+      return '';
+    }
+
+    if (_controller != null) {
+      final result = await _controller!.evaluateJavascript(source: "$sourceId.getMangaShareUrl('$mangaId')");
+
+      return result as String;
+    }
+
+    throw Exception("Uninitialized view controller");
   }
 }

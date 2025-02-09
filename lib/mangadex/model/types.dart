@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:gagaku/util/freezed.dart';
 import 'package:gagaku/util/util.dart';
 
 part 'types.freezed.dart';
@@ -252,16 +253,6 @@ class MangaSearchParameters with _$MangaSearchParameters {
     required String query,
     required MangaFilters filter,
   }) = _MangaSearchParameters;
-}
-
-class TimestampSerializer implements JsonConverter<DateTime, dynamic> {
-  const TimestampSerializer();
-
-  @override
-  DateTime fromJson(dynamic timestamp) => DateTime.parse(timestamp);
-
-  @override
-  dynamic toJson(DateTime date) => date.toString();
 }
 
 class LanguageConverter implements JsonConverter<Language, dynamic> {

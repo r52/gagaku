@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/web/model/types.dart' show RepoInfo, WebSourceInfo;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -24,11 +25,27 @@ class WebSourceCategory {
   Map<String, dynamic> toJson() => _$WebSourceCategoryToJson(this);
 }
 
+class RepoConverter implements JsonConverter<RepoInfo, dynamic> {
+  const RepoConverter();
+
+  @override
+  RepoInfo fromJson(dynamic item) {
+    if (item is String) {
+      return RepoInfo(name: item, url: item);
+    }
+
+    return RepoInfo.fromJson(item);
+  }
+
+  @override
+  dynamic toJson(RepoInfo item) => item.toJson();
+}
+
 @unfreezed
 class WebSourceConfig with _$WebSourceConfig {
   factory WebSourceConfig({
-    @Default('') String sourceDirectory,
-    @Default([]) List<String> repoList,
+    @Default([]) List<WebSourceInfo> installedSources,
+    @RepoConverter() @Default([]) List<RepoInfo> repoList,
     @Default([_defaultCategory]) List<WebSourceCategory> categories,
     @Default(_defaultUUID) String defaultCategory,
   }) = _WebSourceConfig;
@@ -58,15 +75,15 @@ class WebConfig extends _$WebConfig {
 
   @mutation
   FutureOr<WebSourceConfig> saveWith({
-    String? sourceDirectory,
-    List<String>? repoList,
+    List<WebSourceInfo>? installedSources,
+    List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
     String? defaultCategory,
   }) {
     var update = state;
 
-    if (sourceDirectory != null) {
-      update = update.copyWith(sourceDirectory: sourceDirectory);
+    if (installedSources != null) {
+      update = update.copyWith(installedSources: installedSources);
     }
 
     if (repoList != null) {

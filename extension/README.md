@@ -1,0 +1,1 @@
+Partial implementation of the Paperback iOS extension API

@@ -21,9 +21,12 @@ Map<String, dynamic> _$WebSourceCategoryToJson(WebSourceCategory instance) =>
 _$WebSourceConfigImpl _$$WebSourceConfigImplFromJson(
         Map<String, dynamic> json) =>
     _$WebSourceConfigImpl(
-      sourceDirectory: json['sourceDirectory'] as String? ?? '',
+      installedSources: (json['installedSources'] as List<dynamic>?)
+              ?.map((e) => WebSourceInfo.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       repoList: (json['repoList'] as List<dynamic>?)
-              ?.map((e) => e as String)
+              ?.map(const RepoConverter().fromJson)
               .toList() ??
           const [],
       categories: (json['categories'] as List<dynamic>?)
@@ -37,8 +40,8 @@ _$WebSourceConfigImpl _$$WebSourceConfigImplFromJson(
 Map<String, dynamic> _$$WebSourceConfigImplToJson(
         _$WebSourceConfigImpl instance) =>
     <String, dynamic>{
-      'sourceDirectory': instance.sourceDirectory,
-      'repoList': instance.repoList,
+      'installedSources': instance.installedSources,
+      'repoList': instance.repoList.map(const RepoConverter().toJson).toList(),
       'categories': instance.categories,
       'defaultCategory': instance.defaultCategory,
     };
@@ -127,7 +130,7 @@ final class WebConfigProvider
       );
 }
 
-String _$webConfigHash() => r'9c89c96ea97f5fcc1c05b478cd9e20d0188c808b';
+String _$webConfigHash() => r'9c221e7c9fbebe89e015b31b28a09408423e2973';
 
 abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();
@@ -152,14 +155,10 @@ class _$WebConfigElement
   }
 
   @override
-  void visitChildren({
-    required void Function(ProviderElement element) elementVisitor,
-    required void Function($ElementLense element) listenableVisitor,
-  }) {
-    super.visitChildren(
-      elementVisitor: elementVisitor,
-      listenableVisitor: listenableVisitor,
-    );
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$saveWith);
     listenableVisitor(_$save);
@@ -185,8 +184,8 @@ sealed class WebConfig$SaveWith extends MutationBase<WebSourceConfig> {
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
   Future<WebSourceConfig> call(
-      {String? sourceDirectory,
-      List<String>? repoList,
+      {List<WebSourceInfo>? installedSources,
+      List<RepoInfo>? repoList,
       List<WebSourceCategory>? categories,
       String? defaultCategory});
 }
@@ -204,19 +203,19 @@ final class _$WebConfig$SaveWith
 
   @override
   Future<WebSourceConfig> call(
-      {String? sourceDirectory,
-      List<String>? repoList,
+      {List<WebSourceInfo>? installedSources,
+      List<RepoInfo>? repoList,
       List<WebSourceCategory>? categories,
       String? defaultCategory}) {
     return mutateAsync(
       Invocation.method(#saveWith, [], {
-        #sourceDirectory: sourceDirectory,
+        #installedSources: installedSources,
         #repoList: repoList,
         #categories: categories,
         #defaultCategory: defaultCategory
       }),
       ($notifier) => $notifier.saveWith(
-        sourceDirectory: sourceDirectory,
+        installedSources: installedSources,
         repoList: repoList,
         categories: categories,
         defaultCategory: defaultCategory,

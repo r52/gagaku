@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/log.dart';
@@ -33,6 +34,7 @@ import 'package:gagaku/web/history.dart';
 import 'package:gagaku/web/main.dart';
 import 'package:gagaku/web/manga_view.dart';
 import 'package:gagaku/web/reader.dart';
+import 'package:gagaku/web/server.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -57,6 +59,10 @@ void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
+  }
 
   timeagoLocalesMap.forEach((locale, lookupMessages) {
     timeago.setLocaleMessages(locale, lookupMessages);
@@ -93,6 +99,8 @@ void main() async {
               ]))
         : null,
   );
+
+  runExtensionHostServer();
 
   final pkg = await PackageInfo.fromPlatform();
   final gdat = GagakuData();

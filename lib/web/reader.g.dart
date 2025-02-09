@@ -272,7 +272,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
           super.argument,
       FutureOr<List<ReaderPage>> Function(
         Ref ref,
-        dynamic source,
+        dynamic chapter,
         SourceInfo info,
       )? create})
       : _createCb = create,
@@ -286,7 +286,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
 
   final FutureOr<List<ReaderPage>> Function(
     Ref ref,
-    dynamic source,
+    dynamic chapter,
     SourceInfo info,
   )? _createCb;
 
@@ -320,7 +320,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
         from: from! as _GetSourcePagesFamily,
         create: (
           ref,
-          dynamic source,
+          dynamic chapter,
           SourceInfo info,
         ) =>
             create(ref));
@@ -351,7 +351,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$getSourcePagesHash() => r'78a61684dc20a9829f72f8556313e3cf7d96a3fb';
+String _$getSourcePagesHash() => r'8bef7f222546e2527cdb3a7e0d3eb46dc56e38f6';
 
 final class _GetSourcePagesFamily extends Family {
   const _GetSourcePagesFamily._()
@@ -364,11 +364,11 @@ final class _GetSourcePagesFamily extends Family {
         );
 
   _GetSourcePagesProvider call(
-    dynamic source,
+    dynamic chapter,
     SourceInfo info,
   ) =>
       _GetSourcePagesProvider._(argument: (
-        source,
+        chapter,
         info,
       ), from: this);
 

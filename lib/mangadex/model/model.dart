@@ -228,6 +228,12 @@ class MangaDexModel {
         } catch (e) {
           logger.w("refreshToken() error ${e.toString()}", error: e);
           _client = RateLimitedClient(useCustomUA: true);
+
+          // remove broken tokens
+          await storage.delete('accessToken');
+          await storage.delete('refreshToken');
+          await storage.delete('tokenType');
+          await storage.delete('idToken');
         }
       }
     });

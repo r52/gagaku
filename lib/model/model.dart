@@ -27,8 +27,8 @@ abstract class GagakuRoute {
   static const web = '/read';
   static const webManga = '/read/:proxy/:code';
   static const webMangaChapter = '/read/:proxy/:code/:chapter/:page';
-  static const webMangaSource = '/read/:source/:url(.*)';
-  static const webMangaSourceChapter = '/read-chapter/:source/:url(.*)';
+  static const webMangaSource = '/read/:source/:mangaId';
+  static const webMangaSourceChapter = '/read-chapter/:source/:mangaId/:chapterId';
 
   static const config = '/config';
 }

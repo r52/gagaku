@@ -1,0 +1,1 @@
+export const PaperbackPolyfills: Partial<typeof App> = {}

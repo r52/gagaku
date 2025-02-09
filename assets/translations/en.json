@@ -44,7 +44,8 @@
     "noitems": "No items",
     "unsupportedUrl": "Unsupported URL",
     "loginFail": "Failed to login: {}",
-    "notLoggedIn": "Operation failed. User not logged in"
+    "notLoggedIn": "Operation failed. User not logged in",
+    "unsupportedSource": "Unsupported extension type"
   },
   "auth": {
     "login": "Login",
@@ -118,21 +119,23 @@
       "browser": "View in browser",
       "add": "@:ui.add Repo",
       "addWarning": "Ensure that you are only adding trusted sources!",
-      "urlHint": ".json repo URL",
+      "urlHint": "Repo URL",
+      "nameHint": "Repo Name",
       "urlEmptyWarning": "URL cannot be empty",
-      "urlInvalidWarning": "URL must be a .json file"
+      "nameEmptyWarning": "Name cannot be empty",
+      "urlInvalidWarning": "Must be a valid URL"
     },
     "source": {
       "manager": "Source Manager",
       "noDirWarning": "Please set a directory for source storage",
-      "noRepoDataWarning": "No repo data. Showing installed sources only",
+      "noRepoDataWarning": "No repo data. Showing enabled extensions only",
       "refresh": "Refresh repos",
       "delete": "@:ui.delete {}",
       "add": "@:ui.add {}",
       "update": "Update/Replace {}",
-      "sourceDeleteOK": "Source deleted",
-      "sourceUpdateOK": "Source updated",
-      "sourceAddOK": "Source updated",
+      "sourceDeleteOK": "Extension disabled",
+      "sourceUpdateOK": "Extension updated",
+      "sourceAddOK": "Extension enabled",
       "installedVersion": " (installed: v{})"
     },
     "noSourcesWarning": "No sources installed!",
