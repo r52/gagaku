@@ -136,7 +136,13 @@ abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();
   @$internal
   @override
-  WebSourceConfig runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<WebSourceConfig>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<WebSourceConfig>, WebSourceConfig, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$WebConfigElement

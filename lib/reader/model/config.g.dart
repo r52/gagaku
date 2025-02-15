@@ -119,7 +119,13 @@ abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   ReaderConfig build();
   @$internal
   @override
-  ReaderConfig runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<ReaderConfig>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<ReaderConfig>, ReaderConfig, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$ReaderSettingsElement

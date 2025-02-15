@@ -73,7 +73,13 @@ abstract class _$SearchHistory extends $Notifier<List<String>> {
   List<String> build();
   @$internal
   @override
-  List<String> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<List<String>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<List<String>>, List<String>, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(_SearchParams)
@@ -143,7 +149,16 @@ abstract class _$SearchParams extends $Notifier<MangaSearchParameters> {
   MangaSearchParameters build();
   @$internal
   @override
-  MangaSearchParameters runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<MangaSearchParameters>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<MangaSearchParameters>,
+        MangaSearchParameters,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 // ignore_for_file: type=lint

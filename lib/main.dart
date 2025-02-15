@@ -30,6 +30,7 @@ import 'package:gagaku/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/favorites.dart';
+import 'package:gagaku/web/frontpage.dart';
 import 'package:gagaku/web/history.dart';
 import 'package:gagaku/web/main.dart';
 import 'package:gagaku/web/manga_view.dart';
@@ -46,7 +47,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _mdShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'mdshell');
-final GlobalKey<NavigatorState> _proxyShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'proxyshell');
+final GlobalKey<NavigatorState> _extShellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'extshell');
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -63,6 +64,8 @@ void main() async {
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
+
+  await InAppWebViewController.setJavaScriptBridgeName('gagaku');
 
   timeagoLocalesMap.forEach((locale, lookupMessages) {
     timeago.setLocaleMessages(locale, lookupMessages);
@@ -290,8 +293,8 @@ class _AppState extends ConsumerState<App> {
       ),
       // Web
       ShellRoute(
-        navigatorKey: _proxyShellNavigatorKey,
-        restorationScopeId: 'proxy_route_restore',
+        navigatorKey: _extShellNavigatorKey,
+        restorationScopeId: 'extension_route_restore',
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return WebSourceHome(
             child: child,
@@ -299,21 +302,30 @@ class _AppState extends ConsumerState<App> {
         },
         routes: <RouteBase>[
           GoRoute(
-            path: GagakuRoute.proxyHome,
+            path: GagakuRoute.extensionHome,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
-              child: WebSourceHistoryWidget(),
+              child: WebSourceFrontpage(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-              restorationId: 'proxy_home_restore',
+              restorationId: 'extension_home_restore',
             ),
           ),
           GoRoute(
-            path: GagakuRoute.proxySaved,
+            path: GagakuRoute.extensionSaved,
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
               child: WebSourceFavoritesWidget(),
               transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-              restorationId: 'proxy_saved_restore',
+              restorationId: 'extension_saved_restore',
+            ),
+          ),
+          GoRoute(
+            path: GagakuRoute.extensionHistory,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: WebSourceHistoryWidget(),
+              transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+              restorationId: 'extension_history_restore',
             ),
           ),
         ],
@@ -337,6 +349,11 @@ class _AppState extends ConsumerState<App> {
         path: GagakuRoute.webMangaSourceChapter,
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: buildWebReaderPage,
+      ),
+      GoRoute(
+        path: GagakuRoute.extensionHomePage,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: buildExtensionHomepage,
       ),
       GoRoute(
         path: '/ml/:url(.*)',

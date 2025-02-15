@@ -10,7 +10,7 @@ class WebReaderData {
     required this.source,
     this.title,
     this.link,
-    required this.info,
+    required this.handle,
     this.readKey,
     this.onLinkPressed,
   });
@@ -18,7 +18,7 @@ class WebReaderData {
   final dynamic source;
   final String? title;
   final String? link;
-  final SourceInfo info;
+  final SourceHandler handle;
   final String? readKey;
   final VoidCallback? onLinkPressed;
 }
@@ -29,16 +29,16 @@ enum SourceType {
 }
 
 @freezed
-class SourceInfo with _$SourceInfo {
-  const SourceInfo._();
+class SourceHandler with _$SourceHandler {
+  const SourceHandler._();
 
-  const factory SourceInfo({
+  const factory SourceHandler({
     required SourceType type,
     required String source,
     required String location,
     String? chapter,
     WebSourceInfo? parser,
-  }) = _SourceInfo;
+  }) = _SourceHandler;
 
   String getURL() => type == SourceType.proxy ? 'https://cubari.moe/read/$source/$location/' : '$source/$location';
   String getKey() => '$source/$location';
@@ -117,6 +117,9 @@ class HistoryLink with _$HistoryLink {
   }) = _HistoryLink;
 
   factory HistoryLink.fromJson(Map<String, dynamic> json) => _$HistoryLinkFromJson(json);
+
+  factory HistoryLink.fromPartialSourceManga(String sourceId, PartialSourceManga manga) =>
+      HistoryLink(title: manga.title, url: '$sourceId/${manga.mangaId}', cover: manga.image);
 
   @override
   bool operator ==(Object other) {
@@ -256,14 +259,41 @@ class SourceVersion with _$SourceVersion {
     required ContentRating contentRating,
     required String version,
     required String icon,
-    required String websiteBaseURL,
-    String? authorWebsite,
-    String? language,
     List<Badge>? tags,
+    required String websiteBaseURL,
     int? intents,
   }) = _SourceVersion;
 
   factory SourceVersion.fromJson(Map<String, dynamic> json) => _$SourceVersionFromJson(json);
+}
+
+@freezed
+class SourceInfo with _$SourceInfo {
+  const SourceInfo._();
+
+  const factory SourceInfo({
+    required String name,
+    required String author,
+    required String description,
+    required ContentRating contentRating,
+    required String version,
+    required String icon,
+    required String websiteBaseURL,
+    String? authorWebsite,
+    String? language,
+    List<Badge>? sourceTags,
+    int? intents,
+  }) = _SourceInfo;
+
+  bool hasIntent(SourceIntents intent) {
+    if (intents != null && (intents! & intent.flag) == intent.flag) {
+      return true;
+    }
+
+    return false;
+  }
+
+  factory SourceInfo.fromJson(Map<String, dynamic> json) => _$SourceInfoFromJson(json);
 }
 
 @freezed
@@ -411,4 +441,16 @@ class SearchRequest with _$SearchRequest {
   }) = _SearchRequest;
 
   factory SearchRequest.fromJson(Map<String, dynamic> json) => _$SearchRequestFromJson(json);
+}
+
+@freezed
+class HomeSection with _$HomeSection {
+  const factory HomeSection({
+    required String id,
+    required String title,
+    required List<PartialSourceManga> items,
+    required bool containsMoreItems,
+  }) = _HomeSection;
+
+  factory HomeSection.fromJson(Map<String, dynamic> json) => _$HomeSectionFromJson(json);
 }

@@ -132,7 +132,13 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();
   @$internal
   @override
-  GagakuConfig runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<GagakuConfig>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<GagakuConfig>, GagakuConfig, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$GagakuSettingsElement

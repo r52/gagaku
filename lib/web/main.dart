@@ -21,7 +21,7 @@ class WebSourceHome extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controllers = List.generate(2, (idx) => useScrollController());
+    final controllers = List.generate(3, (idx) => useScrollController());
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final api = ref.watch(proxyProvider);
@@ -29,7 +29,7 @@ class WebSourceHome extends HookConsumerWidget {
     final index = _calculateSelectedIndex(context);
 
     return Scaffold(
-      restorationId: 'proxy_home_restore',
+      restorationId: 'extension_home_restore',
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
@@ -131,13 +131,18 @@ class WebSourceHome extends HookConsumerWidget {
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         destinations: [
           NavigationDestination(
-            icon: Icon(Icons.history),
-            label: 'history.text'.tr(context: context),
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'webSources.home'.tr(context: context),
           ),
           NavigationDestination(
             icon: Icon(Icons.favorite_border),
             selectedIcon: Icon(Icons.favorite),
             label: 'webSources.favorites'.tr(context: context),
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.history),
+            label: 'history.text'.tr(context: context),
           ),
         ],
         selectedIndex: index,
@@ -159,10 +164,13 @@ class WebSourceHome extends HookConsumerWidget {
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        GoRouter.of(context).go(GagakuRoute.proxyHome);
+        GoRouter.of(context).go(GagakuRoute.extensionHome);
         break;
       case 1:
-        GoRouter.of(context).go(GagakuRoute.proxySaved);
+        GoRouter.of(context).go(GagakuRoute.extensionSaved);
+        break;
+      case 2:
+        GoRouter.of(context).go(GagakuRoute.extensionHistory);
         break;
     }
   }
@@ -171,9 +179,11 @@ class WebSourceHome extends HookConsumerWidget {
     final location = cleanBaseDomains(GoRouterState.of(context).uri.toString());
 
     switch (location) {
-      case GagakuRoute.proxySaved:
+      case GagakuRoute.extensionSaved:
         return 1;
-      case GagakuRoute.proxyHome:
+      case GagakuRoute.extensionHistory:
+        return 2;
+      case GagakuRoute.extensionHome:
       default:
         return 0;
     }

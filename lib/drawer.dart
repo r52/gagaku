@@ -22,8 +22,9 @@ class MainDrawer extends ConsumerWidget {
     switch (location) {
       case GagakuRoute.local:
         return 1;
-      case GagakuRoute.proxyHome:
-      case GagakuRoute.proxySaved:
+      case GagakuRoute.extensionHome:
+      case GagakuRoute.extensionSaved:
+      case GagakuRoute.extensionHistory:
         return 2;
       case GagakuRoute.config:
         return 3;
@@ -46,7 +47,7 @@ class MainDrawer extends ConsumerWidget {
         GoRouter.of(context).go(GagakuRoute.local);
         break;
       case 2:
-        GoRouter.of(context).go(GagakuRoute.proxyHome);
+        GoRouter.of(context).go(GagakuRoute.extensionHome);
         break;
       case 3:
         GoRouter.of(context).go(GagakuRoute.config);

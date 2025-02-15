@@ -136,7 +136,7 @@ class SourceManager extends HookConsumerWidget {
                     final isInstalled = installed.indexWhere((e) => e.repo == repo.url && e.id == source.id) != -1;
                     final icon = '${repo.url}/${source.id}/includes/${source.icon}';
                     final supportedSource =
-                        source.intents != null && (source.intents! & SourceIntents.mangaChapters.flag) == 1;
+                        source.intents != null && (source.intents! & SourceIntents.mangaChapters.flag) == 0x1;
 
                     return Card(
                       key: ValueKey('${repo.url}/${source.id}'),

@@ -23,6 +23,9 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
     final cfg = ref.watch(webConfigProvider);
     final tabController = useTabController(initialLength: cfg.categories.length, keys: [cfg]);
 
+    // Pre-initialize sources
+    final _ = ref.watch(webSourceManagerProvider);
+
     return Material(
       child: Column(
         children: [

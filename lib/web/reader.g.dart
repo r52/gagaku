@@ -14,10 +14,10 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
     with $FutureModifier<WebReaderData>, $FutureProvider<WebReaderData> {
   const _FetchWebChapterInfoProvider._(
       {required _FetchWebChapterInfoFamily super.from,
-      required SourceInfo super.argument,
+      required SourceHandler super.argument,
       FutureOr<WebReaderData> Function(
         Ref ref,
-        SourceInfo info,
+        SourceHandler handle,
       )? create})
       : _createCb = create,
         super(
@@ -30,7 +30,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
 
   final FutureOr<WebReaderData> Function(
     Ref ref,
-    SourceInfo info,
+    SourceHandler handle,
   )? _createCb;
 
   @override
@@ -56,11 +56,11 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
     ) create,
   ) {
     return _FetchWebChapterInfoProvider._(
-        argument: argument as SourceInfo,
+        argument: argument as SourceHandler,
         from: from! as _FetchWebChapterInfoFamily,
         create: (
           ref,
-          SourceInfo info,
+          SourceHandler handle,
         ) =>
             create(ref));
   }
@@ -68,7 +68,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
   @override
   FutureOr<WebReaderData> create(Ref ref) {
     final _$cb = _createCb ?? _fetchWebChapterInfo;
-    final argument = this.argument as SourceInfo;
+    final argument = this.argument as SourceHandler;
     return _$cb(
       ref,
       argument,
@@ -87,7 +87,7 @@ final class _FetchWebChapterInfoProvider extends $FunctionalProvider<
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'c0e9447e98e4d1e1a7bdfc32c6305f9cd62e3815';
+    r'7a86990e3b4138edf7453126f964179c75e4ef89';
 
 final class _FetchWebChapterInfoFamily extends Family {
   const _FetchWebChapterInfoFamily._()
@@ -100,9 +100,9 @@ final class _FetchWebChapterInfoFamily extends Family {
         );
 
   _FetchWebChapterInfoProvider call(
-    SourceInfo info,
+    SourceHandler handle,
   ) =>
-      _FetchWebChapterInfoProvider._(argument: info, from: this);
+      _FetchWebChapterInfoProvider._(argument: handle, from: this);
 
   @override
   String debugGetCreateSourceHash() => _$fetchWebChapterInfoHash();
@@ -114,7 +114,7 @@ final class _FetchWebChapterInfoFamily extends Family {
   Override overrideWith(
     FutureOr<WebReaderData> Function(
       Ref ref,
-      SourceInfo args,
+      SourceHandler args,
     ) create,
   ) {
     return $FamilyOverride(
@@ -122,7 +122,7 @@ final class _FetchWebChapterInfoFamily extends Family {
       createElement: (pointer) {
         final provider = pointer.origin as _FetchWebChapterInfoProvider;
 
-        final argument = provider.argument as SourceInfo;
+        final argument = provider.argument as SourceHandler;
 
         return provider
             .$copyWithCreate((ref) => create(ref, argument))
@@ -267,13 +267,13 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
       {required _GetSourcePagesFamily super.from,
       required (
         dynamic,
-        SourceInfo,
+        SourceHandler,
       )
           super.argument,
       FutureOr<List<ReaderPage>> Function(
         Ref ref,
         dynamic chapter,
-        SourceInfo info,
+        SourceHandler handle,
       )? create})
       : _createCb = create,
         super(
@@ -287,7 +287,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
   final FutureOr<List<ReaderPage>> Function(
     Ref ref,
     dynamic chapter,
-    SourceInfo info,
+    SourceHandler handle,
   )? _createCb;
 
   @override
@@ -315,13 +315,13 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
     return _GetSourcePagesProvider._(
         argument: argument as (
           dynamic,
-          SourceInfo,
+          SourceHandler,
         ),
         from: from! as _GetSourcePagesFamily,
         create: (
           ref,
           dynamic chapter,
-          SourceInfo info,
+          SourceHandler handle,
         ) =>
             create(ref));
   }
@@ -331,7 +331,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
     final _$cb = _createCb ?? _getSourcePages;
     final argument = this.argument as (
       dynamic,
-      SourceInfo,
+      SourceHandler,
     );
     return _$cb(
       ref,
@@ -351,7 +351,7 @@ final class _GetSourcePagesProvider extends $FunctionalProvider<
   }
 }
 
-String _$getSourcePagesHash() => r'8bef7f222546e2527cdb3a7e0d3eb46dc56e38f6';
+String _$getSourcePagesHash() => r'94f92f9bdd6146cb55ba5171050d27ab58b57b30';
 
 final class _GetSourcePagesFamily extends Family {
   const _GetSourcePagesFamily._()
@@ -365,11 +365,11 @@ final class _GetSourcePagesFamily extends Family {
 
   _GetSourcePagesProvider call(
     dynamic chapter,
-    SourceInfo info,
+    SourceHandler handle,
   ) =>
       _GetSourcePagesProvider._(argument: (
         chapter,
-        info,
+        handle,
       ), from: this);
 
   @override
@@ -384,7 +384,7 @@ final class _GetSourcePagesFamily extends Family {
       Ref ref,
       (
         dynamic,
-        SourceInfo,
+        SourceHandler,
       ) args,
     ) create,
   ) {
@@ -395,7 +395,7 @@ final class _GetSourcePagesFamily extends Family {
 
         final argument = provider.argument as (
           dynamic,
-          SourceInfo,
+          SourceHandler,
         );
 
         return provider

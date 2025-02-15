@@ -14,10 +14,10 @@ final class _FetchWebMangaInfoProvider
     with $FutureModifier<WebManga>, $FutureProvider<WebManga> {
   const _FetchWebMangaInfoProvider._(
       {required _FetchWebMangaInfoFamily super.from,
-      required SourceInfo super.argument,
+      required SourceHandler super.argument,
       FutureOr<WebManga> Function(
         Ref ref,
-        SourceInfo info,
+        SourceHandler handle,
       )? create})
       : _createCb = create,
         super(
@@ -30,7 +30,7 @@ final class _FetchWebMangaInfoProvider
 
   final FutureOr<WebManga> Function(
     Ref ref,
-    SourceInfo info,
+    SourceHandler handle,
   )? _createCb;
 
   @override
@@ -55,11 +55,11 @@ final class _FetchWebMangaInfoProvider
     ) create,
   ) {
     return _FetchWebMangaInfoProvider._(
-        argument: argument as SourceInfo,
+        argument: argument as SourceHandler,
         from: from! as _FetchWebMangaInfoFamily,
         create: (
           ref,
-          SourceInfo info,
+          SourceHandler handle,
         ) =>
             create(ref));
   }
@@ -67,7 +67,7 @@ final class _FetchWebMangaInfoProvider
   @override
   FutureOr<WebManga> create(Ref ref) {
     final _$cb = _createCb ?? _fetchWebMangaInfo;
-    final argument = this.argument as SourceInfo;
+    final argument = this.argument as SourceHandler;
     return _$cb(
       ref,
       argument,
@@ -85,7 +85,7 @@ final class _FetchWebMangaInfoProvider
   }
 }
 
-String _$fetchWebMangaInfoHash() => r'de355fd84a63a4346a5a310266b8e59e4dfb512c';
+String _$fetchWebMangaInfoHash() => r'0622112342007844d48abb8e95b93836544d76dc';
 
 final class _FetchWebMangaInfoFamily extends Family {
   const _FetchWebMangaInfoFamily._()
@@ -98,9 +98,9 @@ final class _FetchWebMangaInfoFamily extends Family {
         );
 
   _FetchWebMangaInfoProvider call(
-    SourceInfo info,
+    SourceHandler handle,
   ) =>
-      _FetchWebMangaInfoProvider._(argument: info, from: this);
+      _FetchWebMangaInfoProvider._(argument: handle, from: this);
 
   @override
   String debugGetCreateSourceHash() => _$fetchWebMangaInfoHash();
@@ -112,7 +112,7 @@ final class _FetchWebMangaInfoFamily extends Family {
   Override overrideWith(
     FutureOr<WebManga> Function(
       Ref ref,
-      SourceInfo args,
+      SourceHandler args,
     ) create,
   ) {
     return $FamilyOverride(
@@ -120,7 +120,7 @@ final class _FetchWebMangaInfoFamily extends Family {
       createElement: (pointer) {
         final provider = pointer.origin as _FetchWebMangaInfoProvider;
 
-        final argument = provider.argument as SourceInfo;
+        final argument = provider.argument as SourceHandler;
 
         return provider
             .$copyWithCreate((ref) => create(ref, argument))
@@ -133,13 +133,13 @@ final class _FetchWebMangaInfoFamily extends Family {
 @ProviderFor(_fetchWebMangaRedirect)
 const _fetchWebMangaRedirectProvider = _FetchWebMangaRedirectFamily._();
 
-final class _FetchWebMangaRedirectProvider
-    extends $FunctionalProvider<AsyncValue<SourceInfo>, FutureOr<SourceInfo>>
-    with $FutureModifier<SourceInfo>, $FutureProvider<SourceInfo> {
+final class _FetchWebMangaRedirectProvider extends $FunctionalProvider<
+        AsyncValue<SourceHandler>, FutureOr<SourceHandler>>
+    with $FutureModifier<SourceHandler>, $FutureProvider<SourceHandler> {
   const _FetchWebMangaRedirectProvider._(
       {required _FetchWebMangaRedirectFamily super.from,
       required String super.argument,
-      FutureOr<SourceInfo> Function(
+      FutureOr<SourceHandler> Function(
         Ref ref,
         String url,
       )? create})
@@ -152,7 +152,7 @@ final class _FetchWebMangaRedirectProvider
           allTransitiveDependencies: null,
         );
 
-  final FutureOr<SourceInfo> Function(
+  final FutureOr<SourceHandler> Function(
     Ref ref,
     String url,
   )? _createCb;
@@ -169,12 +169,13 @@ final class _FetchWebMangaRedirectProvider
 
   @$internal
   @override
-  $FutureProviderElement<SourceInfo> $createElement($ProviderPointer pointer) =>
+  $FutureProviderElement<SourceHandler> $createElement(
+          $ProviderPointer pointer) =>
       $FutureProviderElement(this, pointer);
 
   @override
   _FetchWebMangaRedirectProvider $copyWithCreate(
-    FutureOr<SourceInfo> Function(
+    FutureOr<SourceHandler> Function(
       Ref ref,
     ) create,
   ) {
@@ -189,7 +190,7 @@ final class _FetchWebMangaRedirectProvider
   }
 
   @override
-  FutureOr<SourceInfo> create(Ref ref) {
+  FutureOr<SourceHandler> create(Ref ref) {
     final _$cb = _createCb ?? _fetchWebMangaRedirect;
     final argument = this.argument as String;
     return _$cb(
@@ -211,7 +212,7 @@ final class _FetchWebMangaRedirectProvider
 }
 
 String _$fetchWebMangaRedirectHash() =>
-    r'fbc7fe3c4db83257e6e51a5a1e6c3a0039f29797';
+    r'7c18055102e449391dab2224a2ba3a240b1dc11b';
 
 final class _FetchWebMangaRedirectFamily extends Family {
   const _FetchWebMangaRedirectFamily._()
@@ -236,7 +237,7 @@ final class _FetchWebMangaRedirectFamily extends Family {
 
   /// {@macro riverpod.override_with}
   Override overrideWith(
-    FutureOr<SourceInfo> Function(
+    FutureOr<SourceHandler> Function(
       Ref ref,
       String args,
     ) create,

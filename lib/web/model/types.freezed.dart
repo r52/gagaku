@@ -15,25 +15,25 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$SourceInfo {
+mixin _$SourceHandler {
   SourceType get type => throw _privateConstructorUsedError;
   String get source => throw _privateConstructorUsedError;
   String get location => throw _privateConstructorUsedError;
   String? get chapter => throw _privateConstructorUsedError;
   WebSourceInfo? get parser => throw _privateConstructorUsedError;
 
-  /// Create a copy of SourceInfo
+  /// Create a copy of SourceHandler
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $SourceInfoCopyWith<SourceInfo> get copyWith =>
+  $SourceHandlerCopyWith<SourceHandler> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $SourceInfoCopyWith<$Res> {
-  factory $SourceInfoCopyWith(
-          SourceInfo value, $Res Function(SourceInfo) then) =
-      _$SourceInfoCopyWithImpl<$Res, SourceInfo>;
+abstract class $SourceHandlerCopyWith<$Res> {
+  factory $SourceHandlerCopyWith(
+          SourceHandler value, $Res Function(SourceHandler) then) =
+      _$SourceHandlerCopyWithImpl<$Res, SourceHandler>;
   @useResult
   $Res call(
       {SourceType type,
@@ -46,16 +46,16 @@ abstract class $SourceInfoCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SourceInfoCopyWithImpl<$Res, $Val extends SourceInfo>
-    implements $SourceInfoCopyWith<$Res> {
-  _$SourceInfoCopyWithImpl(this._value, this._then);
+class _$SourceHandlerCopyWithImpl<$Res, $Val extends SourceHandler>
+    implements $SourceHandlerCopyWith<$Res> {
+  _$SourceHandlerCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of SourceInfo
+  /// Create a copy of SourceHandler
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -90,7 +90,7 @@ class _$SourceInfoCopyWithImpl<$Res, $Val extends SourceInfo>
     ) as $Val);
   }
 
-  /// Create a copy of SourceInfo
+  /// Create a copy of SourceHandler
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -106,11 +106,11 @@ class _$SourceInfoCopyWithImpl<$Res, $Val extends SourceInfo>
 }
 
 /// @nodoc
-abstract class _$$SourceInfoImplCopyWith<$Res>
-    implements $SourceInfoCopyWith<$Res> {
-  factory _$$SourceInfoImplCopyWith(
-          _$SourceInfoImpl value, $Res Function(_$SourceInfoImpl) then) =
-      __$$SourceInfoImplCopyWithImpl<$Res>;
+abstract class _$$SourceHandlerImplCopyWith<$Res>
+    implements $SourceHandlerCopyWith<$Res> {
+  factory _$$SourceHandlerImplCopyWith(
+          _$SourceHandlerImpl value, $Res Function(_$SourceHandlerImpl) then) =
+      __$$SourceHandlerImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -125,14 +125,14 @@ abstract class _$$SourceInfoImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$SourceInfoImplCopyWithImpl<$Res>
-    extends _$SourceInfoCopyWithImpl<$Res, _$SourceInfoImpl>
-    implements _$$SourceInfoImplCopyWith<$Res> {
-  __$$SourceInfoImplCopyWithImpl(
-      _$SourceInfoImpl _value, $Res Function(_$SourceInfoImpl) _then)
+class __$$SourceHandlerImplCopyWithImpl<$Res>
+    extends _$SourceHandlerCopyWithImpl<$Res, _$SourceHandlerImpl>
+    implements _$$SourceHandlerImplCopyWith<$Res> {
+  __$$SourceHandlerImplCopyWithImpl(
+      _$SourceHandlerImpl _value, $Res Function(_$SourceHandlerImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of SourceInfo
+  /// Create a copy of SourceHandler
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -143,7 +143,7 @@ class __$$SourceInfoImplCopyWithImpl<$Res>
     Object? chapter = freezed,
     Object? parser = freezed,
   }) {
-    return _then(_$SourceInfoImpl(
+    return _then(_$SourceHandlerImpl(
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -170,8 +170,8 @@ class __$$SourceInfoImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$SourceInfoImpl extends _SourceInfo {
-  const _$SourceInfoImpl(
+class _$SourceHandlerImpl extends _SourceHandler {
+  const _$SourceHandlerImpl(
       {required this.type,
       required this.source,
       required this.location,
@@ -192,14 +192,14 @@ class _$SourceInfoImpl extends _SourceInfo {
 
   @override
   String toString() {
-    return 'SourceInfo(type: $type, source: $source, location: $location, chapter: $chapter, parser: $parser)';
+    return 'SourceHandler(type: $type, source: $source, location: $location, chapter: $chapter, parser: $parser)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SourceInfoImpl &&
+            other is _$SourceHandlerImpl &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.source, source) || other.source == source) &&
             (identical(other.location, location) ||
@@ -212,23 +212,23 @@ class _$SourceInfoImpl extends _SourceInfo {
   int get hashCode =>
       Object.hash(runtimeType, type, source, location, chapter, parser);
 
-  /// Create a copy of SourceInfo
+  /// Create a copy of SourceHandler
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$SourceInfoImplCopyWith<_$SourceInfoImpl> get copyWith =>
-      __$$SourceInfoImplCopyWithImpl<_$SourceInfoImpl>(this, _$identity);
+  _$$SourceHandlerImplCopyWith<_$SourceHandlerImpl> get copyWith =>
+      __$$SourceHandlerImplCopyWithImpl<_$SourceHandlerImpl>(this, _$identity);
 }
 
-abstract class _SourceInfo extends SourceInfo {
-  const factory _SourceInfo(
+abstract class _SourceHandler extends SourceHandler {
+  const factory _SourceHandler(
       {required final SourceType type,
       required final String source,
       required final String location,
       final String? chapter,
-      final WebSourceInfo? parser}) = _$SourceInfoImpl;
-  const _SourceInfo._() : super._();
+      final WebSourceInfo? parser}) = _$SourceHandlerImpl;
+  const _SourceHandler._() : super._();
 
   @override
   SourceType get type;
@@ -241,11 +241,11 @@ abstract class _SourceInfo extends SourceInfo {
   @override
   WebSourceInfo? get parser;
 
-  /// Create a copy of SourceInfo
+  /// Create a copy of SourceHandler
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SourceInfoImplCopyWith<_$SourceInfoImpl> get copyWith =>
+  _$$SourceHandlerImplCopyWith<_$SourceHandlerImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1516,10 +1516,8 @@ mixin _$SourceVersion {
   ContentRating get contentRating => throw _privateConstructorUsedError;
   String get version => throw _privateConstructorUsedError;
   String get icon => throw _privateConstructorUsedError;
-  String get websiteBaseURL => throw _privateConstructorUsedError;
-  String? get authorWebsite => throw _privateConstructorUsedError;
-  String? get language => throw _privateConstructorUsedError;
   List<Badge>? get tags => throw _privateConstructorUsedError;
+  String get websiteBaseURL => throw _privateConstructorUsedError;
   int? get intents => throw _privateConstructorUsedError;
 
   /// Serializes this SourceVersion to a JSON map.
@@ -1547,10 +1545,8 @@ abstract class $SourceVersionCopyWith<$Res> {
       ContentRating contentRating,
       String version,
       String icon,
-      String websiteBaseURL,
-      String? authorWebsite,
-      String? language,
       List<Badge>? tags,
+      String websiteBaseURL,
       int? intents});
 }
 
@@ -1577,10 +1573,8 @@ class _$SourceVersionCopyWithImpl<$Res, $Val extends SourceVersion>
     Object? contentRating = null,
     Object? version = null,
     Object? icon = null,
-    Object? websiteBaseURL = null,
-    Object? authorWebsite = freezed,
-    Object? language = freezed,
     Object? tags = freezed,
+    Object? websiteBaseURL = null,
     Object? intents = freezed,
   }) {
     return _then(_value.copyWith(
@@ -1616,22 +1610,14 @@ class _$SourceVersionCopyWithImpl<$Res, $Val extends SourceVersion>
           ? _value.icon
           : icon // ignore: cast_nullable_to_non_nullable
               as String,
-      websiteBaseURL: null == websiteBaseURL
-          ? _value.websiteBaseURL
-          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-              as String,
-      authorWebsite: freezed == authorWebsite
-          ? _value.authorWebsite
-          : authorWebsite // ignore: cast_nullable_to_non_nullable
-              as String?,
-      language: freezed == language
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String?,
       tags: freezed == tags
           ? _value.tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<Badge>?,
+      websiteBaseURL: null == websiteBaseURL
+          ? _value.websiteBaseURL
+          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+              as String,
       intents: freezed == intents
           ? _value.intents
           : intents // ignore: cast_nullable_to_non_nullable
@@ -1657,10 +1643,8 @@ abstract class _$$SourceVersionImplCopyWith<$Res>
       ContentRating contentRating,
       String version,
       String icon,
-      String websiteBaseURL,
-      String? authorWebsite,
-      String? language,
       List<Badge>? tags,
+      String websiteBaseURL,
       int? intents});
 }
 
@@ -1685,10 +1669,8 @@ class __$$SourceVersionImplCopyWithImpl<$Res>
     Object? contentRating = null,
     Object? version = null,
     Object? icon = null,
-    Object? websiteBaseURL = null,
-    Object? authorWebsite = freezed,
-    Object? language = freezed,
     Object? tags = freezed,
+    Object? websiteBaseURL = null,
     Object? intents = freezed,
   }) {
     return _then(_$SourceVersionImpl(
@@ -1724,22 +1706,14 @@ class __$$SourceVersionImplCopyWithImpl<$Res>
           ? _value.icon
           : icon // ignore: cast_nullable_to_non_nullable
               as String,
-      websiteBaseURL: null == websiteBaseURL
-          ? _value.websiteBaseURL
-          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-              as String,
-      authorWebsite: freezed == authorWebsite
-          ? _value.authorWebsite
-          : authorWebsite // ignore: cast_nullable_to_non_nullable
-              as String?,
-      language: freezed == language
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String?,
       tags: freezed == tags
           ? _value._tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<Badge>?,
+      websiteBaseURL: null == websiteBaseURL
+          ? _value.websiteBaseURL
+          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+              as String,
       intents: freezed == intents
           ? _value.intents
           : intents // ignore: cast_nullable_to_non_nullable
@@ -1760,10 +1734,8 @@ class _$SourceVersionImpl implements _SourceVersion {
       required this.contentRating,
       required this.version,
       required this.icon,
-      required this.websiteBaseURL,
-      this.authorWebsite,
-      this.language,
       final List<Badge>? tags,
+      required this.websiteBaseURL,
       this.intents})
       : _tags = tags;
 
@@ -1786,12 +1758,6 @@ class _$SourceVersionImpl implements _SourceVersion {
   final String version;
   @override
   final String icon;
-  @override
-  final String websiteBaseURL;
-  @override
-  final String? authorWebsite;
-  @override
-  final String? language;
   final List<Badge>? _tags;
   @override
   List<Badge>? get tags {
@@ -1803,11 +1769,13 @@ class _$SourceVersionImpl implements _SourceVersion {
   }
 
   @override
+  final String websiteBaseURL;
+  @override
   final int? intents;
 
   @override
   String toString() {
-    return 'SourceVersion(id: $id, name: $name, author: $author, desc: $desc, website: $website, contentRating: $contentRating, version: $version, icon: $icon, websiteBaseURL: $websiteBaseURL, authorWebsite: $authorWebsite, language: $language, tags: $tags, intents: $intents)';
+    return 'SourceVersion(id: $id, name: $name, author: $author, desc: $desc, website: $website, contentRating: $contentRating, version: $version, icon: $icon, tags: $tags, websiteBaseURL: $websiteBaseURL, intents: $intents)';
   }
 
   @override
@@ -1824,13 +1792,9 @@ class _$SourceVersionImpl implements _SourceVersion {
                 other.contentRating == contentRating) &&
             (identical(other.version, version) || other.version == version) &&
             (identical(other.icon, icon) || other.icon == icon) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
             (identical(other.websiteBaseURL, websiteBaseURL) ||
                 other.websiteBaseURL == websiteBaseURL) &&
-            (identical(other.authorWebsite, authorWebsite) ||
-                other.authorWebsite == authorWebsite) &&
-            (identical(other.language, language) ||
-                other.language == language) &&
-            const DeepCollectionEquality().equals(other._tags, _tags) &&
             (identical(other.intents, intents) || other.intents == intents));
   }
 
@@ -1846,10 +1810,8 @@ class _$SourceVersionImpl implements _SourceVersion {
       contentRating,
       version,
       icon,
-      websiteBaseURL,
-      authorWebsite,
-      language,
       const DeepCollectionEquality().hash(_tags),
+      websiteBaseURL,
       intents);
 
   /// Create a copy of SourceVersion
@@ -1878,10 +1840,8 @@ abstract class _SourceVersion implements SourceVersion {
       required final ContentRating contentRating,
       required final String version,
       required final String icon,
-      required final String websiteBaseURL,
-      final String? authorWebsite,
-      final String? language,
       final List<Badge>? tags,
+      required final String websiteBaseURL,
       final int? intents}) = _$SourceVersionImpl;
 
   factory _SourceVersion.fromJson(Map<String, dynamic> json) =
@@ -1904,13 +1864,9 @@ abstract class _SourceVersion implements SourceVersion {
   @override
   String get icon;
   @override
-  String get websiteBaseURL;
-  @override
-  String? get authorWebsite;
-  @override
-  String? get language;
-  @override
   List<Badge>? get tags;
+  @override
+  String get websiteBaseURL;
   @override
   int? get intents;
 
@@ -1919,6 +1875,388 @@ abstract class _SourceVersion implements SourceVersion {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SourceVersionImplCopyWith<_$SourceVersionImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+SourceInfo _$SourceInfoFromJson(Map<String, dynamic> json) {
+  return _SourceInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SourceInfo {
+  String get name => throw _privateConstructorUsedError;
+  String get author => throw _privateConstructorUsedError;
+  String get description => throw _privateConstructorUsedError;
+  ContentRating get contentRating => throw _privateConstructorUsedError;
+  String get version => throw _privateConstructorUsedError;
+  String get icon => throw _privateConstructorUsedError;
+  String get websiteBaseURL => throw _privateConstructorUsedError;
+  String? get authorWebsite => throw _privateConstructorUsedError;
+  String? get language => throw _privateConstructorUsedError;
+  List<Badge>? get sourceTags => throw _privateConstructorUsedError;
+  int? get intents => throw _privateConstructorUsedError;
+
+  /// Serializes this SourceInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of SourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SourceInfoCopyWith<SourceInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SourceInfoCopyWith<$Res> {
+  factory $SourceInfoCopyWith(
+          SourceInfo value, $Res Function(SourceInfo) then) =
+      _$SourceInfoCopyWithImpl<$Res, SourceInfo>;
+  @useResult
+  $Res call(
+      {String name,
+      String author,
+      String description,
+      ContentRating contentRating,
+      String version,
+      String icon,
+      String websiteBaseURL,
+      String? authorWebsite,
+      String? language,
+      List<Badge>? sourceTags,
+      int? intents});
+}
+
+/// @nodoc
+class _$SourceInfoCopyWithImpl<$Res, $Val extends SourceInfo>
+    implements $SourceInfoCopyWith<$Res> {
+  _$SourceInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? author = null,
+    Object? description = null,
+    Object? contentRating = null,
+    Object? version = null,
+    Object? icon = null,
+    Object? websiteBaseURL = null,
+    Object? authorWebsite = freezed,
+    Object? language = freezed,
+    Object? sourceTags = freezed,
+    Object? intents = freezed,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      author: null == author
+          ? _value.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      contentRating: null == contentRating
+          ? _value.contentRating
+          : contentRating // ignore: cast_nullable_to_non_nullable
+              as ContentRating,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      icon: null == icon
+          ? _value.icon
+          : icon // ignore: cast_nullable_to_non_nullable
+              as String,
+      websiteBaseURL: null == websiteBaseURL
+          ? _value.websiteBaseURL
+          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+              as String,
+      authorWebsite: freezed == authorWebsite
+          ? _value.authorWebsite
+          : authorWebsite // ignore: cast_nullable_to_non_nullable
+              as String?,
+      language: freezed == language
+          ? _value.language
+          : language // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sourceTags: freezed == sourceTags
+          ? _value.sourceTags
+          : sourceTags // ignore: cast_nullable_to_non_nullable
+              as List<Badge>?,
+      intents: freezed == intents
+          ? _value.intents
+          : intents // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$SourceInfoImplCopyWith<$Res>
+    implements $SourceInfoCopyWith<$Res> {
+  factory _$$SourceInfoImplCopyWith(
+          _$SourceInfoImpl value, $Res Function(_$SourceInfoImpl) then) =
+      __$$SourceInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String name,
+      String author,
+      String description,
+      ContentRating contentRating,
+      String version,
+      String icon,
+      String websiteBaseURL,
+      String? authorWebsite,
+      String? language,
+      List<Badge>? sourceTags,
+      int? intents});
+}
+
+/// @nodoc
+class __$$SourceInfoImplCopyWithImpl<$Res>
+    extends _$SourceInfoCopyWithImpl<$Res, _$SourceInfoImpl>
+    implements _$$SourceInfoImplCopyWith<$Res> {
+  __$$SourceInfoImplCopyWithImpl(
+      _$SourceInfoImpl _value, $Res Function(_$SourceInfoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of SourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? author = null,
+    Object? description = null,
+    Object? contentRating = null,
+    Object? version = null,
+    Object? icon = null,
+    Object? websiteBaseURL = null,
+    Object? authorWebsite = freezed,
+    Object? language = freezed,
+    Object? sourceTags = freezed,
+    Object? intents = freezed,
+  }) {
+    return _then(_$SourceInfoImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      author: null == author
+          ? _value.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      contentRating: null == contentRating
+          ? _value.contentRating
+          : contentRating // ignore: cast_nullable_to_non_nullable
+              as ContentRating,
+      version: null == version
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      icon: null == icon
+          ? _value.icon
+          : icon // ignore: cast_nullable_to_non_nullable
+              as String,
+      websiteBaseURL: null == websiteBaseURL
+          ? _value.websiteBaseURL
+          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+              as String,
+      authorWebsite: freezed == authorWebsite
+          ? _value.authorWebsite
+          : authorWebsite // ignore: cast_nullable_to_non_nullable
+              as String?,
+      language: freezed == language
+          ? _value.language
+          : language // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sourceTags: freezed == sourceTags
+          ? _value._sourceTags
+          : sourceTags // ignore: cast_nullable_to_non_nullable
+              as List<Badge>?,
+      intents: freezed == intents
+          ? _value.intents
+          : intents // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$SourceInfoImpl extends _SourceInfo {
+  const _$SourceInfoImpl(
+      {required this.name,
+      required this.author,
+      required this.description,
+      required this.contentRating,
+      required this.version,
+      required this.icon,
+      required this.websiteBaseURL,
+      this.authorWebsite,
+      this.language,
+      final List<Badge>? sourceTags,
+      this.intents})
+      : _sourceTags = sourceTags,
+        super._();
+
+  factory _$SourceInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SourceInfoImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String author;
+  @override
+  final String description;
+  @override
+  final ContentRating contentRating;
+  @override
+  final String version;
+  @override
+  final String icon;
+  @override
+  final String websiteBaseURL;
+  @override
+  final String? authorWebsite;
+  @override
+  final String? language;
+  final List<Badge>? _sourceTags;
+  @override
+  List<Badge>? get sourceTags {
+    final value = _sourceTags;
+    if (value == null) return null;
+    if (_sourceTags is EqualUnmodifiableListView) return _sourceTags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  final int? intents;
+
+  @override
+  String toString() {
+    return 'SourceInfo(name: $name, author: $author, description: $description, contentRating: $contentRating, version: $version, icon: $icon, websiteBaseURL: $websiteBaseURL, authorWebsite: $authorWebsite, language: $language, sourceTags: $sourceTags, intents: $intents)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SourceInfoImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.author, author) || other.author == author) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.contentRating, contentRating) ||
+                other.contentRating == contentRating) &&
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.icon, icon) || other.icon == icon) &&
+            (identical(other.websiteBaseURL, websiteBaseURL) ||
+                other.websiteBaseURL == websiteBaseURL) &&
+            (identical(other.authorWebsite, authorWebsite) ||
+                other.authorWebsite == authorWebsite) &&
+            (identical(other.language, language) ||
+                other.language == language) &&
+            const DeepCollectionEquality()
+                .equals(other._sourceTags, _sourceTags) &&
+            (identical(other.intents, intents) || other.intents == intents));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      name,
+      author,
+      description,
+      contentRating,
+      version,
+      icon,
+      websiteBaseURL,
+      authorWebsite,
+      language,
+      const DeepCollectionEquality().hash(_sourceTags),
+      intents);
+
+  /// Create a copy of SourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SourceInfoImplCopyWith<_$SourceInfoImpl> get copyWith =>
+      __$$SourceInfoImplCopyWithImpl<_$SourceInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$SourceInfoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _SourceInfo extends SourceInfo {
+  const factory _SourceInfo(
+      {required final String name,
+      required final String author,
+      required final String description,
+      required final ContentRating contentRating,
+      required final String version,
+      required final String icon,
+      required final String websiteBaseURL,
+      final String? authorWebsite,
+      final String? language,
+      final List<Badge>? sourceTags,
+      final int? intents}) = _$SourceInfoImpl;
+  const _SourceInfo._() : super._();
+
+  factory _SourceInfo.fromJson(Map<String, dynamic> json) =
+      _$SourceInfoImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String get author;
+  @override
+  String get description;
+  @override
+  ContentRating get contentRating;
+  @override
+  String get version;
+  @override
+  String get icon;
+  @override
+  String get websiteBaseURL;
+  @override
+  String? get authorWebsite;
+  @override
+  String? get language;
+  @override
+  List<Badge>? get sourceTags;
+  @override
+  int? get intents;
+
+  /// Create a copy of SourceInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SourceInfoImplCopyWith<_$SourceInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4473,5 +4811,227 @@ abstract class _SearchRequest implements SearchRequest {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SearchRequestImplCopyWith<_$SearchRequestImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+HomeSection _$HomeSectionFromJson(Map<String, dynamic> json) {
+  return _HomeSection.fromJson(json);
+}
+
+/// @nodoc
+mixin _$HomeSection {
+  String get id => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  List<PartialSourceManga> get items => throw _privateConstructorUsedError;
+  bool get containsMoreItems => throw _privateConstructorUsedError;
+
+  /// Serializes this HomeSection to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of HomeSection
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $HomeSectionCopyWith<HomeSection> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $HomeSectionCopyWith<$Res> {
+  factory $HomeSectionCopyWith(
+          HomeSection value, $Res Function(HomeSection) then) =
+      _$HomeSectionCopyWithImpl<$Res, HomeSection>;
+  @useResult
+  $Res call(
+      {String id,
+      String title,
+      List<PartialSourceManga> items,
+      bool containsMoreItems});
+}
+
+/// @nodoc
+class _$HomeSectionCopyWithImpl<$Res, $Val extends HomeSection>
+    implements $HomeSectionCopyWith<$Res> {
+  _$HomeSectionCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of HomeSection
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? title = null,
+    Object? items = null,
+    Object? containsMoreItems = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<PartialSourceManga>,
+      containsMoreItems: null == containsMoreItems
+          ? _value.containsMoreItems
+          : containsMoreItems // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$HomeSectionImplCopyWith<$Res>
+    implements $HomeSectionCopyWith<$Res> {
+  factory _$$HomeSectionImplCopyWith(
+          _$HomeSectionImpl value, $Res Function(_$HomeSectionImpl) then) =
+      __$$HomeSectionImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String title,
+      List<PartialSourceManga> items,
+      bool containsMoreItems});
+}
+
+/// @nodoc
+class __$$HomeSectionImplCopyWithImpl<$Res>
+    extends _$HomeSectionCopyWithImpl<$Res, _$HomeSectionImpl>
+    implements _$$HomeSectionImplCopyWith<$Res> {
+  __$$HomeSectionImplCopyWithImpl(
+      _$HomeSectionImpl _value, $Res Function(_$HomeSectionImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of HomeSection
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? title = null,
+    Object? items = null,
+    Object? containsMoreItems = null,
+  }) {
+    return _then(_$HomeSectionImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      items: null == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<PartialSourceManga>,
+      containsMoreItems: null == containsMoreItems
+          ? _value.containsMoreItems
+          : containsMoreItems // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$HomeSectionImpl implements _HomeSection {
+  const _$HomeSectionImpl(
+      {required this.id,
+      required this.title,
+      required final List<PartialSourceManga> items,
+      required this.containsMoreItems})
+      : _items = items;
+
+  factory _$HomeSectionImpl.fromJson(Map<String, dynamic> json) =>
+      _$$HomeSectionImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String title;
+  final List<PartialSourceManga> _items;
+  @override
+  List<PartialSourceManga> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  final bool containsMoreItems;
+
+  @override
+  String toString() {
+    return 'HomeSection(id: $id, title: $title, items: $items, containsMoreItems: $containsMoreItems)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$HomeSectionImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.title, title) || other.title == title) &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.containsMoreItems, containsMoreItems) ||
+                other.containsMoreItems == containsMoreItems));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, title,
+      const DeepCollectionEquality().hash(_items), containsMoreItems);
+
+  /// Create a copy of HomeSection
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$HomeSectionImplCopyWith<_$HomeSectionImpl> get copyWith =>
+      __$$HomeSectionImplCopyWithImpl<_$HomeSectionImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$HomeSectionImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _HomeSection implements HomeSection {
+  const factory _HomeSection(
+      {required final String id,
+      required final String title,
+      required final List<PartialSourceManga> items,
+      required final bool containsMoreItems}) = _$HomeSectionImpl;
+
+  factory _HomeSection.fromJson(Map<String, dynamic> json) =
+      _$HomeSectionImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get title;
+  @override
+  List<PartialSourceManga> get items;
+  @override
+  bool get containsMoreItems;
+
+  /// Create a copy of HomeSection
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$HomeSectionImplCopyWith<_$HomeSectionImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -124,7 +124,16 @@ abstract class _$RecentlyAdded extends $AsyncNotifier<List<Manga>> {
   FutureOr<List<Manga>> build();
   @$internal
   @override
-  FutureOr<List<Manga>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<List<Manga>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Manga>>>,
+        AsyncValue<List<Manga>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(LatestChaptersFeed)
@@ -278,9 +287,18 @@ abstract class _$LatestChaptersFeed extends $AsyncNotifier<List<Chapter>> {
   );
   @$internal
   @override
-  FutureOr<List<Chapter>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Chapter>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Chapter>>>,
+        AsyncValue<List<Chapter>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(LatestGlobalFeed)
@@ -342,7 +360,16 @@ abstract class _$LatestGlobalFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
   @$internal
   @override
-  FutureOr<List<Chapter>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<List<Chapter>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Chapter>>>,
+        AsyncValue<List<Chapter>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(GroupFeed)
@@ -495,9 +522,18 @@ abstract class _$GroupFeed extends $AsyncNotifier<List<Chapter>> {
   );
   @$internal
   @override
-  FutureOr<List<Chapter>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Chapter>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Chapter>>>,
+        AsyncValue<List<Chapter>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(GroupTitles)
@@ -650,9 +686,18 @@ abstract class _$GroupTitles extends $AsyncNotifier<List<Manga>> {
   );
   @$internal
   @override
-  FutureOr<List<Manga>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Manga>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Manga>>>,
+        AsyncValue<List<Manga>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(CreatorTitles)
@@ -805,9 +850,18 @@ abstract class _$CreatorTitles extends $AsyncNotifier<List<Manga>> {
   );
   @$internal
   @override
-  FutureOr<List<Manga>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Manga>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Manga>>>,
+        AsyncValue<List<Manga>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(MangaChaptersListSort)
@@ -880,7 +934,13 @@ abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
   ListSort build();
   @$internal
   @override
-  ListSort runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<ListSort>;
+    final element = ref.element as $ClassProviderElement<NotifierBase<ListSort>,
+        ListSort, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(MangaChapters)
@@ -1033,9 +1093,18 @@ abstract class _$MangaChapters extends $AsyncNotifier<List<Chapter>> {
   );
   @$internal
   @override
-  FutureOr<List<Chapter>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Chapter>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Chapter>>>,
+        AsyncValue<List<Chapter>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(MangaCovers)
@@ -1188,9 +1257,18 @@ abstract class _$MangaCovers extends $AsyncNotifier<List<CoverArt>> {
   );
   @$internal
   @override
-  FutureOr<List<CoverArt>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<CoverArt>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<CoverArt>>>,
+        AsyncValue<List<CoverArt>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(ReadChapters)
@@ -1362,9 +1440,18 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
   );
   @$internal
   @override
-  FutureOr<ReadChaptersMap> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<ReadChaptersMap>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<ReadChaptersMap>>,
+        AsyncValue<ReadChaptersMap>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$ReadChaptersElement
@@ -1654,9 +1741,18 @@ abstract class _$UserLibrary
   );
   @$internal
   @override
-  FutureOr<Map<String, MangaReadingStatus>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<Map<String, MangaReadingStatus>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Map<String, MangaReadingStatus>>>,
+        AsyncValue<Map<String, MangaReadingStatus>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$UserLibraryElement extends $AsyncNotifierProviderElement<UserLibrary,
@@ -1927,9 +2023,18 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
   );
   @$internal
   @override
-  FutureOr<List<CustomList>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<CustomList>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<CustomList>>>,
+        AsyncValue<List<CustomList>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$UserListsElement
@@ -2338,9 +2443,18 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
   );
   @$internal
   @override
-  FutureOr<List<CustomList>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<CustomList>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<CustomList>>>,
+        AsyncValue<List<CustomList>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$FollowedListsElement
@@ -2569,9 +2683,18 @@ abstract class _$CustomListFeed extends $AsyncNotifier<List<Chapter>> {
   );
   @$internal
   @override
-  FutureOr<List<Chapter>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Chapter>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Chapter>>>,
+        AsyncValue<List<Chapter>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(getMangaListByPage)
@@ -2913,9 +3036,18 @@ abstract class _$PersistentMangaListPaginator
   );
   @$internal
   @override
-  FutureOr<List<Manga>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Manga>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Manga>>>,
+        AsyncValue<List<Manga>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$PersistentMangaListPaginatorElement
@@ -3278,9 +3410,18 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
   );
   @$internal
   @override
-  FutureOr<CustomList?> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<CustomList?>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<CustomList?>>,
+        AsyncValue<CustomList?>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(TagList)
@@ -3342,7 +3483,16 @@ abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
   FutureOr<Iterable<Tag>> build();
   @$internal
   @override
-  FutureOr<Iterable<Tag>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Iterable<Tag>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Iterable<Tag>>>,
+        AsyncValue<Iterable<Tag>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(MangaSearch)
@@ -3495,9 +3645,18 @@ abstract class _$MangaSearch extends $AsyncNotifier<List<Manga>> {
   );
   @$internal
   @override
-  FutureOr<List<Manga>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<List<Manga>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<Manga>>>,
+        AsyncValue<List<Manga>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(Statistics)
@@ -3569,7 +3728,16 @@ abstract class _$Statistics
   FutureOr<Map<String, MangaStatistics>> build();
   @$internal
   @override
-  FutureOr<Map<String, MangaStatistics>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Map<String, MangaStatistics>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Map<String, MangaStatistics>>>,
+        AsyncValue<Map<String, MangaStatistics>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$StatisticsElement extends $AsyncNotifierProviderElement<Statistics,
@@ -3715,7 +3883,16 @@ abstract class _$ChapterStats
   FutureOr<Map<String, ChapterStatistics>> build();
   @$internal
   @override
-  FutureOr<Map<String, ChapterStatistics>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Map<String, ChapterStatistics>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Map<String, ChapterStatistics>>>,
+        AsyncValue<Map<String, ChapterStatistics>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$ChapterStatsElement extends $AsyncNotifierProviderElement<ChapterStats,
@@ -3963,9 +4140,18 @@ abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
   );
   @$internal
   @override
-  FutureOr<Map<String, SelfRating>> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<Map<String, SelfRating>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Map<String, SelfRating>>>,
+        AsyncValue<Map<String, SelfRating>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$RatingsElement
@@ -4256,9 +4442,18 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
   );
   @$internal
   @override
-  FutureOr<MangaReadingStatus?> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<MangaReadingStatus?>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<MangaReadingStatus?>>,
+        AsyncValue<MangaReadingStatus?>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$ReadingStatusElement
@@ -4491,9 +4686,15 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
   );
   @$internal
   @override
-  FutureOr<bool> runBuild() => build(
-        _$args,
-      );
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<AsyncValue<bool>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<bool>>, AsyncValue<bool>, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$FollowingStatusElement
@@ -4636,7 +4837,16 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();
   @$internal
   @override
-  FutureOr<Queue<Chapter>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Queue<Chapter>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Queue<Chapter>>>,
+        AsyncValue<Queue<Chapter>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$MangaDexHistoryElement
@@ -4770,7 +4980,13 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
   @$internal
   @override
-  FutureOr<User?> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<User?>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<User?>>, AsyncValue<User?>, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(AuthControl)
@@ -4851,7 +5067,13 @@ abstract class _$AuthControl extends $AsyncNotifier<bool> {
   FutureOr<bool> build();
   @$internal
   @override
-  FutureOr<bool> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<bool>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<bool>>, AsyncValue<bool>, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$AuthControlElement

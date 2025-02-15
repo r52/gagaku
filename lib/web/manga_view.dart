@@ -19,7 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 part 'manga_view.g.dart';
 
 Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
-  final info = state.extra.asOrNull<SourceInfo>();
+  final handle = state.extra.asOrNull<SourceHandler>();
 
   final proxy = state.pathParameters['proxy'] ?? state.pathParameters['source'];
   final code = state.pathParameters['code'] ?? state.pathParameters['mangaId'];
@@ -29,7 +29,7 @@ Page<dynamic> buildWebMangaViewPage(BuildContext context, GoRouterState state) {
     child: QueriedWebMangaViewWidget(
       proxy: proxy,
       code: code,
-      info: info,
+      handle: handle,
     ),
     transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
   );
@@ -46,9 +46,9 @@ Page<dynamic> buildRedirectedWebMangaViewPage(BuildContext context, GoRouterStat
 }
 
 @Riverpod(retry: noRetry)
-Future<WebManga> _fetchWebMangaInfo(Ref ref, SourceInfo info) async {
+Future<WebManga> _fetchWebMangaInfo(Ref ref, SourceHandler handle) async {
   final api = ref.watch(proxyProvider);
-  final manga = await api.handleSource(info);
+  final manga = await api.handleSource(handle);
 
   if (manga != null) {
     return manga;
@@ -58,12 +58,12 @@ Future<WebManga> _fetchWebMangaInfo(Ref ref, SourceInfo info) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<SourceInfo> _fetchWebMangaRedirect(Ref ref, String url) async {
+Future<SourceHandler> _fetchWebMangaRedirect(Ref ref, String url) async {
   final api = ref.watch(proxyProvider);
-  final proxy = await api.parseUrl(url);
+  final handle = await api.parseUrl(url);
 
-  if (proxy != null) {
-    return proxy;
+  if (handle != null) {
+    return handle;
   }
 
   throw Exception('Invalid url $url. Data not found.');
@@ -83,24 +83,24 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
     super.key,
     this.proxy,
     this.code,
-    this.info,
-  }) : assert((proxy != null && code != null) || info != null);
+    this.handle,
+  }) : assert((proxy != null && code != null) || handle != null);
 
   final String? proxy;
   final String? code;
-  final SourceInfo? info;
+  final SourceHandler? handle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inf = info ??
-        SourceInfo(
+    final hndl = handle ??
+        SourceHandler(
           type: SourceType.proxy,
           source: proxy!,
           location: code!,
         );
 
     return DataProviderWhenWidget(
-      provider: _fetchWebMangaInfoProvider(inf),
+      provider: _fetchWebMangaInfoProvider(hndl),
       errorBuilder: (context, child) => Scaffold(
         appBar: AppBar(
           leading: BackButton(
@@ -108,7 +108,7 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                context.go(GagakuRoute.proxyHome);
+                context.go(GagakuRoute.extensionHome);
               }
             },
           ),
@@ -119,15 +119,15 @@ class QueriedWebMangaViewWidget extends ConsumerWidget {
             final api = ref.watch(proxyProvider);
             return RefreshIndicator(
               onRefresh: () async {
-                await api.invalidateAll(inf.getKey());
-                return ref.refresh(_fetchWebMangaInfoProvider(inf).future);
+                await api.invalidateAll(hndl.getKey());
+                return ref.refresh(_fetchWebMangaInfoProvider(hndl).future);
               },
               child: child!,
             );
           },
         ),
       ),
-      builder: (context, data) => WebMangaViewWidget(manga: data, info: inf),
+      builder: (context, data) => WebMangaViewWidget(manga: data, handle: hndl),
     );
   }
 }
@@ -149,7 +149,7 @@ class RedirectedWebMangaViewWidget extends StatelessWidget {
                 if (context.canPop()) {
                   context.pop();
                 } else {
-                  context.go(GagakuRoute.proxyHome);
+                  context.go(GagakuRoute.extensionHome);
                 }
               },
             ),
@@ -163,22 +163,22 @@ class RedirectedWebMangaViewWidget extends StatelessWidget {
           ),
         );
       },
-      builder: (context, data) => QueriedWebMangaViewWidget(info: data),
+      builder: (context, data) => QueriedWebMangaViewWidget(handle: data),
     );
   }
 }
 
 class WebMangaViewWidget extends HookConsumerWidget {
-  const WebMangaViewWidget({super.key, required this.manga, required this.info});
+  const WebMangaViewWidget({super.key, required this.manga, required this.handle});
 
   final WebManga manga;
-  final SourceInfo info;
+  final SourceHandler handle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
-    final link = HistoryLink(title: '${info.source}: ${manga.title}', url: info.getURL(), cover: manga.cover);
+    final link = HistoryLink(title: '${handle.source}: ${manga.title}', url: handle.getURL(), cover: manga.cover);
     final chapterlist = manga.chapters.entries.map((e) => ChapterEntry(e.key, e.value)).toList();
     //chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
     chapterlist.sort((a, b) => compareNatural(b.name, a.name));
@@ -194,8 +194,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          await api.invalidateAll(info.getKey());
-          return ref.refresh(_fetchWebMangaInfoProvider(info).future);
+          await api.invalidateAll(handle.getKey());
+          return ref.refresh(_fetchWebMangaInfoProvider(handle).future);
         },
         child: CustomScrollView(
           scrollBehavior: const MouseTouchScrollBehavior(),
@@ -210,7 +210,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   if (context.canPop()) {
                     context.pop();
                   } else {
-                    context.go(GagakuRoute.proxyHome);
+                    context.go(GagakuRoute.extensionHome);
                   }
                 },
               ),
@@ -244,10 +244,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 OverflowBar(
                   spacing: 8.0,
                   children: [
-                    _FavoritesMenu(link: link, info: info),
+                    _FavoritesMenu(link: link, handle: handle),
                     Consumer(
                       builder: (context, ref, child) {
-                        final key = info.getKey();
+                        final key = handle.getKey();
 
                         return IconButton(
                           tooltip: 'webSources.resetRead'.tr(context: context),
@@ -344,7 +344,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     MultiChildExpansionTile(
                       title: 'tracking.links'.tr(context: context),
                       children: [
-                        if (info.type == SourceType.proxy)
+                        if (handle.type == SourceType.proxy)
                           ButtonChip(
                             onPressed: () async {
                               final route = cleanBaseDomains(GoRouterState.of(context).uri.toString());
@@ -356,19 +356,19 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             },
                             text: 'mangaView.openOn'.tr(context: context, args: ['cubari.moe']),
                           ),
-                        if (info.type == SourceType.source)
+                        if (handle.type == SourceType.source)
                           ButtonChip(
                             onPressed: () async {
                               final url = await ref
                                   .read(webSourceManagerProvider.notifier)
-                                  .getMangaURL(info.source, info.location);
+                                  .getMangaURL(handle.source, handle.location);
                               final uri = Uri.parse(url);
 
                               if (!await launchUrl(uri)) {
                                 throw 'Could not launch $url';
                               }
                             },
-                            text: 'mangaView.openOn'.tr(context: context, args: [info.source]),
+                            text: 'mangaView.openOn'.tr(context: context, args: [handle.source]),
                           ),
                       ],
                     ),
@@ -388,7 +388,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       const Spacer(),
                       Consumer(
                         builder: (context, ref, child) {
-                          final key = info.getKey();
+                          final key = handle.getKey();
                           final names = chapterlist.map((e) => e.name);
                           final allRead = ref.watch(webReadMarkersProvider.select((value) => switch (value) {
                                 AsyncValue(value: final data?) => data[key]?.containsAll(names) ?? false,
@@ -462,7 +462,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   key: ValueKey(e.id),
                   data: e,
                   manga: manga,
-                  info: info,
+                  handle: handle,
                 );
               },
               itemCount: manga.chapters.length,
@@ -479,13 +479,13 @@ class ChapterButtonWidget extends HookConsumerWidget {
     super.key,
     required this.data,
     required this.manga,
-    required this.info,
+    required this.handle,
     this.onLinkPressed,
   });
 
   final ChapterEntry data;
   final WebManga manga;
-  final SourceInfo info;
+  final SourceHandler handle;
   final VoidCallback? onLinkPressed;
 
   @override
@@ -495,7 +495,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
     final name = data.name;
-    final key = info.getKey();
+    final key = handle.getKey();
 
     final isRead = ref.watch(webReadMarkersProvider.select((value) => switch (value) {
           AsyncValue(value: final data?) => data[key]?.contains(name) ?? false,
@@ -540,10 +540,10 @@ class ChapterButtonWidget extends HookConsumerWidget {
       visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
     );
 
-    var url = '/read/${info.source}/${info.location}/$name/1/';
+    var url = '/read/${handle.source}/${handle.location}/$name/1/';
 
-    if (info.type == SourceType.source) {
-      url = '/read-chapter/${info.source}/${info.location}/${data.chapter.groups.entries.first.value}';
+    if (handle.type == SourceType.source) {
+      url = '/read-chapter/${handle.source}/${handle.location}/${data.chapter.groups.entries.first.value}';
     }
 
     return ListTile(
@@ -553,7 +553,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
               source: data.chapter.groups.entries.first.value,
               title: title,
               link: manga.title,
-              info: info,
+              handle: handle,
               readKey: name,
               onLinkPressed: onLinkPressed,
             ));
@@ -592,11 +592,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
 class _FavoritesMenu extends HookConsumerWidget {
   const _FavoritesMenu({
     required this.link,
-    required this.info,
+    required this.handle,
   });
 
   final HistoryLink link;
-  final SourceInfo info;
+  final SourceHandler handle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -611,7 +611,7 @@ class _FavoritesMenu extends HookConsumerWidget {
     ));
 
     final favorited =
-        useMemoized(() => favorites?.values.any((l) => l.any((e) => e.url == info.getURL())) ?? false, [favorites]);
+        useMemoized(() => favorites?.values.any((l) => l.any((e) => e.url == handle.getURL())) ?? false, [favorites]);
 
     return MenuAnchor(
       builder: (context, controller, child) {

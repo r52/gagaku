@@ -73,7 +73,13 @@ abstract class _$MangaListView extends $Notifier<MangaListView> {
   MangaListView build();
   @$internal
   @override
-  MangaListView runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<MangaListView>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<MangaListView>, MangaListView, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 // ignore_for_file: type=lint

@@ -1,1 +1,1 @@
-Partial implementation of the Paperback iOS extension API
+Partial implementation of the Paperback iOS extension API, adapted from @paperback/runtime-polyfills

@@ -73,7 +73,13 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
   LibrarySort build();
   @$internal
   @override
-  LibrarySort runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<LibrarySort>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<LibrarySort>, LibrarySort, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(LocalLibrary)
@@ -135,7 +141,16 @@ abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
   FutureOr<LocalLibraryItem> build();
   @$internal
   @override
-  FutureOr<LocalLibraryItem> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<LocalLibraryItem>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<LocalLibraryItem>>,
+        AsyncValue<LocalLibraryItem>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(SupportedFormats)
@@ -197,7 +212,16 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
   FutureOr<FormatInfo> build();
   @$internal
   @override
-  FutureOr<FormatInfo> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<FormatInfo>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<FormatInfo>>,
+        AsyncValue<FormatInfo>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 // ignore_for_file: type=lint

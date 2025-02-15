@@ -191,7 +191,16 @@ abstract class _$WebSourceFavorites
   FutureOr<Map<String, List<HistoryLink>>> build();
   @$internal
   @override
-  FutureOr<Map<String, List<HistoryLink>>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Map<String, List<HistoryLink>>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Map<String, List<HistoryLink>>>>,
+        AsyncValue<Map<String, List<HistoryLink>>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$WebSourceFavoritesElement extends $AsyncNotifierProviderElement<
@@ -667,7 +676,16 @@ abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
   FutureOr<Queue<HistoryLink>> build();
   @$internal
   @override
-  FutureOr<Queue<HistoryLink>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Queue<HistoryLink>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Queue<HistoryLink>>>,
+        AsyncValue<Queue<HistoryLink>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$WebSourceHistoryElement extends $AsyncNotifierProviderElement<
@@ -955,7 +973,16 @@ abstract class _$WebReadMarkers
   FutureOr<Map<String, Set<String>>> build();
   @$internal
   @override
-  FutureOr<Map<String, Set<String>>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Map<String, Set<String>>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<Map<String, Set<String>>>>,
+        AsyncValue<Map<String, Set<String>>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$WebReadMarkersElement extends $AsyncNotifierProviderElement<
@@ -1262,13 +1289,22 @@ final class WebSourceManagerProvider
           $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$webSourceManagerHash() => r'df39e17480168b014f18a1a6924ff1188dcf90b0';
+String _$webSourceManagerHash() => r'815c16c9829ce46946513867440567692b3eb8ab';
 
 abstract class _$WebSourceManager extends $AsyncNotifier<List<WebSourceInfo>> {
   FutureOr<List<WebSourceInfo>> build();
   @$internal
   @override
-  FutureOr<List<WebSourceInfo>> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<List<WebSourceInfo>>>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<AsyncValue<List<WebSourceInfo>>>,
+        AsyncValue<List<WebSourceInfo>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 // ignore_for_file: type=lint

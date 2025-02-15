@@ -124,12 +124,10 @@ _$SourceVersionImpl _$$SourceVersionImplFromJson(Map<String, dynamic> json) =>
       contentRating: $enumDecode(_$ContentRatingEnumMap, json['contentRating']),
       version: json['version'] as String,
       icon: json['icon'] as String,
-      websiteBaseURL: json['websiteBaseURL'] as String,
-      authorWebsite: json['authorWebsite'] as String?,
-      language: json['language'] as String?,
       tags: (json['tags'] as List<dynamic>?)
           ?.map((e) => Badge.fromJson(e as Map<String, dynamic>))
           .toList(),
+      websiteBaseURL: json['websiteBaseURL'] as String,
       intents: (json['intents'] as num?)?.toInt(),
     );
 
@@ -143,10 +141,8 @@ Map<String, dynamic> _$$SourceVersionImplToJson(_$SourceVersionImpl instance) =>
       'contentRating': _$ContentRatingEnumMap[instance.contentRating]!,
       'version': instance.version,
       'icon': instance.icon,
-      'websiteBaseURL': instance.websiteBaseURL,
-      'authorWebsite': instance.authorWebsite,
-      'language': instance.language,
       'tags': instance.tags,
+      'websiteBaseURL': instance.websiteBaseURL,
       'intents': instance.intents,
     };
 
@@ -155,6 +151,38 @@ const _$ContentRatingEnumMap = {
   ContentRating.MATURE: 'MATURE',
   ContentRating.ADULT: 'ADULT',
 };
+
+_$SourceInfoImpl _$$SourceInfoImplFromJson(Map<String, dynamic> json) =>
+    _$SourceInfoImpl(
+      name: json['name'] as String,
+      author: json['author'] as String,
+      description: json['description'] as String,
+      contentRating: $enumDecode(_$ContentRatingEnumMap, json['contentRating']),
+      version: json['version'] as String,
+      icon: json['icon'] as String,
+      websiteBaseURL: json['websiteBaseURL'] as String,
+      authorWebsite: json['authorWebsite'] as String?,
+      language: json['language'] as String?,
+      sourceTags: (json['sourceTags'] as List<dynamic>?)
+          ?.map((e) => Badge.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      intents: (json['intents'] as num?)?.toInt(),
+    );
+
+Map<String, dynamic> _$$SourceInfoImplToJson(_$SourceInfoImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'author': instance.author,
+      'description': instance.description,
+      'contentRating': _$ContentRatingEnumMap[instance.contentRating]!,
+      'version': instance.version,
+      'icon': instance.icon,
+      'websiteBaseURL': instance.websiteBaseURL,
+      'authorWebsite': instance.authorWebsite,
+      'language': instance.language,
+      'sourceTags': instance.sourceTags,
+      'intents': instance.intents,
+    };
 
 _$BuiltWithImpl _$$BuiltWithImplFromJson(Map<String, dynamic> json) =>
     _$BuiltWithImpl(
@@ -362,4 +390,22 @@ Map<String, dynamic> _$$SearchRequestImplToJson(_$SearchRequestImpl instance) =>
       'title': instance.title,
       'includedTags': instance.includedTags,
       'excludedTags': instance.excludedTags,
+    };
+
+_$HomeSectionImpl _$$HomeSectionImplFromJson(Map<String, dynamic> json) =>
+    _$HomeSectionImpl(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      items: (json['items'] as List<dynamic>)
+          .map((e) => PartialSourceManga.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      containsMoreItems: json['containsMoreItems'] as bool,
+    );
+
+Map<String, dynamic> _$$HomeSectionImplToJson(_$HomeSectionImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'items': instance.items,
+      'containsMoreItems': instance.containsMoreItems,
     };

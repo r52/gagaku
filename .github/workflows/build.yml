@@ -73,6 +73,11 @@ jobs:
 
       - run: dart run build_runner build --delete-conflicting-outputs
 
+      - working-directory: extension/
+        run: |
+          npm ci
+          npm run deploy
+
       - name: Build Project
         run: flutter build ${{ matrix.pkg }}
 
@@ -123,7 +128,7 @@ jobs:
           RELDATE="$(date +'%Y-%m-%d %H:%M')"
           NAME="${{ github.event.inputs.tagName }}"
           TAGNAME="${{ github.event.inputs.tagName }}"
-          gh release create "$TAGNAME" --target "master" --title "$NAME" artifacts/**/*.{zip,tar.xz,.apk}
+          gh release create "$TAGNAME" --target "main" --title "$NAME" artifacts/**/*.{zip,tar.xz,.apk}
           echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
           echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
         env:

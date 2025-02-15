@@ -73,7 +73,13 @@ abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
   MangaReadingStatus build();
   @$internal
   @override
-  MangaReadingStatus runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<MangaReadingStatus>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<MangaReadingStatus>, MangaReadingStatus, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 @ProviderFor(_getLibraryListByType)

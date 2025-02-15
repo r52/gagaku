@@ -49,7 +49,8 @@ class ProxyHandler {
       final src = url.substring(20);
       final code = '/read/api/imgur/chapter/$src';
       GoRouter.of(context).push('/read/imgur/$src/1/1/',
-          extra: WebReaderData(source: code, info: SourceInfo(type: SourceType.proxy, source: 'imgur', location: src)));
+          extra: WebReaderData(
+              source: code, handle: SourceHandler(type: SourceType.proxy, source: 'imgur', location: src)));
       ref.read(webSourceHistoryProvider.add)(HistoryLink(title: url, url: url));
       return true;
     }
@@ -81,7 +82,7 @@ class ProxyHandler {
         final loc = parts[1];
         if (!context.mounted) return false;
         GoRouter.of(context).push('/read/${src.id}/$loc',
-            extra: SourceInfo(type: SourceType.source, source: src.id, location: loc, parser: src));
+            extra: SourceHandler(type: SourceType.source, source: src.id, location: loc, parser: src));
         return true;
       }
     }
@@ -89,7 +90,7 @@ class ProxyHandler {
     return false;
   }
 
-  Future<SourceInfo?> parseUrl(String url) async {
+  Future<SourceHandler?> parseUrl(String url) async {
     var src = cleanBaseDomains(url);
 
     if (!src.startsWith('/')) {
@@ -106,7 +107,7 @@ class ProxyHandler {
     switch (proxy[0]) {
       case 'read':
         if (proxy.length >= 4) {
-          return SourceInfo(
+          return SourceHandler(
             type: SourceType.proxy,
             source: proxy[1],
             location: proxy[2],
@@ -114,7 +115,7 @@ class ProxyHandler {
           );
         }
 
-        return SourceInfo(
+        return SourceHandler(
           type: SourceType.proxy,
           source: proxy[1],
           location: proxy[2],
@@ -139,30 +140,30 @@ class ProxyHandler {
     }
   }
 
-  Future<WebManga?> handleSource(SourceInfo info) async {
-    switch (info.type) {
+  Future<WebManga?> handleSource(SourceHandler handle) async {
+    switch (handle.type) {
       case SourceType.source:
         final srcMgr = await ref.watch(webSourceManagerProvider.future);
 
-        if (info.parser != null) {
-          return await ref.read(webSourceManagerProvider.notifier).getManga(info.parser!.id, info.location);
+        if (handle.parser != null) {
+          return await ref.read(webSourceManagerProvider.notifier).getManga(handle.parser!.id, handle.location);
         } else {
           for (final src in srcMgr) {
-            if (info.source == src.id) {
-              return await ref.read(webSourceManagerProvider.notifier).getManga(src.id, info.location);
+            if (handle.source == src.id) {
+              return await ref.read(webSourceManagerProvider.notifier).getManga(src.id, handle.location);
             }
           }
         }
 
         return null;
       case SourceType.proxy:
-        return await _getMangaFromProxy(info);
+        return await _getMangaFromProxy(handle);
     }
   }
 
-  Future<WebManga> _getMangaFromProxy(SourceInfo info) async {
-    final key = info.getKey();
-    final url = "https://cubari.moe/read/api/${info.source}/series/${info.location}/";
+  Future<WebManga> _getMangaFromProxy(SourceHandler handle) async {
+    final key = handle.getKey();
+    final url = "https://cubari.moe/read/api/${handle.source}/series/${handle.location}/";
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
@@ -572,12 +573,12 @@ class WebReadMarkers extends _$WebReadMarkers {
 class WebSourceManager extends _$WebSourceManager {
   HeadlessInAppWebView? _view;
   InAppWebViewController? _controller;
+  final Map<String, SourceInfo> _info = {};
 
   @override
   Future<List<WebSourceInfo>> build() async {
     final completer = Completer<void>();
-    final cfg = ref.watch(webConfigProvider);
-    final installed = cfg.installedSources;
+    final installed = ref.watch(webConfigProvider.select((cfg) => cfg.installedSources));
 
     _view = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
@@ -601,6 +602,10 @@ class WebSourceManager extends _$WebSourceManager {
 
           await controller.evaluateJavascript(
               source: "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);");
+
+          final rinfo = await controller.evaluateJavascript(source: "window.Sources['${source.id}Info'];");
+          final info = SourceInfo.fromJson(rinfo);
+          _info[source.id] = info;
         }
 
         _controller = controller;
@@ -618,6 +623,49 @@ class WebSourceManager extends _$WebSourceManager {
     await completer.future;
 
     return installed;
+  }
+
+  SourceInfo getInfo(String sourceId) {
+    if (_info.containsKey(sourceId)) {
+      return _info[sourceId]!;
+    }
+
+    throw Exception("Unknown source ID");
+  }
+
+  Future<List<HomeSection>> getHomePage(String sourceId) async {
+    await future;
+
+    final info = getInfo(sourceId);
+
+    if (!info.hasIntent(SourceIntents.homepageSections)) {
+      throw Exception("Source does not support homepages");
+    }
+
+    if (_controller != null) {
+      final result = await _controller!.callAsyncJavaScript(functionBody: """
+var homesections = [];
+var cb = function (section) {
+  var idx = homesections.findIndex((e) => e.id == section.id);
+
+  if (idx == -1) {
+    homesections.push(section);
+  } else {
+    homesections[idx] = section;
+  }
+};
+
+await $sourceId.getHomePageSections(cb);
+return homesections;
+""");
+
+      final rsec = result!.value as List<dynamic>;
+      final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
+
+      return sections;
+    }
+
+    throw Exception("Uninitialized view controller");
   }
 
   Future<List<HistoryLink>> searchManga(String sourceId, SearchRequest query) async {
@@ -640,9 +688,7 @@ return await $sourceId.getSearchResults(query, undefined)
         return [];
       }
 
-      final links = pmangas.results!
-          .map((e) => HistoryLink(title: e.title, url: '$sourceId/${e.mangaId}', cover: e.image))
-          .toList();
+      final links = pmangas.results!.map((e) => HistoryLink.fromPartialSourceManga(sourceId, e)).toList();
 
       // logger.d(result);
 

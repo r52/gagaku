@@ -134,7 +134,13 @@ abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   MangaDexConfig build();
   @$internal
   @override
-  MangaDexConfig runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<MangaDexConfig>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<MangaDexConfig>, MangaDexConfig, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$MdConfigElement

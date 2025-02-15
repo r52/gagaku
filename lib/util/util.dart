@@ -151,7 +151,7 @@ mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   }
 }
 
-mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>, FutureOr<T>> {
+mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>> {
   Timer? _staleTimer;
   DateTime? _expiry;
 

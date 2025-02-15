@@ -97,7 +97,13 @@ abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();
   @$internal
   @override
-  LocalLibConfig runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<LocalLibConfig>;
+    final element = ref.element as $ClassProviderElement<
+        NotifierBase<LocalLibConfig>, LocalLibConfig, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$LocalConfigElement
