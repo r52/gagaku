@@ -205,7 +205,7 @@ class LocalLibrary extends _$LocalLibrary {
   }
 
   Future<LocalLibraryItem> _scanLibrary() async {
-    final cfg = ref.watch(localConfigProvider);
+    final libDir = ref.watch(localConfigProvider.select((c) => c.libraryDirectory));
     final currentSort = ref.read(librarySortTypeProvider);
 
     final perms = await Permission.manageExternalStorage.request();
@@ -219,15 +219,15 @@ class LocalLibrary extends _$LocalLibrary {
       );
     }
 
-    if (cfg.libraryDirectory.isNotEmpty) {
+    if (libDir.isNotEmpty) {
       state = const AsyncValue.loading(progress: 0);
       final top = LocalLibraryItem(
-        path: cfg.libraryDirectory,
+        path: libDir,
         type: LibraryItemType.directory,
         modified: DateTime.now(),
       );
 
-      final dir = Directory(cfg.libraryDirectory);
+      final dir = Directory(libDir);
       final entities = await dir.list().toList();
 
       for (final (idx, e) in entities.indexed) {

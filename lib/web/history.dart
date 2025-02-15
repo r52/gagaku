@@ -19,7 +19,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
-    final cfg = ref.watch(webConfigProvider);
+    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
 
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
     final historyProvider = ref.watch(webSourceHistoryProvider);
@@ -110,7 +110,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
             children: [
               WebMangaListViewSliver(
                 items: history.toList(),
-                favoritesKey: cfg.defaultCategory,
+                favoritesKey: defaultCategory,
                 removeFromAll: true,
               ),
             ],

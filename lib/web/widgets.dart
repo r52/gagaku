@@ -143,7 +143,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
     final view = ref.watch(_mangaListViewProvider);
-    final gcfg = ref.watch(gagakuSettingsProvider);
+    final gridExtent = ref.watch(gagakuSettingsProvider.select((c) => c.gridAlbumExtent));
     final theme = Theme.of(context);
 
     final addFavorite = ref.watch(webSourceFavoritesProvider.add);
@@ -288,7 +288,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
       case WebMangaListView.grid:
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: gcfg.gridAlbumExtent.grid,
+            maxCrossAxisExtent: gridExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,

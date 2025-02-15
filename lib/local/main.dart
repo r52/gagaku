@@ -86,7 +86,7 @@ class LocalLibraryHome extends StatelessWidget {
       drawer: const MainDrawer(),
       body: HookConsumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          final settings = ref.watch(localConfigProvider);
+          final libDir = ref.watch(localConfigProvider.select((c) => c.libraryDirectory));
           final libraryProvider = ref.watch(localLibraryProvider);
           final sort = ref.watch(librarySortTypeProvider);
           final currentItem = useState<LocalLibraryItem?>(libraryProvider.value);
@@ -114,7 +114,7 @@ class LocalLibraryHome extends StatelessWidget {
             return null;
           }, [currentItem.value, sort]);
 
-          if (settings.libraryDirectory.isEmpty) {
+          if (libDir.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

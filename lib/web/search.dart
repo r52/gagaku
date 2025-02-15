@@ -31,8 +31,8 @@ class WebSourceSearchWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gagakucfg = ref.watch(gagakuSettingsProvider);
-    final cfg = ref.watch(webConfigProvider);
+    final gridExtent = ref.watch(gagakuSettingsProvider.select((c) => c.gridAlbumExtent));
+    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
     final controller = useSearchController();
     final searchTerm = useState('');
     final sources = ref.watch(webSourceManagerProvider);
@@ -185,7 +185,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
 
                   return SliverGrid.builder(
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: gagakucfg.gridAlbumExtent.grid,
+                      maxCrossAxisExtent: gridExtent.grid,
                       mainAxisSpacing: 8,
                       crossAxisSpacing: 8,
                       childAspectRatio: 0.7,
@@ -195,7 +195,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                       return GridMangaItem(
                         key: ValueKey(item.hashCode),
                         link: item,
-                        favoritesKey: cfg.defaultCategory,
+                        favoritesKey: defaultCategory,
                         showFavoriteButton: false,
                         showRemoveButton: false,
                       );

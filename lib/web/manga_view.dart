@@ -601,7 +601,7 @@ class _FavoritesMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final cfg = ref.watch(webConfigProvider);
+    final categories = ref.watch(webConfigProvider.select((cfg) => cfg.categories));
 
     final favorites = ref.watch(webSourceFavoritesProvider.select(
       (value) => switch (value) {
@@ -641,10 +641,10 @@ class _FavoritesMenu extends HookConsumerWidget {
       },
       menuChildren: favorites != null
           ? List.generate(
-              cfg.categories.length,
+              categories.length,
               (index) => Builder(
                 builder: (context) {
-                  final cat = cfg.categories.elementAt(index);
+                  final cat = categories.elementAt(index);
                   return CheckboxListTile(
                     controlAffinity: ListTileControlAffinity.leading,
                     title: Text(cat.name),

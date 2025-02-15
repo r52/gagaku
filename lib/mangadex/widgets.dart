@@ -920,7 +920,7 @@ class MangaListViewSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cfg = ref.watch(gagakuSettingsProvider);
+    final gridExtent = ref.watch(gagakuSettingsProvider.select((c) => c.gridAlbumExtent));
     final view = selectMode ? MangaListView.grid : ref.watch(_mangaListViewProvider);
 
     switch (view) {
@@ -940,7 +940,7 @@ class MangaListViewSliver extends ConsumerWidget {
       case MangaListView.detailed:
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: cfg.gridAlbumExtent.detailed,
+            maxCrossAxisExtent: gridExtent.detailed,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
@@ -960,7 +960,7 @@ class MangaListViewSliver extends ConsumerWidget {
       case MangaListView.grid:
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
+            maxCrossAxisExtent: gridExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,

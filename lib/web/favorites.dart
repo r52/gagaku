@@ -20,8 +20,8 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
-    final cfg = ref.watch(webConfigProvider);
-    final tabController = useTabController(initialLength: cfg.categories.length, keys: [cfg]);
+    final categories = ref.watch(webConfigProvider.select((cfg) => cfg.categories));
+    final tabController = useTabController(initialLength: categories.length, keys: [categories]);
 
     // Pre-initialize sources
     final _ = ref.watch(webSourceManagerProvider);
@@ -36,9 +36,9 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
               isScrollable: true,
               controller: tabController,
               tabs: List<Tab>.generate(
-                cfg.categories.length,
+                categories.length,
                 (int index) => Tab(
-                  text: cfg.categories.elementAt(index).name,
+                  text: categories.elementAt(index).name,
                 ),
               ),
             ),
@@ -47,7 +47,7 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
             child: TabBarView(
               controller: tabController,
               children: [
-                for (final cat in cfg.categories)
+                for (final cat in categories)
                   Consumer(
                     builder: (context, ref, child) {
                       final items = ref.watch(webSourceFavoritesProvider.select(

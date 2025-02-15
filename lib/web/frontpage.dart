@@ -252,7 +252,7 @@ class MangaCarousel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cfg = ref.watch(webConfigProvider);
+    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
 
     return Center(
       child: ConstrainedBox(
@@ -265,7 +265,7 @@ class MangaCarousel extends ConsumerWidget {
               .map(
                 (e) => GridMangaItem(
                   link: e,
-                  favoritesKey: cfg.defaultCategory,
+                  favoritesKey: defaultCategory,
                   showRemoveButton: false,
                   removeFromAll: true,
                 ),
