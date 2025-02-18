@@ -210,6 +210,16 @@ class WebSourceInfo with _$WebSourceInfo {
   factory WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
 }
 
+@freezed
+class SourceIdentifier with _$SourceIdentifier {
+  const factory SourceIdentifier({
+    required WebSourceInfo internal,
+    required SourceInfo external,
+  }) = _SourceIdentifier;
+
+  factory SourceIdentifier.fromJson(Map<String, dynamic> json) => _$SourceIdentifierFromJson(json);
+}
+
 ///////////////////////////////////////////////////////////////////// PB types
 
 enum SourceIntents {

@@ -96,6 +96,21 @@ Map<String, dynamic> _$$WebSourceInfoImplToJson(_$WebSourceInfoImpl instance) =>
       'icon': instance.icon,
     };
 
+_$SourceIdentifierImpl _$$SourceIdentifierImplFromJson(
+        Map<String, dynamic> json) =>
+    _$SourceIdentifierImpl(
+      internal:
+          WebSourceInfo.fromJson(json['internal'] as Map<String, dynamic>),
+      external: SourceInfo.fromJson(json['external'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$SourceIdentifierImplToJson(
+        _$SourceIdentifierImpl instance) =>
+    <String, dynamic>{
+      'internal': instance.internal,
+      'external': instance.external,
+    };
+
 _$BadgeImpl _$$BadgeImplFromJson(Map<String, dynamic> json) => _$BadgeImpl(
       text: json['text'] as String,
       type: $enumDecode(_$BadgeColorEnumMap, json['type']),

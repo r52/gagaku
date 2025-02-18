@@ -1339,6 +1339,205 @@ abstract class _WebSourceInfo implements WebSourceInfo {
       throw _privateConstructorUsedError;
 }
 
+SourceIdentifier _$SourceIdentifierFromJson(Map<String, dynamic> json) {
+  return _SourceIdentifier.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SourceIdentifier {
+  WebSourceInfo get internal => throw _privateConstructorUsedError;
+  SourceInfo get external => throw _privateConstructorUsedError;
+
+  /// Serializes this SourceIdentifier to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of SourceIdentifier
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SourceIdentifierCopyWith<SourceIdentifier> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SourceIdentifierCopyWith<$Res> {
+  factory $SourceIdentifierCopyWith(
+          SourceIdentifier value, $Res Function(SourceIdentifier) then) =
+      _$SourceIdentifierCopyWithImpl<$Res, SourceIdentifier>;
+  @useResult
+  $Res call({WebSourceInfo internal, SourceInfo external});
+
+  $WebSourceInfoCopyWith<$Res> get internal;
+  $SourceInfoCopyWith<$Res> get external;
+}
+
+/// @nodoc
+class _$SourceIdentifierCopyWithImpl<$Res, $Val extends SourceIdentifier>
+    implements $SourceIdentifierCopyWith<$Res> {
+  _$SourceIdentifierCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SourceIdentifier
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? internal = null,
+    Object? external = null,
+  }) {
+    return _then(_value.copyWith(
+      internal: null == internal
+          ? _value.internal
+          : internal // ignore: cast_nullable_to_non_nullable
+              as WebSourceInfo,
+      external: null == external
+          ? _value.external
+          : external // ignore: cast_nullable_to_non_nullable
+              as SourceInfo,
+    ) as $Val);
+  }
+
+  /// Create a copy of SourceIdentifier
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WebSourceInfoCopyWith<$Res> get internal {
+    return $WebSourceInfoCopyWith<$Res>(_value.internal, (value) {
+      return _then(_value.copyWith(internal: value) as $Val);
+    });
+  }
+
+  /// Create a copy of SourceIdentifier
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SourceInfoCopyWith<$Res> get external {
+    return $SourceInfoCopyWith<$Res>(_value.external, (value) {
+      return _then(_value.copyWith(external: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$SourceIdentifierImplCopyWith<$Res>
+    implements $SourceIdentifierCopyWith<$Res> {
+  factory _$$SourceIdentifierImplCopyWith(_$SourceIdentifierImpl value,
+          $Res Function(_$SourceIdentifierImpl) then) =
+      __$$SourceIdentifierImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({WebSourceInfo internal, SourceInfo external});
+
+  @override
+  $WebSourceInfoCopyWith<$Res> get internal;
+  @override
+  $SourceInfoCopyWith<$Res> get external;
+}
+
+/// @nodoc
+class __$$SourceIdentifierImplCopyWithImpl<$Res>
+    extends _$SourceIdentifierCopyWithImpl<$Res, _$SourceIdentifierImpl>
+    implements _$$SourceIdentifierImplCopyWith<$Res> {
+  __$$SourceIdentifierImplCopyWithImpl(_$SourceIdentifierImpl _value,
+      $Res Function(_$SourceIdentifierImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of SourceIdentifier
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? internal = null,
+    Object? external = null,
+  }) {
+    return _then(_$SourceIdentifierImpl(
+      internal: null == internal
+          ? _value.internal
+          : internal // ignore: cast_nullable_to_non_nullable
+              as WebSourceInfo,
+      external: null == external
+          ? _value.external
+          : external // ignore: cast_nullable_to_non_nullable
+              as SourceInfo,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$SourceIdentifierImpl implements _SourceIdentifier {
+  const _$SourceIdentifierImpl(
+      {required this.internal, required this.external});
+
+  factory _$SourceIdentifierImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SourceIdentifierImplFromJson(json);
+
+  @override
+  final WebSourceInfo internal;
+  @override
+  final SourceInfo external;
+
+  @override
+  String toString() {
+    return 'SourceIdentifier(internal: $internal, external: $external)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SourceIdentifierImpl &&
+            (identical(other.internal, internal) ||
+                other.internal == internal) &&
+            (identical(other.external, external) ||
+                other.external == external));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, internal, external);
+
+  /// Create a copy of SourceIdentifier
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SourceIdentifierImplCopyWith<_$SourceIdentifierImpl> get copyWith =>
+      __$$SourceIdentifierImplCopyWithImpl<_$SourceIdentifierImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$SourceIdentifierImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _SourceIdentifier implements SourceIdentifier {
+  const factory _SourceIdentifier(
+      {required final WebSourceInfo internal,
+      required final SourceInfo external}) = _$SourceIdentifierImpl;
+
+  factory _SourceIdentifier.fromJson(Map<String, dynamic> json) =
+      _$SourceIdentifierImpl.fromJson;
+
+  @override
+  WebSourceInfo get internal;
+  @override
+  SourceInfo get external;
+
+  /// Create a copy of SourceIdentifier
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SourceIdentifierImplCopyWith<_$SourceIdentifierImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Badge _$BadgeFromJson(Map<String, dynamic> json) {
   return _Badge.fromJson(json);
 }

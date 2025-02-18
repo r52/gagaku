@@ -72,8 +72,8 @@ class ProxyHandler {
       return true;
     }
 
-    final sourceMgr = await ref.watch(webSourceManagerProvider.future);
-    for (final src in sourceMgr) {
+    final installed = ref.watch(webConfigProvider.select((cfg) => cfg.installedSources));
+    for (final src in installed) {
       if (url.startsWith('${src.id}/')) {
         final parts = url.split('/');
         if (parts.length != 2) {
@@ -143,14 +143,13 @@ class ProxyHandler {
   Future<WebManga?> handleSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
-        final srcMgr = await ref.watch(webSourceManagerProvider.future);
-
         if (handle.parser != null) {
-          return await ref.read(webSourceManagerProvider.notifier).getManga(handle.parser!.id, handle.location);
+          return await ref.read(extensionSourceProvider(handle.parser!.id).notifier).getManga(handle.location);
         } else {
-          for (final src in srcMgr) {
-            if (handle.source == src.id) {
-              return await ref.read(webSourceManagerProvider.notifier).getManga(src.id, handle.location);
+          final installed = await ref.watch(extensionInfoListProvider.future);
+          for (final src in installed) {
+            if (handle.source == src.internal.id) {
+              return await ref.read(extensionSourceProvider(handle.source).notifier).getManga(handle.location);
             }
           }
         }
@@ -570,15 +569,19 @@ class WebReadMarkers extends _$WebReadMarkers {
 }
 
 @Riverpod(keepAlive: true)
-class WebSourceManager extends _$WebSourceManager {
+class ExtensionSource extends _$ExtensionSource {
   HeadlessInAppWebView? _view;
-  InAppWebViewController? _controller;
-  final Map<String, SourceInfo> _info = {};
+  late InAppWebViewController _controller;
+  late SourceIdentifier _info;
 
   @override
-  Future<List<WebSourceInfo>> build() async {
+  Future<SourceIdentifier> build(String sourceId) async {
     final completer = Completer<void>();
     final installed = ref.watch(webConfigProvider.select((cfg) => cfg.installedSources));
+    late SourceInfo extinfo;
+
+    // Let this throw here if not found
+    final source = installed.firstWhere((e) => e.id == sourceId);
 
     _view = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
@@ -588,62 +591,56 @@ class WebSourceManager extends _$WebSourceManager {
         logger.d('Console Message: ${consoleMessage.message}');
       },
       onLoadStop: (controller, url) async {
-        for (final source in installed) {
-          final scriptUrl = '${source.repo}/${source.id}/source.js';
-          final response = await http.get(Uri.parse(scriptUrl));
+        final scriptUrl = '${source.repo}/${source.id}/source.js';
+        final response = await http.get(Uri.parse(scriptUrl));
 
-          if (response.statusCode != 200) {
-            logger.d("Failed to load $scriptUrl");
-            continue;
-          }
-
-          final script = response.body;
-          await controller.evaluateJavascript(source: script);
-
-          await controller.evaluateJavascript(
-              source: "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);");
-
-          final rinfo = await controller.evaluateJavascript(source: "window.Sources['${source.id}Info'];");
-          final info = SourceInfo.fromJson(rinfo);
-          _info[source.id] = info;
+        if (response.statusCode != 200) {
+          final err = "Failed to load $scriptUrl";
+          logger.d(err);
+          completer.completeError(err);
+          return;
         }
 
+        final script = response.body;
+        await controller.evaluateJavascript(source: script);
+
+        await controller.evaluateJavascript(
+            source: "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);");
+
+        final rinfo = await controller.evaluateJavascript(source: "window.Sources['${source.id}Info'];");
+        final info = SourceInfo.fromJson(rinfo);
+        extinfo = info;
+
         _controller = controller;
-        logger.d("Extension host ready");
+        logger.d("Extension ${extinfo.name} ready");
         completer.complete();
       },
     );
 
     ref.onDispose(() {
       _view?.dispose();
-      _controller = null;
     });
 
     await _view?.run();
     await completer.future;
 
-    return installed;
+    _info = SourceIdentifier(internal: source, external: extinfo);
+
+    return _info;
   }
 
-  SourceInfo getInfo(String sourceId) {
-    if (_info.containsKey(sourceId)) {
-      return _info[sourceId]!;
-    }
-
-    throw Exception("Unknown source ID");
+  SourceIdentifier getInfo() {
+    return _info;
   }
 
-  Future<List<HomeSection>> getHomePage(String sourceId) async {
+  Future<List<HomeSection>> getHomePage() async {
     await future;
 
-    final info = getInfo(sourceId);
-
-    if (!info.hasIntent(SourceIntents.homepageSections)) {
+    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
       throw Exception("Source does not support homepages");
     }
 
-    if (_controller != null) {
-      final result = await _controller!.callAsyncJavaScript(functionBody: """
+    final result = await _controller.callAsyncJavaScript(functionBody: """
 var homesections = [];
 var cb = function (section) {
   var idx = homesections.findIndex((e) => e.id == section.id);
@@ -659,126 +656,117 @@ await $sourceId.getHomePageSections(cb);
 return homesections;
 """);
 
-      final rsec = result!.value as List<dynamic>;
-      final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
+    final rsec = result!.value as List<dynamic>;
+    final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
 
-      return sections;
-    }
-
-    throw Exception("Uninitialized view controller");
+    return sections;
   }
 
-  Future<List<HistoryLink>> searchManga(String sourceId, SearchRequest query) async {
+  Future<List<HistoryLink>> searchManga(SearchRequest query) async {
     await future;
 
     if ((query.title == null || query.title!.isEmpty) && query.includedTags == null) {
       return [];
     }
 
-    if (_controller != null) {
-      String q = json.encode(query.toJson());
-      final result = await _controller!.callAsyncJavaScript(functionBody: """
+    String q = json.encode(query.toJson());
+    final result = await _controller.callAsyncJavaScript(functionBody: """
 var query = $q;
 return await $sourceId.getSearchResults(query, undefined)
 """);
 
-      final pmangas = PagedResults.fromJson(result!.value);
+    final pmangas = PagedResults.fromJson(result!.value);
 
-      if (pmangas.results == null) {
-        return [];
-      }
-
-      final links = pmangas.results!.map((e) => HistoryLink.fromPartialSourceManga(sourceId, e)).toList();
-
-      // logger.d(result);
-
-      return links;
+    if (pmangas.results == null) {
+      return [];
     }
 
-    throw Exception("Uninitialized view controller");
+    final links = pmangas.results!.map((e) => HistoryLink.fromPartialSourceManga(sourceId, e)).toList();
+
+    // logger.d(result);
+
+    return links;
   }
 
-  Future<WebManga?> getManga(String sourceId, String mangaId) async {
+  Future<WebManga?> getManga(String mangaId) async {
     await future;
 
     if (mangaId.isEmpty) {
       return null;
     }
 
-    if (_controller != null) {
-      final mdeets =
-          await _controller!.callAsyncJavaScript(functionBody: "return await $sourceId.getMangaDetails('$mangaId')");
+    final mdeets =
+        await _controller.callAsyncJavaScript(functionBody: "return await $sourceId.getMangaDetails('$mangaId')");
 
-      final smanga = SourceManga.fromJson(mdeets!.value);
+    final smanga = SourceManga.fromJson(mdeets!.value);
 
-      final chaps = await _controller!.callAsyncJavaScript(
-        functionBody: """
+    final chaps = await _controller.callAsyncJavaScript(
+      functionBody: """
 var p = await $sourceId.getChapters('$mangaId');
 p.forEach((e) => e.time = e.time.toISOString());
 return p;
 """,
-      );
+    );
 
-      final clist = chaps!.value as List<dynamic>;
-      final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
-      final chapmap = Map.fromEntries(chapters.map((e) => MapEntry(
-          e.chapNum.toString(),
-          WebChapter(
-            title: e.name,
-            volume: e.volume?.toString(),
-            groups: {e.group ?? sourceId: e.id},
-            releaseDate: e.time,
-          ))));
+    final clist = chaps!.value as List<dynamic>;
+    final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
+    final chapmap = Map.fromEntries(chapters.map((e) => MapEntry(
+        e.chapNum.toString(),
+        WebChapter(
+          title: e.name,
+          volume: e.volume?.toString(),
+          groups: {e.group ?? sourceId: e.id},
+          releaseDate: e.time,
+        ))));
 
-      final manga = WebManga(
-        title: smanga.mangaInfo.titles.first,
-        description: smanga.mangaInfo.desc,
-        artist: smanga.mangaInfo.artist ?? 'Unknown',
-        author: smanga.mangaInfo.author ?? 'Unknown',
-        cover: smanga.mangaInfo.image,
-        chapters: chapmap,
-      );
+    final manga = WebManga(
+      title: smanga.mangaInfo.titles.first,
+      description: smanga.mangaInfo.desc,
+      artist: smanga.mangaInfo.artist ?? 'Unknown',
+      author: smanga.mangaInfo.author ?? 'Unknown',
+      cover: smanga.mangaInfo.image,
+      chapters: chapmap,
+    );
 
-      // logger.d(result);
+    // logger.d(result);
 
-      return manga;
-    }
-
-    throw Exception("Uninitialized view controller");
+    return manga;
   }
 
-  Future<List<String>> getChapterPages(String sourceId, String mangaId, String chapterId) async {
+  Future<List<String>> getChapterPages(String mangaId, String chapterId) async {
     await future;
 
     if (mangaId.isEmpty || chapterId.isEmpty) {
       return [];
     }
 
-    if (_controller != null) {
-      final cdeets = await _controller!
-          .callAsyncJavaScript(functionBody: "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')");
+    final cdeets = await _controller.callAsyncJavaScript(
+        functionBody: "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')");
 
-      final chapterd = ChapterDetails.fromJson(cdeets!.value);
+    final chapterd = ChapterDetails.fromJson(cdeets!.value);
 
-      return chapterd.pages;
-    }
-
-    throw Exception("Uninitialized view controller");
+    return chapterd.pages;
   }
 
-  Future<String> getMangaURL(String sourceId, String mangaId) async {
+  Future<String> getMangaURL(String mangaId) async {
     await future;
 
     if (mangaId.isEmpty) {
       return '';
     }
 
-    if (_controller != null) {
-      final result = await _controller!.evaluateJavascript(source: "$sourceId.getMangaShareUrl('$mangaId')");
+    final result = await _controller.evaluateJavascript(source: "$sourceId.getMangaShareUrl('$mangaId')");
 
-      return result as String;
-    }
+    return result as String;
+  }
+}
 
-    throw Exception("Uninitialized view controller");
+@riverpod
+class ExtensionInfoList extends _$ExtensionInfoList {
+  @override
+  Future<List<SourceIdentifier>> build() async {
+    final installed = ref.watch(webConfigProvider.select((cfg) => cfg.installedSources));
+
+    return await Future.wait(installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)));
   }
 }

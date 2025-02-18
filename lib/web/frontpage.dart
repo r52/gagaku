@@ -14,13 +14,13 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Page<dynamic> buildExtensionHomepage(BuildContext context, GoRouterState state) {
-  final data = state.extra.asOrNull<WebSourceInfo>();
+  final data = state.extra.asOrNull<SourceIdentifier>();
 
   Widget child;
 
   if (data != null) {
     child = _HomepageWidget(
-      key: ValueKey(data.id),
+      key: ValueKey(data.internal.id),
       source: data,
     );
   } else {
@@ -49,14 +49,12 @@ class WebSourceFrontpage extends HookConsumerWidget {
     final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
 
     return DataProviderWhenWidget(
-      provider: webSourceManagerProvider,
-      builder: (BuildContext context, List<WebSourceInfo> sources) {
-        final homepageSources = <WebSourceInfo>[];
+      provider: extensionInfoListProvider,
+      builder: (BuildContext context, List<SourceIdentifier> sources) {
+        final homepageSources = <SourceIdentifier>[];
 
         for (final source in sources) {
-          final info = ref.read(webSourceManagerProvider.notifier).getInfo(source.id);
-
-          if (info.hasIntent(SourceIntents.homepageSections)) {
+          if (source.external.hasIntent(SourceIntents.homepageSections)) {
             homepageSources.add(source);
           }
         }
@@ -86,16 +84,16 @@ class WebSourceFrontpage extends HookConsumerWidget {
 
                   return Card(
                     child: ListTile(
-                      leading: item.icon != null
+                      leading: item.internal.icon != null
                           ? Image.network(
-                              item.icon!,
+                              item.internal.icon!,
                               width: 36,
                               height: 36,
                             )
                           : const Icon(Icons.rss_feed),
-                      title: Text(item.name),
+                      title: Text(item.external.name),
                       onTap: () {
-                        context.push('/extensions/home/${item.id}', extra: item);
+                        context.push('/extensions/home/${item.internal.id}', extra: item);
                       },
                     ),
                   );
@@ -118,7 +116,7 @@ class _QueriedHomepageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DataProviderWhenWidget(
-      provider: webSourceManagerProvider,
+      provider: extensionInfoListProvider,
       errorBuilder: (context, child) => Scaffold(
         appBar: AppBar(
           leading: BackButton(
@@ -134,7 +132,7 @@ class _QueriedHomepageWidget extends StatelessWidget {
         body: child,
       ),
       builder: (context, data) {
-        final idx = data.indexWhere((e) => e.id == sourceId);
+        final idx = data.indexWhere((e) => e.internal.id == sourceId);
 
         if (idx == -1) {
           return Scaffold(
@@ -153,7 +151,7 @@ class _QueriedHomepageWidget extends StatelessWidget {
 }
 
 class _HomepageWidget extends HookConsumerWidget {
-  final WebSourceInfo source;
+  final SourceIdentifier source;
 
   const _HomepageWidget({super.key, required this.source});
 
@@ -162,14 +160,15 @@ class _HomepageWidget extends HookConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     const style = TextStyle(fontSize: 24);
     final controller = useScrollController();
-    final results = useMemoized(() => ref.read(webSourceManagerProvider.notifier).getHomePage(source.id), [source]);
+    final results =
+        useMemoized(() => ref.read(extensionSourceProvider(source.internal.id).notifier).getHomePage(), [source]);
     final future = useFuture(results);
     final slivers = <Widget>[];
 
     if (future.hasError) {
       final error = future.error!;
       final stackTrace = future.stackTrace!;
-      final msg = "WebSource(${source.id}).getHomePage() failed";
+      final msg = "ExtensionSource(${source.internal.id}).getHomePage() failed";
 
       Styles.showErrorSnackBar(messenger, '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
@@ -199,7 +198,7 @@ class _HomepageWidget extends HookConsumerWidget {
             style: style,
           ),
         ));
-        final mangas = section.items.map((e) => HistoryLink.fromPartialSourceManga(source.id, e)).toList();
+        final mangas = section.items.map((e) => HistoryLink.fromPartialSourceManga(source.internal.id, e)).toList();
         homepageWidgets.add(MangaCarousel(items: mangas));
       }
 
@@ -222,7 +221,7 @@ class _HomepageWidget extends HookConsumerWidget {
           onTap: () {
             controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           },
-          child: TitleFlexBar(title: source.name),
+          child: TitleFlexBar(title: source.external.name),
         ),
         leading: BackButton(
           onPressed: () {

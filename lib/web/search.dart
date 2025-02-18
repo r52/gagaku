@@ -35,7 +35,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
     final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
     final controller = useSearchController();
     final searchTerm = useState('');
-    final sources = ref.watch(webSourceManagerProvider);
+    final sources = ref.watch(extensionInfoListProvider);
 
     Widget? sourcesResult = switch (sources) {
       AsyncError(:final error, :final stackTrace) => SliverToBoxAdapter(
@@ -144,7 +144,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 10.0),
                   child: Text(
-                    src.name,
+                    src.external.name,
                     style: const TextStyle(fontSize: 24),
                   ),
                 ),
@@ -153,8 +153,8 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                 builder: (context) {
                   final results = useMemoized(
                       () => ref
-                          .read(webSourceManagerProvider.notifier)
-                          .searchManga(src.id, SearchRequest(title: searchTerm.value.toLowerCase())),
+                          .read(extensionSourceProvider(src.internal.id).notifier)
+                          .searchManga(SearchRequest(title: searchTerm.value.toLowerCase())),
                       [searchTerm.value]);
                   final future = useFuture(results);
 

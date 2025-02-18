@@ -360,8 +360,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           ButtonChip(
                             onPressed: () async {
                               final url = await ref
-                                  .read(webSourceManagerProvider.notifier)
-                                  .getMangaURL(handle.source, handle.location);
+                                  .read(extensionSourceProvider(handle.source).notifier)
+                                  .getMangaURL(handle.location);
                               final uri = Uri.parse(url);
 
                               if (!await launchUrl(uri)) {

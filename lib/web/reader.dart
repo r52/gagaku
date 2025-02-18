@@ -105,15 +105,15 @@ Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
 Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic chapter, SourceHandler handle) async {
   List<String>? links = [];
 
-  final srcMgr = await ref.watch(webSourceManagerProvider.future);
-
   if (handle.parser != null) {
     links =
-        await ref.read(webSourceManagerProvider.notifier).getChapterPages(handle.parser!.id, handle.location, chapter);
+        await ref.read(extensionSourceProvider(handle.parser!.id).notifier).getChapterPages(handle.location, chapter);
   } else {
-    for (final src in srcMgr) {
-      if (handle.source == src.id) {
-        links = await ref.read(webSourceManagerProvider.notifier).getChapterPages(src.id, handle.location, chapter);
+    final installed = await ref.watch(extensionInfoListProvider.future);
+    for (final src in installed) {
+      if (handle.source == src.internal.id) {
+        links =
+            await ref.read(extensionSourceProvider(handle.source).notifier).getChapterPages(handle.location, chapter);
         break;
       }
     }

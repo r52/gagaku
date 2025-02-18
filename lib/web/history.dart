@@ -25,7 +25,7 @@ class WebSourceHistoryWidget extends HookConsumerWidget {
     final historyProvider = ref.watch(webSourceHistoryProvider);
 
     // Pre-initialize sources
-    final _ = ref.watch(webSourceManagerProvider);
+    final _ = ref.watch(extensionInfoListProvider);
 
     return Material(
       child: switch (historyProvider) {
