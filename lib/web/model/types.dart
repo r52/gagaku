@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/util/freezed.dart';
@@ -237,18 +239,28 @@ enum SourceIntents {
 // ignore: constant_identifier_names
 enum ContentRating { EVERYONE, MATURE, ADULT }
 
+class BadgeColorParser implements JsonConverter<BadgeColor, dynamic> {
+  const BadgeColorParser();
+
+  @override
+  BadgeColor fromJson(dynamic type) => type == 'default' ? BadgeColor.def : BadgeColor.values.byName(type);
+
+  @override
+  dynamic toJson(BadgeColor color) => color == BadgeColor.def ? 'default' : color.name;
+}
+
 @freezed
 class Badge with _$Badge {
   const factory Badge({
     required String text,
-    required BadgeColor type,
+    @BadgeColorParser() required BadgeColor type,
   }) = _Badge;
 
   factory Badge.fromJson(Map<String, dynamic> json) => _$BadgeFromJson(json);
 }
 
 enum BadgeColor {
-  //default(Colors.blue),
+  def(Colors.blue),
   success(Colors.green),
   info(Colors.grey),
   warning(Color.fromARGB(255, 230, 162, 60)),
@@ -463,4 +475,61 @@ class HomeSection with _$HomeSection {
   }) = _HomeSection;
 
   factory HomeSection.fromJson(Map<String, dynamic> json) => _$HomeSectionFromJson(json);
+}
+
+abstract class DUIFormRow {
+  String get id;
+}
+
+@Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
+class DUIType with _$DUIType {
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUISection({
+    required String id,
+    String? header,
+    String? footer,
+    required bool isHidden,
+    required List<DUIType> rows,
+  }) = DUISection;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUISelect({
+    required String id,
+    required String label,
+    required List<String> options,
+    required bool allowsMultiselect,
+    required Map<String, String> labels,
+  }) = DUISelect;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUIInputField({
+    required String id,
+    required String label,
+  }) = DUIInputField;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUIButton({
+    required String id,
+    required String label,
+  }) = DUIButton;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUINavigationButton({
+    required String id,
+    required String label,
+    required DUIForm form,
+  }) = DUINavigationButton;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUISwitch({
+    required String id,
+    required String label,
+  }) = DUISwitch;
+
+  const factory DUIType.DUIForm({
+    required List<DUISection> sections,
+    required bool hasSubmit,
+  }) = DUIForm;
+
+  factory DUIType.fromJson(Map<String, dynamic> json) => _$DUITypeFromJson(json);
 }

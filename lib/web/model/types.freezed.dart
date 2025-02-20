@@ -1545,6 +1545,7 @@ Badge _$BadgeFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Badge {
   String get text => throw _privateConstructorUsedError;
+  @BadgeColorParser()
   BadgeColor get type => throw _privateConstructorUsedError;
 
   /// Serializes this Badge to a JSON map.
@@ -1561,7 +1562,7 @@ abstract class $BadgeCopyWith<$Res> {
   factory $BadgeCopyWith(Badge value, $Res Function(Badge) then) =
       _$BadgeCopyWithImpl<$Res, Badge>;
   @useResult
-  $Res call({String text, BadgeColor type});
+  $Res call({String text, @BadgeColorParser() BadgeColor type});
 }
 
 /// @nodoc
@@ -1602,7 +1603,7 @@ abstract class _$$BadgeImplCopyWith<$Res> implements $BadgeCopyWith<$Res> {
       __$$BadgeImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String text, BadgeColor type});
+  $Res call({String text, @BadgeColorParser() BadgeColor type});
 }
 
 /// @nodoc
@@ -1637,7 +1638,8 @@ class __$$BadgeImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$BadgeImpl implements _Badge {
-  const _$BadgeImpl({required this.text, required this.type});
+  const _$BadgeImpl(
+      {required this.text, @BadgeColorParser() required this.type});
 
   factory _$BadgeImpl.fromJson(Map<String, dynamic> json) =>
       _$$BadgeImplFromJson(json);
@@ -1645,6 +1647,7 @@ class _$BadgeImpl implements _Badge {
   @override
   final String text;
   @override
+  @BadgeColorParser()
   final BadgeColor type;
 
   @override
@@ -1684,13 +1687,14 @@ class _$BadgeImpl implements _Badge {
 abstract class _Badge implements Badge {
   const factory _Badge(
       {required final String text,
-      required final BadgeColor type}) = _$BadgeImpl;
+      @BadgeColorParser() required final BadgeColor type}) = _$BadgeImpl;
 
   factory _Badge.fromJson(Map<String, dynamic> json) = _$BadgeImpl.fromJson;
 
   @override
   String get text;
   @override
+  @BadgeColorParser()
   BadgeColor get type;
 
   /// Create a copy of Badge
@@ -5232,5 +5236,1784 @@ abstract class _HomeSection implements HomeSection {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$HomeSectionImplCopyWith<_$HomeSectionImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+DUIType _$DUITypeFromJson(Map<String, dynamic> json) {
+  switch (json['type']) {
+    case 'DUISection':
+      return DUISection.fromJson(json);
+    case 'DUISelect':
+      return DUISelect.fromJson(json);
+    case 'DUIInputField':
+      return DUIInputField.fromJson(json);
+    case 'DUIButton':
+      return DUIButton.fromJson(json);
+    case 'DUINavigationButton':
+      return DUINavigationButton.fromJson(json);
+    case 'DUISwitch':
+      return DUISwitch.fromJson(json);
+    case 'DUIForm':
+      return DUIForm.fromJson(json);
+
+    default:
+      throw CheckedFromJsonException(
+          json, 'type', 'DUIType', 'Invalid union type "${json['type']}"!');
+  }
+}
+
+/// @nodoc
+mixin _$DUIType {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+
+  /// Serializes this DUIType to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DUITypeCopyWith<$Res> {
+  factory $DUITypeCopyWith(DUIType value, $Res Function(DUIType) then) =
+      _$DUITypeCopyWithImpl<$Res, DUIType>;
+}
+
+/// @nodoc
+class _$DUITypeCopyWithImpl<$Res, $Val extends DUIType>
+    implements $DUITypeCopyWith<$Res> {
+  _$DUITypeCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+abstract class _$$DUISectionImplCopyWith<$Res> {
+  factory _$$DUISectionImplCopyWith(
+          _$DUISectionImpl value, $Res Function(_$DUISectionImpl) then) =
+      __$$DUISectionImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows});
+}
+
+/// @nodoc
+class __$$DUISectionImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUISectionImpl>
+    implements _$$DUISectionImplCopyWith<$Res> {
+  __$$DUISectionImplCopyWithImpl(
+      _$DUISectionImpl _value, $Res Function(_$DUISectionImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? header = freezed,
+    Object? footer = freezed,
+    Object? isHidden = null,
+    Object? rows = null,
+  }) {
+    return _then(_$DUISectionImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      header: freezed == header
+          ? _value.header
+          : header // ignore: cast_nullable_to_non_nullable
+              as String?,
+      footer: freezed == footer
+          ? _value.footer
+          : footer // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isHidden: null == isHidden
+          ? _value.isHidden
+          : isHidden // ignore: cast_nullable_to_non_nullable
+              as bool,
+      rows: null == rows
+          ? _value._rows
+          : rows // ignore: cast_nullable_to_non_nullable
+              as List<DUIType>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUISectionImpl implements DUISection {
+  const _$DUISectionImpl(
+      {required this.id,
+      this.header,
+      this.footer,
+      required this.isHidden,
+      required final List<DUIType> rows,
+      final String? $type})
+      : _rows = rows,
+        $type = $type ?? 'DUISection';
+
+  factory _$DUISectionImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUISectionImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String? header;
+  @override
+  final String? footer;
+  @override
+  final bool isHidden;
+  final List<DUIType> _rows;
+  @override
+  List<DUIType> get rows {
+    if (_rows is EqualUnmodifiableListView) return _rows;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_rows);
+  }
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUISection(id: $id, header: $header, footer: $footer, isHidden: $isHidden, rows: $rows)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUISectionImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.header, header) || other.header == header) &&
+            (identical(other.footer, footer) || other.footer == footer) &&
+            (identical(other.isHidden, isHidden) ||
+                other.isHidden == isHidden) &&
+            const DeepCollectionEquality().equals(other._rows, _rows));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, header, footer, isHidden,
+      const DeepCollectionEquality().hash(_rows));
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUISectionImplCopyWith<_$DUISectionImpl> get copyWith =>
+      __$$DUISectionImplCopyWithImpl<_$DUISectionImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUISection(id, header, footer, isHidden, rows);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUISection?.call(id, header, footer, isHidden, rows);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISection != null) {
+      return DUISection(id, header, footer, isHidden, rows);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUISection(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUISection?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISection != null) {
+      return DUISection(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUISectionImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUISection implements DUIType, DUIFormRow {
+  const factory DUISection(
+      {required final String id,
+      final String? header,
+      final String? footer,
+      required final bool isHidden,
+      required final List<DUIType> rows}) = _$DUISectionImpl;
+
+  factory DUISection.fromJson(Map<String, dynamic> json) =
+      _$DUISectionImpl.fromJson;
+
+  String get id;
+  String? get header;
+  String? get footer;
+  bool get isHidden;
+  List<DUIType> get rows;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUISectionImplCopyWith<_$DUISectionImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUISelectImplCopyWith<$Res> {
+  factory _$$DUISelectImplCopyWith(
+          _$DUISelectImpl value, $Res Function(_$DUISelectImpl) then) =
+      __$$DUISelectImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels});
+}
+
+/// @nodoc
+class __$$DUISelectImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUISelectImpl>
+    implements _$$DUISelectImplCopyWith<$Res> {
+  __$$DUISelectImplCopyWithImpl(
+      _$DUISelectImpl _value, $Res Function(_$DUISelectImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+    Object? options = null,
+    Object? allowsMultiselect = null,
+    Object? labels = null,
+  }) {
+    return _then(_$DUISelectImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      options: null == options
+          ? _value._options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      allowsMultiselect: null == allowsMultiselect
+          ? _value.allowsMultiselect
+          : allowsMultiselect // ignore: cast_nullable_to_non_nullable
+              as bool,
+      labels: null == labels
+          ? _value._labels
+          : labels // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUISelectImpl implements DUISelect {
+  const _$DUISelectImpl(
+      {required this.id,
+      required this.label,
+      required final List<String> options,
+      required this.allowsMultiselect,
+      required final Map<String, String> labels,
+      final String? $type})
+      : _options = options,
+        _labels = labels,
+        $type = $type ?? 'DUISelect';
+
+  factory _$DUISelectImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUISelectImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+  final List<String> _options;
+  @override
+  List<String> get options {
+    if (_options is EqualUnmodifiableListView) return _options;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_options);
+  }
+
+  @override
+  final bool allowsMultiselect;
+  final Map<String, String> _labels;
+  @override
+  Map<String, String> get labels {
+    if (_labels is EqualUnmodifiableMapView) return _labels;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_labels);
+  }
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUISelect(id: $id, label: $label, options: $options, allowsMultiselect: $allowsMultiselect, labels: $labels)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUISelectImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label) &&
+            const DeepCollectionEquality().equals(other._options, _options) &&
+            (identical(other.allowsMultiselect, allowsMultiselect) ||
+                other.allowsMultiselect == allowsMultiselect) &&
+            const DeepCollectionEquality().equals(other._labels, _labels));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      label,
+      const DeepCollectionEquality().hash(_options),
+      allowsMultiselect,
+      const DeepCollectionEquality().hash(_labels));
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUISelectImplCopyWith<_$DUISelectImpl> get copyWith =>
+      __$$DUISelectImplCopyWithImpl<_$DUISelectImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUISelect(id, label, options, allowsMultiselect, labels);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUISelect?.call(id, label, options, allowsMultiselect, labels);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISelect != null) {
+      return DUISelect(id, label, options, allowsMultiselect, labels);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUISelect(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUISelect?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISelect != null) {
+      return DUISelect(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUISelectImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUISelect implements DUIType, DUIFormRow {
+  const factory DUISelect(
+      {required final String id,
+      required final String label,
+      required final List<String> options,
+      required final bool allowsMultiselect,
+      required final Map<String, String> labels}) = _$DUISelectImpl;
+
+  factory DUISelect.fromJson(Map<String, dynamic> json) =
+      _$DUISelectImpl.fromJson;
+
+  String get id;
+  String get label;
+  List<String> get options;
+  bool get allowsMultiselect;
+  Map<String, String> get labels;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUISelectImplCopyWith<_$DUISelectImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIInputFieldImplCopyWith<$Res> {
+  factory _$$DUIInputFieldImplCopyWith(
+          _$DUIInputFieldImpl value, $Res Function(_$DUIInputFieldImpl) then) =
+      __$$DUIInputFieldImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label});
+}
+
+/// @nodoc
+class __$$DUIInputFieldImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUIInputFieldImpl>
+    implements _$$DUIInputFieldImplCopyWith<$Res> {
+  __$$DUIInputFieldImplCopyWithImpl(
+      _$DUIInputFieldImpl _value, $Res Function(_$DUIInputFieldImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+  }) {
+    return _then(_$DUIInputFieldImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIInputFieldImpl implements DUIInputField {
+  const _$DUIInputFieldImpl(
+      {required this.id, required this.label, final String? $type})
+      : $type = $type ?? 'DUIInputField';
+
+  factory _$DUIInputFieldImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIInputFieldImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUIInputField(id: $id, label: $label)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIInputFieldImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, label);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIInputFieldImplCopyWith<_$DUIInputFieldImpl> get copyWith =>
+      __$$DUIInputFieldImplCopyWithImpl<_$DUIInputFieldImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUIInputField(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUIInputField?.call(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIInputField != null) {
+      return DUIInputField(id, label);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUIInputField(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUIInputField?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIInputField != null) {
+      return DUIInputField(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIInputFieldImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIInputField implements DUIType, DUIFormRow {
+  const factory DUIInputField(
+      {required final String id,
+      required final String label}) = _$DUIInputFieldImpl;
+
+  factory DUIInputField.fromJson(Map<String, dynamic> json) =
+      _$DUIInputFieldImpl.fromJson;
+
+  String get id;
+  String get label;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIInputFieldImplCopyWith<_$DUIInputFieldImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIButtonImplCopyWith<$Res> {
+  factory _$$DUIButtonImplCopyWith(
+          _$DUIButtonImpl value, $Res Function(_$DUIButtonImpl) then) =
+      __$$DUIButtonImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label});
+}
+
+/// @nodoc
+class __$$DUIButtonImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUIButtonImpl>
+    implements _$$DUIButtonImplCopyWith<$Res> {
+  __$$DUIButtonImplCopyWithImpl(
+      _$DUIButtonImpl _value, $Res Function(_$DUIButtonImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+  }) {
+    return _then(_$DUIButtonImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIButtonImpl implements DUIButton {
+  const _$DUIButtonImpl(
+      {required this.id, required this.label, final String? $type})
+      : $type = $type ?? 'DUIButton';
+
+  factory _$DUIButtonImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIButtonImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUIButton(id: $id, label: $label)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIButtonImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, label);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIButtonImplCopyWith<_$DUIButtonImpl> get copyWith =>
+      __$$DUIButtonImplCopyWithImpl<_$DUIButtonImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUIButton(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUIButton?.call(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIButton != null) {
+      return DUIButton(id, label);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUIButton(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUIButton?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIButton != null) {
+      return DUIButton(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIButtonImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIButton implements DUIType, DUIFormRow {
+  const factory DUIButton(
+      {required final String id,
+      required final String label}) = _$DUIButtonImpl;
+
+  factory DUIButton.fromJson(Map<String, dynamic> json) =
+      _$DUIButtonImpl.fromJson;
+
+  String get id;
+  String get label;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIButtonImplCopyWith<_$DUIButtonImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUINavigationButtonImplCopyWith<$Res> {
+  factory _$$DUINavigationButtonImplCopyWith(_$DUINavigationButtonImpl value,
+          $Res Function(_$DUINavigationButtonImpl) then) =
+      __$$DUINavigationButtonImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label, DUIForm form});
+}
+
+/// @nodoc
+class __$$DUINavigationButtonImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUINavigationButtonImpl>
+    implements _$$DUINavigationButtonImplCopyWith<$Res> {
+  __$$DUINavigationButtonImplCopyWithImpl(_$DUINavigationButtonImpl _value,
+      $Res Function(_$DUINavigationButtonImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+    Object? form = freezed,
+  }) {
+    return _then(_$DUINavigationButtonImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      form: freezed == form
+          ? _value.form
+          : form // ignore: cast_nullable_to_non_nullable
+              as DUIForm,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUINavigationButtonImpl implements DUINavigationButton {
+  const _$DUINavigationButtonImpl(
+      {required this.id,
+      required this.label,
+      required this.form,
+      final String? $type})
+      : $type = $type ?? 'DUINavigationButton';
+
+  factory _$DUINavigationButtonImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUINavigationButtonImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+  @override
+  final DUIForm form;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUINavigationButton(id: $id, label: $label, form: $form)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUINavigationButtonImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label) &&
+            const DeepCollectionEquality().equals(other.form, form));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, label, const DeepCollectionEquality().hash(form));
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUINavigationButtonImplCopyWith<_$DUINavigationButtonImpl> get copyWith =>
+      __$$DUINavigationButtonImplCopyWithImpl<_$DUINavigationButtonImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUINavigationButton(id, label, form);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUINavigationButton?.call(id, label, form);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUINavigationButton != null) {
+      return DUINavigationButton(id, label, form);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUINavigationButton(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUINavigationButton?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUINavigationButton != null) {
+      return DUINavigationButton(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUINavigationButtonImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUINavigationButton implements DUIType, DUIFormRow {
+  const factory DUINavigationButton(
+      {required final String id,
+      required final String label,
+      required final DUIForm form}) = _$DUINavigationButtonImpl;
+
+  factory DUINavigationButton.fromJson(Map<String, dynamic> json) =
+      _$DUINavigationButtonImpl.fromJson;
+
+  String get id;
+  String get label;
+  DUIForm get form;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUINavigationButtonImplCopyWith<_$DUINavigationButtonImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUISwitchImplCopyWith<$Res> {
+  factory _$$DUISwitchImplCopyWith(
+          _$DUISwitchImpl value, $Res Function(_$DUISwitchImpl) then) =
+      __$$DUISwitchImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label});
+}
+
+/// @nodoc
+class __$$DUISwitchImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUISwitchImpl>
+    implements _$$DUISwitchImplCopyWith<$Res> {
+  __$$DUISwitchImplCopyWithImpl(
+      _$DUISwitchImpl _value, $Res Function(_$DUISwitchImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+  }) {
+    return _then(_$DUISwitchImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUISwitchImpl implements DUISwitch {
+  const _$DUISwitchImpl(
+      {required this.id, required this.label, final String? $type})
+      : $type = $type ?? 'DUISwitch';
+
+  factory _$DUISwitchImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUISwitchImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUISwitch(id: $id, label: $label)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUISwitchImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, label);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUISwitchImplCopyWith<_$DUISwitchImpl> get copyWith =>
+      __$$DUISwitchImplCopyWithImpl<_$DUISwitchImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUISwitch(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUISwitch?.call(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISwitch != null) {
+      return DUISwitch(id, label);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUISwitch(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUISwitch?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISwitch != null) {
+      return DUISwitch(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUISwitchImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUISwitch implements DUIType, DUIFormRow {
+  const factory DUISwitch(
+      {required final String id,
+      required final String label}) = _$DUISwitchImpl;
+
+  factory DUISwitch.fromJson(Map<String, dynamic> json) =
+      _$DUISwitchImpl.fromJson;
+
+  String get id;
+  String get label;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUISwitchImplCopyWith<_$DUISwitchImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIFormImplCopyWith<$Res> {
+  factory _$$DUIFormImplCopyWith(
+          _$DUIFormImpl value, $Res Function(_$DUIFormImpl) then) =
+      __$$DUIFormImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<DUISection> sections, bool hasSubmit});
+}
+
+/// @nodoc
+class __$$DUIFormImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUIFormImpl>
+    implements _$$DUIFormImplCopyWith<$Res> {
+  __$$DUIFormImplCopyWithImpl(
+      _$DUIFormImpl _value, $Res Function(_$DUIFormImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sections = null,
+    Object? hasSubmit = null,
+  }) {
+    return _then(_$DUIFormImpl(
+      sections: null == sections
+          ? _value._sections
+          : sections // ignore: cast_nullable_to_non_nullable
+              as List<DUISection>,
+      hasSubmit: null == hasSubmit
+          ? _value.hasSubmit
+          : hasSubmit // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIFormImpl implements DUIForm {
+  const _$DUIFormImpl(
+      {required final List<DUISection> sections,
+      required this.hasSubmit,
+      final String? $type})
+      : _sections = sections,
+        $type = $type ?? 'DUIForm';
+
+  factory _$DUIFormImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIFormImplFromJson(json);
+
+  final List<DUISection> _sections;
+  @override
+  List<DUISection> get sections {
+    if (_sections is EqualUnmodifiableListView) return _sections;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sections);
+  }
+
+  @override
+  final bool hasSubmit;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUIForm(sections: $sections, hasSubmit: $hasSubmit)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIFormImpl &&
+            const DeepCollectionEquality().equals(other._sections, _sections) &&
+            (identical(other.hasSubmit, hasSubmit) ||
+                other.hasSubmit == hasSubmit));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_sections), hasSubmit);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIFormImplCopyWith<_$DUIFormImpl> get copyWith =>
+      __$$DUIFormImplCopyWithImpl<_$DUIFormImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUIForm(sections, hasSubmit);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUIForm?.call(sections, hasSubmit);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIForm != null) {
+      return DUIForm(sections, hasSubmit);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUIForm(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUIForm?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIForm != null) {
+      return DUIForm(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIFormImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIForm implements DUIType {
+  const factory DUIForm(
+      {required final List<DUISection> sections,
+      required final bool hasSubmit}) = _$DUIFormImpl;
+
+  factory DUIForm.fromJson(Map<String, dynamic> json) = _$DUIFormImpl.fromJson;
+
+  List<DUISection> get sections;
+  bool get hasSubmit;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIFormImplCopyWith<_$DUIFormImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -113,21 +113,14 @@ Map<String, dynamic> _$$SourceIdentifierImplToJson(
 
 _$BadgeImpl _$$BadgeImplFromJson(Map<String, dynamic> json) => _$BadgeImpl(
       text: json['text'] as String,
-      type: $enumDecode(_$BadgeColorEnumMap, json['type']),
+      type: const BadgeColorParser().fromJson(json['type']),
     );
 
 Map<String, dynamic> _$$BadgeImplToJson(_$BadgeImpl instance) =>
     <String, dynamic>{
       'text': instance.text,
-      'type': _$BadgeColorEnumMap[instance.type]!,
+      'type': const BadgeColorParser().toJson(instance.type),
     };
-
-const _$BadgeColorEnumMap = {
-  BadgeColor.success: 'success',
-  BadgeColor.info: 'info',
-  BadgeColor.warning: 'warning',
-  BadgeColor.danger: 'danger',
-};
 
 _$SourceVersionImpl _$$SourceVersionImplFromJson(Map<String, dynamic> json) =>
     _$SourceVersionImpl(
@@ -423,4 +416,123 @@ Map<String, dynamic> _$$HomeSectionImplToJson(_$HomeSectionImpl instance) =>
       'title': instance.title,
       'items': instance.items,
       'containsMoreItems': instance.containsMoreItems,
+    };
+
+_$DUISectionImpl _$$DUISectionImplFromJson(Map<String, dynamic> json) =>
+    _$DUISectionImpl(
+      id: json['id'] as String,
+      header: json['header'] as String?,
+      footer: json['footer'] as String?,
+      isHidden: json['isHidden'] as bool,
+      rows: (json['rows'] as List<dynamic>)
+          .map((e) => DUIType.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUISectionImplToJson(_$DUISectionImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'header': instance.header,
+      'footer': instance.footer,
+      'isHidden': instance.isHidden,
+      'rows': instance.rows,
+      'type': instance.$type,
+    };
+
+_$DUISelectImpl _$$DUISelectImplFromJson(Map<String, dynamic> json) =>
+    _$DUISelectImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      options:
+          (json['options'] as List<dynamic>).map((e) => e as String).toList(),
+      allowsMultiselect: json['allowsMultiselect'] as bool,
+      labels: Map<String, String>.from(json['labels'] as Map),
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUISelectImplToJson(_$DUISelectImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'options': instance.options,
+      'allowsMultiselect': instance.allowsMultiselect,
+      'labels': instance.labels,
+      'type': instance.$type,
+    };
+
+_$DUIInputFieldImpl _$$DUIInputFieldImplFromJson(Map<String, dynamic> json) =>
+    _$DUIInputFieldImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIInputFieldImplToJson(_$DUIInputFieldImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'type': instance.$type,
+    };
+
+_$DUIButtonImpl _$$DUIButtonImplFromJson(Map<String, dynamic> json) =>
+    _$DUIButtonImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIButtonImplToJson(_$DUIButtonImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'type': instance.$type,
+    };
+
+_$DUINavigationButtonImpl _$$DUINavigationButtonImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DUINavigationButtonImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      form: DUIForm.fromJson(json['form'] as Map<String, dynamic>),
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUINavigationButtonImplToJson(
+        _$DUINavigationButtonImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'form': instance.form,
+      'type': instance.$type,
+    };
+
+_$DUISwitchImpl _$$DUISwitchImplFromJson(Map<String, dynamic> json) =>
+    _$DUISwitchImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUISwitchImplToJson(_$DUISwitchImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'type': instance.$type,
+    };
+
+_$DUIFormImpl _$$DUIFormImplFromJson(Map<String, dynamic> json) =>
+    _$DUIFormImpl(
+      sections: (json['sections'] as List<dynamic>)
+          .map((e) => DUISection.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      hasSubmit: json['hasSubmit'] as bool,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIFormImplToJson(_$DUIFormImpl instance) =>
+    <String, dynamic>{
+      'sections': instance.sections,
+      'hasSubmit': instance.hasSubmit,
+      'type': instance.$type,
     };

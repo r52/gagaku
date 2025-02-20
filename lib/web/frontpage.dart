@@ -6,6 +6,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -157,11 +158,14 @@ class _HomepageWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     const style = TextStyle(fontSize: 24);
     final controller = useScrollController();
-    final results =
-        useMemoized(() => ref.read(extensionSourceProvider(source.internal.id).notifier).getHomePage(), [source]);
+    final refresh = useState(0);
+    final results = useMemoized(
+        () => ref.read(extensionSourceProvider(source.internal.id).notifier).getHomePage(), [source, refresh.value]);
     final future = useFuture(results);
     final slivers = <Widget>[];
 
@@ -192,12 +196,33 @@ class _HomepageWidget extends HookConsumerWidget {
       final homepageWidgets = <Widget>[];
 
       for (final section in data) {
-        homepageWidgets.add(Center(
-          child: Text(
-            section.title,
-            style: style,
-          ),
-        ));
+        if (section.containsMoreItems) {
+          homepageWidgets.add(
+            TextButton.icon(
+              onPressed: () {
+                nav.push(SlideTransitionRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => _HomeSectionPage(
+                    source: source,
+                    section: section,
+                  ),
+                ));
+              },
+              label: Text(
+                section.title,
+                style: style,
+              ),
+              icon: const Icon(Icons.arrow_forward),
+              iconAlignment: IconAlignment.end,
+            ),
+          );
+        } else {
+          homepageWidgets.add(Center(
+            child: Text(
+              section.title,
+              style: style,
+            ),
+          ));
+        }
         final mangas = section.items.map((e) => HistoryLink.fromPartialSourceManga(source.internal.id, e)).toList();
         homepageWidgets.add(MangaCarousel(items: mangas));
       }
@@ -232,10 +257,137 @@ class _HomepageWidget extends HookConsumerWidget {
             }
           },
         ),
+        actions: [
+          if (source.external.hasIntent(SourceIntents.settingsUI))
+            IconButton(
+              color: theme.colorScheme.onPrimaryContainer,
+              icon: const Icon(Icons.settings),
+              onPressed: () => nav.push(SlideTransitionRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => ExtensionSettings(
+                  source: source,
+                ),
+              )),
+              tooltip: 'webSources.source.settings'.tr(context: context),
+            )
+        ],
       ),
-      body: CustomScrollView(
-        controller: controller,
-        slivers: slivers,
+      body: RefreshIndicator(
+        onRefresh: () {
+          refresh.value++;
+          return results;
+        },
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: controller,
+          slivers: slivers,
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeSectionPage extends StatefulHookConsumerWidget {
+  final SourceIdentifier source;
+  final HomeSection section;
+
+  const _HomeSectionPage({required this.source, required this.section});
+
+  @override
+  ConsumerState<_HomeSectionPage> createState() => _HomeSectionPageState();
+}
+
+class _HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
+  Map<String, dynamic>? metadata = {'page': 1};
+
+  Future<List<HistoryLink>> getPage(List<HistoryLink> current) async {
+    if (metadata != null) {
+      final results = await ref
+          .read(extensionSourceProvider(widget.source.internal.id).notifier)
+          .getHomeSectionMore(widget.section.id, metadata);
+
+      final m = results.results?.map((e) => HistoryLink.fromPartialSourceManga(widget.source.internal.id, e));
+      if (m != null) {
+        current.addAll(m);
+      }
+
+      metadata = results.metadata;
+    }
+
+    return current;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
+    final controller = useScrollController();
+    final items = useState(<HistoryLink>[]);
+    final page = useState(1);
+    final results = useMemoized(() => getPage(items.value), [page.value]);
+    final future = useFuture(results);
+
+    Widget? errorList;
+
+    if (future.hasError) {
+      final error = future.error!;
+      final stackTrace = future.stackTrace!;
+      final msg = "ExtensionSource(${widget.source.internal.id}).getHomeSectionMore() failed";
+
+      Styles.showErrorSnackBar(messenger, '$error');
+      logger.e(msg, error: error, stackTrace: stackTrace);
+
+      errorList = SliverList.list(children: [
+        Text('$error'),
+        Text(stackTrace.toString()),
+      ]);
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        flexibleSpace: GestureDetector(
+          onTap: () {
+            controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
+          },
+          child: TitleFlexBar(title: widget.section.title),
+        ),
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(GagakuRoute.extensionHome);
+            }
+          },
+        ),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () {
+          items.value = [];
+          metadata = {'page': 1};
+          page.value = 1;
+          return results;
+        },
+        child: WebMangaListWidget(
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: controller,
+          showToggle: false,
+          onAtEdge: () {
+            if (metadata != null) {
+              page.value++;
+            }
+          },
+          isLoading: future.connectionState == ConnectionState.waiting || !future.hasData,
+          children: [
+            if (errorList != null) errorList,
+            WebMangaListViewSliver(
+              items: items.value,
+              favoritesKey: defaultCategory,
+              removeFromAll: true,
+              showRemoveButton: false,
+            ),
+          ],
+        ),
       ),
     );
   }

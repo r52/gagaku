@@ -586,7 +586,19 @@ class ExtensionSource extends _$ExtensionSource {
     _view = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
       initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
-      onWebViewCreated: (controller) {},
+      onWebViewCreated: (controller) {
+        controller.addJavaScriptHandler(
+            handlerName: 'getState',
+            callback: (JavaScriptHandlerFunctionData data) {
+              return ref.read(extensionStateProvider.notifier).getState(sourceId, data.args[0]);
+            });
+
+        controller.addJavaScriptHandler(
+            handlerName: 'setState',
+            callback: (JavaScriptHandlerFunctionData data) {
+              ref.read(extensionStateProvider.notifier).setState(sourceId, data.args[0], data.args[1]);
+            });
+      },
       onConsoleMessage: (controller, consoleMessage) {
         logger.d('Console Message: ${consoleMessage.message}');
       },
@@ -633,6 +645,31 @@ class ExtensionSource extends _$ExtensionSource {
     return _info;
   }
 
+  Future<dynamic> callBinding(String bindingId, [List<dynamic> args = const []]) async {
+    final arg = args.map((e) => json.encode(e)).toList().join(",");
+    final result =
+        await _controller.callAsyncJavaScript(functionBody: "return await window.callBinding('$bindingId', $arg)");
+    return result!.value;
+  }
+
+  Future<DUISection> getSourceMenu() async {
+    await future;
+
+    if (!_info.external.hasIntent(SourceIntents.settingsUI)) {
+      throw Exception("Source does not support settings");
+    }
+
+    final result =
+        await _controller.callAsyncJavaScript(functionBody: "return await window.processSourceMenu($sourceId)");
+
+    final menu = DUIType.fromJson(result!.value);
+    if (menu is! DUISection) {
+      throw Exception("Source getSourceMenu() did not return a valid menu");
+    }
+
+    return menu;
+  }
+
   Future<List<HomeSection>> getHomePage() async {
     await future;
 
@@ -660,6 +697,28 @@ return homesections;
     final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
 
     return sections;
+  }
+
+  Future<PagedResults> getHomeSectionMore(String homepageSectionId, dynamic metadata) async {
+    await future;
+
+    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
+      throw Exception("Source does not support homepages");
+    }
+
+    final result = await _controller.callAsyncJavaScript(
+      arguments: {
+        'homepageSectionId': homepageSectionId,
+        'metadata': metadata,
+      },
+      functionBody: """
+return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
+""",
+    );
+
+    final pmangas = PagedResults.fromJson(result!.value);
+
+    return pmangas;
   }
 
   Future<List<HistoryLink>> searchManga(SearchRequest query) async {

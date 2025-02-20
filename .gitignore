@@ -50,7 +50,6 @@ lib/version.dart
 
 # extension artifacts
 extension/dist/
-assets/extensionhost/bundle.js
 
 # node
 node_modules/
