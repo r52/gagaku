@@ -242,7 +242,7 @@ extension CacheForExtension on Ref {
   }
 }
 
-extension SearchUtil on ConsumerWidget {
+extension SearchUtil on StatefulWidget {
   void unfocusSearchBar() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusManager.instance.primaryFocus?.unfocus();

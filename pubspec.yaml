@@ -31,7 +31,7 @@ environment:
 dependencies:
   animations: ^2.0.7
   archive: ^4.0.1
-  file_picker: ^8.1.6
+  file_picker: ^9.0.0
   flutter:
     sdk: flutter
   flutter_hooks: ^0.20.0

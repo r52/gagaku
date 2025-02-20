@@ -1313,7 +1313,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'29e5eec468a83855c6ed4236cd0878c85d522d2d';
+String _$extensionSourceHash() => r'9aff3f4b4e599383bbdcd3d4a64ca55a2ebca453';
 
 final class ExtensionSourceFamily extends Family {
   const ExtensionSourceFamily._()

@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model/config.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -25,38 +24,54 @@ class _SearchHistory extends _$SearchHistory {
 }
 
 class WebSourceSearchWidget extends HookConsumerWidget {
-  const WebSourceSearchWidget({
-    super.key,
-  });
+  final SourceIdentifier source;
+
+  const WebSourceSearchWidget({super.key, required this.source});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gridExtent = ref.watch(gagakuSettingsProvider.select((c) => c.gridAlbumExtent));
     final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
     final controller = useSearchController();
-    final searchTerm = useState('');
-    final sources = ref.watch(extensionInfoListProvider);
 
-    Widget? sourcesResult = switch (sources) {
-      AsyncError(:final error, :final stackTrace) => SliverToBoxAdapter(
-          child: ErrorList(
-            error: error,
-            stackTrace: stackTrace,
-            message: "webSourceManagerProvider() failed",
-          ),
-        ),
-      AsyncData(value: final src) when src.isNotEmpty => null,
-      AsyncData(value: final src) when src.isEmpty => SliverToBoxAdapter(
-          child: Center(
-            child: Text("webSources.noSourcesWarning".tr(context: context)),
-          ),
-        ),
-      _ => const SliverToBoxAdapter(
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-    };
+    final items = useState(<HistoryLink>[]);
+    final trigger = useState(UniqueKey());
+    final metadata = useRef<Map<String, dynamic>?>({'page': 1});
+    final searchTerm = useRef<String?>(null);
+
+    final results = useMemoized(() async {
+      if (metadata.value != null) {
+        final results = await ref
+            .read(extensionSourceProvider(source.internal.id).notifier)
+            .searchManga(SearchRequest(title: searchTerm.value?.toLowerCase()), metadata.value);
+
+        final m = results.results?.map((e) => HistoryLink.fromPartialSourceManga(source.internal.id, e));
+        if (m != null) {
+          items.value.addAll(m);
+        }
+
+        metadata.value = results.metadata;
+      }
+
+      return items.value;
+    }, [trigger.value]);
+    final future = useFuture(results);
+
+    Widget? errorList;
+
+    if (future.hasError) {
+      final error = future.error!;
+      final stackTrace = future.stackTrace!;
+      final msg = "ExtensionSource(${source.internal.id}).searchManga() failed";
+
+      final messenger = ScaffoldMessenger.of(context);
+      Styles.showErrorSnackBar(messenger, '$error');
+      logger.e(msg, error: error, stackTrace: stackTrace);
+
+      errorList = SliverList.list(children: [
+        Text('$error'),
+        Text(stackTrace.toString()),
+      ]);
+    }
 
     return Scaffold(
       body: WebMangaListWidget(
@@ -66,6 +81,12 @@ class WebSourceSearchWidget extends HookConsumerWidget {
           'webSources.sourceSearch'.tr(context: context),
           style: const TextStyle(fontSize: 24),
         ),
+        onAtEdge: () {
+          if (metadata.value != null) {
+            trigger.value = UniqueKey();
+          }
+        },
+        isLoading: future.connectionState == ConnectionState.waiting || !future.hasData,
         leading: [
           SliverAppBar(
             leading: const BackButton(),
@@ -80,7 +101,7 @@ class WebSourceSearchWidget extends HookConsumerWidget {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: 'search.arg'.tr(context: context, args: ['webSources.text'.tr(context: context)]),
+                  hintText: 'search.arg'.tr(context: context, args: [source.external.name]),
                   onTap: () {
                     controller.openView();
                   },
@@ -95,6 +116,9 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                     }
 
                     searchTerm.value = term;
+                    metadata.value = {'page': 1};
+                    items.value = [];
+                    trigger.value = UniqueKey();
 
                     unfocusSearchBar();
                   },
@@ -109,6 +133,9 @@ class WebSourceSearchWidget extends HookConsumerWidget {
 
                 controller.closeView(term);
                 searchTerm.value = term;
+                metadata.value = {'page': 1};
+                items.value = [];
+                trigger.value = UniqueKey();
 
                 unfocusSearchBar();
               },
@@ -127,6 +154,9 @@ class WebSourceSearchWidget extends HookConsumerWidget {
 
                             controller.closeView(term);
                             searchTerm.value = term;
+                            metadata.value = {'page': 1};
+                            items.value = [];
+                            trigger.value = UniqueKey();
 
                             unfocusSearchBar();
                           },
@@ -137,74 +167,13 @@ class WebSourceSearchWidget extends HookConsumerWidget {
           ),
         ],
         children: [
-          if (sourcesResult != null) sourcesResult,
-          if (sourcesResult == null)
-            for (final src in sources.value!) ...[
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Text(
-                    src.external.name,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                ),
-              ),
-              HookBuilder(
-                builder: (context) {
-                  final results = useMemoized(
-                      () => ref
-                          .read(extensionSourceProvider(src.internal.id).notifier)
-                          .searchManga(SearchRequest(title: searchTerm.value.toLowerCase())),
-                      [searchTerm.value]);
-                  final future = useFuture(results);
-
-                  if (future.hasError) {
-                    final error = future.error!;
-                    final stackTrace = future.stackTrace!;
-                    final msg = "WebSource($src).searchManga() failed";
-
-                    final messenger = ScaffoldMessenger.of(context);
-                    Styles.showErrorSnackBar(messenger, '$error');
-                    logger.e(msg, error: error, stackTrace: stackTrace);
-
-                    return SliverList.list(children: [
-                      Text('$error'),
-                      Text(stackTrace.toString()),
-                    ]);
-                  }
-
-                  if (future.connectionState == ConnectionState.waiting || !future.hasData) {
-                    return const SliverToBoxAdapter(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-
-                  final data = future.data!;
-
-                  return SliverGrid.builder(
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: gridExtent.grid,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      childAspectRatio: 0.7,
-                    ),
-                    itemBuilder: (context, index) {
-                      final item = data.elementAt(index);
-                      return GridMangaItem(
-                        key: ValueKey(item.hashCode),
-                        link: item,
-                        favoritesKey: defaultCategory,
-                        showFavoriteButton: false,
-                        showRemoveButton: false,
-                      );
-                    },
-                    itemCount: data.length,
-                  );
-                },
-              ),
-            ]
+          if (errorList != null) errorList,
+          WebMangaListViewSliver(
+            items: items.value,
+            favoritesKey: defaultCategory,
+            showRemoveButton: false,
+            removeFromAll: true,
+          ),
         ],
       ),
     );

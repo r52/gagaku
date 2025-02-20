@@ -7,7 +7,6 @@ import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
-import 'package:gagaku/web/search.dart';
 import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/source_manager.dart';
 import 'package:gagaku/web/ui.dart';
@@ -41,14 +40,6 @@ class WebSourceHome extends HookConsumerWidget {
           OverflowBar(
             spacing: 0.0,
             children: [
-              IconButton(
-                color: theme.colorScheme.onPrimaryContainer,
-                icon: const Icon(Icons.search),
-                onPressed: () => nav.push(SlideTransitionRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) => const WebSourceSearchWidget(),
-                )),
-                tooltip: 'search.arg'.tr(context: context, args: ['webSources.text'.tr(context: context)]),
-              ),
               IconButton(
                 color: theme.colorScheme.onPrimaryContainer,
                 onPressed: () => openLinkDialog(context, api),

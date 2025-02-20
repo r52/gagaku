@@ -10,6 +10,7 @@ import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:gagaku/web/search.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -258,17 +259,32 @@ class _HomepageWidget extends HookConsumerWidget {
           },
         ),
         actions: [
-          if (source.external.hasIntent(SourceIntents.settingsUI))
-            IconButton(
-              color: theme.colorScheme.onPrimaryContainer,
-              icon: const Icon(Icons.settings),
-              onPressed: () => nav.push(SlideTransitionRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => ExtensionSettings(
-                  source: source,
-                ),
-              )),
-              tooltip: 'webSources.source.settings'.tr(context: context),
-            )
+          OverflowBar(
+            spacing: 0.0,
+            children: [
+              IconButton(
+                color: theme.colorScheme.onPrimaryContainer,
+                icon: const Icon(Icons.search),
+                onPressed: () => nav.push(SlideTransitionRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => WebSourceSearchWidget(
+                    source: source,
+                  ),
+                )),
+                tooltip: 'search.arg'.tr(context: context, args: [source.external.name]),
+              ),
+              if (source.external.hasIntent(SourceIntents.settingsUI))
+                IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  icon: const Icon(Icons.settings),
+                  onPressed: () => nav.push(SlideTransitionRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => ExtensionSettings(
+                      source: source,
+                    ),
+                  )),
+                  tooltip: 'webSources.source.settings'.tr(context: context),
+                )
+            ],
+          ),
         ],
       ),
       body: RefreshIndicator(
@@ -287,44 +303,38 @@ class _HomepageWidget extends HookConsumerWidget {
   }
 }
 
-class _HomeSectionPage extends StatefulHookConsumerWidget {
+class _HomeSectionPage extends HookConsumerWidget {
   final SourceIdentifier source;
   final HomeSection section;
 
   const _HomeSectionPage({required this.source, required this.section});
 
   @override
-  ConsumerState<_HomeSectionPage> createState() => _HomeSectionPageState();
-}
-
-class _HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
-  Map<String, dynamic>? metadata = {'page': 1};
-
-  Future<List<HistoryLink>> getPage(List<HistoryLink> current) async {
-    if (metadata != null) {
-      final results = await ref
-          .read(extensionSourceProvider(widget.source.internal.id).notifier)
-          .getHomeSectionMore(widget.section.id, metadata);
-
-      final m = results.results?.map((e) => HistoryLink.fromPartialSourceManga(widget.source.internal.id, e));
-      if (m != null) {
-        current.addAll(m);
-      }
-
-      metadata = results.metadata;
-    }
-
-    return current;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final messenger = ScaffoldMessenger.of(context);
     final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
     final controller = useScrollController();
+
     final items = useState(<HistoryLink>[]);
+    final metadata = useRef<Map<String, dynamic>?>({'page': 1});
     final page = useState(1);
-    final results = useMemoized(() => getPage(items.value), [page.value]);
+
+    final results = useMemoized(() async {
+      if (metadata.value != null) {
+        final results = await ref
+            .read(extensionSourceProvider(source.internal.id).notifier)
+            .getHomeSectionMore(section.id, metadata.value);
+
+        final m = results.results?.map((e) => HistoryLink.fromPartialSourceManga(source.internal.id, e));
+        if (m != null) {
+          items.value.addAll(m);
+        }
+
+        metadata.value = results.metadata;
+      }
+
+      return items.value;
+    }, [page.value]);
     final future = useFuture(results);
 
     Widget? errorList;
@@ -332,7 +342,7 @@ class _HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
     if (future.hasError) {
       final error = future.error!;
       final stackTrace = future.stackTrace!;
-      final msg = "ExtensionSource(${widget.source.internal.id}).getHomeSectionMore() failed";
+      final msg = "ExtensionSource(${source.internal.id}).getHomeSectionMore() failed";
 
       Styles.showErrorSnackBar(messenger, '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
@@ -349,7 +359,7 @@ class _HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
           onTap: () {
             controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
           },
-          child: TitleFlexBar(title: widget.section.title),
+          child: TitleFlexBar(title: section.title),
         ),
         leading: BackButton(
           onPressed: () {
@@ -364,7 +374,7 @@ class _HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
       body: RefreshIndicator(
         onRefresh: () {
           items.value = [];
-          metadata = {'page': 1};
+          metadata.value = {'page': 1};
           page.value = 1;
           return results;
         },
@@ -373,7 +383,7 @@ class _HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
           controller: controller,
           showToggle: false,
           onAtEdge: () {
-            if (metadata != null) {
+            if (metadata.value != null) {
               page.value++;
             }
           },

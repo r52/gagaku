@@ -721,30 +721,23 @@ return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
     return pmangas;
   }
 
-  Future<List<HistoryLink>> searchManga(SearchRequest query) async {
+  Future<PagedResults> searchManga(SearchRequest query, dynamic metadata) async {
     await future;
 
     if ((query.title == null || query.title!.isEmpty) && query.includedTags == null) {
-      return [];
+      return const PagedResults();
     }
 
-    String q = json.encode(query.toJson());
-    final result = await _controller.callAsyncJavaScript(functionBody: """
-var query = $q;
-return await $sourceId.getSearchResults(query, undefined)
+    final result = await _controller.callAsyncJavaScript(arguments: {
+      'query': query.toJson(),
+      'metadata': metadata,
+    }, functionBody: """
+return await $sourceId.getSearchResults(query, metadata)
 """);
 
     final pmangas = PagedResults.fromJson(result!.value);
 
-    if (pmangas.results == null) {
-      return [];
-    }
-
-    final links = pmangas.results!.map((e) => HistoryLink.fromPartialSourceManga(sourceId, e)).toList();
-
-    // logger.d(result);
-
-    return links;
+    return pmangas;
   }
 
   Future<WebManga?> getManga(String mangaId) async {
