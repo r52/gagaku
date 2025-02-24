@@ -11,18 +11,19 @@ const librarySortTypeProvider = LibrarySortTypeProvider._();
 
 final class LibrarySortTypeProvider
     extends $NotifierProvider<LibrarySortType, LibrarySort> {
-  const LibrarySortTypeProvider._(
-      {super.runNotifierBuildOverride, LibrarySortType Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'librarySortTypeProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const LibrarySortTypeProvider._({
+    super.runNotifierBuildOverride,
+    LibrarySortType Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'librarySortTypeProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final LibrarySortType Function()? _createCb;
 
@@ -43,19 +44,14 @@ final class LibrarySortTypeProvider
 
   @$internal
   @override
-  LibrarySortTypeProvider $copyWithCreate(
-    LibrarySortType Function() create,
-  ) {
+  LibrarySortTypeProvider $copyWithCreate(LibrarySortType Function() create) {
     return LibrarySortTypeProvider._(create: create);
   }
 
   @$internal
   @override
   LibrarySortTypeProvider $copyWithBuild(
-    LibrarySort Function(
-      Ref,
-      LibrarySortType,
-    ) build,
+    LibrarySort Function(Ref, LibrarySortType) build,
   ) {
     return LibrarySortTypeProvider._(runNotifierBuildOverride: build);
   }
@@ -63,8 +59,8 @@ final class LibrarySortTypeProvider
   @$internal
   @override
   $NotifierProviderElement<LibrarySortType, LibrarySort> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$librarySortTypeHash() => r'884ea733f1009d8831f3a6fd654e2480908cd7d6';
@@ -76,8 +72,14 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<LibrarySort>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<LibrarySort>, LibrarySort, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<LibrarySort>,
+              LibrarySort,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }
@@ -87,18 +89,19 @@ const localLibraryProvider = LocalLibraryProvider._();
 
 final class LocalLibraryProvider
     extends $AsyncNotifierProvider<LocalLibrary, LocalLibraryItem> {
-  const LocalLibraryProvider._(
-      {super.runNotifierBuildOverride, LocalLibrary Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'localLibraryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const LocalLibraryProvider._({
+    super.runNotifierBuildOverride,
+    LocalLibrary Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'localLibraryProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final LocalLibrary Function()? _createCb;
 
@@ -111,19 +114,14 @@ final class LocalLibraryProvider
 
   @$internal
   @override
-  LocalLibraryProvider $copyWithCreate(
-    LocalLibrary Function() create,
-  ) {
+  LocalLibraryProvider $copyWithCreate(LocalLibrary Function() create) {
     return LocalLibraryProvider._(create: create);
   }
 
   @$internal
   @override
   LocalLibraryProvider $copyWithBuild(
-    FutureOr<LocalLibraryItem> Function(
-      Ref,
-      LocalLibrary,
-    ) build,
+    FutureOr<LocalLibraryItem> Function(Ref, LocalLibrary) build,
   ) {
     return LocalLibraryProvider._(runNotifierBuildOverride: build);
   }
@@ -131,8 +129,8 @@ final class LocalLibraryProvider
   @$internal
   @override
   $AsyncNotifierProviderElement<LocalLibrary, LocalLibraryItem> $createElement(
-          $ProviderPointer pointer) =>
-      $AsyncNotifierProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $AsyncNotifierProviderElement(this, pointer);
 }
 
 String _$localLibraryHash() => r'8403f1c30004f5649903bdc3766b3f9c2068ed66';
@@ -144,11 +142,14 @@ abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<AsyncValue<LocalLibraryItem>>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<AsyncValue<LocalLibraryItem>>,
-        AsyncValue<LocalLibraryItem>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<AsyncValue<LocalLibraryItem>>,
+              AsyncValue<LocalLibraryItem>,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }
@@ -158,18 +159,19 @@ const supportedFormatsProvider = SupportedFormatsProvider._();
 
 final class SupportedFormatsProvider
     extends $AsyncNotifierProvider<SupportedFormats, FormatInfo> {
-  const SupportedFormatsProvider._(
-      {super.runNotifierBuildOverride, SupportedFormats Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'supportedFormatsProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const SupportedFormatsProvider._({
+    super.runNotifierBuildOverride,
+    SupportedFormats Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'supportedFormatsProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final SupportedFormats Function()? _createCb;
 
@@ -182,19 +184,14 @@ final class SupportedFormatsProvider
 
   @$internal
   @override
-  SupportedFormatsProvider $copyWithCreate(
-    SupportedFormats Function() create,
-  ) {
+  SupportedFormatsProvider $copyWithCreate(SupportedFormats Function() create) {
     return SupportedFormatsProvider._(create: create);
   }
 
   @$internal
   @override
   SupportedFormatsProvider $copyWithBuild(
-    FutureOr<FormatInfo> Function(
-      Ref,
-      SupportedFormats,
-    ) build,
+    FutureOr<FormatInfo> Function(Ref, SupportedFormats) build,
   ) {
     return SupportedFormatsProvider._(runNotifierBuildOverride: build);
   }
@@ -202,8 +199,8 @@ final class SupportedFormatsProvider
   @$internal
   @override
   $AsyncNotifierProviderElement<SupportedFormats, FormatInfo> $createElement(
-          $ProviderPointer pointer) =>
-      $AsyncNotifierProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $AsyncNotifierProviderElement(this, pointer);
 }
 
 String _$supportedFormatsHash() => r'3840c7ebd8357ef2b7163a74cb1335481d03be80';
@@ -215,11 +212,14 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<AsyncValue<FormatInfo>>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<AsyncValue<FormatInfo>>,
-        AsyncValue<FormatInfo>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<AsyncValue<FormatInfo>>,
+              AsyncValue<FormatInfo>,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }

@@ -8,11 +8,12 @@ part of 'config.dart';
 
 _$ReaderConfigImpl _$$ReaderConfigImplFromJson(Map<String, dynamic> json) =>
     _$ReaderConfigImpl(
-      format: $enumDecodeNullable(_$ReaderFormatEnumMap, json['format']) ??
+      format:
+          $enumDecodeNullable(_$ReaderFormatEnumMap, json['format']) ??
           ReaderFormat.single,
       direction:
           $enumDecodeNullable(_$ReaderDirectionEnumMap, json['direction']) ??
-              ReaderDirection.leftToRight,
+          ReaderDirection.leftToRight,
       showProgressBar: json['showProgressBar'] as bool? ?? false,
       clickToTurn: json['clickToTurn'] as bool? ?? true,
       swipeGestures: json['swipeGestures'] as bool? ?? true,
@@ -48,18 +49,19 @@ const readerSettingsProvider = ReaderSettingsProvider._();
 
 final class ReaderSettingsProvider
     extends $NotifierProvider<ReaderSettings, ReaderConfig> {
-  const ReaderSettingsProvider._(
-      {super.runNotifierBuildOverride, ReaderSettings Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'readerSettingsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const ReaderSettingsProvider._({
+    super.runNotifierBuildOverride,
+    ReaderSettings Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'readerSettingsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final ReaderSettings Function()? _createCb;
 
@@ -80,19 +82,14 @@ final class ReaderSettingsProvider
 
   @$internal
   @override
-  ReaderSettingsProvider $copyWithCreate(
-    ReaderSettings Function() create,
-  ) {
+  ReaderSettingsProvider $copyWithCreate(ReaderSettings Function() create) {
     return ReaderSettingsProvider._(create: create);
   }
 
   @$internal
   @override
   ReaderSettingsProvider $copyWithBuild(
-    ReaderConfig Function(
-      Ref,
-      ReaderSettings,
-    ) build,
+    ReaderConfig Function(Ref, ReaderSettings) build,
   ) {
     return ReaderSettingsProvider._(runNotifierBuildOverride: build);
   }
@@ -103,14 +100,11 @@ final class ReaderSettingsProvider
       _$ReaderSettingsElement(this, pointer);
 
   ProviderListenable<ReaderSettings$Save> get save =>
-      $LazyProxyListenable<ReaderSettings$Save, ReaderConfig>(
-        this,
-        (element) {
-          element as _$ReaderSettingsElement;
+      $LazyProxyListenable<ReaderSettings$Save, ReaderConfig>(this, (element) {
+        element as _$ReaderSettingsElement;
 
-          return element._$save;
-        },
-      );
+        return element._$save;
+      });
 }
 
 String _$readerSettingsHash() => r'68769a15ea11239838033d69fa771a6dfdeac160';
@@ -122,8 +116,14 @@ abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<ReaderConfig>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<ReaderConfig>, ReaderConfig, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<ReaderConfig>,
+              ReaderConfig,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }
@@ -171,8 +171,10 @@ sealed class ReaderSettings$Save extends MutationBase<ReaderConfig> {
   Future<ReaderConfig> call(ReaderConfig update);
 }
 
-final class _$ReaderSettings$Save extends $SyncMutationBase<ReaderConfig,
-    _$ReaderSettings$Save, ReaderSettings> implements ReaderSettings$Save {
+final class _$ReaderSettings$Save
+    extends
+        $SyncMutationBase<ReaderConfig, _$ReaderSettings$Save, ReaderSettings>
+    implements ReaderSettings$Save {
   _$ReaderSettings$Save(this.element, {super.state, super.key});
 
   @override
@@ -184,20 +186,16 @@ final class _$ReaderSettings$Save extends $SyncMutationBase<ReaderConfig,
   @override
   Future<ReaderConfig> call(ReaderConfig update) {
     return mutateAsync(
-      Invocation.method(
-        #save,
-        [update],
-      ),
-      ($notifier) => $notifier.save(
-        update,
-      ),
+      Invocation.method(#save, [update]),
+      ($notifier) => $notifier.save(update),
     );
   }
 
   @override
-  _$ReaderSettings$Save copyWith(MutationState<ReaderConfig> state,
-          {Object? key}) =>
-      _$ReaderSettings$Save(element, state: state, key: key);
+  _$ReaderSettings$Save copyWith(
+    MutationState<ReaderConfig> state, {
+    Object? key,
+  }) => _$ReaderSettings$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

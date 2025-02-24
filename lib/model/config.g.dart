@@ -8,13 +8,21 @@ part of 'config.dart';
 
 _$GagakuConfigImpl _$$GagakuConfigImplFromJson(Map<String, dynamic> json) =>
     _$GagakuConfigImpl(
-      themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
+      themeMode:
+          $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
           ThemeMode.system,
-      theme: $enumDecodeNullable(_$GagakuThemeEnumMap, json['theme'],
-              unknownValue: GagakuTheme.lime) ??
+      theme:
+          $enumDecodeNullable(
+            _$GagakuThemeEnumMap,
+            json['theme'],
+            unknownValue: GagakuTheme.lime,
+          ) ??
           GagakuTheme.lime,
-      gridAlbumExtent: $enumDecodeNullable(
-              _$GridAlbumExtentEnumMap, json['gridAlbumExtent']) ??
+      gridAlbumExtent:
+          $enumDecodeNullable(
+            _$GridAlbumExtentEnumMap,
+            json['gridAlbumExtent'],
+          ) ??
           GridAlbumExtent.medium,
     );
 
@@ -61,18 +69,19 @@ const gagakuSettingsProvider = GagakuSettingsProvider._();
 
 final class GagakuSettingsProvider
     extends $NotifierProvider<GagakuSettings, GagakuConfig> {
-  const GagakuSettingsProvider._(
-      {super.runNotifierBuildOverride, GagakuSettings Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'gagakuSettingsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const GagakuSettingsProvider._({
+    super.runNotifierBuildOverride,
+    GagakuSettings Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'gagakuSettingsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final GagakuSettings Function()? _createCb;
 
@@ -93,19 +102,14 @@ final class GagakuSettingsProvider
 
   @$internal
   @override
-  GagakuSettingsProvider $copyWithCreate(
-    GagakuSettings Function() create,
-  ) {
+  GagakuSettingsProvider $copyWithCreate(GagakuSettings Function() create) {
     return GagakuSettingsProvider._(create: create);
   }
 
   @$internal
   @override
   GagakuSettingsProvider $copyWithBuild(
-    GagakuConfig Function(
-      Ref,
-      GagakuSettings,
-    ) build,
+    GagakuConfig Function(Ref, GagakuSettings) build,
   ) {
     return GagakuSettingsProvider._(runNotifierBuildOverride: build);
   }
@@ -116,14 +120,11 @@ final class GagakuSettingsProvider
       _$GagakuSettingsElement(this, pointer);
 
   ProviderListenable<GagakuSettings$Save> get save =>
-      $LazyProxyListenable<GagakuSettings$Save, GagakuConfig>(
-        this,
-        (element) {
-          element as _$GagakuSettingsElement;
+      $LazyProxyListenable<GagakuSettings$Save, GagakuConfig>(this, (element) {
+        element as _$GagakuSettingsElement;
 
-          return element._$save;
-        },
-      );
+        return element._$save;
+      });
 }
 
 String _$gagakuSettingsHash() => r'b43e7e7daea8164a9d7496099356031f7735f0a2';
@@ -135,8 +136,14 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<GagakuConfig>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<GagakuConfig>, GagakuConfig, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<GagakuConfig>,
+              GagakuConfig,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }
@@ -184,8 +191,10 @@ sealed class GagakuSettings$Save extends MutationBase<GagakuConfig> {
   Future<GagakuConfig> call(GagakuConfig update);
 }
 
-final class _$GagakuSettings$Save extends $SyncMutationBase<GagakuConfig,
-    _$GagakuSettings$Save, GagakuSettings> implements GagakuSettings$Save {
+final class _$GagakuSettings$Save
+    extends
+        $SyncMutationBase<GagakuConfig, _$GagakuSettings$Save, GagakuSettings>
+    implements GagakuSettings$Save {
   _$GagakuSettings$Save(this.element, {super.state, super.key});
 
   @override
@@ -197,20 +206,16 @@ final class _$GagakuSettings$Save extends $SyncMutationBase<GagakuConfig,
   @override
   Future<GagakuConfig> call(GagakuConfig update) {
     return mutateAsync(
-      Invocation.method(
-        #save,
-        [update],
-      ),
-      ($notifier) => $notifier.save(
-        update,
-      ),
+      Invocation.method(#save, [update]),
+      ($notifier) => $notifier.save(update),
     );
   }
 
   @override
-  _$GagakuSettings$Save copyWith(MutationState<GagakuConfig> state,
-          {Object? key}) =>
-      _$GagakuSettings$Save(element, state: state, key: key);
+  _$GagakuSettings$Save copyWith(
+    MutationState<GagakuConfig> state, {
+    Object? key,
+  }) => _$GagakuSettings$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

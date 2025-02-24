@@ -12,7 +12,8 @@ part of 'config.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 MangaDexConfig _$MangaDexConfigFromJson(Map<String, dynamic> json) {
   return _MangaDexConfig.fromJson(json);
@@ -51,15 +52,17 @@ mixin _$MangaDexConfig {
 /// @nodoc
 abstract class $MangaDexConfigCopyWith<$Res> {
   factory $MangaDexConfigCopyWith(
-          MangaDexConfig value, $Res Function(MangaDexConfig) then) =
-      _$MangaDexConfigCopyWithImpl<$Res, MangaDexConfig>;
+    MangaDexConfig value,
+    $Res Function(MangaDexConfig) then,
+  ) = _$MangaDexConfigCopyWithImpl<$Res, MangaDexConfig>;
   @useResult
-  $Res call(
-      {@LanguageConverter() Set<Language> translatedLanguages,
-      @LanguageConverter() Set<Language> originalLanguage,
-      Set<ContentRating> contentRating,
-      bool dataSaver,
-      Set<String> groupBlacklist});
+  $Res call({
+    @LanguageConverter() Set<Language> translatedLanguages,
+    @LanguageConverter() Set<Language> originalLanguage,
+    Set<ContentRating> contentRating,
+    bool dataSaver,
+    Set<String> groupBlacklist,
+  });
 }
 
 /// @nodoc
@@ -83,45 +86,55 @@ class _$MangaDexConfigCopyWithImpl<$Res, $Val extends MangaDexConfig>
     Object? dataSaver = null,
     Object? groupBlacklist = null,
   }) {
-    return _then(_value.copyWith(
-      translatedLanguages: null == translatedLanguages
-          ? _value.translatedLanguages
-          : translatedLanguages // ignore: cast_nullable_to_non_nullable
-              as Set<Language>,
-      originalLanguage: null == originalLanguage
-          ? _value.originalLanguage
-          : originalLanguage // ignore: cast_nullable_to_non_nullable
-              as Set<Language>,
-      contentRating: null == contentRating
-          ? _value.contentRating
-          : contentRating // ignore: cast_nullable_to_non_nullable
-              as Set<ContentRating>,
-      dataSaver: null == dataSaver
-          ? _value.dataSaver
-          : dataSaver // ignore: cast_nullable_to_non_nullable
-              as bool,
-      groupBlacklist: null == groupBlacklist
-          ? _value.groupBlacklist
-          : groupBlacklist // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            translatedLanguages:
+                null == translatedLanguages
+                    ? _value.translatedLanguages
+                    : translatedLanguages // ignore: cast_nullable_to_non_nullable
+                        as Set<Language>,
+            originalLanguage:
+                null == originalLanguage
+                    ? _value.originalLanguage
+                    : originalLanguage // ignore: cast_nullable_to_non_nullable
+                        as Set<Language>,
+            contentRating:
+                null == contentRating
+                    ? _value.contentRating
+                    : contentRating // ignore: cast_nullable_to_non_nullable
+                        as Set<ContentRating>,
+            dataSaver:
+                null == dataSaver
+                    ? _value.dataSaver
+                    : dataSaver // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            groupBlacklist:
+                null == groupBlacklist
+                    ? _value.groupBlacklist
+                    : groupBlacklist // ignore: cast_nullable_to_non_nullable
+                        as Set<String>,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$MangaDexConfigImplCopyWith<$Res>
     implements $MangaDexConfigCopyWith<$Res> {
-  factory _$$MangaDexConfigImplCopyWith(_$MangaDexConfigImpl value,
-          $Res Function(_$MangaDexConfigImpl) then) =
-      __$$MangaDexConfigImplCopyWithImpl<$Res>;
+  factory _$$MangaDexConfigImplCopyWith(
+    _$MangaDexConfigImpl value,
+    $Res Function(_$MangaDexConfigImpl) then,
+  ) = __$$MangaDexConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {@LanguageConverter() Set<Language> translatedLanguages,
-      @LanguageConverter() Set<Language> originalLanguage,
-      Set<ContentRating> contentRating,
-      bool dataSaver,
-      Set<String> groupBlacklist});
+  $Res call({
+    @LanguageConverter() Set<Language> translatedLanguages,
+    @LanguageConverter() Set<Language> originalLanguage,
+    Set<ContentRating> contentRating,
+    bool dataSaver,
+    Set<String> groupBlacklist,
+  });
 }
 
 /// @nodoc
@@ -129,8 +142,9 @@ class __$$MangaDexConfigImplCopyWithImpl<$Res>
     extends _$MangaDexConfigCopyWithImpl<$Res, _$MangaDexConfigImpl>
     implements _$$MangaDexConfigImplCopyWith<$Res> {
   __$$MangaDexConfigImplCopyWithImpl(
-      _$MangaDexConfigImpl _value, $Res Function(_$MangaDexConfigImpl) _then)
-      : super(_value, _then);
+    _$MangaDexConfigImpl _value,
+    $Res Function(_$MangaDexConfigImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of MangaDexConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -143,44 +157,52 @@ class __$$MangaDexConfigImplCopyWithImpl<$Res>
     Object? dataSaver = null,
     Object? groupBlacklist = null,
   }) {
-    return _then(_$MangaDexConfigImpl(
-      translatedLanguages: null == translatedLanguages
-          ? _value.translatedLanguages
-          : translatedLanguages // ignore: cast_nullable_to_non_nullable
-              as Set<Language>,
-      originalLanguage: null == originalLanguage
-          ? _value.originalLanguage
-          : originalLanguage // ignore: cast_nullable_to_non_nullable
-              as Set<Language>,
-      contentRating: null == contentRating
-          ? _value.contentRating
-          : contentRating // ignore: cast_nullable_to_non_nullable
-              as Set<ContentRating>,
-      dataSaver: null == dataSaver
-          ? _value.dataSaver
-          : dataSaver // ignore: cast_nullable_to_non_nullable
-              as bool,
-      groupBlacklist: null == groupBlacklist
-          ? _value.groupBlacklist
-          : groupBlacklist // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-    ));
+    return _then(
+      _$MangaDexConfigImpl(
+        translatedLanguages:
+            null == translatedLanguages
+                ? _value.translatedLanguages
+                : translatedLanguages // ignore: cast_nullable_to_non_nullable
+                    as Set<Language>,
+        originalLanguage:
+            null == originalLanguage
+                ? _value.originalLanguage
+                : originalLanguage // ignore: cast_nullable_to_non_nullable
+                    as Set<Language>,
+        contentRating:
+            null == contentRating
+                ? _value.contentRating
+                : contentRating // ignore: cast_nullable_to_non_nullable
+                    as Set<ContentRating>,
+        dataSaver:
+            null == dataSaver
+                ? _value.dataSaver
+                : dataSaver // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        groupBlacklist:
+            null == groupBlacklist
+                ? _value.groupBlacklist
+                : groupBlacklist // ignore: cast_nullable_to_non_nullable
+                    as Set<String>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$MangaDexConfigImpl implements _MangaDexConfig {
-  _$MangaDexConfigImpl(
-      {@LanguageConverter() this.translatedLanguages = const {},
-      @LanguageConverter() this.originalLanguage = const {},
-      this.contentRating = const {
-        ContentRating.safe,
-        ContentRating.suggestive,
-        ContentRating.erotica
-      },
-      this.dataSaver = false,
-      this.groupBlacklist = const {}});
+  _$MangaDexConfigImpl({
+    @LanguageConverter() this.translatedLanguages = const {},
+    @LanguageConverter() this.originalLanguage = const {},
+    this.contentRating = const {
+      ContentRating.safe,
+      ContentRating.suggestive,
+      ContentRating.erotica,
+    },
+    this.dataSaver = false,
+    this.groupBlacklist = const {},
+  });
 
   factory _$MangaDexConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$MangaDexConfigImplFromJson(json);
@@ -215,23 +237,24 @@ class _$MangaDexConfigImpl implements _MangaDexConfig {
   @pragma('vm:prefer-inline')
   _$$MangaDexConfigImplCopyWith<_$MangaDexConfigImpl> get copyWith =>
       __$$MangaDexConfigImplCopyWithImpl<_$MangaDexConfigImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MangaDexConfigImplToJson(
-      this,
-    );
+    return _$$MangaDexConfigImplToJson(this);
   }
 }
 
 abstract class _MangaDexConfig implements MangaDexConfig {
-  factory _MangaDexConfig(
-      {@LanguageConverter() Set<Language> translatedLanguages,
-      @LanguageConverter() Set<Language> originalLanguage,
-      Set<ContentRating> contentRating,
-      bool dataSaver,
-      Set<String> groupBlacklist}) = _$MangaDexConfigImpl;
+  factory _MangaDexConfig({
+    @LanguageConverter() Set<Language> translatedLanguages,
+    @LanguageConverter() Set<Language> originalLanguage,
+    Set<ContentRating> contentRating,
+    bool dataSaver,
+    Set<String> groupBlacklist,
+  }) = _$MangaDexConfigImpl;
 
   factory _MangaDexConfig.fromJson(Map<String, dynamic> json) =
       _$MangaDexConfigImpl.fromJson;

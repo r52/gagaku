@@ -12,7 +12,8 @@ part of 'types.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$SourceHandler {
@@ -32,15 +33,17 @@ mixin _$SourceHandler {
 /// @nodoc
 abstract class $SourceHandlerCopyWith<$Res> {
   factory $SourceHandlerCopyWith(
-          SourceHandler value, $Res Function(SourceHandler) then) =
-      _$SourceHandlerCopyWithImpl<$Res, SourceHandler>;
+    SourceHandler value,
+    $Res Function(SourceHandler) then,
+  ) = _$SourceHandlerCopyWithImpl<$Res, SourceHandler>;
   @useResult
-  $Res call(
-      {SourceType type,
-      String source,
-      String location,
-      String? chapter,
-      WebSourceInfo? parser});
+  $Res call({
+    SourceType type,
+    String source,
+    String location,
+    String? chapter,
+    WebSourceInfo? parser,
+  });
 
   $WebSourceInfoCopyWith<$Res>? get parser;
 }
@@ -66,28 +69,36 @@ class _$SourceHandlerCopyWithImpl<$Res, $Val extends SourceHandler>
     Object? chapter = freezed,
     Object? parser = freezed,
   }) {
-    return _then(_value.copyWith(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as SourceType,
-      source: null == source
-          ? _value.source
-          : source // ignore: cast_nullable_to_non_nullable
-              as String,
-      location: null == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String,
-      chapter: freezed == chapter
-          ? _value.chapter
-          : chapter // ignore: cast_nullable_to_non_nullable
-              as String?,
-      parser: freezed == parser
-          ? _value.parser
-          : parser // ignore: cast_nullable_to_non_nullable
-              as WebSourceInfo?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            type:
+                null == type
+                    ? _value.type
+                    : type // ignore: cast_nullable_to_non_nullable
+                        as SourceType,
+            source:
+                null == source
+                    ? _value.source
+                    : source // ignore: cast_nullable_to_non_nullable
+                        as String,
+            location:
+                null == location
+                    ? _value.location
+                    : location // ignore: cast_nullable_to_non_nullable
+                        as String,
+            chapter:
+                freezed == chapter
+                    ? _value.chapter
+                    : chapter // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            parser:
+                freezed == parser
+                    ? _value.parser
+                    : parser // ignore: cast_nullable_to_non_nullable
+                        as WebSourceInfo?,
+          )
+          as $Val,
+    );
   }
 
   /// Create a copy of SourceHandler
@@ -109,16 +120,18 @@ class _$SourceHandlerCopyWithImpl<$Res, $Val extends SourceHandler>
 abstract class _$$SourceHandlerImplCopyWith<$Res>
     implements $SourceHandlerCopyWith<$Res> {
   factory _$$SourceHandlerImplCopyWith(
-          _$SourceHandlerImpl value, $Res Function(_$SourceHandlerImpl) then) =
-      __$$SourceHandlerImplCopyWithImpl<$Res>;
+    _$SourceHandlerImpl value,
+    $Res Function(_$SourceHandlerImpl) then,
+  ) = __$$SourceHandlerImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {SourceType type,
-      String source,
-      String location,
-      String? chapter,
-      WebSourceInfo? parser});
+  $Res call({
+    SourceType type,
+    String source,
+    String location,
+    String? chapter,
+    WebSourceInfo? parser,
+  });
 
   @override
   $WebSourceInfoCopyWith<$Res>? get parser;
@@ -129,8 +142,9 @@ class __$$SourceHandlerImplCopyWithImpl<$Res>
     extends _$SourceHandlerCopyWithImpl<$Res, _$SourceHandlerImpl>
     implements _$$SourceHandlerImplCopyWith<$Res> {
   __$$SourceHandlerImplCopyWithImpl(
-      _$SourceHandlerImpl _value, $Res Function(_$SourceHandlerImpl) _then)
-      : super(_value, _then);
+    _$SourceHandlerImpl _value,
+    $Res Function(_$SourceHandlerImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of SourceHandler
   /// with the given fields replaced by the non-null parameter values.
@@ -143,41 +157,48 @@ class __$$SourceHandlerImplCopyWithImpl<$Res>
     Object? chapter = freezed,
     Object? parser = freezed,
   }) {
-    return _then(_$SourceHandlerImpl(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as SourceType,
-      source: null == source
-          ? _value.source
-          : source // ignore: cast_nullable_to_non_nullable
-              as String,
-      location: null == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String,
-      chapter: freezed == chapter
-          ? _value.chapter
-          : chapter // ignore: cast_nullable_to_non_nullable
-              as String?,
-      parser: freezed == parser
-          ? _value.parser
-          : parser // ignore: cast_nullable_to_non_nullable
-              as WebSourceInfo?,
-    ));
+    return _then(
+      _$SourceHandlerImpl(
+        type:
+            null == type
+                ? _value.type
+                : type // ignore: cast_nullable_to_non_nullable
+                    as SourceType,
+        source:
+            null == source
+                ? _value.source
+                : source // ignore: cast_nullable_to_non_nullable
+                    as String,
+        location:
+            null == location
+                ? _value.location
+                : location // ignore: cast_nullable_to_non_nullable
+                    as String,
+        chapter:
+            freezed == chapter
+                ? _value.chapter
+                : chapter // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        parser:
+            freezed == parser
+                ? _value.parser
+                : parser // ignore: cast_nullable_to_non_nullable
+                    as WebSourceInfo?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 
 class _$SourceHandlerImpl extends _SourceHandler {
-  const _$SourceHandlerImpl(
-      {required this.type,
-      required this.source,
-      required this.location,
-      this.chapter,
-      this.parser})
-      : super._();
+  const _$SourceHandlerImpl({
+    required this.type,
+    required this.source,
+    required this.location,
+    this.chapter,
+    this.parser,
+  }) : super._();
 
   @override
   final SourceType type;
@@ -222,12 +243,13 @@ class _$SourceHandlerImpl extends _SourceHandler {
 }
 
 abstract class _SourceHandler extends SourceHandler {
-  const factory _SourceHandler(
-      {required final SourceType type,
-      required final String source,
-      required final String location,
-      final String? chapter,
-      final WebSourceInfo? parser}) = _$SourceHandlerImpl;
+  const factory _SourceHandler({
+    required final SourceType type,
+    required final String source,
+    required final String location,
+    final String? chapter,
+    final WebSourceInfo? parser,
+  }) = _$SourceHandlerImpl;
   const _SourceHandler._() : super._();
 
   @override
@@ -272,8 +294,9 @@ mixin _$HistoryLink {
 /// @nodoc
 abstract class $HistoryLinkCopyWith<$Res> {
   factory $HistoryLinkCopyWith(
-          HistoryLink value, $Res Function(HistoryLink) then) =
-      _$HistoryLinkCopyWithImpl<$Res, HistoryLink>;
+    HistoryLink value,
+    $Res Function(HistoryLink) then,
+  ) = _$HistoryLinkCopyWithImpl<$Res, HistoryLink>;
   @useResult
   $Res call({String title, String url, String? cover});
 }
@@ -297,20 +320,26 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
     Object? url = null,
     Object? cover = freezed,
   }) {
-    return _then(_value.copyWith(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String,
-      cover: freezed == cover
-          ? _value.cover
-          : cover // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            title:
+                null == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String,
+            url:
+                null == url
+                    ? _value.url
+                    : url // ignore: cast_nullable_to_non_nullable
+                        as String,
+            cover:
+                freezed == cover
+                    ? _value.cover
+                    : cover // ignore: cast_nullable_to_non_nullable
+                        as String?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -318,8 +347,9 @@ class _$HistoryLinkCopyWithImpl<$Res, $Val extends HistoryLink>
 abstract class _$$HistoryLinkImplCopyWith<$Res>
     implements $HistoryLinkCopyWith<$Res> {
   factory _$$HistoryLinkImplCopyWith(
-          _$HistoryLinkImpl value, $Res Function(_$HistoryLinkImpl) then) =
-      __$$HistoryLinkImplCopyWithImpl<$Res>;
+    _$HistoryLinkImpl value,
+    $Res Function(_$HistoryLinkImpl) then,
+  ) = __$$HistoryLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String title, String url, String? cover});
@@ -330,8 +360,9 @@ class __$$HistoryLinkImplCopyWithImpl<$Res>
     extends _$HistoryLinkCopyWithImpl<$Res, _$HistoryLinkImpl>
     implements _$$HistoryLinkImplCopyWith<$Res> {
   __$$HistoryLinkImplCopyWithImpl(
-      _$HistoryLinkImpl _value, $Res Function(_$HistoryLinkImpl) _then)
-      : super(_value, _then);
+    _$HistoryLinkImpl _value,
+    $Res Function(_$HistoryLinkImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of HistoryLink
   /// with the given fields replaced by the non-null parameter values.
@@ -342,20 +373,25 @@ class __$$HistoryLinkImplCopyWithImpl<$Res>
     Object? url = null,
     Object? cover = freezed,
   }) {
-    return _then(_$HistoryLinkImpl(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String,
-      cover: freezed == cover
-          ? _value.cover
-          : cover // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    return _then(
+      _$HistoryLinkImpl(
+        title:
+            null == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String,
+        url:
+            null == url
+                ? _value.url
+                : url // ignore: cast_nullable_to_non_nullable
+                    as String,
+        cover:
+            freezed == cover
+                ? _value.cover
+                : cover // ignore: cast_nullable_to_non_nullable
+                    as String?,
+      ),
+    );
   }
 }
 
@@ -363,7 +399,7 @@ class __$$HistoryLinkImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$HistoryLinkImpl extends _HistoryLink {
   const _$HistoryLinkImpl({required this.title, required this.url, this.cover})
-      : super._();
+    : super._();
 
   factory _$HistoryLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$HistoryLinkImplFromJson(json);
@@ -390,17 +426,16 @@ class _$HistoryLinkImpl extends _HistoryLink {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$HistoryLinkImplToJson(
-      this,
-    );
+    return _$$HistoryLinkImplToJson(this);
   }
 }
 
 abstract class _HistoryLink extends HistoryLink {
-  const factory _HistoryLink(
-      {required final String title,
-      required final String url,
-      final String? cover}) = _$HistoryLinkImpl;
+  const factory _HistoryLink({
+    required final String title,
+    required final String url,
+    final String? cover,
+  }) = _$HistoryLinkImpl;
   const _HistoryLink._() : super._();
 
   factory _HistoryLink.fromJson(Map<String, dynamic> json) =
@@ -450,14 +485,15 @@ abstract class $WebMangaCopyWith<$Res> {
   factory $WebMangaCopyWith(WebManga value, $Res Function(WebManga) then) =
       _$WebMangaCopyWithImpl<$Res, WebManga>;
   @useResult
-  $Res call(
-      {String title,
-      String description,
-      String artist,
-      String author,
-      String cover,
-      Map<String, String>? groups,
-      Map<String, WebChapter> chapters});
+  $Res call({
+    String title,
+    String description,
+    String artist,
+    String author,
+    String cover,
+    Map<String, String>? groups,
+    Map<String, WebChapter> chapters,
+  });
 }
 
 /// @nodoc
@@ -483,36 +519,46 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
     Object? groups = freezed,
     Object? chapters = null,
   }) {
-    return _then(_value.copyWith(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      artist: null == artist
-          ? _value.artist
-          : artist // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      cover: null == cover
-          ? _value.cover
-          : cover // ignore: cast_nullable_to_non_nullable
-              as String,
-      groups: freezed == groups
-          ? _value.groups
-          : groups // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>?,
-      chapters: null == chapters
-          ? _value.chapters
-          : chapters // ignore: cast_nullable_to_non_nullable
-              as Map<String, WebChapter>,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            title:
+                null == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String,
+            description:
+                null == description
+                    ? _value.description
+                    : description // ignore: cast_nullable_to_non_nullable
+                        as String,
+            artist:
+                null == artist
+                    ? _value.artist
+                    : artist // ignore: cast_nullable_to_non_nullable
+                        as String,
+            author:
+                null == author
+                    ? _value.author
+                    : author // ignore: cast_nullable_to_non_nullable
+                        as String,
+            cover:
+                null == cover
+                    ? _value.cover
+                    : cover // ignore: cast_nullable_to_non_nullable
+                        as String,
+            groups:
+                freezed == groups
+                    ? _value.groups
+                    : groups // ignore: cast_nullable_to_non_nullable
+                        as Map<String, String>?,
+            chapters:
+                null == chapters
+                    ? _value.chapters
+                    : chapters // ignore: cast_nullable_to_non_nullable
+                        as Map<String, WebChapter>,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -520,18 +566,20 @@ class _$WebMangaCopyWithImpl<$Res, $Val extends WebManga>
 abstract class _$$WebMangaImplCopyWith<$Res>
     implements $WebMangaCopyWith<$Res> {
   factory _$$WebMangaImplCopyWith(
-          _$WebMangaImpl value, $Res Function(_$WebMangaImpl) then) =
-      __$$WebMangaImplCopyWithImpl<$Res>;
+    _$WebMangaImpl value,
+    $Res Function(_$WebMangaImpl) then,
+  ) = __$$WebMangaImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String title,
-      String description,
-      String artist,
-      String author,
-      String cover,
-      Map<String, String>? groups,
-      Map<String, WebChapter> chapters});
+  $Res call({
+    String title,
+    String description,
+    String artist,
+    String author,
+    String cover,
+    Map<String, String>? groups,
+    Map<String, WebChapter> chapters,
+  });
 }
 
 /// @nodoc
@@ -539,8 +587,9 @@ class __$$WebMangaImplCopyWithImpl<$Res>
     extends _$WebMangaCopyWithImpl<$Res, _$WebMangaImpl>
     implements _$$WebMangaImplCopyWith<$Res> {
   __$$WebMangaImplCopyWithImpl(
-      _$WebMangaImpl _value, $Res Function(_$WebMangaImpl) _then)
-      : super(_value, _then);
+    _$WebMangaImpl _value,
+    $Res Function(_$WebMangaImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of WebManga
   /// with the given fields replaced by the non-null parameter values.
@@ -555,53 +604,62 @@ class __$$WebMangaImplCopyWithImpl<$Res>
     Object? groups = freezed,
     Object? chapters = null,
   }) {
-    return _then(_$WebMangaImpl(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      artist: null == artist
-          ? _value.artist
-          : artist // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      cover: null == cover
-          ? _value.cover
-          : cover // ignore: cast_nullable_to_non_nullable
-              as String,
-      groups: freezed == groups
-          ? _value._groups
-          : groups // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>?,
-      chapters: null == chapters
-          ? _value._chapters
-          : chapters // ignore: cast_nullable_to_non_nullable
-              as Map<String, WebChapter>,
-    ));
+    return _then(
+      _$WebMangaImpl(
+        title:
+            null == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String,
+        description:
+            null == description
+                ? _value.description
+                : description // ignore: cast_nullable_to_non_nullable
+                    as String,
+        artist:
+            null == artist
+                ? _value.artist
+                : artist // ignore: cast_nullable_to_non_nullable
+                    as String,
+        author:
+            null == author
+                ? _value.author
+                : author // ignore: cast_nullable_to_non_nullable
+                    as String,
+        cover:
+            null == cover
+                ? _value.cover
+                : cover // ignore: cast_nullable_to_non_nullable
+                    as String,
+        groups:
+            freezed == groups
+                ? _value._groups
+                : groups // ignore: cast_nullable_to_non_nullable
+                    as Map<String, String>?,
+        chapters:
+            null == chapters
+                ? _value._chapters
+                : chapters // ignore: cast_nullable_to_non_nullable
+                    as Map<String, WebChapter>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$WebMangaImpl extends _WebManga {
-  const _$WebMangaImpl(
-      {required this.title,
-      required this.description,
-      required this.artist,
-      required this.author,
-      required this.cover,
-      final Map<String, String>? groups,
-      required final Map<String, WebChapter> chapters})
-      : _groups = groups,
-        _chapters = chapters,
-        super._();
+  const _$WebMangaImpl({
+    required this.title,
+    required this.description,
+    required this.artist,
+    required this.author,
+    required this.cover,
+    final Map<String, String>? groups,
+    required final Map<String, WebChapter> chapters,
+  }) : _groups = groups,
+       _chapters = chapters,
+       super._();
 
   factory _$WebMangaImpl.fromJson(Map<String, dynamic> json) =>
       _$$WebMangaImplFromJson(json);
@@ -657,14 +715,15 @@ class _$WebMangaImpl extends _WebManga {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      title,
-      description,
-      artist,
-      author,
-      cover,
-      const DeepCollectionEquality().hash(_groups),
-      const DeepCollectionEquality().hash(_chapters));
+    runtimeType,
+    title,
+    description,
+    artist,
+    author,
+    cover,
+    const DeepCollectionEquality().hash(_groups),
+    const DeepCollectionEquality().hash(_chapters),
+  );
 
   /// Create a copy of WebManga
   /// with the given fields replaced by the non-null parameter values.
@@ -676,21 +735,20 @@ class _$WebMangaImpl extends _WebManga {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$WebMangaImplToJson(
-      this,
-    );
+    return _$$WebMangaImplToJson(this);
   }
 }
 
 abstract class _WebManga extends WebManga {
-  const factory _WebManga(
-      {required final String title,
-      required final String description,
-      required final String artist,
-      required final String author,
-      required final String cover,
-      final Map<String, String>? groups,
-      required final Map<String, WebChapter> chapters}) = _$WebMangaImpl;
+  const factory _WebManga({
+    required final String title,
+    required final String description,
+    required final String artist,
+    required final String author,
+    required final String cover,
+    final Map<String, String>? groups,
+    required final Map<String, WebChapter> chapters,
+  }) = _$WebMangaImpl;
   const _WebManga._() : super._();
 
   factory _WebManga.fromJson(Map<String, dynamic> json) =
@@ -746,15 +804,17 @@ mixin _$WebChapter {
 /// @nodoc
 abstract class $WebChapterCopyWith<$Res> {
   factory $WebChapterCopyWith(
-          WebChapter value, $Res Function(WebChapter) then) =
-      _$WebChapterCopyWithImpl<$Res, WebChapter>;
+    WebChapter value,
+    $Res Function(WebChapter) then,
+  ) = _$WebChapterCopyWithImpl<$Res, WebChapter>;
   @useResult
-  $Res call(
-      {String? title,
-      String? volume,
-      @EpochTimestampSerializer() DateTime? lastUpdated,
-      @MappedEpochTimestampSerializer() DateTime? releaseDate,
-      Map<String, dynamic> groups});
+  $Res call({
+    String? title,
+    String? volume,
+    @EpochTimestampSerializer() DateTime? lastUpdated,
+    @MappedEpochTimestampSerializer() DateTime? releaseDate,
+    Map<String, dynamic> groups,
+  });
 }
 
 /// @nodoc
@@ -778,28 +838,36 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
     Object? releaseDate = freezed,
     Object? groups = null,
   }) {
-    return _then(_value.copyWith(
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as String?,
-      lastUpdated: freezed == lastUpdated
-          ? _value.lastUpdated
-          : lastUpdated // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      releaseDate: freezed == releaseDate
-          ? _value.releaseDate
-          : releaseDate // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      groups: null == groups
-          ? _value.groups
-          : groups // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            title:
+                freezed == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            volume:
+                freezed == volume
+                    ? _value.volume
+                    : volume // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            lastUpdated:
+                freezed == lastUpdated
+                    ? _value.lastUpdated
+                    : lastUpdated // ignore: cast_nullable_to_non_nullable
+                        as DateTime?,
+            releaseDate:
+                freezed == releaseDate
+                    ? _value.releaseDate
+                    : releaseDate // ignore: cast_nullable_to_non_nullable
+                        as DateTime?,
+            groups:
+                null == groups
+                    ? _value.groups
+                    : groups // ignore: cast_nullable_to_non_nullable
+                        as Map<String, dynamic>,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -807,16 +875,18 @@ class _$WebChapterCopyWithImpl<$Res, $Val extends WebChapter>
 abstract class _$$WebChapterImplCopyWith<$Res>
     implements $WebChapterCopyWith<$Res> {
   factory _$$WebChapterImplCopyWith(
-          _$WebChapterImpl value, $Res Function(_$WebChapterImpl) then) =
-      __$$WebChapterImplCopyWithImpl<$Res>;
+    _$WebChapterImpl value,
+    $Res Function(_$WebChapterImpl) then,
+  ) = __$$WebChapterImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String? title,
-      String? volume,
-      @EpochTimestampSerializer() DateTime? lastUpdated,
-      @MappedEpochTimestampSerializer() DateTime? releaseDate,
-      Map<String, dynamic> groups});
+  $Res call({
+    String? title,
+    String? volume,
+    @EpochTimestampSerializer() DateTime? lastUpdated,
+    @MappedEpochTimestampSerializer() DateTime? releaseDate,
+    Map<String, dynamic> groups,
+  });
 }
 
 /// @nodoc
@@ -824,8 +894,9 @@ class __$$WebChapterImplCopyWithImpl<$Res>
     extends _$WebChapterCopyWithImpl<$Res, _$WebChapterImpl>
     implements _$$WebChapterImplCopyWith<$Res> {
   __$$WebChapterImplCopyWithImpl(
-      _$WebChapterImpl _value, $Res Function(_$WebChapterImpl) _then)
-      : super(_value, _then);
+    _$WebChapterImpl _value,
+    $Res Function(_$WebChapterImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of WebChapter
   /// with the given fields replaced by the non-null parameter values.
@@ -838,28 +909,35 @@ class __$$WebChapterImplCopyWithImpl<$Res>
     Object? releaseDate = freezed,
     Object? groups = null,
   }) {
-    return _then(_$WebChapterImpl(
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as String?,
-      lastUpdated: freezed == lastUpdated
-          ? _value.lastUpdated
-          : lastUpdated // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      releaseDate: freezed == releaseDate
-          ? _value.releaseDate
-          : releaseDate // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      groups: null == groups
-          ? _value._groups
-          : groups // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
-    ));
+    return _then(
+      _$WebChapterImpl(
+        title:
+            freezed == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        volume:
+            freezed == volume
+                ? _value.volume
+                : volume // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        lastUpdated:
+            freezed == lastUpdated
+                ? _value.lastUpdated
+                : lastUpdated // ignore: cast_nullable_to_non_nullable
+                    as DateTime?,
+        releaseDate:
+            freezed == releaseDate
+                ? _value.releaseDate
+                : releaseDate // ignore: cast_nullable_to_non_nullable
+                    as DateTime?,
+        groups:
+            null == groups
+                ? _value._groups
+                : groups // ignore: cast_nullable_to_non_nullable
+                    as Map<String, dynamic>,
+      ),
+    );
   }
 }
 
@@ -867,14 +945,14 @@ class __$$WebChapterImplCopyWithImpl<$Res>
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _$WebChapterImpl extends _WebChapter {
-  const _$WebChapterImpl(
-      {this.title,
-      this.volume,
-      @EpochTimestampSerializer() this.lastUpdated,
-      @MappedEpochTimestampSerializer() this.releaseDate,
-      required final Map<String, dynamic> groups})
-      : _groups = groups,
-        super._();
+  const _$WebChapterImpl({
+    this.title,
+    this.volume,
+    @EpochTimestampSerializer() this.lastUpdated,
+    @MappedEpochTimestampSerializer() this.releaseDate,
+    required final Map<String, dynamic> groups,
+  }) : _groups = groups,
+       super._();
 
   factory _$WebChapterImpl.fromJson(Map<String, dynamic> json) =>
       _$$WebChapterImplFromJson(json);
@@ -918,8 +996,14 @@ class _$WebChapterImpl extends _WebChapter {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, title, volume, lastUpdated,
-      releaseDate, const DeepCollectionEquality().hash(_groups));
+  int get hashCode => Object.hash(
+    runtimeType,
+    title,
+    volume,
+    lastUpdated,
+    releaseDate,
+    const DeepCollectionEquality().hash(_groups),
+  );
 
   /// Create a copy of WebChapter
   /// with the given fields replaced by the non-null parameter values.
@@ -931,19 +1015,18 @@ class _$WebChapterImpl extends _WebChapter {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$WebChapterImplToJson(
-      this,
-    );
+    return _$$WebChapterImplToJson(this);
   }
 }
 
 abstract class _WebChapter extends WebChapter {
-  const factory _WebChapter(
-      {final String? title,
-      final String? volume,
-      @EpochTimestampSerializer() final DateTime? lastUpdated,
-      @MappedEpochTimestampSerializer() final DateTime? releaseDate,
-      required final Map<String, dynamic> groups}) = _$WebChapterImpl;
+  const factory _WebChapter({
+    final String? title,
+    final String? volume,
+    @EpochTimestampSerializer() final DateTime? lastUpdated,
+    @MappedEpochTimestampSerializer() final DateTime? releaseDate,
+    required final Map<String, dynamic> groups,
+  }) = _$WebChapterImpl;
   const _WebChapter._() : super._();
 
   factory _WebChapter.fromJson(Map<String, dynamic> json) =
@@ -1011,20 +1094,22 @@ class _$ImgurPageCopyWithImpl<$Res, $Val extends ImgurPage>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? description = null,
-    Object? src = null,
-  }) {
-    return _then(_value.copyWith(
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      src: null == src
-          ? _value.src
-          : src // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  $Res call({Object? description = null, Object? src = null}) {
+    return _then(
+      _value.copyWith(
+            description:
+                null == description
+                    ? _value.description
+                    : description // ignore: cast_nullable_to_non_nullable
+                        as String,
+            src:
+                null == src
+                    ? _value.src
+                    : src // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -1032,8 +1117,9 @@ class _$ImgurPageCopyWithImpl<$Res, $Val extends ImgurPage>
 abstract class _$$ImgurPageImplCopyWith<$Res>
     implements $ImgurPageCopyWith<$Res> {
   factory _$$ImgurPageImplCopyWith(
-          _$ImgurPageImpl value, $Res Function(_$ImgurPageImpl) then) =
-      __$$ImgurPageImplCopyWithImpl<$Res>;
+    _$ImgurPageImpl value,
+    $Res Function(_$ImgurPageImpl) then,
+  ) = __$$ImgurPageImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String description, String src});
@@ -1044,27 +1130,29 @@ class __$$ImgurPageImplCopyWithImpl<$Res>
     extends _$ImgurPageCopyWithImpl<$Res, _$ImgurPageImpl>
     implements _$$ImgurPageImplCopyWith<$Res> {
   __$$ImgurPageImplCopyWithImpl(
-      _$ImgurPageImpl _value, $Res Function(_$ImgurPageImpl) _then)
-      : super(_value, _then);
+    _$ImgurPageImpl _value,
+    $Res Function(_$ImgurPageImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ImgurPage
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? description = null,
-    Object? src = null,
-  }) {
-    return _then(_$ImgurPageImpl(
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      src: null == src
-          ? _value.src
-          : src // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? description = null, Object? src = null}) {
+    return _then(
+      _$ImgurPageImpl(
+        description:
+            null == description
+                ? _value.description
+                : description // ignore: cast_nullable_to_non_nullable
+                    as String,
+        src:
+            null == src
+                ? _value.src
+                : src // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
@@ -1110,16 +1198,15 @@ class _$ImgurPageImpl implements _ImgurPage {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ImgurPageImplToJson(
-      this,
-    );
+    return _$$ImgurPageImplToJson(this);
   }
 }
 
 abstract class _ImgurPage implements ImgurPage {
-  const factory _ImgurPage(
-      {required final String description,
-      required final String src}) = _$ImgurPageImpl;
+  const factory _ImgurPage({
+    required final String description,
+    required final String src,
+  }) = _$ImgurPageImpl;
 
   factory _ImgurPage.fromJson(Map<String, dynamic> json) =
       _$ImgurPageImpl.fromJson;
@@ -1161,8 +1248,9 @@ mixin _$WebSourceInfo {
 /// @nodoc
 abstract class $WebSourceInfoCopyWith<$Res> {
   factory $WebSourceInfoCopyWith(
-          WebSourceInfo value, $Res Function(WebSourceInfo) then) =
-      _$WebSourceInfoCopyWithImpl<$Res, WebSourceInfo>;
+    WebSourceInfo value,
+    $Res Function(WebSourceInfo) then,
+  ) = _$WebSourceInfoCopyWithImpl<$Res, WebSourceInfo>;
   @useResult
   $Res call({String id, String name, String repo, String? icon});
 }
@@ -1187,24 +1275,31 @@ class _$WebSourceInfoCopyWithImpl<$Res, $Val extends WebSourceInfo>
     Object? repo = null,
     Object? icon = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      repo: null == repo
-          ? _value.repo
-          : repo // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: freezed == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            name:
+                null == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String,
+            repo:
+                null == repo
+                    ? _value.repo
+                    : repo // ignore: cast_nullable_to_non_nullable
+                        as String,
+            icon:
+                freezed == icon
+                    ? _value.icon
+                    : icon // ignore: cast_nullable_to_non_nullable
+                        as String?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -1212,8 +1307,9 @@ class _$WebSourceInfoCopyWithImpl<$Res, $Val extends WebSourceInfo>
 abstract class _$$WebSourceInfoImplCopyWith<$Res>
     implements $WebSourceInfoCopyWith<$Res> {
   factory _$$WebSourceInfoImplCopyWith(
-          _$WebSourceInfoImpl value, $Res Function(_$WebSourceInfoImpl) then) =
-      __$$WebSourceInfoImplCopyWithImpl<$Res>;
+    _$WebSourceInfoImpl value,
+    $Res Function(_$WebSourceInfoImpl) then,
+  ) = __$$WebSourceInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, String name, String repo, String? icon});
@@ -1224,8 +1320,9 @@ class __$$WebSourceInfoImplCopyWithImpl<$Res>
     extends _$WebSourceInfoCopyWithImpl<$Res, _$WebSourceInfoImpl>
     implements _$$WebSourceInfoImplCopyWith<$Res> {
   __$$WebSourceInfoImplCopyWithImpl(
-      _$WebSourceInfoImpl _value, $Res Function(_$WebSourceInfoImpl) _then)
-      : super(_value, _then);
+    _$WebSourceInfoImpl _value,
+    $Res Function(_$WebSourceInfoImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of WebSourceInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -1237,32 +1334,42 @@ class __$$WebSourceInfoImplCopyWithImpl<$Res>
     Object? repo = null,
     Object? icon = freezed,
   }) {
-    return _then(_$WebSourceInfoImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      repo: null == repo
-          ? _value.repo
-          : repo // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: freezed == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    return _then(
+      _$WebSourceInfoImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        name:
+            null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String,
+        repo:
+            null == repo
+                ? _value.repo
+                : repo // ignore: cast_nullable_to_non_nullable
+                    as String,
+        icon:
+            freezed == icon
+                ? _value.icon
+                : icon // ignore: cast_nullable_to_non_nullable
+                    as String?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$WebSourceInfoImpl implements _WebSourceInfo {
-  const _$WebSourceInfoImpl(
-      {required this.id, required this.name, required this.repo, this.icon});
+  const _$WebSourceInfoImpl({
+    required this.id,
+    required this.name,
+    required this.repo,
+    this.icon,
+  });
 
   factory _$WebSourceInfoImpl.fromJson(Map<String, dynamic> json) =>
       _$$WebSourceInfoImplFromJson(json);
@@ -1306,18 +1413,17 @@ class _$WebSourceInfoImpl implements _WebSourceInfo {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$WebSourceInfoImplToJson(
-      this,
-    );
+    return _$$WebSourceInfoImplToJson(this);
   }
 }
 
 abstract class _WebSourceInfo implements WebSourceInfo {
-  const factory _WebSourceInfo(
-      {required final String id,
-      required final String name,
-      required final String repo,
-      final String? icon}) = _$WebSourceInfoImpl;
+  const factory _WebSourceInfo({
+    required final String id,
+    required final String name,
+    required final String repo,
+    final String? icon,
+  }) = _$WebSourceInfoImpl;
 
   factory _WebSourceInfo.fromJson(Map<String, dynamic> json) =
       _$WebSourceInfoImpl.fromJson;
@@ -1361,8 +1467,9 @@ mixin _$SourceIdentifier {
 /// @nodoc
 abstract class $SourceIdentifierCopyWith<$Res> {
   factory $SourceIdentifierCopyWith(
-          SourceIdentifier value, $Res Function(SourceIdentifier) then) =
-      _$SourceIdentifierCopyWithImpl<$Res, SourceIdentifier>;
+    SourceIdentifier value,
+    $Res Function(SourceIdentifier) then,
+  ) = _$SourceIdentifierCopyWithImpl<$Res, SourceIdentifier>;
   @useResult
   $Res call({WebSourceInfo internal, SourceInfo external});
 
@@ -1384,20 +1491,22 @@ class _$SourceIdentifierCopyWithImpl<$Res, $Val extends SourceIdentifier>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? internal = null,
-    Object? external = null,
-  }) {
-    return _then(_value.copyWith(
-      internal: null == internal
-          ? _value.internal
-          : internal // ignore: cast_nullable_to_non_nullable
-              as WebSourceInfo,
-      external: null == external
-          ? _value.external
-          : external // ignore: cast_nullable_to_non_nullable
-              as SourceInfo,
-    ) as $Val);
+  $Res call({Object? internal = null, Object? external = null}) {
+    return _then(
+      _value.copyWith(
+            internal:
+                null == internal
+                    ? _value.internal
+                    : internal // ignore: cast_nullable_to_non_nullable
+                        as WebSourceInfo,
+            external:
+                null == external
+                    ? _value.external
+                    : external // ignore: cast_nullable_to_non_nullable
+                        as SourceInfo,
+          )
+          as $Val,
+    );
   }
 
   /// Create a copy of SourceIdentifier
@@ -1424,9 +1533,10 @@ class _$SourceIdentifierCopyWithImpl<$Res, $Val extends SourceIdentifier>
 /// @nodoc
 abstract class _$$SourceIdentifierImplCopyWith<$Res>
     implements $SourceIdentifierCopyWith<$Res> {
-  factory _$$SourceIdentifierImplCopyWith(_$SourceIdentifierImpl value,
-          $Res Function(_$SourceIdentifierImpl) then) =
-      __$$SourceIdentifierImplCopyWithImpl<$Res>;
+  factory _$$SourceIdentifierImplCopyWith(
+    _$SourceIdentifierImpl value,
+    $Res Function(_$SourceIdentifierImpl) then,
+  ) = __$$SourceIdentifierImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({WebSourceInfo internal, SourceInfo external});
@@ -1441,36 +1551,40 @@ abstract class _$$SourceIdentifierImplCopyWith<$Res>
 class __$$SourceIdentifierImplCopyWithImpl<$Res>
     extends _$SourceIdentifierCopyWithImpl<$Res, _$SourceIdentifierImpl>
     implements _$$SourceIdentifierImplCopyWith<$Res> {
-  __$$SourceIdentifierImplCopyWithImpl(_$SourceIdentifierImpl _value,
-      $Res Function(_$SourceIdentifierImpl) _then)
-      : super(_value, _then);
+  __$$SourceIdentifierImplCopyWithImpl(
+    _$SourceIdentifierImpl _value,
+    $Res Function(_$SourceIdentifierImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of SourceIdentifier
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? internal = null,
-    Object? external = null,
-  }) {
-    return _then(_$SourceIdentifierImpl(
-      internal: null == internal
-          ? _value.internal
-          : internal // ignore: cast_nullable_to_non_nullable
-              as WebSourceInfo,
-      external: null == external
-          ? _value.external
-          : external // ignore: cast_nullable_to_non_nullable
-              as SourceInfo,
-    ));
+  $Res call({Object? internal = null, Object? external = null}) {
+    return _then(
+      _$SourceIdentifierImpl(
+        internal:
+            null == internal
+                ? _value.internal
+                : internal // ignore: cast_nullable_to_non_nullable
+                    as WebSourceInfo,
+        external:
+            null == external
+                ? _value.external
+                : external // ignore: cast_nullable_to_non_nullable
+                    as SourceInfo,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$SourceIdentifierImpl implements _SourceIdentifier {
-  const _$SourceIdentifierImpl(
-      {required this.internal, required this.external});
+  const _$SourceIdentifierImpl({
+    required this.internal,
+    required this.external,
+  });
 
   factory _$SourceIdentifierImpl.fromJson(Map<String, dynamic> json) =>
       _$$SourceIdentifierImplFromJson(json);
@@ -1507,20 +1621,21 @@ class _$SourceIdentifierImpl implements _SourceIdentifier {
   @pragma('vm:prefer-inline')
   _$$SourceIdentifierImplCopyWith<_$SourceIdentifierImpl> get copyWith =>
       __$$SourceIdentifierImplCopyWithImpl<_$SourceIdentifierImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SourceIdentifierImplToJson(
-      this,
-    );
+    return _$$SourceIdentifierImplToJson(this);
   }
 }
 
 abstract class _SourceIdentifier implements SourceIdentifier {
-  const factory _SourceIdentifier(
-      {required final WebSourceInfo internal,
-      required final SourceInfo external}) = _$SourceIdentifierImpl;
+  const factory _SourceIdentifier({
+    required final WebSourceInfo internal,
+    required final SourceInfo external,
+  }) = _$SourceIdentifierImpl;
 
   factory _SourceIdentifier.fromJson(Map<String, dynamic> json) =
       _$SourceIdentifierImpl.fromJson;
@@ -1579,28 +1694,31 @@ class _$BadgeCopyWithImpl<$Res, $Val extends Badge>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? text = null,
-    Object? type = null,
-  }) {
-    return _then(_value.copyWith(
-      text: null == text
-          ? _value.text
-          : text // ignore: cast_nullable_to_non_nullable
-              as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as BadgeColor,
-    ) as $Val);
+  $Res call({Object? text = null, Object? type = null}) {
+    return _then(
+      _value.copyWith(
+            text:
+                null == text
+                    ? _value.text
+                    : text // ignore: cast_nullable_to_non_nullable
+                        as String,
+            type:
+                null == type
+                    ? _value.type
+                    : type // ignore: cast_nullable_to_non_nullable
+                        as BadgeColor,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$BadgeImplCopyWith<$Res> implements $BadgeCopyWith<$Res> {
   factory _$$BadgeImplCopyWith(
-          _$BadgeImpl value, $Res Function(_$BadgeImpl) then) =
-      __$$BadgeImplCopyWithImpl<$Res>;
+    _$BadgeImpl value,
+    $Res Function(_$BadgeImpl) then,
+  ) = __$$BadgeImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String text, @BadgeColorParser() BadgeColor type});
@@ -1611,35 +1729,39 @@ class __$$BadgeImplCopyWithImpl<$Res>
     extends _$BadgeCopyWithImpl<$Res, _$BadgeImpl>
     implements _$$BadgeImplCopyWith<$Res> {
   __$$BadgeImplCopyWithImpl(
-      _$BadgeImpl _value, $Res Function(_$BadgeImpl) _then)
-      : super(_value, _then);
+    _$BadgeImpl _value,
+    $Res Function(_$BadgeImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of Badge
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? text = null,
-    Object? type = null,
-  }) {
-    return _then(_$BadgeImpl(
-      text: null == text
-          ? _value.text
-          : text // ignore: cast_nullable_to_non_nullable
-              as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as BadgeColor,
-    ));
+  $Res call({Object? text = null, Object? type = null}) {
+    return _then(
+      _$BadgeImpl(
+        text:
+            null == text
+                ? _value.text
+                : text // ignore: cast_nullable_to_non_nullable
+                    as String,
+        type:
+            null == type
+                ? _value.type
+                : type // ignore: cast_nullable_to_non_nullable
+                    as BadgeColor,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$BadgeImpl implements _Badge {
-  const _$BadgeImpl(
-      {required this.text, @BadgeColorParser() required this.type});
+  const _$BadgeImpl({
+    required this.text,
+    @BadgeColorParser() required this.type,
+  });
 
   factory _$BadgeImpl.fromJson(Map<String, dynamic> json) =>
       _$$BadgeImplFromJson(json);
@@ -1678,16 +1800,15 @@ class _$BadgeImpl implements _Badge {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$BadgeImplToJson(
-      this,
-    );
+    return _$$BadgeImplToJson(this);
   }
 }
 
 abstract class _Badge implements Badge {
-  const factory _Badge(
-      {required final String text,
-      @BadgeColorParser() required final BadgeColor type}) = _$BadgeImpl;
+  const factory _Badge({
+    required final String text,
+    @BadgeColorParser() required final BadgeColor type,
+  }) = _$BadgeImpl;
 
   factory _Badge.fromJson(Map<String, dynamic> json) = _$BadgeImpl.fromJson;
 
@@ -1736,21 +1857,23 @@ mixin _$SourceVersion {
 /// @nodoc
 abstract class $SourceVersionCopyWith<$Res> {
   factory $SourceVersionCopyWith(
-          SourceVersion value, $Res Function(SourceVersion) then) =
-      _$SourceVersionCopyWithImpl<$Res, SourceVersion>;
+    SourceVersion value,
+    $Res Function(SourceVersion) then,
+  ) = _$SourceVersionCopyWithImpl<$Res, SourceVersion>;
   @useResult
-  $Res call(
-      {String id,
-      String name,
-      String author,
-      String desc,
-      String? website,
-      ContentRating contentRating,
-      String version,
-      String icon,
-      List<Badge>? tags,
-      String websiteBaseURL,
-      int? intents});
+  $Res call({
+    String id,
+    String name,
+    String author,
+    String desc,
+    String? website,
+    ContentRating contentRating,
+    String version,
+    String icon,
+    List<Badge>? tags,
+    String websiteBaseURL,
+    int? intents,
+  });
 }
 
 /// @nodoc
@@ -1780,52 +1903,66 @@ class _$SourceVersionCopyWithImpl<$Res, $Val extends SourceVersion>
     Object? websiteBaseURL = null,
     Object? intents = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      desc: null == desc
-          ? _value.desc
-          : desc // ignore: cast_nullable_to_non_nullable
-              as String,
-      website: freezed == website
-          ? _value.website
-          : website // ignore: cast_nullable_to_non_nullable
-              as String?,
-      contentRating: null == contentRating
-          ? _value.contentRating
-          : contentRating // ignore: cast_nullable_to_non_nullable
-              as ContentRating,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      tags: freezed == tags
-          ? _value.tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<Badge>?,
-      websiteBaseURL: null == websiteBaseURL
-          ? _value.websiteBaseURL
-          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-              as String,
-      intents: freezed == intents
-          ? _value.intents
-          : intents // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            name:
+                null == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String,
+            author:
+                null == author
+                    ? _value.author
+                    : author // ignore: cast_nullable_to_non_nullable
+                        as String,
+            desc:
+                null == desc
+                    ? _value.desc
+                    : desc // ignore: cast_nullable_to_non_nullable
+                        as String,
+            website:
+                freezed == website
+                    ? _value.website
+                    : website // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            contentRating:
+                null == contentRating
+                    ? _value.contentRating
+                    : contentRating // ignore: cast_nullable_to_non_nullable
+                        as ContentRating,
+            version:
+                null == version
+                    ? _value.version
+                    : version // ignore: cast_nullable_to_non_nullable
+                        as String,
+            icon:
+                null == icon
+                    ? _value.icon
+                    : icon // ignore: cast_nullable_to_non_nullable
+                        as String,
+            tags:
+                freezed == tags
+                    ? _value.tags
+                    : tags // ignore: cast_nullable_to_non_nullable
+                        as List<Badge>?,
+            websiteBaseURL:
+                null == websiteBaseURL
+                    ? _value.websiteBaseURL
+                    : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+                        as String,
+            intents:
+                freezed == intents
+                    ? _value.intents
+                    : intents // ignore: cast_nullable_to_non_nullable
+                        as int?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -1833,22 +1970,24 @@ class _$SourceVersionCopyWithImpl<$Res, $Val extends SourceVersion>
 abstract class _$$SourceVersionImplCopyWith<$Res>
     implements $SourceVersionCopyWith<$Res> {
   factory _$$SourceVersionImplCopyWith(
-          _$SourceVersionImpl value, $Res Function(_$SourceVersionImpl) then) =
-      __$$SourceVersionImplCopyWithImpl<$Res>;
+    _$SourceVersionImpl value,
+    $Res Function(_$SourceVersionImpl) then,
+  ) = __$$SourceVersionImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      String name,
-      String author,
-      String desc,
-      String? website,
-      ContentRating contentRating,
-      String version,
-      String icon,
-      List<Badge>? tags,
-      String websiteBaseURL,
-      int? intents});
+  $Res call({
+    String id,
+    String name,
+    String author,
+    String desc,
+    String? website,
+    ContentRating contentRating,
+    String version,
+    String icon,
+    List<Badge>? tags,
+    String websiteBaseURL,
+    int? intents,
+  });
 }
 
 /// @nodoc
@@ -1856,8 +1995,9 @@ class __$$SourceVersionImplCopyWithImpl<$Res>
     extends _$SourceVersionCopyWithImpl<$Res, _$SourceVersionImpl>
     implements _$$SourceVersionImplCopyWith<$Res> {
   __$$SourceVersionImplCopyWithImpl(
-      _$SourceVersionImpl _value, $Res Function(_$SourceVersionImpl) _then)
-      : super(_value, _then);
+    _$SourceVersionImpl _value,
+    $Res Function(_$SourceVersionImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of SourceVersion
   /// with the given fields replaced by the non-null parameter values.
@@ -1876,71 +2016,84 @@ class __$$SourceVersionImplCopyWithImpl<$Res>
     Object? websiteBaseURL = null,
     Object? intents = freezed,
   }) {
-    return _then(_$SourceVersionImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      desc: null == desc
-          ? _value.desc
-          : desc // ignore: cast_nullable_to_non_nullable
-              as String,
-      website: freezed == website
-          ? _value.website
-          : website // ignore: cast_nullable_to_non_nullable
-              as String?,
-      contentRating: null == contentRating
-          ? _value.contentRating
-          : contentRating // ignore: cast_nullable_to_non_nullable
-              as ContentRating,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      tags: freezed == tags
-          ? _value._tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<Badge>?,
-      websiteBaseURL: null == websiteBaseURL
-          ? _value.websiteBaseURL
-          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-              as String,
-      intents: freezed == intents
-          ? _value.intents
-          : intents // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ));
+    return _then(
+      _$SourceVersionImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        name:
+            null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String,
+        author:
+            null == author
+                ? _value.author
+                : author // ignore: cast_nullable_to_non_nullable
+                    as String,
+        desc:
+            null == desc
+                ? _value.desc
+                : desc // ignore: cast_nullable_to_non_nullable
+                    as String,
+        website:
+            freezed == website
+                ? _value.website
+                : website // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        contentRating:
+            null == contentRating
+                ? _value.contentRating
+                : contentRating // ignore: cast_nullable_to_non_nullable
+                    as ContentRating,
+        version:
+            null == version
+                ? _value.version
+                : version // ignore: cast_nullable_to_non_nullable
+                    as String,
+        icon:
+            null == icon
+                ? _value.icon
+                : icon // ignore: cast_nullable_to_non_nullable
+                    as String,
+        tags:
+            freezed == tags
+                ? _value._tags
+                : tags // ignore: cast_nullable_to_non_nullable
+                    as List<Badge>?,
+        websiteBaseURL:
+            null == websiteBaseURL
+                ? _value.websiteBaseURL
+                : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+                    as String,
+        intents:
+            freezed == intents
+                ? _value.intents
+                : intents // ignore: cast_nullable_to_non_nullable
+                    as int?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$SourceVersionImpl implements _SourceVersion {
-  const _$SourceVersionImpl(
-      {required this.id,
-      required this.name,
-      required this.author,
-      required this.desc,
-      this.website,
-      required this.contentRating,
-      required this.version,
-      required this.icon,
-      final List<Badge>? tags,
-      required this.websiteBaseURL,
-      this.intents})
-      : _tags = tags;
+  const _$SourceVersionImpl({
+    required this.id,
+    required this.name,
+    required this.author,
+    required this.desc,
+    this.website,
+    required this.contentRating,
+    required this.version,
+    required this.icon,
+    final List<Badge>? tags,
+    required this.websiteBaseURL,
+    this.intents,
+  }) : _tags = tags;
 
   factory _$SourceVersionImpl.fromJson(Map<String, dynamic> json) =>
       _$$SourceVersionImplFromJson(json);
@@ -2004,18 +2157,19 @@ class _$SourceVersionImpl implements _SourceVersion {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      author,
-      desc,
-      website,
-      contentRating,
-      version,
-      icon,
-      const DeepCollectionEquality().hash(_tags),
-      websiteBaseURL,
-      intents);
+    runtimeType,
+    id,
+    name,
+    author,
+    desc,
+    website,
+    contentRating,
+    version,
+    icon,
+    const DeepCollectionEquality().hash(_tags),
+    websiteBaseURL,
+    intents,
+  );
 
   /// Create a copy of SourceVersion
   /// with the given fields replaced by the non-null parameter values.
@@ -2027,25 +2181,24 @@ class _$SourceVersionImpl implements _SourceVersion {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SourceVersionImplToJson(
-      this,
-    );
+    return _$$SourceVersionImplToJson(this);
   }
 }
 
 abstract class _SourceVersion implements SourceVersion {
-  const factory _SourceVersion(
-      {required final String id,
-      required final String name,
-      required final String author,
-      required final String desc,
-      final String? website,
-      required final ContentRating contentRating,
-      required final String version,
-      required final String icon,
-      final List<Badge>? tags,
-      required final String websiteBaseURL,
-      final int? intents}) = _$SourceVersionImpl;
+  const factory _SourceVersion({
+    required final String id,
+    required final String name,
+    required final String author,
+    required final String desc,
+    final String? website,
+    required final ContentRating contentRating,
+    required final String version,
+    required final String icon,
+    final List<Badge>? tags,
+    required final String websiteBaseURL,
+    final int? intents,
+  }) = _$SourceVersionImpl;
 
   factory _SourceVersion.fromJson(Map<String, dynamic> json) =
       _$SourceVersionImpl.fromJson;
@@ -2112,21 +2265,23 @@ mixin _$SourceInfo {
 /// @nodoc
 abstract class $SourceInfoCopyWith<$Res> {
   factory $SourceInfoCopyWith(
-          SourceInfo value, $Res Function(SourceInfo) then) =
-      _$SourceInfoCopyWithImpl<$Res, SourceInfo>;
+    SourceInfo value,
+    $Res Function(SourceInfo) then,
+  ) = _$SourceInfoCopyWithImpl<$Res, SourceInfo>;
   @useResult
-  $Res call(
-      {String name,
-      String author,
-      String description,
-      ContentRating contentRating,
-      String version,
-      String icon,
-      String websiteBaseURL,
-      String? authorWebsite,
-      String? language,
-      List<Badge>? sourceTags,
-      int? intents});
+  $Res call({
+    String name,
+    String author,
+    String description,
+    ContentRating contentRating,
+    String version,
+    String icon,
+    String websiteBaseURL,
+    String? authorWebsite,
+    String? language,
+    List<Badge>? sourceTags,
+    int? intents,
+  });
 }
 
 /// @nodoc
@@ -2156,52 +2311,66 @@ class _$SourceInfoCopyWithImpl<$Res, $Val extends SourceInfo>
     Object? sourceTags = freezed,
     Object? intents = freezed,
   }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      contentRating: null == contentRating
-          ? _value.contentRating
-          : contentRating // ignore: cast_nullable_to_non_nullable
-              as ContentRating,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      websiteBaseURL: null == websiteBaseURL
-          ? _value.websiteBaseURL
-          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-              as String,
-      authorWebsite: freezed == authorWebsite
-          ? _value.authorWebsite
-          : authorWebsite // ignore: cast_nullable_to_non_nullable
-              as String?,
-      language: freezed == language
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String?,
-      sourceTags: freezed == sourceTags
-          ? _value.sourceTags
-          : sourceTags // ignore: cast_nullable_to_non_nullable
-              as List<Badge>?,
-      intents: freezed == intents
-          ? _value.intents
-          : intents // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            name:
+                null == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String,
+            author:
+                null == author
+                    ? _value.author
+                    : author // ignore: cast_nullable_to_non_nullable
+                        as String,
+            description:
+                null == description
+                    ? _value.description
+                    : description // ignore: cast_nullable_to_non_nullable
+                        as String,
+            contentRating:
+                null == contentRating
+                    ? _value.contentRating
+                    : contentRating // ignore: cast_nullable_to_non_nullable
+                        as ContentRating,
+            version:
+                null == version
+                    ? _value.version
+                    : version // ignore: cast_nullable_to_non_nullable
+                        as String,
+            icon:
+                null == icon
+                    ? _value.icon
+                    : icon // ignore: cast_nullable_to_non_nullable
+                        as String,
+            websiteBaseURL:
+                null == websiteBaseURL
+                    ? _value.websiteBaseURL
+                    : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+                        as String,
+            authorWebsite:
+                freezed == authorWebsite
+                    ? _value.authorWebsite
+                    : authorWebsite // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            language:
+                freezed == language
+                    ? _value.language
+                    : language // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            sourceTags:
+                freezed == sourceTags
+                    ? _value.sourceTags
+                    : sourceTags // ignore: cast_nullable_to_non_nullable
+                        as List<Badge>?,
+            intents:
+                freezed == intents
+                    ? _value.intents
+                    : intents // ignore: cast_nullable_to_non_nullable
+                        as int?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -2209,22 +2378,24 @@ class _$SourceInfoCopyWithImpl<$Res, $Val extends SourceInfo>
 abstract class _$$SourceInfoImplCopyWith<$Res>
     implements $SourceInfoCopyWith<$Res> {
   factory _$$SourceInfoImplCopyWith(
-          _$SourceInfoImpl value, $Res Function(_$SourceInfoImpl) then) =
-      __$$SourceInfoImplCopyWithImpl<$Res>;
+    _$SourceInfoImpl value,
+    $Res Function(_$SourceInfoImpl) then,
+  ) = __$$SourceInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String name,
-      String author,
-      String description,
-      ContentRating contentRating,
-      String version,
-      String icon,
-      String websiteBaseURL,
-      String? authorWebsite,
-      String? language,
-      List<Badge>? sourceTags,
-      int? intents});
+  $Res call({
+    String name,
+    String author,
+    String description,
+    ContentRating contentRating,
+    String version,
+    String icon,
+    String websiteBaseURL,
+    String? authorWebsite,
+    String? language,
+    List<Badge>? sourceTags,
+    int? intents,
+  });
 }
 
 /// @nodoc
@@ -2232,8 +2403,9 @@ class __$$SourceInfoImplCopyWithImpl<$Res>
     extends _$SourceInfoCopyWithImpl<$Res, _$SourceInfoImpl>
     implements _$$SourceInfoImplCopyWith<$Res> {
   __$$SourceInfoImplCopyWithImpl(
-      _$SourceInfoImpl _value, $Res Function(_$SourceInfoImpl) _then)
-      : super(_value, _then);
+    _$SourceInfoImpl _value,
+    $Res Function(_$SourceInfoImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of SourceInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -2252,72 +2424,85 @@ class __$$SourceInfoImplCopyWithImpl<$Res>
     Object? sourceTags = freezed,
     Object? intents = freezed,
   }) {
-    return _then(_$SourceInfoImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      contentRating: null == contentRating
-          ? _value.contentRating
-          : contentRating // ignore: cast_nullable_to_non_nullable
-              as ContentRating,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      websiteBaseURL: null == websiteBaseURL
-          ? _value.websiteBaseURL
-          : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-              as String,
-      authorWebsite: freezed == authorWebsite
-          ? _value.authorWebsite
-          : authorWebsite // ignore: cast_nullable_to_non_nullable
-              as String?,
-      language: freezed == language
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String?,
-      sourceTags: freezed == sourceTags
-          ? _value._sourceTags
-          : sourceTags // ignore: cast_nullable_to_non_nullable
-              as List<Badge>?,
-      intents: freezed == intents
-          ? _value.intents
-          : intents // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ));
+    return _then(
+      _$SourceInfoImpl(
+        name:
+            null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String,
+        author:
+            null == author
+                ? _value.author
+                : author // ignore: cast_nullable_to_non_nullable
+                    as String,
+        description:
+            null == description
+                ? _value.description
+                : description // ignore: cast_nullable_to_non_nullable
+                    as String,
+        contentRating:
+            null == contentRating
+                ? _value.contentRating
+                : contentRating // ignore: cast_nullable_to_non_nullable
+                    as ContentRating,
+        version:
+            null == version
+                ? _value.version
+                : version // ignore: cast_nullable_to_non_nullable
+                    as String,
+        icon:
+            null == icon
+                ? _value.icon
+                : icon // ignore: cast_nullable_to_non_nullable
+                    as String,
+        websiteBaseURL:
+            null == websiteBaseURL
+                ? _value.websiteBaseURL
+                : websiteBaseURL // ignore: cast_nullable_to_non_nullable
+                    as String,
+        authorWebsite:
+            freezed == authorWebsite
+                ? _value.authorWebsite
+                : authorWebsite // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        language:
+            freezed == language
+                ? _value.language
+                : language // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        sourceTags:
+            freezed == sourceTags
+                ? _value._sourceTags
+                : sourceTags // ignore: cast_nullable_to_non_nullable
+                    as List<Badge>?,
+        intents:
+            freezed == intents
+                ? _value.intents
+                : intents // ignore: cast_nullable_to_non_nullable
+                    as int?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$SourceInfoImpl extends _SourceInfo {
-  const _$SourceInfoImpl(
-      {required this.name,
-      required this.author,
-      required this.description,
-      required this.contentRating,
-      required this.version,
-      required this.icon,
-      required this.websiteBaseURL,
-      this.authorWebsite,
-      this.language,
-      final List<Badge>? sourceTags,
-      this.intents})
-      : _sourceTags = sourceTags,
-        super._();
+  const _$SourceInfoImpl({
+    required this.name,
+    required this.author,
+    required this.description,
+    required this.contentRating,
+    required this.version,
+    required this.icon,
+    required this.websiteBaseURL,
+    this.authorWebsite,
+    this.language,
+    final List<Badge>? sourceTags,
+    this.intents,
+  }) : _sourceTags = sourceTags,
+       super._();
 
   factory _$SourceInfoImpl.fromJson(Map<String, dynamic> json) =>
       _$$SourceInfoImplFromJson(json);
@@ -2377,26 +2562,29 @@ class _$SourceInfoImpl extends _SourceInfo {
                 other.authorWebsite == authorWebsite) &&
             (identical(other.language, language) ||
                 other.language == language) &&
-            const DeepCollectionEquality()
-                .equals(other._sourceTags, _sourceTags) &&
+            const DeepCollectionEquality().equals(
+              other._sourceTags,
+              _sourceTags,
+            ) &&
             (identical(other.intents, intents) || other.intents == intents));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      author,
-      description,
-      contentRating,
-      version,
-      icon,
-      websiteBaseURL,
-      authorWebsite,
-      language,
-      const DeepCollectionEquality().hash(_sourceTags),
-      intents);
+    runtimeType,
+    name,
+    author,
+    description,
+    contentRating,
+    version,
+    icon,
+    websiteBaseURL,
+    authorWebsite,
+    language,
+    const DeepCollectionEquality().hash(_sourceTags),
+    intents,
+  );
 
   /// Create a copy of SourceInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -2408,25 +2596,24 @@ class _$SourceInfoImpl extends _SourceInfo {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SourceInfoImplToJson(
-      this,
-    );
+    return _$$SourceInfoImplToJson(this);
   }
 }
 
 abstract class _SourceInfo extends SourceInfo {
-  const factory _SourceInfo(
-      {required final String name,
-      required final String author,
-      required final String description,
-      required final ContentRating contentRating,
-      required final String version,
-      required final String icon,
-      required final String websiteBaseURL,
-      final String? authorWebsite,
-      final String? language,
-      final List<Badge>? sourceTags,
-      final int? intents}) = _$SourceInfoImpl;
+  const factory _SourceInfo({
+    required final String name,
+    required final String author,
+    required final String description,
+    required final ContentRating contentRating,
+    required final String version,
+    required final String icon,
+    required final String websiteBaseURL,
+    final String? authorWebsite,
+    final String? language,
+    final List<Badge>? sourceTags,
+    final int? intents,
+  }) = _$SourceInfoImpl;
   const _SourceInfo._() : super._();
 
   factory _SourceInfo.fromJson(Map<String, dynamic> json) =
@@ -2504,20 +2691,22 @@ class _$BuiltWithCopyWithImpl<$Res, $Val extends BuiltWith>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? toolchain = null,
-    Object? types = null,
-  }) {
-    return _then(_value.copyWith(
-      toolchain: null == toolchain
-          ? _value.toolchain
-          : toolchain // ignore: cast_nullable_to_non_nullable
-              as String,
-      types: null == types
-          ? _value.types
-          : types // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  $Res call({Object? toolchain = null, Object? types = null}) {
+    return _then(
+      _value.copyWith(
+            toolchain:
+                null == toolchain
+                    ? _value.toolchain
+                    : toolchain // ignore: cast_nullable_to_non_nullable
+                        as String,
+            types:
+                null == types
+                    ? _value.types
+                    : types // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -2525,8 +2714,9 @@ class _$BuiltWithCopyWithImpl<$Res, $Val extends BuiltWith>
 abstract class _$$BuiltWithImplCopyWith<$Res>
     implements $BuiltWithCopyWith<$Res> {
   factory _$$BuiltWithImplCopyWith(
-          _$BuiltWithImpl value, $Res Function(_$BuiltWithImpl) then) =
-      __$$BuiltWithImplCopyWithImpl<$Res>;
+    _$BuiltWithImpl value,
+    $Res Function(_$BuiltWithImpl) then,
+  ) = __$$BuiltWithImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String toolchain, String types});
@@ -2537,27 +2727,29 @@ class __$$BuiltWithImplCopyWithImpl<$Res>
     extends _$BuiltWithCopyWithImpl<$Res, _$BuiltWithImpl>
     implements _$$BuiltWithImplCopyWith<$Res> {
   __$$BuiltWithImplCopyWithImpl(
-      _$BuiltWithImpl _value, $Res Function(_$BuiltWithImpl) _then)
-      : super(_value, _then);
+    _$BuiltWithImpl _value,
+    $Res Function(_$BuiltWithImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of BuiltWith
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? toolchain = null,
-    Object? types = null,
-  }) {
-    return _then(_$BuiltWithImpl(
-      toolchain: null == toolchain
-          ? _value.toolchain
-          : toolchain // ignore: cast_nullable_to_non_nullable
-              as String,
-      types: null == types
-          ? _value.types
-          : types // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? toolchain = null, Object? types = null}) {
+    return _then(
+      _$BuiltWithImpl(
+        toolchain:
+            null == toolchain
+                ? _value.toolchain
+                : toolchain // ignore: cast_nullable_to_non_nullable
+                    as String,
+        types:
+            null == types
+                ? _value.types
+                : types // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
@@ -2603,16 +2795,15 @@ class _$BuiltWithImpl implements _BuiltWith {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$BuiltWithImplToJson(
-      this,
-    );
+    return _$$BuiltWithImplToJson(this);
   }
 }
 
 abstract class _BuiltWith implements BuiltWith {
-  const factory _BuiltWith(
-      {required final String toolchain,
-      required final String types}) = _$BuiltWithImpl;
+  const factory _BuiltWith({
+    required final String toolchain,
+    required final String types,
+  }) = _$BuiltWithImpl;
 
   factory _BuiltWith.fromJson(Map<String, dynamic> json) =
       _$BuiltWithImpl.fromJson;
@@ -2653,11 +2844,15 @@ mixin _$Versioning {
 /// @nodoc
 abstract class $VersioningCopyWith<$Res> {
   factory $VersioningCopyWith(
-          Versioning value, $Res Function(Versioning) then) =
-      _$VersioningCopyWithImpl<$Res, Versioning>;
+    Versioning value,
+    $Res Function(Versioning) then,
+  ) = _$VersioningCopyWithImpl<$Res, Versioning>;
   @useResult
-  $Res call(
-      {String buildTime, List<SourceVersion> sources, BuiltWith builtWith});
+  $Res call({
+    String buildTime,
+    List<SourceVersion> sources,
+    BuiltWith builtWith,
+  });
 
   $BuiltWithCopyWith<$Res> get builtWith;
 }
@@ -2681,20 +2876,26 @@ class _$VersioningCopyWithImpl<$Res, $Val extends Versioning>
     Object? sources = null,
     Object? builtWith = null,
   }) {
-    return _then(_value.copyWith(
-      buildTime: null == buildTime
-          ? _value.buildTime
-          : buildTime // ignore: cast_nullable_to_non_nullable
-              as String,
-      sources: null == sources
-          ? _value.sources
-          : sources // ignore: cast_nullable_to_non_nullable
-              as List<SourceVersion>,
-      builtWith: null == builtWith
-          ? _value.builtWith
-          : builtWith // ignore: cast_nullable_to_non_nullable
-              as BuiltWith,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            buildTime:
+                null == buildTime
+                    ? _value.buildTime
+                    : buildTime // ignore: cast_nullable_to_non_nullable
+                        as String,
+            sources:
+                null == sources
+                    ? _value.sources
+                    : sources // ignore: cast_nullable_to_non_nullable
+                        as List<SourceVersion>,
+            builtWith:
+                null == builtWith
+                    ? _value.builtWith
+                    : builtWith // ignore: cast_nullable_to_non_nullable
+                        as BuiltWith,
+          )
+          as $Val,
+    );
   }
 
   /// Create a copy of Versioning
@@ -2712,12 +2913,16 @@ class _$VersioningCopyWithImpl<$Res, $Val extends Versioning>
 abstract class _$$VersioningImplCopyWith<$Res>
     implements $VersioningCopyWith<$Res> {
   factory _$$VersioningImplCopyWith(
-          _$VersioningImpl value, $Res Function(_$VersioningImpl) then) =
-      __$$VersioningImplCopyWithImpl<$Res>;
+    _$VersioningImpl value,
+    $Res Function(_$VersioningImpl) then,
+  ) = __$$VersioningImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String buildTime, List<SourceVersion> sources, BuiltWith builtWith});
+  $Res call({
+    String buildTime,
+    List<SourceVersion> sources,
+    BuiltWith builtWith,
+  });
 
   @override
   $BuiltWithCopyWith<$Res> get builtWith;
@@ -2728,8 +2933,9 @@ class __$$VersioningImplCopyWithImpl<$Res>
     extends _$VersioningCopyWithImpl<$Res, _$VersioningImpl>
     implements _$$VersioningImplCopyWith<$Res> {
   __$$VersioningImplCopyWithImpl(
-      _$VersioningImpl _value, $Res Function(_$VersioningImpl) _then)
-      : super(_value, _then);
+    _$VersioningImpl _value,
+    $Res Function(_$VersioningImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of Versioning
   /// with the given fields replaced by the non-null parameter values.
@@ -2740,31 +2946,36 @@ class __$$VersioningImplCopyWithImpl<$Res>
     Object? sources = null,
     Object? builtWith = null,
   }) {
-    return _then(_$VersioningImpl(
-      buildTime: null == buildTime
-          ? _value.buildTime
-          : buildTime // ignore: cast_nullable_to_non_nullable
-              as String,
-      sources: null == sources
-          ? _value._sources
-          : sources // ignore: cast_nullable_to_non_nullable
-              as List<SourceVersion>,
-      builtWith: null == builtWith
-          ? _value.builtWith
-          : builtWith // ignore: cast_nullable_to_non_nullable
-              as BuiltWith,
-    ));
+    return _then(
+      _$VersioningImpl(
+        buildTime:
+            null == buildTime
+                ? _value.buildTime
+                : buildTime // ignore: cast_nullable_to_non_nullable
+                    as String,
+        sources:
+            null == sources
+                ? _value._sources
+                : sources // ignore: cast_nullable_to_non_nullable
+                    as List<SourceVersion>,
+        builtWith:
+            null == builtWith
+                ? _value.builtWith
+                : builtWith // ignore: cast_nullable_to_non_nullable
+                    as BuiltWith,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$VersioningImpl implements _Versioning {
-  const _$VersioningImpl(
-      {required this.buildTime,
-      required final List<SourceVersion> sources,
-      required this.builtWith})
-      : _sources = sources;
+  const _$VersioningImpl({
+    required this.buildTime,
+    required final List<SourceVersion> sources,
+    required this.builtWith,
+  }) : _sources = sources;
 
   factory _$VersioningImpl.fromJson(Map<String, dynamic> json) =>
       _$$VersioningImplFromJson(json);
@@ -2801,8 +3012,12 @@ class _$VersioningImpl implements _Versioning {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, buildTime,
-      const DeepCollectionEquality().hash(_sources), builtWith);
+  int get hashCode => Object.hash(
+    runtimeType,
+    buildTime,
+    const DeepCollectionEquality().hash(_sources),
+    builtWith,
+  );
 
   /// Create a copy of Versioning
   /// with the given fields replaced by the non-null parameter values.
@@ -2814,17 +3029,16 @@ class _$VersioningImpl implements _Versioning {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$VersioningImplToJson(
-      this,
-    );
+    return _$$VersioningImplToJson(this);
   }
 }
 
 abstract class _Versioning implements Versioning {
-  const factory _Versioning(
-      {required final String buildTime,
-      required final List<SourceVersion> sources,
-      required final BuiltWith builtWith}) = _$VersioningImpl;
+  const factory _Versioning({
+    required final String buildTime,
+    required final List<SourceVersion> sources,
+    required final BuiltWith builtWith,
+  }) = _$VersioningImpl;
 
   factory _Versioning.fromJson(Map<String, dynamic> json) =
       _$VersioningImpl.fromJson;
@@ -2885,20 +3099,22 @@ class _$RepoInfoCopyWithImpl<$Res, $Val extends RepoInfo>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? name = null,
-    Object? url = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  $Res call({Object? name = null, Object? url = null}) {
+    return _then(
+      _value.copyWith(
+            name:
+                null == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String,
+            url:
+                null == url
+                    ? _value.url
+                    : url // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -2906,8 +3122,9 @@ class _$RepoInfoCopyWithImpl<$Res, $Val extends RepoInfo>
 abstract class _$$RepoInfoImplCopyWith<$Res>
     implements $RepoInfoCopyWith<$Res> {
   factory _$$RepoInfoImplCopyWith(
-          _$RepoInfoImpl value, $Res Function(_$RepoInfoImpl) then) =
-      __$$RepoInfoImplCopyWithImpl<$Res>;
+    _$RepoInfoImpl value,
+    $Res Function(_$RepoInfoImpl) then,
+  ) = __$$RepoInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String name, String url});
@@ -2918,27 +3135,29 @@ class __$$RepoInfoImplCopyWithImpl<$Res>
     extends _$RepoInfoCopyWithImpl<$Res, _$RepoInfoImpl>
     implements _$$RepoInfoImplCopyWith<$Res> {
   __$$RepoInfoImplCopyWithImpl(
-      _$RepoInfoImpl _value, $Res Function(_$RepoInfoImpl) _then)
-      : super(_value, _then);
+    _$RepoInfoImpl _value,
+    $Res Function(_$RepoInfoImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of RepoInfo
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? name = null,
-    Object? url = null,
-  }) {
-    return _then(_$RepoInfoImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? name = null, Object? url = null}) {
+    return _then(
+      _$RepoInfoImpl(
+        name:
+            null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String,
+        url:
+            null == url
+                ? _value.url
+                : url // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
@@ -2983,15 +3202,15 @@ class _$RepoInfoImpl implements _RepoInfo {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RepoInfoImplToJson(
-      this,
-    );
+    return _$$RepoInfoImplToJson(this);
   }
 }
 
 abstract class _RepoInfo implements RepoInfo {
-  const factory _RepoInfo(
-      {required final String name, required final String url}) = _$RepoInfoImpl;
+  const factory _RepoInfo({
+    required final String name,
+    required final String url,
+  }) = _$RepoInfoImpl;
 
   factory _RepoInfo.fromJson(Map<String, dynamic> json) =
       _$RepoInfoImpl.fromJson;
@@ -3033,8 +3252,9 @@ mixin _$PartialSourceManga {
 /// @nodoc
 abstract class $PartialSourceMangaCopyWith<$Res> {
   factory $PartialSourceMangaCopyWith(
-          PartialSourceManga value, $Res Function(PartialSourceManga) then) =
-      _$PartialSourceMangaCopyWithImpl<$Res, PartialSourceManga>;
+    PartialSourceManga value,
+    $Res Function(PartialSourceManga) then,
+  ) = _$PartialSourceMangaCopyWithImpl<$Res, PartialSourceManga>;
   @useResult
   $Res call({String mangaId, String image, String title, String? subtitle});
 }
@@ -3059,33 +3279,41 @@ class _$PartialSourceMangaCopyWithImpl<$Res, $Val extends PartialSourceManga>
     Object? title = null,
     Object? subtitle = freezed,
   }) {
-    return _then(_value.copyWith(
-      mangaId: null == mangaId
-          ? _value.mangaId
-          : mangaId // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      subtitle: freezed == subtitle
-          ? _value.subtitle
-          : subtitle // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            mangaId:
+                null == mangaId
+                    ? _value.mangaId
+                    : mangaId // ignore: cast_nullable_to_non_nullable
+                        as String,
+            image:
+                null == image
+                    ? _value.image
+                    : image // ignore: cast_nullable_to_non_nullable
+                        as String,
+            title:
+                null == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String,
+            subtitle:
+                freezed == subtitle
+                    ? _value.subtitle
+                    : subtitle // ignore: cast_nullable_to_non_nullable
+                        as String?,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$PartialSourceMangaImplCopyWith<$Res>
     implements $PartialSourceMangaCopyWith<$Res> {
-  factory _$$PartialSourceMangaImplCopyWith(_$PartialSourceMangaImpl value,
-          $Res Function(_$PartialSourceMangaImpl) then) =
-      __$$PartialSourceMangaImplCopyWithImpl<$Res>;
+  factory _$$PartialSourceMangaImplCopyWith(
+    _$PartialSourceMangaImpl value,
+    $Res Function(_$PartialSourceMangaImpl) then,
+  ) = __$$PartialSourceMangaImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String mangaId, String image, String title, String? subtitle});
@@ -3095,9 +3323,10 @@ abstract class _$$PartialSourceMangaImplCopyWith<$Res>
 class __$$PartialSourceMangaImplCopyWithImpl<$Res>
     extends _$PartialSourceMangaCopyWithImpl<$Res, _$PartialSourceMangaImpl>
     implements _$$PartialSourceMangaImplCopyWith<$Res> {
-  __$$PartialSourceMangaImplCopyWithImpl(_$PartialSourceMangaImpl _value,
-      $Res Function(_$PartialSourceMangaImpl) _then)
-      : super(_value, _then);
+  __$$PartialSourceMangaImplCopyWithImpl(
+    _$PartialSourceMangaImpl _value,
+    $Res Function(_$PartialSourceMangaImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of PartialSourceManga
   /// with the given fields replaced by the non-null parameter values.
@@ -3109,35 +3338,42 @@ class __$$PartialSourceMangaImplCopyWithImpl<$Res>
     Object? title = null,
     Object? subtitle = freezed,
   }) {
-    return _then(_$PartialSourceMangaImpl(
-      mangaId: null == mangaId
-          ? _value.mangaId
-          : mangaId // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      subtitle: freezed == subtitle
-          ? _value.subtitle
-          : subtitle // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    return _then(
+      _$PartialSourceMangaImpl(
+        mangaId:
+            null == mangaId
+                ? _value.mangaId
+                : mangaId // ignore: cast_nullable_to_non_nullable
+                    as String,
+        image:
+            null == image
+                ? _value.image
+                : image // ignore: cast_nullable_to_non_nullable
+                    as String,
+        title:
+            null == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String,
+        subtitle:
+            freezed == subtitle
+                ? _value.subtitle
+                : subtitle // ignore: cast_nullable_to_non_nullable
+                    as String?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$PartialSourceMangaImpl implements _PartialSourceManga {
-  const _$PartialSourceMangaImpl(
-      {required this.mangaId,
-      required this.image,
-      required this.title,
-      this.subtitle});
+  const _$PartialSourceMangaImpl({
+    required this.mangaId,
+    required this.image,
+    required this.title,
+    this.subtitle,
+  });
 
   factory _$PartialSourceMangaImpl.fromJson(Map<String, dynamic> json) =>
       _$$PartialSourceMangaImplFromJson(json);
@@ -3179,22 +3415,23 @@ class _$PartialSourceMangaImpl implements _PartialSourceManga {
   @pragma('vm:prefer-inline')
   _$$PartialSourceMangaImplCopyWith<_$PartialSourceMangaImpl> get copyWith =>
       __$$PartialSourceMangaImplCopyWithImpl<_$PartialSourceMangaImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PartialSourceMangaImplToJson(
-      this,
-    );
+    return _$$PartialSourceMangaImplToJson(this);
   }
 }
 
 abstract class _PartialSourceManga implements PartialSourceManga {
-  const factory _PartialSourceManga(
-      {required final String mangaId,
-      required final String image,
-      required final String title,
-      final String? subtitle}) = _$PartialSourceMangaImpl;
+  const factory _PartialSourceManga({
+    required final String mangaId,
+    required final String image,
+    required final String title,
+    final String? subtitle,
+  }) = _$PartialSourceMangaImpl;
 
   factory _PartialSourceManga.fromJson(Map<String, dynamic> json) =
       _$PartialSourceMangaImpl.fromJson;
@@ -3238,8 +3475,9 @@ mixin _$PagedResults {
 /// @nodoc
 abstract class $PagedResultsCopyWith<$Res> {
   factory $PagedResultsCopyWith(
-          PagedResults value, $Res Function(PagedResults) then) =
-      _$PagedResultsCopyWithImpl<$Res, PagedResults>;
+    PagedResults value,
+    $Res Function(PagedResults) then,
+  ) = _$PagedResultsCopyWithImpl<$Res, PagedResults>;
   @useResult
   $Res call({List<PartialSourceManga>? results, dynamic metadata});
 }
@@ -3258,20 +3496,22 @@ class _$PagedResultsCopyWithImpl<$Res, $Val extends PagedResults>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? results = freezed,
-    Object? metadata = freezed,
-  }) {
-    return _then(_value.copyWith(
-      results: freezed == results
-          ? _value.results
-          : results // ignore: cast_nullable_to_non_nullable
-              as List<PartialSourceManga>?,
-      metadata: freezed == metadata
-          ? _value.metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as dynamic,
-    ) as $Val);
+  $Res call({Object? results = freezed, Object? metadata = freezed}) {
+    return _then(
+      _value.copyWith(
+            results:
+                freezed == results
+                    ? _value.results
+                    : results // ignore: cast_nullable_to_non_nullable
+                        as List<PartialSourceManga>?,
+            metadata:
+                freezed == metadata
+                    ? _value.metadata
+                    : metadata // ignore: cast_nullable_to_non_nullable
+                        as dynamic,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -3279,8 +3519,9 @@ class _$PagedResultsCopyWithImpl<$Res, $Val extends PagedResults>
 abstract class _$$PagedResultsImplCopyWith<$Res>
     implements $PagedResultsCopyWith<$Res> {
   factory _$$PagedResultsImplCopyWith(
-          _$PagedResultsImpl value, $Res Function(_$PagedResultsImpl) then) =
-      __$$PagedResultsImplCopyWithImpl<$Res>;
+    _$PagedResultsImpl value,
+    $Res Function(_$PagedResultsImpl) then,
+  ) = __$$PagedResultsImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<PartialSourceManga>? results, dynamic metadata});
@@ -3291,36 +3532,39 @@ class __$$PagedResultsImplCopyWithImpl<$Res>
     extends _$PagedResultsCopyWithImpl<$Res, _$PagedResultsImpl>
     implements _$$PagedResultsImplCopyWith<$Res> {
   __$$PagedResultsImplCopyWithImpl(
-      _$PagedResultsImpl _value, $Res Function(_$PagedResultsImpl) _then)
-      : super(_value, _then);
+    _$PagedResultsImpl _value,
+    $Res Function(_$PagedResultsImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of PagedResults
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? results = freezed,
-    Object? metadata = freezed,
-  }) {
-    return _then(_$PagedResultsImpl(
-      results: freezed == results
-          ? _value._results
-          : results // ignore: cast_nullable_to_non_nullable
-              as List<PartialSourceManga>?,
-      metadata: freezed == metadata
-          ? _value.metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as dynamic,
-    ));
+  $Res call({Object? results = freezed, Object? metadata = freezed}) {
+    return _then(
+      _$PagedResultsImpl(
+        results:
+            freezed == results
+                ? _value._results
+                : results // ignore: cast_nullable_to_non_nullable
+                    as List<PartialSourceManga>?,
+        metadata:
+            freezed == metadata
+                ? _value.metadata
+                : metadata // ignore: cast_nullable_to_non_nullable
+                    as dynamic,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$PagedResultsImpl implements _PagedResults {
-  const _$PagedResultsImpl(
-      {final List<PartialSourceManga>? results, this.metadata})
-      : _results = results;
+  const _$PagedResultsImpl({
+    final List<PartialSourceManga>? results,
+    this.metadata,
+  }) : _results = results;
 
   factory _$PagedResultsImpl.fromJson(Map<String, dynamic> json) =>
       _$$PagedResultsImplFromJson(json);
@@ -3355,9 +3599,10 @@ class _$PagedResultsImpl implements _PagedResults {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_results),
-      const DeepCollectionEquality().hash(metadata));
+    runtimeType,
+    const DeepCollectionEquality().hash(_results),
+    const DeepCollectionEquality().hash(metadata),
+  );
 
   /// Create a copy of PagedResults
   /// with the given fields replaced by the non-null parameter values.
@@ -3369,16 +3614,15 @@ class _$PagedResultsImpl implements _PagedResults {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PagedResultsImplToJson(
-      this,
-    );
+    return _$$PagedResultsImplToJson(this);
   }
 }
 
 abstract class _PagedResults implements PagedResults {
-  const factory _PagedResults(
-      {final List<PartialSourceManga>? results,
-      final dynamic metadata}) = _$PagedResultsImpl;
+  const factory _PagedResults({
+    final List<PartialSourceManga>? results,
+    final dynamic metadata,
+  }) = _$PagedResultsImpl;
 
   factory _PagedResults.fromJson(Map<String, dynamic> json) =
       _$PagedResultsImpl.fromJson;
@@ -3429,18 +3673,19 @@ abstract class $MangaInfoCopyWith<$Res> {
   factory $MangaInfoCopyWith(MangaInfo value, $Res Function(MangaInfo) then) =
       _$MangaInfoCopyWithImpl<$Res, MangaInfo>;
   @useResult
-  $Res call(
-      {String image,
-      String? artist,
-      String? author,
-      String desc,
-      String status,
-      bool? hentai,
-      List<String> titles,
-      String? banner,
-      num? rating,
-      List<TagSection>? tags,
-      List<String>? covers});
+  $Res call({
+    String image,
+    String? artist,
+    String? author,
+    String desc,
+    String status,
+    bool? hentai,
+    List<String> titles,
+    String? banner,
+    num? rating,
+    List<TagSection>? tags,
+    List<String>? covers,
+  });
 }
 
 /// @nodoc
@@ -3470,52 +3715,66 @@ class _$MangaInfoCopyWithImpl<$Res, $Val extends MangaInfo>
     Object? tags = freezed,
     Object? covers = freezed,
   }) {
-    return _then(_value.copyWith(
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      artist: freezed == artist
-          ? _value.artist
-          : artist // ignore: cast_nullable_to_non_nullable
-              as String?,
-      author: freezed == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String?,
-      desc: null == desc
-          ? _value.desc
-          : desc // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      hentai: freezed == hentai
-          ? _value.hentai
-          : hentai // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      titles: null == titles
-          ? _value.titles
-          : titles // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      banner: freezed == banner
-          ? _value.banner
-          : banner // ignore: cast_nullable_to_non_nullable
-              as String?,
-      rating: freezed == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as num?,
-      tags: freezed == tags
-          ? _value.tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<TagSection>?,
-      covers: freezed == covers
-          ? _value.covers
-          : covers // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            image:
+                null == image
+                    ? _value.image
+                    : image // ignore: cast_nullable_to_non_nullable
+                        as String,
+            artist:
+                freezed == artist
+                    ? _value.artist
+                    : artist // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            author:
+                freezed == author
+                    ? _value.author
+                    : author // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            desc:
+                null == desc
+                    ? _value.desc
+                    : desc // ignore: cast_nullable_to_non_nullable
+                        as String,
+            status:
+                null == status
+                    ? _value.status
+                    : status // ignore: cast_nullable_to_non_nullable
+                        as String,
+            hentai:
+                freezed == hentai
+                    ? _value.hentai
+                    : hentai // ignore: cast_nullable_to_non_nullable
+                        as bool?,
+            titles:
+                null == titles
+                    ? _value.titles
+                    : titles // ignore: cast_nullable_to_non_nullable
+                        as List<String>,
+            banner:
+                freezed == banner
+                    ? _value.banner
+                    : banner // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            rating:
+                freezed == rating
+                    ? _value.rating
+                    : rating // ignore: cast_nullable_to_non_nullable
+                        as num?,
+            tags:
+                freezed == tags
+                    ? _value.tags
+                    : tags // ignore: cast_nullable_to_non_nullable
+                        as List<TagSection>?,
+            covers:
+                freezed == covers
+                    ? _value.covers
+                    : covers // ignore: cast_nullable_to_non_nullable
+                        as List<String>?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -3523,22 +3782,24 @@ class _$MangaInfoCopyWithImpl<$Res, $Val extends MangaInfo>
 abstract class _$$MangaInfoImplCopyWith<$Res>
     implements $MangaInfoCopyWith<$Res> {
   factory _$$MangaInfoImplCopyWith(
-          _$MangaInfoImpl value, $Res Function(_$MangaInfoImpl) then) =
-      __$$MangaInfoImplCopyWithImpl<$Res>;
+    _$MangaInfoImpl value,
+    $Res Function(_$MangaInfoImpl) then,
+  ) = __$$MangaInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String image,
-      String? artist,
-      String? author,
-      String desc,
-      String status,
-      bool? hentai,
-      List<String> titles,
-      String? banner,
-      num? rating,
-      List<TagSection>? tags,
-      List<String>? covers});
+  $Res call({
+    String image,
+    String? artist,
+    String? author,
+    String desc,
+    String status,
+    bool? hentai,
+    List<String> titles,
+    String? banner,
+    num? rating,
+    List<TagSection>? tags,
+    List<String>? covers,
+  });
 }
 
 /// @nodoc
@@ -3546,8 +3807,9 @@ class __$$MangaInfoImplCopyWithImpl<$Res>
     extends _$MangaInfoCopyWithImpl<$Res, _$MangaInfoImpl>
     implements _$$MangaInfoImplCopyWith<$Res> {
   __$$MangaInfoImplCopyWithImpl(
-      _$MangaInfoImpl _value, $Res Function(_$MangaInfoImpl) _then)
-      : super(_value, _then);
+    _$MangaInfoImpl _value,
+    $Res Function(_$MangaInfoImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of MangaInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -3566,73 +3828,86 @@ class __$$MangaInfoImplCopyWithImpl<$Res>
     Object? tags = freezed,
     Object? covers = freezed,
   }) {
-    return _then(_$MangaInfoImpl(
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      artist: freezed == artist
-          ? _value.artist
-          : artist // ignore: cast_nullable_to_non_nullable
-              as String?,
-      author: freezed == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String?,
-      desc: null == desc
-          ? _value.desc
-          : desc // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      hentai: freezed == hentai
-          ? _value.hentai
-          : hentai // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      titles: null == titles
-          ? _value._titles
-          : titles // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      banner: freezed == banner
-          ? _value.banner
-          : banner // ignore: cast_nullable_to_non_nullable
-              as String?,
-      rating: freezed == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as num?,
-      tags: freezed == tags
-          ? _value._tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<TagSection>?,
-      covers: freezed == covers
-          ? _value._covers
-          : covers // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
-    ));
+    return _then(
+      _$MangaInfoImpl(
+        image:
+            null == image
+                ? _value.image
+                : image // ignore: cast_nullable_to_non_nullable
+                    as String,
+        artist:
+            freezed == artist
+                ? _value.artist
+                : artist // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        author:
+            freezed == author
+                ? _value.author
+                : author // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        desc:
+            null == desc
+                ? _value.desc
+                : desc // ignore: cast_nullable_to_non_nullable
+                    as String,
+        status:
+            null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                    as String,
+        hentai:
+            freezed == hentai
+                ? _value.hentai
+                : hentai // ignore: cast_nullable_to_non_nullable
+                    as bool?,
+        titles:
+            null == titles
+                ? _value._titles
+                : titles // ignore: cast_nullable_to_non_nullable
+                    as List<String>,
+        banner:
+            freezed == banner
+                ? _value.banner
+                : banner // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        rating:
+            freezed == rating
+                ? _value.rating
+                : rating // ignore: cast_nullable_to_non_nullable
+                    as num?,
+        tags:
+            freezed == tags
+                ? _value._tags
+                : tags // ignore: cast_nullable_to_non_nullable
+                    as List<TagSection>?,
+        covers:
+            freezed == covers
+                ? _value._covers
+                : covers // ignore: cast_nullable_to_non_nullable
+                    as List<String>?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$MangaInfoImpl implements _MangaInfo {
-  const _$MangaInfoImpl(
-      {required this.image,
-      this.artist,
-      this.author,
-      required this.desc,
-      required this.status,
-      this.hentai,
-      required final List<String> titles,
-      this.banner,
-      this.rating,
-      final List<TagSection>? tags,
-      final List<String>? covers})
-      : _titles = titles,
-        _tags = tags,
-        _covers = covers;
+  const _$MangaInfoImpl({
+    required this.image,
+    this.artist,
+    this.author,
+    required this.desc,
+    required this.status,
+    this.hentai,
+    required final List<String> titles,
+    this.banner,
+    this.rating,
+    final List<TagSection>? tags,
+    final List<String>? covers,
+  }) : _titles = titles,
+       _tags = tags,
+       _covers = covers;
 
   factory _$MangaInfoImpl.fromJson(Map<String, dynamic> json) =>
       _$$MangaInfoImplFromJson(json);
@@ -3707,18 +3982,19 @@ class _$MangaInfoImpl implements _MangaInfo {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      image,
-      artist,
-      author,
-      desc,
-      status,
-      hentai,
-      const DeepCollectionEquality().hash(_titles),
-      banner,
-      rating,
-      const DeepCollectionEquality().hash(_tags),
-      const DeepCollectionEquality().hash(_covers));
+    runtimeType,
+    image,
+    artist,
+    author,
+    desc,
+    status,
+    hentai,
+    const DeepCollectionEquality().hash(_titles),
+    banner,
+    rating,
+    const DeepCollectionEquality().hash(_tags),
+    const DeepCollectionEquality().hash(_covers),
+  );
 
   /// Create a copy of MangaInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -3730,25 +4006,24 @@ class _$MangaInfoImpl implements _MangaInfo {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MangaInfoImplToJson(
-      this,
-    );
+    return _$$MangaInfoImplToJson(this);
   }
 }
 
 abstract class _MangaInfo implements MangaInfo {
-  const factory _MangaInfo(
-      {required final String image,
-      final String? artist,
-      final String? author,
-      required final String desc,
-      required final String status,
-      final bool? hentai,
-      required final List<String> titles,
-      final String? banner,
-      final num? rating,
-      final List<TagSection>? tags,
-      final List<String>? covers}) = _$MangaInfoImpl;
+  const factory _MangaInfo({
+    required final String image,
+    final String? artist,
+    final String? author,
+    required final String desc,
+    required final String status,
+    final bool? hentai,
+    required final List<String> titles,
+    final String? banner,
+    final num? rating,
+    final List<TagSection>? tags,
+    final List<String>? covers,
+  }) = _$MangaInfoImpl;
 
   factory _MangaInfo.fromJson(Map<String, dynamic> json) =
       _$MangaInfoImpl.fromJson;
@@ -3823,20 +4098,22 @@ class _$TagCopyWithImpl<$Res, $Val extends Tag> implements $TagCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  $Res call({Object? id = null, Object? label = null}) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            label:
+                null == label
+                    ? _value.label
+                    : label // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -3853,26 +4130,27 @@ abstract class _$$TagImplCopyWith<$Res> implements $TagCopyWith<$Res> {
 class __$$TagImplCopyWithImpl<$Res> extends _$TagCopyWithImpl<$Res, _$TagImpl>
     implements _$$TagImplCopyWith<$Res> {
   __$$TagImplCopyWithImpl(_$TagImpl _value, $Res Function(_$TagImpl) _then)
-      : super(_value, _then);
+    : super(_value, _then);
 
   /// Create a copy of Tag
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-  }) {
-    return _then(_$TagImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? id = null, Object? label = null}) {
+    return _then(
+      _$TagImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
@@ -3917,9 +4195,7 @@ class _$TagImpl implements _Tag {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$TagImplToJson(
-      this,
-    );
+    return _$$TagImplToJson(this);
   }
 }
 
@@ -3965,8 +4241,9 @@ mixin _$TagSection {
 /// @nodoc
 abstract class $TagSectionCopyWith<$Res> {
   factory $TagSectionCopyWith(
-          TagSection value, $Res Function(TagSection) then) =
-      _$TagSectionCopyWithImpl<$Res, TagSection>;
+    TagSection value,
+    $Res Function(TagSection) then,
+  ) = _$TagSectionCopyWithImpl<$Res, TagSection>;
   @useResult
   $Res call({String id, String label, List<Tag> tags});
 }
@@ -3985,25 +4262,27 @@ class _$TagSectionCopyWithImpl<$Res, $Val extends TagSection>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-    Object? tags = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      tags: null == tags
-          ? _value.tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<Tag>,
-    ) as $Val);
+  $Res call({Object? id = null, Object? label = null, Object? tags = null}) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            label:
+                null == label
+                    ? _value.label
+                    : label // ignore: cast_nullable_to_non_nullable
+                        as String,
+            tags:
+                null == tags
+                    ? _value.tags
+                    : tags // ignore: cast_nullable_to_non_nullable
+                        as List<Tag>,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -4011,8 +4290,9 @@ class _$TagSectionCopyWithImpl<$Res, $Val extends TagSection>
 abstract class _$$TagSectionImplCopyWith<$Res>
     implements $TagSectionCopyWith<$Res> {
   factory _$$TagSectionImplCopyWith(
-          _$TagSectionImpl value, $Res Function(_$TagSectionImpl) then) =
-      __$$TagSectionImplCopyWithImpl<$Res>;
+    _$TagSectionImpl value,
+    $Res Function(_$TagSectionImpl) then,
+  ) = __$$TagSectionImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, String label, List<Tag> tags});
@@ -4023,41 +4303,45 @@ class __$$TagSectionImplCopyWithImpl<$Res>
     extends _$TagSectionCopyWithImpl<$Res, _$TagSectionImpl>
     implements _$$TagSectionImplCopyWith<$Res> {
   __$$TagSectionImplCopyWithImpl(
-      _$TagSectionImpl _value, $Res Function(_$TagSectionImpl) _then)
-      : super(_value, _then);
+    _$TagSectionImpl _value,
+    $Res Function(_$TagSectionImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of TagSection
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-    Object? tags = null,
-  }) {
-    return _then(_$TagSectionImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      tags: null == tags
-          ? _value._tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<Tag>,
-    ));
+  $Res call({Object? id = null, Object? label = null, Object? tags = null}) {
+    return _then(
+      _$TagSectionImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+        tags:
+            null == tags
+                ? _value._tags
+                : tags // ignore: cast_nullable_to_non_nullable
+                    as List<Tag>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$TagSectionImpl implements _TagSection {
-  const _$TagSectionImpl(
-      {required this.id, required this.label, required final List<Tag> tags})
-      : _tags = tags;
+  const _$TagSectionImpl({
+    required this.id,
+    required this.label,
+    required final List<Tag> tags,
+  }) : _tags = tags;
 
   factory _$TagSectionImpl.fromJson(Map<String, dynamic> json) =>
       _$$TagSectionImplFromJson(json);
@@ -4092,7 +4376,11 @@ class _$TagSectionImpl implements _TagSection {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, label, const DeepCollectionEquality().hash(_tags));
+    runtimeType,
+    id,
+    label,
+    const DeepCollectionEquality().hash(_tags),
+  );
 
   /// Create a copy of TagSection
   /// with the given fields replaced by the non-null parameter values.
@@ -4104,17 +4392,16 @@ class _$TagSectionImpl implements _TagSection {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$TagSectionImplToJson(
-      this,
-    );
+    return _$$TagSectionImplToJson(this);
   }
 }
 
 abstract class _TagSection implements TagSection {
-  const factory _TagSection(
-      {required final String id,
-      required final String label,
-      required final List<Tag> tags}) = _$TagSectionImpl;
+  const factory _TagSection({
+    required final String id,
+    required final String label,
+    required final List<Tag> tags,
+  }) = _$TagSectionImpl;
 
   factory _TagSection.fromJson(Map<String, dynamic> json) =
       _$TagSectionImpl.fromJson;
@@ -4156,8 +4443,9 @@ mixin _$SourceManga {
 /// @nodoc
 abstract class $SourceMangaCopyWith<$Res> {
   factory $SourceMangaCopyWith(
-          SourceManga value, $Res Function(SourceManga) then) =
-      _$SourceMangaCopyWithImpl<$Res, SourceManga>;
+    SourceManga value,
+    $Res Function(SourceManga) then,
+  ) = _$SourceMangaCopyWithImpl<$Res, SourceManga>;
   @useResult
   $Res call({String id, MangaInfo mangaInfo});
 
@@ -4178,20 +4466,22 @@ class _$SourceMangaCopyWithImpl<$Res, $Val extends SourceManga>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? mangaInfo = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      mangaInfo: null == mangaInfo
-          ? _value.mangaInfo
-          : mangaInfo // ignore: cast_nullable_to_non_nullable
-              as MangaInfo,
-    ) as $Val);
+  $Res call({Object? id = null, Object? mangaInfo = null}) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            mangaInfo:
+                null == mangaInfo
+                    ? _value.mangaInfo
+                    : mangaInfo // ignore: cast_nullable_to_non_nullable
+                        as MangaInfo,
+          )
+          as $Val,
+    );
   }
 
   /// Create a copy of SourceManga
@@ -4209,8 +4499,9 @@ class _$SourceMangaCopyWithImpl<$Res, $Val extends SourceManga>
 abstract class _$$SourceMangaImplCopyWith<$Res>
     implements $SourceMangaCopyWith<$Res> {
   factory _$$SourceMangaImplCopyWith(
-          _$SourceMangaImpl value, $Res Function(_$SourceMangaImpl) then) =
-      __$$SourceMangaImplCopyWithImpl<$Res>;
+    _$SourceMangaImpl value,
+    $Res Function(_$SourceMangaImpl) then,
+  ) = __$$SourceMangaImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, MangaInfo mangaInfo});
@@ -4224,27 +4515,29 @@ class __$$SourceMangaImplCopyWithImpl<$Res>
     extends _$SourceMangaCopyWithImpl<$Res, _$SourceMangaImpl>
     implements _$$SourceMangaImplCopyWith<$Res> {
   __$$SourceMangaImplCopyWithImpl(
-      _$SourceMangaImpl _value, $Res Function(_$SourceMangaImpl) _then)
-      : super(_value, _then);
+    _$SourceMangaImpl _value,
+    $Res Function(_$SourceMangaImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of SourceManga
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? mangaInfo = null,
-  }) {
-    return _then(_$SourceMangaImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      mangaInfo: null == mangaInfo
-          ? _value.mangaInfo
-          : mangaInfo // ignore: cast_nullable_to_non_nullable
-              as MangaInfo,
-    ));
+  $Res call({Object? id = null, Object? mangaInfo = null}) {
+    return _then(
+      _$SourceMangaImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        mangaInfo:
+            null == mangaInfo
+                ? _value.mangaInfo
+                : mangaInfo // ignore: cast_nullable_to_non_nullable
+                    as MangaInfo,
+      ),
+    );
   }
 }
 
@@ -4290,16 +4583,15 @@ class _$SourceMangaImpl implements _SourceManga {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SourceMangaImplToJson(
-      this,
-    );
+    return _$$SourceMangaImplToJson(this);
   }
 }
 
 abstract class _SourceManga implements SourceManga {
-  const factory _SourceManga(
-      {required final String id,
-      required final MangaInfo mangaInfo}) = _$SourceMangaImpl;
+  const factory _SourceManga({
+    required final String id,
+    required final MangaInfo mangaInfo,
+  }) = _$SourceMangaImpl;
 
   factory _SourceManga.fromJson(Map<String, dynamic> json) =
       _$SourceMangaImpl.fromJson;
@@ -4347,15 +4639,16 @@ abstract class $ChapterCopyWith<$Res> {
   factory $ChapterCopyWith(Chapter value, $Res Function(Chapter) then) =
       _$ChapterCopyWithImpl<$Res, Chapter>;
   @useResult
-  $Res call(
-      {String id,
-      num chapNum,
-      String? langCode,
-      String? name,
-      num? volume,
-      String? group,
-      @TimestampSerializer() DateTime? time,
-      num? sortingIndex});
+  $Res call({
+    String id,
+    num chapNum,
+    String? langCode,
+    String? name,
+    num? volume,
+    String? group,
+    @TimestampSerializer() DateTime? time,
+    num? sortingIndex,
+  });
 }
 
 /// @nodoc
@@ -4382,59 +4675,72 @@ class _$ChapterCopyWithImpl<$Res, $Val extends Chapter>
     Object? time = freezed,
     Object? sortingIndex = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      chapNum: null == chapNum
-          ? _value.chapNum
-          : chapNum // ignore: cast_nullable_to_non_nullable
-              as num,
-      langCode: freezed == langCode
-          ? _value.langCode
-          : langCode // ignore: cast_nullable_to_non_nullable
-              as String?,
-      name: freezed == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String?,
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as num?,
-      group: freezed == group
-          ? _value.group
-          : group // ignore: cast_nullable_to_non_nullable
-              as String?,
-      time: freezed == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      sortingIndex: freezed == sortingIndex
-          ? _value.sortingIndex
-          : sortingIndex // ignore: cast_nullable_to_non_nullable
-              as num?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            chapNum:
+                null == chapNum
+                    ? _value.chapNum
+                    : chapNum // ignore: cast_nullable_to_non_nullable
+                        as num,
+            langCode:
+                freezed == langCode
+                    ? _value.langCode
+                    : langCode // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            name:
+                freezed == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            volume:
+                freezed == volume
+                    ? _value.volume
+                    : volume // ignore: cast_nullable_to_non_nullable
+                        as num?,
+            group:
+                freezed == group
+                    ? _value.group
+                    : group // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            time:
+                freezed == time
+                    ? _value.time
+                    : time // ignore: cast_nullable_to_non_nullable
+                        as DateTime?,
+            sortingIndex:
+                freezed == sortingIndex
+                    ? _value.sortingIndex
+                    : sortingIndex // ignore: cast_nullable_to_non_nullable
+                        as num?,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$ChapterImplCopyWith<$Res> implements $ChapterCopyWith<$Res> {
   factory _$$ChapterImplCopyWith(
-          _$ChapterImpl value, $Res Function(_$ChapterImpl) then) =
-      __$$ChapterImplCopyWithImpl<$Res>;
+    _$ChapterImpl value,
+    $Res Function(_$ChapterImpl) then,
+  ) = __$$ChapterImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      num chapNum,
-      String? langCode,
-      String? name,
-      num? volume,
-      String? group,
-      @TimestampSerializer() DateTime? time,
-      num? sortingIndex});
+  $Res call({
+    String id,
+    num chapNum,
+    String? langCode,
+    String? name,
+    num? volume,
+    String? group,
+    @TimestampSerializer() DateTime? time,
+    num? sortingIndex,
+  });
 }
 
 /// @nodoc
@@ -4442,8 +4748,9 @@ class __$$ChapterImplCopyWithImpl<$Res>
     extends _$ChapterCopyWithImpl<$Res, _$ChapterImpl>
     implements _$$ChapterImplCopyWith<$Res> {
   __$$ChapterImplCopyWithImpl(
-      _$ChapterImpl _value, $Res Function(_$ChapterImpl) _then)
-      : super(_value, _then);
+    _$ChapterImpl _value,
+    $Res Function(_$ChapterImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of Chapter
   /// with the given fields replaced by the non-null parameter values.
@@ -4459,55 +4766,66 @@ class __$$ChapterImplCopyWithImpl<$Res>
     Object? time = freezed,
     Object? sortingIndex = freezed,
   }) {
-    return _then(_$ChapterImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      chapNum: null == chapNum
-          ? _value.chapNum
-          : chapNum // ignore: cast_nullable_to_non_nullable
-              as num,
-      langCode: freezed == langCode
-          ? _value.langCode
-          : langCode // ignore: cast_nullable_to_non_nullable
-              as String?,
-      name: freezed == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String?,
-      volume: freezed == volume
-          ? _value.volume
-          : volume // ignore: cast_nullable_to_non_nullable
-              as num?,
-      group: freezed == group
-          ? _value.group
-          : group // ignore: cast_nullable_to_non_nullable
-              as String?,
-      time: freezed == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      sortingIndex: freezed == sortingIndex
-          ? _value.sortingIndex
-          : sortingIndex // ignore: cast_nullable_to_non_nullable
-              as num?,
-    ));
+    return _then(
+      _$ChapterImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        chapNum:
+            null == chapNum
+                ? _value.chapNum
+                : chapNum // ignore: cast_nullable_to_non_nullable
+                    as num,
+        langCode:
+            freezed == langCode
+                ? _value.langCode
+                : langCode // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        name:
+            freezed == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        volume:
+            freezed == volume
+                ? _value.volume
+                : volume // ignore: cast_nullable_to_non_nullable
+                    as num?,
+        group:
+            freezed == group
+                ? _value.group
+                : group // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        time:
+            freezed == time
+                ? _value.time
+                : time // ignore: cast_nullable_to_non_nullable
+                    as DateTime?,
+        sortingIndex:
+            freezed == sortingIndex
+                ? _value.sortingIndex
+                : sortingIndex // ignore: cast_nullable_to_non_nullable
+                    as num?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ChapterImpl implements _Chapter {
-  const _$ChapterImpl(
-      {required this.id,
-      required this.chapNum,
-      this.langCode,
-      this.name,
-      this.volume,
-      this.group,
-      @TimestampSerializer() this.time,
-      this.sortingIndex});
+  const _$ChapterImpl({
+    required this.id,
+    required this.chapNum,
+    this.langCode,
+    this.name,
+    this.volume,
+    this.group,
+    @TimestampSerializer() this.time,
+    this.sortingIndex,
+  });
 
   factory _$ChapterImpl.fromJson(Map<String, dynamic> json) =>
       _$$ChapterImplFromJson(json);
@@ -4554,8 +4872,17 @@ class _$ChapterImpl implements _Chapter {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, chapNum, langCode, name,
-      volume, group, time, sortingIndex);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    chapNum,
+    langCode,
+    name,
+    volume,
+    group,
+    time,
+    sortingIndex,
+  );
 
   /// Create a copy of Chapter
   /// with the given fields replaced by the non-null parameter values.
@@ -4567,22 +4894,21 @@ class _$ChapterImpl implements _Chapter {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ChapterImplToJson(
-      this,
-    );
+    return _$$ChapterImplToJson(this);
   }
 }
 
 abstract class _Chapter implements Chapter {
-  const factory _Chapter(
-      {required final String id,
-      required final num chapNum,
-      final String? langCode,
-      final String? name,
-      final num? volume,
-      final String? group,
-      @TimestampSerializer() final DateTime? time,
-      final num? sortingIndex}) = _$ChapterImpl;
+  const factory _Chapter({
+    required final String id,
+    required final num chapNum,
+    final String? langCode,
+    final String? name,
+    final num? volume,
+    final String? group,
+    @TimestampSerializer() final DateTime? time,
+    final num? sortingIndex,
+  }) = _$ChapterImpl;
 
   factory _Chapter.fromJson(Map<String, dynamic> json) = _$ChapterImpl.fromJson;
 
@@ -4635,8 +4961,9 @@ mixin _$ChapterDetails {
 /// @nodoc
 abstract class $ChapterDetailsCopyWith<$Res> {
   factory $ChapterDetailsCopyWith(
-          ChapterDetails value, $Res Function(ChapterDetails) then) =
-      _$ChapterDetailsCopyWithImpl<$Res, ChapterDetails>;
+    ChapterDetails value,
+    $Res Function(ChapterDetails) then,
+  ) = _$ChapterDetailsCopyWithImpl<$Res, ChapterDetails>;
   @useResult
   $Res call({String id, String mangaId, List<String> pages});
 }
@@ -4655,34 +4982,37 @@ class _$ChapterDetailsCopyWithImpl<$Res, $Val extends ChapterDetails>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? mangaId = null,
-    Object? pages = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      mangaId: null == mangaId
-          ? _value.mangaId
-          : mangaId // ignore: cast_nullable_to_non_nullable
-              as String,
-      pages: null == pages
-          ? _value.pages
-          : pages // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ) as $Val);
+  $Res call({Object? id = null, Object? mangaId = null, Object? pages = null}) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            mangaId:
+                null == mangaId
+                    ? _value.mangaId
+                    : mangaId // ignore: cast_nullable_to_non_nullable
+                        as String,
+            pages:
+                null == pages
+                    ? _value.pages
+                    : pages // ignore: cast_nullable_to_non_nullable
+                        as List<String>,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$ChapterDetailsImplCopyWith<$Res>
     implements $ChapterDetailsCopyWith<$Res> {
-  factory _$$ChapterDetailsImplCopyWith(_$ChapterDetailsImpl value,
-          $Res Function(_$ChapterDetailsImpl) then) =
-      __$$ChapterDetailsImplCopyWithImpl<$Res>;
+  factory _$$ChapterDetailsImplCopyWith(
+    _$ChapterDetailsImpl value,
+    $Res Function(_$ChapterDetailsImpl) then,
+  ) = __$$ChapterDetailsImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, String mangaId, List<String> pages});
@@ -4693,43 +5023,45 @@ class __$$ChapterDetailsImplCopyWithImpl<$Res>
     extends _$ChapterDetailsCopyWithImpl<$Res, _$ChapterDetailsImpl>
     implements _$$ChapterDetailsImplCopyWith<$Res> {
   __$$ChapterDetailsImplCopyWithImpl(
-      _$ChapterDetailsImpl _value, $Res Function(_$ChapterDetailsImpl) _then)
-      : super(_value, _then);
+    _$ChapterDetailsImpl _value,
+    $Res Function(_$ChapterDetailsImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ChapterDetails
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? mangaId = null,
-    Object? pages = null,
-  }) {
-    return _then(_$ChapterDetailsImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      mangaId: null == mangaId
-          ? _value.mangaId
-          : mangaId // ignore: cast_nullable_to_non_nullable
-              as String,
-      pages: null == pages
-          ? _value._pages
-          : pages // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
+  $Res call({Object? id = null, Object? mangaId = null, Object? pages = null}) {
+    return _then(
+      _$ChapterDetailsImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        mangaId:
+            null == mangaId
+                ? _value.mangaId
+                : mangaId // ignore: cast_nullable_to_non_nullable
+                    as String,
+        pages:
+            null == pages
+                ? _value._pages
+                : pages // ignore: cast_nullable_to_non_nullable
+                    as List<String>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ChapterDetailsImpl implements _ChapterDetails {
-  const _$ChapterDetailsImpl(
-      {required this.id,
-      required this.mangaId,
-      required final List<String> pages})
-      : _pages = pages;
+  const _$ChapterDetailsImpl({
+    required this.id,
+    required this.mangaId,
+    required final List<String> pages,
+  }) : _pages = pages;
 
   factory _$ChapterDetailsImpl.fromJson(Map<String, dynamic> json) =>
       _$$ChapterDetailsImplFromJson(json);
@@ -4764,7 +5096,11 @@ class _$ChapterDetailsImpl implements _ChapterDetails {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, mangaId, const DeepCollectionEquality().hash(_pages));
+    runtimeType,
+    id,
+    mangaId,
+    const DeepCollectionEquality().hash(_pages),
+  );
 
   /// Create a copy of ChapterDetails
   /// with the given fields replaced by the non-null parameter values.
@@ -4773,21 +5109,22 @@ class _$ChapterDetailsImpl implements _ChapterDetails {
   @pragma('vm:prefer-inline')
   _$$ChapterDetailsImplCopyWith<_$ChapterDetailsImpl> get copyWith =>
       __$$ChapterDetailsImplCopyWithImpl<_$ChapterDetailsImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ChapterDetailsImplToJson(
-      this,
-    );
+    return _$$ChapterDetailsImplToJson(this);
   }
 }
 
 abstract class _ChapterDetails implements ChapterDetails {
-  const factory _ChapterDetails(
-      {required final String id,
-      required final String mangaId,
-      required final List<String> pages}) = _$ChapterDetailsImpl;
+  const factory _ChapterDetails({
+    required final String id,
+    required final String mangaId,
+    required final List<String> pages,
+  }) = _$ChapterDetailsImpl;
 
   factory _ChapterDetails.fromJson(Map<String, dynamic> json) =
       _$ChapterDetailsImpl.fromJson;
@@ -4830,8 +5167,9 @@ mixin _$SearchRequest {
 /// @nodoc
 abstract class $SearchRequestCopyWith<$Res> {
   factory $SearchRequestCopyWith(
-          SearchRequest value, $Res Function(SearchRequest) then) =
-      _$SearchRequestCopyWithImpl<$Res, SearchRequest>;
+    SearchRequest value,
+    $Res Function(SearchRequest) then,
+  ) = _$SearchRequestCopyWithImpl<$Res, SearchRequest>;
   @useResult
   $Res call({String? title, List<Tag>? includedTags, List<Tag>? excludedTags});
 }
@@ -4855,20 +5193,26 @@ class _$SearchRequestCopyWithImpl<$Res, $Val extends SearchRequest>
     Object? includedTags = freezed,
     Object? excludedTags = freezed,
   }) {
-    return _then(_value.copyWith(
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      includedTags: freezed == includedTags
-          ? _value.includedTags
-          : includedTags // ignore: cast_nullable_to_non_nullable
-              as List<Tag>?,
-      excludedTags: freezed == excludedTags
-          ? _value.excludedTags
-          : excludedTags // ignore: cast_nullable_to_non_nullable
-              as List<Tag>?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            title:
+                freezed == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            includedTags:
+                freezed == includedTags
+                    ? _value.includedTags
+                    : includedTags // ignore: cast_nullable_to_non_nullable
+                        as List<Tag>?,
+            excludedTags:
+                freezed == excludedTags
+                    ? _value.excludedTags
+                    : excludedTags // ignore: cast_nullable_to_non_nullable
+                        as List<Tag>?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -4876,8 +5220,9 @@ class _$SearchRequestCopyWithImpl<$Res, $Val extends SearchRequest>
 abstract class _$$SearchRequestImplCopyWith<$Res>
     implements $SearchRequestCopyWith<$Res> {
   factory _$$SearchRequestImplCopyWith(
-          _$SearchRequestImpl value, $Res Function(_$SearchRequestImpl) then) =
-      __$$SearchRequestImplCopyWithImpl<$Res>;
+    _$SearchRequestImpl value,
+    $Res Function(_$SearchRequestImpl) then,
+  ) = __$$SearchRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String? title, List<Tag>? includedTags, List<Tag>? excludedTags});
@@ -4888,8 +5233,9 @@ class __$$SearchRequestImplCopyWithImpl<$Res>
     extends _$SearchRequestCopyWithImpl<$Res, _$SearchRequestImpl>
     implements _$$SearchRequestImplCopyWith<$Res> {
   __$$SearchRequestImplCopyWithImpl(
-      _$SearchRequestImpl _value, $Res Function(_$SearchRequestImpl) _then)
-      : super(_value, _then);
+    _$SearchRequestImpl _value,
+    $Res Function(_$SearchRequestImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of SearchRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -4900,32 +5246,37 @@ class __$$SearchRequestImplCopyWithImpl<$Res>
     Object? includedTags = freezed,
     Object? excludedTags = freezed,
   }) {
-    return _then(_$SearchRequestImpl(
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      includedTags: freezed == includedTags
-          ? _value._includedTags
-          : includedTags // ignore: cast_nullable_to_non_nullable
-              as List<Tag>?,
-      excludedTags: freezed == excludedTags
-          ? _value._excludedTags
-          : excludedTags // ignore: cast_nullable_to_non_nullable
-              as List<Tag>?,
-    ));
+    return _then(
+      _$SearchRequestImpl(
+        title:
+            freezed == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        includedTags:
+            freezed == includedTags
+                ? _value._includedTags
+                : includedTags // ignore: cast_nullable_to_non_nullable
+                    as List<Tag>?,
+        excludedTags:
+            freezed == excludedTags
+                ? _value._excludedTags
+                : excludedTags // ignore: cast_nullable_to_non_nullable
+                    as List<Tag>?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$SearchRequestImpl implements _SearchRequest {
-  const _$SearchRequestImpl(
-      {this.title,
-      final List<Tag>? includedTags,
-      final List<Tag>? excludedTags})
-      : _includedTags = includedTags,
-        _excludedTags = excludedTags;
+  const _$SearchRequestImpl({
+    this.title,
+    final List<Tag>? includedTags,
+    final List<Tag>? excludedTags,
+  }) : _includedTags = includedTags,
+       _excludedTags = excludedTags;
 
   factory _$SearchRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$SearchRequestImplFromJson(json);
@@ -4963,19 +5314,24 @@ class _$SearchRequestImpl implements _SearchRequest {
         (other.runtimeType == runtimeType &&
             other is _$SearchRequestImpl &&
             (identical(other.title, title) || other.title == title) &&
-            const DeepCollectionEquality()
-                .equals(other._includedTags, _includedTags) &&
-            const DeepCollectionEquality()
-                .equals(other._excludedTags, _excludedTags));
+            const DeepCollectionEquality().equals(
+              other._includedTags,
+              _includedTags,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._excludedTags,
+              _excludedTags,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      title,
-      const DeepCollectionEquality().hash(_includedTags),
-      const DeepCollectionEquality().hash(_excludedTags));
+    runtimeType,
+    title,
+    const DeepCollectionEquality().hash(_includedTags),
+    const DeepCollectionEquality().hash(_excludedTags),
+  );
 
   /// Create a copy of SearchRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -4987,17 +5343,16 @@ class _$SearchRequestImpl implements _SearchRequest {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SearchRequestImplToJson(
-      this,
-    );
+    return _$$SearchRequestImplToJson(this);
   }
 }
 
 abstract class _SearchRequest implements SearchRequest {
-  const factory _SearchRequest(
-      {final String? title,
-      final List<Tag>? includedTags,
-      final List<Tag>? excludedTags}) = _$SearchRequestImpl;
+  const factory _SearchRequest({
+    final String? title,
+    final List<Tag>? includedTags,
+    final List<Tag>? excludedTags,
+  }) = _$SearchRequestImpl;
 
   factory _SearchRequest.fromJson(Map<String, dynamic> json) =
       _$SearchRequestImpl.fromJson;
@@ -5041,14 +5396,16 @@ mixin _$HomeSection {
 /// @nodoc
 abstract class $HomeSectionCopyWith<$Res> {
   factory $HomeSectionCopyWith(
-          HomeSection value, $Res Function(HomeSection) then) =
-      _$HomeSectionCopyWithImpl<$Res, HomeSection>;
+    HomeSection value,
+    $Res Function(HomeSection) then,
+  ) = _$HomeSectionCopyWithImpl<$Res, HomeSection>;
   @useResult
-  $Res call(
-      {String id,
-      String title,
-      List<PartialSourceManga> items,
-      bool containsMoreItems});
+  $Res call({
+    String id,
+    String title,
+    List<PartialSourceManga> items,
+    bool containsMoreItems,
+  });
 }
 
 /// @nodoc
@@ -5071,24 +5428,31 @@ class _$HomeSectionCopyWithImpl<$Res, $Val extends HomeSection>
     Object? items = null,
     Object? containsMoreItems = null,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<PartialSourceManga>,
-      containsMoreItems: null == containsMoreItems
-          ? _value.containsMoreItems
-          : containsMoreItems // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as String,
+            title:
+                null == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String,
+            items:
+                null == items
+                    ? _value.items
+                    : items // ignore: cast_nullable_to_non_nullable
+                        as List<PartialSourceManga>,
+            containsMoreItems:
+                null == containsMoreItems
+                    ? _value.containsMoreItems
+                    : containsMoreItems // ignore: cast_nullable_to_non_nullable
+                        as bool,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -5096,15 +5460,17 @@ class _$HomeSectionCopyWithImpl<$Res, $Val extends HomeSection>
 abstract class _$$HomeSectionImplCopyWith<$Res>
     implements $HomeSectionCopyWith<$Res> {
   factory _$$HomeSectionImplCopyWith(
-          _$HomeSectionImpl value, $Res Function(_$HomeSectionImpl) then) =
-      __$$HomeSectionImplCopyWithImpl<$Res>;
+    _$HomeSectionImpl value,
+    $Res Function(_$HomeSectionImpl) then,
+  ) = __$$HomeSectionImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      String title,
-      List<PartialSourceManga> items,
-      bool containsMoreItems});
+  $Res call({
+    String id,
+    String title,
+    List<PartialSourceManga> items,
+    bool containsMoreItems,
+  });
 }
 
 /// @nodoc
@@ -5112,8 +5478,9 @@ class __$$HomeSectionImplCopyWithImpl<$Res>
     extends _$HomeSectionCopyWithImpl<$Res, _$HomeSectionImpl>
     implements _$$HomeSectionImplCopyWith<$Res> {
   __$$HomeSectionImplCopyWithImpl(
-      _$HomeSectionImpl _value, $Res Function(_$HomeSectionImpl) _then)
-      : super(_value, _then);
+    _$HomeSectionImpl _value,
+    $Res Function(_$HomeSectionImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of HomeSection
   /// with the given fields replaced by the non-null parameter values.
@@ -5125,36 +5492,42 @@ class __$$HomeSectionImplCopyWithImpl<$Res>
     Object? items = null,
     Object? containsMoreItems = null,
   }) {
-    return _then(_$HomeSectionImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<PartialSourceManga>,
-      containsMoreItems: null == containsMoreItems
-          ? _value.containsMoreItems
-          : containsMoreItems // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+    return _then(
+      _$HomeSectionImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        title:
+            null == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String,
+        items:
+            null == items
+                ? _value._items
+                : items // ignore: cast_nullable_to_non_nullable
+                    as List<PartialSourceManga>,
+        containsMoreItems:
+            null == containsMoreItems
+                ? _value.containsMoreItems
+                : containsMoreItems // ignore: cast_nullable_to_non_nullable
+                    as bool,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$HomeSectionImpl implements _HomeSection {
-  const _$HomeSectionImpl(
-      {required this.id,
-      required this.title,
-      required final List<PartialSourceManga> items,
-      required this.containsMoreItems})
-      : _items = items;
+  const _$HomeSectionImpl({
+    required this.id,
+    required this.title,
+    required final List<PartialSourceManga> items,
+    required this.containsMoreItems,
+  }) : _items = items;
 
   factory _$HomeSectionImpl.fromJson(Map<String, dynamic> json) =>
       _$$HomeSectionImplFromJson(json);
@@ -5193,8 +5566,13 @@ class _$HomeSectionImpl implements _HomeSection {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title,
-      const DeepCollectionEquality().hash(_items), containsMoreItems);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    title,
+    const DeepCollectionEquality().hash(_items),
+    containsMoreItems,
+  );
 
   /// Create a copy of HomeSection
   /// with the given fields replaced by the non-null parameter values.
@@ -5206,18 +5584,17 @@ class _$HomeSectionImpl implements _HomeSection {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$HomeSectionImplToJson(
-      this,
-    );
+    return _$$HomeSectionImplToJson(this);
   }
 }
 
 abstract class _HomeSection implements HomeSection {
-  const factory _HomeSection(
-      {required final String id,
-      required final String title,
-      required final List<PartialSourceManga> items,
-      required final bool containsMoreItems}) = _$HomeSectionImpl;
+  const factory _HomeSection({
+    required final String id,
+    required final String title,
+    required final List<PartialSourceManga> items,
+    required final bool containsMoreItems,
+  }) = _$HomeSectionImpl;
 
   factory _HomeSection.fromJson(Map<String, dynamic> json) =
       _$HomeSectionImpl.fromJson;
@@ -5249,8 +5626,12 @@ DUIOAuthResponseType _$DUIOAuthResponseTypeFromJson(Map<String, dynamic> json) {
       return DUIOAuthPKCEResponse.fromJson(json);
 
     default:
-      throw CheckedFromJsonException(json, 'type', 'DUIOAuthResponseType',
-          'Invalid union type "${json['type']}"!');
+      throw CheckedFromJsonException(
+        json,
+        'type',
+        'DUIOAuthResponseType',
+        'Invalid union type "${json['type']}"!',
+      );
   }
 }
 
@@ -5260,52 +5641,58 @@ mixin _$DUIOAuthResponseType {
   TResult when<TResult extends Object?>({
     required TResult Function() token,
     required TResult Function(String tokenEndpoint) code,
-    required TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)
-        pkce,
-  }) =>
-      throw _privateConstructorUsedError;
+    required TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )
+    pkce,
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? token,
     TResult? Function(String tokenEndpoint)? code,
-    TResult? Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
-  }) =>
-      throw _privateConstructorUsedError;
+    TResult? Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? token,
     TResult Function(String tokenEndpoint)? code,
-    TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
+    TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(DUIOAuthTokenResponse value) token,
     required TResult Function(DUIOAuthCodeResponse value) code,
     required TResult Function(DUIOAuthPKCEResponse value) pkce,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(DUIOAuthTokenResponse value)? token,
     TResult? Function(DUIOAuthCodeResponse value)? code,
     TResult? Function(DUIOAuthPKCEResponse value)? pkce,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(DUIOAuthTokenResponse value)? token,
     TResult Function(DUIOAuthCodeResponse value)? code,
     TResult Function(DUIOAuthPKCEResponse value)? pkce,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 
   /// Serializes this DUIOAuthResponseType to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -5313,14 +5700,17 @@ mixin _$DUIOAuthResponseType {
 
 /// @nodoc
 abstract class $DUIOAuthResponseTypeCopyWith<$Res> {
-  factory $DUIOAuthResponseTypeCopyWith(DUIOAuthResponseType value,
-          $Res Function(DUIOAuthResponseType) then) =
-      _$DUIOAuthResponseTypeCopyWithImpl<$Res, DUIOAuthResponseType>;
+  factory $DUIOAuthResponseTypeCopyWith(
+    DUIOAuthResponseType value,
+    $Res Function(DUIOAuthResponseType) then,
+  ) = _$DUIOAuthResponseTypeCopyWithImpl<$Res, DUIOAuthResponseType>;
 }
 
 /// @nodoc
-class _$DUIOAuthResponseTypeCopyWithImpl<$Res,
-        $Val extends DUIOAuthResponseType>
+class _$DUIOAuthResponseTypeCopyWithImpl<
+  $Res,
+  $Val extends DUIOAuthResponseType
+>
     implements $DUIOAuthResponseTypeCopyWith<$Res> {
   _$DUIOAuthResponseTypeCopyWithImpl(this._value, this._then);
 
@@ -5336,19 +5726,20 @@ class _$DUIOAuthResponseTypeCopyWithImpl<$Res,
 /// @nodoc
 abstract class _$$DUIOAuthTokenResponseImplCopyWith<$Res> {
   factory _$$DUIOAuthTokenResponseImplCopyWith(
-          _$DUIOAuthTokenResponseImpl value,
-          $Res Function(_$DUIOAuthTokenResponseImpl) then) =
-      __$$DUIOAuthTokenResponseImplCopyWithImpl<$Res>;
+    _$DUIOAuthTokenResponseImpl value,
+    $Res Function(_$DUIOAuthTokenResponseImpl) then,
+  ) = __$$DUIOAuthTokenResponseImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$DUIOAuthTokenResponseImplCopyWithImpl<$Res>
-    extends _$DUIOAuthResponseTypeCopyWithImpl<$Res,
-        _$DUIOAuthTokenResponseImpl>
+    extends
+        _$DUIOAuthResponseTypeCopyWithImpl<$Res, _$DUIOAuthTokenResponseImpl>
     implements _$$DUIOAuthTokenResponseImplCopyWith<$Res> {
-  __$$DUIOAuthTokenResponseImplCopyWithImpl(_$DUIOAuthTokenResponseImpl _value,
-      $Res Function(_$DUIOAuthTokenResponseImpl) _then)
-      : super(_value, _then);
+  __$$DUIOAuthTokenResponseImplCopyWithImpl(
+    _$DUIOAuthTokenResponseImpl _value,
+    $Res Function(_$DUIOAuthTokenResponseImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIOAuthResponseType
   /// with the given fields replaced by the non-null parameter values.
@@ -5358,7 +5749,7 @@ class __$$DUIOAuthTokenResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$DUIOAuthTokenResponseImpl implements DUIOAuthTokenResponse {
   const _$DUIOAuthTokenResponseImpl({final String? $type})
-      : $type = $type ?? 'token';
+    : $type = $type ?? 'token';
 
   factory _$DUIOAuthTokenResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIOAuthTokenResponseImplFromJson(json);
@@ -5387,9 +5778,13 @@ class _$DUIOAuthTokenResponseImpl implements DUIOAuthTokenResponse {
   TResult when<TResult extends Object?>({
     required TResult Function() token,
     required TResult Function(String tokenEndpoint) code,
-    required TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)
-        pkce,
+    required TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )
+    pkce,
   }) {
     return token();
   }
@@ -5399,9 +5794,13 @@ class _$DUIOAuthTokenResponseImpl implements DUIOAuthTokenResponse {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? token,
     TResult? Function(String tokenEndpoint)? code,
-    TResult? Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
+    TResult? Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
   }) {
     return token?.call();
   }
@@ -5411,9 +5810,13 @@ class _$DUIOAuthTokenResponseImpl implements DUIOAuthTokenResponse {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? token,
     TResult Function(String tokenEndpoint)? code,
-    TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
+    TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
     required TResult orElse(),
   }) {
     if (token != null) {
@@ -5458,9 +5861,7 @@ class _$DUIOAuthTokenResponseImpl implements DUIOAuthTokenResponse {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIOAuthTokenResponseImplToJson(
-      this,
-    );
+    return _$$DUIOAuthTokenResponseImplToJson(this);
   }
 }
 
@@ -5473,9 +5874,10 @@ abstract class DUIOAuthTokenResponse implements DUIOAuthResponseType {
 
 /// @nodoc
 abstract class _$$DUIOAuthCodeResponseImplCopyWith<$Res> {
-  factory _$$DUIOAuthCodeResponseImplCopyWith(_$DUIOAuthCodeResponseImpl value,
-          $Res Function(_$DUIOAuthCodeResponseImpl) then) =
-      __$$DUIOAuthCodeResponseImplCopyWithImpl<$Res>;
+  factory _$$DUIOAuthCodeResponseImplCopyWith(
+    _$DUIOAuthCodeResponseImpl value,
+    $Res Function(_$DUIOAuthCodeResponseImpl) then,
+  ) = __$$DUIOAuthCodeResponseImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String tokenEndpoint});
 }
@@ -5484,32 +5886,35 @@ abstract class _$$DUIOAuthCodeResponseImplCopyWith<$Res> {
 class __$$DUIOAuthCodeResponseImplCopyWithImpl<$Res>
     extends _$DUIOAuthResponseTypeCopyWithImpl<$Res, _$DUIOAuthCodeResponseImpl>
     implements _$$DUIOAuthCodeResponseImplCopyWith<$Res> {
-  __$$DUIOAuthCodeResponseImplCopyWithImpl(_$DUIOAuthCodeResponseImpl _value,
-      $Res Function(_$DUIOAuthCodeResponseImpl) _then)
-      : super(_value, _then);
+  __$$DUIOAuthCodeResponseImplCopyWithImpl(
+    _$DUIOAuthCodeResponseImpl _value,
+    $Res Function(_$DUIOAuthCodeResponseImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIOAuthResponseType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? tokenEndpoint = null,
-  }) {
-    return _then(_$DUIOAuthCodeResponseImpl(
-      tokenEndpoint: null == tokenEndpoint
-          ? _value.tokenEndpoint
-          : tokenEndpoint // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? tokenEndpoint = null}) {
+    return _then(
+      _$DUIOAuthCodeResponseImpl(
+        tokenEndpoint:
+            null == tokenEndpoint
+                ? _value.tokenEndpoint
+                : tokenEndpoint // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIOAuthCodeResponseImpl implements DUIOAuthCodeResponse {
-  const _$DUIOAuthCodeResponseImpl(
-      {required this.tokenEndpoint, final String? $type})
-      : $type = $type ?? 'code';
+  const _$DUIOAuthCodeResponseImpl({
+    required this.tokenEndpoint,
+    final String? $type,
+  }) : $type = $type ?? 'code';
 
   factory _$DUIOAuthCodeResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIOAuthCodeResponseImplFromJson(json);
@@ -5544,18 +5949,24 @@ class _$DUIOAuthCodeResponseImpl implements DUIOAuthCodeResponse {
   @override
   @pragma('vm:prefer-inline')
   _$$DUIOAuthCodeResponseImplCopyWith<_$DUIOAuthCodeResponseImpl>
-      get copyWith =>
-          __$$DUIOAuthCodeResponseImplCopyWithImpl<_$DUIOAuthCodeResponseImpl>(
-              this, _$identity);
+  get copyWith =>
+      __$$DUIOAuthCodeResponseImplCopyWithImpl<_$DUIOAuthCodeResponseImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() token,
     required TResult Function(String tokenEndpoint) code,
-    required TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)
-        pkce,
+    required TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )
+    pkce,
   }) {
     return code(tokenEndpoint);
   }
@@ -5565,9 +5976,13 @@ class _$DUIOAuthCodeResponseImpl implements DUIOAuthCodeResponse {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? token,
     TResult? Function(String tokenEndpoint)? code,
-    TResult? Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
+    TResult? Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
   }) {
     return code?.call(tokenEndpoint);
   }
@@ -5577,9 +5992,13 @@ class _$DUIOAuthCodeResponseImpl implements DUIOAuthCodeResponse {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? token,
     TResult Function(String tokenEndpoint)? code,
-    TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
+    TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
     required TResult orElse(),
   }) {
     if (code != null) {
@@ -5624,9 +6043,7 @@ class _$DUIOAuthCodeResponseImpl implements DUIOAuthCodeResponse {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIOAuthCodeResponseImplToJson(
-      this,
-    );
+    return _$$DUIOAuthCodeResponseImplToJson(this);
   }
 }
 
@@ -5643,29 +6060,32 @@ abstract class DUIOAuthCodeResponse implements DUIOAuthResponseType {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DUIOAuthCodeResponseImplCopyWith<_$DUIOAuthCodeResponseImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class _$$DUIOAuthPKCEResponseImplCopyWith<$Res> {
-  factory _$$DUIOAuthPKCEResponseImplCopyWith(_$DUIOAuthPKCEResponseImpl value,
-          $Res Function(_$DUIOAuthPKCEResponseImpl) then) =
-      __$$DUIOAuthPKCEResponseImplCopyWithImpl<$Res>;
+  factory _$$DUIOAuthPKCEResponseImplCopyWith(
+    _$DUIOAuthPKCEResponseImpl value,
+    $Res Function(_$DUIOAuthPKCEResponseImpl) then,
+  ) = __$$DUIOAuthPKCEResponseImplCopyWithImpl<$Res>;
   @useResult
-  $Res call(
-      {String tokenEndpoint,
-      num pkceCodeLength,
-      String pkceCodeMethod,
-      bool formEncodeGrant});
+  $Res call({
+    String tokenEndpoint,
+    num pkceCodeLength,
+    String pkceCodeMethod,
+    bool formEncodeGrant,
+  });
 }
 
 /// @nodoc
 class __$$DUIOAuthPKCEResponseImplCopyWithImpl<$Res>
     extends _$DUIOAuthResponseTypeCopyWithImpl<$Res, _$DUIOAuthPKCEResponseImpl>
     implements _$$DUIOAuthPKCEResponseImplCopyWith<$Res> {
-  __$$DUIOAuthPKCEResponseImplCopyWithImpl(_$DUIOAuthPKCEResponseImpl _value,
-      $Res Function(_$DUIOAuthPKCEResponseImpl) _then)
-      : super(_value, _then);
+  __$$DUIOAuthPKCEResponseImplCopyWithImpl(
+    _$DUIOAuthPKCEResponseImpl _value,
+    $Res Function(_$DUIOAuthPKCEResponseImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIOAuthResponseType
   /// with the given fields replaced by the non-null parameter values.
@@ -5677,37 +6097,43 @@ class __$$DUIOAuthPKCEResponseImplCopyWithImpl<$Res>
     Object? pkceCodeMethod = null,
     Object? formEncodeGrant = null,
   }) {
-    return _then(_$DUIOAuthPKCEResponseImpl(
-      tokenEndpoint: null == tokenEndpoint
-          ? _value.tokenEndpoint
-          : tokenEndpoint // ignore: cast_nullable_to_non_nullable
-              as String,
-      pkceCodeLength: null == pkceCodeLength
-          ? _value.pkceCodeLength
-          : pkceCodeLength // ignore: cast_nullable_to_non_nullable
-              as num,
-      pkceCodeMethod: null == pkceCodeMethod
-          ? _value.pkceCodeMethod
-          : pkceCodeMethod // ignore: cast_nullable_to_non_nullable
-              as String,
-      formEncodeGrant: null == formEncodeGrant
-          ? _value.formEncodeGrant
-          : formEncodeGrant // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+    return _then(
+      _$DUIOAuthPKCEResponseImpl(
+        tokenEndpoint:
+            null == tokenEndpoint
+                ? _value.tokenEndpoint
+                : tokenEndpoint // ignore: cast_nullable_to_non_nullable
+                    as String,
+        pkceCodeLength:
+            null == pkceCodeLength
+                ? _value.pkceCodeLength
+                : pkceCodeLength // ignore: cast_nullable_to_non_nullable
+                    as num,
+        pkceCodeMethod:
+            null == pkceCodeMethod
+                ? _value.pkceCodeMethod
+                : pkceCodeMethod // ignore: cast_nullable_to_non_nullable
+                    as String,
+        formEncodeGrant:
+            null == formEncodeGrant
+                ? _value.formEncodeGrant
+                : formEncodeGrant // ignore: cast_nullable_to_non_nullable
+                    as bool,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIOAuthPKCEResponseImpl implements DUIOAuthPKCEResponse {
-  const _$DUIOAuthPKCEResponseImpl(
-      {required this.tokenEndpoint,
-      required this.pkceCodeLength,
-      required this.pkceCodeMethod,
-      required this.formEncodeGrant,
-      final String? $type})
-      : $type = $type ?? 'pkce';
+  const _$DUIOAuthPKCEResponseImpl({
+    required this.tokenEndpoint,
+    required this.pkceCodeLength,
+    required this.pkceCodeMethod,
+    required this.formEncodeGrant,
+    final String? $type,
+  }) : $type = $type ?? 'pkce';
 
   factory _$DUIOAuthPKCEResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIOAuthPKCEResponseImplFromJson(json);
@@ -5746,8 +6172,13 @@ class _$DUIOAuthPKCEResponseImpl implements DUIOAuthPKCEResponse {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, tokenEndpoint, pkceCodeLength,
-      pkceCodeMethod, formEncodeGrant);
+  int get hashCode => Object.hash(
+    runtimeType,
+    tokenEndpoint,
+    pkceCodeLength,
+    pkceCodeMethod,
+    formEncodeGrant,
+  );
 
   /// Create a copy of DUIOAuthResponseType
   /// with the given fields replaced by the non-null parameter values.
@@ -5755,18 +6186,24 @@ class _$DUIOAuthPKCEResponseImpl implements DUIOAuthPKCEResponse {
   @override
   @pragma('vm:prefer-inline')
   _$$DUIOAuthPKCEResponseImplCopyWith<_$DUIOAuthPKCEResponseImpl>
-      get copyWith =>
-          __$$DUIOAuthPKCEResponseImplCopyWithImpl<_$DUIOAuthPKCEResponseImpl>(
-              this, _$identity);
+  get copyWith =>
+      __$$DUIOAuthPKCEResponseImplCopyWithImpl<_$DUIOAuthPKCEResponseImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() token,
     required TResult Function(String tokenEndpoint) code,
-    required TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)
-        pkce,
+    required TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )
+    pkce,
   }) {
     return pkce(tokenEndpoint, pkceCodeLength, pkceCodeMethod, formEncodeGrant);
   }
@@ -5776,12 +6213,20 @@ class _$DUIOAuthPKCEResponseImpl implements DUIOAuthPKCEResponse {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? token,
     TResult? Function(String tokenEndpoint)? code,
-    TResult? Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
+    TResult? Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
   }) {
     return pkce?.call(
-        tokenEndpoint, pkceCodeLength, pkceCodeMethod, formEncodeGrant);
+      tokenEndpoint,
+      pkceCodeLength,
+      pkceCodeMethod,
+      formEncodeGrant,
+    );
   }
 
   @override
@@ -5789,14 +6234,22 @@ class _$DUIOAuthPKCEResponseImpl implements DUIOAuthPKCEResponse {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? token,
     TResult Function(String tokenEndpoint)? code,
-    TResult Function(String tokenEndpoint, num pkceCodeLength,
-            String pkceCodeMethod, bool formEncodeGrant)?
-        pkce,
+    TResult Function(
+      String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant,
+    )?
+    pkce,
     required TResult orElse(),
   }) {
     if (pkce != null) {
       return pkce(
-          tokenEndpoint, pkceCodeLength, pkceCodeMethod, formEncodeGrant);
+        tokenEndpoint,
+        pkceCodeLength,
+        pkceCodeMethod,
+        formEncodeGrant,
+      );
     }
     return orElse();
   }
@@ -5837,18 +6290,17 @@ class _$DUIOAuthPKCEResponseImpl implements DUIOAuthPKCEResponse {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIOAuthPKCEResponseImplToJson(
-      this,
-    );
+    return _$$DUIOAuthPKCEResponseImplToJson(this);
   }
 }
 
 abstract class DUIOAuthPKCEResponse implements DUIOAuthResponseType {
-  const factory DUIOAuthPKCEResponse(
-      {required final String tokenEndpoint,
-      required final num pkceCodeLength,
-      required final String pkceCodeMethod,
-      required final bool formEncodeGrant}) = _$DUIOAuthPKCEResponseImpl;
+  const factory DUIOAuthPKCEResponse({
+    required final String tokenEndpoint,
+    required final num pkceCodeLength,
+    required final String pkceCodeMethod,
+    required final bool formEncodeGrant,
+  }) = _$DUIOAuthPKCEResponseImpl;
 
   factory DUIOAuthPKCEResponse.fromJson(Map<String, dynamic> json) =
       _$DUIOAuthPKCEResponseImpl.fromJson;
@@ -5862,7 +6314,7 @@ abstract class DUIOAuthPKCEResponse implements DUIOAuthResponseType {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DUIOAuthPKCEResponseImplCopyWith<_$DUIOAuthPKCEResponseImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 DUIType _$DUITypeFromJson(Map<String, dynamic> json) {
@@ -5896,7 +6348,11 @@ DUIType _$DUITypeFromJson(Map<String, dynamic> json) {
 
     default:
       throw CheckedFromJsonException(
-          json, 'type', 'DUIType', 'Invalid union type "${json['type']}"!');
+        json,
+        'type',
+        'DUIType',
+        'Invalid union type "${json['type']}"!',
+      );
   }
 }
 
@@ -5904,107 +6360,154 @@ DUIType _$DUITypeFromJson(Map<String, dynamic> json) {
 mixin _$DUIType {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
-  }) =>
-      throw _privateConstructorUsedError;
+    DUIForm,
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(DUISection value) DUISection,
@@ -6020,8 +6523,7 @@ mixin _$DUIType {
     required TResult Function(DUISwitch value) DUISwitch,
     required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(DUISection value)? DUISection,
@@ -6037,8 +6539,7 @@ mixin _$DUIType {
     TResult? Function(DUISwitch value)? DUISwitch,
     TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(DUISection value)? DUISection,
@@ -6055,8 +6556,7 @@ mixin _$DUIType {
     TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 
   /// Serializes this DUIType to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -6085,15 +6585,17 @@ class _$DUITypeCopyWithImpl<$Res, $Val extends DUIType>
 /// @nodoc
 abstract class _$$DUISectionImplCopyWith<$Res> {
   factory _$$DUISectionImplCopyWith(
-          _$DUISectionImpl value, $Res Function(_$DUISectionImpl) then) =
-      __$$DUISectionImplCopyWithImpl<$Res>;
+    _$DUISectionImpl value,
+    $Res Function(_$DUISectionImpl) then,
+  ) = __$$DUISectionImplCopyWithImpl<$Res>;
   @useResult
-  $Res call(
-      {String id,
-      String? header,
-      String? footer,
-      bool isHidden,
-      List<DUIType> rows});
+  $Res call({
+    String id,
+    String? header,
+    String? footer,
+    bool isHidden,
+    List<DUIType> rows,
+  });
 }
 
 /// @nodoc
@@ -6101,8 +6603,9 @@ class __$$DUISectionImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUISectionImpl>
     implements _$$DUISectionImplCopyWith<$Res> {
   __$$DUISectionImplCopyWithImpl(
-      _$DUISectionImpl _value, $Res Function(_$DUISectionImpl) _then)
-      : super(_value, _then);
+    _$DUISectionImpl _value,
+    $Res Function(_$DUISectionImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -6115,43 +6618,50 @@ class __$$DUISectionImplCopyWithImpl<$Res>
     Object? isHidden = null,
     Object? rows = null,
   }) {
-    return _then(_$DUISectionImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      header: freezed == header
-          ? _value.header
-          : header // ignore: cast_nullable_to_non_nullable
-              as String?,
-      footer: freezed == footer
-          ? _value.footer
-          : footer // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isHidden: null == isHidden
-          ? _value.isHidden
-          : isHidden // ignore: cast_nullable_to_non_nullable
-              as bool,
-      rows: null == rows
-          ? _value._rows
-          : rows // ignore: cast_nullable_to_non_nullable
-              as List<DUIType>,
-    ));
+    return _then(
+      _$DUISectionImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        header:
+            freezed == header
+                ? _value.header
+                : header // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        footer:
+            freezed == footer
+                ? _value.footer
+                : footer // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        isHidden:
+            null == isHidden
+                ? _value.isHidden
+                : isHidden // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        rows:
+            null == rows
+                ? _value._rows
+                : rows // ignore: cast_nullable_to_non_nullable
+                    as List<DUIType>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUISectionImpl implements DUISection {
-  const _$DUISectionImpl(
-      {required this.id,
-      this.header,
-      this.footer,
-      required this.isHidden,
-      required final List<DUIType> rows,
-      final String? $type})
-      : _rows = rows,
-        $type = $type ?? 'DUISection';
+  const _$DUISectionImpl({
+    required this.id,
+    this.header,
+    this.footer,
+    required this.isHidden,
+    required final List<DUIType> rows,
+    final String? $type,
+  }) : _rows = rows,
+       $type = $type ?? 'DUISection';
 
   factory _$DUISectionImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUISectionImplFromJson(json);
@@ -6195,8 +6705,14 @@ class _$DUISectionImpl implements DUISection {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, header, footer, isHidden,
-      const DeepCollectionEquality().hash(_rows));
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    header,
+    footer,
+    isHidden,
+    const DeepCollectionEquality().hash(_rows),
+  );
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -6209,38 +6725,58 @@ class _$DUISectionImpl implements DUISection {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUISection(id, header, footer, isHidden, rows);
   }
@@ -6248,34 +6784,49 @@ class _$DUISectionImpl implements DUISection {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUISection?.call(id, header, footer, isHidden, rows);
@@ -6284,34 +6835,49 @@ class _$DUISectionImpl implements DUISection {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6387,19 +6953,18 @@ class _$DUISectionImpl implements DUISection {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUISectionImplToJson(
-      this,
-    );
+    return _$$DUISectionImplToJson(this);
   }
 }
 
 abstract class DUISection implements DUIType, DUIFormRow {
-  const factory DUISection(
-      {required final String id,
-      final String? header,
-      final String? footer,
-      required final bool isHidden,
-      required final List<DUIType> rows}) = _$DUISectionImpl;
+  const factory DUISection({
+    required final String id,
+    final String? header,
+    final String? footer,
+    required final bool isHidden,
+    required final List<DUIType> rows,
+  }) = _$DUISectionImpl;
 
   factory DUISection.fromJson(Map<String, dynamic> json) =
       _$DUISectionImpl.fromJson;
@@ -6420,15 +6985,17 @@ abstract class DUISection implements DUIType, DUIFormRow {
 /// @nodoc
 abstract class _$$DUISelectImplCopyWith<$Res> {
   factory _$$DUISelectImplCopyWith(
-          _$DUISelectImpl value, $Res Function(_$DUISelectImpl) then) =
-      __$$DUISelectImplCopyWithImpl<$Res>;
+    _$DUISelectImpl value,
+    $Res Function(_$DUISelectImpl) then,
+  ) = __$$DUISelectImplCopyWithImpl<$Res>;
   @useResult
-  $Res call(
-      {String id,
-      String label,
-      List<String> options,
-      bool allowsMultiselect,
-      Map<String, String> labels});
+  $Res call({
+    String id,
+    String label,
+    List<String> options,
+    bool allowsMultiselect,
+    Map<String, String> labels,
+  });
 }
 
 /// @nodoc
@@ -6436,8 +7003,9 @@ class __$$DUISelectImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUISelectImpl>
     implements _$$DUISelectImplCopyWith<$Res> {
   __$$DUISelectImplCopyWithImpl(
-      _$DUISelectImpl _value, $Res Function(_$DUISelectImpl) _then)
-      : super(_value, _then);
+    _$DUISelectImpl _value,
+    $Res Function(_$DUISelectImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -6450,44 +7018,51 @@ class __$$DUISelectImplCopyWithImpl<$Res>
     Object? allowsMultiselect = null,
     Object? labels = null,
   }) {
-    return _then(_$DUISelectImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      options: null == options
-          ? _value._options
-          : options // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      allowsMultiselect: null == allowsMultiselect
-          ? _value.allowsMultiselect
-          : allowsMultiselect // ignore: cast_nullable_to_non_nullable
-              as bool,
-      labels: null == labels
-          ? _value._labels
-          : labels // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
-    ));
+    return _then(
+      _$DUISelectImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+        options:
+            null == options
+                ? _value._options
+                : options // ignore: cast_nullable_to_non_nullable
+                    as List<String>,
+        allowsMultiselect:
+            null == allowsMultiselect
+                ? _value.allowsMultiselect
+                : allowsMultiselect // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        labels:
+            null == labels
+                ? _value._labels
+                : labels // ignore: cast_nullable_to_non_nullable
+                    as Map<String, String>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUISelectImpl implements DUISelect {
-  const _$DUISelectImpl(
-      {required this.id,
-      required this.label,
-      required final List<String> options,
-      required this.allowsMultiselect,
-      required final Map<String, String> labels,
-      final String? $type})
-      : _options = options,
-        _labels = labels,
-        $type = $type ?? 'DUISelect';
+  const _$DUISelectImpl({
+    required this.id,
+    required this.label,
+    required final List<String> options,
+    required this.allowsMultiselect,
+    required final Map<String, String> labels,
+    final String? $type,
+  }) : _options = options,
+       _labels = labels,
+       $type = $type ?? 'DUISelect';
 
   factory _$DUISelectImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUISelectImplFromJson(json);
@@ -6538,12 +7113,13 @@ class _$DUISelectImpl implements DUISelect {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      label,
-      const DeepCollectionEquality().hash(_options),
-      allowsMultiselect,
-      const DeepCollectionEquality().hash(_labels));
+    runtimeType,
+    id,
+    label,
+    const DeepCollectionEquality().hash(_options),
+    allowsMultiselect,
+    const DeepCollectionEquality().hash(_labels),
+  );
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -6556,38 +7132,58 @@ class _$DUISelectImpl implements DUISelect {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUISelect(id, label, options, allowsMultiselect, labels);
   }
@@ -6595,34 +7191,49 @@ class _$DUISelectImpl implements DUISelect {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUISelect?.call(id, label, options, allowsMultiselect, labels);
@@ -6631,34 +7242,49 @@ class _$DUISelectImpl implements DUISelect {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6734,19 +7360,18 @@ class _$DUISelectImpl implements DUISelect {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUISelectImplToJson(
-      this,
-    );
+    return _$$DUISelectImplToJson(this);
   }
 }
 
 abstract class DUISelect implements DUIType, DUIFormRow {
-  const factory DUISelect(
-      {required final String id,
-      required final String label,
-      required final List<String> options,
-      required final bool allowsMultiselect,
-      required final Map<String, String> labels}) = _$DUISelectImpl;
+  const factory DUISelect({
+    required final String id,
+    required final String label,
+    required final List<String> options,
+    required final bool allowsMultiselect,
+    required final Map<String, String> labels,
+  }) = _$DUISelectImpl;
 
   factory DUISelect.fromJson(Map<String, dynamic> json) =
       _$DUISelectImpl.fromJson;
@@ -6767,8 +7392,9 @@ abstract class DUISelect implements DUIType, DUIFormRow {
 /// @nodoc
 abstract class _$$DUIInputFieldImplCopyWith<$Res> {
   factory _$$DUIInputFieldImplCopyWith(
-          _$DUIInputFieldImpl value, $Res Function(_$DUIInputFieldImpl) then) =
-      __$$DUIInputFieldImplCopyWithImpl<$Res>;
+    _$DUIInputFieldImpl value,
+    $Res Function(_$DUIInputFieldImpl) then,
+  ) = __$$DUIInputFieldImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label});
 }
@@ -6778,36 +7404,40 @@ class __$$DUIInputFieldImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUIInputFieldImpl>
     implements _$$DUIInputFieldImplCopyWith<$Res> {
   __$$DUIInputFieldImplCopyWithImpl(
-      _$DUIInputFieldImpl _value, $Res Function(_$DUIInputFieldImpl) _then)
-      : super(_value, _then);
+    _$DUIInputFieldImpl _value,
+    $Res Function(_$DUIInputFieldImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-  }) {
-    return _then(_$DUIInputFieldImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? id = null, Object? label = null}) {
+    return _then(
+      _$DUIInputFieldImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIInputFieldImpl implements DUIInputField {
-  const _$DUIInputFieldImpl(
-      {required this.id, required this.label, final String? $type})
-      : $type = $type ?? 'DUIInputField';
+  const _$DUIInputFieldImpl({
+    required this.id,
+    required this.label,
+    final String? $type,
+  }) : $type = $type ?? 'DUIInputField';
 
   factory _$DUIInputFieldImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIInputFieldImplFromJson(json);
@@ -6849,38 +7479,58 @@ class _$DUIInputFieldImpl implements DUIInputField {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUIInputField(id, label);
   }
@@ -6888,34 +7538,49 @@ class _$DUIInputFieldImpl implements DUIInputField {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIInputField?.call(id, label);
@@ -6924,34 +7589,49 @@ class _$DUIInputFieldImpl implements DUIInputField {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -7027,16 +7707,15 @@ class _$DUIInputFieldImpl implements DUIInputField {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIInputFieldImplToJson(
-      this,
-    );
+    return _$$DUIInputFieldImplToJson(this);
   }
 }
 
 abstract class DUIInputField implements DUIType, DUIInputType {
-  const factory DUIInputField(
-      {required final String id,
-      required final String label}) = _$DUIInputFieldImpl;
+  const factory DUIInputField({
+    required final String id,
+    required final String label,
+  }) = _$DUIInputFieldImpl;
 
   factory DUIInputField.fromJson(Map<String, dynamic> json) =
       _$DUIInputFieldImpl.fromJson;
@@ -7053,9 +7732,10 @@ abstract class DUIInputField implements DUIType, DUIInputType {
 
 /// @nodoc
 abstract class _$$DUISecureInputFieldImplCopyWith<$Res> {
-  factory _$$DUISecureInputFieldImplCopyWith(_$DUISecureInputFieldImpl value,
-          $Res Function(_$DUISecureInputFieldImpl) then) =
-      __$$DUISecureInputFieldImplCopyWithImpl<$Res>;
+  factory _$$DUISecureInputFieldImplCopyWith(
+    _$DUISecureInputFieldImpl value,
+    $Res Function(_$DUISecureInputFieldImpl) then,
+  ) = __$$DUISecureInputFieldImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label});
 }
@@ -7064,37 +7744,41 @@ abstract class _$$DUISecureInputFieldImplCopyWith<$Res> {
 class __$$DUISecureInputFieldImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUISecureInputFieldImpl>
     implements _$$DUISecureInputFieldImplCopyWith<$Res> {
-  __$$DUISecureInputFieldImplCopyWithImpl(_$DUISecureInputFieldImpl _value,
-      $Res Function(_$DUISecureInputFieldImpl) _then)
-      : super(_value, _then);
+  __$$DUISecureInputFieldImplCopyWithImpl(
+    _$DUISecureInputFieldImpl _value,
+    $Res Function(_$DUISecureInputFieldImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-  }) {
-    return _then(_$DUISecureInputFieldImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? id = null, Object? label = null}) {
+    return _then(
+      _$DUISecureInputFieldImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUISecureInputFieldImpl implements DUISecureInputField {
-  const _$DUISecureInputFieldImpl(
-      {required this.id, required this.label, final String? $type})
-      : $type = $type ?? 'DUISecureInputField';
+  const _$DUISecureInputFieldImpl({
+    required this.id,
+    required this.label,
+    final String? $type,
+  }) : $type = $type ?? 'DUISecureInputField';
 
   factory _$DUISecureInputFieldImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUISecureInputFieldImplFromJson(json);
@@ -7132,43 +7816,65 @@ class _$DUISecureInputFieldImpl implements DUISecureInputField {
   @pragma('vm:prefer-inline')
   _$$DUISecureInputFieldImplCopyWith<_$DUISecureInputFieldImpl> get copyWith =>
       __$$DUISecureInputFieldImplCopyWithImpl<_$DUISecureInputFieldImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUISecureInputField(id, label);
   }
@@ -7176,34 +7882,49 @@ class _$DUISecureInputFieldImpl implements DUISecureInputField {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUISecureInputField?.call(id, label);
@@ -7212,34 +7933,49 @@ class _$DUISecureInputFieldImpl implements DUISecureInputField {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -7315,16 +8051,15 @@ class _$DUISecureInputFieldImpl implements DUISecureInputField {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUISecureInputFieldImplToJson(
-      this,
-    );
+    return _$$DUISecureInputFieldImplToJson(this);
   }
 }
 
 abstract class DUISecureInputField implements DUIType, DUIInputType {
-  const factory DUISecureInputField(
-      {required final String id,
-      required final String label}) = _$DUISecureInputFieldImpl;
+  const factory DUISecureInputField({
+    required final String id,
+    required final String label,
+  }) = _$DUISecureInputFieldImpl;
 
   factory DUISecureInputField.fromJson(Map<String, dynamic> json) =
       _$DUISecureInputFieldImpl.fromJson;
@@ -7342,8 +8077,9 @@ abstract class DUISecureInputField implements DUIType, DUIInputType {
 /// @nodoc
 abstract class _$$DUIStepperImplCopyWith<$Res> {
   factory _$$DUIStepperImplCopyWith(
-          _$DUIStepperImpl value, $Res Function(_$DUIStepperImpl) then) =
-      __$$DUIStepperImplCopyWithImpl<$Res>;
+    _$DUIStepperImpl value,
+    $Res Function(_$DUIStepperImpl) then,
+  ) = __$$DUIStepperImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label, num? min, num? max, num? step});
 }
@@ -7353,8 +8089,9 @@ class __$$DUIStepperImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUIStepperImpl>
     implements _$$DUIStepperImplCopyWith<$Res> {
   __$$DUIStepperImplCopyWithImpl(
-      _$DUIStepperImpl _value, $Res Function(_$DUIStepperImpl) _then)
-      : super(_value, _then);
+    _$DUIStepperImpl _value,
+    $Res Function(_$DUIStepperImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -7367,42 +8104,49 @@ class __$$DUIStepperImplCopyWithImpl<$Res>
     Object? max = freezed,
     Object? step = freezed,
   }) {
-    return _then(_$DUIStepperImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      min: freezed == min
-          ? _value.min
-          : min // ignore: cast_nullable_to_non_nullable
-              as num?,
-      max: freezed == max
-          ? _value.max
-          : max // ignore: cast_nullable_to_non_nullable
-              as num?,
-      step: freezed == step
-          ? _value.step
-          : step // ignore: cast_nullable_to_non_nullable
-              as num?,
-    ));
+    return _then(
+      _$DUIStepperImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+        min:
+            freezed == min
+                ? _value.min
+                : min // ignore: cast_nullable_to_non_nullable
+                    as num?,
+        max:
+            freezed == max
+                ? _value.max
+                : max // ignore: cast_nullable_to_non_nullable
+                    as num?,
+        step:
+            freezed == step
+                ? _value.step
+                : step // ignore: cast_nullable_to_non_nullable
+                    as num?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIStepperImpl implements DUIStepper {
-  const _$DUIStepperImpl(
-      {required this.id,
-      required this.label,
-      this.min,
-      this.max,
-      this.step,
-      final String? $type})
-      : $type = $type ?? 'DUIStepper';
+  const _$DUIStepperImpl({
+    required this.id,
+    required this.label,
+    this.min,
+    this.max,
+    this.step,
+    final String? $type,
+  }) : $type = $type ?? 'DUIStepper';
 
   factory _$DUIStepperImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIStepperImplFromJson(json);
@@ -7453,38 +8197,58 @@ class _$DUIStepperImpl implements DUIStepper {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUIStepper(id, label, min, max, step);
   }
@@ -7492,34 +8256,49 @@ class _$DUIStepperImpl implements DUIStepper {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIStepper?.call(id, label, min, max, step);
@@ -7528,34 +8307,49 @@ class _$DUIStepperImpl implements DUIStepper {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -7631,19 +8425,18 @@ class _$DUIStepperImpl implements DUIStepper {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIStepperImplToJson(
-      this,
-    );
+    return _$$DUIStepperImplToJson(this);
   }
 }
 
 abstract class DUIStepper implements DUIType, DUIFormRow {
-  const factory DUIStepper(
-      {required final String id,
-      required final String label,
-      final num? min,
-      final num? max,
-      final num? step}) = _$DUIStepperImpl;
+  const factory DUIStepper({
+    required final String id,
+    required final String label,
+    final num? min,
+    final num? max,
+    final num? step,
+  }) = _$DUIStepperImpl;
 
   factory DUIStepper.fromJson(Map<String, dynamic> json) =
       _$DUIStepperImpl.fromJson;
@@ -7664,8 +8457,9 @@ abstract class DUIStepper implements DUIType, DUIFormRow {
 /// @nodoc
 abstract class _$$DUILabelImplCopyWith<$Res> {
   factory _$$DUILabelImplCopyWith(
-          _$DUILabelImpl value, $Res Function(_$DUILabelImpl) then) =
-      __$$DUILabelImplCopyWithImpl<$Res>;
+    _$DUILabelImpl value,
+    $Res Function(_$DUILabelImpl) then,
+  ) = __$$DUILabelImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label, String? value});
 }
@@ -7675,8 +8469,9 @@ class __$$DUILabelImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUILabelImpl>
     implements _$$DUILabelImplCopyWith<$Res> {
   __$$DUILabelImplCopyWithImpl(
-      _$DUILabelImpl _value, $Res Function(_$DUILabelImpl) _then)
-      : super(_value, _then);
+    _$DUILabelImpl _value,
+    $Res Function(_$DUILabelImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -7687,29 +8482,37 @@ class __$$DUILabelImplCopyWithImpl<$Res>
     Object? label = null,
     Object? value = freezed,
   }) {
-    return _then(_$DUILabelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      value: freezed == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    return _then(
+      _$DUILabelImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+        value:
+            freezed == value
+                ? _value.value
+                : value // ignore: cast_nullable_to_non_nullable
+                    as String?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUILabelImpl implements DUILabel {
-  const _$DUILabelImpl(
-      {required this.id, required this.label, this.value, final String? $type})
-      : $type = $type ?? 'DUILabel';
+  const _$DUILabelImpl({
+    required this.id,
+    required this.label,
+    this.value,
+    final String? $type,
+  }) : $type = $type ?? 'DUILabel';
 
   factory _$DUILabelImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUILabelImplFromJson(json);
@@ -7754,38 +8557,58 @@ class _$DUILabelImpl implements DUILabel {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUILabel(id, label, value);
   }
@@ -7793,34 +8616,49 @@ class _$DUILabelImpl implements DUILabel {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUILabel?.call(id, label, value);
@@ -7829,34 +8667,49 @@ class _$DUILabelImpl implements DUILabel {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -7932,17 +8785,16 @@ class _$DUILabelImpl implements DUILabel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUILabelImplToJson(
-      this,
-    );
+    return _$$DUILabelImplToJson(this);
   }
 }
 
 abstract class DUILabel implements DUIType, DUILabelType {
-  const factory DUILabel(
-      {required final String id,
-      required final String label,
-      final String? value}) = _$DUILabelImpl;
+  const factory DUILabel({
+    required final String id,
+    required final String label,
+    final String? value,
+  }) = _$DUILabelImpl;
 
   factory DUILabel.fromJson(Map<String, dynamic> json) =
       _$DUILabelImpl.fromJson;
@@ -7960,9 +8812,10 @@ abstract class DUILabel implements DUIType, DUILabelType {
 
 /// @nodoc
 abstract class _$$DUIMultilineLabelImplCopyWith<$Res> {
-  factory _$$DUIMultilineLabelImplCopyWith(_$DUIMultilineLabelImpl value,
-          $Res Function(_$DUIMultilineLabelImpl) then) =
-      __$$DUIMultilineLabelImplCopyWithImpl<$Res>;
+  factory _$$DUIMultilineLabelImplCopyWith(
+    _$DUIMultilineLabelImpl value,
+    $Res Function(_$DUIMultilineLabelImpl) then,
+  ) = __$$DUIMultilineLabelImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label, String value});
 }
@@ -7971,45 +8824,47 @@ abstract class _$$DUIMultilineLabelImplCopyWith<$Res> {
 class __$$DUIMultilineLabelImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUIMultilineLabelImpl>
     implements _$$DUIMultilineLabelImplCopyWith<$Res> {
-  __$$DUIMultilineLabelImplCopyWithImpl(_$DUIMultilineLabelImpl _value,
-      $Res Function(_$DUIMultilineLabelImpl) _then)
-      : super(_value, _then);
+  __$$DUIMultilineLabelImplCopyWithImpl(
+    _$DUIMultilineLabelImpl _value,
+    $Res Function(_$DUIMultilineLabelImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-    Object? value = null,
-  }) {
-    return _then(_$DUIMultilineLabelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? id = null, Object? label = null, Object? value = null}) {
+    return _then(
+      _$DUIMultilineLabelImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+        value:
+            null == value
+                ? _value.value
+                : value // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIMultilineLabelImpl implements DUIMultilineLabel {
-  const _$DUIMultilineLabelImpl(
-      {required this.id,
-      required this.label,
-      required this.value,
-      final String? $type})
-      : $type = $type ?? 'DUIMultilineLabel';
+  const _$DUIMultilineLabelImpl({
+    required this.id,
+    required this.label,
+    required this.value,
+    final String? $type,
+  }) : $type = $type ?? 'DUIMultilineLabel';
 
   factory _$DUIMultilineLabelImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIMultilineLabelImplFromJson(json);
@@ -8050,43 +8905,65 @@ class _$DUIMultilineLabelImpl implements DUIMultilineLabel {
   @pragma('vm:prefer-inline')
   _$$DUIMultilineLabelImplCopyWith<_$DUIMultilineLabelImpl> get copyWith =>
       __$$DUIMultilineLabelImplCopyWithImpl<_$DUIMultilineLabelImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUIMultilineLabel(id, label, value);
   }
@@ -8094,34 +8971,49 @@ class _$DUIMultilineLabelImpl implements DUIMultilineLabel {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIMultilineLabel?.call(id, label, value);
@@ -8130,34 +9022,49 @@ class _$DUIMultilineLabelImpl implements DUIMultilineLabel {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -8233,17 +9140,16 @@ class _$DUIMultilineLabelImpl implements DUIMultilineLabel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIMultilineLabelImplToJson(
-      this,
-    );
+    return _$$DUIMultilineLabelImplToJson(this);
   }
 }
 
 abstract class DUIMultilineLabel implements DUIType, DUILabelType {
-  const factory DUIMultilineLabel(
-      {required final String id,
-      required final String label,
-      required final String value}) = _$DUIMultilineLabelImpl;
+  const factory DUIMultilineLabel({
+    required final String id,
+    required final String label,
+    required final String value,
+  }) = _$DUIMultilineLabelImpl;
 
   factory DUIMultilineLabel.fromJson(Map<String, dynamic> json) =
       _$DUIMultilineLabelImpl.fromJson;
@@ -8262,8 +9168,9 @@ abstract class DUIMultilineLabel implements DUIType, DUILabelType {
 /// @nodoc
 abstract class _$$DUIHeaderImplCopyWith<$Res> {
   factory _$$DUIHeaderImplCopyWith(
-          _$DUIHeaderImpl value, $Res Function(_$DUIHeaderImpl) then) =
-      __$$DUIHeaderImplCopyWithImpl<$Res>;
+    _$DUIHeaderImpl value,
+    $Res Function(_$DUIHeaderImpl) then,
+  ) = __$$DUIHeaderImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String imageUrl, String title, String? subtitle});
 }
@@ -8273,8 +9180,9 @@ class __$$DUIHeaderImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUIHeaderImpl>
     implements _$$DUIHeaderImplCopyWith<$Res> {
   __$$DUIHeaderImplCopyWithImpl(
-      _$DUIHeaderImpl _value, $Res Function(_$DUIHeaderImpl) _then)
-      : super(_value, _then);
+    _$DUIHeaderImpl _value,
+    $Res Function(_$DUIHeaderImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -8286,37 +9194,43 @@ class __$$DUIHeaderImplCopyWithImpl<$Res>
     Object? title = null,
     Object? subtitle = freezed,
   }) {
-    return _then(_$DUIHeaderImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      imageUrl: null == imageUrl
-          ? _value.imageUrl
-          : imageUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      subtitle: freezed == subtitle
-          ? _value.subtitle
-          : subtitle // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    return _then(
+      _$DUIHeaderImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        imageUrl:
+            null == imageUrl
+                ? _value.imageUrl
+                : imageUrl // ignore: cast_nullable_to_non_nullable
+                    as String,
+        title:
+            null == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String,
+        subtitle:
+            freezed == subtitle
+                ? _value.subtitle
+                : subtitle // ignore: cast_nullable_to_non_nullable
+                    as String?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIHeaderImpl implements DUIHeader {
-  const _$DUIHeaderImpl(
-      {required this.id,
-      required this.imageUrl,
-      required this.title,
-      this.subtitle,
-      final String? $type})
-      : $type = $type ?? 'DUIHeader';
+  const _$DUIHeaderImpl({
+    required this.id,
+    required this.imageUrl,
+    required this.title,
+    this.subtitle,
+    final String? $type,
+  }) : $type = $type ?? 'DUIHeader';
 
   factory _$DUIHeaderImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIHeaderImplFromJson(json);
@@ -8366,38 +9280,58 @@ class _$DUIHeaderImpl implements DUIHeader {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUIHeader(id, imageUrl, title, subtitle);
   }
@@ -8405,34 +9339,49 @@ class _$DUIHeaderImpl implements DUIHeader {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIHeader?.call(id, imageUrl, title, subtitle);
@@ -8441,34 +9390,49 @@ class _$DUIHeaderImpl implements DUIHeader {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -8544,18 +9508,17 @@ class _$DUIHeaderImpl implements DUIHeader {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIHeaderImplToJson(
-      this,
-    );
+    return _$$DUIHeaderImplToJson(this);
   }
 }
 
 abstract class DUIHeader implements DUIType, DUIFormRow {
-  const factory DUIHeader(
-      {required final String id,
-      required final String imageUrl,
-      required final String title,
-      final String? subtitle}) = _$DUIHeaderImpl;
+  const factory DUIHeader({
+    required final String id,
+    required final String imageUrl,
+    required final String title,
+    final String? subtitle,
+  }) = _$DUIHeaderImpl;
 
   factory DUIHeader.fromJson(Map<String, dynamic> json) =
       _$DUIHeaderImpl.fromJson;
@@ -8575,8 +9538,9 @@ abstract class DUIHeader implements DUIType, DUIFormRow {
 /// @nodoc
 abstract class _$$DUIButtonImplCopyWith<$Res> {
   factory _$$DUIButtonImplCopyWith(
-          _$DUIButtonImpl value, $Res Function(_$DUIButtonImpl) then) =
-      __$$DUIButtonImplCopyWithImpl<$Res>;
+    _$DUIButtonImpl value,
+    $Res Function(_$DUIButtonImpl) then,
+  ) = __$$DUIButtonImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label});
 }
@@ -8586,36 +9550,40 @@ class __$$DUIButtonImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUIButtonImpl>
     implements _$$DUIButtonImplCopyWith<$Res> {
   __$$DUIButtonImplCopyWithImpl(
-      _$DUIButtonImpl _value, $Res Function(_$DUIButtonImpl) _then)
-      : super(_value, _then);
+    _$DUIButtonImpl _value,
+    $Res Function(_$DUIButtonImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-  }) {
-    return _then(_$DUIButtonImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? id = null, Object? label = null}) {
+    return _then(
+      _$DUIButtonImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIButtonImpl implements DUIButton {
-  const _$DUIButtonImpl(
-      {required this.id, required this.label, final String? $type})
-      : $type = $type ?? 'DUIButton';
+  const _$DUIButtonImpl({
+    required this.id,
+    required this.label,
+    final String? $type,
+  }) : $type = $type ?? 'DUIButton';
 
   factory _$DUIButtonImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIButtonImplFromJson(json);
@@ -8657,38 +9625,58 @@ class _$DUIButtonImpl implements DUIButton {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUIButton(id, label);
   }
@@ -8696,34 +9684,49 @@ class _$DUIButtonImpl implements DUIButton {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIButton?.call(id, label);
@@ -8732,34 +9735,49 @@ class _$DUIButtonImpl implements DUIButton {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -8835,16 +9853,15 @@ class _$DUIButtonImpl implements DUIButton {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIButtonImplToJson(
-      this,
-    );
+    return _$$DUIButtonImplToJson(this);
   }
 }
 
 abstract class DUIButton implements DUIType, DUIFormRow {
-  const factory DUIButton(
-      {required final String id,
-      required final String label}) = _$DUIButtonImpl;
+  const factory DUIButton({
+    required final String id,
+    required final String label,
+  }) = _$DUIButtonImpl;
 
   factory DUIButton.fromJson(Map<String, dynamic> json) =
       _$DUIButtonImpl.fromJson;
@@ -8861,9 +9878,10 @@ abstract class DUIButton implements DUIType, DUIFormRow {
 
 /// @nodoc
 abstract class _$$DUINavigationButtonImplCopyWith<$Res> {
-  factory _$$DUINavigationButtonImplCopyWith(_$DUINavigationButtonImpl value,
-          $Res Function(_$DUINavigationButtonImpl) then) =
-      __$$DUINavigationButtonImplCopyWithImpl<$Res>;
+  factory _$$DUINavigationButtonImplCopyWith(
+    _$DUINavigationButtonImpl value,
+    $Res Function(_$DUINavigationButtonImpl) then,
+  ) = __$$DUINavigationButtonImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label, DUIForm form});
 }
@@ -8872,45 +9890,47 @@ abstract class _$$DUINavigationButtonImplCopyWith<$Res> {
 class __$$DUINavigationButtonImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUINavigationButtonImpl>
     implements _$$DUINavigationButtonImplCopyWith<$Res> {
-  __$$DUINavigationButtonImplCopyWithImpl(_$DUINavigationButtonImpl _value,
-      $Res Function(_$DUINavigationButtonImpl) _then)
-      : super(_value, _then);
+  __$$DUINavigationButtonImplCopyWithImpl(
+    _$DUINavigationButtonImpl _value,
+    $Res Function(_$DUINavigationButtonImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-    Object? form = freezed,
-  }) {
-    return _then(_$DUINavigationButtonImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      form: freezed == form
-          ? _value.form
-          : form // ignore: cast_nullable_to_non_nullable
-              as DUIForm,
-    ));
+  $Res call({Object? id = null, Object? label = null, Object? form = freezed}) {
+    return _then(
+      _$DUINavigationButtonImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+        form:
+            freezed == form
+                ? _value.form
+                : form // ignore: cast_nullable_to_non_nullable
+                    as DUIForm,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUINavigationButtonImpl implements DUINavigationButton {
-  const _$DUINavigationButtonImpl(
-      {required this.id,
-      required this.label,
-      required this.form,
-      final String? $type})
-      : $type = $type ?? 'DUINavigationButton';
+  const _$DUINavigationButtonImpl({
+    required this.id,
+    required this.label,
+    required this.form,
+    final String? $type,
+  }) : $type = $type ?? 'DUINavigationButton';
 
   factory _$DUINavigationButtonImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUINavigationButtonImplFromJson(json);
@@ -8943,7 +9963,11 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, label, const DeepCollectionEquality().hash(form));
+    runtimeType,
+    id,
+    label,
+    const DeepCollectionEquality().hash(form),
+  );
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -8952,43 +9976,65 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
   @pragma('vm:prefer-inline')
   _$$DUINavigationButtonImplCopyWith<_$DUINavigationButtonImpl> get copyWith =>
       __$$DUINavigationButtonImplCopyWithImpl<_$DUINavigationButtonImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUINavigationButton(id, label, form);
   }
@@ -8996,34 +10042,49 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUINavigationButton?.call(id, label, form);
@@ -9032,34 +10093,49 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -9135,17 +10211,16 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUINavigationButtonImplToJson(
-      this,
-    );
+    return _$$DUINavigationButtonImplToJson(this);
   }
 }
 
 abstract class DUINavigationButton implements DUIType, DUIFormRow {
-  const factory DUINavigationButton(
-      {required final String id,
-      required final String label,
-      required final DUIForm form}) = _$DUINavigationButtonImpl;
+  const factory DUINavigationButton({
+    required final String id,
+    required final String label,
+    required final DUIForm form,
+  }) = _$DUINavigationButtonImpl;
 
   factory DUINavigationButton.fromJson(Map<String, dynamic> json) =
       _$DUINavigationButtonImpl.fromJson;
@@ -9164,8 +10239,9 @@ abstract class DUINavigationButton implements DUIType, DUIFormRow {
 /// @nodoc
 abstract class _$$DUISwitchImplCopyWith<$Res> {
   factory _$$DUISwitchImplCopyWith(
-          _$DUISwitchImpl value, $Res Function(_$DUISwitchImpl) then) =
-      __$$DUISwitchImplCopyWithImpl<$Res>;
+    _$DUISwitchImpl value,
+    $Res Function(_$DUISwitchImpl) then,
+  ) = __$$DUISwitchImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id, String label});
 }
@@ -9175,36 +10251,40 @@ class __$$DUISwitchImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUISwitchImpl>
     implements _$$DUISwitchImplCopyWith<$Res> {
   __$$DUISwitchImplCopyWithImpl(
-      _$DUISwitchImpl _value, $Res Function(_$DUISwitchImpl) _then)
-      : super(_value, _then);
+    _$DUISwitchImpl _value,
+    $Res Function(_$DUISwitchImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? label = null,
-  }) {
-    return _then(_$DUISwitchImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? id = null, Object? label = null}) {
+    return _then(
+      _$DUISwitchImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUISwitchImpl implements DUISwitch {
-  const _$DUISwitchImpl(
-      {required this.id, required this.label, final String? $type})
-      : $type = $type ?? 'DUISwitch';
+  const _$DUISwitchImpl({
+    required this.id,
+    required this.label,
+    final String? $type,
+  }) : $type = $type ?? 'DUISwitch';
 
   factory _$DUISwitchImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUISwitchImplFromJson(json);
@@ -9246,38 +10326,58 @@ class _$DUISwitchImpl implements DUISwitch {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUISwitch(id, label);
   }
@@ -9285,34 +10385,49 @@ class _$DUISwitchImpl implements DUISwitch {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUISwitch?.call(id, label);
@@ -9321,34 +10436,49 @@ class _$DUISwitchImpl implements DUISwitch {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -9424,16 +10554,15 @@ class _$DUISwitchImpl implements DUISwitch {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUISwitchImplToJson(
-      this,
-    );
+    return _$$DUISwitchImplToJson(this);
   }
 }
 
 abstract class DUISwitch implements DUIType, DUIFormRow {
-  const factory DUISwitch(
-      {required final String id,
-      required final String label}) = _$DUISwitchImpl;
+  const factory DUISwitch({
+    required final String id,
+    required final String label,
+  }) = _$DUISwitchImpl;
 
   factory DUISwitch.fromJson(Map<String, dynamic> json) =
       _$DUISwitchImpl.fromJson;
@@ -9450,18 +10579,20 @@ abstract class DUISwitch implements DUIType, DUIFormRow {
 
 /// @nodoc
 abstract class _$$DUIOAuthButtonImplCopyWith<$Res> {
-  factory _$$DUIOAuthButtonImplCopyWith(_$DUIOAuthButtonImpl value,
-          $Res Function(_$DUIOAuthButtonImpl) then) =
-      __$$DUIOAuthButtonImplCopyWithImpl<$Res>;
+  factory _$$DUIOAuthButtonImplCopyWith(
+    _$DUIOAuthButtonImpl value,
+    $Res Function(_$DUIOAuthButtonImpl) then,
+  ) = __$$DUIOAuthButtonImplCopyWithImpl<$Res>;
   @useResult
-  $Res call(
-      {String id,
-      String label,
-      String authorizeEndpoint,
-      String clientId,
-      DUIOAuthResponseType responseType,
-      String? redirectUri,
-      List<String>? scopes});
+  $Res call({
+    String id,
+    String label,
+    String authorizeEndpoint,
+    String clientId,
+    DUIOAuthResponseType responseType,
+    String? redirectUri,
+    List<String>? scopes,
+  });
 
   $DUIOAuthResponseTypeCopyWith<$Res> get responseType;
 }
@@ -9471,8 +10602,9 @@ class __$$DUIOAuthButtonImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUIOAuthButtonImpl>
     implements _$$DUIOAuthButtonImplCopyWith<$Res> {
   __$$DUIOAuthButtonImplCopyWithImpl(
-      _$DUIOAuthButtonImpl _value, $Res Function(_$DUIOAuthButtonImpl) _then)
-      : super(_value, _then);
+    _$DUIOAuthButtonImpl _value,
+    $Res Function(_$DUIOAuthButtonImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -9487,36 +10619,45 @@ class __$$DUIOAuthButtonImplCopyWithImpl<$Res>
     Object? redirectUri = freezed,
     Object? scopes = freezed,
   }) {
-    return _then(_$DUIOAuthButtonImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      authorizeEndpoint: null == authorizeEndpoint
-          ? _value.authorizeEndpoint
-          : authorizeEndpoint // ignore: cast_nullable_to_non_nullable
-              as String,
-      clientId: null == clientId
-          ? _value.clientId
-          : clientId // ignore: cast_nullable_to_non_nullable
-              as String,
-      responseType: null == responseType
-          ? _value.responseType
-          : responseType // ignore: cast_nullable_to_non_nullable
-              as DUIOAuthResponseType,
-      redirectUri: freezed == redirectUri
-          ? _value.redirectUri
-          : redirectUri // ignore: cast_nullable_to_non_nullable
-              as String?,
-      scopes: freezed == scopes
-          ? _value._scopes
-          : scopes // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
-    ));
+    return _then(
+      _$DUIOAuthButtonImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as String,
+        label:
+            null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                    as String,
+        authorizeEndpoint:
+            null == authorizeEndpoint
+                ? _value.authorizeEndpoint
+                : authorizeEndpoint // ignore: cast_nullable_to_non_nullable
+                    as String,
+        clientId:
+            null == clientId
+                ? _value.clientId
+                : clientId // ignore: cast_nullable_to_non_nullable
+                    as String,
+        responseType:
+            null == responseType
+                ? _value.responseType
+                : responseType // ignore: cast_nullable_to_non_nullable
+                    as DUIOAuthResponseType,
+        redirectUri:
+            freezed == redirectUri
+                ? _value.redirectUri
+                : redirectUri // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        scopes:
+            freezed == scopes
+                ? _value._scopes
+                : scopes // ignore: cast_nullable_to_non_nullable
+                    as List<String>?,
+      ),
+    );
   }
 
   /// Create a copy of DUIType
@@ -9533,17 +10674,17 @@ class __$$DUIOAuthButtonImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$DUIOAuthButtonImpl implements DUIOAuthButton {
-  const _$DUIOAuthButtonImpl(
-      {required this.id,
-      required this.label,
-      required this.authorizeEndpoint,
-      required this.clientId,
-      required this.responseType,
-      this.redirectUri,
-      final List<String>? scopes,
-      final String? $type})
-      : _scopes = scopes,
-        $type = $type ?? 'DUIOAuthButton';
+  const _$DUIOAuthButtonImpl({
+    required this.id,
+    required this.label,
+    required this.authorizeEndpoint,
+    required this.clientId,
+    required this.responseType,
+    this.redirectUri,
+    final List<String>? scopes,
+    final String? $type,
+  }) : _scopes = scopes,
+       $type = $type ?? 'DUIOAuthButton';
 
   factory _$DUIOAuthButtonImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIOAuthButtonImplFromJson(json);
@@ -9599,14 +10740,15 @@ class _$DUIOAuthButtonImpl implements DUIOAuthButton {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      label,
-      authorizeEndpoint,
-      clientId,
-      responseType,
-      redirectUri,
-      const DeepCollectionEquality().hash(_scopes));
+    runtimeType,
+    id,
+    label,
+    authorizeEndpoint,
+    clientId,
+    responseType,
+    redirectUri,
+    const DeepCollectionEquality().hash(_scopes),
+  );
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -9615,122 +10757,195 @@ class _$DUIOAuthButtonImpl implements DUIOAuthButton {
   @pragma('vm:prefer-inline')
   _$$DUIOAuthButtonImplCopyWith<_$DUIOAuthButtonImpl> get copyWith =>
       __$$DUIOAuthButtonImplCopyWithImpl<_$DUIOAuthButtonImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
-    return DUIOAuthButton(id, label, authorizeEndpoint, clientId, responseType,
-        redirectUri, scopes);
+    return DUIOAuthButton(
+      id,
+      label,
+      authorizeEndpoint,
+      clientId,
+      responseType,
+      redirectUri,
+      scopes,
+    );
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
-    return DUIOAuthButton?.call(id, label, authorizeEndpoint, clientId,
-        responseType, redirectUri, scopes);
+    return DUIOAuthButton?.call(
+      id,
+      label,
+      authorizeEndpoint,
+      clientId,
+      responseType,
+      redirectUri,
+      scopes,
+    );
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
     if (DUIOAuthButton != null) {
-      return DUIOAuthButton(id, label, authorizeEndpoint, clientId,
-          responseType, redirectUri, scopes);
+      return DUIOAuthButton(
+        id,
+        label,
+        authorizeEndpoint,
+        clientId,
+        responseType,
+        redirectUri,
+        scopes,
+      );
     }
     return orElse();
   }
@@ -9801,21 +11016,20 @@ class _$DUIOAuthButtonImpl implements DUIOAuthButton {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIOAuthButtonImplToJson(
-      this,
-    );
+    return _$$DUIOAuthButtonImplToJson(this);
   }
 }
 
 abstract class DUIOAuthButton implements DUIType, DUIFormRow {
-  const factory DUIOAuthButton(
-      {required final String id,
-      required final String label,
-      required final String authorizeEndpoint,
-      required final String clientId,
-      required final DUIOAuthResponseType responseType,
-      final String? redirectUri,
-      final List<String>? scopes}) = _$DUIOAuthButtonImpl;
+  const factory DUIOAuthButton({
+    required final String id,
+    required final String label,
+    required final String authorizeEndpoint,
+    required final String clientId,
+    required final DUIOAuthResponseType responseType,
+    final String? redirectUri,
+    final List<String>? scopes,
+  }) = _$DUIOAuthButtonImpl;
 
   factory DUIOAuthButton.fromJson(Map<String, dynamic> json) =
       _$DUIOAuthButtonImpl.fromJson;
@@ -9838,8 +11052,9 @@ abstract class DUIOAuthButton implements DUIType, DUIFormRow {
 /// @nodoc
 abstract class _$$DUIFormImplCopyWith<$Res> {
   factory _$$DUIFormImplCopyWith(
-          _$DUIFormImpl value, $Res Function(_$DUIFormImpl) then) =
-      __$$DUIFormImplCopyWithImpl<$Res>;
+    _$DUIFormImpl value,
+    $Res Function(_$DUIFormImpl) then,
+  ) = __$$DUIFormImplCopyWithImpl<$Res>;
   @useResult
   $Res call({List<DUISection> sections, bool hasSubmit});
 }
@@ -9849,39 +11064,41 @@ class __$$DUIFormImplCopyWithImpl<$Res>
     extends _$DUITypeCopyWithImpl<$Res, _$DUIFormImpl>
     implements _$$DUIFormImplCopyWith<$Res> {
   __$$DUIFormImplCopyWithImpl(
-      _$DUIFormImpl _value, $Res Function(_$DUIFormImpl) _then)
-      : super(_value, _then);
+    _$DUIFormImpl _value,
+    $Res Function(_$DUIFormImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? sections = null,
-    Object? hasSubmit = null,
-  }) {
-    return _then(_$DUIFormImpl(
-      sections: null == sections
-          ? _value._sections
-          : sections // ignore: cast_nullable_to_non_nullable
-              as List<DUISection>,
-      hasSubmit: null == hasSubmit
-          ? _value.hasSubmit
-          : hasSubmit // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+  $Res call({Object? sections = null, Object? hasSubmit = null}) {
+    return _then(
+      _$DUIFormImpl(
+        sections:
+            null == sections
+                ? _value._sections
+                : sections // ignore: cast_nullable_to_non_nullable
+                    as List<DUISection>,
+        hasSubmit:
+            null == hasSubmit
+                ? _value.hasSubmit
+                : hasSubmit // ignore: cast_nullable_to_non_nullable
+                    as bool,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DUIFormImpl implements DUIForm {
-  const _$DUIFormImpl(
-      {required final List<DUISection> sections,
-      required this.hasSubmit,
-      final String? $type})
-      : _sections = sections,
-        $type = $type ?? 'DUIForm';
+  const _$DUIFormImpl({
+    required final List<DUISection> sections,
+    required this.hasSubmit,
+    final String? $type,
+  }) : _sections = sections,
+       $type = $type ?? 'DUIForm';
 
   factory _$DUIFormImpl.fromJson(Map<String, dynamic> json) =>
       _$$DUIFormImplFromJson(json);
@@ -9918,7 +11135,10 @@ class _$DUIFormImpl implements DUIForm {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_sections), hasSubmit);
+    runtimeType,
+    const DeepCollectionEquality().hash(_sections),
+    hasSubmit,
+  );
 
   /// Create a copy of DUIType
   /// with the given fields replaced by the non-null parameter values.
@@ -9931,38 +11151,58 @@ class _$DUIFormImpl implements DUIForm {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id, String? header, String? footer,
-            bool isHidden, List<DUIType> rows)
-        DUISection,
-    required TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)
-        DUISelect,
+    required TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )
+    DUISection,
+    required TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )
+    DUISelect,
     required TResult Function(String id, String label) DUIInputField,
     required TResult Function(String id, String label) DUISecureInputField,
     required TResult Function(
-            String id, String label, num? min, num? max, num? step)
-        DUIStepper,
+      String id,
+      String label,
+      num? min,
+      num? max,
+      num? step,
+    )
+    DUIStepper,
     required TResult Function(String id, String label, String? value) DUILabel,
     required TResult Function(String id, String label, String value)
-        DUIMultilineLabel,
+    DUIMultilineLabel,
     required TResult Function(
-            String id, String imageUrl, String title, String? subtitle)
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )
+    DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
-        DUINavigationButton,
+    DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
     required TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )
+    DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
-        DUIForm,
+    DUIForm,
   }) {
     return DUIForm(sections, hasSubmit);
   }
@@ -9970,34 +11210,49 @@ class _$DUIFormImpl implements DUIForm {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult? Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult? Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult? Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
     TResult? Function(String id, String label)? DUISecureInputField,
     TResult? Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult? Function(String id, String label, String? value)? DUILabel,
     TResult? Function(String id, String label, String value)? DUIMultilineLabel,
     TResult? Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
     TResult? Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIForm?.call(sections, hasSubmit);
@@ -10006,34 +11261,49 @@ class _$DUIFormImpl implements DUIForm {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, String? header, String? footer, bool isHidden,
-            List<DUIType> rows)?
-        DUISection,
-    TResult Function(String id, String label, List<String> options,
-            bool allowsMultiselect, Map<String, String> labels)?
-        DUISelect,
+    TResult Function(
+      String id,
+      String? header,
+      String? footer,
+      bool isHidden,
+      List<DUIType> rows,
+    )?
+    DUISection,
+    TResult Function(
+      String id,
+      String label,
+      List<String> options,
+      bool allowsMultiselect,
+      Map<String, String> labels,
+    )?
+    DUISelect,
     TResult Function(String id, String label)? DUIInputField,
     TResult Function(String id, String label)? DUISecureInputField,
     TResult Function(String id, String label, num? min, num? max, num? step)?
-        DUIStepper,
+    DUIStepper,
     TResult Function(String id, String label, String? value)? DUILabel,
     TResult Function(String id, String label, String value)? DUIMultilineLabel,
     TResult Function(
-            String id, String imageUrl, String title, String? subtitle)?
-        DUIHeader,
+      String id,
+      String imageUrl,
+      String title,
+      String? subtitle,
+    )?
+    DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
-        DUINavigationButton,
+    DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
     TResult Function(
-            String id,
-            String label,
-            String authorizeEndpoint,
-            String clientId,
-            DUIOAuthResponseType responseType,
-            String? redirectUri,
-            List<String>? scopes)?
-        DUIOAuthButton,
+      String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes,
+    )?
+    DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -10109,16 +11379,15 @@ class _$DUIFormImpl implements DUIForm {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DUIFormImplToJson(
-      this,
-    );
+    return _$$DUIFormImplToJson(this);
   }
 }
 
 abstract class DUIForm implements DUIType {
-  const factory DUIForm(
-      {required final List<DUISection> sections,
-      required final bool hasSubmit}) = _$DUIFormImpl;
+  const factory DUIForm({
+    required final List<DUISection> sections,
+    required final bool hasSubmit,
+  }) = _$DUIFormImpl;
 
   factory DUIForm.fromJson(Map<String, dynamic> json) = _$DUIFormImpl.fromJson;
 

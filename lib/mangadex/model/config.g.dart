@@ -8,44 +8,47 @@ part of 'config.dart';
 
 _$MangaDexConfigImpl _$$MangaDexConfigImplFromJson(Map<String, dynamic> json) =>
     _$MangaDexConfigImpl(
-      translatedLanguages: (json['translatedLanguages'] as List<dynamic>?)
+      translatedLanguages:
+          (json['translatedLanguages'] as List<dynamic>?)
               ?.map(const LanguageConverter().fromJson)
               .toSet() ??
           const {},
-      originalLanguage: (json['originalLanguage'] as List<dynamic>?)
+      originalLanguage:
+          (json['originalLanguage'] as List<dynamic>?)
               ?.map(const LanguageConverter().fromJson)
               .toSet() ??
           const {},
-      contentRating: (json['contentRating'] as List<dynamic>?)
+      contentRating:
+          (json['contentRating'] as List<dynamic>?)
               ?.map((e) => $enumDecode(_$ContentRatingEnumMap, e))
               .toSet() ??
           const {
             ContentRating.safe,
             ContentRating.suggestive,
-            ContentRating.erotica
+            ContentRating.erotica,
           },
       dataSaver: json['dataSaver'] as bool? ?? false,
-      groupBlacklist: (json['groupBlacklist'] as List<dynamic>?)
+      groupBlacklist:
+          (json['groupBlacklist'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toSet() ??
           const {},
     );
 
 Map<String, dynamic> _$$MangaDexConfigImplToJson(
-        _$MangaDexConfigImpl instance) =>
-    <String, dynamic>{
-      'translatedLanguages': instance.translatedLanguages
+  _$MangaDexConfigImpl instance,
+) => <String, dynamic>{
+  'translatedLanguages':
+      instance.translatedLanguages
           .map(const LanguageConverter().toJson)
           .toList(),
-      'originalLanguage': instance.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'contentRating': instance.contentRating
-          .map((e) => _$ContentRatingEnumMap[e]!)
-          .toList(),
-      'dataSaver': instance.dataSaver,
-      'groupBlacklist': instance.groupBlacklist.toList(),
-    };
+  'originalLanguage':
+      instance.originalLanguage.map(const LanguageConverter().toJson).toList(),
+  'contentRating':
+      instance.contentRating.map((e) => _$ContentRatingEnumMap[e]!).toList(),
+  'dataSaver': instance.dataSaver,
+  'groupBlacklist': instance.groupBlacklist.toList(),
+};
 
 const _$ContentRatingEnumMap = {
   ContentRating.safe: 'safe',
@@ -63,18 +66,19 @@ const mdConfigProvider = MdConfigProvider._();
 
 final class MdConfigProvider
     extends $NotifierProvider<MdConfig, MangaDexConfig> {
-  const MdConfigProvider._(
-      {super.runNotifierBuildOverride, MdConfig Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'mdConfigProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const MdConfigProvider._({
+    super.runNotifierBuildOverride,
+    MdConfig Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'mdConfigProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final MdConfig Function()? _createCb;
 
@@ -95,19 +99,14 @@ final class MdConfigProvider
 
   @$internal
   @override
-  MdConfigProvider $copyWithCreate(
-    MdConfig Function() create,
-  ) {
+  MdConfigProvider $copyWithCreate(MdConfig Function() create) {
     return MdConfigProvider._(create: create);
   }
 
   @$internal
   @override
   MdConfigProvider $copyWithBuild(
-    MangaDexConfig Function(
-      Ref,
-      MdConfig,
-    ) build,
+    MangaDexConfig Function(Ref, MdConfig) build,
   ) {
     return MdConfigProvider._(runNotifierBuildOverride: build);
   }
@@ -118,14 +117,11 @@ final class MdConfigProvider
       _$MdConfigElement(this, pointer);
 
   ProviderListenable<MdConfig$Save> get save =>
-      $LazyProxyListenable<MdConfig$Save, MangaDexConfig>(
-        this,
-        (element) {
-          element as _$MdConfigElement;
+      $LazyProxyListenable<MdConfig$Save, MangaDexConfig>(this, (element) {
+        element as _$MdConfigElement;
 
-          return element._$save;
-        },
-      );
+        return element._$save;
+      });
 }
 
 String _$mdConfigHash() => r'1adb0a68f5f631151a2d471a52904ab2fbeedba5';
@@ -137,8 +133,14 @@ abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<MangaDexConfig>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<MangaDexConfig>, MangaDexConfig, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<MangaDexConfig>,
+              MangaDexConfig,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }
@@ -200,20 +202,16 @@ final class _$MdConfig$Save
   @override
   Future<MangaDexConfig> call(MangaDexConfig update) {
     return mutateAsync(
-      Invocation.method(
-        #save,
-        [update],
-      ),
-      ($notifier) => $notifier.save(
-        update,
-      ),
+      Invocation.method(#save, [update]),
+      ($notifier) => $notifier.save(update),
     );
   }
 
   @override
-  _$MdConfig$Save copyWith(MutationState<MangaDexConfig> state,
-          {Object? key}) =>
-      _$MdConfig$Save(element, state: state, key: key);
+  _$MdConfig$Save copyWith(
+    MutationState<MangaDexConfig> state, {
+    Object? key,
+  }) => _$MdConfig$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

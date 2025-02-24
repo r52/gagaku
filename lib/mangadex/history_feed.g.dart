@@ -9,30 +9,29 @@ part of 'history_feed.dart';
 @ProviderFor(_fetchHistoryFeed)
 const _fetchHistoryFeedProvider = _FetchHistoryFeedProvider._();
 
-final class _FetchHistoryFeedProvider extends $FunctionalProvider<
-        AsyncValue<List<ChapterFeedItemData>>,
-        FutureOr<List<ChapterFeedItemData>>>
+final class _FetchHistoryFeedProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ChapterFeedItemData>>,
+          FutureOr<List<ChapterFeedItemData>>
+        >
     with
         $FutureModifier<List<ChapterFeedItemData>>,
         $FutureProvider<List<ChapterFeedItemData>> {
-  const _FetchHistoryFeedProvider._(
-      {FutureOr<List<ChapterFeedItemData>> Function(
-        Ref ref,
-      )? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: noRetry,
-          name: r'_fetchHistoryFeedProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _FetchHistoryFeedProvider._({
+    FutureOr<List<ChapterFeedItemData>> Function(Ref ref)? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: noRetry,
+         name: r'_fetchHistoryFeedProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
-  final FutureOr<List<ChapterFeedItemData>> Function(
-    Ref ref,
-  )? _createCb;
+  final FutureOr<List<ChapterFeedItemData>> Function(Ref ref)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchHistoryFeedHash();
@@ -40,14 +39,12 @@ final class _FetchHistoryFeedProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ChapterFeedItemData>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(this, pointer);
 
   @override
   _FetchHistoryFeedProvider $copyWithCreate(
-    FutureOr<List<ChapterFeedItemData>> Function(
-      Ref ref,
-    ) create,
+    FutureOr<List<ChapterFeedItemData>> Function(Ref ref) create,
   ) {
     return _FetchHistoryFeedProvider._(create: create);
   }

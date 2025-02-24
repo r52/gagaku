@@ -12,7 +12,8 @@ part of 'config.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) {
   return _ReaderConfig.fromJson(json);
@@ -51,16 +52,18 @@ mixin _$ReaderConfig {
 /// @nodoc
 abstract class $ReaderConfigCopyWith<$Res> {
   factory $ReaderConfigCopyWith(
-          ReaderConfig value, $Res Function(ReaderConfig) then) =
-      _$ReaderConfigCopyWithImpl<$Res, ReaderConfig>;
+    ReaderConfig value,
+    $Res Function(ReaderConfig) then,
+  ) = _$ReaderConfigCopyWithImpl<$Res, ReaderConfig>;
   @useResult
-  $Res call(
-      {ReaderFormat format,
-      ReaderDirection direction,
-      bool showProgressBar,
-      bool clickToTurn,
-      bool swipeGestures,
-      int precacheCount});
+  $Res call({
+    ReaderFormat format,
+    ReaderDirection direction,
+    bool showProgressBar,
+    bool clickToTurn,
+    bool swipeGestures,
+    int precacheCount,
+  });
 }
 
 /// @nodoc
@@ -85,32 +88,41 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
     Object? swipeGestures = null,
     Object? precacheCount = null,
   }) {
-    return _then(_value.copyWith(
-      format: null == format
-          ? _value.format
-          : format // ignore: cast_nullable_to_non_nullable
-              as ReaderFormat,
-      direction: null == direction
-          ? _value.direction
-          : direction // ignore: cast_nullable_to_non_nullable
-              as ReaderDirection,
-      showProgressBar: null == showProgressBar
-          ? _value.showProgressBar
-          : showProgressBar // ignore: cast_nullable_to_non_nullable
-              as bool,
-      clickToTurn: null == clickToTurn
-          ? _value.clickToTurn
-          : clickToTurn // ignore: cast_nullable_to_non_nullable
-              as bool,
-      swipeGestures: null == swipeGestures
-          ? _value.swipeGestures
-          : swipeGestures // ignore: cast_nullable_to_non_nullable
-              as bool,
-      precacheCount: null == precacheCount
-          ? _value.precacheCount
-          : precacheCount // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            format:
+                null == format
+                    ? _value.format
+                    : format // ignore: cast_nullable_to_non_nullable
+                        as ReaderFormat,
+            direction:
+                null == direction
+                    ? _value.direction
+                    : direction // ignore: cast_nullable_to_non_nullable
+                        as ReaderDirection,
+            showProgressBar:
+                null == showProgressBar
+                    ? _value.showProgressBar
+                    : showProgressBar // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            clickToTurn:
+                null == clickToTurn
+                    ? _value.clickToTurn
+                    : clickToTurn // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            swipeGestures:
+                null == swipeGestures
+                    ? _value.swipeGestures
+                    : swipeGestures // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            precacheCount:
+                null == precacheCount
+                    ? _value.precacheCount
+                    : precacheCount // ignore: cast_nullable_to_non_nullable
+                        as int,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -118,17 +130,19 @@ class _$ReaderConfigCopyWithImpl<$Res, $Val extends ReaderConfig>
 abstract class _$$ReaderConfigImplCopyWith<$Res>
     implements $ReaderConfigCopyWith<$Res> {
   factory _$$ReaderConfigImplCopyWith(
-          _$ReaderConfigImpl value, $Res Function(_$ReaderConfigImpl) then) =
-      __$$ReaderConfigImplCopyWithImpl<$Res>;
+    _$ReaderConfigImpl value,
+    $Res Function(_$ReaderConfigImpl) then,
+  ) = __$$ReaderConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {ReaderFormat format,
-      ReaderDirection direction,
-      bool showProgressBar,
-      bool clickToTurn,
-      bool swipeGestures,
-      int precacheCount});
+  $Res call({
+    ReaderFormat format,
+    ReaderDirection direction,
+    bool showProgressBar,
+    bool clickToTurn,
+    bool swipeGestures,
+    int precacheCount,
+  });
 }
 
 /// @nodoc
@@ -136,8 +150,9 @@ class __$$ReaderConfigImplCopyWithImpl<$Res>
     extends _$ReaderConfigCopyWithImpl<$Res, _$ReaderConfigImpl>
     implements _$$ReaderConfigImplCopyWith<$Res> {
   __$$ReaderConfigImplCopyWithImpl(
-      _$ReaderConfigImpl _value, $Res Function(_$ReaderConfigImpl) _then)
-      : super(_value, _then);
+    _$ReaderConfigImpl _value,
+    $Res Function(_$ReaderConfigImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ReaderConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -151,45 +166,54 @@ class __$$ReaderConfigImplCopyWithImpl<$Res>
     Object? swipeGestures = null,
     Object? precacheCount = null,
   }) {
-    return _then(_$ReaderConfigImpl(
-      format: null == format
-          ? _value.format
-          : format // ignore: cast_nullable_to_non_nullable
-              as ReaderFormat,
-      direction: null == direction
-          ? _value.direction
-          : direction // ignore: cast_nullable_to_non_nullable
-              as ReaderDirection,
-      showProgressBar: null == showProgressBar
-          ? _value.showProgressBar
-          : showProgressBar // ignore: cast_nullable_to_non_nullable
-              as bool,
-      clickToTurn: null == clickToTurn
-          ? _value.clickToTurn
-          : clickToTurn // ignore: cast_nullable_to_non_nullable
-              as bool,
-      swipeGestures: null == swipeGestures
-          ? _value.swipeGestures
-          : swipeGestures // ignore: cast_nullable_to_non_nullable
-              as bool,
-      precacheCount: null == precacheCount
-          ? _value.precacheCount
-          : precacheCount // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    return _then(
+      _$ReaderConfigImpl(
+        format:
+            null == format
+                ? _value.format
+                : format // ignore: cast_nullable_to_non_nullable
+                    as ReaderFormat,
+        direction:
+            null == direction
+                ? _value.direction
+                : direction // ignore: cast_nullable_to_non_nullable
+                    as ReaderDirection,
+        showProgressBar:
+            null == showProgressBar
+                ? _value.showProgressBar
+                : showProgressBar // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        clickToTurn:
+            null == clickToTurn
+                ? _value.clickToTurn
+                : clickToTurn // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        swipeGestures:
+            null == swipeGestures
+                ? _value.swipeGestures
+                : swipeGestures // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        precacheCount:
+            null == precacheCount
+                ? _value.precacheCount
+                : precacheCount // ignore: cast_nullable_to_non_nullable
+                    as int,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ReaderConfigImpl implements _ReaderConfig {
-  const _$ReaderConfigImpl(
-      {this.format = ReaderFormat.single,
-      this.direction = ReaderDirection.leftToRight,
-      this.showProgressBar = false,
-      this.clickToTurn = true,
-      this.swipeGestures = true,
-      this.precacheCount = 3});
+  const _$ReaderConfigImpl({
+    this.format = ReaderFormat.single,
+    this.direction = ReaderDirection.leftToRight,
+    this.showProgressBar = false,
+    this.clickToTurn = true,
+    this.swipeGestures = true,
+    this.precacheCount = 3,
+  });
 
   factory _$ReaderConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReaderConfigImplFromJson(json);
@@ -249,8 +273,15 @@ class _$ReaderConfigImpl implements _ReaderConfig {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, format, direction,
-      showProgressBar, clickToTurn, swipeGestures, precacheCount);
+  int get hashCode => Object.hash(
+    runtimeType,
+    format,
+    direction,
+    showProgressBar,
+    clickToTurn,
+    swipeGestures,
+    precacheCount,
+  );
 
   /// Create a copy of ReaderConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -262,20 +293,19 @@ class _$ReaderConfigImpl implements _ReaderConfig {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ReaderConfigImplToJson(
-      this,
-    );
+    return _$$ReaderConfigImplToJson(this);
   }
 }
 
 abstract class _ReaderConfig implements ReaderConfig {
-  const factory _ReaderConfig(
-      {final ReaderFormat format,
-      final ReaderDirection direction,
-      final bool showProgressBar,
-      final bool clickToTurn,
-      final bool swipeGestures,
-      final int precacheCount}) = _$ReaderConfigImpl;
+  const factory _ReaderConfig({
+    final ReaderFormat format,
+    final ReaderDirection direction,
+    final bool showProgressBar,
+    final bool clickToTurn,
+    final bool swipeGestures,
+    final int precacheCount,
+  }) = _$ReaderConfigImpl;
 
   factory _ReaderConfig.fromJson(Map<String, dynamic> json) =
       _$ReaderConfigImpl.fromJson;

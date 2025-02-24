@@ -12,7 +12,8 @@ part of 'config.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 WebSourceConfig _$WebSourceConfigFromJson(Map<String, dynamic> json) {
   return _WebSourceConfig.fromJson(json);
@@ -47,14 +48,16 @@ mixin _$WebSourceConfig {
 /// @nodoc
 abstract class $WebSourceConfigCopyWith<$Res> {
   factory $WebSourceConfigCopyWith(
-          WebSourceConfig value, $Res Function(WebSourceConfig) then) =
-      _$WebSourceConfigCopyWithImpl<$Res, WebSourceConfig>;
+    WebSourceConfig value,
+    $Res Function(WebSourceConfig) then,
+  ) = _$WebSourceConfigCopyWithImpl<$Res, WebSourceConfig>;
   @useResult
-  $Res call(
-      {List<WebSourceInfo> installedSources,
-      @RepoConverter() List<RepoInfo> repoList,
-      List<WebSourceCategory> categories,
-      String defaultCategory});
+  $Res call({
+    List<WebSourceInfo> installedSources,
+    @RepoConverter() List<RepoInfo> repoList,
+    List<WebSourceCategory> categories,
+    String defaultCategory,
+  });
 }
 
 /// @nodoc
@@ -77,40 +80,49 @@ class _$WebSourceConfigCopyWithImpl<$Res, $Val extends WebSourceConfig>
     Object? categories = null,
     Object? defaultCategory = null,
   }) {
-    return _then(_value.copyWith(
-      installedSources: null == installedSources
-          ? _value.installedSources
-          : installedSources // ignore: cast_nullable_to_non_nullable
-              as List<WebSourceInfo>,
-      repoList: null == repoList
-          ? _value.repoList
-          : repoList // ignore: cast_nullable_to_non_nullable
-              as List<RepoInfo>,
-      categories: null == categories
-          ? _value.categories
-          : categories // ignore: cast_nullable_to_non_nullable
-              as List<WebSourceCategory>,
-      defaultCategory: null == defaultCategory
-          ? _value.defaultCategory
-          : defaultCategory // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            installedSources:
+                null == installedSources
+                    ? _value.installedSources
+                    : installedSources // ignore: cast_nullable_to_non_nullable
+                        as List<WebSourceInfo>,
+            repoList:
+                null == repoList
+                    ? _value.repoList
+                    : repoList // ignore: cast_nullable_to_non_nullable
+                        as List<RepoInfo>,
+            categories:
+                null == categories
+                    ? _value.categories
+                    : categories // ignore: cast_nullable_to_non_nullable
+                        as List<WebSourceCategory>,
+            defaultCategory:
+                null == defaultCategory
+                    ? _value.defaultCategory
+                    : defaultCategory // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$WebSourceConfigImplCopyWith<$Res>
     implements $WebSourceConfigCopyWith<$Res> {
-  factory _$$WebSourceConfigImplCopyWith(_$WebSourceConfigImpl value,
-          $Res Function(_$WebSourceConfigImpl) then) =
-      __$$WebSourceConfigImplCopyWithImpl<$Res>;
+  factory _$$WebSourceConfigImplCopyWith(
+    _$WebSourceConfigImpl value,
+    $Res Function(_$WebSourceConfigImpl) then,
+  ) = __$$WebSourceConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {List<WebSourceInfo> installedSources,
-      @RepoConverter() List<RepoInfo> repoList,
-      List<WebSourceCategory> categories,
-      String defaultCategory});
+  $Res call({
+    List<WebSourceInfo> installedSources,
+    @RepoConverter() List<RepoInfo> repoList,
+    List<WebSourceCategory> categories,
+    String defaultCategory,
+  });
 }
 
 /// @nodoc
@@ -118,8 +130,9 @@ class __$$WebSourceConfigImplCopyWithImpl<$Res>
     extends _$WebSourceConfigCopyWithImpl<$Res, _$WebSourceConfigImpl>
     implements _$$WebSourceConfigImplCopyWith<$Res> {
   __$$WebSourceConfigImplCopyWithImpl(
-      _$WebSourceConfigImpl _value, $Res Function(_$WebSourceConfigImpl) _then)
-      : super(_value, _then);
+    _$WebSourceConfigImpl _value,
+    $Res Function(_$WebSourceConfigImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of WebSourceConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -131,35 +144,42 @@ class __$$WebSourceConfigImplCopyWithImpl<$Res>
     Object? categories = null,
     Object? defaultCategory = null,
   }) {
-    return _then(_$WebSourceConfigImpl(
-      installedSources: null == installedSources
-          ? _value.installedSources
-          : installedSources // ignore: cast_nullable_to_non_nullable
-              as List<WebSourceInfo>,
-      repoList: null == repoList
-          ? _value.repoList
-          : repoList // ignore: cast_nullable_to_non_nullable
-              as List<RepoInfo>,
-      categories: null == categories
-          ? _value.categories
-          : categories // ignore: cast_nullable_to_non_nullable
-              as List<WebSourceCategory>,
-      defaultCategory: null == defaultCategory
-          ? _value.defaultCategory
-          : defaultCategory // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return _then(
+      _$WebSourceConfigImpl(
+        installedSources:
+            null == installedSources
+                ? _value.installedSources
+                : installedSources // ignore: cast_nullable_to_non_nullable
+                    as List<WebSourceInfo>,
+        repoList:
+            null == repoList
+                ? _value.repoList
+                : repoList // ignore: cast_nullable_to_non_nullable
+                    as List<RepoInfo>,
+        categories:
+            null == categories
+                ? _value.categories
+                : categories // ignore: cast_nullable_to_non_nullable
+                    as List<WebSourceCategory>,
+        defaultCategory:
+            null == defaultCategory
+                ? _value.defaultCategory
+                : defaultCategory // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$WebSourceConfigImpl implements _WebSourceConfig {
-  _$WebSourceConfigImpl(
-      {this.installedSources = const [],
-      @RepoConverter() this.repoList = const [],
-      this.categories = const [_defaultCategory],
-      this.defaultCategory = _defaultUUID});
+  _$WebSourceConfigImpl({
+    this.installedSources = const [],
+    @RepoConverter() this.repoList = const [],
+    this.categories = const [_defaultCategory],
+    this.defaultCategory = _defaultUUID,
+  });
 
   factory _$WebSourceConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$WebSourceConfigImplFromJson(json);
@@ -190,22 +210,23 @@ class _$WebSourceConfigImpl implements _WebSourceConfig {
   @pragma('vm:prefer-inline')
   _$$WebSourceConfigImplCopyWith<_$WebSourceConfigImpl> get copyWith =>
       __$$WebSourceConfigImplCopyWithImpl<_$WebSourceConfigImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$WebSourceConfigImplToJson(
-      this,
-    );
+    return _$$WebSourceConfigImplToJson(this);
   }
 }
 
 abstract class _WebSourceConfig implements WebSourceConfig {
-  factory _WebSourceConfig(
-      {List<WebSourceInfo> installedSources,
-      @RepoConverter() List<RepoInfo> repoList,
-      List<WebSourceCategory> categories,
-      String defaultCategory}) = _$WebSourceConfigImpl;
+  factory _WebSourceConfig({
+    List<WebSourceInfo> installedSources,
+    @RepoConverter() List<RepoInfo> repoList,
+    List<WebSourceCategory> categories,
+    String defaultCategory,
+  }) = _$WebSourceConfigImpl;
 
   factory _WebSourceConfig.fromJson(Map<String, dynamic> json) =
       _$WebSourceConfigImpl.fromJson;

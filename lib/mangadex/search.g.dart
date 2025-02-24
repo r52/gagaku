@@ -11,18 +11,19 @@ const _searchHistoryProvider = _SearchHistoryProvider._();
 
 final class _SearchHistoryProvider
     extends $NotifierProvider<_SearchHistory, List<String>> {
-  const _SearchHistoryProvider._(
-      {super.runNotifierBuildOverride, _SearchHistory Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'_searchHistoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _SearchHistoryProvider._({
+    super.runNotifierBuildOverride,
+    _SearchHistory Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'_searchHistoryProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final _SearchHistory Function()? _createCb;
 
@@ -43,19 +44,14 @@ final class _SearchHistoryProvider
 
   @$internal
   @override
-  _SearchHistoryProvider $copyWithCreate(
-    _SearchHistory Function() create,
-  ) {
+  _SearchHistoryProvider $copyWithCreate(_SearchHistory Function() create) {
     return _SearchHistoryProvider._(create: create);
   }
 
   @$internal
   @override
   _SearchHistoryProvider $copyWithBuild(
-    List<String> Function(
-      Ref,
-      _SearchHistory,
-    ) build,
+    List<String> Function(Ref, _SearchHistory) build,
   ) {
     return _SearchHistoryProvider._(runNotifierBuildOverride: build);
   }
@@ -63,8 +59,8 @@ final class _SearchHistoryProvider
   @$internal
   @override
   $NotifierProviderElement<_SearchHistory, List<String>> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$searchHistoryHash() => r'03b2bdeb09ccc897e60e3e498de7f80aa8df9377';
@@ -76,8 +72,14 @@ abstract class _$SearchHistory extends $Notifier<List<String>> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<List<String>>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<List<String>>, List<String>, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<List<String>>,
+              List<String>,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }
@@ -87,18 +89,19 @@ const _searchParamsProvider = _SearchParamsProvider._();
 
 final class _SearchParamsProvider
     extends $NotifierProvider<_SearchParams, MangaSearchParameters> {
-  const _SearchParamsProvider._(
-      {super.runNotifierBuildOverride, _SearchParams Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'_searchParamsProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _SearchParamsProvider._({
+    super.runNotifierBuildOverride,
+    _SearchParams Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'_searchParamsProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final _SearchParams Function()? _createCb;
 
@@ -119,19 +122,14 @@ final class _SearchParamsProvider
 
   @$internal
   @override
-  _SearchParamsProvider $copyWithCreate(
-    _SearchParams Function() create,
-  ) {
+  _SearchParamsProvider $copyWithCreate(_SearchParams Function() create) {
     return _SearchParamsProvider._(create: create);
   }
 
   @$internal
   @override
   _SearchParamsProvider $copyWithBuild(
-    MangaSearchParameters Function(
-      Ref,
-      _SearchParams,
-    ) build,
+    MangaSearchParameters Function(Ref, _SearchParams) build,
   ) {
     return _SearchParamsProvider._(runNotifierBuildOverride: build);
   }
@@ -139,8 +137,8 @@ final class _SearchParamsProvider
   @$internal
   @override
   $NotifierProviderElement<_SearchParams, MangaSearchParameters> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$searchParamsHash() => r'f582a835c216b1a198b6d5c3357f2e354b05cf68';
@@ -152,11 +150,14 @@ abstract class _$SearchParams extends $Notifier<MangaSearchParameters> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<MangaSearchParameters>;
-    final element = ref.element as $ClassProviderElement<
-        NotifierBase<MangaSearchParameters>,
-        MangaSearchParameters,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<MangaSearchParameters>,
+              MangaSearchParameters,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }

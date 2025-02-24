@@ -9,30 +9,29 @@ part of 'chapter_feed.dart';
 @ProviderFor(_fetchChapters)
 const _fetchChaptersProvider = _FetchChaptersProvider._();
 
-final class _FetchChaptersProvider extends $FunctionalProvider<
-        AsyncValue<List<ChapterFeedItemData>>,
-        FutureOr<List<ChapterFeedItemData>>>
+final class _FetchChaptersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ChapterFeedItemData>>,
+          FutureOr<List<ChapterFeedItemData>>
+        >
     with
         $FutureModifier<List<ChapterFeedItemData>>,
         $FutureProvider<List<ChapterFeedItemData>> {
-  const _FetchChaptersProvider._(
-      {FutureOr<List<ChapterFeedItemData>> Function(
-        Ref ref,
-      )? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: noRetry,
-          name: r'_fetchChaptersProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _FetchChaptersProvider._({
+    FutureOr<List<ChapterFeedItemData>> Function(Ref ref)? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: noRetry,
+         name: r'_fetchChaptersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
-  final FutureOr<List<ChapterFeedItemData>> Function(
-    Ref ref,
-  )? _createCb;
+  final FutureOr<List<ChapterFeedItemData>> Function(Ref ref)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchChaptersHash();
@@ -40,14 +39,12 @@ final class _FetchChaptersProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ChapterFeedItemData>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(this, pointer);
 
   @override
   _FetchChaptersProvider $copyWithCreate(
-    FutureOr<List<ChapterFeedItemData>> Function(
-      Ref ref,
-    ) create,
+    FutureOr<List<ChapterFeedItemData>> Function(Ref ref) create,
   ) {
     return _FetchChaptersProvider._(create: create);
   }

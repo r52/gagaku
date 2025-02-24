@@ -9,30 +9,29 @@ part of 'latest_feed.dart';
 @ProviderFor(_fetchGlobalChapters)
 const _fetchGlobalChaptersProvider = _FetchGlobalChaptersProvider._();
 
-final class _FetchGlobalChaptersProvider extends $FunctionalProvider<
-        AsyncValue<List<ChapterFeedItemData>>,
-        FutureOr<List<ChapterFeedItemData>>>
+final class _FetchGlobalChaptersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ChapterFeedItemData>>,
+          FutureOr<List<ChapterFeedItemData>>
+        >
     with
         $FutureModifier<List<ChapterFeedItemData>>,
         $FutureProvider<List<ChapterFeedItemData>> {
-  const _FetchGlobalChaptersProvider._(
-      {FutureOr<List<ChapterFeedItemData>> Function(
-        Ref ref,
-      )? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: noRetry,
-          name: r'_fetchGlobalChaptersProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _FetchGlobalChaptersProvider._({
+    FutureOr<List<ChapterFeedItemData>> Function(Ref ref)? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: noRetry,
+         name: r'_fetchGlobalChaptersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
-  final FutureOr<List<ChapterFeedItemData>> Function(
-    Ref ref,
-  )? _createCb;
+  final FutureOr<List<ChapterFeedItemData>> Function(Ref ref)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchGlobalChaptersHash();
@@ -40,14 +39,12 @@ final class _FetchGlobalChaptersProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ChapterFeedItemData>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(this, pointer);
 
   @override
   _FetchGlobalChaptersProvider $copyWithCreate(
-    FutureOr<List<ChapterFeedItemData>> Function(
-      Ref ref,
-    ) create,
+    FutureOr<List<ChapterFeedItemData>> Function(Ref ref) create,
   ) {
     return _FetchGlobalChaptersProvider._(create: create);
   }

@@ -12,7 +12,8 @@ part of 'config.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 GagakuConfig _$GagakuConfigFromJson(Map<String, dynamic> json) {
   return _GagakuConfig.fromJson(json);
@@ -41,13 +42,15 @@ mixin _$GagakuConfig {
 /// @nodoc
 abstract class $GagakuConfigCopyWith<$Res> {
   factory $GagakuConfigCopyWith(
-          GagakuConfig value, $Res Function(GagakuConfig) then) =
-      _$GagakuConfigCopyWithImpl<$Res, GagakuConfig>;
+    GagakuConfig value,
+    $Res Function(GagakuConfig) then,
+  ) = _$GagakuConfigCopyWithImpl<$Res, GagakuConfig>;
   @useResult
-  $Res call(
-      {ThemeMode themeMode,
-      @JsonKey(unknownEnumValue: GagakuTheme.lime) GagakuTheme theme,
-      GridAlbumExtent gridAlbumExtent});
+  $Res call({
+    ThemeMode themeMode,
+    @JsonKey(unknownEnumValue: GagakuTheme.lime) GagakuTheme theme,
+    GridAlbumExtent gridAlbumExtent,
+  });
 }
 
 /// @nodoc
@@ -69,20 +72,26 @@ class _$GagakuConfigCopyWithImpl<$Res, $Val extends GagakuConfig>
     Object? theme = null,
     Object? gridAlbumExtent = null,
   }) {
-    return _then(_value.copyWith(
-      themeMode: null == themeMode
-          ? _value.themeMode
-          : themeMode // ignore: cast_nullable_to_non_nullable
-              as ThemeMode,
-      theme: null == theme
-          ? _value.theme
-          : theme // ignore: cast_nullable_to_non_nullable
-              as GagakuTheme,
-      gridAlbumExtent: null == gridAlbumExtent
-          ? _value.gridAlbumExtent
-          : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
-              as GridAlbumExtent,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            themeMode:
+                null == themeMode
+                    ? _value.themeMode
+                    : themeMode // ignore: cast_nullable_to_non_nullable
+                        as ThemeMode,
+            theme:
+                null == theme
+                    ? _value.theme
+                    : theme // ignore: cast_nullable_to_non_nullable
+                        as GagakuTheme,
+            gridAlbumExtent:
+                null == gridAlbumExtent
+                    ? _value.gridAlbumExtent
+                    : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
+                        as GridAlbumExtent,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -90,14 +99,16 @@ class _$GagakuConfigCopyWithImpl<$Res, $Val extends GagakuConfig>
 abstract class _$$GagakuConfigImplCopyWith<$Res>
     implements $GagakuConfigCopyWith<$Res> {
   factory _$$GagakuConfigImplCopyWith(
-          _$GagakuConfigImpl value, $Res Function(_$GagakuConfigImpl) then) =
-      __$$GagakuConfigImplCopyWithImpl<$Res>;
+    _$GagakuConfigImpl value,
+    $Res Function(_$GagakuConfigImpl) then,
+  ) = __$$GagakuConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {ThemeMode themeMode,
-      @JsonKey(unknownEnumValue: GagakuTheme.lime) GagakuTheme theme,
-      GridAlbumExtent gridAlbumExtent});
+  $Res call({
+    ThemeMode themeMode,
+    @JsonKey(unknownEnumValue: GagakuTheme.lime) GagakuTheme theme,
+    GridAlbumExtent gridAlbumExtent,
+  });
 }
 
 /// @nodoc
@@ -105,8 +116,9 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
     extends _$GagakuConfigCopyWithImpl<$Res, _$GagakuConfigImpl>
     implements _$$GagakuConfigImplCopyWith<$Res> {
   __$$GagakuConfigImplCopyWithImpl(
-      _$GagakuConfigImpl _value, $Res Function(_$GagakuConfigImpl) _then)
-      : super(_value, _then);
+    _$GagakuConfigImpl _value,
+    $Res Function(_$GagakuConfigImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of GagakuConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -117,31 +129,36 @@ class __$$GagakuConfigImplCopyWithImpl<$Res>
     Object? theme = null,
     Object? gridAlbumExtent = null,
   }) {
-    return _then(_$GagakuConfigImpl(
-      themeMode: null == themeMode
-          ? _value.themeMode
-          : themeMode // ignore: cast_nullable_to_non_nullable
-              as ThemeMode,
-      theme: null == theme
-          ? _value.theme
-          : theme // ignore: cast_nullable_to_non_nullable
-              as GagakuTheme,
-      gridAlbumExtent: null == gridAlbumExtent
-          ? _value.gridAlbumExtent
-          : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
-              as GridAlbumExtent,
-    ));
+    return _then(
+      _$GagakuConfigImpl(
+        themeMode:
+            null == themeMode
+                ? _value.themeMode
+                : themeMode // ignore: cast_nullable_to_non_nullable
+                    as ThemeMode,
+        theme:
+            null == theme
+                ? _value.theme
+                : theme // ignore: cast_nullable_to_non_nullable
+                    as GagakuTheme,
+        gridAlbumExtent:
+            null == gridAlbumExtent
+                ? _value.gridAlbumExtent
+                : gridAlbumExtent // ignore: cast_nullable_to_non_nullable
+                    as GridAlbumExtent,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$GagakuConfigImpl implements _GagakuConfig {
-  const _$GagakuConfigImpl(
-      {this.themeMode = ThemeMode.system,
-      @JsonKey(unknownEnumValue: GagakuTheme.lime)
-      this.theme = GagakuTheme.lime,
-      this.gridAlbumExtent = GridAlbumExtent.medium});
+  const _$GagakuConfigImpl({
+    this.themeMode = ThemeMode.system,
+    @JsonKey(unknownEnumValue: GagakuTheme.lime) this.theme = GagakuTheme.lime,
+    this.gridAlbumExtent = GridAlbumExtent.medium,
+  });
 
   factory _$GagakuConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$GagakuConfigImplFromJson(json);
@@ -155,7 +172,7 @@ class _$GagakuConfigImpl implements _GagakuConfig {
   @override
   @JsonKey(unknownEnumValue: GagakuTheme.lime)
   final GagakuTheme theme;
-// Grid view size
+  // Grid view size
   @override
   @JsonKey()
   final GridAlbumExtent gridAlbumExtent;
@@ -192,17 +209,16 @@ class _$GagakuConfigImpl implements _GagakuConfig {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$GagakuConfigImplToJson(
-      this,
-    );
+    return _$$GagakuConfigImplToJson(this);
   }
 }
 
 abstract class _GagakuConfig implements GagakuConfig {
-  const factory _GagakuConfig(
-      {final ThemeMode themeMode,
-      @JsonKey(unknownEnumValue: GagakuTheme.lime) final GagakuTheme theme,
-      final GridAlbumExtent gridAlbumExtent}) = _$GagakuConfigImpl;
+  const factory _GagakuConfig({
+    final ThemeMode themeMode,
+    @JsonKey(unknownEnumValue: GagakuTheme.lime) final GagakuTheme theme,
+    final GridAlbumExtent gridAlbumExtent,
+  }) = _$GagakuConfigImpl;
 
   factory _GagakuConfig.fromJson(Map<String, dynamic> json) =
       _$GagakuConfigImpl.fromJson;

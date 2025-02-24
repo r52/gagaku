@@ -12,24 +12,20 @@ const _fetchMangaFeedProvider = _FetchMangaFeedProvider._();
 final class _FetchMangaFeedProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _FetchMangaFeedProvider._(
-      {FutureOr<List<Manga>> Function(
-        Ref ref,
-      )? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: noRetry,
-          name: r'_fetchMangaFeedProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _FetchMangaFeedProvider._({
+    FutureOr<List<Manga>> Function(Ref ref)? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: noRetry,
+         name: r'_fetchMangaFeedProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
-  final FutureOr<List<Manga>> Function(
-    Ref ref,
-  )? _createCb;
+  final FutureOr<List<Manga>> Function(Ref ref)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchMangaFeedHash();
@@ -37,14 +33,12 @@ final class _FetchMangaFeedProvider
   @$internal
   @override
   $FutureProviderElement<List<Manga>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(this, pointer);
 
   @override
   _FetchMangaFeedProvider $copyWithCreate(
-    FutureOr<List<Manga>> Function(
-      Ref ref,
-    ) create,
+    FutureOr<List<Manga>> Function(Ref ref) create,
   ) {
     return _FetchMangaFeedProvider._(create: create);
   }
