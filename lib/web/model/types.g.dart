@@ -418,6 +418,52 @@ Map<String, dynamic> _$$HomeSectionImplToJson(_$HomeSectionImpl instance) =>
       'containsMoreItems': instance.containsMoreItems,
     };
 
+_$DUIOAuthTokenResponseImpl _$$DUIOAuthTokenResponseImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DUIOAuthTokenResponseImpl(
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIOAuthTokenResponseImplToJson(
+        _$DUIOAuthTokenResponseImpl instance) =>
+    <String, dynamic>{
+      'type': instance.$type,
+    };
+
+_$DUIOAuthCodeResponseImpl _$$DUIOAuthCodeResponseImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DUIOAuthCodeResponseImpl(
+      tokenEndpoint: json['tokenEndpoint'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIOAuthCodeResponseImplToJson(
+        _$DUIOAuthCodeResponseImpl instance) =>
+    <String, dynamic>{
+      'tokenEndpoint': instance.tokenEndpoint,
+      'type': instance.$type,
+    };
+
+_$DUIOAuthPKCEResponseImpl _$$DUIOAuthPKCEResponseImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DUIOAuthPKCEResponseImpl(
+      tokenEndpoint: json['tokenEndpoint'] as String,
+      pkceCodeLength: json['pkceCodeLength'] as num,
+      pkceCodeMethod: json['pkceCodeMethod'] as String,
+      formEncodeGrant: json['formEncodeGrant'] as bool,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIOAuthPKCEResponseImplToJson(
+        _$DUIOAuthPKCEResponseImpl instance) =>
+    <String, dynamic>{
+      'tokenEndpoint': instance.tokenEndpoint,
+      'pkceCodeLength': instance.pkceCodeLength,
+      'pkceCodeMethod': instance.pkceCodeMethod,
+      'formEncodeGrant': instance.formEncodeGrant,
+      'type': instance.$type,
+    };
+
 _$DUISectionImpl _$$DUISectionImplFromJson(Map<String, dynamic> json) =>
     _$DUISectionImpl(
       id: json['id'] as String,
@@ -475,6 +521,94 @@ Map<String, dynamic> _$$DUIInputFieldImplToJson(_$DUIInputFieldImpl instance) =>
       'type': instance.$type,
     };
 
+_$DUISecureInputFieldImpl _$$DUISecureInputFieldImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DUISecureInputFieldImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUISecureInputFieldImplToJson(
+        _$DUISecureInputFieldImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'type': instance.$type,
+    };
+
+_$DUIStepperImpl _$$DUIStepperImplFromJson(Map<String, dynamic> json) =>
+    _$DUIStepperImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      min: json['min'] as num?,
+      max: json['max'] as num?,
+      step: json['step'] as num?,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIStepperImplToJson(_$DUIStepperImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'min': instance.min,
+      'max': instance.max,
+      'step': instance.step,
+      'type': instance.$type,
+    };
+
+_$DUILabelImpl _$$DUILabelImplFromJson(Map<String, dynamic> json) =>
+    _$DUILabelImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      value: json['value'] as String?,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUILabelImplToJson(_$DUILabelImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'value': instance.value,
+      'type': instance.$type,
+    };
+
+_$DUIMultilineLabelImpl _$$DUIMultilineLabelImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DUIMultilineLabelImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      value: json['value'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIMultilineLabelImplToJson(
+        _$DUIMultilineLabelImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'value': instance.value,
+      'type': instance.$type,
+    };
+
+_$DUIHeaderImpl _$$DUIHeaderImplFromJson(Map<String, dynamic> json) =>
+    _$DUIHeaderImpl(
+      id: json['id'] as String,
+      imageUrl: json['imageUrl'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIHeaderImplToJson(_$DUIHeaderImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'imageUrl': instance.imageUrl,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
+      'type': instance.$type,
+    };
+
 _$DUIButtonImpl _$$DUIButtonImplFromJson(Map<String, dynamic> json) =>
     _$DUIButtonImpl(
       id: json['id'] as String,
@@ -518,6 +652,33 @@ Map<String, dynamic> _$$DUISwitchImplToJson(_$DUISwitchImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'label': instance.label,
+      'type': instance.$type,
+    };
+
+_$DUIOAuthButtonImpl _$$DUIOAuthButtonImplFromJson(Map<String, dynamic> json) =>
+    _$DUIOAuthButtonImpl(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      authorizeEndpoint: json['authorizeEndpoint'] as String,
+      clientId: json['clientId'] as String,
+      responseType: DUIOAuthResponseType.fromJson(
+          json['responseType'] as Map<String, dynamic>),
+      redirectUri: json['redirectUri'] as String?,
+      scopes:
+          (json['scopes'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$$DUIOAuthButtonImplToJson(
+        _$DUIOAuthButtonImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label': instance.label,
+      'authorizeEndpoint': instance.authorizeEndpoint,
+      'clientId': instance.clientId,
+      'responseType': instance.responseType,
+      'redirectUri': instance.redirectUri,
+      'scopes': instance.scopes,
       'type': instance.$type,
     };
 

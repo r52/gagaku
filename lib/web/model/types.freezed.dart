@@ -5239,6 +5239,632 @@ abstract class _HomeSection implements HomeSection {
       throw _privateConstructorUsedError;
 }
 
+DUIOAuthResponseType _$DUIOAuthResponseTypeFromJson(Map<String, dynamic> json) {
+  switch (json['type']) {
+    case 'token':
+      return DUIOAuthTokenResponse.fromJson(json);
+    case 'code':
+      return DUIOAuthCodeResponse.fromJson(json);
+    case 'pkce':
+      return DUIOAuthPKCEResponse.fromJson(json);
+
+    default:
+      throw CheckedFromJsonException(json, 'type', 'DUIOAuthResponseType',
+          'Invalid union type "${json['type']}"!');
+  }
+}
+
+/// @nodoc
+mixin _$DUIOAuthResponseType {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() token,
+    required TResult Function(String tokenEndpoint) code,
+    required TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)
+        pkce,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? token,
+    TResult? Function(String tokenEndpoint)? code,
+    TResult? Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? token,
+    TResult Function(String tokenEndpoint)? code,
+    TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUIOAuthTokenResponse value) token,
+    required TResult Function(DUIOAuthCodeResponse value) code,
+    required TResult Function(DUIOAuthPKCEResponse value) pkce,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUIOAuthTokenResponse value)? token,
+    TResult? Function(DUIOAuthCodeResponse value)? code,
+    TResult? Function(DUIOAuthPKCEResponse value)? pkce,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUIOAuthTokenResponse value)? token,
+    TResult Function(DUIOAuthCodeResponse value)? code,
+    TResult Function(DUIOAuthPKCEResponse value)? pkce,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+
+  /// Serializes this DUIOAuthResponseType to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DUIOAuthResponseTypeCopyWith<$Res> {
+  factory $DUIOAuthResponseTypeCopyWith(DUIOAuthResponseType value,
+          $Res Function(DUIOAuthResponseType) then) =
+      _$DUIOAuthResponseTypeCopyWithImpl<$Res, DUIOAuthResponseType>;
+}
+
+/// @nodoc
+class _$DUIOAuthResponseTypeCopyWithImpl<$Res,
+        $Val extends DUIOAuthResponseType>
+    implements $DUIOAuthResponseTypeCopyWith<$Res> {
+  _$DUIOAuthResponseTypeCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+abstract class _$$DUIOAuthTokenResponseImplCopyWith<$Res> {
+  factory _$$DUIOAuthTokenResponseImplCopyWith(
+          _$DUIOAuthTokenResponseImpl value,
+          $Res Function(_$DUIOAuthTokenResponseImpl) then) =
+      __$$DUIOAuthTokenResponseImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$DUIOAuthTokenResponseImplCopyWithImpl<$Res>
+    extends _$DUIOAuthResponseTypeCopyWithImpl<$Res,
+        _$DUIOAuthTokenResponseImpl>
+    implements _$$DUIOAuthTokenResponseImplCopyWith<$Res> {
+  __$$DUIOAuthTokenResponseImplCopyWithImpl(_$DUIOAuthTokenResponseImpl _value,
+      $Res Function(_$DUIOAuthTokenResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIOAuthTokenResponseImpl implements DUIOAuthTokenResponse {
+  const _$DUIOAuthTokenResponseImpl({final String? $type})
+      : $type = $type ?? 'token';
+
+  factory _$DUIOAuthTokenResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIOAuthTokenResponseImplFromJson(json);
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIOAuthResponseType.token()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIOAuthTokenResponseImpl);
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() token,
+    required TResult Function(String tokenEndpoint) code,
+    required TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)
+        pkce,
+  }) {
+    return token();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? token,
+    TResult? Function(String tokenEndpoint)? code,
+    TResult? Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+  }) {
+    return token?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? token,
+    TResult Function(String tokenEndpoint)? code,
+    TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+    required TResult orElse(),
+  }) {
+    if (token != null) {
+      return token();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUIOAuthTokenResponse value) token,
+    required TResult Function(DUIOAuthCodeResponse value) code,
+    required TResult Function(DUIOAuthPKCEResponse value) pkce,
+  }) {
+    return token(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUIOAuthTokenResponse value)? token,
+    TResult? Function(DUIOAuthCodeResponse value)? code,
+    TResult? Function(DUIOAuthPKCEResponse value)? pkce,
+  }) {
+    return token?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUIOAuthTokenResponse value)? token,
+    TResult Function(DUIOAuthCodeResponse value)? code,
+    TResult Function(DUIOAuthPKCEResponse value)? pkce,
+    required TResult orElse(),
+  }) {
+    if (token != null) {
+      return token(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIOAuthTokenResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIOAuthTokenResponse implements DUIOAuthResponseType {
+  const factory DUIOAuthTokenResponse() = _$DUIOAuthTokenResponseImpl;
+
+  factory DUIOAuthTokenResponse.fromJson(Map<String, dynamic> json) =
+      _$DUIOAuthTokenResponseImpl.fromJson;
+}
+
+/// @nodoc
+abstract class _$$DUIOAuthCodeResponseImplCopyWith<$Res> {
+  factory _$$DUIOAuthCodeResponseImplCopyWith(_$DUIOAuthCodeResponseImpl value,
+          $Res Function(_$DUIOAuthCodeResponseImpl) then) =
+      __$$DUIOAuthCodeResponseImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String tokenEndpoint});
+}
+
+/// @nodoc
+class __$$DUIOAuthCodeResponseImplCopyWithImpl<$Res>
+    extends _$DUIOAuthResponseTypeCopyWithImpl<$Res, _$DUIOAuthCodeResponseImpl>
+    implements _$$DUIOAuthCodeResponseImplCopyWith<$Res> {
+  __$$DUIOAuthCodeResponseImplCopyWithImpl(_$DUIOAuthCodeResponseImpl _value,
+      $Res Function(_$DUIOAuthCodeResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? tokenEndpoint = null,
+  }) {
+    return _then(_$DUIOAuthCodeResponseImpl(
+      tokenEndpoint: null == tokenEndpoint
+          ? _value.tokenEndpoint
+          : tokenEndpoint // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIOAuthCodeResponseImpl implements DUIOAuthCodeResponse {
+  const _$DUIOAuthCodeResponseImpl(
+      {required this.tokenEndpoint, final String? $type})
+      : $type = $type ?? 'code';
+
+  factory _$DUIOAuthCodeResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIOAuthCodeResponseImplFromJson(json);
+
+  @override
+  final String tokenEndpoint;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIOAuthResponseType.code(tokenEndpoint: $tokenEndpoint)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIOAuthCodeResponseImpl &&
+            (identical(other.tokenEndpoint, tokenEndpoint) ||
+                other.tokenEndpoint == tokenEndpoint));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, tokenEndpoint);
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIOAuthCodeResponseImplCopyWith<_$DUIOAuthCodeResponseImpl>
+      get copyWith =>
+          __$$DUIOAuthCodeResponseImplCopyWithImpl<_$DUIOAuthCodeResponseImpl>(
+              this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() token,
+    required TResult Function(String tokenEndpoint) code,
+    required TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)
+        pkce,
+  }) {
+    return code(tokenEndpoint);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? token,
+    TResult? Function(String tokenEndpoint)? code,
+    TResult? Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+  }) {
+    return code?.call(tokenEndpoint);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? token,
+    TResult Function(String tokenEndpoint)? code,
+    TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+    required TResult orElse(),
+  }) {
+    if (code != null) {
+      return code(tokenEndpoint);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUIOAuthTokenResponse value) token,
+    required TResult Function(DUIOAuthCodeResponse value) code,
+    required TResult Function(DUIOAuthPKCEResponse value) pkce,
+  }) {
+    return code(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUIOAuthTokenResponse value)? token,
+    TResult? Function(DUIOAuthCodeResponse value)? code,
+    TResult? Function(DUIOAuthPKCEResponse value)? pkce,
+  }) {
+    return code?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUIOAuthTokenResponse value)? token,
+    TResult Function(DUIOAuthCodeResponse value)? code,
+    TResult Function(DUIOAuthPKCEResponse value)? pkce,
+    required TResult orElse(),
+  }) {
+    if (code != null) {
+      return code(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIOAuthCodeResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIOAuthCodeResponse implements DUIOAuthResponseType {
+  const factory DUIOAuthCodeResponse({required final String tokenEndpoint}) =
+      _$DUIOAuthCodeResponseImpl;
+
+  factory DUIOAuthCodeResponse.fromJson(Map<String, dynamic> json) =
+      _$DUIOAuthCodeResponseImpl.fromJson;
+
+  String get tokenEndpoint;
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIOAuthCodeResponseImplCopyWith<_$DUIOAuthCodeResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIOAuthPKCEResponseImplCopyWith<$Res> {
+  factory _$$DUIOAuthPKCEResponseImplCopyWith(_$DUIOAuthPKCEResponseImpl value,
+          $Res Function(_$DUIOAuthPKCEResponseImpl) then) =
+      __$$DUIOAuthPKCEResponseImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String tokenEndpoint,
+      num pkceCodeLength,
+      String pkceCodeMethod,
+      bool formEncodeGrant});
+}
+
+/// @nodoc
+class __$$DUIOAuthPKCEResponseImplCopyWithImpl<$Res>
+    extends _$DUIOAuthResponseTypeCopyWithImpl<$Res, _$DUIOAuthPKCEResponseImpl>
+    implements _$$DUIOAuthPKCEResponseImplCopyWith<$Res> {
+  __$$DUIOAuthPKCEResponseImplCopyWithImpl(_$DUIOAuthPKCEResponseImpl _value,
+      $Res Function(_$DUIOAuthPKCEResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? tokenEndpoint = null,
+    Object? pkceCodeLength = null,
+    Object? pkceCodeMethod = null,
+    Object? formEncodeGrant = null,
+  }) {
+    return _then(_$DUIOAuthPKCEResponseImpl(
+      tokenEndpoint: null == tokenEndpoint
+          ? _value.tokenEndpoint
+          : tokenEndpoint // ignore: cast_nullable_to_non_nullable
+              as String,
+      pkceCodeLength: null == pkceCodeLength
+          ? _value.pkceCodeLength
+          : pkceCodeLength // ignore: cast_nullable_to_non_nullable
+              as num,
+      pkceCodeMethod: null == pkceCodeMethod
+          ? _value.pkceCodeMethod
+          : pkceCodeMethod // ignore: cast_nullable_to_non_nullable
+              as String,
+      formEncodeGrant: null == formEncodeGrant
+          ? _value.formEncodeGrant
+          : formEncodeGrant // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIOAuthPKCEResponseImpl implements DUIOAuthPKCEResponse {
+  const _$DUIOAuthPKCEResponseImpl(
+      {required this.tokenEndpoint,
+      required this.pkceCodeLength,
+      required this.pkceCodeMethod,
+      required this.formEncodeGrant,
+      final String? $type})
+      : $type = $type ?? 'pkce';
+
+  factory _$DUIOAuthPKCEResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIOAuthPKCEResponseImplFromJson(json);
+
+  @override
+  final String tokenEndpoint;
+  @override
+  final num pkceCodeLength;
+  @override
+  final String pkceCodeMethod;
+  @override
+  final bool formEncodeGrant;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIOAuthResponseType.pkce(tokenEndpoint: $tokenEndpoint, pkceCodeLength: $pkceCodeLength, pkceCodeMethod: $pkceCodeMethod, formEncodeGrant: $formEncodeGrant)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIOAuthPKCEResponseImpl &&
+            (identical(other.tokenEndpoint, tokenEndpoint) ||
+                other.tokenEndpoint == tokenEndpoint) &&
+            (identical(other.pkceCodeLength, pkceCodeLength) ||
+                other.pkceCodeLength == pkceCodeLength) &&
+            (identical(other.pkceCodeMethod, pkceCodeMethod) ||
+                other.pkceCodeMethod == pkceCodeMethod) &&
+            (identical(other.formEncodeGrant, formEncodeGrant) ||
+                other.formEncodeGrant == formEncodeGrant));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, tokenEndpoint, pkceCodeLength,
+      pkceCodeMethod, formEncodeGrant);
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIOAuthPKCEResponseImplCopyWith<_$DUIOAuthPKCEResponseImpl>
+      get copyWith =>
+          __$$DUIOAuthPKCEResponseImplCopyWithImpl<_$DUIOAuthPKCEResponseImpl>(
+              this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() token,
+    required TResult Function(String tokenEndpoint) code,
+    required TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)
+        pkce,
+  }) {
+    return pkce(tokenEndpoint, pkceCodeLength, pkceCodeMethod, formEncodeGrant);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? token,
+    TResult? Function(String tokenEndpoint)? code,
+    TResult? Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+  }) {
+    return pkce?.call(
+        tokenEndpoint, pkceCodeLength, pkceCodeMethod, formEncodeGrant);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? token,
+    TResult Function(String tokenEndpoint)? code,
+    TResult Function(String tokenEndpoint, num pkceCodeLength,
+            String pkceCodeMethod, bool formEncodeGrant)?
+        pkce,
+    required TResult orElse(),
+  }) {
+    if (pkce != null) {
+      return pkce(
+          tokenEndpoint, pkceCodeLength, pkceCodeMethod, formEncodeGrant);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUIOAuthTokenResponse value) token,
+    required TResult Function(DUIOAuthCodeResponse value) code,
+    required TResult Function(DUIOAuthPKCEResponse value) pkce,
+  }) {
+    return pkce(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUIOAuthTokenResponse value)? token,
+    TResult? Function(DUIOAuthCodeResponse value)? code,
+    TResult? Function(DUIOAuthPKCEResponse value)? pkce,
+  }) {
+    return pkce?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUIOAuthTokenResponse value)? token,
+    TResult Function(DUIOAuthCodeResponse value)? code,
+    TResult Function(DUIOAuthPKCEResponse value)? pkce,
+    required TResult orElse(),
+  }) {
+    if (pkce != null) {
+      return pkce(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIOAuthPKCEResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIOAuthPKCEResponse implements DUIOAuthResponseType {
+  const factory DUIOAuthPKCEResponse(
+      {required final String tokenEndpoint,
+      required final num pkceCodeLength,
+      required final String pkceCodeMethod,
+      required final bool formEncodeGrant}) = _$DUIOAuthPKCEResponseImpl;
+
+  factory DUIOAuthPKCEResponse.fromJson(Map<String, dynamic> json) =
+      _$DUIOAuthPKCEResponseImpl.fromJson;
+
+  String get tokenEndpoint;
+  num get pkceCodeLength;
+  String get pkceCodeMethod;
+  bool get formEncodeGrant;
+
+  /// Create a copy of DUIOAuthResponseType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIOAuthPKCEResponseImplCopyWith<_$DUIOAuthPKCEResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
 DUIType _$DUITypeFromJson(Map<String, dynamic> json) {
   switch (json['type']) {
     case 'DUISection':
@@ -5247,12 +5873,24 @@ DUIType _$DUITypeFromJson(Map<String, dynamic> json) {
       return DUISelect.fromJson(json);
     case 'DUIInputField':
       return DUIInputField.fromJson(json);
+    case 'DUISecureInputField':
+      return DUISecureInputField.fromJson(json);
+    case 'DUIStepper':
+      return DUIStepper.fromJson(json);
+    case 'DUILabel':
+      return DUILabel.fromJson(json);
+    case 'DUIMultilineLabel':
+      return DUIMultilineLabel.fromJson(json);
+    case 'DUIHeader':
+      return DUIHeader.fromJson(json);
     case 'DUIButton':
       return DUIButton.fromJson(json);
     case 'DUINavigationButton':
       return DUINavigationButton.fromJson(json);
     case 'DUISwitch':
       return DUISwitch.fromJson(json);
+    case 'DUIOAuthButton':
+      return DUIOAuthButton.fromJson(json);
     case 'DUIForm':
       return DUIForm.fromJson(json);
 
@@ -5273,10 +5911,29 @@ mixin _$DUIType {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) =>
@@ -5290,10 +5947,27 @@ mixin _$DUIType {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) =>
       throw _privateConstructorUsedError;
@@ -5306,10 +5980,27 @@ mixin _$DUIType {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) =>
@@ -5319,9 +6010,15 @@ mixin _$DUIType {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) =>
       throw _privateConstructorUsedError;
@@ -5330,9 +6027,15 @@ mixin _$DUIType {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) =>
       throw _privateConstructorUsedError;
@@ -5341,9 +6044,15 @@ mixin _$DUIType {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) =>
@@ -5507,10 +6216,29 @@ class _$DUISectionImpl implements DUISection {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) {
@@ -5527,10 +6255,27 @@ class _$DUISectionImpl implements DUISection {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUISection?.call(id, header, footer, isHidden, rows);
@@ -5546,10 +6291,27 @@ class _$DUISectionImpl implements DUISection {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -5565,9 +6327,15 @@ class _$DUISectionImpl implements DUISection {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) {
     return DUISection(this);
@@ -5579,9 +6347,15 @@ class _$DUISectionImpl implements DUISection {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) {
     return DUISection?.call(this);
@@ -5593,9 +6367,15 @@ class _$DUISectionImpl implements DUISection {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) {
@@ -5783,10 +6563,29 @@ class _$DUISelectImpl implements DUISelect {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) {
@@ -5803,10 +6602,27 @@ class _$DUISelectImpl implements DUISelect {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUISelect?.call(id, label, options, allowsMultiselect, labels);
@@ -5822,10 +6638,27 @@ class _$DUISelectImpl implements DUISelect {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -5841,9 +6674,15 @@ class _$DUISelectImpl implements DUISelect {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) {
     return DUISelect(this);
@@ -5855,9 +6694,15 @@ class _$DUISelectImpl implements DUISelect {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) {
     return DUISelect?.call(this);
@@ -5869,9 +6714,15 @@ class _$DUISelectImpl implements DUISelect {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6005,10 +6856,29 @@ class _$DUIInputFieldImpl implements DUIInputField {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) {
@@ -6025,10 +6895,27 @@ class _$DUIInputFieldImpl implements DUIInputField {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIInputField?.call(id, label);
@@ -6044,10 +6931,27 @@ class _$DUIInputFieldImpl implements DUIInputField {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6063,9 +6967,15 @@ class _$DUIInputFieldImpl implements DUIInputField {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) {
     return DUIInputField(this);
@@ -6077,9 +6987,15 @@ class _$DUIInputFieldImpl implements DUIInputField {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) {
     return DUIInputField?.call(this);
@@ -6091,9 +7007,15 @@ class _$DUIInputFieldImpl implements DUIInputField {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6111,7 +7033,7 @@ class _$DUIInputFieldImpl implements DUIInputField {
   }
 }
 
-abstract class DUIInputField implements DUIType, DUIFormRow {
+abstract class DUIInputField implements DUIType, DUIInputType {
   const factory DUIInputField(
       {required final String id,
       required final String label}) = _$DUIInputFieldImpl;
@@ -6126,6 +7048,1527 @@ abstract class DUIInputField implements DUIType, DUIFormRow {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DUIInputFieldImplCopyWith<_$DUIInputFieldImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUISecureInputFieldImplCopyWith<$Res> {
+  factory _$$DUISecureInputFieldImplCopyWith(_$DUISecureInputFieldImpl value,
+          $Res Function(_$DUISecureInputFieldImpl) then) =
+      __$$DUISecureInputFieldImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label});
+}
+
+/// @nodoc
+class __$$DUISecureInputFieldImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUISecureInputFieldImpl>
+    implements _$$DUISecureInputFieldImplCopyWith<$Res> {
+  __$$DUISecureInputFieldImplCopyWithImpl(_$DUISecureInputFieldImpl _value,
+      $Res Function(_$DUISecureInputFieldImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+  }) {
+    return _then(_$DUISecureInputFieldImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUISecureInputFieldImpl implements DUISecureInputField {
+  const _$DUISecureInputFieldImpl(
+      {required this.id, required this.label, final String? $type})
+      : $type = $type ?? 'DUISecureInputField';
+
+  factory _$DUISecureInputFieldImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUISecureInputFieldImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUISecureInputField(id: $id, label: $label)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUISecureInputFieldImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, label);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUISecureInputFieldImplCopyWith<_$DUISecureInputFieldImpl> get copyWith =>
+      __$$DUISecureInputFieldImplCopyWithImpl<_$DUISecureInputFieldImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUISecureInputField(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUISecureInputField?.call(id, label);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISecureInputField != null) {
+      return DUISecureInputField(id, label);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUISecureInputField(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUISecureInputField?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUISecureInputField != null) {
+      return DUISecureInputField(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUISecureInputFieldImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUISecureInputField implements DUIType, DUIInputType {
+  const factory DUISecureInputField(
+      {required final String id,
+      required final String label}) = _$DUISecureInputFieldImpl;
+
+  factory DUISecureInputField.fromJson(Map<String, dynamic> json) =
+      _$DUISecureInputFieldImpl.fromJson;
+
+  String get id;
+  String get label;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUISecureInputFieldImplCopyWith<_$DUISecureInputFieldImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIStepperImplCopyWith<$Res> {
+  factory _$$DUIStepperImplCopyWith(
+          _$DUIStepperImpl value, $Res Function(_$DUIStepperImpl) then) =
+      __$$DUIStepperImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label, num? min, num? max, num? step});
+}
+
+/// @nodoc
+class __$$DUIStepperImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUIStepperImpl>
+    implements _$$DUIStepperImplCopyWith<$Res> {
+  __$$DUIStepperImplCopyWithImpl(
+      _$DUIStepperImpl _value, $Res Function(_$DUIStepperImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+    Object? min = freezed,
+    Object? max = freezed,
+    Object? step = freezed,
+  }) {
+    return _then(_$DUIStepperImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      min: freezed == min
+          ? _value.min
+          : min // ignore: cast_nullable_to_non_nullable
+              as num?,
+      max: freezed == max
+          ? _value.max
+          : max // ignore: cast_nullable_to_non_nullable
+              as num?,
+      step: freezed == step
+          ? _value.step
+          : step // ignore: cast_nullable_to_non_nullable
+              as num?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIStepperImpl implements DUIStepper {
+  const _$DUIStepperImpl(
+      {required this.id,
+      required this.label,
+      this.min,
+      this.max,
+      this.step,
+      final String? $type})
+      : $type = $type ?? 'DUIStepper';
+
+  factory _$DUIStepperImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIStepperImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+  @override
+  final num? min;
+  @override
+  final num? max;
+  @override
+  final num? step;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUIStepper(id: $id, label: $label, min: $min, max: $max, step: $step)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIStepperImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.min, min) || other.min == min) &&
+            (identical(other.max, max) || other.max == max) &&
+            (identical(other.step, step) || other.step == step));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, label, min, max, step);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIStepperImplCopyWith<_$DUIStepperImpl> get copyWith =>
+      __$$DUIStepperImplCopyWithImpl<_$DUIStepperImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUIStepper(id, label, min, max, step);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUIStepper?.call(id, label, min, max, step);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIStepper != null) {
+      return DUIStepper(id, label, min, max, step);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUIStepper(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUIStepper?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIStepper != null) {
+      return DUIStepper(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIStepperImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIStepper implements DUIType, DUIFormRow {
+  const factory DUIStepper(
+      {required final String id,
+      required final String label,
+      final num? min,
+      final num? max,
+      final num? step}) = _$DUIStepperImpl;
+
+  factory DUIStepper.fromJson(Map<String, dynamic> json) =
+      _$DUIStepperImpl.fromJson;
+
+  String get id;
+  String get label;
+  num? get min;
+  num? get max;
+  num? get step;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIStepperImplCopyWith<_$DUIStepperImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUILabelImplCopyWith<$Res> {
+  factory _$$DUILabelImplCopyWith(
+          _$DUILabelImpl value, $Res Function(_$DUILabelImpl) then) =
+      __$$DUILabelImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label, String? value});
+}
+
+/// @nodoc
+class __$$DUILabelImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUILabelImpl>
+    implements _$$DUILabelImplCopyWith<$Res> {
+  __$$DUILabelImplCopyWithImpl(
+      _$DUILabelImpl _value, $Res Function(_$DUILabelImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+    Object? value = freezed,
+  }) {
+    return _then(_$DUILabelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      value: freezed == value
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUILabelImpl implements DUILabel {
+  const _$DUILabelImpl(
+      {required this.id, required this.label, this.value, final String? $type})
+      : $type = $type ?? 'DUILabel';
+
+  factory _$DUILabelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUILabelImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+  @override
+  final String? value;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUILabel(id: $id, label: $label, value: $value)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUILabelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.value, value) || other.value == value));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, label, value);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUILabelImplCopyWith<_$DUILabelImpl> get copyWith =>
+      __$$DUILabelImplCopyWithImpl<_$DUILabelImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUILabel(id, label, value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUILabel?.call(id, label, value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUILabel != null) {
+      return DUILabel(id, label, value);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUILabel(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUILabel?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUILabel != null) {
+      return DUILabel(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUILabelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUILabel implements DUIType, DUILabelType {
+  const factory DUILabel(
+      {required final String id,
+      required final String label,
+      final String? value}) = _$DUILabelImpl;
+
+  factory DUILabel.fromJson(Map<String, dynamic> json) =
+      _$DUILabelImpl.fromJson;
+
+  String get id;
+  String get label;
+  String? get value;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUILabelImplCopyWith<_$DUILabelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIMultilineLabelImplCopyWith<$Res> {
+  factory _$$DUIMultilineLabelImplCopyWith(_$DUIMultilineLabelImpl value,
+          $Res Function(_$DUIMultilineLabelImpl) then) =
+      __$$DUIMultilineLabelImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String label, String value});
+}
+
+/// @nodoc
+class __$$DUIMultilineLabelImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUIMultilineLabelImpl>
+    implements _$$DUIMultilineLabelImplCopyWith<$Res> {
+  __$$DUIMultilineLabelImplCopyWithImpl(_$DUIMultilineLabelImpl _value,
+      $Res Function(_$DUIMultilineLabelImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+    Object? value = null,
+  }) {
+    return _then(_$DUIMultilineLabelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      value: null == value
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIMultilineLabelImpl implements DUIMultilineLabel {
+  const _$DUIMultilineLabelImpl(
+      {required this.id,
+      required this.label,
+      required this.value,
+      final String? $type})
+      : $type = $type ?? 'DUIMultilineLabel';
+
+  factory _$DUIMultilineLabelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIMultilineLabelImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+  @override
+  final String value;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUIMultilineLabel(id: $id, label: $label, value: $value)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIMultilineLabelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.value, value) || other.value == value));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, label, value);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIMultilineLabelImplCopyWith<_$DUIMultilineLabelImpl> get copyWith =>
+      __$$DUIMultilineLabelImplCopyWithImpl<_$DUIMultilineLabelImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUIMultilineLabel(id, label, value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUIMultilineLabel?.call(id, label, value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIMultilineLabel != null) {
+      return DUIMultilineLabel(id, label, value);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUIMultilineLabel(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUIMultilineLabel?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIMultilineLabel != null) {
+      return DUIMultilineLabel(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIMultilineLabelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIMultilineLabel implements DUIType, DUILabelType {
+  const factory DUIMultilineLabel(
+      {required final String id,
+      required final String label,
+      required final String value}) = _$DUIMultilineLabelImpl;
+
+  factory DUIMultilineLabel.fromJson(Map<String, dynamic> json) =
+      _$DUIMultilineLabelImpl.fromJson;
+
+  String get id;
+  String get label;
+  String get value;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIMultilineLabelImplCopyWith<_$DUIMultilineLabelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIHeaderImplCopyWith<$Res> {
+  factory _$$DUIHeaderImplCopyWith(
+          _$DUIHeaderImpl value, $Res Function(_$DUIHeaderImpl) then) =
+      __$$DUIHeaderImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, String imageUrl, String title, String? subtitle});
+}
+
+/// @nodoc
+class __$$DUIHeaderImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUIHeaderImpl>
+    implements _$$DUIHeaderImplCopyWith<$Res> {
+  __$$DUIHeaderImplCopyWithImpl(
+      _$DUIHeaderImpl _value, $Res Function(_$DUIHeaderImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? imageUrl = null,
+    Object? title = null,
+    Object? subtitle = freezed,
+  }) {
+    return _then(_$DUIHeaderImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageUrl: null == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      subtitle: freezed == subtitle
+          ? _value.subtitle
+          : subtitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIHeaderImpl implements DUIHeader {
+  const _$DUIHeaderImpl(
+      {required this.id,
+      required this.imageUrl,
+      required this.title,
+      this.subtitle,
+      final String? $type})
+      : $type = $type ?? 'DUIHeader';
+
+  factory _$DUIHeaderImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIHeaderImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String imageUrl;
+  @override
+  final String title;
+  @override
+  final String? subtitle;
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUIHeader(id: $id, imageUrl: $imageUrl, title: $title, subtitle: $subtitle)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIHeaderImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.subtitle, subtitle) ||
+                other.subtitle == subtitle));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, imageUrl, title, subtitle);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIHeaderImplCopyWith<_$DUIHeaderImpl> get copyWith =>
+      __$$DUIHeaderImplCopyWithImpl<_$DUIHeaderImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUIHeader(id, imageUrl, title, subtitle);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUIHeader?.call(id, imageUrl, title, subtitle);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIHeader != null) {
+      return DUIHeader(id, imageUrl, title, subtitle);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUIHeader(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUIHeader?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIHeader != null) {
+      return DUIHeader(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIHeaderImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIHeader implements DUIType, DUIFormRow {
+  const factory DUIHeader(
+      {required final String id,
+      required final String imageUrl,
+      required final String title,
+      final String? subtitle}) = _$DUIHeaderImpl;
+
+  factory DUIHeader.fromJson(Map<String, dynamic> json) =
+      _$DUIHeaderImpl.fromJson;
+
+  String get id;
+  String get imageUrl;
+  String get title;
+  String? get subtitle;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIHeaderImplCopyWith<_$DUIHeaderImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -6221,10 +8664,29 @@ class _$DUIButtonImpl implements DUIButton {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) {
@@ -6241,10 +8703,27 @@ class _$DUIButtonImpl implements DUIButton {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIButton?.call(id, label);
@@ -6260,10 +8739,27 @@ class _$DUIButtonImpl implements DUIButton {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6279,9 +8775,15 @@ class _$DUIButtonImpl implements DUIButton {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) {
     return DUIButton(this);
@@ -6293,9 +8795,15 @@ class _$DUIButtonImpl implements DUIButton {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) {
     return DUIButton?.call(this);
@@ -6307,9 +8815,15 @@ class _$DUIButtonImpl implements DUIButton {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6450,10 +8964,29 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) {
@@ -6470,10 +9003,27 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUINavigationButton?.call(id, label, form);
@@ -6489,10 +9039,27 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6508,9 +9075,15 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) {
     return DUINavigationButton(this);
@@ -6522,9 +9095,15 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) {
     return DUINavigationButton?.call(this);
@@ -6536,9 +9115,15 @@ class _$DUINavigationButtonImpl implements DUINavigationButton {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6668,10 +9253,29 @@ class _$DUISwitchImpl implements DUISwitch {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) {
@@ -6688,10 +9292,27 @@ class _$DUISwitchImpl implements DUISwitch {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUISwitch?.call(id, label);
@@ -6707,10 +9328,27 @@ class _$DUISwitchImpl implements DUISwitch {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6726,9 +9364,15 @@ class _$DUISwitchImpl implements DUISwitch {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) {
     return DUISwitch(this);
@@ -6740,9 +9384,15 @@ class _$DUISwitchImpl implements DUISwitch {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) {
     return DUISwitch?.call(this);
@@ -6754,9 +9404,15 @@ class _$DUISwitchImpl implements DUISwitch {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6789,6 +9445,393 @@ abstract class DUISwitch implements DUIType, DUIFormRow {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DUISwitchImplCopyWith<_$DUISwitchImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DUIOAuthButtonImplCopyWith<$Res> {
+  factory _$$DUIOAuthButtonImplCopyWith(_$DUIOAuthButtonImpl value,
+          $Res Function(_$DUIOAuthButtonImpl) then) =
+      __$$DUIOAuthButtonImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String id,
+      String label,
+      String authorizeEndpoint,
+      String clientId,
+      DUIOAuthResponseType responseType,
+      String? redirectUri,
+      List<String>? scopes});
+
+  $DUIOAuthResponseTypeCopyWith<$Res> get responseType;
+}
+
+/// @nodoc
+class __$$DUIOAuthButtonImplCopyWithImpl<$Res>
+    extends _$DUITypeCopyWithImpl<$Res, _$DUIOAuthButtonImpl>
+    implements _$$DUIOAuthButtonImplCopyWith<$Res> {
+  __$$DUIOAuthButtonImplCopyWithImpl(
+      _$DUIOAuthButtonImpl _value, $Res Function(_$DUIOAuthButtonImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? label = null,
+    Object? authorizeEndpoint = null,
+    Object? clientId = null,
+    Object? responseType = null,
+    Object? redirectUri = freezed,
+    Object? scopes = freezed,
+  }) {
+    return _then(_$DUIOAuthButtonImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      authorizeEndpoint: null == authorizeEndpoint
+          ? _value.authorizeEndpoint
+          : authorizeEndpoint // ignore: cast_nullable_to_non_nullable
+              as String,
+      clientId: null == clientId
+          ? _value.clientId
+          : clientId // ignore: cast_nullable_to_non_nullable
+              as String,
+      responseType: null == responseType
+          ? _value.responseType
+          : responseType // ignore: cast_nullable_to_non_nullable
+              as DUIOAuthResponseType,
+      redirectUri: freezed == redirectUri
+          ? _value.redirectUri
+          : redirectUri // ignore: cast_nullable_to_non_nullable
+              as String?,
+      scopes: freezed == scopes
+          ? _value._scopes
+          : scopes // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+    ));
+  }
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DUIOAuthResponseTypeCopyWith<$Res> get responseType {
+    return $DUIOAuthResponseTypeCopyWith<$Res>(_value.responseType, (value) {
+      return _then(_value.copyWith(responseType: value));
+    });
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DUIOAuthButtonImpl implements DUIOAuthButton {
+  const _$DUIOAuthButtonImpl(
+      {required this.id,
+      required this.label,
+      required this.authorizeEndpoint,
+      required this.clientId,
+      required this.responseType,
+      this.redirectUri,
+      final List<String>? scopes,
+      final String? $type})
+      : _scopes = scopes,
+        $type = $type ?? 'DUIOAuthButton';
+
+  factory _$DUIOAuthButtonImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DUIOAuthButtonImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String label;
+  @override
+  final String authorizeEndpoint;
+  @override
+  final String clientId;
+  @override
+  final DUIOAuthResponseType responseType;
+  @override
+  final String? redirectUri;
+  final List<String>? _scopes;
+  @override
+  List<String>? get scopes {
+    final value = _scopes;
+    if (value == null) return null;
+    if (_scopes is EqualUnmodifiableListView) return _scopes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @JsonKey(name: 'type')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'DUIType.DUIOAuthButton(id: $id, label: $label, authorizeEndpoint: $authorizeEndpoint, clientId: $clientId, responseType: $responseType, redirectUri: $redirectUri, scopes: $scopes)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DUIOAuthButtonImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.authorizeEndpoint, authorizeEndpoint) ||
+                other.authorizeEndpoint == authorizeEndpoint) &&
+            (identical(other.clientId, clientId) ||
+                other.clientId == clientId) &&
+            (identical(other.responseType, responseType) ||
+                other.responseType == responseType) &&
+            (identical(other.redirectUri, redirectUri) ||
+                other.redirectUri == redirectUri) &&
+            const DeepCollectionEquality().equals(other._scopes, _scopes));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      label,
+      authorizeEndpoint,
+      clientId,
+      responseType,
+      redirectUri,
+      const DeepCollectionEquality().hash(_scopes));
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DUIOAuthButtonImplCopyWith<_$DUIOAuthButtonImpl> get copyWith =>
+      __$$DUIOAuthButtonImplCopyWithImpl<_$DUIOAuthButtonImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, String? header, String? footer,
+            bool isHidden, List<DUIType> rows)
+        DUISection,
+    required TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)
+        DUISelect,
+    required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
+    required TResult Function(String id, String label) DUIButton,
+    required TResult Function(String id, String label, DUIForm form)
+        DUINavigationButton,
+    required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
+    required TResult Function(List<DUISection> sections, bool hasSubmit)
+        DUIForm,
+  }) {
+    return DUIOAuthButton(id, label, authorizeEndpoint, clientId, responseType,
+        redirectUri, scopes);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult? Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult? Function(String id, String label)? DUIButton,
+    TResult? Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+  }) {
+    return DUIOAuthButton?.call(id, label, authorizeEndpoint, clientId,
+        responseType, redirectUri, scopes);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id, String? header, String? footer, bool isHidden,
+            List<DUIType> rows)?
+        DUISection,
+    TResult Function(String id, String label, List<String> options,
+            bool allowsMultiselect, Map<String, String> labels)?
+        DUISelect,
+    TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
+    TResult Function(String id, String label)? DUIButton,
+    TResult Function(String id, String label, DUIForm form)?
+        DUINavigationButton,
+    TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
+    TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIOAuthButton != null) {
+      return DUIOAuthButton(id, label, authorizeEndpoint, clientId,
+          responseType, redirectUri, scopes);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(DUISection value) DUISection,
+    required TResult Function(DUISelect value) DUISelect,
+    required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
+    required TResult Function(DUIButton value) DUIButton,
+    required TResult Function(DUINavigationButton value) DUINavigationButton,
+    required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
+    required TResult Function(DUIForm value) DUIForm,
+  }) {
+    return DUIOAuthButton(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(DUISection value)? DUISection,
+    TResult? Function(DUISelect value)? DUISelect,
+    TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
+    TResult? Function(DUIButton value)? DUIButton,
+    TResult? Function(DUINavigationButton value)? DUINavigationButton,
+    TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult? Function(DUIForm value)? DUIForm,
+  }) {
+    return DUIOAuthButton?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(DUISection value)? DUISection,
+    TResult Function(DUISelect value)? DUISelect,
+    TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
+    TResult Function(DUIButton value)? DUIButton,
+    TResult Function(DUINavigationButton value)? DUINavigationButton,
+    TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
+    TResult Function(DUIForm value)? DUIForm,
+    required TResult orElse(),
+  }) {
+    if (DUIOAuthButton != null) {
+      return DUIOAuthButton(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DUIOAuthButtonImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class DUIOAuthButton implements DUIType, DUIFormRow {
+  const factory DUIOAuthButton(
+      {required final String id,
+      required final String label,
+      required final String authorizeEndpoint,
+      required final String clientId,
+      required final DUIOAuthResponseType responseType,
+      final String? redirectUri,
+      final List<String>? scopes}) = _$DUIOAuthButtonImpl;
+
+  factory DUIOAuthButton.fromJson(Map<String, dynamic> json) =
+      _$DUIOAuthButtonImpl.fromJson;
+
+  String get id;
+  String get label;
+  String get authorizeEndpoint;
+  String get clientId;
+  DUIOAuthResponseType get responseType;
+  String? get redirectUri;
+  List<String>? get scopes;
+
+  /// Create a copy of DUIType
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DUIOAuthButtonImplCopyWith<_$DUIOAuthButtonImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -6895,10 +9938,29 @@ class _$DUIFormImpl implements DUIForm {
             bool allowsMultiselect, Map<String, String> labels)
         DUISelect,
     required TResult Function(String id, String label) DUIInputField,
+    required TResult Function(String id, String label) DUISecureInputField,
+    required TResult Function(
+            String id, String label, num? min, num? max, num? step)
+        DUIStepper,
+    required TResult Function(String id, String label, String? value) DUILabel,
+    required TResult Function(String id, String label, String value)
+        DUIMultilineLabel,
+    required TResult Function(
+            String id, String imageUrl, String title, String? subtitle)
+        DUIHeader,
     required TResult Function(String id, String label) DUIButton,
     required TResult Function(String id, String label, DUIForm form)
         DUINavigationButton,
     required TResult Function(String id, String label) DUISwitch,
+    required TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)
+        DUIOAuthButton,
     required TResult Function(List<DUISection> sections, bool hasSubmit)
         DUIForm,
   }) {
@@ -6915,10 +9977,27 @@ class _$DUIFormImpl implements DUIForm {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult? Function(String id, String label)? DUIInputField,
+    TResult? Function(String id, String label)? DUISecureInputField,
+    TResult? Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult? Function(String id, String label, String? value)? DUILabel,
+    TResult? Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult? Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult? Function(String id, String label)? DUIButton,
     TResult? Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult? Function(String id, String label)? DUISwitch,
+    TResult? Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult? Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
   }) {
     return DUIForm?.call(sections, hasSubmit);
@@ -6934,10 +10013,27 @@ class _$DUIFormImpl implements DUIForm {
             bool allowsMultiselect, Map<String, String> labels)?
         DUISelect,
     TResult Function(String id, String label)? DUIInputField,
+    TResult Function(String id, String label)? DUISecureInputField,
+    TResult Function(String id, String label, num? min, num? max, num? step)?
+        DUIStepper,
+    TResult Function(String id, String label, String? value)? DUILabel,
+    TResult Function(String id, String label, String value)? DUIMultilineLabel,
+    TResult Function(
+            String id, String imageUrl, String title, String? subtitle)?
+        DUIHeader,
     TResult Function(String id, String label)? DUIButton,
     TResult Function(String id, String label, DUIForm form)?
         DUINavigationButton,
     TResult Function(String id, String label)? DUISwitch,
+    TResult Function(
+            String id,
+            String label,
+            String authorizeEndpoint,
+            String clientId,
+            DUIOAuthResponseType responseType,
+            String? redirectUri,
+            List<String>? scopes)?
+        DUIOAuthButton,
     TResult Function(List<DUISection> sections, bool hasSubmit)? DUIForm,
     required TResult orElse(),
   }) {
@@ -6953,9 +10049,15 @@ class _$DUIFormImpl implements DUIForm {
     required TResult Function(DUISection value) DUISection,
     required TResult Function(DUISelect value) DUISelect,
     required TResult Function(DUIInputField value) DUIInputField,
+    required TResult Function(DUISecureInputField value) DUISecureInputField,
+    required TResult Function(DUIStepper value) DUIStepper,
+    required TResult Function(DUILabel value) DUILabel,
+    required TResult Function(DUIMultilineLabel value) DUIMultilineLabel,
+    required TResult Function(DUIHeader value) DUIHeader,
     required TResult Function(DUIButton value) DUIButton,
     required TResult Function(DUINavigationButton value) DUINavigationButton,
     required TResult Function(DUISwitch value) DUISwitch,
+    required TResult Function(DUIOAuthButton value) DUIOAuthButton,
     required TResult Function(DUIForm value) DUIForm,
   }) {
     return DUIForm(this);
@@ -6967,9 +10069,15 @@ class _$DUIFormImpl implements DUIForm {
     TResult? Function(DUISection value)? DUISection,
     TResult? Function(DUISelect value)? DUISelect,
     TResult? Function(DUIInputField value)? DUIInputField,
+    TResult? Function(DUISecureInputField value)? DUISecureInputField,
+    TResult? Function(DUIStepper value)? DUIStepper,
+    TResult? Function(DUILabel value)? DUILabel,
+    TResult? Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult? Function(DUIHeader value)? DUIHeader,
     TResult? Function(DUIButton value)? DUIButton,
     TResult? Function(DUINavigationButton value)? DUINavigationButton,
     TResult? Function(DUISwitch value)? DUISwitch,
+    TResult? Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult? Function(DUIForm value)? DUIForm,
   }) {
     return DUIForm?.call(this);
@@ -6981,9 +10089,15 @@ class _$DUIFormImpl implements DUIForm {
     TResult Function(DUISection value)? DUISection,
     TResult Function(DUISelect value)? DUISelect,
     TResult Function(DUIInputField value)? DUIInputField,
+    TResult Function(DUISecureInputField value)? DUISecureInputField,
+    TResult Function(DUIStepper value)? DUIStepper,
+    TResult Function(DUILabel value)? DUILabel,
+    TResult Function(DUIMultilineLabel value)? DUIMultilineLabel,
+    TResult Function(DUIHeader value)? DUIHeader,
     TResult Function(DUIButton value)? DUIButton,
     TResult Function(DUINavigationButton value)? DUINavigationButton,
     TResult Function(DUISwitch value)? DUISwitch,
+    TResult Function(DUIOAuthButton value)? DUIOAuthButton,
     TResult Function(DUIForm value)? DUIForm,
     required TResult orElse(),
   }) {

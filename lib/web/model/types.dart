@@ -481,6 +481,32 @@ abstract class DUIFormRow {
   String get id;
 }
 
+abstract class DUIInputType extends DUIFormRow {
+  String get label;
+}
+
+abstract class DUILabelType extends DUIFormRow {
+  String get label;
+}
+
+@Freezed(unionKey: 'type')
+class DUIOAuthResponseType with _$DUIOAuthResponseType {
+  const factory DUIOAuthResponseType.token() = DUIOAuthTokenResponse;
+
+  const factory DUIOAuthResponseType.code({
+    required String tokenEndpoint,
+  }) = DUIOAuthCodeResponse;
+
+  const factory DUIOAuthResponseType.pkce({
+    required String tokenEndpoint,
+    required num pkceCodeLength,
+    required String pkceCodeMethod,
+    required bool formEncodeGrant,
+  }) = DUIOAuthPKCEResponse;
+
+  factory DUIOAuthResponseType.fromJson(Map<String, dynamic> json) => _$DUIOAuthResponseTypeFromJson(json);
+}
+
 @Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
 class DUIType with _$DUIType {
   @Implements<DUIFormRow>()
@@ -501,11 +527,48 @@ class DUIType with _$DUIType {
     required Map<String, String> labels,
   }) = DUISelect;
 
-  @Implements<DUIFormRow>()
+  @Implements<DUIInputType>()
   const factory DUIType.DUIInputField({
     required String id,
     required String label,
   }) = DUIInputField;
+
+  @Implements<DUIInputType>()
+  const factory DUIType.DUISecureInputField({
+    required String id,
+    required String label,
+  }) = DUISecureInputField;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUIStepper({
+    required String id,
+    required String label,
+    num? min,
+    num? max,
+    num? step,
+  }) = DUIStepper;
+
+  @Implements<DUILabelType>()
+  const factory DUIType.DUILabel({
+    required String id,
+    required String label,
+    String? value,
+  }) = DUILabel;
+
+  @Implements<DUILabelType>()
+  const factory DUIType.DUIMultilineLabel({
+    required String id,
+    required String label,
+    required String value,
+  }) = DUIMultilineLabel;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUIHeader({
+    required String id,
+    required String imageUrl,
+    required String title,
+    String? subtitle,
+  }) = DUIHeader;
 
   @Implements<DUIFormRow>()
   const factory DUIType.DUIButton({
@@ -525,6 +588,17 @@ class DUIType with _$DUIType {
     required String id,
     required String label,
   }) = DUISwitch;
+
+  @Implements<DUIFormRow>()
+  const factory DUIType.DUIOAuthButton({
+    required String id,
+    required String label,
+    required String authorizeEndpoint,
+    required String clientId,
+    required DUIOAuthResponseType responseType,
+    String? redirectUri,
+    List<String>? scopes,
+  }) = DUIOAuthButton;
 
   const factory DUIType.DUIForm({
     required List<DUISection> sections,

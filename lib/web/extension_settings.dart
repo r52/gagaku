@@ -7,6 +7,7 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:input_quantity/input_quantity.dart';
 
 class ExtensionSettings extends HookConsumerWidget {
   const ExtensionSettings({super.key, required this.source});
@@ -81,9 +82,11 @@ class DUIDelegateBuilder extends StatelessWidget {
           element: element as DUISelect,
         );
       case DUIInputField():
+      case DUISecureInputField():
         return DUIInputFieldBuilder(
           source: source,
-          element: element as DUIInputField,
+          element: element as DUIInputType,
+          secure: element is DUISecureInputField,
         );
       case DUIButton():
         return DUIButtonBuilder(
@@ -100,6 +103,27 @@ class DUIDelegateBuilder extends StatelessWidget {
           source: source,
           element: element as DUIForm,
           parent: element,
+        );
+      case DUIStepper():
+        return DUIStepperBuilder(
+          source: source,
+          element: element as DUIStepper,
+        );
+      case DUILabel():
+      case DUIMultilineLabel():
+        return DUILabelBuilder(
+          source: source,
+          element: element as DUILabelType,
+        );
+      case DUIHeader():
+        return DUIHeaderBuilder(
+          source: source,
+          element: element as DUIHeader,
+        );
+      case DUIOAuthButton():
+        return DUIOAuthButtonBuilder(
+          source: source,
+          element: element as DUIOAuthButton,
         );
       default:
         return Text("Invalid DUI type");
@@ -284,10 +308,11 @@ class DUISelectBuilder extends HookConsumerWidget {
 }
 
 class DUIInputFieldBuilder extends HookConsumerWidget {
-  const DUIInputFieldBuilder({super.key, required this.source, required this.element});
+  const DUIInputFieldBuilder({super.key, required this.source, required this.element, this.secure = false});
 
   final SourceIdentifier source;
-  final DUIInputField element;
+  final DUIInputType element;
+  final bool secure;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -331,6 +356,7 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
               decoration: const InputDecoration(
                 filled: true,
               ),
+              obscureText: secure,
             );
           },
         );
@@ -353,7 +379,8 @@ class DUINavigationButtonBuilder extends StatelessWidget {
       child: ListTile(
         title: Text(element.label),
         trailing: Icon(Icons.arrow_forward_ios),
-        onTap: () => nav.push(SlideTransitionRouteBuilder(
+        onTap: () => nav.push(PageTransitionRouteBuilder(
+          pageTransitionsBuilder: const FadeForwardsPageTransitionsBuilder(),
           pageBuilder: (context, animation, secondaryAnimation) => DUIFormBuilder(
             source: source,
             element: element.form,
@@ -396,6 +423,94 @@ class DUISwitchBuilder extends HookConsumerWidget {
           },
         );
       },
+    );
+  }
+}
+
+class DUIStepperBuilder extends HookConsumerWidget {
+  const DUIStepperBuilder({super.key, required this.source, required this.element});
+
+  final SourceIdentifier source;
+  final DUIStepper element;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final initFuture = useMemoized(
+        () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'));
+    final initial = useFuture(initFuture);
+
+    if (initial.connectionState == ConnectionState.waiting) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    final data = useState(initial.hasData ? (initial.data != null ? initial.data! as num : null) : null);
+
+    return SettingCardWidget(
+      title: Text(element.label),
+      builder: (context) {
+        return InputQty(
+          initVal: data.value ?? 0,
+          minVal: element.min ?? 0,
+          maxVal: element.max ?? double.maxFinite,
+          steps: element.step ?? 1,
+          onQtyChanged: (value) {
+            ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.set', [value]);
+            data.value = value;
+          },
+        );
+      },
+    );
+  }
+}
+
+class DUILabelBuilder extends StatelessWidget {
+  const DUILabelBuilder({super.key, required this.source, required this.element});
+
+  final SourceIdentifier source;
+  final DUILabelType element;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Text(element.label),
+    );
+  }
+}
+
+class DUIHeaderBuilder extends StatelessWidget {
+  const DUIHeaderBuilder({super.key, required this.source, required this.element});
+
+  final SourceIdentifier source;
+  final DUIHeader element;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: Image.network(element.imageUrl),
+        title: Text(element.title),
+        subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
+      ),
+    );
+  }
+}
+
+class DUIOAuthButtonBuilder extends ConsumerWidget {
+  const DUIOAuthButtonBuilder({super.key, required this.source, required this.element});
+
+  final SourceIdentifier source;
+  final DUIOAuthButton element;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // TODO
+    return Card(
+      child: ListTile(
+        title: Text("Unsupported"),
+        enabled: false,
+      ),
     );
   }
 }

@@ -9,8 +9,16 @@ import {
   DUISelect,
   DUIInputField,
   DUISwitch,
+  DUISecureInputField,
+  DUIStepper,
+  DUILabel,
+  DUIOAuthButton,
+  DUIMultilineLabel,
+  DUIHeader,
 } from "@paperback/types";
 import { PaperbackPolyfills } from "./PBPolyfills";
+
+/// Poly types
 
 export interface CType {
   readonly type: string;
@@ -63,6 +71,15 @@ export interface CInputField extends DUIInputField, CType {
 
 export type RDUIInputField = Omit<CInputField, "value">;
 
+export interface CSecureInputField extends DUISecureInputField, CType {
+  readonly type: "DUISecureInputField";
+  id: string;
+  label: string;
+  value: DUIBinding;
+}
+
+export type RDUISecureInputField = Omit<CSecureInputField, "value">;
+
 export interface CButton extends DUIButton, CType {
   readonly type: "DUIButton";
   id: string;
@@ -83,7 +100,7 @@ export type RDUINavigationButton = Omit<CNavigationButton, "form"> & {
   form: RDUIForm;
 };
 
-export interface CSwitch extends DUISwitch {
+export interface CSwitch extends DUISwitch, CType {
   readonly type: "DUISwitch";
   id: string;
   label: string;
@@ -91,6 +108,56 @@ export interface CSwitch extends DUISwitch {
 }
 
 export type RDUISwitch = Omit<CSwitch, "value">;
+
+export interface CStepper extends DUIStepper, CType {
+  readonly type: "DUIStepper";
+  id: string;
+  label: string;
+  value: DUIBinding;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
+export type RDUIStepper = Omit<CStepper, "value">;
+
+export interface CLabel extends DUILabel, CType {
+  readonly type: "DUILabel";
+  id: string;
+  label: string;
+  value?: string;
+}
+
+export interface COAuthButton extends DUIOAuthButton, CType {
+  readonly type: "DUIOAuthButton";
+  id: string;
+  label: string;
+  authorizeEndpoint: string;
+  clientId: string;
+  responseType: Record<string, any>;
+  redirectUri?: string;
+  scopes?: string[];
+  successHandler: (arg0: string, arg1: string | undefined) => Promise<void>;
+}
+
+export type RDUIOAuthButton = Omit<COAuthButton, "successHandler">;
+
+export interface CMultilineLabel extends DUIMultilineLabel, CType {
+  readonly type: "DUIMultilineLabel";
+  id: string;
+  label: string;
+  value: string;
+}
+
+export interface CHeader extends DUIHeader, CType {
+  readonly type: "DUIHeader";
+  id: string;
+  imageUrl: string;
+  title: string;
+  subtitle?: string;
+}
+
+/// Bindings
 
 export const bindingMap: Record<string, Function> = {};
 
@@ -106,6 +173,8 @@ function registerBinding(id: string, binding: DUIBinding | Function) {
     console.log(`Successfully saved binding?: ${`${id}.get` in bindingMap}`);
   }
 }
+
+/// Polyfill
 
 PaperbackPolyfills.createDUISection = function (info): CSection {
   return {
@@ -143,6 +212,15 @@ PaperbackPolyfills.createDUIInputField = function (info): CInputField {
   };
 };
 
+PaperbackPolyfills.createDUISecureInputField = function (
+  info
+): CSecureInputField {
+  return {
+    type: "DUISecureInputField",
+    ...info,
+  };
+};
+
 PaperbackPolyfills.createDUINavigationButton = function (
   info
 ): CNavigationButton {
@@ -155,6 +233,41 @@ PaperbackPolyfills.createDUINavigationButton = function (
 PaperbackPolyfills.createDUISwitch = function (info): CSwitch {
   return {
     type: "DUISwitch",
+    ...info,
+  };
+};
+
+PaperbackPolyfills.createDUIStepper = function (info): CStepper {
+  return {
+    type: "DUIStepper",
+    ...info,
+  };
+};
+
+PaperbackPolyfills.createDUILabel = function (info): CLabel {
+  return {
+    type: "DUILabel",
+    ...info,
+  };
+};
+
+PaperbackPolyfills.createDUIOAuthButton = function (info): COAuthButton {
+  return {
+    type: "DUIOAuthButton",
+    ...info,
+  };
+};
+
+PaperbackPolyfills.createDUIMultilineLabel = function (info): CMultilineLabel {
+  return {
+    type: "DUIMultilineLabel",
+    ...info,
+  };
+};
+
+PaperbackPolyfills.createDUIHeader = function (info): CHeader {
+  return {
+    type: "DUIHeader",
     ...info,
   };
 };
@@ -205,18 +318,6 @@ async function processDUINavigationButton(
   };
 }
 
-async function processDUIInputField(
-  element: DUIFormRow
-): Promise<RDUIInputField> {
-  let c = element as CInputField;
-
-  registerBinding(c.id, c.value);
-
-  return {
-    ...c,
-  };
-}
-
 async function processDUISelect(element: DUIFormRow): Promise<RDUISelect> {
   let c = element as CSelect;
   let labels: Record<string, string> = {};
@@ -233,12 +334,24 @@ async function processDUISelect(element: DUIFormRow): Promise<RDUISelect> {
   };
 }
 
-async function processDUISwitch(
+async function processDUIBindingField(
   element: DUIFormRow
-): Promise<RDUISwitch> {
-  let c = element as CSwitch;
+): Promise<RDUIInputField | RDUISecureInputField | RDUISwitch | RDUIStepper> {
+  let c = element as CInputField | CSecureInputField | CSwitch | CStepper;
 
   registerBinding(c.id, c.value);
+
+  return {
+    ...c,
+  };
+}
+
+async function processDUIOAuthButton(
+  element: DUIFormRow
+): Promise<RDUIOAuthButton> {
+  let c = element as COAuthButton;
+
+  registerBinding(c.id, c.successHandler);
 
   return {
     ...c,
@@ -253,12 +366,15 @@ async function processMenuElement(element: DUIFormRow): Promise<DUIFormRow> {
       return await processDUIButton(element);
     case "DUINavigationButton":
       return await processDUINavigationButton(element);
-    case "DUIInputField":
-      return await processDUIInputField(element);
     case "DUISelect":
       return await processDUISelect(element);
+    case "DUIInputField":
+    case "DUISecureInputField":
     case "DUISwitch":
-      return await processDUISwitch(element);
+    case "DUIStepper":
+      return await processDUIBindingField(element);
+    case "DUIOAuthButton":
+      return await processDUIOAuthButton(element);
     default:
       return element;
   }

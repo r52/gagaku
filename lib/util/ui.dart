@@ -759,6 +759,21 @@ class SlideTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
   }) : super(transitionsBuilder: Styles.slideTransitionBuilder);
 }
 
+class PageTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
+  final PageTransitionsBuilder pageTransitionsBuilder;
+
+  PageTransitionRouteBuilder({
+    required super.pageBuilder,
+    required this.pageTransitionsBuilder,
+  });
+
+  @override
+  Widget buildTransitions(
+      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    return pageTransitionsBuilder.buildTransitions(this, context, animation, secondaryAnimation, child);
+  }
+}
+
 class TransparentOverlay<T> extends ModalRoute<T> {
   TransparentOverlay({
     required this.builder,
