@@ -107,7 +107,7 @@ final class ReaderSettingsProvider
       });
 }
 
-String _$readerSettingsHash() => r'68769a15ea11239838033d69fa771a6dfdeac160';
+String _$readerSettingsHash() => r'8f3157aeb36d9c1ec1da041827e62fdee71c5066';
 
 abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   ReaderConfig build();
@@ -160,15 +160,12 @@ sealed class ReaderSettings$Save extends MutationBase<ReaderConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<ReaderConfig> call(ReaderConfig update);
+  ReaderConfig call(ReaderConfig update);
 }
 
 final class _$ReaderSettings$Save
@@ -184,8 +181,8 @@ final class _$ReaderSettings$Save
   $ElementLense<_$ReaderSettings$Save> get listenable => element._$save;
 
   @override
-  Future<ReaderConfig> call(ReaderConfig update) {
-    return mutateAsync(
+  ReaderConfig call(ReaderConfig update) {
+    return mutate(
       Invocation.method(#save, [update]),
       ($notifier) => $notifier.save(update),
     );

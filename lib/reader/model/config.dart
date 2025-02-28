@@ -31,7 +31,8 @@ class ReaderConfig with _$ReaderConfig {
     @Default(3) int precacheCount,
   }) = _ReaderConfig;
 
-  factory ReaderConfig.fromJson(Map<String, dynamic> json) => _$ReaderConfigFromJson(json);
+  factory ReaderConfig.fromJson(Map<String, dynamic> json) =>
+      _$ReaderConfigFromJson(json);
 }
 
 @riverpod
@@ -55,7 +56,8 @@ class ReaderSettings extends _$ReaderSettings {
   }
 
   @mutation
-  FutureOr<ReaderConfig> save(ReaderConfig update) {
+  ReaderConfig save(ReaderConfig update) {
+    state = update;
     final box = Hive.box(gagakuBox);
     box.put('reader', json.encode(update.toJson()));
 

@@ -124,7 +124,7 @@ final class MdConfigProvider
       });
 }
 
-String _$mdConfigHash() => r'1adb0a68f5f631151a2d471a52904ab2fbeedba5';
+String _$mdConfigHash() => r'1960773775590f451cf940bceddd1957277654d4';
 
 abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   MangaDexConfig build();
@@ -177,15 +177,12 @@ sealed class MdConfig$Save extends MutationBase<MangaDexConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<MangaDexConfig> call(MangaDexConfig update);
+  MangaDexConfig call(MangaDexConfig update);
 }
 
 final class _$MdConfig$Save
@@ -200,8 +197,8 @@ final class _$MdConfig$Save
   $ElementLense<_$MdConfig$Save> get listenable => element._$save;
 
   @override
-  Future<MangaDexConfig> call(MangaDexConfig update) {
-    return mutateAsync(
+  MangaDexConfig call(MangaDexConfig update) {
+    return mutate(
       Invocation.method(#save, [update]),
       ($notifier) => $notifier.save(update),
     );

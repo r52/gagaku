@@ -171,7 +171,7 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'872e17a8ff4f3bed3264af2c2b7abbc2779ea9bb';
+    r'6406a0679e2e0f4d3e3a69c9285cbdb91dea65e2';
 
 abstract class _$WebSourceFavorites
     extends $AsyncNotifier<Map<String, List<HistoryLink>>> {
@@ -242,8 +242,7 @@ class _$WebSourceFavoritesElement
   }
 }
 
-sealed class WebSourceFavorites$Clear
-    extends MutationBase<Map<String, List<HistoryLink>>> {
+sealed class WebSourceFavorites$Clear extends MutationBase<void> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -253,24 +252,17 @@ sealed class WebSourceFavorites$Clear
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<Map<String, List<HistoryLink>>> call();
+  Future<void> call();
 }
 
 final class _$WebSourceFavorites$Clear
     extends
-        $AsyncMutationBase<
-          Map<String, List<HistoryLink>>,
-          _$WebSourceFavorites$Clear,
-          WebSourceFavorites
-        >
+        $AsyncMutationBase<void, _$WebSourceFavorites$Clear, WebSourceFavorites>
     implements WebSourceFavorites$Clear {
   _$WebSourceFavorites$Clear(this.element, {super.state, super.key});
 
@@ -281,8 +273,8 @@ final class _$WebSourceFavorites$Clear
   $ElementLense<_$WebSourceFavorites$Clear> get listenable => element._$clear;
 
   @override
-  Future<Map<String, List<HistoryLink>>> call() {
-    return mutateAsync(
+  Future<void> call() {
+    return mutate(
       Invocation.method(#clear, []),
       ($notifier) => $notifier.clear(),
     );
@@ -290,7 +282,7 @@ final class _$WebSourceFavorites$Clear
 
   @override
   _$WebSourceFavorites$Clear copyWith(
-    MutationState<Map<String, List<HistoryLink>>> state, {
+    MutationState<void> state, {
     Object? key,
   }) => _$WebSourceFavorites$Clear(element, state: state, key: key);
 }
@@ -305,9 +297,6 @@ sealed class WebSourceFavorites$Add
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -341,7 +330,7 @@ final class _$WebSourceFavorites$Add
     String category,
     HistoryLink link,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#add, [category, link]),
       ($notifier) => $notifier.add(category, link),
     );
@@ -364,9 +353,6 @@ sealed class WebSourceFavorites$UpdateAll
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -395,7 +381,7 @@ final class _$WebSourceFavorites$UpdateAll
 
   @override
   Future<Map<String, List<HistoryLink>>> call(HistoryLink link) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#updateAll, [link]),
       ($notifier) => $notifier.updateAll(link),
     );
@@ -418,9 +404,6 @@ sealed class WebSourceFavorites$Remove
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -454,7 +437,7 @@ final class _$WebSourceFavorites$Remove
     String category,
     HistoryLink link,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#remove, [category, link]),
       ($notifier) => $notifier.remove(category, link),
     );
@@ -477,9 +460,6 @@ sealed class WebSourceFavorites$UpdateList
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -516,7 +496,7 @@ final class _$WebSourceFavorites$UpdateList
     int oldIndex,
     int newIndex,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#updateList, [category, oldIndex, newIndex]),
       ($notifier) => $notifier.updateList(category, oldIndex, newIndex),
     );
@@ -539,9 +519,6 @@ sealed class WebSourceFavorites$ReconfigureCategories
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -580,7 +557,7 @@ final class _$WebSourceFavorites$ReconfigureCategories
     List<WebSourceCategory> categories,
     String defaultCategory,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#reconfigureCategories, [categories, defaultCategory]),
       ($notifier) =>
           $notifier.reconfigureCategories(categories, defaultCategory),
@@ -674,7 +651,7 @@ final class WebSourceHistoryProvider
       });
 }
 
-String _$webSourceHistoryHash() => r'aa0bafe0916acfa2bb4983818dcda81b42b35fbc';
+String _$webSourceHistoryHash() => r'034d6fd317996f812b6e81b805ccc9142082030c';
 
 abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
   FutureOr<Queue<HistoryLink>> build();
@@ -736,9 +713,6 @@ sealed class WebSourceHistory$Clear extends MutationBase<Queue<HistoryLink>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -765,7 +739,7 @@ final class _$WebSourceHistory$Clear
 
   @override
   Future<Queue<HistoryLink>> call() {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#clear, []),
       ($notifier) => $notifier.clear(),
     );
@@ -787,9 +761,6 @@ sealed class WebSourceHistory$Add extends MutationBase<Queue<HistoryLink>> {
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -817,7 +788,7 @@ final class _$WebSourceHistory$Add
 
   @override
   Future<Queue<HistoryLink>> call(HistoryLink link) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#add, [link]),
       ($notifier) => $notifier.add(link),
     );
@@ -839,9 +810,6 @@ sealed class WebSourceHistory$Remove extends MutationBase<Queue<HistoryLink>> {
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -869,7 +837,7 @@ final class _$WebSourceHistory$Remove
 
   @override
   Future<Queue<HistoryLink>> call(HistoryLink link) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#remove, [link]),
       ($notifier) => $notifier.remove(link),
     );
@@ -968,7 +936,7 @@ final class WebReadMarkersProvider
       });
 }
 
-String _$webReadMarkersHash() => r'9119a7b9453a07c05a184ff46966ab530728ad92';
+String _$webReadMarkersHash() => r'f7c8a9346a9e67f742205f4b2e05606b1f72b3e6';
 
 abstract class _$WebReadMarkers
     extends $AsyncNotifier<Map<String, Set<String>>> {
@@ -1039,9 +1007,6 @@ sealed class WebReadMarkers$Clear
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -1068,7 +1033,7 @@ final class _$WebReadMarkers$Clear
 
   @override
   Future<Map<String, Set<String>>> call() {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#clear, []),
       ($notifier) => $notifier.clear(),
     );
@@ -1090,9 +1055,6 @@ sealed class WebReadMarkers$Set extends MutationBase<Map<String, Set<String>>> {
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -1128,7 +1090,7 @@ final class _$WebReadMarkers$Set
     String chapter,
     bool setRead,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#set, [manga, chapter, setRead]),
       ($notifier) => $notifier.set(manga, chapter, setRead),
     );
@@ -1151,9 +1113,6 @@ sealed class WebReadMarkers$SetBulk
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -1189,7 +1148,7 @@ final class _$WebReadMarkers$SetBulk
     Iterable<String>? read,
     Iterable<String>? unread,
   }) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#setBulk, [manga], {#read: read, #unread: unread}),
       ($notifier) => $notifier.setBulk(manga, read: read, unread: unread),
     );
@@ -1212,9 +1171,6 @@ sealed class WebReadMarkers$DeleteKey
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -1243,7 +1199,7 @@ final class _$WebReadMarkers$DeleteKey
 
   @override
   Future<Map<String, Set<String>>> call(String manga) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#deleteKey, [manga]),
       ($notifier) => $notifier.deleteKey(manga),
     );

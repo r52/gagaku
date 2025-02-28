@@ -31,11 +31,13 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
           stackTrace: stackTrace,
           message: "_fetchListFromIdProvider($listId) failed",
         ),
-        AsyncValue(hasValue: true, value: final list) when list != null => MangaDexEditListScreen(list: list),
-        AsyncValue(hasValue: true, value: final list) when list == null => Center(
-          child: Text('Invalid listId $listId!'),
+        AsyncValue(hasValue: true, value: final list) when list != null =>
+          MangaDexEditListScreen(list: list),
+        AsyncValue(hasValue: true, value: final list) when list == null =>
+          Center(child: Text('Invalid listId $listId!')),
+        AsyncValue(:final progress) => ListSpinner(
+          progress: progress?.toDouble(),
         ),
-        AsyncValue(:final progress) => ListSpinner(progress: progress?.toDouble()),
       },
     );
   }
@@ -48,7 +50,11 @@ class MangaDexCreateListScreen extends MangaDexEditListScreen {
 
 @RoutePage()
 class MangaDexEditListScreen extends HookConsumerWidget {
-  const MangaDexEditListScreen({super.key, @PathParam() this.listId, this.list});
+  const MangaDexEditListScreen({
+    super.key,
+    @PathParam() this.listId,
+    this.list,
+  });
 
   final String? listId;
   final CustomList? list;
@@ -58,13 +64,19 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final router = AutoRouter.of(context);
     final me = ref.watch(loggedUserProvider).value;
     final id = useRef(list?.id ?? const Uuid().v4());
-    final listNameController = useTextEditingController(text: list?.attributes.name);
+    final listNameController = useTextEditingController(
+      text: list?.attributes.name,
+    );
 
-    final visibility = useValueNotifier(list != null ? list!.attributes.visibility : CustomListVisibility.private);
+    final visibility = useValueNotifier(
+      list != null ? list!.attributes.visibility : CustomListVisibility.private,
+    );
 
     final editList = ref.watch(userListsProvider(me?.id).editList);
     final newList = ref.watch(userListsProvider(me?.id).newList);
-    final isLoading = editList.state is PendingMutationState || newList.state is PendingMutationState;
+    final isLoading =
+        editList.state is PendingMutationState ||
+        newList.state is PendingMutationState;
 
     final selected = useReducer(
       MangaSetAction.modify,
@@ -116,7 +128,10 @@ class MangaDexEditListScreen extends HookConsumerWidget {
       appBar: AppBar(
         leading: AutoLeadingButton(),
         flexibleSpace: TitleFlexBar(
-          title: list != null ? 'mangadex.editList'.tr(context: context) : 'mangadex.createList'.tr(context: context),
+          title:
+              list != null
+                  ? 'mangadex.editList'.tr(context: context)
+                  : 'mangadex.createList'.tr(context: context),
         ),
         actions: [
           OverflowBar(
@@ -144,18 +159,29 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                     style: Styles.buttonStyle(),
                     onPressed:
                         listNameChanged ||
-                                (list != null && !setEquals(selected.state, list!.set)) ||
-                                (list != null && vis != list!.attributes.visibility)
+                                (list != null &&
+                                    !setEquals(selected.state, list!.set)) ||
+                                (list != null &&
+                                    vis != list!.attributes.visibility)
                             ? () async {
                               final messenger = ScaffoldMessenger.of(context);
 
                               if (listNameController.text.isNotEmpty) {
-                                Future<List<CustomList>> success;
+                                Future<CustomList> success;
 
                                 if (list != null) {
-                                  success = editList(list!, listNameController.text, vis, selected.state);
+                                  success = editList(
+                                    list!,
+                                    listNameController.text,
+                                    vis,
+                                    selected.state,
+                                  );
                                 } else {
-                                  success = newList(listNameController.text, vis, selected.state);
+                                  success = newList(
+                                    listNameController.text,
+                                    vis,
+                                    selected.state,
+                                  );
                                 }
 
                                 success.then((_) {
@@ -167,14 +193,22 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                   ..removeCurrentSnackBar()
                                   ..showSnackBar(
                                     SnackBar(
-                                      content: Text('mangadex.listNameEmptyWarning'.tr(context: context)),
+                                      content: Text(
+                                        'mangadex.listNameEmptyWarning'.tr(
+                                          context: context,
+                                        ),
+                                      ),
                                       backgroundColor: Colors.red,
                                     ),
                                   );
                               }
                             }
                             : null,
-                    child: Text(list != null ? 'ui.save'.tr(context: context) : 'ui.create'.tr(context: context)),
+                    child: Text(
+                      list != null
+                          ? 'ui.save'.tr(context: context)
+                          : 'ui.create'.tr(context: context),
+                    ),
                   );
                 },
               ),
@@ -196,11 +230,16 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                     Expanded(
                       child: TextFormField(
                         controller: listNameController,
-                        decoration: InputDecoration(filled: true, labelText: 'mangadex.listName'.tr(context: context)),
+                        decoration: InputDecoration(
+                          filled: true,
+                          labelText: 'mangadex.listName'.tr(context: context),
+                        ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           return (value == null || value.isEmpty)
-                              ? 'mangadex.listNameEmptyWarning'.tr(context: context)
+                              ? 'mangadex.listNameEmptyWarning'.tr(
+                                context: context,
+                              )
                               : null;
                         },
                       ),
@@ -230,14 +269,31 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   ],
                 ),
                 ElevatedButton(
-                  style: Styles.buttonStyle(backgroundColor: Theme.of(context).colorScheme.primaryContainer),
+                  style: Styles.buttonStyle(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                  ),
                   onPressed: () {
                     router
-                        .push<Set<String>>(MangaDexSearchRoute(selectMode: true, selectedTitles: selected.state))
+                        .push<Set<String>>(
+                          MangaDexSearchRoute(
+                            selectMode: true,
+                            selectedTitles: selected.state,
+                          ),
+                        )
                         .then((result) {
                           if (result != null) {
-                            selected.dispatch(MangaSetAction(action: MangaSetActions.replace, replacement: result));
-                            ref.read(persistentMangaListPaginatorProvider(id.value).updateList)(selected.state);
+                            selected.dispatch(
+                              MangaSetAction(
+                                action: MangaSetActions.replace,
+                                replacement: result,
+                              ),
+                            );
+                            ref.read(
+                              persistentMangaListPaginatorProvider(
+                                id.value,
+                              ).updateList,
+                            )(selected.state);
                           }
                         });
                   },
@@ -246,21 +302,31 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 Expanded(
                   child: HookConsumer(
                     builder: (context, ref, child) {
-                      final titlesProvider = ref.watch(persistentMangaListPaginatorProvider(id.value));
-                      final updateList = ref.watch(persistentMangaListPaginatorProvider(id.value).updateList);
-                      final getPage = ref.watch(persistentMangaListPaginatorProvider(id.value).getPage);
+                      final titlesProvider = ref.watch(
+                        persistentMangaListPaginatorProvider(id.value),
+                      );
+                      final updateList = ref.watch(
+                        persistentMangaListPaginatorProvider(
+                          id.value,
+                        ).updateList,
+                      );
+                      final getPage = ref.watch(
+                        persistentMangaListPaginatorProvider(id.value).getPage,
+                      );
 
                       useEffect(() {
                         Future.delayed(
                           Duration.zero,
-                          () => ref.read(persistentMangaListPaginatorProvider(id.value).updateList)(selected.state),
+                          () => updateList(selected.state),
                         );
 
                         return null;
                       }, []);
 
                       return DataProviderWhenWidget(
-                        provider: persistentMangaListPaginatorProvider(id.value),
+                        provider: persistentMangaListPaginatorProvider(
+                          id.value,
+                        ),
                         data: titlesProvider,
                         builder:
                             (context, mangas) => MangaListWidget(
@@ -283,9 +349,12 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                   },
                                   onSelected: (manga) {
                                     selected.dispatch(
-                                      MangaSetAction(action: MangaSetActions.remove, element: manga.id),
+                                      MangaSetAction(
+                                        action: MangaSetActions.remove,
+                                        element: manga.id,
+                                      ),
                                     );
-                                    ref.read(persistentMangaListPaginatorProvider(id.value).updateList)(selected.state);
+                                    updateList(selected.state);
                                   },
                                 ),
                               ],
@@ -299,10 +368,18 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   builder: (context) {
                     final currentPage = useState(0);
                     return NumberPaginator(
-                      numberPages: max((selected.state.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                      numberPages: max(
+                        (selected.state.length / MangaDexEndpoints.searchLimit)
+                            .ceil(),
+                        1,
+                      ),
                       onPageChange: (int index) {
                         currentPage.value = index;
-                        ref.read(persistentMangaListPaginatorProvider(id.value).getPage)(index);
+                        ref.read(
+                          persistentMangaListPaginatorProvider(
+                            id.value,
+                          ).getPage,
+                        )(index);
                       },
                     );
                   },

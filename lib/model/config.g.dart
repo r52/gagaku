@@ -127,7 +127,7 @@ final class GagakuSettingsProvider
       });
 }
 
-String _$gagakuSettingsHash() => r'b43e7e7daea8164a9d7496099356031f7735f0a2';
+String _$gagakuSettingsHash() => r'2fac8d25121935616099a1b26c5087025c8faf74';
 
 abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();
@@ -180,15 +180,12 @@ sealed class GagakuSettings$Save extends MutationBase<GagakuConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<GagakuConfig> call(GagakuConfig update);
+  GagakuConfig call(GagakuConfig update);
 }
 
 final class _$GagakuSettings$Save
@@ -204,8 +201,8 @@ final class _$GagakuSettings$Save
   $ElementLense<_$GagakuSettings$Save> get listenable => element._$save;
 
   @override
-  Future<GagakuConfig> call(GagakuConfig update) {
-    return mutateAsync(
+  GagakuConfig call(GagakuConfig update) {
+    return mutate(
       Invocation.method(#save, [update]),
       ($notifier) => $notifier.save(update),
     );

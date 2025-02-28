@@ -1316,7 +1316,7 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'7416db2f44cce3d1dc05701ba1b1d8034cdcc3ce';
+String _$readChaptersHash() => r'1e52eceee5ec71ee240aa09663fbd4c633cabbdd';
 
 final class ReadChaptersFamily extends Family {
   const ReadChaptersFamily._()
@@ -1435,9 +1435,6 @@ sealed class ReadChapters$Get extends MutationBase<ReadChaptersMap> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -1460,7 +1457,7 @@ final class _$ReadChapters$Get
 
   @override
   Future<ReadChaptersMap> call(Iterable<Manga> mangas) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#get, [mangas]),
       ($notifier) => $notifier.get(mangas),
     );
@@ -1482,9 +1479,6 @@ sealed class ReadChapters$Set extends MutationBase<ReadChaptersMap> {
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -1516,7 +1510,7 @@ final class _$ReadChapters$Set
     Iterable<Chapter>? read,
     Iterable<Chapter>? unread,
   }) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#set, [manga], {#read: read, #unread: unread}),
       ($notifier) => $notifier.set(manga, read: read, unread: unread),
     );
@@ -1612,7 +1606,7 @@ final class UserLibraryProvider
   }
 }
 
-String _$userLibraryHash() => r'73aa98bfcf1e7771677589d4ff0328d32e358694';
+String _$userLibraryHash() => r'8c20b25da530b2241f508d90111dce2a68e3f3e1';
 
 final class UserLibraryFamily extends Family {
   const UserLibraryFamily._()
@@ -1733,9 +1727,6 @@ sealed class UserLibrary$Set
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -1768,7 +1759,7 @@ final class _$UserLibrary$Set
     Manga manga,
     MangaReadingStatus? status,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#set, [manga, status]),
       ($notifier) => $notifier.set(manga, status),
     );
@@ -1894,7 +1885,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'23724a91c07593227bf8113bd2afac58475d0cf2';
+String _$userListsHash() => r'edb412e9fd72eb9f2d98b551c881b6c39b67ea84';
 
 final class UserListsFamily extends Family {
   const UserListsFamily._()
@@ -2011,7 +2002,7 @@ class _$UserListsElement
   }
 }
 
-sealed class UserLists$UpdateList extends MutationBase<List<CustomList>> {
+sealed class UserLists$UpdateList extends MutationBase<CustomList?> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -2021,20 +2012,16 @@ sealed class UserLists$UpdateList extends MutationBase<List<CustomList>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<List<CustomList>> call(CustomList list, Manga manga, bool add);
+  Future<CustomList?> call(CustomList list, Manga manga, bool add);
 }
 
 final class _$UserLists$UpdateList
-    extends
-        $AsyncMutationBase<List<CustomList>, _$UserLists$UpdateList, UserLists>
+    extends $AsyncMutationBase<CustomList?, _$UserLists$UpdateList, UserLists>
     implements UserLists$UpdateList {
   _$UserLists$UpdateList(this.element, {super.state, super.key});
 
@@ -2045,8 +2032,8 @@ final class _$UserLists$UpdateList
   $ElementLense<_$UserLists$UpdateList> get listenable => element._$updateList;
 
   @override
-  Future<List<CustomList>> call(CustomList list, Manga manga, bool add) {
-    return mutateAsync(
+  Future<CustomList?> call(CustomList list, Manga manga, bool add) {
+    return mutate(
       Invocation.method(#updateList, [list, manga, add]),
       ($notifier) => $notifier.updateList(list, manga, add),
     );
@@ -2054,12 +2041,12 @@ final class _$UserLists$UpdateList
 
   @override
   _$UserLists$UpdateList copyWith(
-    MutationState<List<CustomList>> state, {
+    MutationState<CustomList?> state, {
     Object? key,
   }) => _$UserLists$UpdateList(element, state: state, key: key);
 }
 
-sealed class UserLists$EditList extends MutationBase<List<CustomList>> {
+sealed class UserLists$EditList extends MutationBase<CustomList> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -2069,15 +2056,12 @@ sealed class UserLists$EditList extends MutationBase<List<CustomList>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<List<CustomList>> call(
+  Future<CustomList> call(
     CustomList list,
     String name,
     CustomListVisibility visibility,
@@ -2086,8 +2070,7 @@ sealed class UserLists$EditList extends MutationBase<List<CustomList>> {
 }
 
 final class _$UserLists$EditList
-    extends
-        $AsyncMutationBase<List<CustomList>, _$UserLists$EditList, UserLists>
+    extends $AsyncMutationBase<CustomList, _$UserLists$EditList, UserLists>
     implements UserLists$EditList {
   _$UserLists$EditList(this.element, {super.state, super.key});
 
@@ -2098,13 +2081,13 @@ final class _$UserLists$EditList
   $ElementLense<_$UserLists$EditList> get listenable => element._$editList;
 
   @override
-  Future<List<CustomList>> call(
+  Future<CustomList> call(
     CustomList list,
     String name,
     CustomListVisibility visibility,
     Iterable<String> mangaIds,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#editList, [list, name, visibility, mangaIds]),
       ($notifier) => $notifier.editList(list, name, visibility, mangaIds),
     );
@@ -2112,12 +2095,12 @@ final class _$UserLists$EditList
 
   @override
   _$UserLists$EditList copyWith(
-    MutationState<List<CustomList>> state, {
+    MutationState<CustomList> state, {
     Object? key,
   }) => _$UserLists$EditList(element, state: state, key: key);
 }
 
-sealed class UserLists$DeleteList extends MutationBase<List<CustomList>> {
+sealed class UserLists$DeleteList extends MutationBase<CustomList> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -2127,20 +2110,16 @@ sealed class UserLists$DeleteList extends MutationBase<List<CustomList>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<List<CustomList>> call(CustomList list);
+  Future<CustomList> call(CustomList list);
 }
 
 final class _$UserLists$DeleteList
-    extends
-        $AsyncMutationBase<List<CustomList>, _$UserLists$DeleteList, UserLists>
+    extends $AsyncMutationBase<CustomList, _$UserLists$DeleteList, UserLists>
     implements UserLists$DeleteList {
   _$UserLists$DeleteList(this.element, {super.state, super.key});
 
@@ -2151,8 +2130,8 @@ final class _$UserLists$DeleteList
   $ElementLense<_$UserLists$DeleteList> get listenable => element._$deleteList;
 
   @override
-  Future<List<CustomList>> call(CustomList list) {
-    return mutateAsync(
+  Future<CustomList> call(CustomList list) {
+    return mutate(
       Invocation.method(#deleteList, [list]),
       ($notifier) => $notifier.deleteList(list),
     );
@@ -2160,12 +2139,12 @@ final class _$UserLists$DeleteList
 
   @override
   _$UserLists$DeleteList copyWith(
-    MutationState<List<CustomList>> state, {
+    MutationState<CustomList> state, {
     Object? key,
   }) => _$UserLists$DeleteList(element, state: state, key: key);
 }
 
-sealed class UserLists$NewList extends MutationBase<List<CustomList>> {
+sealed class UserLists$NewList extends MutationBase<CustomList> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -2175,15 +2154,12 @@ sealed class UserLists$NewList extends MutationBase<List<CustomList>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<List<CustomList>> call(
+  Future<CustomList> call(
     String name,
     CustomListVisibility visibility,
     Iterable<String> mangaIds,
@@ -2191,7 +2167,7 @@ sealed class UserLists$NewList extends MutationBase<List<CustomList>> {
 }
 
 final class _$UserLists$NewList
-    extends $AsyncMutationBase<List<CustomList>, _$UserLists$NewList, UserLists>
+    extends $AsyncMutationBase<CustomList, _$UserLists$NewList, UserLists>
     implements UserLists$NewList {
   _$UserLists$NewList(this.element, {super.state, super.key});
 
@@ -2202,12 +2178,12 @@ final class _$UserLists$NewList
   $ElementLense<_$UserLists$NewList> get listenable => element._$newList;
 
   @override
-  Future<List<CustomList>> call(
+  Future<CustomList> call(
     String name,
     CustomListVisibility visibility,
     Iterable<String> mangaIds,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#newList, [name, visibility, mangaIds]),
       ($notifier) => $notifier.newList(name, visibility, mangaIds),
     );
@@ -2215,7 +2191,7 @@ final class _$UserLists$NewList
 
   @override
   _$UserLists$NewList copyWith(
-    MutationState<List<CustomList>> state, {
+    MutationState<CustomList> state, {
     Object? key,
   }) => _$UserLists$NewList(element, state: state, key: key);
 }
@@ -2303,7 +2279,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'770c515c15f79c49085a0a21ff96d5cd9e15314d';
+String _$followedListsHash() => r'fe33a7a0a4205478a2d59f626db08386bd42fb3d';
 
 final class FollowedListsFamily extends Family {
   const FollowedListsFamily._()
@@ -2408,7 +2384,7 @@ class _$FollowedListsElement
   }
 }
 
-sealed class FollowedLists$SetFollow extends MutationBase<List<CustomList>> {
+sealed class FollowedLists$SetFollow extends MutationBase<bool> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -2418,24 +2394,16 @@ sealed class FollowedLists$SetFollow extends MutationBase<List<CustomList>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<List<CustomList>> call(CustomList list, bool follow);
+  Future<bool> call(CustomList list, bool follow);
 }
 
 final class _$FollowedLists$SetFollow
-    extends
-        $AsyncMutationBase<
-          List<CustomList>,
-          _$FollowedLists$SetFollow,
-          FollowedLists
-        >
+    extends $AsyncMutationBase<bool, _$FollowedLists$SetFollow, FollowedLists>
     implements FollowedLists$SetFollow {
   _$FollowedLists$SetFollow(this.element, {super.state, super.key});
 
@@ -2447,8 +2415,8 @@ final class _$FollowedLists$SetFollow
       element._$setFollow;
 
   @override
-  Future<List<CustomList>> call(CustomList list, bool follow) {
-    return mutateAsync(
+  Future<bool> call(CustomList list, bool follow) {
+    return mutate(
       Invocation.method(#setFollow, [list, follow]),
       ($notifier) => $notifier.setFollow(list, follow),
     );
@@ -2456,7 +2424,7 @@ final class _$FollowedLists$SetFollow
 
   @override
   _$FollowedLists$SetFollow copyWith(
-    MutationState<List<CustomList>> state, {
+    MutationState<bool> state, {
     Object? key,
   }) => _$FollowedLists$SetFollow(element, state: state, key: key);
 }
@@ -2842,7 +2810,7 @@ final class PersistentMangaListPaginatorProvider
 }
 
 String _$persistentMangaListPaginatorHash() =>
-    r'6cbdfac489e89a7daab01cdd47884874d4414bd7';
+    r'0107d1af939454795f1c86f0cc7d5f646d71a175';
 
 final class PersistentMangaListPaginatorFamily extends Family {
   const PersistentMangaListPaginatorFamily._()
@@ -2981,9 +2949,6 @@ sealed class PersistentMangaListPaginator$GetPage
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -3015,7 +2980,7 @@ final class _$PersistentMangaListPaginator$GetPage
 
   @override
   Future<List<Manga>> call(int page) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#getPage, [page]),
       ($notifier) => $notifier.getPage(page),
     );
@@ -3038,9 +3003,6 @@ sealed class PersistentMangaListPaginator$UpdateList
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -3073,7 +3035,7 @@ final class _$PersistentMangaListPaginator$UpdateList
 
   @override
   Future<List<Manga>> call(Iterable<String> list) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#updateList, [list]),
       ($notifier) => $notifier.updateList(list),
     );
@@ -3100,9 +3062,6 @@ sealed class PersistentMangaListPaginator$UpdateListPage
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -3135,7 +3094,7 @@ final class _$PersistentMangaListPaginator$UpdateListPage
 
   @override
   Future<List<Manga>> call(Iterable<String> list, int page) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#updateListPage, [list, page]),
       ($notifier) => $notifier.updateListPage(list, page),
     );
@@ -3595,7 +3554,7 @@ final class StatisticsProvider
   });
 }
 
-String _$statisticsHash() => r'1886297bbf3f51e233cbe1b0bb1ace5515b527e5';
+String _$statisticsHash() => r'239a7a9095d0d55aefada8a1e7d64d09175443b3';
 
 abstract class _$Statistics
     extends $AsyncNotifier<Map<String, MangaStatistics>> {
@@ -3653,9 +3612,6 @@ sealed class Statistics$Get extends MutationBase<Map<String, MangaStatistics>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -3682,7 +3638,7 @@ final class _$Statistics$Get
 
   @override
   Future<Map<String, MangaStatistics>> call(Iterable<Manga> mangas) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#get, [mangas]),
       ($notifier) => $notifier.get(mangas),
     );
@@ -3753,7 +3709,7 @@ final class ChapterStatsProvider
   });
 }
 
-String _$chapterStatsHash() => r'df4469b6e66e59997ded830d77e1d0403b1b0b7a';
+String _$chapterStatsHash() => r'6b0d401ef5fe20f1d08ca68ea63060a9382bbc3e';
 
 abstract class _$ChapterStats
     extends $AsyncNotifier<Map<String, ChapterStatistics>> {
@@ -3812,9 +3768,6 @@ sealed class ChapterStats$Get
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -3841,7 +3794,7 @@ final class _$ChapterStats$Get
 
   @override
   Future<Map<String, ChapterStatistics>> call(Iterable<Chapter> chapters) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#get, [chapters]),
       ($notifier) => $notifier.get(chapters),
     );
@@ -3947,7 +3900,7 @@ final class RatingsProvider
   }
 }
 
-String _$ratingsHash() => r'333aad427f970d7826e2c7992af6bf4e035809cf';
+String _$ratingsHash() => r'4cbf0300ac8e1bac2ea41d0b575b47be0d942f1f';
 
 final class RatingsFamily extends Family {
   const RatingsFamily._()
@@ -4066,9 +4019,6 @@ sealed class Ratings$Get extends MutationBase<Map<String, SelfRating>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -4090,7 +4040,7 @@ final class _$Ratings$Get
 
   @override
   Future<Map<String, SelfRating>> call(Iterable<Manga> mangas) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#get, [mangas]),
       ($notifier) => $notifier.get(mangas),
     );
@@ -4103,7 +4053,7 @@ final class _$Ratings$Get
   }) => _$Ratings$Get(element, state: state, key: key);
 }
 
-sealed class Ratings$Set extends MutationBase<Map<String, SelfRating>> {
+sealed class Ratings$Set extends MutationBase<bool> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -4113,19 +4063,16 @@ sealed class Ratings$Set extends MutationBase<Map<String, SelfRating>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<Map<String, SelfRating>> call(Manga manga, int? rating);
+  Future<bool> call(Manga manga, int? rating);
 }
 
 final class _$Ratings$Set
-    extends $AsyncMutationBase<Map<String, SelfRating>, _$Ratings$Set, Ratings>
+    extends $AsyncMutationBase<bool, _$Ratings$Set, Ratings>
     implements Ratings$Set {
   _$Ratings$Set(this.element, {super.state, super.key});
 
@@ -4136,18 +4083,16 @@ final class _$Ratings$Set
   $ElementLense<_$Ratings$Set> get listenable => element._$set;
 
   @override
-  Future<Map<String, SelfRating>> call(Manga manga, int? rating) {
-    return mutateAsync(
+  Future<bool> call(Manga manga, int? rating) {
+    return mutate(
       Invocation.method(#set, [manga, rating]),
       ($notifier) => $notifier.set(manga, rating),
     );
   }
 
   @override
-  _$Ratings$Set copyWith(
-    MutationState<Map<String, SelfRating>> state, {
-    Object? key,
-  }) => _$Ratings$Set(element, state: state, key: key);
+  _$Ratings$Set copyWith(MutationState<bool> state, {Object? key}) =>
+      _$Ratings$Set(element, state: state, key: key);
 }
 
 @ProviderFor(ReadingStatus)
@@ -4233,7 +4178,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'2b8c21d37a1b7be01aca10b130cb1f2bf57539fc';
+String _$readingStatusHash() => r'894553c73b09455414aba31e2363c6044e7e7947';
 
 final class ReadingStatusFamily extends Family {
   const ReadingStatusFamily._()
@@ -4338,7 +4283,7 @@ class _$ReadingStatusElement
   }
 }
 
-sealed class ReadingStatus$Set extends MutationBase<MangaReadingStatus?> {
+sealed class ReadingStatus$Set extends MutationBase<bool> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -4348,24 +4293,16 @@ sealed class ReadingStatus$Set extends MutationBase<MangaReadingStatus?> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<MangaReadingStatus?> call(MangaReadingStatus? status);
+  Future<bool> call(MangaReadingStatus? status);
 }
 
 final class _$ReadingStatus$Set
-    extends
-        $AsyncMutationBase<
-          MangaReadingStatus?,
-          _$ReadingStatus$Set,
-          ReadingStatus
-        >
+    extends $AsyncMutationBase<bool, _$ReadingStatus$Set, ReadingStatus>
     implements ReadingStatus$Set {
   _$ReadingStatus$Set(this.element, {super.state, super.key});
 
@@ -4376,18 +4313,16 @@ final class _$ReadingStatus$Set
   $ElementLense<_$ReadingStatus$Set> get listenable => element._$set;
 
   @override
-  Future<MangaReadingStatus?> call(MangaReadingStatus? status) {
-    return mutateAsync(
+  Future<bool> call(MangaReadingStatus? status) {
+    return mutate(
       Invocation.method(#set, [status]),
       ($notifier) => $notifier.set(status),
     );
   }
 
   @override
-  _$ReadingStatus$Set copyWith(
-    MutationState<MangaReadingStatus?> state, {
-    Object? key,
-  }) => _$ReadingStatus$Set(element, state: state, key: key);
+  _$ReadingStatus$Set copyWith(MutationState<bool> state, {Object? key}) =>
+      _$ReadingStatus$Set(element, state: state, key: key);
 }
 
 @ProviderFor(FollowingStatus)
@@ -4472,7 +4407,7 @@ final class FollowingStatusProvider
   }
 }
 
-String _$followingStatusHash() => r'283f69eb8a5a46c74ad68a98809c7632027274f9';
+String _$followingStatusHash() => r'1de36b37907bc85db5d2581c90f5762e02d98f02';
 
 final class FollowingStatusFamily extends Family {
   const FollowingStatusFamily._()
@@ -4583,9 +4518,6 @@ sealed class FollowingStatus$Set extends MutationBase<bool> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -4607,7 +4539,7 @@ final class _$FollowingStatus$Set
 
   @override
   Future<bool> call(bool following) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#set, [following]),
       ($notifier) => $notifier.set(following),
     );
@@ -4676,7 +4608,7 @@ final class MangaDexHistoryProvider
       );
 }
 
-String _$mangaDexHistoryHash() => r'311e39e2c47319cc22050958d302dfbe053d1ebd';
+String _$mangaDexHistoryHash() => r'878b924c71458b17deb8e7f16a9e44ddf17fba91';
 
 abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();
@@ -4719,7 +4651,7 @@ class _$MangaDexHistoryElement
   }
 }
 
-sealed class MangaDexHistory$Add extends MutationBase<Queue<Chapter>> {
+sealed class MangaDexHistory$Add extends MutationBase<Chapter> {
   /// Starts the mutation.
   ///
   /// This will first set the state to [PendingMutationState], then
@@ -4729,24 +4661,16 @@ sealed class MangaDexHistory$Add extends MutationBase<Queue<Chapter>> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<Queue<Chapter>> call(Chapter chapter);
+  Future<Chapter> call(Chapter chapter);
 }
 
 final class _$MangaDexHistory$Add
-    extends
-        $AsyncMutationBase<
-          Queue<Chapter>,
-          _$MangaDexHistory$Add,
-          MangaDexHistory
-        >
+    extends $AsyncMutationBase<Chapter, _$MangaDexHistory$Add, MangaDexHistory>
     implements MangaDexHistory$Add {
   _$MangaDexHistory$Add(this.element, {super.state, super.key});
 
@@ -4757,18 +4681,16 @@ final class _$MangaDexHistory$Add
   $ElementLense<_$MangaDexHistory$Add> get listenable => element._$add;
 
   @override
-  Future<Queue<Chapter>> call(Chapter chapter) {
-    return mutateAsync(
+  Future<Chapter> call(Chapter chapter) {
+    return mutate(
       Invocation.method(#add, [chapter]),
       ($notifier) => $notifier.add(chapter),
     );
   }
 
   @override
-  _$MangaDexHistory$Add copyWith(
-    MutationState<Queue<Chapter>> state, {
-    Object? key,
-  }) => _$MangaDexHistory$Add(element, state: state, key: key);
+  _$MangaDexHistory$Add copyWith(MutationState<Chapter> state, {Object? key}) =>
+      _$MangaDexHistory$Add(element, state: state, key: key);
 }
 
 @ProviderFor(LoggedUser)
@@ -4907,7 +4829,7 @@ final class AuthControlProvider
       });
 }
 
-String _$authControlHash() => r'8b71a67ac16746fb47853136068621f325098b78';
+String _$authControlHash() => r'ef594015647fe50089f23b1219e506212c3276bf';
 
 abstract class _$AuthControl extends $AsyncNotifier<bool> {
   FutureOr<bool> build();
@@ -4964,9 +4886,6 @@ sealed class AuthControl$Login extends MutationBase<bool> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
@@ -4998,7 +4917,7 @@ final class _$AuthControl$Login
     String clientId,
     String clientSecret,
   ) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#login, [user, pass, clientId, clientSecret]),
       ($notifier) => $notifier.login(user, pass, clientId, clientSecret),
     );
@@ -5018,9 +4937,6 @@ sealed class AuthControl$Logout extends MutationBase<bool> {
   /// After the method completes, the mutation state will be updated to either
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
-  ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
   ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
@@ -5043,7 +4959,7 @@ final class _$AuthControl$Logout
 
   @override
   Future<bool> call() {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#logout, []),
       ($notifier) => $notifier.logout(),
     );

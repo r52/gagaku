@@ -31,13 +31,16 @@ class GagakuConfig with _$GagakuConfig {
     @Default(ThemeMode.system) ThemeMode themeMode,
 
     /// Theme color
-    @JsonKey(unknownEnumValue: GagakuTheme.lime) @Default(GagakuTheme.lime) GagakuTheme theme,
+    @JsonKey(unknownEnumValue: GagakuTheme.lime)
+    @Default(GagakuTheme.lime)
+    GagakuTheme theme,
 
     // Grid view size
     @Default(GridAlbumExtent.medium) GridAlbumExtent gridAlbumExtent,
   }) = _GagakuConfig;
 
-  factory GagakuConfig.fromJson(Map<String, dynamic> json) => _$GagakuConfigFromJson(json);
+  factory GagakuConfig.fromJson(Map<String, dynamic> json) =>
+      _$GagakuConfigFromJson(json);
 }
 
 @riverpod
@@ -61,7 +64,8 @@ class GagakuSettings extends _$GagakuSettings {
   }
 
   @mutation
-  FutureOr<GagakuConfig> save(GagakuConfig update) async {
+  GagakuConfig save(GagakuConfig update) {
+    state = update;
     final box = Hive.box(gagakuBox);
     box.put('gagaku', json.encode(update.toJson()));
 

@@ -82,7 +82,7 @@ final class LocalConfigProvider
       });
 }
 
-String _$localConfigHash() => r'fb372f5d9185395eac934b890e8f1c409970d07b';
+String _$localConfigHash() => r'2d256629dac8ccaf6abbfd3d1ef120a1b718a2c1';
 
 abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();
@@ -135,15 +135,12 @@ sealed class LocalConfig$Save extends MutationBase<LocalLibConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<LocalLibConfig> call(LocalLibConfig update);
+  LocalLibConfig call(LocalLibConfig update);
 }
 
 final class _$LocalConfig$Save
@@ -158,8 +155,8 @@ final class _$LocalConfig$Save
   $ElementLense<_$LocalConfig$Save> get listenable => element._$save;
 
   @override
-  Future<LocalLibConfig> call(LocalLibConfig update) {
-    return mutateAsync(
+  LocalLibConfig call(LocalLibConfig update) {
+    return mutate(
       Invocation.method(#save, [update]),
       ($notifier) => $notifier.save(update),
     );

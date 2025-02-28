@@ -118,7 +118,7 @@ final class WebConfigProvider
       });
 }
 
-String _$webConfigHash() => r'9c221e7c9fbebe89e015b31b28a09408423e2973';
+String _$webConfigHash() => r'e29a8d2c9b8b3383dcdf068a313f6abd4da40492';
 
 abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();
@@ -175,15 +175,12 @@ sealed class WebConfig$SaveWith extends MutationBase<WebSourceConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<WebSourceConfig> call({
+  WebSourceConfig call({
     List<WebSourceInfo>? installedSources,
     List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
@@ -203,13 +200,13 @@ final class _$WebConfig$SaveWith
   $ElementLense<_$WebConfig$SaveWith> get listenable => element._$saveWith;
 
   @override
-  Future<WebSourceConfig> call({
+  WebSourceConfig call({
     List<WebSourceInfo>? installedSources,
     List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
     String? defaultCategory,
   }) {
-    return mutateAsync(
+    return mutate(
       Invocation.method(#saveWith, [], {
         #installedSources: installedSources,
         #repoList: repoList,
@@ -242,15 +239,12 @@ sealed class WebConfig$Save extends MutationBase<WebSourceConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<WebSourceConfig> call(WebSourceConfig update);
+  WebSourceConfig call(WebSourceConfig update);
 }
 
 final class _$WebConfig$Save
@@ -265,8 +259,8 @@ final class _$WebConfig$Save
   $ElementLense<_$WebConfig$Save> get listenable => element._$save;
 
   @override
-  Future<WebSourceConfig> call(WebSourceConfig update) {
-    return mutateAsync(
+  WebSourceConfig call(WebSourceConfig update) {
+    return mutate(
       Invocation.method(#save, [update]),
       ($notifier) => $notifier.save(update),
     );

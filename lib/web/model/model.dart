@@ -45,7 +45,10 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
-  Future<bool> handleUrl({required String url, required BuildContext context}) async {
+  Future<bool> handleUrl({
+    required String url,
+    required BuildContext context,
+  }) async {
     if (url.startsWith('https://imgur.com/a/')) {
       final src = url.substring(20);
       final code = '/read/api/imgur/chapter/$src';
@@ -57,7 +60,11 @@ class ProxyHandler {
           page: '1',
           readerData: WebReaderData(
             source: code,
-            handle: SourceHandler(type: SourceType.proxy, source: 'imgur', location: src),
+            handle: SourceHandler(
+              type: SourceType.proxy,
+              source: 'imgur',
+              location: src,
+            ),
           ),
         ),
       );
@@ -75,17 +82,30 @@ class ProxyHandler {
 
       if (!context.mounted) return false;
       if (info.chapter != null) {
-        AutoRouter.of(
-          context,
-        ).push(ProxyWebSourceReaderRoute(proxy: info.source, code: info.location, chapter: info.chapter!, page: '1'));
+        AutoRouter.of(context).push(
+          ProxyWebSourceReaderRoute(
+            proxy: info.source,
+            code: info.location,
+            chapter: info.chapter!,
+            page: '1',
+          ),
+        );
       } else {
-        AutoRouter.of(context).push(WebMangaViewRoute(source: info.source, mangaId: info.location, handle: info));
+        AutoRouter.of(context).push(
+          WebMangaViewRoute(
+            source: info.source,
+            mangaId: info.location,
+            handle: info,
+          ),
+        );
       }
 
       return true;
     }
 
-    final installed = ref.watch(webConfigProvider.select((cfg) => cfg.installedSources));
+    final installed = ref.watch(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
     for (final src in installed) {
       if (url.startsWith('${src.id}/')) {
         final parts = url.split('/');
@@ -99,7 +119,12 @@ class ProxyHandler {
           WebMangaViewRoute(
             source: src.id,
             mangaId: loc,
-            handle: SourceHandler(type: SourceType.source, source: src.id, location: loc, parser: src),
+            handle: SourceHandler(
+              type: SourceType.source,
+              source: src.id,
+              location: loc,
+              parser: src,
+            ),
           ),
         );
 
@@ -127,15 +152,27 @@ class ProxyHandler {
     switch (proxy[0]) {
       case 'read':
         if (proxy.length >= 4) {
-          return SourceHandler(type: SourceType.proxy, source: proxy[1], location: proxy[2], chapter: proxy[3]);
+          return SourceHandler(
+            type: SourceType.proxy,
+            source: proxy[1],
+            location: proxy[2],
+            chapter: proxy[3],
+          );
         }
 
-        return SourceHandler(type: SourceType.proxy, source: proxy[1], location: proxy[2]);
+        return SourceHandler(
+          type: SourceType.proxy,
+          source: proxy[1],
+          location: proxy[2],
+        );
       default:
         logger.d('ProxyHandler: retrieving url $url');
-        final response = await client.send((http.Request('GET', Uri.parse(url))..followRedirects = false));
+        final response = await client.send(
+          (http.Request('GET', Uri.parse(url))..followRedirects = false),
+        );
 
-        if (response.statusCode != 302 || !response.headers.containsKey('location')) {
+        if (response.statusCode != 302 ||
+            !response.headers.containsKey('location')) {
           return null;
         }
 
@@ -155,12 +192,16 @@ class ProxyHandler {
     switch (handle.type) {
       case SourceType.source:
         if (handle.parser != null) {
-          return await ref.read(extensionSourceProvider(handle.parser!.id).notifier).getManga(handle.location);
+          return await ref
+              .read(extensionSourceProvider(handle.parser!.id).notifier)
+              .getManga(handle.location);
         } else {
           final installed = await ref.watch(extensionInfoListProvider.future);
           for (final src in installed) {
             if (handle.source == src.internal.id) {
-              return await ref.read(extensionSourceProvider(handle.source).notifier).getManga(handle.location);
+              return await ref
+                  .read(extensionSourceProvider(handle.source).notifier)
+                  .getManga(handle.location);
             }
           }
         }
@@ -173,7 +214,8 @@ class ProxyHandler {
 
   Future<WebManga> _getMangaFromProxy(SourceHandler handle) async {
     final key = handle.getKey();
-    final url = "https://cubari.moe/read/api/${handle.source}/series/${handle.location}/";
+    final url =
+        "https://cubari.moe/read/api/${handle.source}/series/${handle.location}/";
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
@@ -234,7 +276,10 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       return {cfg.defaultCategory: links};
     } else if (content is Map) {
       final map = (content as Map<String, dynamic>).map(
-        (key, value) => MapEntry(key, (value as List).map((e) => HistoryLink.fromJson(e)).toList()),
+        (key, value) => MapEntry(
+          key,
+          (value as List).map((e) => HistoryLink.fromJson(e)).toList(),
+        ),
       );
 
       final keys = map.keys.toList();
@@ -259,18 +304,21 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> clear() async {
+  Future<void> clear() async {
     await future;
     final empty = <String, List<HistoryLink>>{};
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(empty));
 
-    return empty;
+    state = AsyncData(empty);
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> add(String category, HistoryLink link) async {
+  Future<Map<String, List<HistoryLink>>> add(
+    String category,
+    HistoryLink link,
+  ) async {
     final oldstate = await future;
     final list = oldstate[category];
 
@@ -284,6 +332,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
+
+    state = AsyncData(udp);
 
     return udp;
   }
@@ -304,14 +354,20 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
 
+    state = AsyncData(udp);
+
     return udp;
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> remove(String category, HistoryLink link) async {
+  Future<Map<String, List<HistoryLink>>> remove(
+    String category,
+    HistoryLink link,
+  ) async {
     final oldstate = await future;
 
-    final categoriesToEdit = category == 'all' ? oldstate.keys.toList() : [category];
+    final categoriesToEdit =
+        category == 'all' ? oldstate.keys.toList() : [category];
 
     for (final c in categoriesToEdit) {
       final list = oldstate[c];
@@ -328,11 +384,17 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
 
+    state = AsyncData(udp);
+
     return udp;
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> updateList(String category, int oldIndex, int newIndex) async {
+  Future<Map<String, List<HistoryLink>>> updateList(
+    String category,
+    int oldIndex,
+    int newIndex,
+  ) async {
     final oldstate = await future;
     if (oldIndex < newIndex) {
       // removing the item at oldIndex will shorten the list by 1.
@@ -348,6 +410,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
+
+    state = AsyncData(udp);
 
     return udp;
   }
@@ -372,6 +436,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
+
+    state = AsyncData(udp);
 
     return udp;
   }
@@ -410,6 +476,8 @@ class WebSourceHistory extends _$WebSourceHistory {
     final box = Hive.box(gagakuBox);
     await box.put('web_history', json.encode(links));
 
+    state = AsyncData(empty);
+
     return empty;
   }
 
@@ -433,6 +501,8 @@ class WebSourceHistory extends _$WebSourceHistory {
     final box = Hive.box(gagakuBox);
     await box.put('web_history', json.encode(links));
 
+    state = AsyncData(cpy);
+
     return cpy;
   }
 
@@ -453,6 +523,8 @@ class WebSourceHistory extends _$WebSourceHistory {
 
     final box = Hive.box(gagakuBox);
     await box.put('web_history', json.encode(links));
+
+    state = AsyncData(cpy);
 
     return cpy;
   }
@@ -487,11 +559,17 @@ class WebReadMarkers extends _$WebReadMarkers {
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode({}));
 
+    state = AsyncData(empty);
+
     return empty;
   }
 
   @mutation
-  Future<Map<String, Set<String>>> set(String manga, String chapter, bool setRead) async {
+  Future<Map<String, Set<String>>> set(
+    String manga,
+    String chapter,
+    bool setRead,
+  ) async {
     final oldstate = await future;
     final keyExists = oldstate.containsKey(manga);
 
@@ -515,16 +593,24 @@ class WebReadMarkers extends _$WebReadMarkers {
       }
     }
 
-    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+    final converted = oldstate.map(
+      (key, value) => MapEntry(key, value.toList()),
+    );
 
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode(converted));
 
-    return {...oldstate};
+    state = AsyncData({...oldstate});
+
+    return oldstate;
   }
 
   @mutation
-  Future<Map<String, Set<String>>> setBulk(String manga, {Iterable<String>? read, Iterable<String>? unread}) async {
+  Future<Map<String, Set<String>>> setBulk(
+    String manga, {
+    Iterable<String>? read,
+    Iterable<String>? unread,
+  }) async {
     final oldstate = await future;
     final keyExists = oldstate.containsKey(manga);
 
@@ -551,12 +637,16 @@ class WebReadMarkers extends _$WebReadMarkers {
       }
     }
 
-    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+    final converted = oldstate.map(
+      (key, value) => MapEntry(key, value.toList()),
+    );
 
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode(converted));
 
-    return {...oldstate};
+    state = AsyncData({...oldstate});
+
+    return oldstate;
   }
 
   @mutation
@@ -569,12 +659,16 @@ class WebReadMarkers extends _$WebReadMarkers {
       oldstate.remove(manga);
     }
 
-    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+    final converted = oldstate.map(
+      (key, value) => MapEntry(key, value.toList()),
+    );
 
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode(converted));
 
-    return {...oldstate};
+    state = AsyncData({...oldstate});
+
+    return oldstate;
   }
 }
 
@@ -587,7 +681,9 @@ class ExtensionSource extends _$ExtensionSource {
   @override
   Future<SourceIdentifier> build(String sourceId) async {
     final completer = Completer<void>();
-    final installed = ref.watch(webConfigProvider.select((cfg) => cfg.installedSources));
+    final installed = ref.watch(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
     late SourceInfo extinfo;
 
     // Let this throw here if not found
@@ -600,14 +696,18 @@ class ExtensionSource extends _$ExtensionSource {
         controller.addJavaScriptHandler(
           handlerName: 'getState',
           callback: (JavaScriptHandlerFunctionData data) {
-            return ref.read(extensionStateProvider.notifier).getState(sourceId, data.args[0]);
+            return ref
+                .read(extensionStateProvider.notifier)
+                .getState(sourceId, data.args[0]);
           },
         );
 
         controller.addJavaScriptHandler(
           handlerName: 'setState',
           callback: (JavaScriptHandlerFunctionData data) {
-            ref.read(extensionStateProvider.notifier).setState(sourceId, data.args[0], data.args[1]);
+            ref
+                .read(extensionStateProvider.notifier)
+                .setState(sourceId, data.args[0], data.args[1]);
           },
         );
       },
@@ -629,10 +729,13 @@ class ExtensionSource extends _$ExtensionSource {
         await controller.evaluateJavascript(source: script);
 
         await controller.evaluateJavascript(
-          source: "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
+          source:
+              "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
         );
 
-        final rinfo = await controller.evaluateJavascript(source: "window.Sources['${source.id}Info'];");
+        final rinfo = await controller.evaluateJavascript(
+          source: "window.Sources['${source.id}Info'];",
+        );
         final info = SourceInfo.fromJson(rinfo);
         extinfo = info;
 
@@ -658,7 +761,10 @@ class ExtensionSource extends _$ExtensionSource {
     return _info;
   }
 
-  Future<dynamic> callBinding(String bindingId, [List<dynamic> args = const []]) async {
+  Future<dynamic> callBinding(
+    String bindingId, [
+    List<dynamic> args = const [],
+  ]) async {
     final arg = args.map((e) => json.encode(e)).toList().join(",");
     final result = await _controller.callAsyncJavaScript(
       functionBody: "return await window.callBinding('$bindingId', $arg)",
@@ -716,7 +822,10 @@ return homesections;
     return sections;
   }
 
-  Future<PagedResults> getHomeSectionMore(String homepageSectionId, dynamic metadata) async {
+  Future<PagedResults> getHomeSectionMore(
+    String homepageSectionId,
+    dynamic metadata,
+  ) async {
     await future;
 
     if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
@@ -735,10 +844,14 @@ return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
     return pmangas;
   }
 
-  Future<PagedResults> searchManga(SearchRequest query, dynamic metadata) async {
+  Future<PagedResults> searchManga(
+    SearchRequest query,
+    dynamic metadata,
+  ) async {
     await future;
 
-    if ((query.title == null || query.title!.isEmpty) && query.includedTags == null) {
+    if ((query.title == null || query.title!.isEmpty) &&
+        query.includedTags == null) {
       return const PagedResults();
     }
 
@@ -813,7 +926,8 @@ return p;
     }
 
     final cdeets = await _controller.callAsyncJavaScript(
-      functionBody: "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')",
+      functionBody:
+          "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')",
     );
 
     final chapterd = ChapterDetails.fromJson(cdeets!.value);
@@ -828,7 +942,9 @@ return p;
       return '';
     }
 
-    final result = await _controller.evaluateJavascript(source: "$sourceId.getMangaShareUrl('$mangaId')");
+    final result = await _controller.evaluateJavascript(
+      source: "$sourceId.getMangaShareUrl('$mangaId')",
+    );
 
     return result as String;
   }
@@ -838,8 +954,12 @@ return p;
 class ExtensionInfoList extends _$ExtensionInfoList {
   @override
   Future<List<SourceIdentifier>> build() async {
-    final installed = ref.watch(webConfigProvider.select((cfg) => cfg.installedSources));
+    final installed = ref.watch(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
 
-    return await Future.wait(installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)));
+    return await Future.wait(
+      installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
+    );
   }
 }

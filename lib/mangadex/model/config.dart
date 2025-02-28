@@ -14,12 +14,18 @@ class MangaDexConfig with _$MangaDexConfig {
   factory MangaDexConfig({
     @Default({}) @LanguageConverter() Set<Language> translatedLanguages,
     @Default({}) @LanguageConverter() Set<Language> originalLanguage,
-    @Default({ContentRating.safe, ContentRating.suggestive, ContentRating.erotica}) Set<ContentRating> contentRating,
+    @Default({
+      ContentRating.safe,
+      ContentRating.suggestive,
+      ContentRating.erotica,
+    })
+    Set<ContentRating> contentRating,
     @Default(false) bool dataSaver,
     @Default({}) Set<String> groupBlacklist,
   }) = _MangaDexConfig;
 
-  factory MangaDexConfig.fromJson(Map<String, dynamic> json) => _$MangaDexConfigFromJson(json);
+  factory MangaDexConfig.fromJson(Map<String, dynamic> json) =>
+      _$MangaDexConfigFromJson(json);
 }
 
 @riverpod
@@ -43,7 +49,8 @@ class MdConfig extends _$MdConfig {
   }
 
   @mutation
-  FutureOr<MangaDexConfig> save(MangaDexConfig update) {
+  MangaDexConfig save(MangaDexConfig update) {
+    state = update;
     final box = Hive.box(gagakuBox);
     box.put('mangadex', json.encode(update.toJson()));
 

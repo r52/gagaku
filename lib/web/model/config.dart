@@ -23,7 +23,8 @@ class WebSourceCategory {
   final String id;
   final String name;
 
-  factory WebSourceCategory.fromJson(Map<String, dynamic> json) => _$WebSourceCategoryFromJson(json);
+  factory WebSourceCategory.fromJson(Map<String, dynamic> json) =>
+      _$WebSourceCategoryFromJson(json);
   Map<String, dynamic> toJson() => _$WebSourceCategoryToJson(this);
 }
 
@@ -52,7 +53,8 @@ class WebSourceConfig with _$WebSourceConfig {
     @Default(_defaultUUID) String defaultCategory,
   }) = _WebSourceConfig;
 
-  factory WebSourceConfig.fromJson(Map<String, dynamic> json) => _$WebSourceConfigFromJson(json);
+  factory WebSourceConfig.fromJson(Map<String, dynamic> json) =>
+      _$WebSourceConfigFromJson(json);
 }
 
 @Riverpod(keepAlive: true)
@@ -76,7 +78,7 @@ class WebConfig extends _$WebConfig {
   }
 
   @mutation
-  FutureOr<WebSourceConfig> saveWith({
+  WebSourceConfig saveWith({
     List<WebSourceInfo>? installedSources,
     List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
@@ -100,6 +102,8 @@ class WebConfig extends _$WebConfig {
       update = update.copyWith(defaultCategory: defaultCategory);
     }
 
+    state = update;
+
     final box = Hive.box(gagakuBox);
     box.put('websource', json.encode(update.toJson()));
 
@@ -107,7 +111,8 @@ class WebConfig extends _$WebConfig {
   }
 
   @mutation
-  FutureOr<WebSourceConfig> save(WebSourceConfig update) {
+  WebSourceConfig save(WebSourceConfig update) {
+    state = update;
     final box = Hive.box(gagakuBox);
     box.put('websource', json.encode(update.toJson()));
 
