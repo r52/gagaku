@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -6,33 +7,12 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:go_router/go_router.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'creator_view.g.dart';
-
-Page<dynamic> buildCreatorViewPage(BuildContext context, GoRouterState state) {
-  final creator = state.extra.asOrNull<CreatorType>();
-
-  Widget child;
-
-  if (creator != null) {
-    child = MangaDexCreatorViewWidget(
-      creator: creator,
-    );
-  } else {
-    child = QueriedMangaDexCreatorViewWidget(creatorId: state.pathParameters['creatorId']!);
-  }
-
-  return CustomTransitionPage<void>(
-    key: state.pageKey,
-    child: child,
-    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-  );
-}
 
 @riverpod
 Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
@@ -51,18 +31,32 @@ Future<List<Manga>> _fetchCreatorTitles(Ref ref, CreatorType creator) async {
   return mangas;
 }
 
-class QueriedMangaDexCreatorViewWidget extends StatelessWidget {
-  const QueriedMangaDexCreatorViewWidget({super.key, required this.creatorId});
+@RoutePage()
+class MangaDexCreatorViewWithNamePage extends MangaDexCreatorViewPage {
+  const MangaDexCreatorViewWithNamePage({super.key, @PathParam() required super.creatorId, @PathParam() this.name});
+
+  final String? name;
+}
+
+@RoutePage()
+class MangaDexCreatorViewPage extends StatelessWidget {
+  const MangaDexCreatorViewPage({super.key, @PathParam() required this.creatorId, this.creator});
 
   final String creatorId;
 
+  final CreatorType? creator;
+
   @override
   Widget build(BuildContext context) {
+    if (creator != null) {
+      return MangaDexCreatorViewWidget(creator: creator!);
+    }
+
     return DataProviderWhenWidget(
       provider: _fetchCreatorFromIdProvider(creatorId),
       errorBuilder: (context, child) => Scaffold(body: child),
-      builder: (context, creator) {
-        return MangaDexCreatorViewWidget(creator: creator);
+      builder: (context, data) {
+        return MangaDexCreatorViewWidget(creator: data);
       },
     );
   }
@@ -96,19 +90,14 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                   pinned: true,
                   snap: false,
                   floating: false,
-                  leading: BackButton(
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.go('/');
-                      }
-                    },
-                  ),
+                  leading: AutoLeadingButton(),
                   flexibleSpace: GestureDetector(
                     onTap: () {
-                      scrollController.animateTo(0.0,
-                          duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+                      scrollController.animateTo(
+                        0.0,
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeInOut,
+                      );
                     },
                     child: TitleFlexBar(title: creator.attributes.name),
                   ),
@@ -137,7 +126,7 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                                   ),
                                 ),
                               ],
-                            )
+                            ),
                         ],
                       ),
                     if (creator.attributes.twitter != null ||
@@ -170,28 +159,19 @@ class MangaDexCreatorViewWidget extends HookConsumerWidget {
                   ],
                 ),
               ],
-              title: Text(
-                'mangadex.creator.works'.tr(context: context),
-                style: TextStyle(fontSize: 24),
-              ),
+              title: Text('mangadex.creator.works'.tr(context: context), style: TextStyle(fontSize: 24)),
               physics: const AlwaysScrollableScrollPhysics(),
               controller: scrollController,
               onAtEdge: () => ref.read(creatorTitlesProvider(creator).notifier).getMore(),
               isLoading: isLoading,
               children: [
                 if (mangas.isEmpty)
-                  SliverToBoxAdapter(
-                    child: Center(
-                      child: Text('errors.notitles'.tr(context: context)),
-                    ),
-                  ),
+                  SliverToBoxAdapter(child: Center(child: Text('errors.notitles'.tr(context: context)))),
                 MangaListViewSliver(items: mangas),
               ],
             );
           },
-          loadingBuilder: (_, progress) => LoadingOverlayStack(
-            progress: progress?.toDouble(),
-          ),
+          loadingBuilder: (_, progress) => LoadingOverlayStack(progress: progress?.toDouble()),
         ),
       ),
     );

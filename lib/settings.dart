@@ -1,3 +1,4 @@
+import 'package:auto_route/annotations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/model/config.dart';
@@ -6,8 +7,9 @@ import 'package:gagaku/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SettingsHome extends ConsumerWidget {
-  const SettingsHome({super.key});
+@RoutePage()
+class AppSettingsPage extends ConsumerWidget {
+  const AppSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,9 +17,7 @@ class SettingsHome extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: TitleFlexBar(title: 'arg_settings'.tr(context: context, args: ['Gagaku'])),
-      ),
+      appBar: AppBar(flexibleSpace: TitleFlexBar(title: 'arg_settings'.tr(context: context, args: ['Gagaku']))),
       drawer: const MainDrawer(),
       body: SafeArea(
         child: ListView(
@@ -26,10 +26,7 @@ class SettingsHome extends ConsumerWidget {
             SettingCardWidget(
               title: Text(
                 'theme.mode'.tr(context: context),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               builder: (context) {
                 return Center(
@@ -56,10 +53,7 @@ class SettingsHome extends ConsumerWidget {
             SettingCardWidget(
               title: Text(
                 'theme.color'.tr(context: context),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               builder: (context) {
                 return Center(
@@ -74,8 +68,10 @@ class SettingsHome extends ConsumerWidget {
                           leadingIcon: Container(
                             width: 15,
                             height: 15,
-                            decoration:
-                                BoxDecoration(color: c.color, border: Border.all(color: theme.colorScheme.onSurface)),
+                            decoration: BoxDecoration(
+                              color: c.color,
+                              border: Border.all(color: theme.colorScheme.onSurface),
+                            ),
                           ),
                           value: c,
                           label: context.tr(c.label),

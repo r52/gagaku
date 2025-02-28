@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -48,17 +50,15 @@ Future<List<ChapterFeedItemData>> _fetchHistoryFeed(Ref ref) async {
   return dlist;
 }
 
-class MangaDexHistoryFeed extends ConsumerWidget {
-  const MangaDexHistoryFeed({
-    super.key,
-    this.controller,
-  });
+@RoutePage()
+class MangaDexHistoryFeedPage extends HookConsumerWidget {
+  const MangaDexHistoryFeedPage({super.key, this.controller});
 
   final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
     return ChapterFeedWidget(
       provider: _fetchHistoryFeedProvider,
       title: 'mangadex.localHistory'.tr(context: context),
@@ -66,12 +66,7 @@ class MangaDexHistoryFeed extends ConsumerWidget {
       onRefresh: () async => ref.refresh(mangaDexHistoryProvider.future),
       controller: scrollController,
       restorationId: 'history_list_offset',
-      leading: [
-        MangaDexSliverAppBar(
-          title: 'history.text'.tr(context: context),
-          controller: scrollController,
-        ),
-      ],
+      leading: [MangaDexSliverAppBar(title: 'history.text'.tr(context: context), controller: scrollController)],
     );
   }
 }

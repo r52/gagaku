@@ -1,12 +1,13 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,10 +20,7 @@ Future<List<Manga>> _popularTitles(Ref ref) async {
   final format = DateFormat('yyyy-MM-ddT07:00:00');
   final popularTime = DateTime.now().subtract(const Duration(days: 30));
 
-  final extraParams = {
-    'hasAvailableChapters': 'true',
-    'createdAtSince': format.format(popularTime),
-  };
+  final extraParams = {'hasAvailableChapters': 'true', 'createdAtSince': format.format(popularTime)};
 
   final manga = await api.fetchManga(
     limit: 15,
@@ -83,6 +81,7 @@ Future<FrontPageData> _fetchFrontPageData(Ref ref) async {
   return data;
 }
 
+@RoutePage()
 class MangaDexFrontPage extends StatelessWidget {
   const MangaDexFrontPage({super.key, this.controller});
 
@@ -92,25 +91,24 @@ class MangaDexFrontPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DataProviderWhenWidget(
       provider: _fetchFrontPageDataProvider,
-      errorBuilder: (context, child) => Consumer(
-        child: child,
-        builder: (context, ref, child) => RefreshIndicator(
-          onRefresh: () {
-            return ref.refresh(_fetchFrontPageDataProvider.future);
-          },
-          child: child!,
-        ),
-      ),
-      builder: (context, data) => _FrontPageWidget(
-        key: ValueKey('_FrontPageWidget'),
-        data: data,
-        controller: controller,
-      ),
+      errorBuilder:
+          (context, child) => Consumer(
+            child: child,
+            builder:
+                (context, ref, child) => RefreshIndicator(
+                  onRefresh: () {
+                    return ref.refresh(_fetchFrontPageDataProvider.future);
+                  },
+                  child: child!,
+                ),
+          ),
+      builder:
+          (context, data) => _FrontPageWidget(key: ValueKey('_FrontPageWidget'), data: data, controller: controller),
     );
   }
 }
 
-class _FrontPageWidget extends ConsumerWidget {
+class _FrontPageWidget extends HookConsumerWidget {
   const _FrontPageWidget({super.key, required this.data, this.controller});
 
   final FrontPageData data;
@@ -118,65 +116,49 @@ class _FrontPageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final router = AutoRouter.of(context);
     const style = TextStyle(fontSize: 24);
 
     final staffPicks = _fetchCustomListMangaProvider(data.staffPicks);
     final seasonal = _fetchCustomListMangaProvider(data.seasonal);
 
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
 
     final frontPageWidgets = [
-      Center(
-        child: Text(
-          'mangadex.popularNewTitles'.tr(context: context),
-          style: style,
-        ),
-      ),
+      Center(child: Text('mangadex.popularNewTitles'.tr(context: context), style: style)),
       const MangaProviderCarousel(provider: _popularTitlesProvider),
       TextButton.icon(
         onPressed: () {
-          context.push('/titles/latest');
+          router.pushPath('/titles/latest');
         },
-        label: Text(
-          'mangadex.latestUpdates'.tr(context: context),
-          style: style,
-        ),
+        label: Text('mangadex.latestUpdates'.tr(context: context), style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
       const MangaProviderCarousel(provider: _latestUpdatesProvider),
       TextButton.icon(
         onPressed: () {
-          context.push('/list/${data.staffPicks}');
+          router.pushPath('/list/${data.staffPicks}');
         },
-        label: Text(
-          'mangadex.staffPicks'.tr(context: context),
-          style: style,
-        ),
+        label: Text('mangadex.staffPicks'.tr(context: context), style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
       MangaProviderCarousel(provider: staffPicks),
       TextButton.icon(
         onPressed: () {
-          context.push('/list/${data.seasonal}');
+          router.pushPath('/list/${data.seasonal}');
         },
-        label: Text(
-          'mangadex.seasonal'.tr(context: context),
-          style: style,
-        ),
+        label: Text('mangadex.seasonal'.tr(context: context), style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
       MangaProviderCarousel(provider: seasonal),
       TextButton.icon(
         onPressed: () {
-          context.push('/titles/recent');
+          router.pushPath('/titles/recent');
         },
-        label: Text(
-          'mangadex.recentlyAdded'.tr(context: context),
-          style: style,
-        ),
+        label: Text('mangadex.recentlyAdded'.tr(context: context), style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
@@ -199,18 +181,14 @@ class _FrontPageWidget extends ConsumerWidget {
           scrollBehavior: const MouseTouchScrollBehavior(),
           controller: scrollController,
           slivers: [
-            MangaDexSliverAppBar(
-              controller: scrollController,
-            ),
+            MangaDexSliverAppBar(controller: scrollController),
             SliverList.separated(
               itemCount: frontPageWidgets.length,
               itemBuilder: (context, index) {
                 return frontPageWidgets.elementAt(index);
               },
-              separatorBuilder: (context, index) => const SizedBox(
-                height: 10.0,
-              ),
-            )
+              separatorBuilder: (context, index) => const SizedBox(height: 10.0),
+            ),
           ],
         ),
       ),
@@ -219,10 +197,7 @@ class _FrontPageWidget extends ConsumerWidget {
 }
 
 class MangaProviderCarousel extends StatelessWidget {
-  const MangaProviderCarousel({
-    super.key,
-    required this.provider,
-  });
+  const MangaProviderCarousel({super.key, required this.provider});
 
   final Refreshable<AsyncValue<List<Manga>>> provider;
 
@@ -231,22 +206,16 @@ class MangaProviderCarousel extends StatelessWidget {
     return Center(
       child: DataProviderWhenWidget(
         provider: provider,
-        builder: (context, items) => ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 256),
-          child: CarouselView(
-            itemExtent: 180,
-            shrinkExtent: 180,
-            enableSplash: false,
-            children: items
-                .map(
-                  (e) => GridMangaItem(
-                    key: ValueKey(e.id),
-                    manga: e,
-                  ),
-                )
-                .toList(),
-          ),
-        ),
+        builder:
+            (context, items) => ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 256),
+              child: CarouselView(
+                itemExtent: 180,
+                shrinkExtent: 180,
+                enableSplash: false,
+                children: items.map((e) => GridMangaItem(key: ValueKey(e.id), manga: e)).toList(),
+              ),
+            ),
       ),
     );
   }

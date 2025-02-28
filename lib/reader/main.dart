@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +10,6 @@ import 'package:gagaku/reader/model/controller_hooks.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -26,6 +26,8 @@ enum LongStripScale {
   final double scale;
 }
 
+typedef CtxCallback = void Function(BuildContext);
+
 class ReaderWidget extends HookConsumerWidget {
   const ReaderWidget({
     super.key,
@@ -36,7 +38,6 @@ class ReaderWidget extends HookConsumerWidget {
     this.drawerHeader,
     this.onHeaderPressed,
     this.externalUrl,
-    this.backRoute,
   });
 
   final List<ReaderPage> pages;
@@ -44,11 +45,8 @@ class ReaderWidget extends HookConsumerWidget {
   final String? subtitle;
   final bool longstrip;
   final String? drawerHeader;
-  final VoidCallback? onHeaderPressed;
+  final CtxCallback? onHeaderPressed;
   final String? externalUrl;
-
-  // Backup route for BackButton if nav stack cannot pop
-  final String? backRoute;
 
   LongStripScale toggleLongStripScale(LongStripScale current) {
     switch (current) {
@@ -120,11 +118,7 @@ class ReaderWidget extends HookConsumerWidget {
     switch (format) {
       case ReaderFormat.longstrip:
         if (listController.isAttached) {
-          listController.jumpToItem(
-            index: page,
-            scrollController: scrollController,
-            alignment: 0,
-          );
+          listController.jumpToItem(index: page, scrollController: scrollController, alignment: 0);
         }
 
         break;
@@ -174,11 +168,13 @@ class ReaderWidget extends HookConsumerWidget {
     required ListController listController,
     required ScrollController scrollController,
   }) {
-    jumpToPage(currentPage.value - 1,
-        format: format,
-        pageController: pageController,
-        listController: listController,
-        scrollController: scrollController);
+    jumpToPage(
+      currentPage.value - 1,
+      format: format,
+      pageController: pageController,
+      listController: listController,
+      scrollController: scrollController,
+    );
   }
 
   void jumpToNextPage(
@@ -188,11 +184,13 @@ class ReaderWidget extends HookConsumerWidget {
     required ListController listController,
     required ScrollController scrollController,
   }) {
-    jumpToPage(currentPage.value + 1,
-        format: format,
-        pageController: pageController,
-        listController: listController,
-        scrollController: scrollController);
+    jumpToPage(
+      currentPage.value + 1,
+      format: format,
+      pageController: pageController,
+      listController: listController,
+      scrollController: scrollController,
+    );
   }
 
   KeyEventResult onTapLeft({
@@ -226,9 +224,7 @@ class ReaderWidget extends HookConsumerWidget {
             scrollController: scrollController,
           );
         } else {
-          if (context.canPop()) {
-            context.pop();
-          }
+          context.maybePop();
         }
         break;
     }
@@ -258,9 +254,7 @@ class ReaderWidget extends HookConsumerWidget {
             scrollController: scrollController,
           );
         } else {
-          if (context.canPop()) {
-            context.pop();
-          }
+          context.maybePop();
         }
         break;
       case ReaderDirection.rightToLeft:
@@ -288,8 +282,11 @@ class ReaderWidget extends HookConsumerWidget {
     required BuildContext context,
   }) {
     if (format == ReaderFormat.longstrip) {
-      scrollController.animateTo(scrollController.offset - offset,
-          duration: const Duration(milliseconds: 50), curve: Curves.easeInOut);
+      scrollController.animateTo(
+        scrollController.offset - offset,
+        duration: const Duration(milliseconds: 50),
+        curve: Curves.easeInOut,
+      );
 
       return KeyEventResult.handled;
     }
@@ -322,12 +319,13 @@ class ReaderWidget extends HookConsumerWidget {
         if (max == pages.length - 1 &&
             scrollController.position.atEdge &&
             scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-          if (context.canPop()) {
-            context.pop();
-          }
+          context.maybePop();
         } else {
-          scrollController.animateTo(scrollController.offset + offset,
-              duration: const Duration(milliseconds: 50), curve: Curves.easeInOut);
+          scrollController.animateTo(
+            scrollController.offset + offset,
+            duration: const Duration(milliseconds: 50),
+            curve: Curves.easeInOut,
+          );
         }
       }
 
@@ -349,8 +347,10 @@ class ReaderWidget extends HookConsumerWidget {
     final pageCount = pages.length;
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
-    final scaleStateController =
-        List<PhotoViewScaleStateController>.generate(pageCount, (index) => usePhotoViewScaleStateController());
+    final scaleStateController = List<PhotoViewScaleStateController>.generate(
+      pageCount,
+      (index) => usePhotoViewScaleStateController(),
+    );
     final viewController = List<PhotoViewController>.generate(pageCount, (index) => usePhotoViewController());
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
@@ -412,25 +412,16 @@ class ReaderWidget extends HookConsumerWidget {
     }, [listController, settings]);
 
     final pageDropdownItems = List<DropdownMenuEntry<int>>.generate(
-        pageCount, (int index) => DropdownMenuEntry<int>(value: index, label: (index + 1).toString()));
+      pageCount,
+      (int index) => DropdownMenuEntry<int>(value: index, label: (index + 1).toString()),
+    );
 
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else if (backRoute != null) {
-              context.go(backRoute!);
-            }
-          },
-        ),
+        leading: AutoLeadingButton(),
         title: ListTile(
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: HookBuilder(
             builder: (_) {
               final value = useValueListenable(subtext);
@@ -444,11 +435,12 @@ class ReaderWidget extends HookConsumerWidget {
         ),
         actions: [
           Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-              tooltip: 'reader.settings'.tr(context: context),
-            ),
+            builder:
+                (context) => IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () => Scaffold.of(context).openEndDrawer(),
+                  tooltip: 'reader.settings'.tr(context: context),
+                ),
           ),
         ],
       ),
@@ -464,29 +456,19 @@ class ReaderWidget extends HookConsumerWidget {
                   TextButton(
                     onPressed: () {
                       // First one pops the drawer
-                      if (context.canPop()) {
-                        context.pop();
-                      }
+                      context.maybePop();
 
                       // Second one pops the reader
-                      if (context.canPop()) {
-                        context.pop();
-                      }
+                      context.maybePop();
 
-                      onHeaderPressed!();
+                      onHeaderPressed!(context);
                     },
-                    child: Text(
-                      drawerHeader!,
-                      style: const TextStyle(fontSize: 18),
-                    ),
+                    child: Text(drawerHeader!, style: const TextStyle(fontSize: 18)),
                   ),
                 if (drawerHeader != null && onHeaderPressed == null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      drawerHeader!,
-                      style: theme.textTheme.labelLarge?.copyWith(fontSize: 18),
-                    ),
+                    child: Text(drawerHeader!, style: theme.textTheme.labelLarge?.copyWith(fontSize: 18)),
                   ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -496,15 +478,16 @@ class ReaderWidget extends HookConsumerWidget {
                       builder: (_) {
                         final value = useValueListenable(currentPage);
                         return OutlinedButton(
-                          onPressed: (value > 0)
-                              ? () => jumpToPreviousPage(
+                          onPressed:
+                              (value > 0)
+                                  ? () => jumpToPreviousPage(
                                     currentPage,
                                     format: format,
                                     pageController: pageController,
                                     listController: listController,
                                     scrollController: scrollController,
                                   )
-                              : null,
+                                  : null,
                           child: const Icon(Icons.arrow_back_ios_new),
                         );
                       },
@@ -520,10 +503,7 @@ class ReaderWidget extends HookConsumerWidget {
                           requestFocusOnTap: false,
                           inputDecorationTheme: InputDecorationTheme(
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 2.0,
-                                color: theme.colorScheme.inversePrimary,
-                              ),
+                              borderSide: BorderSide(width: 2.0, color: theme.colorScheme.inversePrimary),
                             ),
                           ),
                           onSelected: (int? index) {
@@ -545,15 +525,16 @@ class ReaderWidget extends HookConsumerWidget {
                       builder: (_) {
                         final value = useValueListenable(currentPage);
                         return OutlinedButton(
-                          onPressed: (value < pageCount - 1)
-                              ? () => jumpToNextPage(
+                          onPressed:
+                              (value < pageCount - 1)
+                                  ? () => jumpToNextPage(
                                     currentPage,
                                     format: format,
                                     pageController: pageController,
                                     listController: listController,
                                     scrollController: scrollController,
                                   )
-                              : null,
+                                  : null,
                           child: const Icon(Icons.arrow_forward_ios),
                         );
                       },
@@ -570,52 +551,50 @@ class ReaderWidget extends HookConsumerWidget {
                   children: [
                     for (final f in ReaderFormat.values)
                       ChoiceChip(
-                        avatar: Icon(
-                          f.icon,
-                          color: theme.iconTheme.color,
-                        ),
+                        avatar: Icon(f.icon, color: theme.iconTheme.color),
                         label: Text(context.tr(f.label)),
                         selected: settings.format == f,
-                        onSelected: (longstrip)
-                            ? null
-                            : (value) {
-                                if (value) {
-                                  ref.read(readerSettingsProvider.save)(settings.copyWith(format: f));
-                                }
-                              },
+                        onSelected:
+                            (longstrip)
+                                ? null
+                                : (value) {
+                                  if (value) {
+                                    ref.read(readerSettingsProvider.save)(settings.copyWith(format: f));
+                                  }
+                                },
                       ),
                   ],
                 ),
                 ActionChip(
                   avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
                   label: Text('reader.togglePageSize'.tr(context: context)),
-                  onPressed: (format == ReaderFormat.longstrip)
-                      ? () {
-                          longStripScale.value = toggleLongStripScale(longStripScale.value);
-                        }
-                      : () {
-                          scaleStateController[currentPage.value].scaleState =
-                              defaultScaleStateCycle(scaleStateController[currentPage.value].scaleState);
-                        },
+                  onPressed:
+                      (format == ReaderFormat.longstrip)
+                          ? () {
+                            longStripScale.value = toggleLongStripScale(longStripScale.value);
+                          }
+                          : () {
+                            scaleStateController[currentPage.value].scaleState = defaultScaleStateCycle(
+                              scaleStateController[currentPage.value].scaleState,
+                            );
+                          },
                 ),
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [
                     for (final dir in ReaderDirection.values)
                       ChoiceChip(
-                        avatar: Icon(
-                          dir.icon,
-                          color: theme.iconTheme.color,
-                        ),
+                        avatar: Icon(dir.icon, color: theme.iconTheme.color),
                         label: Text(context.tr(dir.label)),
                         selected: settings.direction == dir,
-                        onSelected: (format == ReaderFormat.longstrip)
-                            ? null
-                            : (value) {
-                                if (value) {
-                                  ref.read(readerSettingsProvider.save)(settings.copyWith(direction: dir));
-                                }
-                              },
+                        onSelected:
+                            (format == ReaderFormat.longstrip)
+                                ? null
+                                : (value) {
+                                  if (value) {
+                                    ref.read(readerSettingsProvider.save)(settings.copyWith(direction: dir));
+                                  }
+                                },
                       ),
                   ],
                 ),
@@ -627,7 +606,8 @@ class ReaderWidget extends HookConsumerWidget {
                   label: Text('reader.progressBar'.tr(context: context)),
                   onPressed: () {
                     ref.read(readerSettingsProvider.save)(
-                        settings.copyWith(showProgressBar: !settings.showProgressBar));
+                      settings.copyWith(showProgressBar: !settings.showProgressBar),
+                    );
                   },
                 ),
                 ActionChip(
@@ -636,24 +616,26 @@ class ReaderWidget extends HookConsumerWidget {
                     color: settings.swipeGestures ? theme.iconTheme.color : theme.disabledColor,
                   ),
                   label: Text('reader.swipeGestures'.tr(context: context)),
-                  onPressed: (format == ReaderFormat.longstrip)
-                      ? null
-                      : () {
-                          ref.read(readerSettingsProvider.save)(
-                              settings.copyWith(swipeGestures: !settings.swipeGestures));
-                        },
+                  onPressed:
+                      (format == ReaderFormat.longstrip)
+                          ? null
+                          : () {
+                            ref.read(readerSettingsProvider.save)(
+                              settings.copyWith(swipeGestures: !settings.swipeGestures),
+                            );
+                          },
                 ),
                 ActionChip(
-                  avatar: Icon(
-                    Icons.mouse,
-                    color: settings.clickToTurn ? theme.iconTheme.color : theme.disabledColor,
-                  ),
+                  avatar: Icon(Icons.mouse, color: settings.clickToTurn ? theme.iconTheme.color : theme.disabledColor),
                   label: Text('reader.clickToTurn'.tr(context: context)),
-                  onPressed: (format == ReaderFormat.longstrip)
-                      ? null
-                      : () {
-                          ref.read(readerSettingsProvider.save)(settings.copyWith(clickToTurn: !settings.clickToTurn));
-                        },
+                  onPressed:
+                      (format == ReaderFormat.longstrip)
+                          ? null
+                          : () {
+                            ref.read(readerSettingsProvider.save)(
+                              settings.copyWith(clickToTurn: !settings.clickToTurn),
+                            );
+                          },
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -668,10 +650,7 @@ class ReaderWidget extends HookConsumerWidget {
                       requestFocusOnTap: false,
                       inputDecorationTheme: InputDecorationTheme(
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2.0,
-                            color: theme.colorScheme.inversePrimary,
-                          ),
+                          borderSide: BorderSide(width: 2.0, color: theme.colorScheme.inversePrimary),
                         ),
                       ),
                       onSelected: (int? value) {
@@ -850,40 +829,42 @@ class ReaderWidget extends HookConsumerWidget {
                 listController: listController,
                 controller: scrollController,
                 cacheExtent: mediaSize.height * pageCount,
-                children: pages
-                    .map(
-                      (page) => Center(
-                        key: ValueKey(page.id),
-                        child: HookBuilder(
-                          builder: (context) {
-                            final scale = useValueListenable(longStripScale);
-                            final width = mediaSize.width * scale.scale;
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(minWidth: width, maxWidth: width),
-                              child: KeepAliveImage(
-                                image: page.provider,
-                                fit: BoxFit.contain,
-                                alignment: Alignment.topCenter,
-                                loadingBuilder: (context, child, event) {
-                                  if (event == null) {
-                                    return child;
-                                  }
+                children:
+                    pages
+                        .map(
+                          (page) => Center(
+                            key: ValueKey(page.id),
+                            child: HookBuilder(
+                              builder: (context) {
+                                final scale = useValueListenable(longStripScale);
+                                final width = mediaSize.width * scale.scale;
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(minWidth: width, maxWidth: width),
+                                  child: KeepAliveImage(
+                                    image: page.provider,
+                                    fit: BoxFit.contain,
+                                    alignment: Alignment.topCenter,
+                                    loadingBuilder: (context, child, event) {
+                                      if (event == null) {
+                                        return child;
+                                      }
 
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      value: event.expectedTotalBytes != null
-                                          ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
-                                          : null,
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    )
-                    .toList(),
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value:
+                                              event.expectedTotalBytes != null
+                                                  ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                                                  : null,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        )
+                        .toList(),
               );
             }
 
@@ -896,16 +877,18 @@ class ReaderWidget extends HookConsumerWidget {
               onPageChanged: (int index) {
                 focusNode.requestFocus();
               },
-              loadingBuilder: (context, event) => Center(
-                child: SizedBox(
-                  width: 150,
-                  child: LinearProgressIndicator(
-                    value: event != null && event.expectedTotalBytes != null
-                        ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
-                        : null,
+              loadingBuilder:
+                  (context, event) => Center(
+                    child: SizedBox(
+                      width: 150,
+                      child: LinearProgressIndicator(
+                        value:
+                            event != null && event.expectedTotalBytes != null
+                                ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                                : null,
+                      ),
+                    ),
                   ),
-                ),
-              ),
               itemCount: pageCount,
               builder: (context, index) {
                 final page = pages.elementAt(index);
@@ -918,38 +901,39 @@ class ReaderWidget extends HookConsumerWidget {
                   maxScale: PhotoViewComputedScale.covered * 5.0,
                   initialScale: PhotoViewComputedScale.contained,
                   basePosition: Alignment.topCenter,
-                  onTapUp: settings.clickToTurn
-                      ? (context, details, value) {
-                          focusNode.requestFocus();
+                  onTapUp:
+                      settings.clickToTurn
+                          ? (context, details, value) {
+                            focusNode.requestFocus();
 
-                          final taploc = details.localPosition.dx;
-                          final viewport = context.size!.width;
+                            final taploc = details.localPosition.dx;
+                            final viewport = context.size!.width;
 
-                          final tapmargin = viewport / 2.5;
+                            final tapmargin = viewport / 2.5;
 
-                          if (taploc < tapmargin) {
-                            onTapLeft(
-                              currentPage: currentPage,
-                              settings: settings,
-                              format: format,
-                              pageController: pageController,
-                              listController: listController,
-                              scrollController: scrollController,
-                              context: context,
-                            );
-                          } else if (taploc > viewport - tapmargin) {
-                            onTapRight(
-                              currentPage: currentPage,
-                              settings: settings,
-                              format: format,
-                              pageController: pageController,
-                              listController: listController,
-                              scrollController: scrollController,
-                              context: context,
-                            );
+                            if (taploc < tapmargin) {
+                              onTapLeft(
+                                currentPage: currentPage,
+                                settings: settings,
+                                format: format,
+                                pageController: pageController,
+                                listController: listController,
+                                scrollController: scrollController,
+                                context: context,
+                              );
+                            } else if (taploc > viewport - tapmargin) {
+                              onTapRight(
+                                currentPage: currentPage,
+                                settings: settings,
+                                format: format,
+                                pageController: pageController,
+                                listController: listController,
+                                scrollController: scrollController,
+                                context: context,
+                              );
+                            }
                           }
-                        }
-                      : null,
+                          : null,
                 );
               },
             );
@@ -960,23 +944,25 @@ class ReaderWidget extends HookConsumerWidget {
       // forcing bottom sheet width to be 640 max
       // https://github.com/flutter/flutter/pull/122445
       extendBody: true,
-      bottomNavigationBar: settings.showProgressBar
-          ? ProgressIndicator(
-              reverse: (format != ReaderFormat.longstrip) && settings.direction == ReaderDirection.rightToLeft,
-              currentPage: currentPage,
-              itemCount: pageCount,
-              color: theme.colorScheme.primary,
-              onPageSelected: (index) => animateToPage(
-                index,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut,
-                format: format,
-                pageController: pageController,
-                listController: listController,
-                scrollController: scrollController,
-              ),
-            )
-          : null,
+      bottomNavigationBar:
+          settings.showProgressBar
+              ? ProgressIndicator(
+                reverse: (format != ReaderFormat.longstrip) && settings.direction == ReaderDirection.rightToLeft,
+                currentPage: currentPage,
+                itemCount: pageCount,
+                color: theme.colorScheme.primary,
+                onPageSelected:
+                    (index) => animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                      format: format,
+                      pageController: pageController,
+                      listController: listController,
+                      scrollController: scrollController,
+                    ),
+              )
+              : null,
     );
   }
 }
@@ -1022,10 +1008,7 @@ class ProgressIndicator extends HookWidget {
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
             stops: [0.0, 0.6],
-            colors: [
-              Color.fromARGB(255, 0, 0, 0),
-              Colors.transparent,
-            ],
+            colors: [Color.fromARGB(255, 0, 0, 0), Colors.transparent],
           ),
         ),
         child: Row(
@@ -1068,10 +1051,7 @@ class _ProgressBarSection extends StatelessWidget {
                 final page = useValueListenable(currentPage);
                 return Material(
                   color: (index == 0 || page >= index) ? color : Colors.transparent,
-                  child: SizedBox(
-                    height: height,
-                    width: double.infinity,
-                  ),
+                  child: SizedBox(height: height, width: double.infinity),
                 );
               },
             ),

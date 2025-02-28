@@ -1,8 +1,10 @@
 import 'dart:math';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -34,18 +36,27 @@ Future<List<String>> _getLibraryListByType(Ref ref, MangaReadingStatus type) asy
   return results;
 }
 
-class MangaDexLibraryView extends HookConsumerWidget {
-  const MangaDexLibraryView({
-    super.key,
-    this.controller,
-  });
+@RoutePage()
+class MangaDexLibraryPage extends StatelessWidget {
+  const MangaDexLibraryPage({super.key, this.controller});
+
+  final ScrollController? controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return MangaDexLoginWidget(builder: (context) => MangaDexLibraryWidget());
+  }
+}
+
+class MangaDexLibraryWidget extends HookConsumerWidget {
+  const MangaDexLibraryWidget({super.key, this.controller});
 
   final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
+    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
     final statuses = useMemoized(() => MangaReadingStatus.values.skip(1).toList());
     final initialtype = ref.read(libraryViewTypeProvider);
     final tabController = useTabController(initialLength: statuses.length, initialIndex: statuses.indexOf(initialtype));
@@ -65,10 +76,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
       controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
-          MangaDexSliverAppBar(
-            title: 'library'.tr(context: context),
-            controller: scrollController,
-          ),
+          MangaDexSliverAppBar(title: 'library'.tr(context: context), controller: scrollController),
           SliverOverlapAbsorber(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             sliver: SliverAppBar(
@@ -82,9 +90,7 @@ class MangaDexLibraryView extends HookConsumerWidget {
                 controller: tabController,
                 tabs: List<Tab>.generate(
                   statuses.length,
-                  (int index) => Tab(
-                    text: context.tr(statuses.elementAt(index).label),
-                  ),
+                  (int index) => Tab(text: context.tr(statuses.elementAt(index).label)),
                 ),
               ),
             ),
@@ -107,55 +113,54 @@ class MangaDexLibraryView extends HookConsumerWidget {
                   },
                   child: DataProviderWhenWidget(
                     provider: _getLibraryListByTypeProvider(type),
-                    builder: (context, list) => Consumer(
-                      builder: (context, ref, child) {
-                        final titlesProvider = ref.watch(getMangaListByPageProvider(list, currentPage.value));
+                    builder:
+                        (context, list) => Consumer(
+                          builder: (context, ref, child) {
+                            final titlesProvider = ref.watch(getMangaListByPageProvider(list, currentPage.value));
 
-                        return Column(
-                          children: [
-                            Expanded(
-                              child: switch (titlesProvider) {
-                                AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                                    error: error,
-                                    stackTrace: stackTrace,
-                                    message:
-                                        "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
-                                  ),
-                                AsyncValue(value: final mangas) => MangaListWidget(
-                                    title: Text(
-                                      'num_manga'.plural(list.length),
-                                      style: const TextStyle(fontSize: 24),
+                            return Column(
+                              children: [
+                                Expanded(
+                                  child: switch (titlesProvider) {
+                                    AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+                                      error: error,
+                                      stackTrace: stackTrace,
+                                      message:
+                                          "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
                                     ),
-                                    physics: const AlwaysScrollableScrollPhysics(),
-                                    noController: true,
-                                    isLoading: titlesProvider.isLoading,
-                                    leading: [
-                                      SliverOverlapInjector(
-                                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                                    AsyncValue(value: final mangas) => MangaListWidget(
+                                      title: Text(
+                                        'num_manga'.plural(list.length),
+                                        style: const TextStyle(fontSize: 24),
                                       ),
-                                    ],
-                                    children: [
-                                      if (mangas == null || mangas.isEmpty)
-                                        SliverToBoxAdapter(
-                                          child: Center(
-                                            child: Text('errors.notitles'.tr(context: context)),
-                                          ),
+                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      noController: true,
+                                      isLoading: titlesProvider.isLoading,
+                                      leading: [
+                                        SliverOverlapInjector(
+                                          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                                         ),
-                                      if (mangas != null) MangaListViewSliver(items: mangas),
-                                    ],
-                                  ),
-                              },
-                            ),
-                            NumberPaginator(
-                              numberPages: max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
-                              onPageChange: (int index) {
-                                currentPage.value = index;
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                                      ],
+                                      children: [
+                                        if (mangas == null || mangas.isEmpty)
+                                          SliverToBoxAdapter(
+                                            child: Center(child: Text('errors.notitles'.tr(context: context))),
+                                          ),
+                                        if (mangas != null) MangaListViewSliver(items: mangas),
+                                      ],
+                                    ),
+                                  },
+                                ),
+                                NumberPaginator(
+                                  numberPages: max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                                  onPageChange: (int index) {
+                                    currentPage.value = index;
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                   ),
                 );
               },

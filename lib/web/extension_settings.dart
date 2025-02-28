@@ -1,37 +1,33 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:input_quantity/input_quantity.dart';
 
-class ExtensionSettings extends HookConsumerWidget {
-  const ExtensionSettings({super.key, required this.source});
+class ExtensionSettingsPage extends HookConsumerWidget {
+  const ExtensionSettingsPage({super.key, required this.source});
 
   final SourceIdentifier source;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final results =
-        useMemoized(() => ref.read(extensionSourceProvider(source.internal.id).notifier).getSourceMenu(), [source]);
+    final results = useMemoized(() => ref.read(extensionSourceProvider(source.internal.id).notifier).getSourceMenu(), [
+      source,
+    ]);
     final future = useFuture(results);
 
-    Widget body = Center(
-      child: CircularProgressIndicator(),
-    );
+    Widget body = Center(child: CircularProgressIndicator());
 
     if (future.hasError) {
       body = ErrorList(error: future.error!, stackTrace: future.stackTrace!);
     }
 
     if (future.connectionState == ConnectionState.waiting || !future.hasData) {
-      body = Center(
-        child: CircularProgressIndicator(),
-      );
+      body = Center(child: CircularProgressIndicator());
     }
 
     if (future.data != null) {
@@ -42,15 +38,7 @@ class ExtensionSettings extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('arg_settings'.tr(context: context, args: [source.external.name])),
-        leading: BackButton(
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go(GagakuRoute.extensionHome);
-            }
-          },
-        ),
+        leading: AutoLeadingButton(),
       ),
       body: SafeArea(child: body),
     );
@@ -67,20 +55,11 @@ class DUIDelegateBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (element) {
       case DUISection():
-        return DUISectionBuilder(
-          source: source,
-          element: element as DUISection,
-        );
+        return DUISectionBuilder(source: source, element: element as DUISection);
       case DUINavigationButton():
-        return DUINavigationButtonBuilder(
-          source: source,
-          element: element as DUINavigationButton,
-        );
+        return DUINavigationButtonBuilder(source: source, element: element as DUINavigationButton);
       case DUISelect():
-        return DUISelectBuilder(
-          source: source,
-          element: element as DUISelect,
-        );
+        return DUISelectBuilder(source: source, element: element as DUISelect);
       case DUIInputField():
       case DUISecureInputField():
         return DUIInputFieldBuilder(
@@ -89,42 +68,20 @@ class DUIDelegateBuilder extends StatelessWidget {
           secure: element is DUISecureInputField,
         );
       case DUIButton():
-        return DUIButtonBuilder(
-          source: source,
-          element: element as DUIButton,
-        );
+        return DUIButtonBuilder(source: source, element: element as DUIButton);
       case DUISwitch():
-        return DUISwitchBuilder(
-          source: source,
-          element: element as DUISwitch,
-        );
+        return DUISwitchBuilder(source: source, element: element as DUISwitch);
       case DUIForm():
-        return DUIFormBuilder(
-          source: source,
-          element: element as DUIForm,
-          parent: element,
-        );
+        return DUIFormBuilder(source: source, element: element as DUIForm, parent: element);
       case DUIStepper():
-        return DUIStepperBuilder(
-          source: source,
-          element: element as DUIStepper,
-        );
+        return DUIStepperBuilder(source: source, element: element as DUIStepper);
       case DUILabel():
       case DUIMultilineLabel():
-        return DUILabelBuilder(
-          source: source,
-          element: element as DUILabelType,
-        );
+        return DUILabelBuilder(source: source, element: element as DUILabelType);
       case DUIHeader():
-        return DUIHeaderBuilder(
-          source: source,
-          element: element as DUIHeader,
-        );
+        return DUIHeaderBuilder(source: source, element: element as DUIHeader);
       case DUIOAuthButton():
-        return DUIOAuthButtonBuilder(
-          source: source,
-          element: element as DUIOAuthButton,
-        );
+        return DUIOAuthButtonBuilder(source: source, element: element as DUIOAuthButton);
       default:
         return Text("Invalid DUI type");
     }
@@ -145,14 +102,7 @@ class DUISectionBuilder extends StatelessWidget {
 
     return Column(
       children: [
-        if (element.header != null)
-          Text(
-            element.header!,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        if (element.header != null) Text(element.header!, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         for (final row in element.rows) DUIDelegateBuilder(source: source, element: row),
         if (element.footer != null) Text(element.footer!),
       ],
@@ -189,17 +139,17 @@ class DUISelectBuilder extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final initFuture = useMemoized(
-        () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'));
+      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+    );
     final initial = useFuture(initFuture);
 
     if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     final data = useState(
-        initial.hasData ? (initial.data != null ? List<String>.from(initial.data! as List) : <String>[]) : <String>[]);
+      initial.hasData ? (initial.data != null ? List<String>.from(initial.data! as List) : <String>[]) : <String>[],
+    );
 
     return SettingCardWidget(
       title: Text(element.label),
@@ -215,12 +165,12 @@ class DUISelectBuilder extends HookConsumerWidget {
                   enableFilter: false,
                   dropdownMenuEntries: [
                     for (final MapEntry(key: option, value: label) in element.labels.entries)
-                      DropdownMenuEntry(value: option, label: label)
+                      DropdownMenuEntry(value: option, label: label),
                   ],
                   onSelected: (String? value) {
                     if (value != null) {
                       ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.set', [
-                        [value]
+                        [value],
                       ]);
 
                       data.value = [value];
@@ -231,26 +181,24 @@ class DUISelectBuilder extends HookConsumerWidget {
             } else {
               return Center(
                 child: MenuAnchor(
-                  builder: (context, controller, child) => SizedBox(
-                    width: double.infinity,
-                    child: Material(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-                      child: InkWell(
-                        onTap: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: child,
+                  builder:
+                      (context, controller, child) => SizedBox(
+                        width: double.infinity,
+                        child: Material(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+                          child: InkWell(
+                            onTap: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                              } else {
+                                controller.open();
+                              }
+                            },
+                            child: Padding(padding: const EdgeInsets.all(6.0), child: child),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
                   menuChildren: List.generate(
                     element.labels.entries.length,
                     (index) => Builder(
@@ -267,9 +215,10 @@ class DUISelectBuilder extends HookConsumerWidget {
                               data.value = [...data.value..remove(option.key)];
                             }
 
-                            ref
-                                .read(extensionSourceProvider(source.internal.id).notifier)
-                                .callBinding('${element.id}.set', [data.value]);
+                            ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding(
+                              '${element.id}.set',
+                              [data.value],
+                            );
                           },
                         );
                       },
@@ -285,9 +234,10 @@ class DUISelectBuilder extends HookConsumerWidget {
                             ElevatedButton.icon(
                               onPressed: () {
                                 data.value = [...data.value..remove(option)];
-                                ref
-                                    .read(extensionSourceProvider(source.internal.id).notifier)
-                                    .callBinding('${element.id}.set', [data.value]);
+                                ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding(
+                                  '${element.id}.set',
+                                  [data.value],
+                                );
                               },
                               icon: const Icon(Icons.close),
                               label: Text(element.labels[option]!),
@@ -317,13 +267,12 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
-        () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'));
+      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+    );
     final initial = useFuture(initFuture);
 
     if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     final data = useState(initial.hasData ? (initial.data != null ? initial.data! as String : null) : null);
@@ -335,17 +284,14 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
           builder: (context) {
             final controller = useTextEditingController(text: data.value);
             final settingText = useListenableSelector(controller, () => controller.text);
-            final debouncedInput = useDebounced(
-              settingText,
-              const Duration(milliseconds: 500),
-            );
+            final debouncedInput = useDebounced(settingText, const Duration(milliseconds: 500));
 
             useEffect(() {
               Future.delayed(Duration.zero, () {
                 if (debouncedInput != null) {
-                  ref
-                      .read(extensionSourceProvider(source.internal.id).notifier)
-                      .callBinding('${element.id}.set', [debouncedInput]);
+                  ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.set', [
+                    debouncedInput,
+                  ]);
                 }
               });
               return null;
@@ -353,9 +299,7 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
 
             return TextFormField(
               controller: controller,
-              decoration: const InputDecoration(
-                filled: true,
-              ),
+              decoration: const InputDecoration(filled: true),
               obscureText: secure,
             );
           },
@@ -379,14 +323,15 @@ class DUINavigationButtonBuilder extends StatelessWidget {
       child: ListTile(
         title: Text(element.label),
         trailing: Icon(Icons.arrow_forward_ios),
-        onTap: () => nav.push(PageTransitionRouteBuilder(
-          pageTransitionsBuilder: const FadeForwardsPageTransitionsBuilder(),
-          pageBuilder: (context, animation, secondaryAnimation) => DUIFormBuilder(
-            source: source,
-            element: element.form,
-            parent: element,
-          ),
-        )),
+        onTap:
+            () => nav.push(
+              PageTransitionRouteBuilder(
+                pageTransitionsBuilder: const FadeForwardsPageTransitionsBuilder(),
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        DUIFormBuilder(source: source, element: element.form, parent: element),
+              ),
+            ),
       ),
     );
   }
@@ -401,13 +346,12 @@ class DUISwitchBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
-        () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'));
+      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+    );
     final initial = useFuture(initFuture);
 
     if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     final data = useState(initial.hasData ? (initial.data != null ? initial.data! as bool : false) : false);
@@ -436,13 +380,12 @@ class DUIStepperBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
-        () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'));
+      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+    );
     final initial = useFuture(initFuture);
 
     if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     final data = useState(initial.hasData ? (initial.data != null ? initial.data! as num : null) : null);
@@ -473,9 +416,7 @@ class DUILabelBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Text(element.label),
-    );
+    return Card(child: Text(element.label));
   }
 }
 
@@ -506,12 +447,7 @@ class DUIOAuthButtonBuilder extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TODO
-    return Card(
-      child: ListTile(
-        title: Text("Unsupported"),
-        enabled: false,
-      ),
-    );
+    return Card(child: ListTile(title: Text("Unsupported"), enabled: false));
   }
 }
 
@@ -527,22 +463,10 @@ class DUIFormBuilder extends StatelessWidget {
     // TODO submit
 
     return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go(GagakuRoute.extensionHome);
-            }
-          },
-        ),
-      ),
+      appBar: AppBar(leading: AutoLeadingButton()),
       body: SafeArea(
         child: ListView(
-          children: [
-            for (final sec in element.sections) DUISectionBuilder(source: source, element: sec),
-          ],
+          children: [for (final sec in element.sections) DUISectionBuilder(source: source, element: sec)],
         ),
       ),
     );

@@ -103,8 +103,6 @@
     "homepages": "Homepages",
     "openUrl": "Open URL",
     "settings": {
-      "sourcePath": "Sources Path",
-      "sourcePathDesc": "Choose where to store your downloaded sources",
       "repos": "Repos",
       "reposDesc": "Configure source repos",
       "categories": "Categories",
@@ -121,12 +119,15 @@
       "newRepo": "@:ui.addNew Repo",
       "browser": "View in browser",
       "add": "@:ui.add Repo",
+      "addConfirm": "Are you sure you want to add the repo {}?",
       "addWarning": "Ensure that you are only adding trusted sources!",
       "urlHint": "Repo URL",
       "nameHint": "Repo Name",
       "urlEmptyWarning": "URL cannot be empty",
       "nameEmptyWarning": "Name cannot be empty",
-      "urlInvalidWarning": "Must be a valid URL"
+      "urlInvalidWarning": "Must be a valid URL",
+      "repoAddOK": "Repo added",
+      "repoExists": "Repo already exists"
     },
     "source": {
       "settings": "Extension Settings",

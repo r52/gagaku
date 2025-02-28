@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -8,7 +9,6 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,26 +16,6 @@ import 'package:url_launcher/url_launcher.dart';
 part 'group_view.g.dart';
 
 enum _ViewType { info, feed, titles }
-
-Page<dynamic> buildGroupViewPage(BuildContext context, GoRouterState state) {
-  final group = state.extra.asOrNull<Group>();
-
-  Widget child;
-
-  if (group != null) {
-    child = MangaDexGroupViewWidget(
-      group: group,
-    );
-  } else {
-    child = QueriedMangaDexGroupViewWidget(groupId: state.pathParameters['groupId']!);
-  }
-
-  return CustomTransitionPage<void>(
-    key: state.pageKey,
-    child: child,
-    transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-  );
-}
 
 @riverpod
 Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
@@ -92,20 +72,32 @@ Future<List<Manga>> _fetchGroupTitles(Ref ref, Group group) async {
   return mangas;
 }
 
-class QueriedMangaDexGroupViewWidget extends StatelessWidget {
-  const QueriedMangaDexGroupViewWidget({super.key, required this.groupId});
+@RoutePage()
+class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
+  const MangaDexGroupViewWithNamePage({super.key, @PathParam() required super.groupId, @PathParam() this.name});
+
+  final String? name;
+}
+
+@RoutePage()
+class MangaDexGroupViewPage extends StatelessWidget {
+  const MangaDexGroupViewPage({super.key, @PathParam() required this.groupId, this.group});
 
   final String groupId;
 
+  final Group? group;
+
   @override
   Widget build(BuildContext context) {
+    if (group != null) {
+      return MangaDexGroupViewWidget(group: group!);
+    }
+
     return DataProviderWhenWidget(
       provider: _fetchGroupFromIdProvider(groupId),
       errorBuilder: (context, child) => Scaffold(body: child),
-      builder: (context, group) {
-        return MangaDexGroupViewWidget(
-          group: group,
-        );
+      builder: (context, data) {
+        return MangaDexGroupViewWidget(group: data);
       },
     );
   }
@@ -126,32 +118,20 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
     final cfg = useRef(settings);
 
     const bottomNavigationBarItems = <Widget>[
-      NavigationDestination(
-        icon: Icon(Icons.info),
-        label: 'Info',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.feed),
-        label: 'Group Feed',
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.menu_book),
-        label: 'Group Titles',
-      ),
+      NavigationDestination(icon: Icon(Icons.info), label: 'Info'),
+      NavigationDestination(icon: Icon(Icons.feed), label: 'Group Feed'),
+      NavigationDestination(icon: Icon(Icons.menu_book), label: 'Group Titles'),
     ];
 
-    final controllers = [
-      useScrollController(),
-      useScrollController(),
-      useScrollController(),
-    ];
+    final controllers = [useScrollController(), useScrollController(), useScrollController()];
 
     final tab = switch (view.value) {
       _ViewType.info => CustomScrollView(
-          controller: controllers[0],
-          scrollBehavior: const MouseTouchScrollBehavior(),
-          slivers: <Widget>[
-            SliverList.list(children: [
+        controller: controllers[0],
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        slivers: <Widget>[
+          SliverList.list(
+            children: [
               if (group.attributes.description != null)
                 ExpansionTile(
                   initiallyExpanded: true,
@@ -204,98 +184,83 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               if (group.attributes.description == null &&
                   group.attributes.website == null &&
                   group.attributes.discord == null)
-                Center(
-                  child: Text('tracking.nothing'.tr(context: context)),
-                ),
-            ]),
-          ],
-        ),
+                Center(child: Text('tracking.nothing'.tr(context: context))),
+            ],
+          ),
+        ],
+      ),
       _ViewType.feed => Consumer(
-          key: const Key('/group?tab=feed'),
-          builder: (context, ref, child) {
-            return ChapterFeedWidget(
-              provider: _fetchGroupFeedProvider(group),
-              title: 'mangadex.groupFeed'.tr(context: context),
-              emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
-              onAtEdge: () => ref.read(groupFeedProvider(group).notifier).getMore(),
-              onRefresh: () async {
-                ref.read(groupFeedProvider(group).notifier).clear();
-                return ref.refresh(_fetchGroupFeedProvider(group).future);
-              },
-              controller: controllers[1],
-              restorationId: 'group_feed_offset',
-            );
-          },
-        ),
+        key: const Key('/group?tab=feed'),
+        builder: (context, ref, child) {
+          return ChapterFeedWidget(
+            provider: _fetchGroupFeedProvider(group),
+            title: 'mangadex.groupFeed'.tr(context: context),
+            emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
+            onAtEdge: () => ref.read(groupFeedProvider(group).notifier).getMore(),
+            onRefresh: () async {
+              ref.read(groupFeedProvider(group).notifier).clear();
+              return ref.refresh(_fetchGroupFeedProvider(group).future);
+            },
+            controller: controllers[1],
+            restorationId: 'group_feed_offset',
+          );
+        },
+      ),
       _ViewType.titles => Consumer(
-          key: const Key('/group?tab=titles'),
-          builder: (context, ref, child) {
-            final titleProvider = ref.watch(_fetchGroupTitlesProvider(group));
-            final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
+        key: const Key('/group?tab=titles'),
+        builder: (context, ref, child) {
+          final titleProvider = ref.watch(_fetchGroupTitlesProvider(group));
+          final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                ref.read(groupTitlesProvider(group).notifier).clear();
-                return ref.refresh(_fetchGroupTitlesProvider(group).future);
-              },
-              child: DataProviderWhenWidget(
-                provider: _fetchGroupTitlesProvider(group),
-                data: titleProvider,
-                builder: (context, mangas) => MangaListWidget(
-                  title: Text(
-                    'mangadex.groupTitles'.tr(context: context),
-                    style: TextStyle(fontSize: 24),
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.read(groupTitlesProvider(group).notifier).clear();
+              return ref.refresh(_fetchGroupTitlesProvider(group).future);
+            },
+            child: DataProviderWhenWidget(
+              provider: _fetchGroupTitlesProvider(group),
+              data: titleProvider,
+              builder:
+                  (context, mangas) => MangaListWidget(
+                    title: Text('mangadex.groupTitles'.tr(context: context), style: TextStyle(fontSize: 24)),
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: controllers[2],
+                    onAtEdge: () => ref.read(groupTitlesProvider(group).notifier).getMore(),
+                    isLoading: isLoading,
+                    children: [
+                      if (mangas.isEmpty)
+                        SliverToBoxAdapter(child: Center(child: Text('errors.notitles'.tr(context: context)))),
+                      MangaListViewSliver(items: mangas),
+                    ],
                   ),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: controllers[2],
-                  onAtEdge: () => ref.read(groupTitlesProvider(group).notifier).getMore(),
-                  isLoading: isLoading,
-                  children: [
-                    if (mangas.isEmpty)
-                      SliverToBoxAdapter(
-                        child: Center(
-                          child: Text('errors.notitles'.tr(context: context)),
-                        ),
-                      ),
-                    MangaListViewSliver(items: mangas),
-                  ],
-                ),
-                loadingBuilder: (_, progress) => LoadingOverlayStack(
-                  progress: progress?.toDouble(),
-                ),
-              ),
-            );
-          },
-        ),
+              loadingBuilder: (_, progress) => LoadingOverlayStack(progress: progress?.toDouble()),
+            ),
+          );
+        },
+      ),
     };
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
+        leading: AutoLeadingButton(),
         flexibleSpace: GestureDetector(
           onTap: () {
-            controllers[view.value.index]
-                .animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            controllers[view.value.index].animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+            );
           },
           child: TitleFlexBar(title: group.attributes.name),
         ),
         actions: [
           ElevatedButton.icon(
-            style: Styles.buttonStyle(
-              backgroundColor: isBlacklisted ? Colors.green.shade900 : Colors.red.shade900,
-            ),
+            style: Styles.buttonStyle(backgroundColor: isBlacklisted ? Colors.green.shade900 : Colors.red.shade900),
             onPressed: () {
               if (isBlacklisted) {
                 cfg.value = settings.copyWith(
-                    groupBlacklist: settings.groupBlacklist.where((element) => element != group.id).toSet());
+                  groupBlacklist: settings.groupBlacklist.where((element) => element != group.id).toSet(),
+                );
               } else {
                 cfg.value = settings.copyWith(groupBlacklist: {...settings.groupBlacklist, group.id});
               }

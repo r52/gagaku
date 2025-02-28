@@ -1,47 +1,18 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/model/model.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader.g.dart';
-
-Page<dynamic> buildWebReaderPage(BuildContext context, GoRouterState state) {
-  final data = state.extra.asOrNull<WebReaderData>();
-
-  Widget child;
-
-  if (data != null) {
-    child = WebSourceReaderWidget(
-      source: data.source,
-      title: data.title,
-      link: data.link,
-      handle: data.handle,
-      readKey: data.readKey,
-      onLinkPressed: data.onLinkPressed,
-    );
-  } else {
-    child = QueriedWebSourceReaderWidget(
-        proxy: state.pathParameters['proxy']!,
-        code: state.pathParameters['code']!,
-        chapter: state.pathParameters['chapter']!);
-  }
-
-  return CustomTransitionPage<void>(
-    key: state.pageKey,
-    child: child,
-    transitionsBuilder: Styles.slideTransitionBuilder,
-  );
-}
 
 @Riverpod(retry: noRetry)
 Future<WebReaderData> _fetchWebChapterInfo(Ref ref, SourceHandler handle) async {
@@ -50,7 +21,8 @@ Future<WebReaderData> _fetchWebChapterInfo(Ref ref, SourceHandler handle) async 
 
   if (manga != null) {
     ref.read(webSourceHistoryProvider.add)(
-        HistoryLink(title: '${handle.source}: ${manga.title}', url: handle.getURL(), cover: manga.cover));
+      HistoryLink(title: '${handle.source}: ${manga.title}', url: handle.getURL(), cover: manga.cover),
+    );
 
     final chapter = manga.getChapter(handle.chapter!);
 
@@ -88,11 +60,7 @@ Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
     links = List<String>.from(source);
   }
 
-  final pages = links
-      .map((e) => ReaderPage(
-            provider: NetworkImage(e),
-          ))
-      .toList();
+  final pages = links.map((e) => ReaderPage(provider: NetworkImage(e))).toList();
 
   ref.onDispose(() {
     pages.clear();
@@ -106,14 +74,16 @@ Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic chapter, SourceHandler
   List<String>? links = [];
 
   if (handle.parser != null) {
-    links =
-        await ref.read(extensionSourceProvider(handle.parser!.id).notifier).getChapterPages(handle.location, chapter);
+    links = await ref
+        .read(extensionSourceProvider(handle.parser!.id).notifier)
+        .getChapterPages(handle.location, chapter);
   } else {
     final installed = await ref.watch(extensionInfoListProvider.future);
     for (final src in installed) {
       if (handle.source == src.internal.id) {
-        links =
-            await ref.read(extensionSourceProvider(handle.source).notifier).getChapterPages(handle.location, chapter);
+        links = await ref
+            .read(extensionSourceProvider(handle.source).notifier)
+            .getChapterPages(handle.location, chapter);
         break;
       }
     }
@@ -123,11 +93,7 @@ Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic chapter, SourceHandler
     throw Exception('Failed to download pages from source ${handle.source}, chapter id $chapter');
   }
 
-  final pages = links
-      .map((e) => ReaderPage(
-            provider: NetworkImage(e),
-          ))
-      .toList();
+  final pages = links.map((e) => ReaderPage(provider: NetworkImage(e))).toList();
 
   ref.onDispose(() {
     pages.clear();
@@ -136,48 +102,102 @@ Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic chapter, SourceHandler
   return pages;
 }
 
-class QueriedWebSourceReaderWidget extends StatelessWidget {
-  const QueriedWebSourceReaderWidget({
+@RoutePage()
+class ProxyWebSourceReaderPage extends StatelessWidget {
+  const ProxyWebSourceReaderPage({
     super.key,
-    required this.proxy,
-    required this.code,
-    required this.chapter,
+    @PathParam() required this.proxy,
+    @PathParam() required this.code,
+    @PathParam() required this.chapter,
+    this.page,
+    this.readerData,
   });
 
   final String proxy;
   final String code;
   final String chapter;
+  final String? page;
+
+  final WebReaderData? readerData;
 
   @override
   Widget build(BuildContext context) {
-    final handle =
-        SourceHandler(type: SourceType.proxy, source: proxy, location: code, chapter: chapter.replaceFirst('-', '.'));
+    if (readerData != null) {
+      return WebSourceReaderWidget(
+        source: readerData!.source,
+        title: readerData!.title,
+        link: readerData!.link,
+        handle: readerData!.handle,
+        readKey: readerData!.readKey,
+        onLinkPressed: readerData!.onLinkPressed,
+      );
+    }
+
+    final handle = SourceHandler(
+      type: SourceType.proxy,
+      source: proxy,
+      location: code,
+      chapter: chapter.replaceFirst('-', '.'),
+    );
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
-      errorBuilder: (context, child) => Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(GagakuRoute.extensionHome);
-              }
-            },
+      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: AutoLeadingButton()), body: child),
+      builder:
+          (context, data) => WebSourceReaderWidget(
+            source: data.source,
+            title: data.title,
+            link: data.link,
+            handle: data.handle,
+            readKey: data.readKey,
+            onLinkPressed: data.onLinkPressed,
           ),
-        ),
-        body: child,
-      ),
-      builder: (context, data) => WebSourceReaderWidget(
-        source: data.source,
-        title: data.title,
-        link: data.link,
-        handle: data.handle,
-        readKey: data.readKey,
-        onLinkPressed: data.onLinkPressed,
-        backRoute: GagakuRoute.extensionHome,
-      ),
+    );
+  }
+}
+
+@RoutePage()
+class ExtensionReaderPage extends StatelessWidget {
+  const ExtensionReaderPage({
+    super.key,
+    @PathParam() required this.source,
+    @PathParam() required this.mangaId,
+    @PathParam() required this.chapterId,
+    this.readerData,
+  });
+
+  final String source;
+  final String mangaId;
+  final String chapterId;
+  final WebReaderData? readerData;
+
+  @override
+  Widget build(BuildContext context) {
+    if (readerData != null) {
+      return WebSourceReaderWidget(
+        source: readerData!.source,
+        title: readerData!.title,
+        link: readerData!.link,
+        handle: readerData!.handle,
+        readKey: readerData!.readKey,
+        onLinkPressed: readerData!.onLinkPressed,
+      );
+    }
+
+    final handle = SourceHandler(type: SourceType.source, source: source, location: mangaId, chapter: chapterId);
+
+    return DataProviderWhenWidget(
+      provider: _fetchWebChapterInfoProvider(handle),
+      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: AutoLeadingButton()), body: child),
+      builder:
+          (context, data) => WebSourceReaderWidget(
+            source: data.source,
+            title: data.title,
+            link: data.link,
+            handle: data.handle,
+            readKey: data.readKey,
+            onLinkPressed: data.onLinkPressed,
+          ),
     );
   }
 }
@@ -191,7 +211,6 @@ class WebSourceReaderWidget extends HookConsumerWidget {
     required this.handle,
     this.readKey,
     this.onLinkPressed,
-    this.backRoute,
   });
 
   final dynamic source;
@@ -199,8 +218,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
   final String? link;
   final SourceHandler handle;
   final String? readKey;
-  final VoidCallback? onLinkPressed;
-  final String? backRoute;
+  final CtxCallback? onLinkPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -227,28 +245,15 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: handle.type == SourceType.proxy ? _getPagesProvider(source) : _getSourcePagesProvider(source, handle),
-      errorBuilder: (context, child) => Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(backRoute ?? GagakuRoute.extensionHome);
-              }
-            },
+      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: AutoLeadingButton()), body: child),
+      builder:
+          (context, pages) => ReaderWidget(
+            pages: pages,
+            title: name,
+            longstrip: false,
+            drawerHeader: link,
+            onHeaderPressed: onLinkPressed,
           ),
-        ),
-        body: child,
-      ),
-      builder: (context, pages) => ReaderWidget(
-        pages: pages,
-        title: name,
-        longstrip: false,
-        drawerHeader: link,
-        onHeaderPressed: onLinkPressed,
-        backRoute: backRoute,
-      ),
     );
   }
 }
