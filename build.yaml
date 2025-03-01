@@ -1,3 +1,10 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          explicit_to_json: true
+
 builders:
   version_builder:
     import: "package:gagaku/gen_version.dart"

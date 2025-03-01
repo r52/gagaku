@@ -9,8 +9,8 @@ import 'package:gagaku/mangadex/model/types.dart';
 part 'config.freezed.dart';
 part 'config.g.dart';
 
-@unfreezed
-class MangaDexConfig with _$MangaDexConfig {
+@freezed
+abstract class MangaDexConfig with _$MangaDexConfig {
   factory MangaDexConfig({
     @Default({}) @LanguageConverter() Set<Language> translatedLanguages,
     @Default({}) @LanguageConverter() Set<Language> originalLanguage,

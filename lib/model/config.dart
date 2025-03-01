@@ -25,7 +25,7 @@ enum GridAlbumExtent {
 }
 
 @freezed
-class GagakuConfig with _$GagakuConfig {
+abstract class GagakuConfig with _$GagakuConfig {
   const factory GagakuConfig({
     /// Theme mode
     @Default(ThemeMode.system) ThemeMode themeMode,

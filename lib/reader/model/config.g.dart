@@ -6,8 +6,8 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ReaderConfigImpl _$$ReaderConfigImplFromJson(Map<String, dynamic> json) =>
-    _$ReaderConfigImpl(
+_ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) =>
+    _ReaderConfig(
       format:
           $enumDecodeNullable(_$ReaderFormatEnumMap, json['format']) ??
           ReaderFormat.single,
@@ -20,7 +20,7 @@ _$ReaderConfigImpl _$$ReaderConfigImplFromJson(Map<String, dynamic> json) =>
       precacheCount: (json['precacheCount'] as num?)?.toInt() ?? 3,
     );
 
-Map<String, dynamic> _$$ReaderConfigImplToJson(_$ReaderConfigImpl instance) =>
+Map<String, dynamic> _$ReaderConfigToJson(_ReaderConfig instance) =>
     <String, dynamic>{
       'format': _$ReaderFormatEnumMap[instance.format]!,
       'direction': _$ReaderDirectionEnumMap[instance.direction]!,

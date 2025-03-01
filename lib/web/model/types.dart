@@ -29,7 +29,7 @@ class WebReaderData {
 enum SourceType { proxy, source }
 
 @freezed
-class SourceHandler with _$SourceHandler {
+abstract class SourceHandler with _$SourceHandler {
   const SourceHandler._();
 
   const factory SourceHandler({
@@ -40,7 +40,10 @@ class SourceHandler with _$SourceHandler {
     WebSourceInfo? parser,
   }) = _SourceHandler;
 
-  String getURL() => type == SourceType.proxy ? 'https://cubari.moe/read/$source/$location/' : '$source/$location';
+  String getURL() =>
+      type == SourceType.proxy
+          ? 'https://cubari.moe/read/$source/$location/'
+          : '$source/$location';
   String getKey() => '$source/$location';
 }
 
@@ -72,7 +75,8 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
   }
 }
 
-class MappedEpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
+class MappedEpochTimestampSerializer
+    implements JsonConverter<DateTime?, dynamic> {
   const MappedEpochTimestampSerializer();
 
   @override
@@ -107,21 +111,32 @@ class MappedEpochTimestampSerializer implements JsonConverter<DateTime?, dynamic
 }
 
 @freezed
-class HistoryLink with _$HistoryLink {
+abstract class HistoryLink with _$HistoryLink {
   const HistoryLink._();
 
-  const factory HistoryLink({required String title, required String url, String? cover}) = _HistoryLink;
+  const factory HistoryLink({
+    required String title,
+    required String url,
+    String? cover,
+  }) = _HistoryLink;
 
-  factory HistoryLink.fromJson(Map<String, dynamic> json) => _$HistoryLinkFromJson(json);
+  factory HistoryLink.fromJson(Map<String, dynamic> json) =>
+      _$HistoryLinkFromJson(json);
 
-  factory HistoryLink.fromPartialSourceManga(String sourceId, PartialSourceManga manga) =>
-      HistoryLink(title: manga.title, url: '$sourceId/${manga.mangaId}', cover: manga.image);
+  factory HistoryLink.fromPartialSourceManga(
+    String sourceId,
+    PartialSourceManga manga,
+  ) => HistoryLink(
+    title: manga.title,
+    url: '$sourceId/${manga.mangaId}',
+    cover: manga.image,
+  );
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HistoryLinkImpl &&
+            other is HistoryLink &&
             (identical(other.url, url) || other.url == url));
   }
 
@@ -130,7 +145,7 @@ class HistoryLink with _$HistoryLink {
 }
 
 @freezed
-class WebManga with _$WebManga {
+abstract class WebManga with _$WebManga {
   const WebManga._();
 
   const factory WebManga({
@@ -143,7 +158,8 @@ class WebManga with _$WebManga {
     required Map<String, WebChapter> chapters,
   }) = _WebManga;
 
-  factory WebManga.fromJson(Map<String, dynamic> json) => _$WebMangaFromJson(json);
+  factory WebManga.fromJson(Map<String, dynamic> json) =>
+      _$WebMangaFromJson(json);
 
   WebChapter? getChapter(String chapter) {
     if (chapters.containsKey(chapter)) {
@@ -154,7 +170,7 @@ class WebManga with _$WebManga {
 }
 
 @freezed
-class WebChapter with _$WebChapter {
+abstract class WebChapter with _$WebChapter {
   const WebChapter._();
 
   // ignore: invalid_annotation_target
@@ -167,7 +183,8 @@ class WebChapter with _$WebChapter {
     required Map<String, dynamic> groups,
   }) = _WebChapter;
 
-  factory WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
+  factory WebChapter.fromJson(Map<String, dynamic> json) =>
+      _$WebChapterFromJson(json);
 
   String getTitle(String index) {
     if (index == title) {
@@ -185,25 +202,36 @@ class WebChapter with _$WebChapter {
 }
 
 @freezed
-class ImgurPage with _$ImgurPage {
-  const factory ImgurPage({required String description, required String src}) = _ImgurPage;
+abstract class ImgurPage with _$ImgurPage {
+  const factory ImgurPage({required String description, required String src}) =
+      _ImgurPage;
 
-  factory ImgurPage.fromJson(Map<String, dynamic> json) => _$ImgurPageFromJson(json);
+  factory ImgurPage.fromJson(Map<String, dynamic> json) =>
+      _$ImgurPageFromJson(json);
 }
 
 @freezed
-class WebSourceInfo with _$WebSourceInfo {
-  const factory WebSourceInfo({required String id, required String name, required String repo, String? icon}) =
-      _WebSourceInfo;
+abstract class WebSourceInfo with _$WebSourceInfo {
+  const factory WebSourceInfo({
+    required String id,
+    required String name,
+    required String repo,
+    String? icon,
+  }) = _WebSourceInfo;
 
-  factory WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
+  factory WebSourceInfo.fromJson(Map<String, dynamic> json) =>
+      _$WebSourceInfoFromJson(json);
 }
 
 @freezed
-class SourceIdentifier with _$SourceIdentifier {
-  const factory SourceIdentifier({required WebSourceInfo internal, required SourceInfo external}) = _SourceIdentifier;
+abstract class SourceIdentifier with _$SourceIdentifier {
+  const factory SourceIdentifier({
+    required WebSourceInfo internal,
+    required SourceInfo external,
+  }) = _SourceIdentifier;
 
-  factory SourceIdentifier.fromJson(Map<String, dynamic> json) => _$SourceIdentifierFromJson(json);
+  factory SourceIdentifier.fromJson(Map<String, dynamic> json) =>
+      _$SourceIdentifierFromJson(json);
 }
 
 ///////////////////////////////////////////////////////////////////// PB types
@@ -227,15 +255,20 @@ class BadgeColorParser implements JsonConverter<BadgeColor, dynamic> {
   const BadgeColorParser();
 
   @override
-  BadgeColor fromJson(dynamic type) => type == 'default' ? BadgeColor.def : BadgeColor.values.byName(type);
+  BadgeColor fromJson(dynamic type) =>
+      type == 'default' ? BadgeColor.def : BadgeColor.values.byName(type);
 
   @override
-  dynamic toJson(BadgeColor color) => color == BadgeColor.def ? 'default' : color.name;
+  dynamic toJson(BadgeColor color) =>
+      color == BadgeColor.def ? 'default' : color.name;
 }
 
 @freezed
-class Badge with _$Badge {
-  const factory Badge({required String text, @BadgeColorParser() required BadgeColor type}) = _Badge;
+abstract class Badge with _$Badge {
+  const factory Badge({
+    required String text,
+    @BadgeColorParser() required BadgeColor type,
+  }) = _Badge;
 
   factory Badge.fromJson(Map<String, dynamic> json) => _$BadgeFromJson(json);
 }
@@ -252,7 +285,7 @@ enum BadgeColor {
 }
 
 @freezed
-class SourceVersion with _$SourceVersion {
+abstract class SourceVersion with _$SourceVersion {
   const factory SourceVersion({
     required String id,
     required String name,
@@ -267,11 +300,12 @@ class SourceVersion with _$SourceVersion {
     int? intents,
   }) = _SourceVersion;
 
-  factory SourceVersion.fromJson(Map<String, dynamic> json) => _$SourceVersionFromJson(json);
+  factory SourceVersion.fromJson(Map<String, dynamic> json) =>
+      _$SourceVersionFromJson(json);
 }
 
 @freezed
-class SourceInfo with _$SourceInfo {
+abstract class SourceInfo with _$SourceInfo {
   const SourceInfo._();
 
   const factory SourceInfo({
@@ -296,36 +330,42 @@ class SourceInfo with _$SourceInfo {
     return false;
   }
 
-  factory SourceInfo.fromJson(Map<String, dynamic> json) => _$SourceInfoFromJson(json);
+  factory SourceInfo.fromJson(Map<String, dynamic> json) =>
+      _$SourceInfoFromJson(json);
 }
 
 @freezed
-class BuiltWith with _$BuiltWith {
-  const factory BuiltWith({required String toolchain, required String types}) = _BuiltWith;
+abstract class BuiltWith with _$BuiltWith {
+  const factory BuiltWith({required String toolchain, required String types}) =
+      _BuiltWith;
 
-  factory BuiltWith.fromJson(Map<String, dynamic> json) => _$BuiltWithFromJson(json);
+  factory BuiltWith.fromJson(Map<String, dynamic> json) =>
+      _$BuiltWithFromJson(json);
 }
 
 @freezed
-class Versioning with _$Versioning {
+abstract class Versioning with _$Versioning {
   const factory Versioning({
     required String buildTime,
     required List<SourceVersion> sources,
     required BuiltWith builtWith,
   }) = _Versioning;
 
-  factory Versioning.fromJson(Map<String, dynamic> json) => _$VersioningFromJson(json);
+  factory Versioning.fromJson(Map<String, dynamic> json) =>
+      _$VersioningFromJson(json);
 }
 
 @freezed
-class RepoInfo with _$RepoInfo {
-  const factory RepoInfo({required String name, required String url}) = _RepoInfo;
+abstract class RepoInfo with _$RepoInfo {
+  const factory RepoInfo({required String name, required String url}) =
+      _RepoInfo;
 
-  factory RepoInfo.fromJson(Map<String, dynamic> json) => _$RepoInfoFromJson(json);
+  factory RepoInfo.fromJson(Map<String, dynamic> json) =>
+      _$RepoInfoFromJson(json);
 }
 
 @freezed
-class PartialSourceManga with _$PartialSourceManga {
+abstract class PartialSourceManga with _$PartialSourceManga {
   const factory PartialSourceManga({
     required String mangaId,
     required String image,
@@ -333,18 +373,23 @@ class PartialSourceManga with _$PartialSourceManga {
     String? subtitle,
   }) = _PartialSourceManga;
 
-  factory PartialSourceManga.fromJson(Map<String, dynamic> json) => _$PartialSourceMangaFromJson(json);
+  factory PartialSourceManga.fromJson(Map<String, dynamic> json) =>
+      _$PartialSourceMangaFromJson(json);
 }
 
 @freezed
-class PagedResults with _$PagedResults {
-  const factory PagedResults({List<PartialSourceManga>? results, dynamic metadata}) = _PagedResults;
+abstract class PagedResults with _$PagedResults {
+  const factory PagedResults({
+    List<PartialSourceManga>? results,
+    dynamic metadata,
+  }) = _PagedResults;
 
-  factory PagedResults.fromJson(Map<String, dynamic> json) => _$PagedResultsFromJson(json);
+  factory PagedResults.fromJson(Map<String, dynamic> json) =>
+      _$PagedResultsFromJson(json);
 }
 
 @freezed
-class MangaInfo with _$MangaInfo {
+abstract class MangaInfo with _$MangaInfo {
   const factory MangaInfo({
     required String image,
     String? artist,
@@ -365,32 +410,42 @@ class MangaInfo with _$MangaInfo {
     // required num views,
   }) = _MangaInfo;
 
-  factory MangaInfo.fromJson(Map<String, dynamic> json) => _$MangaInfoFromJson(json);
+  factory MangaInfo.fromJson(Map<String, dynamic> json) =>
+      _$MangaInfoFromJson(json);
 }
 
 @freezed
-class Tag with _$Tag {
+abstract class Tag with _$Tag {
   const factory Tag({required String id, required String label}) = _Tag;
 
   factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
 }
 
 @freezed
-class TagSection with _$TagSection {
-  const factory TagSection({required String id, required String label, required List<Tag> tags}) = _TagSection;
+abstract class TagSection with _$TagSection {
+  const factory TagSection({
+    required String id,
+    required String label,
+    required List<Tag> tags,
+  }) = _TagSection;
 
-  factory TagSection.fromJson(Map<String, dynamic> json) => _$TagSectionFromJson(json);
+  factory TagSection.fromJson(Map<String, dynamic> json) =>
+      _$TagSectionFromJson(json);
 }
 
 @freezed
-class SourceManga with _$SourceManga {
-  const factory SourceManga({required String id, required MangaInfo mangaInfo}) = _SourceManga;
+abstract class SourceManga with _$SourceManga {
+  const factory SourceManga({
+    required String id,
+    required MangaInfo mangaInfo,
+  }) = _SourceManga;
 
-  factory SourceManga.fromJson(Map<String, dynamic> json) => _$SourceMangaFromJson(json);
+  factory SourceManga.fromJson(Map<String, dynamic> json) =>
+      _$SourceMangaFromJson(json);
 }
 
 @freezed
-class Chapter with _$Chapter {
+abstract class Chapter with _$Chapter {
   const factory Chapter({
     required String id,
     required num chapNum,
@@ -402,26 +457,36 @@ class Chapter with _$Chapter {
     num? sortingIndex,
   }) = _Chapter;
 
-  factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
+  factory Chapter.fromJson(Map<String, dynamic> json) =>
+      _$ChapterFromJson(json);
 }
 
 @freezed
-class ChapterDetails with _$ChapterDetails {
-  const factory ChapterDetails({required String id, required String mangaId, required List<String> pages}) =
-      _ChapterDetails;
+abstract class ChapterDetails with _$ChapterDetails {
+  const factory ChapterDetails({
+    required String id,
+    required String mangaId,
+    required List<String> pages,
+  }) = _ChapterDetails;
 
-  factory ChapterDetails.fromJson(Map<String, dynamic> json) => _$ChapterDetailsFromJson(json);
+  factory ChapterDetails.fromJson(Map<String, dynamic> json) =>
+      _$ChapterDetailsFromJson(json);
 }
 
 @freezed
-class SearchRequest with _$SearchRequest {
-  const factory SearchRequest({String? title, List<Tag>? includedTags, List<Tag>? excludedTags}) = _SearchRequest;
+abstract class SearchRequest with _$SearchRequest {
+  const factory SearchRequest({
+    String? title,
+    List<Tag>? includedTags,
+    List<Tag>? excludedTags,
+  }) = _SearchRequest;
 
-  factory SearchRequest.fromJson(Map<String, dynamic> json) => _$SearchRequestFromJson(json);
+  factory SearchRequest.fromJson(Map<String, dynamic> json) =>
+      _$SearchRequestFromJson(json);
 }
 
 @freezed
-class HomeSection with _$HomeSection {
+abstract class HomeSection with _$HomeSection {
   const factory HomeSection({
     required String id,
     required String title,
@@ -429,7 +494,8 @@ class HomeSection with _$HomeSection {
     required bool containsMoreItems,
   }) = _HomeSection;
 
-  factory HomeSection.fromJson(Map<String, dynamic> json) => _$HomeSectionFromJson(json);
+  factory HomeSection.fromJson(Map<String, dynamic> json) =>
+      _$HomeSectionFromJson(json);
 }
 
 abstract class DUIFormRow {
@@ -445,10 +511,11 @@ abstract class DUILabelType extends DUIFormRow {
 }
 
 @Freezed(unionKey: 'type')
-class DUIOAuthResponseType with _$DUIOAuthResponseType {
+abstract class DUIOAuthResponseType with _$DUIOAuthResponseType {
   const factory DUIOAuthResponseType.token() = DUIOAuthTokenResponse;
 
-  const factory DUIOAuthResponseType.code({required String tokenEndpoint}) = DUIOAuthCodeResponse;
+  const factory DUIOAuthResponseType.code({required String tokenEndpoint}) =
+      DUIOAuthCodeResponse;
 
   const factory DUIOAuthResponseType.pkce({
     required String tokenEndpoint,
@@ -457,11 +524,12 @@ class DUIOAuthResponseType with _$DUIOAuthResponseType {
     required bool formEncodeGrant,
   }) = DUIOAuthPKCEResponse;
 
-  factory DUIOAuthResponseType.fromJson(Map<String, dynamic> json) => _$DUIOAuthResponseTypeFromJson(json);
+  factory DUIOAuthResponseType.fromJson(Map<String, dynamic> json) =>
+      _$DUIOAuthResponseTypeFromJson(json);
 }
 
 @Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
-class DUIType with _$DUIType {
+sealed class DUIType with _$DUIType {
   @Implements<DUIFormRow>()
   const factory DUIType.DUISection({
     required String id,
@@ -481,21 +549,39 @@ class DUIType with _$DUIType {
   }) = DUISelect;
 
   @Implements<DUIInputType>()
-  const factory DUIType.DUIInputField({required String id, required String label}) = DUIInputField;
+  const factory DUIType.DUIInputField({
+    required String id,
+    required String label,
+  }) = DUIInputField;
 
   @Implements<DUIInputType>()
-  const factory DUIType.DUISecureInputField({required String id, required String label}) = DUISecureInputField;
+  const factory DUIType.DUISecureInputField({
+    required String id,
+    required String label,
+  }) = DUISecureInputField;
 
   @Implements<DUIFormRow>()
-  const factory DUIType.DUIStepper({required String id, required String label, num? min, num? max, num? step}) =
-      DUIStepper;
+  const factory DUIType.DUIStepper({
+    required String id,
+    required String label,
+    num? min,
+    num? max,
+    num? step,
+  }) = DUIStepper;
 
   @Implements<DUILabelType>()
-  const factory DUIType.DUILabel({required String id, required String label, String? value}) = DUILabel;
+  const factory DUIType.DUILabel({
+    required String id,
+    required String label,
+    String? value,
+  }) = DUILabel;
 
   @Implements<DUILabelType>()
-  const factory DUIType.DUIMultilineLabel({required String id, required String label, required String value}) =
-      DUIMultilineLabel;
+  const factory DUIType.DUIMultilineLabel({
+    required String id,
+    required String label,
+    required String value,
+  }) = DUIMultilineLabel;
 
   @Implements<DUIFormRow>()
   const factory DUIType.DUIHeader({
@@ -506,14 +592,19 @@ class DUIType with _$DUIType {
   }) = DUIHeader;
 
   @Implements<DUIFormRow>()
-  const factory DUIType.DUIButton({required String id, required String label}) = DUIButton;
+  const factory DUIType.DUIButton({required String id, required String label}) =
+      DUIButton;
 
   @Implements<DUIFormRow>()
-  const factory DUIType.DUINavigationButton({required String id, required String label, required DUIForm form}) =
-      DUINavigationButton;
+  const factory DUIType.DUINavigationButton({
+    required String id,
+    required String label,
+    required DUIForm form,
+  }) = DUINavigationButton;
 
   @Implements<DUIFormRow>()
-  const factory DUIType.DUISwitch({required String id, required String label}) = DUISwitch;
+  const factory DUIType.DUISwitch({required String id, required String label}) =
+      DUISwitch;
 
   @Implements<DUIFormRow>()
   const factory DUIType.DUIOAuthButton({
@@ -526,7 +617,11 @@ class DUIType with _$DUIType {
     List<String>? scopes,
   }) = DUIOAuthButton;
 
-  const factory DUIType.DUIForm({required List<DUISection> sections, required bool hasSubmit}) = DUIForm;
+  const factory DUIType.DUIForm({
+    required List<DUISection> sections,
+    required bool hasSubmit,
+  }) = DUIForm;
 
-  factory DUIType.fromJson(Map<String, dynamic> json) => _$DUITypeFromJson(json);
+  factory DUIType.fromJson(Map<String, dynamic> json) =>
+      _$DUITypeFromJson(json);
 }

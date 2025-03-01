@@ -8,8 +8,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'config.freezed.dart';
 part 'config.g.dart';
 
-@unfreezed
-class LocalLibConfig with _$LocalLibConfig {
+@freezed
+abstract class LocalLibConfig with _$LocalLibConfig {
   factory LocalLibConfig({@Default('') String libraryDirectory}) =
       _LocalLibConfig;
 

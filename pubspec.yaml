@@ -35,7 +35,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_hooks: ^0.21.2
-  freezed_annotation: ^2.2.0
+  freezed_annotation: ^3.0.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hooks_riverpod: ^3.0.0-dev.3
@@ -89,7 +89,7 @@ dev_dependencies:
   riverpod_lint: ^3.0.0-dev.4
   build_runner:
   riverpod_generator: ^3.0.0-dev.11
-  freezed: ^2.5.2
+  freezed: ^3.0.2
   json_serializable: ^6.6.1
   flutter_native_splash: ^2.2.19
   flutter_launcher_icons: "^0.14.1"

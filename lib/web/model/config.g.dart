@@ -12,33 +12,34 @@ WebSourceCategory _$WebSourceCategoryFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$WebSourceCategoryToJson(WebSourceCategory instance) =>
     <String, dynamic>{'id': instance.id, 'name': instance.name};
 
-_$WebSourceConfigImpl _$$WebSourceConfigImplFromJson(
-  Map<String, dynamic> json,
-) => _$WebSourceConfigImpl(
-  installedSources:
-      (json['installedSources'] as List<dynamic>?)
-          ?.map((e) => WebSourceInfo.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-  repoList:
-      (json['repoList'] as List<dynamic>?)
-          ?.map(const RepoConverter().fromJson)
-          .toList() ??
-      const [],
-  categories:
-      (json['categories'] as List<dynamic>?)
-          ?.map((e) => WebSourceCategory.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [_defaultCategory],
-  defaultCategory: json['defaultCategory'] as String? ?? _defaultUUID,
-);
+_WebSourceConfig _$WebSourceConfigFromJson(Map<String, dynamic> json) =>
+    _WebSourceConfig(
+      installedSources:
+          (json['installedSources'] as List<dynamic>?)
+              ?.map((e) => WebSourceInfo.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      repoList:
+          (json['repoList'] as List<dynamic>?)
+              ?.map(const RepoConverter().fromJson)
+              .toList() ??
+          const [],
+      categories:
+          (json['categories'] as List<dynamic>?)
+              ?.map(
+                (e) => WebSourceCategory.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [_defaultCategory],
+      defaultCategory: json['defaultCategory'] as String? ?? _defaultUUID,
+    );
 
-Map<String, dynamic> _$$WebSourceConfigImplToJson(
-  _$WebSourceConfigImpl instance,
+Map<String, dynamic> _$WebSourceConfigToJson(
+  _WebSourceConfig instance,
 ) => <String, dynamic>{
-  'installedSources': instance.installedSources,
+  'installedSources': instance.installedSources.map((e) => e.toJson()).toList(),
   'repoList': instance.repoList.map(const RepoConverter().toJson).toList(),
-  'categories': instance.categories,
+  'categories': instance.categories.map((e) => e.toJson()).toList(),
   'defaultCategory': instance.defaultCategory,
 };
 

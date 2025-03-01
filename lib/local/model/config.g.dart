@@ -6,14 +6,13 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$LocalLibConfigImpl _$$LocalLibConfigImplFromJson(Map<String, dynamic> json) =>
-    _$LocalLibConfigImpl(
+_LocalLibConfig _$LocalLibConfigFromJson(Map<String, dynamic> json) =>
+    _LocalLibConfig(
       libraryDirectory: json['libraryDirectory'] as String? ?? '',
     );
 
-Map<String, dynamic> _$$LocalLibConfigImplToJson(
-  _$LocalLibConfigImpl instance,
-) => <String, dynamic>{'libraryDirectory': instance.libraryDirectory};
+Map<String, dynamic> _$LocalLibConfigToJson(_LocalLibConfig instance) =>
+    <String, dynamic>{'libraryDirectory': instance.libraryDirectory};
 
 // **************************************************************************
 // RiverpodGenerator

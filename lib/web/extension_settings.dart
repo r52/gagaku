@@ -15,9 +15,13 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final results = useMemoized(() => ref.read(extensionSourceProvider(source.internal.id).notifier).getSourceMenu(), [
-      source,
-    ]);
+    final results = useMemoized(
+      () =>
+          ref
+              .read(extensionSourceProvider(source.internal.id).notifier)
+              .getSourceMenu(),
+      [source],
+    );
     final future = useFuture(results);
 
     Widget body = Center(child: CircularProgressIndicator());
@@ -37,7 +41,9 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('arg_settings'.tr(context: context, args: [source.external.name])),
+        title: Text(
+          'arg_settings'.tr(context: context, args: [source.external.name]),
+        ),
         leading: AutoLeadingButton(),
       ),
       body: SafeArea(child: body),
@@ -46,7 +52,11 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 }
 
 class DUIDelegateBuilder extends StatelessWidget {
-  const DUIDelegateBuilder({super.key, required this.source, required this.element});
+  const DUIDelegateBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUIType element;
@@ -55,9 +65,15 @@ class DUIDelegateBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (element) {
       case DUISection():
-        return DUISectionBuilder(source: source, element: element as DUISection);
+        return DUISectionBuilder(
+          source: source,
+          element: element as DUISection,
+        );
       case DUINavigationButton():
-        return DUINavigationButtonBuilder(source: source, element: element as DUINavigationButton);
+        return DUINavigationButtonBuilder(
+          source: source,
+          element: element as DUINavigationButton,
+        );
       case DUISelect():
         return DUISelectBuilder(source: source, element: element as DUISelect);
       case DUIInputField():
@@ -72,24 +88,39 @@ class DUIDelegateBuilder extends StatelessWidget {
       case DUISwitch():
         return DUISwitchBuilder(source: source, element: element as DUISwitch);
       case DUIForm():
-        return DUIFormBuilder(source: source, element: element as DUIForm, parent: element);
+        return DUIFormBuilder(
+          source: source,
+          element: element as DUIForm,
+          parent: element,
+        );
       case DUIStepper():
-        return DUIStepperBuilder(source: source, element: element as DUIStepper);
+        return DUIStepperBuilder(
+          source: source,
+          element: element as DUIStepper,
+        );
       case DUILabel():
       case DUIMultilineLabel():
-        return DUILabelBuilder(source: source, element: element as DUILabelType);
+        return DUILabelBuilder(
+          source: source,
+          element: element as DUILabelType,
+        );
       case DUIHeader():
         return DUIHeaderBuilder(source: source, element: element as DUIHeader);
       case DUIOAuthButton():
-        return DUIOAuthButtonBuilder(source: source, element: element as DUIOAuthButton);
-      default:
-        return Text("Invalid DUI type");
+        return DUIOAuthButtonBuilder(
+          source: source,
+          element: element as DUIOAuthButton,
+        );
     }
   }
 }
 
 class DUISectionBuilder extends StatelessWidget {
-  const DUISectionBuilder({super.key, required this.source, required this.element});
+  const DUISectionBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUISection element;
@@ -102,8 +133,13 @@ class DUISectionBuilder extends StatelessWidget {
 
     return Column(
       children: [
-        if (element.header != null) Text(element.header!, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        for (final row in element.rows) DUIDelegateBuilder(source: source, element: row),
+        if (element.header != null)
+          Text(
+            element.header!,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        for (final row in element.rows)
+          DUIDelegateBuilder(source: source, element: row),
         if (element.footer != null) Text(element.footer!),
       ],
     );
@@ -111,7 +147,11 @@ class DUISectionBuilder extends StatelessWidget {
 }
 
 class DUIButtonBuilder extends ConsumerWidget {
-  const DUIButtonBuilder({super.key, required this.source, required this.element});
+  const DUIButtonBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUIButton element;
@@ -122,7 +162,9 @@ class DUIButtonBuilder extends ConsumerWidget {
       child: ListTile(
         title: Text(element.label),
         onTap: () async {
-          await ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding(element.id);
+          await ref
+              .read(extensionSourceProvider(source.internal.id).notifier)
+              .callBinding(element.id);
         },
       ),
     );
@@ -130,7 +172,11 @@ class DUIButtonBuilder extends ConsumerWidget {
 }
 
 class DUISelectBuilder extends HookConsumerWidget {
-  const DUISelectBuilder({super.key, required this.source, required this.element});
+  const DUISelectBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUISelect element;
@@ -139,7 +185,9 @@ class DUISelectBuilder extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final initFuture = useMemoized(
-      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+      () => ref
+          .read(extensionSourceProvider(source.internal.id).notifier)
+          .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
 
@@ -148,7 +196,11 @@ class DUISelectBuilder extends HookConsumerWidget {
     }
 
     final data = useState(
-      initial.hasData ? (initial.data != null ? List<String>.from(initial.data! as List) : <String>[]) : <String>[],
+      initial.hasData
+          ? (initial.data != null
+              ? List<String>.from(initial.data! as List)
+              : <String>[])
+          : <String>[],
     );
 
     return SettingCardWidget(
@@ -159,19 +211,27 @@ class DUISelectBuilder extends HookConsumerWidget {
             if (!element.allowsMultiselect) {
               return Center(
                 child: DropdownMenu<String>(
-                  initialSelection: data.value.isNotEmpty ? data.value.first : null,
+                  initialSelection:
+                      data.value.isNotEmpty ? data.value.first : null,
                   requestFocusOnTap: false,
                   enableSearch: false,
                   enableFilter: false,
                   dropdownMenuEntries: [
-                    for (final MapEntry(key: option, value: label) in element.labels.entries)
+                    for (final MapEntry(key: option, value: label)
+                        in element.labels.entries)
                       DropdownMenuEntry(value: option, label: label),
                   ],
                   onSelected: (String? value) {
                     if (value != null) {
-                      ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.set', [
-                        [value],
-                      ]);
+                      ref
+                          .read(
+                            extensionSourceProvider(
+                              source.internal.id,
+                            ).notifier,
+                          )
+                          .callBinding('${element.id}.set', [
+                            [value],
+                          ]);
 
                       data.value = [value];
                     }
@@ -186,7 +246,9 @@ class DUISelectBuilder extends HookConsumerWidget {
                         width: double.infinity,
                         child: Material(
                           color: theme.colorScheme.surfaceContainerHighest,
-                          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(6.0),
+                          ),
                           child: InkWell(
                             onTap: () {
                               if (controller.isOpen) {
@@ -195,7 +257,10 @@ class DUISelectBuilder extends HookConsumerWidget {
                                 controller.open();
                               }
                             },
-                            child: Padding(padding: const EdgeInsets.all(6.0), child: child),
+                            child: Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: child,
+                            ),
                           ),
                         ),
                       ),
@@ -215,10 +280,13 @@ class DUISelectBuilder extends HookConsumerWidget {
                               data.value = [...data.value..remove(option.key)];
                             }
 
-                            ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding(
-                              '${element.id}.set',
-                              [data.value],
-                            );
+                            ref
+                                .read(
+                                  extensionSourceProvider(
+                                    source.internal.id,
+                                  ).notifier,
+                                )
+                                .callBinding('${element.id}.set', [data.value]);
                           },
                         );
                       },
@@ -234,10 +302,15 @@ class DUISelectBuilder extends HookConsumerWidget {
                             ElevatedButton.icon(
                               onPressed: () {
                                 data.value = [...data.value..remove(option)];
-                                ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding(
-                                  '${element.id}.set',
-                                  [data.value],
-                                );
+                                ref
+                                    .read(
+                                      extensionSourceProvider(
+                                        source.internal.id,
+                                      ).notifier,
+                                    )
+                                    .callBinding('${element.id}.set', [
+                                      data.value,
+                                    ]);
                               },
                               icon: const Icon(Icons.close),
                               label: Text(element.labels[option]!),
@@ -258,7 +331,12 @@ class DUISelectBuilder extends HookConsumerWidget {
 }
 
 class DUIInputFieldBuilder extends HookConsumerWidget {
-  const DUIInputFieldBuilder({super.key, required this.source, required this.element, this.secure = false});
+  const DUIInputFieldBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+    this.secure = false,
+  });
 
   final SourceIdentifier source;
   final DUIInputType element;
@@ -267,7 +345,9 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
-      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+      () => ref
+          .read(extensionSourceProvider(source.internal.id).notifier)
+          .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
 
@@ -275,7 +355,11 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final data = useState(initial.hasData ? (initial.data != null ? initial.data! as String : null) : null);
+    final data = useState(
+      initial.hasData
+          ? (initial.data != null ? initial.data! as String : null)
+          : null,
+    );
 
     return SettingCardWidget(
       title: Text(element.label),
@@ -283,15 +367,23 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
         return HookBuilder(
           builder: (context) {
             final controller = useTextEditingController(text: data.value);
-            final settingText = useListenableSelector(controller, () => controller.text);
-            final debouncedInput = useDebounced(settingText, const Duration(milliseconds: 500));
+            final settingText = useListenableSelector(
+              controller,
+              () => controller.text,
+            );
+            final debouncedInput = useDebounced(
+              settingText,
+              const Duration(milliseconds: 500),
+            );
 
             useEffect(() {
               Future.delayed(Duration.zero, () {
                 if (debouncedInput != null) {
-                  ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.set', [
-                    debouncedInput,
-                  ]);
+                  ref
+                      .read(
+                        extensionSourceProvider(source.internal.id).notifier,
+                      )
+                      .callBinding('${element.id}.set', [debouncedInput]);
                 }
               });
               return null;
@@ -310,7 +402,11 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
 }
 
 class DUINavigationButtonBuilder extends StatelessWidget {
-  const DUINavigationButtonBuilder({super.key, required this.source, required this.element});
+  const DUINavigationButtonBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUINavigationButton element;
@@ -326,10 +422,14 @@ class DUINavigationButtonBuilder extends StatelessWidget {
         onTap:
             () => nav.push(
               PageTransitionRouteBuilder(
-                pageTransitionsBuilder: const FadeForwardsPageTransitionsBuilder(),
+                pageTransitionsBuilder:
+                    const FadeForwardsPageTransitionsBuilder(),
                 pageBuilder:
-                    (context, animation, secondaryAnimation) =>
-                        DUIFormBuilder(source: source, element: element.form, parent: element),
+                    (context, animation, secondaryAnimation) => DUIFormBuilder(
+                      source: source,
+                      element: element.form,
+                      parent: element,
+                    ),
               ),
             ),
       ),
@@ -338,7 +438,11 @@ class DUINavigationButtonBuilder extends StatelessWidget {
 }
 
 class DUISwitchBuilder extends HookConsumerWidget {
-  const DUISwitchBuilder({super.key, required this.source, required this.element});
+  const DUISwitchBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUISwitch element;
@@ -346,7 +450,9 @@ class DUISwitchBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
-      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+      () => ref
+          .read(extensionSourceProvider(source.internal.id).notifier)
+          .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
 
@@ -354,7 +460,11 @@ class DUISwitchBuilder extends HookConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final data = useState(initial.hasData ? (initial.data != null ? initial.data! as bool : false) : false);
+    final data = useState(
+      initial.hasData
+          ? (initial.data != null ? initial.data! as bool : false)
+          : false,
+    );
 
     return SettingCardWidget(
       title: Text(element.label),
@@ -362,7 +472,9 @@ class DUISwitchBuilder extends HookConsumerWidget {
         return Switch(
           value: data.value,
           onChanged: (value) {
-            ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.set', [value]);
+            ref
+                .read(extensionSourceProvider(source.internal.id).notifier)
+                .callBinding('${element.id}.set', [value]);
             data.value = value;
           },
         );
@@ -372,7 +484,11 @@ class DUISwitchBuilder extends HookConsumerWidget {
 }
 
 class DUIStepperBuilder extends HookConsumerWidget {
-  const DUIStepperBuilder({super.key, required this.source, required this.element});
+  const DUIStepperBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUIStepper element;
@@ -380,7 +496,9 @@ class DUIStepperBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
-      () => ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.get'),
+      () => ref
+          .read(extensionSourceProvider(source.internal.id).notifier)
+          .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
 
@@ -388,7 +506,11 @@ class DUIStepperBuilder extends HookConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final data = useState(initial.hasData ? (initial.data != null ? initial.data! as num : null) : null);
+    final data = useState(
+      initial.hasData
+          ? (initial.data != null ? initial.data! as num : null)
+          : null,
+    );
 
     return SettingCardWidget(
       title: Text(element.label),
@@ -399,7 +521,9 @@ class DUIStepperBuilder extends HookConsumerWidget {
           maxVal: element.max ?? double.maxFinite,
           steps: element.step ?? 1,
           onQtyChanged: (value) {
-            ref.read(extensionSourceProvider(source.internal.id).notifier).callBinding('${element.id}.set', [value]);
+            ref
+                .read(extensionSourceProvider(source.internal.id).notifier)
+                .callBinding('${element.id}.set', [value]);
             data.value = value;
           },
         );
@@ -409,7 +533,11 @@ class DUIStepperBuilder extends HookConsumerWidget {
 }
 
 class DUILabelBuilder extends StatelessWidget {
-  const DUILabelBuilder({super.key, required this.source, required this.element});
+  const DUILabelBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUILabelType element;
@@ -421,7 +549,11 @@ class DUILabelBuilder extends StatelessWidget {
 }
 
 class DUIHeaderBuilder extends StatelessWidget {
-  const DUIHeaderBuilder({super.key, required this.source, required this.element});
+  const DUIHeaderBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUIHeader element;
@@ -439,7 +571,11 @@ class DUIHeaderBuilder extends StatelessWidget {
 }
 
 class DUIOAuthButtonBuilder extends ConsumerWidget {
-  const DUIOAuthButtonBuilder({super.key, required this.source, required this.element});
+  const DUIOAuthButtonBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
   final SourceIdentifier source;
   final DUIOAuthButton element;
@@ -452,7 +588,12 @@ class DUIOAuthButtonBuilder extends ConsumerWidget {
 }
 
 class DUIFormBuilder extends StatelessWidget {
-  const DUIFormBuilder({super.key, required this.source, required this.element, required this.parent});
+  const DUIFormBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+    required this.parent,
+  });
 
   final SourceIdentifier source;
   final DUIForm element;
@@ -466,7 +607,10 @@ class DUIFormBuilder extends StatelessWidget {
       appBar: AppBar(leading: AutoLeadingButton()),
       body: SafeArea(
         child: ListView(
-          children: [for (final sec in element.sections) DUISectionBuilder(source: source, element: sec)],
+          children: [
+            for (final sec in element.sections)
+              DUISectionBuilder(source: source, element: sec),
+          ],
         ),
       ),
     );

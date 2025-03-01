@@ -6,8 +6,8 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$MangaDexConfigImpl _$$MangaDexConfigImplFromJson(Map<String, dynamic> json) =>
-    _$MangaDexConfigImpl(
+_MangaDexConfig _$MangaDexConfigFromJson(Map<String, dynamic> json) =>
+    _MangaDexConfig(
       translatedLanguages:
           (json['translatedLanguages'] as List<dynamic>?)
               ?.map(const LanguageConverter().fromJson)
@@ -35,8 +35,8 @@ _$MangaDexConfigImpl _$$MangaDexConfigImplFromJson(Map<String, dynamic> json) =>
           const {},
     );
 
-Map<String, dynamic> _$$MangaDexConfigImplToJson(
-  _$MangaDexConfigImpl instance,
+Map<String, dynamic> _$MangaDexConfigToJson(
+  _MangaDexConfig instance,
 ) => <String, dynamic>{
   'translatedLanguages':
       instance.translatedLanguages

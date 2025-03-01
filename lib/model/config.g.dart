@@ -6,8 +6,8 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GagakuConfigImpl _$$GagakuConfigImplFromJson(Map<String, dynamic> json) =>
-    _$GagakuConfigImpl(
+_GagakuConfig _$GagakuConfigFromJson(Map<String, dynamic> json) =>
+    _GagakuConfig(
       themeMode:
           $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
           ThemeMode.system,
@@ -26,7 +26,7 @@ _$GagakuConfigImpl _$$GagakuConfigImplFromJson(Map<String, dynamic> json) =>
           GridAlbumExtent.medium,
     );
 
-Map<String, dynamic> _$$GagakuConfigImplToJson(_$GagakuConfigImpl instance) =>
+Map<String, dynamic> _$GagakuConfigToJson(_GagakuConfig instance) =>
     <String, dynamic>{
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
       'theme': _$GagakuThemeEnumMap[instance.theme]!,

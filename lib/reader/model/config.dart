@@ -10,7 +10,7 @@ part 'config.freezed.dart';
 part 'config.g.dart';
 
 @freezed
-class ReaderConfig with _$ReaderConfig {
+abstract class ReaderConfig with _$ReaderConfig {
   const factory ReaderConfig({
     /// Reader format
     @Default(ReaderFormat.single) ReaderFormat format,

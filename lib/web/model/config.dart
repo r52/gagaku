@@ -44,8 +44,8 @@ class RepoConverter implements JsonConverter<RepoInfo, dynamic> {
   dynamic toJson(RepoInfo item) => item.toJson();
 }
 
-@unfreezed
-class WebSourceConfig with _$WebSourceConfig {
+@freezed
+abstract class WebSourceConfig with _$WebSourceConfig {
   factory WebSourceConfig({
     @Default([]) List<WebSourceInfo> installedSources,
     @RepoConverter() @Default([]) List<RepoInfo> repoList,

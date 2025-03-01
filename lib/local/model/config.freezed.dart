@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,155 +10,139 @@ part of 'config.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
-LocalLibConfig _$LocalLibConfigFromJson(Map<String, dynamic> json) {
-  return _LocalLibConfig.fromJson(json);
-}
 
 /// @nodoc
 mixin _$LocalLibConfig {
-  String get libraryDirectory => throw _privateConstructorUsedError;
-  set libraryDirectory(String value) => throw _privateConstructorUsedError;
+
+ String get libraryDirectory;
+/// Create a copy of LocalLibConfig
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LocalLibConfigCopyWith<LocalLibConfig> get copyWith => _$LocalLibConfigCopyWithImpl<LocalLibConfig>(this as LocalLibConfig, _$identity);
 
   /// Serializes this LocalLibConfig to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of LocalLibConfig
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $LocalLibConfigCopyWith<LocalLibConfig> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocalLibConfig&&(identical(other.libraryDirectory, libraryDirectory) || other.libraryDirectory == libraryDirectory));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,libraryDirectory);
+
+@override
+String toString() {
+  return 'LocalLibConfig(libraryDirectory: $libraryDirectory)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $LocalLibConfigCopyWith<$Res> {
-  factory $LocalLibConfigCopyWith(
-    LocalLibConfig value,
-    $Res Function(LocalLibConfig) then,
-  ) = _$LocalLibConfigCopyWithImpl<$Res, LocalLibConfig>;
-  @useResult
-  $Res call({String libraryDirectory});
-}
+abstract mixin class $LocalLibConfigCopyWith<$Res>  {
+  factory $LocalLibConfigCopyWith(LocalLibConfig value, $Res Function(LocalLibConfig) _then) = _$LocalLibConfigCopyWithImpl;
+@useResult
+$Res call({
+ String libraryDirectory
+});
 
+
+
+
+}
 /// @nodoc
-class _$LocalLibConfigCopyWithImpl<$Res, $Val extends LocalLibConfig>
+class _$LocalLibConfigCopyWithImpl<$Res>
     implements $LocalLibConfigCopyWith<$Res> {
-  _$LocalLibConfigCopyWithImpl(this._value, this._then);
+  _$LocalLibConfigCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final LocalLibConfig _self;
+  final $Res Function(LocalLibConfig) _then;
 
-  /// Create a copy of LocalLibConfig
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? libraryDirectory = null}) {
-    return _then(
-      _value.copyWith(
-            libraryDirectory:
-                null == libraryDirectory
-                    ? _value.libraryDirectory
-                    : libraryDirectory // ignore: cast_nullable_to_non_nullable
-                        as String,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of LocalLibConfig
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? libraryDirectory = null,}) {
+  return _then(_self.copyWith(
+libraryDirectory: null == libraryDirectory ? _self.libraryDirectory : libraryDirectory // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
-/// @nodoc
-abstract class _$$LocalLibConfigImplCopyWith<$Res>
-    implements $LocalLibConfigCopyWith<$Res> {
-  factory _$$LocalLibConfigImplCopyWith(
-    _$LocalLibConfigImpl value,
-    $Res Function(_$LocalLibConfigImpl) then,
-  ) = __$$LocalLibConfigImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String libraryDirectory});
 }
 
-/// @nodoc
-class __$$LocalLibConfigImplCopyWithImpl<$Res>
-    extends _$LocalLibConfigCopyWithImpl<$Res, _$LocalLibConfigImpl>
-    implements _$$LocalLibConfigImplCopyWith<$Res> {
-  __$$LocalLibConfigImplCopyWithImpl(
-    _$LocalLibConfigImpl _value,
-    $Res Function(_$LocalLibConfigImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of LocalLibConfig
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? libraryDirectory = null}) {
-    return _then(
-      _$LocalLibConfigImpl(
-        libraryDirectory:
-            null == libraryDirectory
-                ? _value.libraryDirectory
-                : libraryDirectory // ignore: cast_nullable_to_non_nullable
-                    as String,
-      ),
-    );
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$LocalLibConfigImpl implements _LocalLibConfig {
-  _$LocalLibConfigImpl({this.libraryDirectory = ''});
 
-  factory _$LocalLibConfigImpl.fromJson(Map<String, dynamic> json) =>
-      _$$LocalLibConfigImplFromJson(json);
+class _LocalLibConfig implements LocalLibConfig {
+   _LocalLibConfig({this.libraryDirectory = ''});
+  factory _LocalLibConfig.fromJson(Map<String, dynamic> json) => _$LocalLibConfigFromJson(json);
 
-  @override
-  @JsonKey()
-  String libraryDirectory;
+@override@JsonKey() final  String libraryDirectory;
 
-  @override
-  String toString() {
-    return 'LocalLibConfig(libraryDirectory: $libraryDirectory)';
-  }
+/// Create a copy of LocalLibConfig
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$LocalLibConfigCopyWith<_LocalLibConfig> get copyWith => __$LocalLibConfigCopyWithImpl<_LocalLibConfig>(this, _$identity);
 
-  /// Create a copy of LocalLibConfig
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$LocalLibConfigImplCopyWith<_$LocalLibConfigImpl> get copyWith =>
-      __$$LocalLibConfigImplCopyWithImpl<_$LocalLibConfigImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$LocalLibConfigImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$LocalLibConfigToJson(this, );
 }
 
-abstract class _LocalLibConfig implements LocalLibConfig {
-  factory _LocalLibConfig({String libraryDirectory}) = _$LocalLibConfigImpl;
-
-  factory _LocalLibConfig.fromJson(Map<String, dynamic> json) =
-      _$LocalLibConfigImpl.fromJson;
-
-  @override
-  String get libraryDirectory;
-  set libraryDirectory(String value);
-
-  /// Create a copy of LocalLibConfig
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LocalLibConfigImplCopyWith<_$LocalLibConfigImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalLibConfig&&(identical(other.libraryDirectory, libraryDirectory) || other.libraryDirectory == libraryDirectory));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,libraryDirectory);
+
+@override
+String toString() {
+  return 'LocalLibConfig(libraryDirectory: $libraryDirectory)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$LocalLibConfigCopyWith<$Res> implements $LocalLibConfigCopyWith<$Res> {
+  factory _$LocalLibConfigCopyWith(_LocalLibConfig value, $Res Function(_LocalLibConfig) _then) = __$LocalLibConfigCopyWithImpl;
+@override @useResult
+$Res call({
+ String libraryDirectory
+});
+
+
+
+
+}
+/// @nodoc
+class __$LocalLibConfigCopyWithImpl<$Res>
+    implements _$LocalLibConfigCopyWith<$Res> {
+  __$LocalLibConfigCopyWithImpl(this._self, this._then);
+
+  final _LocalLibConfig _self;
+  final $Res Function(_LocalLibConfig) _then;
+
+/// Create a copy of LocalLibConfig
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? libraryDirectory = null,}) {
+  return _then(_LocalLibConfig(
+libraryDirectory: null == libraryDirectory ? _self.libraryDirectory : libraryDirectory // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+// dart format on
