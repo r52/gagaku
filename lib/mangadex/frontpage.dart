@@ -20,7 +20,10 @@ Future<List<Manga>> _popularTitles(Ref ref) async {
   final format = DateFormat('yyyy-MM-ddT07:00:00');
   final popularTime = DateTime.now().subtract(const Duration(days: 30));
 
-  final extraParams = {'hasAvailableChapters': 'true', 'createdAtSince': format.format(popularTime)};
+  final extraParams = {
+    'hasAvailableChapters': 'true',
+    'createdAtSince': format.format(popularTime),
+  };
 
   final manga = await api.fetchManga(
     limit: 15,
@@ -49,7 +52,10 @@ Future<List<Manga>> _latestUpdates(Ref ref) async {
   final chapters = await ref.watch(latestGlobalFeedProvider.future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet().take(15);
-  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(
+    ids: mangaIds,
+    limit: MangaDexEndpoints.breakLimit,
+  );
 
   ref.disposeAfter(const Duration(minutes: 10));
 
@@ -65,7 +71,10 @@ Future<List<Manga>> _fetchCustomListManga(Ref ref, String listid) async {
     return [];
   }
 
-  final mangas = await api.fetchManga(ids: list.set.take(15), limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(
+    ids: list.set.take(15),
+    limit: MangaDexEndpoints.breakLimit,
+  );
 
   ref.disposeAfter(const Duration(minutes: 60));
 
@@ -103,7 +112,11 @@ class MangaDexFrontPage extends StatelessWidget {
                 ),
           ),
       builder:
-          (context, data) => _FrontPageWidget(key: ValueKey('_FrontPageWidget'), data: data, controller: controller),
+          (context, data) => _FrontPageWidget(
+            key: ValueKey('_FrontPageWidget'),
+            data: data,
+            controller: controller,
+          ),
     );
   }
 }
@@ -122,16 +135,27 @@ class _FrontPageWidget extends HookConsumerWidget {
     final staffPicks = _fetchCustomListMangaProvider(data.staffPicks);
     final seasonal = _fetchCustomListMangaProvider(data.seasonal);
 
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
+    final scrollController =
+        DefaultScrollController.maybeOf(context) ??
+        controller ??
+        useScrollController();
 
     final frontPageWidgets = [
-      Center(child: Text('mangadex.popularNewTitles'.tr(context: context), style: style)),
+      Center(
+        child: Text(
+          'mangadex.popularNewTitles'.tr(context: context),
+          style: style,
+        ),
+      ),
       const MangaProviderCarousel(provider: _popularTitlesProvider),
       TextButton.icon(
         onPressed: () {
           router.pushPath('/titles/latest');
         },
-        label: Text('mangadex.latestUpdates'.tr(context: context), style: style),
+        label: Text(
+          'mangadex.latestUpdates'.tr(context: context),
+          style: style,
+        ),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
@@ -158,7 +182,10 @@ class _FrontPageWidget extends HookConsumerWidget {
         onPressed: () {
           router.pushPath('/titles/recent');
         },
-        label: Text('mangadex.recentlyAdded'.tr(context: context), style: style),
+        label: Text(
+          'mangadex.recentlyAdded'.tr(context: context),
+          style: style,
+        ),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
@@ -172,8 +199,11 @@ class _FrontPageWidget extends HookConsumerWidget {
         ref.invalidate(_recentlyAddedProvider);
         ref.invalidate(recentlyAddedProvider);
         ref.invalidate(_latestUpdatesProvider);
-        ref.read(latestGlobalFeedProvider.notifier).clear();
-        return ref.refresh(_popularTitlesProvider.future);
+        ref.invalidate(latestGlobalFeedProvider);
+        return Future.wait([
+          ref.refresh(_popularTitlesProvider.future),
+          ref.refresh(_latestUpdatesProvider.future),
+        ]);
       },
       child: ScrollConfiguration(
         behavior: const MouseTouchScrollBehavior(),
@@ -187,7 +217,8 @@ class _FrontPageWidget extends HookConsumerWidget {
               itemBuilder: (context, index) {
                 return frontPageWidgets.elementAt(index);
               },
-              separatorBuilder: (context, index) => const SizedBox(height: 10.0),
+              separatorBuilder:
+                  (context, index) => const SizedBox(height: 10.0),
             ),
           ],
         ),
@@ -213,7 +244,12 @@ class MangaProviderCarousel extends StatelessWidget {
                 itemExtent: 180,
                 shrinkExtent: 180,
                 enableSplash: false,
-                children: items.map((e) => GridMangaItem(key: ValueKey(e.id), manga: e)).toList(),
+                children:
+                    items
+                        .map(
+                          (e) => GridMangaItem(key: ValueKey(e.id), manga: e),
+                        )
+                        .toList(),
               ),
             ),
       ),

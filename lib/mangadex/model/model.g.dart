@@ -100,12 +100,21 @@ final class RecentlyAddedProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<RecentlyAdded, List<Manga>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$RecentlyAddedElement $createElement($ProviderPointer pointer) =>
+      _$RecentlyAddedElement(this, pointer);
+
+  ProviderListenable<RecentlyAdded$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<RecentlyAdded$GetNextPage, AsyncValue<List<Manga>>>(
+        this,
+        (element) {
+          element as _$RecentlyAddedElement;
+
+          return element._$getNextPage;
+        },
+      );
 }
 
-String _$recentlyAddedHash() => r'27e386fd5c62ca2d639a07aaa892a4ebf9343e2a';
+String _$recentlyAddedHash() => r'c31119c715bcee0528f0a69d4e4e968224e2a648';
 
 abstract class _$RecentlyAdded extends $AsyncNotifier<List<Manga>> {
   FutureOr<List<Manga>> build();
@@ -124,6 +133,78 @@ abstract class _$RecentlyAdded extends $AsyncNotifier<List<Manga>> {
             >;
     element.handleValue(ref, created);
   }
+}
+
+class _$RecentlyAddedElement
+    extends $AsyncNotifierProviderElement<RecentlyAdded, List<Manga>> {
+  _$RecentlyAddedElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$RecentlyAdded$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$RecentlyAdded$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class RecentlyAdded$GetNextPage extends MutationBase<List<Manga>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [RecentlyAdded.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Manga>> call();
+}
+
+final class _$RecentlyAdded$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<Manga>,
+          _$RecentlyAdded$GetNextPage,
+          RecentlyAdded
+        >
+    implements RecentlyAdded$GetNextPage {
+  _$RecentlyAdded$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$RecentlyAddedElement element;
+
+  @override
+  $ElementLense<_$RecentlyAdded$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Manga>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$RecentlyAdded$GetNextPage copyWith(
+    MutationState<List<Manga>> state, {
+    Object? key,
+  }) => _$RecentlyAdded$GetNextPage(element, state: state, key: key);
 }
 
 @ProviderFor(LatestChaptersFeed)
@@ -187,9 +268,18 @@ final class LatestChaptersFeedProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<LatestChaptersFeed, List<Chapter>>
-  $createElement($ProviderPointer pointer) =>
-      $AsyncNotifierProviderElement(this, pointer);
+  _$LatestChaptersFeedElement $createElement($ProviderPointer pointer) =>
+      _$LatestChaptersFeedElement(this, pointer);
+
+  ProviderListenable<LatestChaptersFeed$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<
+        LatestChaptersFeed$GetNextPage,
+        AsyncValue<List<Chapter>>
+      >(this, (element) {
+        element as _$LatestChaptersFeedElement;
+
+        return element._$getNextPage;
+      });
 
   @override
   bool operator ==(Object other) {
@@ -203,7 +293,7 @@ final class LatestChaptersFeedProvider
 }
 
 String _$latestChaptersFeedHash() =>
-    r'fd662e51c46a01297dce5ac36d2737104bb45828';
+    r'd36b410b5e1c7e76d96c6e018d3c39fce719479f';
 
 final class LatestChaptersFeedFamily extends Family {
   const LatestChaptersFeedFamily._()
@@ -286,6 +376,79 @@ abstract class _$LatestChaptersFeed extends $AsyncNotifier<List<Chapter>> {
   }
 }
 
+class _$LatestChaptersFeedElement
+    extends $AsyncNotifierProviderElement<LatestChaptersFeed, List<Chapter>> {
+  _$LatestChaptersFeedElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$LatestChaptersFeed$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$LatestChaptersFeed$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class LatestChaptersFeed$GetNextPage
+    extends MutationBase<List<Chapter>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [LatestChaptersFeed.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Chapter>> call();
+}
+
+final class _$LatestChaptersFeed$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<Chapter>,
+          _$LatestChaptersFeed$GetNextPage,
+          LatestChaptersFeed
+        >
+    implements LatestChaptersFeed$GetNextPage {
+  _$LatestChaptersFeed$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$LatestChaptersFeedElement element;
+
+  @override
+  $ElementLense<_$LatestChaptersFeed$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Chapter>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$LatestChaptersFeed$GetNextPage copyWith(
+    MutationState<List<Chapter>> state, {
+    Object? key,
+  }) => _$LatestChaptersFeed$GetNextPage(element, state: state, key: key);
+}
+
 @ProviderFor(LatestGlobalFeed)
 const latestGlobalFeedProvider = LatestGlobalFeedProvider._();
 
@@ -330,12 +493,21 @@ final class LatestGlobalFeedProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<LatestGlobalFeed, List<Chapter>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$LatestGlobalFeedElement $createElement($ProviderPointer pointer) =>
+      _$LatestGlobalFeedElement(this, pointer);
+
+  ProviderListenable<LatestGlobalFeed$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<
+        LatestGlobalFeed$GetNextPage,
+        AsyncValue<List<Chapter>>
+      >(this, (element) {
+        element as _$LatestGlobalFeedElement;
+
+        return element._$getNextPage;
+      });
 }
 
-String _$latestGlobalFeedHash() => r'5e07a6116979b2e033a0d06e08ded8d9e8e04370';
+String _$latestGlobalFeedHash() => r'177f7e9f04f569e68f426d41e4d363fddd93900b';
 
 abstract class _$LatestGlobalFeed extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();
@@ -354,6 +526,78 @@ abstract class _$LatestGlobalFeed extends $AsyncNotifier<List<Chapter>> {
             >;
     element.handleValue(ref, created);
   }
+}
+
+class _$LatestGlobalFeedElement
+    extends $AsyncNotifierProviderElement<LatestGlobalFeed, List<Chapter>> {
+  _$LatestGlobalFeedElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$LatestGlobalFeed$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$LatestGlobalFeed$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class LatestGlobalFeed$GetNextPage extends MutationBase<List<Chapter>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [LatestGlobalFeed.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Chapter>> call();
+}
+
+final class _$LatestGlobalFeed$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<Chapter>,
+          _$LatestGlobalFeed$GetNextPage,
+          LatestGlobalFeed
+        >
+    implements LatestGlobalFeed$GetNextPage {
+  _$LatestGlobalFeed$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$LatestGlobalFeedElement element;
+
+  @override
+  $ElementLense<_$LatestGlobalFeed$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Chapter>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$LatestGlobalFeed$GetNextPage copyWith(
+    MutationState<List<Chapter>> state, {
+    Object? key,
+  }) => _$LatestGlobalFeed$GetNextPage(element, state: state, key: key);
 }
 
 @ProviderFor(GroupFeed)
@@ -415,9 +659,18 @@ final class GroupFeedProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<GroupFeed, List<Chapter>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$GroupFeedElement $createElement($ProviderPointer pointer) =>
+      _$GroupFeedElement(this, pointer);
+
+  ProviderListenable<GroupFeed$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<GroupFeed$GetNextPage, AsyncValue<List<Chapter>>>(
+        this,
+        (element) {
+          element as _$GroupFeedElement;
+
+          return element._$getNextPage;
+        },
+      );
 
   @override
   bool operator ==(Object other) {
@@ -430,7 +683,7 @@ final class GroupFeedProvider
   }
 }
 
-String _$groupFeedHash() => r'cb2bfae2514fa1384502fbeebcd2a026c38310ef';
+String _$groupFeedHash() => r'05cbf48acc187004df076f24c89512b86fcc7164';
 
 final class GroupFeedFamily extends Family {
   const GroupFeedFamily._()
@@ -513,6 +766,74 @@ abstract class _$GroupFeed extends $AsyncNotifier<List<Chapter>> {
   }
 }
 
+class _$GroupFeedElement
+    extends $AsyncNotifierProviderElement<GroupFeed, List<Chapter>> {
+  _$GroupFeedElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$GroupFeed$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$GroupFeed$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class GroupFeed$GetNextPage extends MutationBase<List<Chapter>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [GroupFeed.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Chapter>> call();
+}
+
+final class _$GroupFeed$GetNextPage
+    extends
+        $AsyncMutationBase<List<Chapter>, _$GroupFeed$GetNextPage, GroupFeed>
+    implements GroupFeed$GetNextPage {
+  _$GroupFeed$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$GroupFeedElement element;
+
+  @override
+  $ElementLense<_$GroupFeed$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Chapter>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$GroupFeed$GetNextPage copyWith(
+    MutationState<List<Chapter>> state, {
+    Object? key,
+  }) => _$GroupFeed$GetNextPage(element, state: state, key: key);
+}
+
 @ProviderFor(GroupTitles)
 const groupTitlesProvider = GroupTitlesFamily._();
 
@@ -572,9 +893,18 @@ final class GroupTitlesProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<GroupTitles, List<Manga>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$GroupTitlesElement $createElement($ProviderPointer pointer) =>
+      _$GroupTitlesElement(this, pointer);
+
+  ProviderListenable<GroupTitles$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<GroupTitles$GetNextPage, AsyncValue<List<Manga>>>(
+        this,
+        (element) {
+          element as _$GroupTitlesElement;
+
+          return element._$getNextPage;
+        },
+      );
 
   @override
   bool operator ==(Object other) {
@@ -587,7 +917,7 @@ final class GroupTitlesProvider
   }
 }
 
-String _$groupTitlesHash() => r'f0d58ebd46a2f57e40c074ad4f6362a65960ac54';
+String _$groupTitlesHash() => r'd22eec36b87527c6d7b08eee4c4ea0e89cc00e6d';
 
 final class GroupTitlesFamily extends Family {
   const GroupTitlesFamily._()
@@ -670,6 +1000,74 @@ abstract class _$GroupTitles extends $AsyncNotifier<List<Manga>> {
   }
 }
 
+class _$GroupTitlesElement
+    extends $AsyncNotifierProviderElement<GroupTitles, List<Manga>> {
+  _$GroupTitlesElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$GroupTitles$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$GroupTitles$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class GroupTitles$GetNextPage extends MutationBase<List<Manga>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [GroupTitles.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Manga>> call();
+}
+
+final class _$GroupTitles$GetNextPage
+    extends
+        $AsyncMutationBase<List<Manga>, _$GroupTitles$GetNextPage, GroupTitles>
+    implements GroupTitles$GetNextPage {
+  _$GroupTitles$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$GroupTitlesElement element;
+
+  @override
+  $ElementLense<_$GroupTitles$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Manga>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$GroupTitles$GetNextPage copyWith(
+    MutationState<List<Manga>> state, {
+    Object? key,
+  }) => _$GroupTitles$GetNextPage(element, state: state, key: key);
+}
+
 @ProviderFor(CreatorTitles)
 const creatorTitlesProvider = CreatorTitlesFamily._();
 
@@ -729,9 +1127,18 @@ final class CreatorTitlesProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<CreatorTitles, List<Manga>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$CreatorTitlesElement $createElement($ProviderPointer pointer) =>
+      _$CreatorTitlesElement(this, pointer);
+
+  ProviderListenable<CreatorTitles$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<CreatorTitles$GetNextPage, AsyncValue<List<Manga>>>(
+        this,
+        (element) {
+          element as _$CreatorTitlesElement;
+
+          return element._$getNextPage;
+        },
+      );
 
   @override
   bool operator ==(Object other) {
@@ -744,7 +1151,7 @@ final class CreatorTitlesProvider
   }
 }
 
-String _$creatorTitlesHash() => r'04f86fc79ac915e62499cafc32a17ebc70e65f9c';
+String _$creatorTitlesHash() => r'66e6cb3c7bc3b9c89b82aeac278a869c3c755a1c';
 
 final class CreatorTitlesFamily extends Family {
   const CreatorTitlesFamily._()
@@ -825,6 +1232,78 @@ abstract class _$CreatorTitles extends $AsyncNotifier<List<Manga>> {
             >;
     element.handleValue(ref, created);
   }
+}
+
+class _$CreatorTitlesElement
+    extends $AsyncNotifierProviderElement<CreatorTitles, List<Manga>> {
+  _$CreatorTitlesElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$CreatorTitles$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$CreatorTitles$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class CreatorTitles$GetNextPage extends MutationBase<List<Manga>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [CreatorTitles.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Manga>> call();
+}
+
+final class _$CreatorTitles$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<Manga>,
+          _$CreatorTitles$GetNextPage,
+          CreatorTitles
+        >
+    implements CreatorTitles$GetNextPage {
+  _$CreatorTitles$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$CreatorTitlesElement element;
+
+  @override
+  $ElementLense<_$CreatorTitles$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Manga>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$CreatorTitles$GetNextPage copyWith(
+    MutationState<List<Manga>> state, {
+    Object? key,
+  }) => _$CreatorTitles$GetNextPage(element, state: state, key: key);
 }
 
 @ProviderFor(MangaChaptersListSort)
@@ -968,9 +1447,18 @@ final class MangaChaptersProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<MangaChapters, List<Chapter>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$MangaChaptersElement $createElement($ProviderPointer pointer) =>
+      _$MangaChaptersElement(this, pointer);
+
+  ProviderListenable<MangaChapters$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<
+        MangaChapters$GetNextPage,
+        AsyncValue<List<Chapter>>
+      >(this, (element) {
+        element as _$MangaChaptersElement;
+
+        return element._$getNextPage;
+      });
 
   @override
   bool operator ==(Object other) {
@@ -983,7 +1471,7 @@ final class MangaChaptersProvider
   }
 }
 
-String _$mangaChaptersHash() => r'937ff5111f655411183679c912cd114b32da1e76';
+String _$mangaChaptersHash() => r'54d9bdd3b1bb893e18b313126a79e4629c70ff2e';
 
 final class MangaChaptersFamily extends Family {
   const MangaChaptersFamily._()
@@ -1066,6 +1554,78 @@ abstract class _$MangaChapters extends $AsyncNotifier<List<Chapter>> {
   }
 }
 
+class _$MangaChaptersElement
+    extends $AsyncNotifierProviderElement<MangaChapters, List<Chapter>> {
+  _$MangaChaptersElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$MangaChapters$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$MangaChapters$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class MangaChapters$GetNextPage extends MutationBase<List<Chapter>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [MangaChapters.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Chapter>> call();
+}
+
+final class _$MangaChapters$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<Chapter>,
+          _$MangaChapters$GetNextPage,
+          MangaChapters
+        >
+    implements MangaChapters$GetNextPage {
+  _$MangaChapters$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$MangaChaptersElement element;
+
+  @override
+  $ElementLense<_$MangaChapters$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Chapter>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$MangaChapters$GetNextPage copyWith(
+    MutationState<List<Chapter>> state, {
+    Object? key,
+  }) => _$MangaChapters$GetNextPage(element, state: state, key: key);
+}
+
 @ProviderFor(MangaCovers)
 const mangaCoversProvider = MangaCoversFamily._();
 
@@ -1125,9 +1685,18 @@ final class MangaCoversProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<MangaCovers, List<CoverArt>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$MangaCoversElement $createElement($ProviderPointer pointer) =>
+      _$MangaCoversElement(this, pointer);
+
+  ProviderListenable<MangaCovers$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<MangaCovers$GetNextPage, AsyncValue<List<CoverArt>>>(
+        this,
+        (element) {
+          element as _$MangaCoversElement;
+
+          return element._$getNextPage;
+        },
+      );
 
   @override
   bool operator ==(Object other) {
@@ -1140,7 +1709,7 @@ final class MangaCoversProvider
   }
 }
 
-String _$mangaCoversHash() => r'51b81d104906d3631b8b252d19e145e0c6101e94';
+String _$mangaCoversHash() => r'2f2685f926df7474b49b85a89418fd2c14084d71';
 
 final class MangaCoversFamily extends Family {
   const MangaCoversFamily._()
@@ -1221,6 +1790,78 @@ abstract class _$MangaCovers extends $AsyncNotifier<List<CoverArt>> {
             >;
     element.handleValue(ref, created);
   }
+}
+
+class _$MangaCoversElement
+    extends $AsyncNotifierProviderElement<MangaCovers, List<CoverArt>> {
+  _$MangaCoversElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$MangaCovers$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$MangaCovers$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class MangaCovers$GetNextPage extends MutationBase<List<CoverArt>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [MangaCovers.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<CoverArt>> call();
+}
+
+final class _$MangaCovers$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<CoverArt>,
+          _$MangaCovers$GetNextPage,
+          MangaCovers
+        >
+    implements MangaCovers$GetNextPage {
+  _$MangaCovers$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$MangaCoversElement element;
+
+  @override
+  $ElementLense<_$MangaCovers$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<CoverArt>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$MangaCovers$GetNextPage copyWith(
+    MutationState<List<CoverArt>> state, {
+    Object? key,
+  }) => _$MangaCovers$GetNextPage(element, state: state, key: key);
 }
 
 @ProviderFor(ReadChapters)
@@ -1874,6 +2515,16 @@ final class UserListsProvider
         },
       );
 
+  ProviderListenable<UserLists$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<UserLists$GetNextPage, AsyncValue<List<CustomList>>>(
+        this,
+        (element) {
+          element as _$UserListsElement;
+
+          return element._$getNextPage;
+        },
+      );
+
   @override
   bool operator ==(Object other) {
     return other is UserListsProvider && other.argument == argument;
@@ -1885,7 +2536,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'edb412e9fd72eb9f2d98b551c881b6c39b67ea84';
+String _$userListsHash() => r'bf4e11df899fb17a7c09c9771104cbbce821fcb9';
 
 final class UserListsFamily extends Family {
   const UserListsFamily._()
@@ -1975,11 +2626,13 @@ class _$UserListsElement
     _$editList.result = $Result.data(_$UserLists$EditList(this));
     _$deleteList.result = $Result.data(_$UserLists$DeleteList(this));
     _$newList.result = $Result.data(_$UserLists$NewList(this));
+    _$getNextPage.result = $Result.data(_$UserLists$GetNextPage(this));
   }
   final _$updateList = $ElementLense<_$UserLists$UpdateList>();
   final _$editList = $ElementLense<_$UserLists$EditList>();
   final _$deleteList = $ElementLense<_$UserLists$DeleteList>();
   final _$newList = $ElementLense<_$UserLists$NewList>();
+  final _$getNextPage = $ElementLense<_$UserLists$GetNextPage>();
   @override
   void mount() {
     super.mount();
@@ -1987,6 +2640,7 @@ class _$UserListsElement
     _$editList.result!.stateOrNull!.reset();
     _$deleteList.result!.stateOrNull!.reset();
     _$newList.result!.stateOrNull!.reset();
+    _$getNextPage.result!.stateOrNull!.reset();
   }
 
   @override
@@ -1999,6 +2653,7 @@ class _$UserListsElement
     listenableVisitor(_$editList);
     listenableVisitor(_$deleteList);
     listenableVisitor(_$newList);
+    listenableVisitor(_$getNextPage);
   }
 }
 
@@ -2196,6 +2851,52 @@ final class _$UserLists$NewList
   }) => _$UserLists$NewList(element, state: state, key: key);
 }
 
+sealed class UserLists$GetNextPage extends MutationBase<List<CustomList>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [UserLists.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<CustomList>> call();
+}
+
+final class _$UserLists$GetNextPage
+    extends
+        $AsyncMutationBase<List<CustomList>, _$UserLists$GetNextPage, UserLists>
+    implements UserLists$GetNextPage {
+  _$UserLists$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$UserListsElement element;
+
+  @override
+  $ElementLense<_$UserLists$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<CustomList>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$UserLists$GetNextPage copyWith(
+    MutationState<List<CustomList>> state, {
+    Object? key,
+  }) => _$UserLists$GetNextPage(element, state: state, key: key);
+}
+
 @ProviderFor(FollowedLists)
 const followedListsProvider = FollowedListsFamily._();
 
@@ -2268,6 +2969,16 @@ final class FollowedListsProvider
         return element._$setFollow;
       });
 
+  ProviderListenable<FollowedLists$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<
+        FollowedLists$GetNextPage,
+        AsyncValue<List<CustomList>>
+      >(this, (element) {
+        element as _$FollowedListsElement;
+
+        return element._$getNextPage;
+      });
+
   @override
   bool operator ==(Object other) {
     return other is FollowedListsProvider && other.argument == argument;
@@ -2279,7 +2990,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'fe33a7a0a4205478a2d59f626db08386bd42fb3d';
+String _$followedListsHash() => r'585f71c2bab7eb61a2264ee995ec30e21541bec6';
 
 final class FollowedListsFamily extends Family {
   const FollowedListsFamily._()
@@ -2366,12 +3077,15 @@ class _$FollowedListsElement
     extends $AsyncNotifierProviderElement<FollowedLists, List<CustomList>> {
   _$FollowedListsElement(super.provider, super.pointer) {
     _$setFollow.result = $Result.data(_$FollowedLists$SetFollow(this));
+    _$getNextPage.result = $Result.data(_$FollowedLists$GetNextPage(this));
   }
   final _$setFollow = $ElementLense<_$FollowedLists$SetFollow>();
+  final _$getNextPage = $ElementLense<_$FollowedLists$GetNextPage>();
   @override
   void mount() {
     super.mount();
     _$setFollow.result!.stateOrNull!.reset();
+    _$getNextPage.result!.stateOrNull!.reset();
   }
 
   @override
@@ -2381,6 +3095,7 @@ class _$FollowedListsElement
     super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$setFollow);
+    listenableVisitor(_$getNextPage);
   }
 }
 
@@ -2427,6 +3142,56 @@ final class _$FollowedLists$SetFollow
     MutationState<bool> state, {
     Object? key,
   }) => _$FollowedLists$SetFollow(element, state: state, key: key);
+}
+
+sealed class FollowedLists$GetNextPage extends MutationBase<List<CustomList>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [FollowedLists.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<CustomList>> call();
+}
+
+final class _$FollowedLists$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<CustomList>,
+          _$FollowedLists$GetNextPage,
+          FollowedLists
+        >
+    implements FollowedLists$GetNextPage {
+  _$FollowedLists$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$FollowedListsElement element;
+
+  @override
+  $ElementLense<_$FollowedLists$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<CustomList>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$FollowedLists$GetNextPage copyWith(
+    MutationState<List<CustomList>> state, {
+    Object? key,
+  }) => _$FollowedLists$GetNextPage(element, state: state, key: key);
 }
 
 @ProviderFor(CustomListFeed)
@@ -2488,9 +3253,18 @@ final class CustomListFeedProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<CustomListFeed, List<Chapter>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$CustomListFeedElement $createElement($ProviderPointer pointer) =>
+      _$CustomListFeedElement(this, pointer);
+
+  ProviderListenable<CustomListFeed$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<
+        CustomListFeed$GetNextPage,
+        AsyncValue<List<Chapter>>
+      >(this, (element) {
+        element as _$CustomListFeedElement;
+
+        return element._$getNextPage;
+      });
 
   @override
   bool operator ==(Object other) {
@@ -2503,7 +3277,7 @@ final class CustomListFeedProvider
   }
 }
 
-String _$customListFeedHash() => r'21e3e77eac362ecc6a00d0eef1f30b911f24067c';
+String _$customListFeedHash() => r'042d4884a6859b89169d55cc4a4684cc52eb7c34';
 
 final class CustomListFeedFamily extends Family {
   const CustomListFeedFamily._()
@@ -2584,6 +3358,78 @@ abstract class _$CustomListFeed extends $AsyncNotifier<List<Chapter>> {
             >;
     element.handleValue(ref, created);
   }
+}
+
+class _$CustomListFeedElement
+    extends $AsyncNotifierProviderElement<CustomListFeed, List<Chapter>> {
+  _$CustomListFeedElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$CustomListFeed$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$CustomListFeed$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class CustomListFeed$GetNextPage extends MutationBase<List<Chapter>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [CustomListFeed.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Chapter>> call();
+}
+
+final class _$CustomListFeed$GetNextPage
+    extends
+        $AsyncMutationBase<
+          List<Chapter>,
+          _$CustomListFeed$GetNextPage,
+          CustomListFeed
+        >
+    implements CustomListFeed$GetNextPage {
+  _$CustomListFeed$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$CustomListFeedElement element;
+
+  @override
+  $ElementLense<_$CustomListFeed$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Chapter>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$CustomListFeed$GetNextPage copyWith(
+    MutationState<List<Chapter>> state, {
+    Object? key,
+  }) => _$CustomListFeed$GetNextPage(element, state: state, key: key);
 }
 
 @ProviderFor(getMangaListByPage)
@@ -3397,9 +4243,18 @@ final class MangaSearchProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<MangaSearch, List<Manga>> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  _$MangaSearchElement $createElement($ProviderPointer pointer) =>
+      _$MangaSearchElement(this, pointer);
+
+  ProviderListenable<MangaSearch$GetNextPage> get getNextPage =>
+      $LazyProxyListenable<MangaSearch$GetNextPage, AsyncValue<List<Manga>>>(
+        this,
+        (element) {
+          element as _$MangaSearchElement;
+
+          return element._$getNextPage;
+        },
+      );
 
   @override
   bool operator ==(Object other) {
@@ -3412,7 +4267,7 @@ final class MangaSearchProvider
   }
 }
 
-String _$mangaSearchHash() => r'08334a1dc1868a05e8c23e0db4c9ec3d940f932e';
+String _$mangaSearchHash() => r'619afc373bd06d3cd66dc25580d29cd9cbd230ad';
 
 final class MangaSearchFamily extends Family {
   const MangaSearchFamily._()
@@ -3495,6 +4350,74 @@ abstract class _$MangaSearch extends $AsyncNotifier<List<Manga>> {
             >;
     element.handleValue(ref, created);
   }
+}
+
+class _$MangaSearchElement
+    extends $AsyncNotifierProviderElement<MangaSearch, List<Manga>> {
+  _$MangaSearchElement(super.provider, super.pointer) {
+    _$getNextPage.result = $Result.data(_$MangaSearch$GetNextPage(this));
+  }
+  final _$getNextPage = $ElementLense<_$MangaSearch$GetNextPage>();
+  @override
+  void mount() {
+    super.mount();
+    _$getNextPage.result!.stateOrNull!.reset();
+  }
+
+  @override
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
+
+    listenableVisitor(_$getNextPage);
+  }
+}
+
+sealed class MangaSearch$GetNextPage extends MutationBase<List<Manga>> {
+  /// Starts the mutation.
+  ///
+  /// This will first set the state to [PendingMutationState], then
+  /// will call [MangaSearch.getNextPage] with the provided parameters.
+  ///
+  /// After the method completes, the mutation state will be updated to either
+  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// threw or not.
+  ///
+  /// **Note**:
+  /// If the notifier threw in its constructor, the mutation won't start
+  /// and [call] will throw.
+  /// This should generally never happen though, as Notifiers are not supposed
+  /// to have logic in their constructors.
+  Future<List<Manga>> call();
+}
+
+final class _$MangaSearch$GetNextPage
+    extends
+        $AsyncMutationBase<List<Manga>, _$MangaSearch$GetNextPage, MangaSearch>
+    implements MangaSearch$GetNextPage {
+  _$MangaSearch$GetNextPage(this.element, {super.state, super.key});
+
+  @override
+  final _$MangaSearchElement element;
+
+  @override
+  $ElementLense<_$MangaSearch$GetNextPage> get listenable =>
+      element._$getNextPage;
+
+  @override
+  Future<List<Manga>> call() {
+    return mutate(
+      Invocation.method(#getNextPage, []),
+      ($notifier) => $notifier.getNextPage(),
+    );
+  }
+
+  @override
+  _$MangaSearch$GetNextPage copyWith(
+    MutationState<List<Manga>> state, {
+    Object? key,
+  }) => _$MangaSearch$GetNextPage(element, state: state, key: key);
 }
 
 @ProviderFor(Statistics)

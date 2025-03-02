@@ -19,22 +19,30 @@ class _SearchHistory extends _$SearchHistory {
 
   @override
   set state(List<String> newState) => super.state = newState;
-  List<String> update(List<String> Function(List<String> state) cb) => state = cb(state);
+  List<String> update(List<String> Function(List<String> state) cb) =>
+      state = cb(state);
 }
 
 @Riverpod(keepAlive: true)
 class _SearchParams extends _$SearchParams {
   @override
-  MangaSearchParameters build() => const MangaSearchParameters(query: '', filter: MangaFilters());
+  MangaSearchParameters build() =>
+      const MangaSearchParameters(query: '', filter: MangaFilters());
 
   @override
   set state(MangaSearchParameters newState) => super.state = newState;
-  MangaSearchParameters update(MangaSearchParameters Function(MangaSearchParameters state) cb) => state = cb(state);
+  MangaSearchParameters update(
+    MangaSearchParameters Function(MangaSearchParameters state) cb,
+  ) => state = cb(state);
 }
 
 @RoutePage()
 class MangaDexSearchPage extends HookConsumerWidget {
-  const MangaDexSearchPage({super.key, this.selectMode = false, this.selectedTitles});
+  const MangaDexSearchPage({
+    super.key,
+    this.selectMode = false,
+    this.selectedTitles,
+  });
 
   final bool selectMode;
   final Set<String>? selectedTitles;
@@ -46,7 +54,11 @@ class MangaDexSearchPage extends HookConsumerWidget {
     final controller = useSearchController();
 
     final searchProvider = ref.watch(mangaSearchProvider(filter));
-    final isLoading = searchProvider.isLoading && searchProvider.isReloading;
+    final getNextPage = ref.watch(mangaSearchProvider(filter).getNextPage);
+
+    final isLoading =
+        getNextPage.state is PendingMutationState ||
+        (searchProvider.isLoading && searchProvider.isReloading);
 
     final selected = useReducer(
       MangaSetAction.modify,
@@ -64,7 +76,7 @@ class MangaDexSearchPage extends HookConsumerWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         onAtEdge: () {
           final lt = ref.read(_searchParamsProvider);
-          ref.read(mangaSearchProvider(lt).notifier).getMore();
+          ref.read(mangaSearchProvider(lt).getNextPage)();
         },
         showToggle: !selectMode,
         leading: [
@@ -85,7 +97,10 @@ class MangaDexSearchPage extends HookConsumerWidget {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: 'search.arg'.tr(context: context, args: ['MangaDex']),
+                  hintText: 'search.arg'.tr(
+                    context: context,
+                    args: ['MangaDex'],
+                  ),
                   trailing: <Widget>[
                     Tooltip(
                       message: 'search.filters'.tr(context: context),
@@ -95,12 +110,16 @@ class MangaDexSearchPage extends HookConsumerWidget {
                             SlideTransitionRouteBuilder(
                               pageBuilder:
                                   (context, animation, secondaryAnimation) =>
-                                      _MangaDexFilterWidget(filter: filter.filter),
+                                      _MangaDexFilterWidget(
+                                        filter: filter.filter,
+                                      ),
                             ),
                           );
 
                           if (result != null) {
-                            ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
+                            ref
+                                .read(_searchParamsProvider.notifier)
+                                .state = filter.copyWith(
                               query: filter.query,
                               filter: result,
                             );
@@ -120,13 +139,12 @@ class MangaDexSearchPage extends HookConsumerWidget {
                     final term = value.trim();
                     if (term.isNotEmpty) {
                       final history = ref.read(_searchHistoryProvider);
-                      ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                      ref.read(_searchHistoryProvider.notifier).state =
+                          {term, ...history}.take(5).toList();
                     }
 
-                    ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
-                      query: term,
-                      filter: filter.filter,
-                    );
+                    ref.read(_searchParamsProvider.notifier).state = filter
+                        .copyWith(query: term, filter: filter.filter);
 
                     unfocusSearchBar();
                   },
@@ -136,15 +154,20 @@ class MangaDexSearchPage extends HookConsumerWidget {
                 final term = value.trim();
                 if (term.isNotEmpty) {
                   final history = ref.read(_searchHistoryProvider);
-                  ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                  ref.read(_searchHistoryProvider.notifier).state =
+                      {term, ...history}.take(5).toList();
                 }
 
                 controller.closeView(term);
-                ref.read(_searchParamsProvider.notifier).state = filter.copyWith(query: term, filter: filter.filter);
+                ref.read(_searchParamsProvider.notifier).state = filter
+                    .copyWith(query: term, filter: filter.filter);
 
                 unfocusSearchBar();
               },
-              suggestionsBuilder: (BuildContext context, SearchController controller) {
+              suggestionsBuilder: (
+                BuildContext context,
+                SearchController controller,
+              ) {
                 final history = ref.read(_searchHistoryProvider);
                 return history
                     .map(
@@ -155,11 +178,14 @@ class MangaDexSearchPage extends HookConsumerWidget {
                           final term = e.trim();
                           if (term.isNotEmpty) {
                             final history = ref.read(_searchHistoryProvider);
-                            ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                            ref.read(_searchHistoryProvider.notifier).state =
+                                {term, ...history}.take(5).toList();
                           }
 
                           controller.closeView(term);
-                          ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
+                          ref
+                              .read(_searchParamsProvider.notifier)
+                              .state = filter.copyWith(
                             query: term,
                             filter: filter.filter,
                           );
@@ -185,24 +211,31 @@ class MangaDexSearchPage extends HookConsumerWidget {
                 inputDecorationTheme: InputDecorationTheme(
                   filled: true,
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(width: 2.0, color: Theme.of(context).colorScheme.inversePrimary),
+                    borderSide: BorderSide(
+                      width: 2.0,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
                   ),
                 ),
                 onSelected: (FilterOrder? order) async {
                   if (order != null) {
-                    ref.read(_searchParamsProvider.notifier).state = filter.copyWith(
-                      query: filter.query,
-                      filter: filter.filter.copyWith(order: order),
-                    );
+                    ref.read(_searchParamsProvider.notifier).state = filter
+                        .copyWith(
+                          query: filter.query,
+                          filter: filter.filter.copyWith(order: order),
+                        );
                   }
                 },
-                dropdownMenuEntries: List<DropdownMenuEntry<FilterOrder>>.generate(
-                  FilterOrder.values.length,
-                  (int index) => DropdownMenuEntry<FilterOrder>(
-                    value: FilterOrder.values.elementAt(index),
-                    label: context.tr(FilterOrder.values.elementAt(index).label),
-                  ),
-                ),
+                dropdownMenuEntries:
+                    List<DropdownMenuEntry<FilterOrder>>.generate(
+                      FilterOrder.values.length,
+                      (int index) => DropdownMenuEntry<FilterOrder>(
+                        value: FilterOrder.values.elementAt(index),
+                        label: context.tr(
+                          FilterOrder.values.elementAt(index).label,
+                        ),
+                      ),
+                    ),
               ),
             ],
           ),
@@ -211,30 +244,49 @@ class MangaDexSearchPage extends HookConsumerWidget {
         children: [
           switch (searchProvider) {
             AsyncValue(:final error?, :final stackTrace?) => SliverToBoxAdapter(
-              child: ErrorList(error: error, stackTrace: stackTrace, message: "mangaSearchProvider() failed"),
+              child: ErrorList(
+                error: error,
+                stackTrace: stackTrace,
+                message: "mangaSearchProvider() failed",
+              ),
             ),
-            AsyncValue(value: final results?) when results.isNotEmpty => MangaListViewSliver(
-              items: results,
-              selectMode: selectMode,
-              selectButton: (manga) {
-                if (selected.state.contains(manga.id)) {
-                  return const Icon(Icons.remove);
-                }
+            AsyncValue(value: final results?) when results.isNotEmpty =>
+              MangaListViewSliver(
+                items: results,
+                selectMode: selectMode,
+                selectButton: (manga) {
+                  if (selected.state.contains(manga.id)) {
+                    return const Icon(Icons.remove);
+                  }
 
-                return const Icon(Icons.add);
-              },
-              onSelected: (manga) {
-                if (selected.state.contains(manga.id)) {
-                  selected.dispatch(MangaSetAction(action: MangaSetActions.remove, element: manga.id));
-                } else {
-                  selected.dispatch(MangaSetAction(action: MangaSetActions.add, element: manga.id));
-                }
-              },
-            ),
+                  return const Icon(Icons.add);
+                },
+                onSelected: (manga) {
+                  if (selected.state.contains(manga.id)) {
+                    selected.dispatch(
+                      MangaSetAction(
+                        action: MangaSetActions.remove,
+                        element: manga.id,
+                      ),
+                    );
+                  } else {
+                    selected.dispatch(
+                      MangaSetAction(
+                        action: MangaSetActions.add,
+                        element: manga.id,
+                      ),
+                    );
+                  }
+                },
+              ),
             AsyncValue(value: final _?) => SliverToBoxAdapter(
-              child: Center(child: Text('errors.noresults'.tr(context: context))),
+              child: Center(
+                child: Text('errors.noresults'.tr(context: context)),
+              ),
             ),
-            _ => const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())),
+            _ => const SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()),
+            ),
           },
         ],
       ),
@@ -322,7 +374,10 @@ class _MangaDexFilterWidget extends HookWidget {
                               onDeleted: () {
                                 fil.value = MangaFilterAction.action(
                                   fil.value,
-                                  includedTags: fil.value.includedTags.where((element) => element != e).toSet(),
+                                  includedTags:
+                                      fil.value.includedTags
+                                          .where((element) => element != e)
+                                          .toSet(),
                                 );
                               },
                               selectedColor: selectedChipColor,
@@ -331,11 +386,17 @@ class _MangaDexFilterWidget extends HookWidget {
                           ...fil.value.excludedTags.map(
                             (e) => InputChip(
                               label: Text(e.attributes.name.get('en')),
-                              avatar: Icon(Icons.remove, color: theme.colorScheme.primary),
+                              avatar: Icon(
+                                Icons.remove,
+                                color: theme.colorScheme.primary,
+                              ),
                               onDeleted: () {
                                 fil.value = MangaFilterAction.action(
                                   fil.value,
-                                  excludedTags: fil.value.excludedTags.where((element) => element != e).toSet(),
+                                  excludedTags:
+                                      fil.value.excludedTags
+                                          .where((element) => element != e)
+                                          .toSet(),
                                 );
                               },
                               side: BorderSide(color: selectedChipColor),
@@ -349,7 +410,11 @@ class _MangaDexFilterWidget extends HookWidget {
                         children:
                             selectedFilters.isNotEmpty
                                 ? selectedFilters
-                                : [InputChip(label: Text('ui.none'.tr(context: context)))],
+                                : [
+                                  InputChip(
+                                    label: Text('ui.none'.tr(context: context)),
+                                  ),
+                                ],
                       );
                     },
                   ),
@@ -381,13 +446,20 @@ class _MangaDexFilterWidget extends HookWidget {
                                       if (value) {
                                         fil.value = MangaFilterAction.action(
                                           fil.value,
-                                          contentRating: {...fil.value.contentRating, e},
+                                          contentRating: {
+                                            ...fil.value.contentRating,
+                                            e,
+                                          },
                                         );
                                       } else {
                                         fil.value = MangaFilterAction.action(
                                           fil.value,
                                           contentRating:
-                                              fil.value.contentRating.where((element) => element != e).toSet(),
+                                              fil.value.contentRating
+                                                  .where(
+                                                    (element) => element != e,
+                                                  )
+                                                  .toSet(),
                                         );
                                       }
                                     },
@@ -399,7 +471,10 @@ class _MangaDexFilterWidget extends HookWidget {
                   ),
 
                   /// Demographic
-                  _SectionHeader(key: ValueKey("_demographic"), header: 'mangadex.demographic'.tr(context: context)),
+                  _SectionHeader(
+                    key: ValueKey("_demographic"),
+                    header: 'mangadex.demographic'.tr(context: context),
+                  ),
                   _SectionChildren(
                     key: const ValueKey("_demographicChildren"),
                     children:
@@ -409,7 +484,8 @@ class _MangaDexFilterWidget extends HookWidget {
                                 builder: (context) {
                                   final selected = useListenableSelector(
                                     fil,
-                                    () => fil.value.publicationDemographic.contains(e),
+                                    () => fil.value.publicationDemographic
+                                        .contains(e),
                                   );
 
                                   return FilterChip(
@@ -420,13 +496,20 @@ class _MangaDexFilterWidget extends HookWidget {
                                       if (value) {
                                         fil.value = MangaFilterAction.action(
                                           fil.value,
-                                          publicationDemographic: {...fil.value.publicationDemographic, e},
+                                          publicationDemographic: {
+                                            ...fil.value.publicationDemographic,
+                                            e,
+                                          },
                                         );
                                       } else {
                                         fil.value = MangaFilterAction.action(
                                           fil.value,
                                           publicationDemographic:
-                                              fil.value.publicationDemographic.where((element) => element != e).toSet(),
+                                              fil.value.publicationDemographic
+                                                  .where(
+                                                    (element) => element != e,
+                                                  )
+                                                  .toSet(),
                                         );
                                       }
                                     },
@@ -438,7 +521,10 @@ class _MangaDexFilterWidget extends HookWidget {
                   ),
 
                   /// Pub status
-                  _SectionHeader(key: ValueKey("_pubStatus"), header: 'mangadex.pubStatus'.tr(context: context)),
+                  _SectionHeader(
+                    key: ValueKey("_pubStatus"),
+                    header: 'mangadex.pubStatus'.tr(context: context),
+                  ),
                   _SectionChildren(
                     key: const ValueKey("_pubChildren"),
                     children:
@@ -446,7 +532,10 @@ class _MangaDexFilterWidget extends HookWidget {
                             .map(
                               (e) => HookBuilder(
                                 builder: (context) {
-                                  final selected = useListenableSelector(fil, () => fil.value.status.contains(e));
+                                  final selected = useListenableSelector(
+                                    fil,
+                                    () => fil.value.status.contains(e),
+                                  );
 
                                   return FilterChip(
                                     label: Text(context.tr(e.label)),
@@ -461,7 +550,12 @@ class _MangaDexFilterWidget extends HookWidget {
                                       } else {
                                         fil.value = MangaFilterAction.action(
                                           fil.value,
-                                          status: fil.value.status.where((element) => element != e).toSet(),
+                                          status:
+                                              fil.value.status
+                                                  .where(
+                                                    (element) => element != e,
+                                                  )
+                                                  .toSet(),
                                         );
                                       }
                                     },
@@ -475,12 +569,17 @@ class _MangaDexFilterWidget extends HookWidget {
 
                   /// Tags
                   for (final group in TagGroup.values) ...[
-                    _SectionHeader(key: ValueKey(group.label), header: group.label),
+                    _SectionHeader(
+                      key: ValueKey(group.label),
+                      header: group.label,
+                    ),
                     _SectionChildren(
                       key: ValueKey("_${group.label}Children"),
                       children:
                           tags
-                              .where((element) => element.attributes.group == group)
+                              .where(
+                                (element) => element.attributes.group == group,
+                              )
                               .map(
                                 (e) => HookBuilder(
                                   builder: (context) {
@@ -489,7 +588,10 @@ class _MangaDexFilterWidget extends HookWidget {
                                       () =>
                                           fil.value.includedTags.contains(e)
                                               ? true
-                                              : (fil.value.excludedTags.contains(e) ? false : null),
+                                              : (fil.value.excludedTags
+                                                      .contains(e)
+                                                  ? false
+                                                  : null),
                                     );
 
                                     return TriStateChip(
@@ -498,29 +600,58 @@ class _MangaDexFilterWidget extends HookWidget {
                                       onChanged: (bool? value) {
                                         switch (value) {
                                           case null:
-                                            fil.value = MangaFilterAction.action(
-                                              fil.value,
-                                              includedTags:
-                                                  fil.value.includedTags.where((element) => element != e).toSet(),
-                                              excludedTags:
-                                                  fil.value.excludedTags.where((element) => element != e).toSet(),
-                                            );
+                                            fil.value =
+                                                MangaFilterAction.action(
+                                                  fil.value,
+                                                  includedTags:
+                                                      fil.value.includedTags
+                                                          .where(
+                                                            (element) =>
+                                                                element != e,
+                                                          )
+                                                          .toSet(),
+                                                  excludedTags:
+                                                      fil.value.excludedTags
+                                                          .where(
+                                                            (element) =>
+                                                                element != e,
+                                                          )
+                                                          .toSet(),
+                                                );
                                             break;
                                           case true:
-                                            fil.value = MangaFilterAction.action(
-                                              fil.value,
-                                              includedTags: {...fil.value.includedTags, e},
-                                              excludedTags:
-                                                  fil.value.excludedTags.where((element) => element != e).toSet(),
-                                            );
+                                            fil.value =
+                                                MangaFilterAction.action(
+                                                  fil.value,
+                                                  includedTags: {
+                                                    ...fil.value.includedTags,
+                                                    e,
+                                                  },
+                                                  excludedTags:
+                                                      fil.value.excludedTags
+                                                          .where(
+                                                            (element) =>
+                                                                element != e,
+                                                          )
+                                                          .toSet(),
+                                                );
                                             break;
                                           case false:
-                                            fil.value = MangaFilterAction.action(
-                                              fil.value,
-                                              includedTags:
-                                                  fil.value.includedTags.where((element) => element != e).toSet(),
-                                              excludedTags: {...fil.value.excludedTags, e},
-                                            );
+                                            fil.value =
+                                                MangaFilterAction.action(
+                                                  fil.value,
+                                                  includedTags:
+                                                      fil.value.includedTags
+                                                          .where(
+                                                            (element) =>
+                                                                element != e,
+                                                          )
+                                                          .toSet(),
+                                                  excludedTags: {
+                                                    ...fil.value.excludedTags,
+                                                    e,
+                                                  },
+                                                );
                                             break;
                                         }
                                       },
@@ -534,7 +665,10 @@ class _MangaDexFilterWidget extends HookWidget {
                   ],
 
                   // Modes
-                  _SectionHeader(key: ValueKey("Modes"), header: 'search.otherOptions'.tr(context: context)),
+                  _SectionHeader(
+                    key: ValueKey("Modes"),
+                    header: 'search.otherOptions'.tr(context: context),
+                  ),
                   _SectionChildren(
                     key: const ValueKey("_modesChildren"),
                     children: [
@@ -545,11 +679,15 @@ class _MangaDexFilterWidget extends HookWidget {
                         enableSearch: false,
                         enableFilter: false,
                         dropdownMenuEntries: [
-                          for (final mode in TagMode.values) DropdownMenuEntry(value: mode, label: mode.label),
+                          for (final mode in TagMode.values)
+                            DropdownMenuEntry(value: mode, label: mode.label),
                         ],
                         onSelected: (value) {
                           if (value != null) {
-                            fil.value = MangaFilterAction.action(fil.value, includedTagsMode: value);
+                            fil.value = MangaFilterAction.action(
+                              fil.value,
+                              includedTagsMode: value,
+                            );
                           }
                         },
                       ),
@@ -560,11 +698,15 @@ class _MangaDexFilterWidget extends HookWidget {
                         enableSearch: false,
                         enableFilter: false,
                         dropdownMenuEntries: [
-                          for (final mode in TagMode.values) DropdownMenuEntry(value: mode, label: mode.label),
+                          for (final mode in TagMode.values)
+                            DropdownMenuEntry(value: mode, label: mode.label),
                         ],
                         onSelected: (value) {
                           if (value != null) {
-                            fil.value = MangaFilterAction.action(fil.value, excludedTagsMode: value);
+                            fil.value = MangaFilterAction.action(
+                              fil.value,
+                              excludedTagsMode: value,
+                            );
                           }
                         },
                       ),
@@ -588,7 +730,10 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Text(header, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      child: Text(
+        header,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

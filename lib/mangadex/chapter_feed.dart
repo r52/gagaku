@@ -24,7 +24,10 @@ Future<List<ChapterFeedItemData>> _fetchChapters(Ref ref) async {
   final chapters = await ref.watch(latestChaptersFeedProvider(me?.id).future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(
+    ids: mangaIds,
+    limit: MangaDexEndpoints.breakLimit,
+  );
 
   await ref.read(statisticsProvider.get)(mangas);
   await ref.read(readChaptersProvider(me?.id).get)(mangas);
@@ -62,7 +65,9 @@ class MangaDexChapterFeedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MangaDexLoginWidget(builder: (context) => MangaDexChapterFeedWidget());
+    return MangaDexLoginWidget(
+      builder: (context) => MangaDexChapterFeedWidget(),
+    );
   }
 }
 
@@ -73,19 +78,30 @@ class MangaDexChapterFeedWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
+    final scrollController =
+        DefaultScrollController.maybeOf(context) ??
+        controller ??
+        useScrollController();
     final view = useState(_FeedViewType.chapters);
 
     final leading = <Widget>[
-      MangaDexSliverAppBar(title: 'mangadex.myFeed'.tr(context: context), controller: scrollController),
+      MangaDexSliverAppBar(
+        title: 'mangadex.myFeed'.tr(context: context),
+        controller: scrollController,
+      ),
       SliverAppBar(
         automaticallyImplyLeading: false,
         pinned: true,
-        title: Text('mangadex.updates'.tr(context: context), style: TextStyle(fontSize: 24)),
+        title: Text(
+          'mangadex.updates'.tr(context: context),
+          style: TextStyle(fontSize: 24),
+        ),
         actions: [
           SegmentedButton<_FeedViewType>(
             style: SegmentedButton.styleFrom(
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4.0)),
+              ),
             ),
             showSelectedIcon: false,
             segments: <ButtonSegment<_FeedViewType>>[
@@ -111,23 +127,34 @@ class MangaDexChapterFeedWidget extends HookWidget {
       _FeedViewType.chapters => Consumer(
         builder: (context, ref, child) {
           final me = ref.watch(loggedUserProvider).value;
+          final getNextPage = ref.watch(
+            latestChaptersFeedProvider(me?.id).getNextPage,
+          );
 
           return ChapterFeedWidget(
             key: ValueKey('ChapterFeedWidget(${me?.id})'),
             provider: _fetchChaptersProvider,
             emptyText: 'mangadex.noFollowsMsg'.tr(context: context),
-            onAtEdge: () => ref.read(latestChaptersFeedProvider(me?.id).notifier).getMore(),
+            onAtEdge: () {
+              if (getNextPage.state is! PendingMutationState) {
+                getNextPage();
+              }
+            },
             onRefresh: () async {
-              ref.read(latestChaptersFeedProvider(me?.id).notifier).clear();
+              ref.invalidate(latestChaptersFeedProvider(me?.id));
               return ref.refresh(_fetchChaptersProvider.future);
             },
             controller: scrollController,
             restorationId: 'chapter_list_offset',
             leading: leading,
+            isLoading: getNextPage.state is PendingMutationState,
           );
         },
       ),
-      _FeedViewType.manga => MangaDexMangaFeed(controller: scrollController, leading: leading),
+      _FeedViewType.manga => MangaDexMangaFeed(
+        controller: scrollController,
+        leading: leading,
+      ),
     };
   }
 }

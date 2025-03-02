@@ -586,10 +586,10 @@ packages:
     dependency: "direct dev"
     description:
       name: freezed
-      sha256: a3d6429368603a591ca7c1795799a247998fb213ded509070c2c59708b25df31
+      sha256: a6274c34d61b3d68082f2b0e9a641a3ec197e525d269f35b82f62d5b2c6d9f75
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.2"
+    version: "3.0.3"
   freezed_annotation:
     dependency: "direct main"
     description:
@@ -899,10 +899,10 @@ packages:
     dependency: "direct main"
     description:
       name: number_paginator
-      sha256: "2ef6f87e47f7098c93c510601db5c7f8dd8e9a38e38e052f66d06144ebcb3a46"
+      sha256: b6781d6dd12fe47a1cd9433f514041bc9f3d105303a6509a9aada68885104181
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.3"
+    version: "0.4.4"
   octo_image:
     dependency: transitive
     description:

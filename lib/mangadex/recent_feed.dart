@@ -33,36 +33,53 @@ class MangaDexRecentFeedPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ctrler = controller ?? useScrollController();
     final feedProvider = ref.watch(_fetchMangaFeedProvider);
-    final isLoading = feedProvider.isLoading && !feedProvider.isRefreshing;
+    final getNextPage = ref.watch(recentlyAddedProvider.getNextPage);
+    final isLoading =
+        getNextPage.state is PendingMutationState ||
+        (feedProvider.isLoading && !feedProvider.isRefreshing);
 
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            ctrler.animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            ctrler.animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+            );
           },
-          child: TitleFlexBar(title: 'mangadex.recentlyAdded'.tr(context: context)),
+          child: TitleFlexBar(
+            title: 'mangadex.recentlyAdded'.tr(context: context),
+          ),
         ),
         leading: AutoLeadingButton(),
       ),
       body: Center(
         child: RefreshIndicator(
           onRefresh: () async {
-            ref.read(recentlyAddedProvider.notifier).clear();
+            ref.invalidate(recentlyAddedProvider);
             return ref.refresh(_fetchMangaFeedProvider.future);
           },
           child: DataProviderWhenWidget(
             provider: _fetchMangaFeedProvider,
-            data: feedProvider,
+            initialData: feedProvider,
             builder:
                 (context, mangas) => MangaListWidget(
                   physics: const AlwaysScrollableScrollPhysics(),
                   controller: ctrler,
-                  onAtEdge: () => ref.read(recentlyAddedProvider.notifier).getMore(),
+                  onAtEdge: () {
+                    if (getNextPage.state is! PendingMutationState) {
+                      getNextPage();
+                    }
+                  },
                   isLoading: isLoading,
                   children: [
                     if (mangas.isEmpty)
-                      SliverToBoxAdapter(child: Center(child: Text('errors.noresults'.tr(context: context)))),
+                      SliverToBoxAdapter(
+                        child: Center(
+                          child: Text('errors.noresults'.tr(context: context)),
+                        ),
+                      ),
                     MangaListViewSliver(items: mangas),
                   ],
                 ),

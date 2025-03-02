@@ -20,14 +20,20 @@ part 'list_view.g.dart';
 enum _ViewType { titles, feed }
 
 @Riverpod(retry: noRetry)
-Future<List<ChapterFeedItemData>> _fetchListFeed(Ref ref, CustomList list) async {
+Future<List<ChapterFeedItemData>> _fetchListFeed(
+  Ref ref,
+  CustomList list,
+) async {
   final me = await ref.watch(loggedUserProvider.future);
   final api = ref.watch(mangadexProvider);
 
   final chapters = await ref.watch(customListFeedProvider(list).future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(
+    ids: mangaIds,
+    limit: MangaDexEndpoints.breakLimit,
+  );
 
   await ref.read(statisticsProvider.get)(mangas);
   await ref.read(readChaptersProvider(me?.id).get)(mangas);
@@ -75,7 +81,11 @@ Future<CustomList?> _getList(Ref ref, String listId) async {
 
 @RoutePage()
 class MangaDexListViewWithNamePage extends MangaDexListViewPage {
-  const MangaDexListViewWithNamePage({super.key, @PathParam() required super.listId, @PathParam() this.name});
+  const MangaDexListViewWithNamePage({
+    super.key,
+    @PathParam() required super.listId,
+    @PathParam() this.name,
+  });
 
   final String? name;
 }
@@ -95,8 +105,14 @@ class MangaDexListViewPage extends HookConsumerWidget {
     final listProvider = ref.watch(_getListProvider(listId));
 
     final bottomNavigationBarItems = <Widget>[
-      NavigationDestination(icon: Icon(Icons.menu_book), label: 'titles'.tr(context: context)),
-      NavigationDestination(icon: Icon(Icons.feed), label: 'feed'.tr(context: context)),
+      NavigationDestination(
+        icon: Icon(Icons.menu_book),
+        label: 'titles'.tr(context: context),
+      ),
+      NavigationDestination(
+        icon: Icon(Icons.feed),
+        label: 'feed'.tr(context: context),
+      ),
     ];
 
     final controllers = [useScrollController(), useScrollController()];
@@ -106,8 +122,13 @@ class MangaDexListViewPage extends HookConsumerWidget {
         return Scaffold(
           appBar: AppBar(),
           body: RefreshIndicator(
-            onRefresh: () async => ref.refresh(listSourceProvider(listId).future),
-            child: ErrorList(error: error, stackTrace: stackTrace, message: "_fetchListFromIdProvider($listId) failed"),
+            onRefresh:
+                () async => ref.refresh(listSourceProvider(listId).future),
+            child: ErrorList(
+              error: error,
+              stackTrace: stackTrace,
+              message: "_fetchListFromIdProvider($listId) failed",
+            ),
           ),
         );
       case AsyncValue(hasValue: true, value: final list) when list != null:
@@ -130,28 +151,40 @@ class MangaDexListViewPage extends HookConsumerWidget {
                 children: [
                   Consumer(
                     builder: (context, ref, child) {
-                      final followedLists = ref.watch(followedListsProvider(me?.id)).value;
-                      final followList = ref.watch(followedListsProvider(me?.id).setFollow);
-                      final idx = followedLists?.indexWhere((e) => e.id == list.id);
+                      final followedLists =
+                          ref.watch(followedListsProvider(me?.id)).value;
+                      final followList = ref.watch(
+                        followedListsProvider(me?.id).setFollow,
+                      );
+                      final idx = followedLists?.indexWhere(
+                        (e) => e.id == list.id,
+                      );
 
                       if (idx == null) {
                         return const SizedBox.shrink();
                       }
 
                       return IconButton(
-                        style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
+                        style: Styles.squareIconButtonStyle(
+                          backgroundColor: theme.colorScheme.surfaceContainer,
+                        ),
                         onPressed: () => followList(list, idx == -1),
                         icon: Icon(
                           idx == -1 ? Icons.bookmark_border : Icons.bookmark,
                           color: idx == -1 ? null : theme.colorScheme.primary,
                         ),
-                        tooltip: idx == -1 ? 'ui.follow'.tr(context: context) : 'ui.unfollow'.tr(context: context),
+                        tooltip:
+                            idx == -1
+                                ? 'ui.follow'.tr(context: context)
+                                : 'ui.unfollow'.tr(context: context),
                       );
                     },
                   ),
                   if (list.user != null && me != null && list.user!.id == me.id)
                     IconButton(
-                      style: Styles.squareIconButtonStyle(backgroundColor: theme.colorScheme.surfaceContainer),
+                      style: Styles.squareIconButtonStyle(
+                        backgroundColor: theme.colorScheme.surfaceContainer,
+                      ),
                       onPressed: () {
                         router.push(MangaDexEditListRoute(list: list));
                       },
@@ -178,16 +211,21 @@ class MangaDexListViewPage extends HookConsumerWidget {
                   key: const Key('/list?tab=titles'),
                   builder: (context, ref, child) {
                     final currentPage = useState(0);
-                    final titlesProvider = ref.watch(getMangaListByPageProvider(list.set, currentPage.value));
+                    final titlesProvider = ref.watch(
+                      getMangaListByPageProvider(list.set, currentPage.value),
+                    );
 
                     return RefreshIndicator(
                       onRefresh:
-                          () async => ref.refresh(getMangaListByPageProvider(list.set, currentPage.value).future),
+                          () async => ref.refresh(
+                            getMangaListByPageProvider(
+                              list.set,
+                              currentPage.value,
+                            ).future,
+                          ),
                       child: switch (titlesProvider) {
-                        AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                          error: error,
-                          stackTrace: stackTrace,
-                        ),
+                        AsyncValue(:final error?, :final stackTrace?) =>
+                          ErrorList(error: error, stackTrace: stackTrace),
                         AsyncValue(value: final mangas) => Column(
                           children: [
                             Expanded(
@@ -199,11 +237,19 @@ class MangaDexListViewPage extends HookConsumerWidget {
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 controller: controllers[0],
                                 isLoading: titlesProvider.isLoading,
-                                children: [if (mangas != null) MangaListViewSliver(items: mangas)],
+                                children: [
+                                  if (mangas != null)
+                                    MangaListViewSliver(items: mangas),
+                                ],
                               ),
                             ),
                             NumberPaginator(
-                              numberPages: max((list.set.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                              numberPages: max(
+                                (list.set.length /
+                                        MangaDexEndpoints.searchLimit)
+                                    .ceil(),
+                                1,
+                              ),
                               onPageChange: (int index) {
                                 currentPage.value = index;
                               },
@@ -217,17 +263,26 @@ class MangaDexListViewPage extends HookConsumerWidget {
                 _ViewType.feed => Consumer(
                   key: const Key('/list?tab=feed'),
                   builder: (context, ref, child) {
+                    final getNextPage = ref.watch(
+                      customListFeedProvider(list).getNextPage,
+                    );
+
                     return ChapterFeedWidget(
                       provider: _fetchListFeedProvider(list),
                       title: 'mangadex.listFeed'.tr(context: context),
                       emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
-                      onAtEdge: () => ref.read(customListFeedProvider(list).notifier).getMore(),
+                      onAtEdge: () {
+                        if (getNextPage.state is! PendingMutationState) {
+                          getNextPage();
+                        }
+                      },
                       onRefresh: () async {
-                        ref.read(customListFeedProvider(list).notifier).clear();
+                        ref.invalidate(customListFeedProvider(list));
                         return ref.refresh(_fetchListFeedProvider(list).future);
                       },
                       controller: controllers[1],
                       restorationId: 'list_feed_offset',
+                      isLoading: getNextPage.state is PendingMutationState,
                     );
                   },
                 ),
@@ -244,7 +299,11 @@ class MangaDexListViewPage extends HookConsumerWidget {
 
               if (currTab == _ViewType.values[index]) {
                 // Scroll to top if on the same tab
-                controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+                controllers[index].animateTo(
+                  0.0,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                );
               } else {
                 // Switch tab
                 view.value = _ViewType.values[index];
@@ -255,7 +314,11 @@ class MangaDexListViewPage extends HookConsumerWidget {
       case AsyncValue(hasValue: true, value: final list) when list == null:
         return Scaffold(
           appBar: AppBar(),
-          body: Center(child: Text('mangadex.listNotExistError'.tr(context: context, args: [listId]))),
+          body: Center(
+            child: Text(
+              'mangadex.listNotExistError'.tr(context: context, args: [listId]),
+            ),
+          ),
         );
       case AsyncValue(:final progress):
         return Scaffold(body: ListSpinner(progress: progress?.toDouble()));

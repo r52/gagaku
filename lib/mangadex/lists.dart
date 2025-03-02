@@ -37,11 +37,18 @@ class MangaDexListsWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = AutoRouter.of(context);
     final theme = Theme.of(context);
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
+    final scrollController =
+        DefaultScrollController.maybeOf(context) ??
+        controller ??
+        useScrollController();
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
     final deleteList = ref.watch(userListsProvider(me?.id).deleteList);
     final followList = ref.watch(followedListsProvider(me?.id).setFollow);
+    final userGetNextPage = ref.watch(userListsProvider(me?.id).getNextPage);
+    final followGetNextPage = ref.watch(
+      followedListsProvider(me?.id).getNextPage,
+    );
 
     ref.listen(userListsProvider(me?.id).deleteList, (_, state) {
       if (state.state is ErrorMutationState) {
@@ -62,7 +69,10 @@ class MangaDexListsWidget extends HookConsumerWidget {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
-            SnackBar(content: Text('mangadex.deleteListOk'.tr(context: context)), backgroundColor: Colors.green),
+            SnackBar(
+              content: Text('mangadex.deleteListOk'.tr(context: context)),
+              backgroundColor: Colors.green,
+            ),
           );
       }
 
@@ -72,13 +82,18 @@ class MangaDexListsWidget extends HookConsumerWidget {
     useEffect(() {
       void controllerAtEdge() {
         if (scrollController.position.atEdge &&
-            scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
           switch (view.value) {
             case _ListViewType.self:
-              ref.read(userListsProvider(me?.id).notifier).getMore();
+              if (userGetNextPage.state is! PendingMutationState) {
+                userGetNextPage();
+              }
               break;
             case _ListViewType.followed:
-              ref.read(followedListsProvider(me?.id).notifier).getMore();
+              if (followGetNextPage.state is! PendingMutationState) {
+                followGetNextPage();
+              }
               break;
           }
         }
@@ -88,7 +103,10 @@ class MangaDexListsWidget extends HookConsumerWidget {
       return () => scrollController.removeListener(controllerAtEdge);
     }, [scrollController, me]);
 
-    final appbar = MangaDexSliverAppBar(title: 'mangadex.myLists'.tr(context: context), controller: scrollController);
+    final appbar = MangaDexSliverAppBar(
+      title: 'mangadex.myLists'.tr(context: context),
+      controller: scrollController,
+    );
 
     final leading = SliverAppBar(
       automaticallyImplyLeading: false,
@@ -96,7 +114,9 @@ class MangaDexListsWidget extends HookConsumerWidget {
       actions: [
         SegmentedButton<_ListViewType>(
           style: SegmentedButton.styleFrom(
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(4.0)),
+            ),
           ),
           showSelectedIcon: false,
           segments: <ButtonSegment<_ListViewType>>[
@@ -131,7 +151,10 @@ class MangaDexListsWidget extends HookConsumerWidget {
               messenger
                 ..removeCurrentSnackBar()
                 ..showSnackBar(
-                  SnackBar(content: Text('mangadex.newListOk'.tr(context: context)), backgroundColor: Colors.green),
+                  SnackBar(
+                    content: Text('mangadex.newListOk'.tr(context: context)),
+                    backgroundColor: Colors.green,
+                  ),
                 );
             }
           });
@@ -142,10 +165,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
           builder: (context, ref, child) {
             return RefreshIndicator(
               key: ValueKey('_ListViewType.self(${me?.id})'),
-              onRefresh: () async {
-                ref.read(userListsProvider(me?.id).notifier).clear();
-                return ref.refresh(userListsProvider(me?.id).future);
-              },
+              onRefresh: () => ref.refresh(userListsProvider(me?.id).future),
               child: DataProviderWhenWidget(
                 provider: userListsProvider(me?.id),
                 builder:
@@ -156,12 +176,17 @@ class MangaDexListsWidget extends HookConsumerWidget {
                       slivers: [
                         appbar,
                         leading,
-                        if (lists.isEmpty) SliverToBoxAdapter(child: Text('errors.nolists'.tr(context: context))),
+                        if (lists.isEmpty)
+                          SliverToBoxAdapter(
+                            child: Text('errors.nolists'.tr(context: context)),
+                          ),
                         SliverList.builder(
                           itemCount: lists.length,
                           findChildIndexCallback: (key) {
                             final valueKey = key as ValueKey<String>;
-                            final val = lists.indexWhere((i) => i.id == valueKey.value);
+                            final val = lists.indexWhere(
+                              (i) => i.id == valueKey.value,
+                            );
                             return val >= 0 ? val : null;
                           },
                           itemBuilder: (BuildContext context, int index) {
@@ -172,67 +197,97 @@ class MangaDexListsWidget extends HookConsumerWidget {
                               color:
                                   index.isOdd
                                       ? theme.colorScheme.surfaceContainer
-                                      : theme.colorScheme.surfaceContainerHighest,
+                                      : theme
+                                          .colorScheme
+                                          .surfaceContainerHighest,
                               child: ListTile(
                                 leading: Tooltip(
-                                  message: item.attributes.visibility.name.capitalize(),
+                                  message:
+                                      item.attributes.visibility.name
+                                          .capitalize(),
                                   child: Icon(
                                     Icons.circle,
                                     size: 16.0,
                                     color:
-                                        item.attributes.visibility == CustomListVisibility.private
+                                        item.attributes.visibility ==
+                                                CustomListVisibility.private
                                             ? Colors.red
                                             : Colors.green,
                                   ),
                                 ),
                                 title: Text(item.attributes.name),
-                                subtitle: Text('num_items'.plural(item.set.length)),
+                                subtitle: Text(
+                                  'num_items'.plural(item.set.length),
+                                ),
                                 trailing: MenuAnchor(
                                   builder:
-                                      (context, controller, child) => IconButton(
-                                        onPressed: () {
-                                          if (controller.isOpen) {
-                                            controller.close();
-                                          } else {
-                                            controller.open();
-                                          }
-                                        },
-                                        icon: const Icon(Icons.more_vert),
-                                      ),
+                                      (context, controller, child) =>
+                                          IconButton(
+                                            onPressed: () {
+                                              if (controller.isOpen) {
+                                                controller.close();
+                                              } else {
+                                                controller.open();
+                                              }
+                                            },
+                                            icon: const Icon(Icons.more_vert),
+                                          ),
                                   menuChildren: [
                                     Consumer(
                                       builder: (context, refx, child) {
-                                        final followedLists = refx.watch(followedListsProvider(me?.id)).value;
-                                        final idx = followedLists?.indexWhere((e) => e.id == item.id);
+                                        final followedLists =
+                                            refx
+                                                .watch(
+                                                  followedListsProvider(me?.id),
+                                                )
+                                                .value;
+                                        final idx = followedLists?.indexWhere(
+                                          (e) => e.id == item.id,
+                                        );
 
                                         if (idx == null) {
                                           return const SizedBox.shrink();
                                         }
 
                                         return MenuItemButton(
-                                          onPressed: () => followList(item, idx == -1),
+                                          onPressed:
+                                              () => followList(item, idx == -1),
                                           child: Text(
                                             idx == -1
-                                                ? 'ui.follow'.tr(context: context)
-                                                : 'ui.unfollow'.tr(context: context),
+                                                ? 'ui.follow'.tr(
+                                                  context: context,
+                                                )
+                                                : 'ui.unfollow'.tr(
+                                                  context: context,
+                                                ),
                                           ),
                                         );
                                       },
                                     ),
                                     MenuItemButton(
                                       onPressed: () async {
-                                        final result = await showDeleteListDialog(context, item.attributes.name);
+                                        final result =
+                                            await showDeleteListDialog(
+                                              context,
+                                              item.attributes.name,
+                                            );
                                         if (result == true) {
                                           deleteList(item);
                                         }
                                       },
-                                      child: Text('ui.delete'.tr(context: context)),
+                                      child: Text(
+                                        'ui.delete'.tr(context: context),
+                                      ),
                                     ),
                                     MenuItemButton(
                                       onPressed: () {
-                                        router.push(MangaDexEditListRoute(list: item));
+                                        router.push(
+                                          MangaDexEditListRoute(list: item),
+                                        );
                                       },
-                                      child: Text('ui.edit'.tr(context: context)),
+                                      child: Text(
+                                        'ui.edit'.tr(context: context),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -243,9 +298,13 @@ class MangaDexListsWidget extends HookConsumerWidget {
                             );
                           },
                         ),
+                        if (userGetNextPage.state is PendingMutationState)
+                          const SliverToBoxAdapter(child: ListSpinner()),
                       ],
                     ),
-                loadingBuilder: (_, progress) => LoadingOverlayStack(progress: progress?.toDouble()),
+                loadingBuilder:
+                    (_, progress) =>
+                        LoadingOverlayStack(progress: progress?.toDouble()),
               ),
             );
           },
@@ -254,10 +313,8 @@ class MangaDexListsWidget extends HookConsumerWidget {
           builder: (context, ref, child) {
             return RefreshIndicator(
               key: ValueKey('_ListViewType.followed(${me?.id})'),
-              onRefresh: () async {
-                ref.read(followedListsProvider(me?.id).notifier).clear();
-                return ref.refresh(followedListsProvider(me?.id).future);
-              },
+              onRefresh:
+                  () => ref.refresh(followedListsProvider(me?.id).future),
               child: DataProviderWhenWidget(
                 provider: followedListsProvider(me?.id),
                 builder:
@@ -268,12 +325,17 @@ class MangaDexListsWidget extends HookConsumerWidget {
                       slivers: [
                         appbar,
                         leading,
-                        if (lists.isEmpty) SliverToBoxAdapter(child: Text('errors.nolists'.tr(context: context))),
+                        if (lists.isEmpty)
+                          SliverToBoxAdapter(
+                            child: Text('errors.nolists'.tr(context: context)),
+                          ),
                         SliverList.builder(
                           itemCount: lists.length,
                           findChildIndexCallback: (key) {
                             final valueKey = key as ValueKey<String>;
-                            final val = lists.indexWhere((i) => i.id == valueKey.value);
+                            final val = lists.indexWhere(
+                              (i) => i.id == valueKey.value,
+                            );
                             return val >= 0 ? val : null;
                           },
                           itemBuilder: (BuildContext context, int index) {
@@ -284,56 +346,80 @@ class MangaDexListsWidget extends HookConsumerWidget {
                               color:
                                   index.isOdd
                                       ? theme.colorScheme.surfaceContainer
-                                      : theme.colorScheme.surfaceContainerHighest,
+                                      : theme
+                                          .colorScheme
+                                          .surfaceContainerHighest,
                               child: ListTile(
                                 leading: Tooltip(
-                                  message: item.attributes.visibility.name.capitalize(),
+                                  message:
+                                      item.attributes.visibility.name
+                                          .capitalize(),
                                   child: Icon(
                                     Icons.circle,
                                     size: 16.0,
                                     color:
-                                        item.attributes.visibility == CustomListVisibility.private
+                                        item.attributes.visibility ==
+                                                CustomListVisibility.private
                                             ? Colors.red
                                             : Colors.green,
                                   ),
                                 ),
                                 title: Text(item.attributes.name),
-                                subtitle: Text('num_items'.plural(item.set.length)),
+                                subtitle: Text(
+                                  'num_items'.plural(item.set.length),
+                                ),
                                 trailing: MenuAnchor(
                                   builder:
-                                      (context, controller, child) => IconButton(
-                                        onPressed: () {
-                                          if (controller.isOpen) {
-                                            controller.close();
-                                          } else {
-                                            controller.open();
-                                          }
-                                        },
-                                        icon: const Icon(Icons.more_vert),
-                                      ),
+                                      (context, controller, child) =>
+                                          IconButton(
+                                            onPressed: () {
+                                              if (controller.isOpen) {
+                                                controller.close();
+                                              } else {
+                                                controller.open();
+                                              }
+                                            },
+                                            icon: const Icon(Icons.more_vert),
+                                          ),
                                   menuChildren: [
                                     MenuItemButton(
                                       onPressed: () async {
                                         followList(item, false);
                                       },
-                                      child: Text('ui.unfollow'.tr(context: context)),
+                                      child: Text(
+                                        'ui.unfollow'.tr(context: context),
+                                      ),
                                     ),
-                                    if (item.user != null && me != null && item.user!.id == me.id)
+                                    if (item.user != null &&
+                                        me != null &&
+                                        item.user!.id == me.id)
                                       MenuItemButton(
                                         onPressed: () async {
-                                          final result = await showDeleteListDialog(context, item.attributes.name);
+                                          final result =
+                                              await showDeleteListDialog(
+                                                context,
+                                                item.attributes.name,
+                                              );
                                           if (result == true) {
                                             deleteList(item);
                                           }
                                         },
-                                        child: Text('ui.delete'.tr(context: context)),
+                                        child: Text(
+                                          'ui.delete'.tr(context: context),
+                                        ),
                                       ),
-                                    if (item.user != null && me != null && item.user!.id == me.id)
+                                    if (item.user != null &&
+                                        me != null &&
+                                        item.user!.id == me.id)
                                       MenuItemButton(
                                         onPressed: () {
-                                          router.push(MangaDexEditListRoute(list: item));
+                                          router.push(
+                                            MangaDexEditListRoute(list: item),
+                                          );
                                         },
-                                        child: Text('ui.edit'.tr(context: context)),
+                                        child: Text(
+                                          'ui.edit'.tr(context: context),
+                                        ),
                                       ),
                                   ],
                                 ),
@@ -344,9 +430,13 @@ class MangaDexListsWidget extends HookConsumerWidget {
                             );
                           },
                         ),
+                        if (followGetNextPage.state is PendingMutationState)
+                          const SliverToBoxAdapter(child: ListSpinner()),
                       ],
                     ),
-                loadingBuilder: (_, progress) => LoadingOverlayStack(progress: progress?.toDouble()),
+                loadingBuilder:
+                    (_, progress) =>
+                        LoadingOverlayStack(progress: progress?.toDouble()),
               ),
             );
           },

@@ -20,7 +20,10 @@ Future<List<ChapterFeedItemData>> _fetchGlobalChapters(Ref ref) async {
   final chapters = await ref.watch(latestGlobalFeedProvider.future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(
+    ids: mangaIds,
+    limit: MangaDexEndpoints.breakLimit,
+  );
 
   await ref.read(statisticsProvider.get)(mangas);
   await ref.read(readChaptersProvider(me?.id).get)(mangas);
@@ -57,26 +60,38 @@ class MangaDexGlobalFeedPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useScrollController();
+    final getNextPage = ref.watch(latestGlobalFeedProvider.getNextPage);
 
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
+            controller.animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.easeOutCirc,
+            );
           },
-          child: TitleFlexBar(title: 'mangadex.latestUpdates'.tr(context: context)),
+          child: TitleFlexBar(
+            title: 'mangadex.latestUpdates'.tr(context: context),
+          ),
         ),
         leading: AutoLeadingButton(),
       ),
       body: ChapterFeedWidget(
         provider: _fetchGlobalChaptersProvider,
-        onAtEdge: () => ref.read(latestGlobalFeedProvider.notifier).getMore(),
+        onAtEdge: () {
+          if (getNextPage.state is! PendingMutationState) {
+            getNextPage();
+          }
+        },
         onRefresh: () async {
-          ref.read(latestGlobalFeedProvider.notifier).clear();
+          ref.invalidate(latestGlobalFeedProvider);
           return ref.refresh(_fetchGlobalChaptersProvider.future);
         },
         controller: controller,
         restorationId: 'global_list_offset',
+        isLoading: getNextPage.state is PendingMutationState,
       ),
     );
   }

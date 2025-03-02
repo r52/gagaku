@@ -1835,12 +1835,10 @@ class RecentlyAdded extends _$RecentlyAdded
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    offset = 0;
-    atEnd = false;
-    ref.invalidateSelf();
+  @mutation
+  Future<List<Manga>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -1876,6 +1874,12 @@ class LatestChaptersFeed extends _$LatestChaptersFeed
 
   @override
   Future<List<Chapter>> build(String? userId) async {
+    final api = ref.watch(mangadexProvider);
+
+    ref.onDispose(() async {
+      await api.invalidateAll(feedKey);
+    });
+
     if (userId == null) {
       return [];
     }
@@ -1883,14 +1887,10 @@ class LatestChaptersFeed extends _$LatestChaptersFeed
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    final api = ref.watch(mangadexProvider);
-    await api.invalidateAll(feedKey);
-    offset = 0;
-    atEnd = false;
-    ref.invalidateSelf();
+  @mutation
+  Future<List<Chapter>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -1925,17 +1925,19 @@ class LatestGlobalFeed extends _$LatestGlobalFeed
 
   @override
   Future<List<Chapter>> build() async {
+    final api = ref.watch(mangadexProvider);
+
+    ref.onDispose(() async {
+      await api.invalidateAll(feedKey);
+    });
+
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    final api = ref.watch(mangadexProvider);
-    await api.invalidateAll(feedKey);
-    offset = 0;
-    atEnd = false;
-    ref.invalidateSelf();
+  @mutation
+  Future<List<Chapter>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -1970,17 +1972,19 @@ class GroupFeed extends _$GroupFeed
 
   @override
   Future<List<Chapter>> build(Group group) async {
+    final api = ref.watch(mangadexProvider);
+
+    ref.onDispose(() async {
+      await api.invalidateAll('$feedKey(${group.id}');
+    });
+
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    final api = ref.watch(mangadexProvider);
-    await api.invalidateAll('$feedKey(${group.id}');
-    offset = 0;
-    atEnd = false;
-    ref.invalidateSelf();
+  @mutation
+  Future<List<Chapter>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2010,12 +2014,10 @@ class GroupTitles extends _$GroupTitles with ListBasedInfiniteScrollMix {
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    offset = 0;
-    atEnd = false;
-    ref.invalidateSelf();
+  @mutation
+  Future<List<Manga>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2045,11 +2047,10 @@ class CreatorTitles extends _$CreatorTitles with ListBasedInfiniteScrollMix {
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    offset = 0;
-    atEnd = false;
+  @mutation
+  Future<List<Manga>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2098,16 +2099,19 @@ class MangaChapters extends _$MangaChapters
 
   @override
   Future<List<Chapter>> build(Manga manga) async {
+    final api = ref.watch(mangadexProvider);
+
+    ref.onDispose(() async {
+      await api.invalidateAll('$feedKey(${manga.id}');
+    });
+
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    final api = ref.watch(mangadexProvider);
-    await api.invalidateAll('$feedKey(${manga.id}');
-    offset = 0;
-    atEnd = false;
+  @mutation
+  Future<List<Chapter>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2133,15 +2137,19 @@ class MangaCovers extends _$MangaCovers
 
   @override
   Future<List<CoverArt>> build(Manga manga) async {
+    final api = ref.watch(mangadexProvider);
+
+    ref.onDispose(() async {
+      await api.invalidateAll('CoverList(${manga.id}');
+    });
+
     return fetchData(0);
   }
 
   @override
-  Future<void> clear() async {
-    final api = ref.watch(mangadexProvider);
-    await api.invalidateAll('CoverList(${manga.id}');
-    offset = 0;
-    atEnd = false;
+  @mutation
+  Future<List<CoverArt>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2385,11 +2393,10 @@ class UserLists extends _$UserLists
     return result;
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    offset = 0;
-    atEnd = false;
+  @mutation
+  Future<List<CustomList>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2445,11 +2452,10 @@ class FollowedLists extends _$FollowedLists
     return result;
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    offset = 0;
-    atEnd = false;
+  @mutation
+  Future<List<CustomList>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2484,17 +2490,19 @@ class CustomListFeed extends _$CustomListFeed
 
   @override
   Future<List<Chapter>> build(CustomList list) async {
+    final api = ref.watch(mangadexProvider);
+
+    ref.onDispose(() async {
+      await api.invalidateAll('$feedKey(${list.id}');
+    });
+
     return fetchData(0);
   }
 
-  /// Clears the list and refetch from the beginning
   @override
-  Future<void> clear() async {
-    final api = ref.watch(mangadexProvider);
-    await api.invalidateAll('$feedKey(${list.id}');
-    offset = 0;
-    atEnd = false;
-    ref.invalidateSelf();
+  @mutation
+  Future<List<Chapter>> getNextPage() async {
+    return getMore();
   }
 }
 
@@ -2641,10 +2649,9 @@ class MangaSearch extends _$MangaSearch with ListBasedInfiniteScrollMix {
   }
 
   @override
-  Future<void> clear() async {
-    offset = 0;
-    atEnd = false;
-    ref.invalidateSelf();
+  @mutation
+  Future<List<Manga>> getNextPage() async {
+    return getMore();
   }
 }
 

@@ -125,6 +125,13 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
     final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
 
+    final chapterGetNextPage = ref.watch(
+      mangaChaptersProvider(manga).getNextPage,
+    );
+    final coverGetNextPage = ref.watch(
+      mangaChaptersProvider(manga).getNextPage,
+    );
+
     final hasRelated = manga.relatedMangas.isNotEmpty;
     final tabController = useTabController(
       initialLength:
@@ -182,10 +189,14 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
           notification.metrics.pixels == notification.metrics.maxScrollExtent) {
         switch (_ViewType.values.elementAt(tabview)) {
           case _ViewType.chapters:
-            ref.read(mangaChaptersProvider(manga).notifier).getMore();
+            if (chapterGetNextPage.state is! PendingMutationState) {
+              chapterGetNextPage();
+            }
             break;
           case _ViewType.art:
-            ref.read(mangaCoversProvider(manga).notifier).getMore();
+            if (coverGetNextPage.state is! PendingMutationState) {
+              coverGetNextPage();
+            }
           default:
             break;
         }
@@ -236,10 +247,8 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
           switch (_ViewType.values.elementAt(tabview)) {
             case _ViewType.chapters:
-              await ref.read(mangaChaptersProvider(manga).notifier).clear();
               return ref.refresh(mangaChaptersProvider(manga).future);
             case _ViewType.art:
-              await ref.read(mangaCoversProvider(manga).notifier).clear();
               return ref.refresh(mangaCoversProvider(manga).future);
             case _ViewType.related:
               return ref.refresh(_fetchRelatedMangaProvider(manga).future);
@@ -863,7 +872,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     children: [
                       DataProviderWhenWidget(
                         provider: mangaChaptersProvider(manga),
-                        data: chapterProvider,
+                        initialData: chapterProvider,
                         builder:
                             (context, chapters) =>
                                 NotificationListener<ScrollEndNotification>(
@@ -881,7 +890,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                                 ),
                         loadingWidget: const SizedBox.shrink(),
                       ),
-                      if (chapterProvider.isLoading) ...Styles.loadingOverlay,
+                      if (chapterGetNextPage.state is PendingMutationState ||
+                          chapterProvider.isLoading)
+                        ...Styles.loadingOverlay,
                     ],
                   );
                 },
@@ -894,7 +905,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                     children: [
                       DataProviderWhenWidget(
                         provider: mangaCoversProvider(manga),
-                        data: coverProvider,
+                        initialData: coverProvider,
                         builder:
                             (
                               context,
@@ -1081,7 +1092,9 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
                             ),
                         loadingWidget: const SizedBox.shrink(),
                       ),
-                      if (coverProvider.isLoading) ...Styles.loadingOverlay,
+                      if (coverGetNextPage.state is PendingMutationState ||
+                          coverProvider.isLoading)
+                        ...Styles.loadingOverlay,
                     ],
                   );
                 },
@@ -1094,7 +1107,7 @@ class MangaDexMangaViewWidget extends HookConsumerWidget {
 
                   return DataProviderWhenWidget(
                     provider: _fetchRelatedMangaProvider(manga),
-                    data: relatedProvider,
+                    initialData: relatedProvider,
                     builder:
                         (context, related) => MangaListWidget(
                           title: Text(

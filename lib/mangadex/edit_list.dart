@@ -327,7 +327,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         provider: persistentMangaListPaginatorProvider(
                           id.value,
                         ),
-                        data: titlesProvider,
+                        initialData: titlesProvider,
                         builder:
                             (context, mangas) => MangaListWidget(
                               title: Text(

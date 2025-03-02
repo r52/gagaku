@@ -18,7 +18,10 @@ Future<List<Manga>> _fetchMangaFeed(Ref ref) async {
 
   final mangaids = chapters.map((e) => e.manga.id).toSet();
 
-  final mangas = await api.fetchManga(ids: mangaids, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(
+    ids: mangaids,
+    limit: MangaDexEndpoints.breakLimit,
+  );
 
   await ref.read(statisticsProvider.get)(mangas);
 
@@ -41,35 +44,47 @@ class MangaDexMangaFeed extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
     final feedProvider = ref.watch(_fetchMangaFeedProvider);
-    final isLoading = feedProvider.isLoading && !feedProvider.isRefreshing;
+    final getNextPage = ref.watch(
+      latestChaptersFeedProvider(me?.id).getNextPage,
+    );
+    final isLoading =
+        getNextPage.state is PendingMutationState ||
+        (feedProvider.isLoading && !feedProvider.isRefreshing);
 
     return Center(
       child: RefreshIndicator(
         key: ValueKey('MangaDexMangaFeed_L1(${me?.id})'),
         onRefresh: () async {
-          ref.read(latestChaptersFeedProvider(me?.id).notifier).clear();
+          ref.invalidate(latestChaptersFeedProvider(me?.id));
           return ref.refresh(_fetchMangaFeedProvider.future);
         },
         child: DataProviderWhenWidget(
           provider: _fetchMangaFeedProvider,
-          data: feedProvider,
-          builder: (context, mangas) => MangaListWidget(
-            key: ValueKey('MangaDexMangaFeed_L2(${me?.id})'),
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: controller,
-            onAtEdge: () => ref.read(latestChaptersFeedProvider(me?.id).notifier).getMore(),
-            leading: leading,
-            isLoading: isLoading,
-            children: [
-              if (mangas.isEmpty)
-                SliverToBoxAdapter(
-                  child: Center(
-                    child: Text('mangadex.noFollowsMsg'.tr(context: context)),
-                  ),
-                ),
-              MangaListViewSliver(items: mangas),
-            ],
-          ),
+          initialData: feedProvider,
+          builder:
+              (context, mangas) => MangaListWidget(
+                key: ValueKey('MangaDexMangaFeed_L2(${me?.id})'),
+                physics: const AlwaysScrollableScrollPhysics(),
+                controller: controller,
+                onAtEdge: () {
+                  if (getNextPage.state is! PendingMutationState) {
+                    getNextPage();
+                  }
+                },
+                leading: leading,
+                isLoading: isLoading,
+                children: [
+                  if (mangas.isEmpty)
+                    SliverToBoxAdapter(
+                      child: Center(
+                        child: Text(
+                          'mangadex.noFollowsMsg'.tr(context: context),
+                        ),
+                      ),
+                    ),
+                  MangaListViewSliver(items: mangas),
+                ],
+              ),
           loadingWidget: const LoadingOverlayStack(),
         ),
       ),

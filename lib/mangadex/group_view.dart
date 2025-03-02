@@ -32,7 +32,10 @@ Future<List<ChapterFeedItemData>> _fetchGroupFeed(Ref ref, Group group) async {
   final chapters = await ref.watch(groupFeedProvider(group).future);
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet();
-  final mangas = await api.fetchManga(ids: mangaIds, limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchManga(
+    ids: mangaIds,
+    limit: MangaDexEndpoints.breakLimit,
+  );
 
   await ref.read(statisticsProvider.get)(mangas);
   await ref.read(readChaptersProvider(me?.id).get)(mangas);
@@ -74,14 +77,22 @@ Future<List<Manga>> _fetchGroupTitles(Ref ref, Group group) async {
 
 @RoutePage()
 class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
-  const MangaDexGroupViewWithNamePage({super.key, @PathParam() required super.groupId, @PathParam() this.name});
+  const MangaDexGroupViewWithNamePage({
+    super.key,
+    @PathParam() required super.groupId,
+    @PathParam() this.name,
+  });
 
   final String? name;
 }
 
 @RoutePage()
 class MangaDexGroupViewPage extends StatelessWidget {
-  const MangaDexGroupViewPage({super.key, @PathParam() required this.groupId, this.group});
+  const MangaDexGroupViewPage({
+    super.key,
+    @PathParam() required this.groupId,
+    this.group,
+  });
 
   final String groupId;
 
@@ -123,7 +134,11 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
       NavigationDestination(icon: Icon(Icons.menu_book), label: 'Group Titles'),
     ];
 
-    final controllers = [useScrollController(), useScrollController(), useScrollController()];
+    final controllers = [
+      useScrollController(),
+      useScrollController(),
+      useScrollController(),
+    ];
 
     final tab = switch (view.value) {
       _ViewType.info => CustomScrollView(
@@ -145,7 +160,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                     ),
                   ],
                 ),
-              if (group.attributes.website != null || group.attributes.discord != null)
+              if (group.attributes.website != null ||
+                  group.attributes.discord != null)
                 ExpansionTile(
                   initiallyExpanded: true,
                   expandedAlignment: Alignment.centerLeft,
@@ -160,7 +176,9 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                           if (group.attributes.website != null)
                             ButtonChip(
                               onPressed: () async {
-                                if (!await launchUrl(Uri.parse(group.attributes.website!))) {
+                                if (!await launchUrl(
+                                  Uri.parse(group.attributes.website!),
+                                )) {
                                   throw 'Could not launch ${group.attributes.website!}';
                                 }
                               },
@@ -169,7 +187,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                           if (group.attributes.discord != null)
                             ButtonChip(
                               onPressed: () async {
-                                final url = 'https://discord.gg/${group.attributes.discord!}';
+                                final url =
+                                    'https://discord.gg/${group.attributes.discord!}';
                                 if (!await launchUrl(Uri.parse(url))) {
                                   throw 'Could not launch $url';
                                 }
@@ -192,17 +211,24 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
       _ViewType.feed => Consumer(
         key: const Key('/group?tab=feed'),
         builder: (context, ref, child) {
+          final getNextPage = ref.watch(groupFeedProvider(group).getNextPage);
+
           return ChapterFeedWidget(
             provider: _fetchGroupFeedProvider(group),
             title: 'mangadex.groupFeed'.tr(context: context),
             emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
-            onAtEdge: () => ref.read(groupFeedProvider(group).notifier).getMore(),
+            onAtEdge: () {
+              if (getNextPage.state is! PendingMutationState) {
+                getNextPage();
+              }
+            },
             onRefresh: () async {
-              ref.read(groupFeedProvider(group).notifier).clear();
+              ref.invalidate(groupFeedProvider(group));
               return ref.refresh(_fetchGroupFeedProvider(group).future);
             },
             controller: controllers[1],
             restorationId: 'group_feed_offset',
+            isLoading: getNextPage.state is PendingMutationState,
           );
         },
       ),
@@ -210,30 +236,46 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         key: const Key('/group?tab=titles'),
         builder: (context, ref, child) {
           final titleProvider = ref.watch(_fetchGroupTitlesProvider(group));
-          final isLoading = titleProvider.isLoading && !titleProvider.isRefreshing;
+          final getNextPage = ref.watch(groupTitlesProvider(group).getNextPage);
+          final isLoading =
+              getNextPage.state is PendingMutationState ||
+              (titleProvider.isLoading && !titleProvider.isRefreshing);
 
           return RefreshIndicator(
             onRefresh: () async {
-              ref.read(groupTitlesProvider(group).notifier).clear();
+              ref.invalidate(groupTitlesProvider(group));
               return ref.refresh(_fetchGroupTitlesProvider(group).future);
             },
             child: DataProviderWhenWidget(
               provider: _fetchGroupTitlesProvider(group),
-              data: titleProvider,
+              initialData: titleProvider,
               builder:
                   (context, mangas) => MangaListWidget(
-                    title: Text('mangadex.groupTitles'.tr(context: context), style: TextStyle(fontSize: 24)),
+                    title: Text(
+                      'mangadex.groupTitles'.tr(context: context),
+                      style: TextStyle(fontSize: 24),
+                    ),
                     physics: const AlwaysScrollableScrollPhysics(),
                     controller: controllers[2],
-                    onAtEdge: () => ref.read(groupTitlesProvider(group).notifier).getMore(),
+                    onAtEdge: () {
+                      if (getNextPage.state is! PendingMutationState) {
+                        getNextPage();
+                      }
+                    },
                     isLoading: isLoading,
                     children: [
                       if (mangas.isEmpty)
-                        SliverToBoxAdapter(child: Center(child: Text('errors.notitles'.tr(context: context)))),
+                        SliverToBoxAdapter(
+                          child: Center(
+                            child: Text('errors.notitles'.tr(context: context)),
+                          ),
+                        ),
                       MangaListViewSliver(items: mangas),
                     ],
                   ),
-              loadingBuilder: (_, progress) => LoadingOverlayStack(progress: progress?.toDouble()),
+              loadingBuilder:
+                  (_, progress) =>
+                      LoadingOverlayStack(progress: progress?.toDouble()),
             ),
           );
         },
@@ -255,20 +297,32 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         ),
         actions: [
           ElevatedButton.icon(
-            style: Styles.buttonStyle(backgroundColor: isBlacklisted ? Colors.green.shade900 : Colors.red.shade900),
+            style: Styles.buttonStyle(
+              backgroundColor:
+                  isBlacklisted ? Colors.green.shade900 : Colors.red.shade900,
+            ),
             onPressed: () {
               if (isBlacklisted) {
                 cfg.value = settings.copyWith(
-                  groupBlacklist: settings.groupBlacklist.where((element) => element != group.id).toSet(),
+                  groupBlacklist:
+                      settings.groupBlacklist
+                          .where((element) => element != group.id)
+                          .toSet(),
                 );
               } else {
-                cfg.value = settings.copyWith(groupBlacklist: {...settings.groupBlacklist, group.id});
+                cfg.value = settings.copyWith(
+                  groupBlacklist: {...settings.groupBlacklist, group.id},
+                );
               }
 
               ref.read(mdConfigProvider.save)(cfg.value);
             },
             icon: const Icon(Icons.block),
-            label: Text(isBlacklisted ? 'ui.unblock'.tr(context: context) : 'ui.block'.tr(context: context)),
+            label: Text(
+              isBlacklisted
+                  ? 'ui.unblock'.tr(context: context)
+                  : 'ui.block'.tr(context: context),
+            ),
           ),
         ],
       ),
@@ -295,7 +349,11 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
           if (currTab == _ViewType.values[index]) {
             // Scroll to top if on the same tab
-            controllers[index].animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+            controllers[index].animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+            );
           } else {
             // Switch tab
             view.value = _ViewType.values[index];

@@ -82,7 +82,11 @@ extension StringExtension on String {
   String formatWithMap(Map<String, String> mappedValues) {
     return replaceAllMapped(RegExp(r'{(.*?)}'), (match) {
       final mapped = mappedValues[match[1]];
-      if (mapped == null) throw ArgumentError('$mappedValues does not contain the key "${match[1]}"');
+      if (mapped == null) {
+        throw ArgumentError(
+          '$mappedValues does not contain the key "${match[1]}"',
+        );
+      }
       return mapped;
     });
   }
@@ -91,7 +95,8 @@ extension StringExtension on String {
 class DeviceContext {
   static bool isMobile() => (Platform.isIOS || Platform.isAndroid);
 
-  static bool isDesktop() => (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
+  static bool isDesktop() =>
+      (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
   static bool screenWidthSmall(BuildContext context) {
     // Somewhat arbitrary measurement but w/e
@@ -118,36 +123,34 @@ mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   Future<List<T>> fetchData(int offset);
 
   @mustBeOverridden
-  Future<void> clear();
+  Future<List<T>> getNextPage();
 
-  Future<void> getMore() async {
-    if (state.isLoading || state.isReloading) {
-      return;
-    }
-
+  @protected
+  Future<List<T>> getMore() async {
     if (atEnd) {
-      return;
+      return [];
     }
 
-    final oldstate = await future;
+    final current = await future;
 
     // If there is more content, get more
-    if (oldstate.length == offset + limit && !atEnd) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final result = await fetchData(offset + limit);
-        offset += limit;
+    if (current.length == offset + limit && !atEnd) {
+      final result = await fetchData(offset + limit);
+      offset += limit;
 
-        if (result.isEmpty) {
-          atEnd = true;
-        }
+      if (result.isEmpty) {
+        atEnd = true;
+      }
 
-        return [...oldstate, ...result];
-      });
-    } else {
-      // Otherwise, do nothing because there is no more content
-      atEnd = true;
+      state = AsyncData([...current, ...result]);
+
+      return result;
     }
+
+    // Otherwise, do nothing because there is no more content
+    atEnd = true;
+
+    return [];
   }
 }
 
@@ -190,7 +193,9 @@ mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>> {
 
     ref.onCancel(() {
       _staleTimer = Timer(duration, () {
-        logger.d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+        logger.d(
+          '${runtimeType.toString()}: disposeAfter ${duration.toString()}',
+        );
         link.close();
       });
     });
@@ -227,7 +232,9 @@ extension CacheForExtension on Ref {
     final link = keepAlive();
 
     onCancel(() {
-      logger.d('${runtimeType.toString()}: disposeAfter ${duration.toString()}');
+      logger.d(
+        '${runtimeType.toString()}: disposeAfter ${duration.toString()}',
+      );
       timer = Timer(duration, link.close);
     });
 
@@ -251,7 +258,10 @@ extension SearchUtil on StatefulWidget {
 }
 
 extension WidgetRefWorkaround on WidgetRef {
-  void invalidateifExists(ProviderBase<Object?> provider, {bool asReload = false}) {
+  void invalidateifExists(
+    ProviderBase<Object?> provider, {
+    bool asReload = false,
+  }) {
     if (exists(provider)) {
       invalidate(provider, asReload: asReload);
     }
@@ -259,7 +269,10 @@ extension WidgetRefWorkaround on WidgetRef {
 }
 
 extension RefWorkaround on Ref {
-  void invalidateifExists(ProviderBase<Object?> provider, {bool asReload = false}) {
+  void invalidateifExists(
+    ProviderBase<Object?> provider, {
+    bool asReload = false,
+  }) {
     if (exists(provider)) {
       invalidate(provider, asReload: asReload);
     }
