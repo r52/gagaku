@@ -371,6 +371,7 @@ class TriStateChip extends StatelessWidget {
     this.elevation,
     this.shadowColor,
     this.selectedColor,
+    this.unselectedColor,
   }) : assert(onChanged != null),
        assert(elevation == null || elevation >= 0.0);
 
@@ -391,6 +392,7 @@ class TriStateChip extends StatelessWidget {
   final bool? value;
   final ValueChanged<bool?>? onChanged;
   final Color? selectedColor;
+  final Color? unselectedColor;
 
   void _onPressed() {
     switch (value) {
@@ -407,12 +409,12 @@ class TriStateChip extends StatelessWidget {
   }
 
   BorderSide? _getBorder(Set<WidgetState> states) {
-    if (selectedColor == null) {
-      return null;
+    if (value == true && selectedColor != null) {
+      return BorderSide(color: selectedColor!);
     }
 
-    if (value == false) {
-      return BorderSide(color: selectedColor!);
+    if (value == false && unselectedColor != null) {
+      return BorderSide(color: unselectedColor!);
     }
 
     return null;
@@ -430,9 +432,10 @@ class TriStateChip extends StatelessWidget {
         break;
       case true:
         selected = true;
+        avatar = Icon(Icons.add, color: selectedColor);
         break;
       case false:
-        avatar = const Icon(Icons.remove);
+        avatar = Icon(Icons.remove, color: unselectedColor);
         selected = false;
         break;
     }
@@ -442,7 +445,7 @@ class TriStateChip extends StatelessWidget {
       label: label,
       onPressed: _onPressed,
       labelStyle: labelStyle,
-      selectedColor: selectedColor,
+      // selectedColor: selectedColor,
       side: WidgetStateBorderSide.resolveWith(_getBorder),
       shape: shape,
       clipBehavior: clipBehavior,
@@ -457,6 +460,7 @@ class TriStateChip extends StatelessWidget {
       materialTapTargetSize: materialTapTargetSize,
       elevation: elevation,
       shadowColor: shadowColor,
+      showCheckmark: false,
     );
   }
 }

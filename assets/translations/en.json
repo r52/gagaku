@@ -158,9 +158,11 @@
     "resetFilters": "Reset Filters",
     "applyFilters": "Apply Filters",
     "selectedTagFilters": "Selected Tag Filters",
+    "filterTags": "Filter tags",
     "otherOptions": "Other Options",
     "inclusion": "Inclusion Mode",
-    "exclusion": "Exclusion Mode"
+    "exclusion": "Exclusion Mode",
+    "any": "Any"
   },
   "settings": "Settings",
   "arg_settings": "{} @:settings",
