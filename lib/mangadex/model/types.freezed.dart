@@ -500,8 +500,8 @@ as String,
 /// @nodoc
 @JsonSerializable()
 
-class Chapter with DiagnosticableTreeMixin, ChapterOps implements MangaDexEntity {
-   Chapter({required this.id, required this.attributes, required final  List<MangaDexEntity> relationships, final  String? $type}): _relationships = relationships,$type = $type ?? 'chapter';
+class Chapter extends MangaDexEntity with DiagnosticableTreeMixin, ChapterOps {
+   Chapter({required this.id, required this.attributes, required final  List<MangaDexEntity> relationships, final  String? $type}): _relationships = relationships,$type = $type ?? 'chapter',super._();
   factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
 
 @override final  String id;
@@ -598,8 +598,8 @@ $ChapterAttributesCopyWith<$Res> get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class Manga with DiagnosticableTreeMixin, MangaOps implements MangaDexEntity {
-   Manga({required this.id, this.attributes, final  List<MangaDexEntity>? relationships, this.related, final  String? $type}): _relationships = relationships,$type = $type ?? 'manga';
+class Manga extends MangaDexEntity with DiagnosticableTreeMixin, MangaOps {
+   Manga({required this.id, this.attributes, final  List<MangaDexEntity>? relationships, this.related, final  String? $type}): _relationships = relationships,$type = $type ?? 'manga',super._();
   factory Manga.fromJson(Map<String, dynamic> json) => _$MangaFromJson(json);
 
 @override final  String id;
@@ -703,8 +703,8 @@ $MangaAttributesCopyWith<$Res>? get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class User with DiagnosticableTreeMixin implements MangaDexEntity {
-  const User({required this.id, this.attributes, final  String? $type}): $type = $type ?? 'user';
+class User extends MangaDexEntity with DiagnosticableTreeMixin {
+  const User({required this.id, this.attributes, final  String? $type}): $type = $type ?? 'user',super._();
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String id;
@@ -796,8 +796,8 @@ $UserAttributesCopyWith<$Res>? get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class Artist with DiagnosticableTreeMixin implements MangaDexEntity, CreatorType {
-  const Artist({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'artist';
+class Artist extends MangaDexEntity with DiagnosticableTreeMixin implements CreatorType {
+  const Artist({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'artist',super._();
   factory Artist.fromJson(Map<String, dynamic> json) => _$ArtistFromJson(json);
 
 @override final  String id;
@@ -886,8 +886,8 @@ $AuthorAttributesCopyWith<$Res> get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class Author with DiagnosticableTreeMixin implements MangaDexEntity, CreatorType {
-  const Author({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'author';
+class Author extends MangaDexEntity with DiagnosticableTreeMixin implements CreatorType {
+  const Author({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'author',super._();
   factory Author.fromJson(Map<String, dynamic> json) => _$AuthorFromJson(json);
 
 @override final  String id;
@@ -976,8 +976,8 @@ $AuthorAttributesCopyWith<$Res> get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class CreatorID with DiagnosticableTreeMixin implements MangaDexEntity {
-  const CreatorID({required this.id, final  String? $type}): $type = $type ?? 'creator';
+class CreatorID extends MangaDexEntity with DiagnosticableTreeMixin {
+  const CreatorID({required this.id, final  String? $type}): $type = $type ?? 'creator',super._();
   factory CreatorID.fromJson(Map<String, dynamic> json) => _$CreatorIDFromJson(json);
 
 @override final  String id;
@@ -1055,8 +1055,8 @@ as String,
 /// @nodoc
 @JsonSerializable()
 
-class CoverArt with DiagnosticableTreeMixin implements MangaDexEntity {
-  const CoverArt({required this.id, this.attributes, final  String? $type}): $type = $type ?? 'cover_art';
+class CoverArt extends MangaDexEntity with DiagnosticableTreeMixin {
+  const CoverArt({required this.id, this.attributes, final  String? $type}): $type = $type ?? 'cover_art',super._();
   factory CoverArt.fromJson(Map<String, dynamic> json) => _$CoverArtFromJson(json);
 
 @override final  String id;
@@ -1148,8 +1148,8 @@ $CoverArtAttributesCopyWith<$Res>? get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class Group with DiagnosticableTreeMixin implements MangaDexEntity {
-  const Group({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'scanlation_group';
+class Group extends MangaDexEntity with DiagnosticableTreeMixin {
+  const Group({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'scanlation_group',super._();
   factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
 
 @override final  String id;
@@ -1238,8 +1238,8 @@ $ScanlationGroupAttributesCopyWith<$Res> get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class CustomList with DiagnosticableTreeMixin, CustomListOps implements MangaDexEntity {
-   CustomList({required this.id, required this.attributes, required final  List<MangaDexEntity> relationships, final  String? $type}): _relationships = relationships,$type = $type ?? 'custom_list';
+class CustomList extends MangaDexEntity with DiagnosticableTreeMixin, CustomListOps {
+   CustomList({required this.id, required this.attributes, required final  List<MangaDexEntity> relationships, final  String? $type}): _relationships = relationships,$type = $type ?? 'custom_list',super._();
   factory CustomList.fromJson(Map<String, dynamic> json) => _$CustomListFromJson(json);
 
 @override final  String id;
@@ -1336,8 +1336,8 @@ $CustomListAttributesCopyWith<$Res> get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class MDError with DiagnosticableTreeMixin implements MangaDexEntity {
-  const MDError({required this.id, required this.status, required this.title, this.detail, this.context, final  String? $type}): $type = $type ?? 'error';
+class MDError extends MangaDexEntity with DiagnosticableTreeMixin {
+  const MDError({required this.id, required this.status, required this.title, this.detail, this.context, final  String? $type}): $type = $type ?? 'error',super._();
   factory MDError.fromJson(Map<String, dynamic> json) => _$MDErrorFromJson(json);
 
 @override final  String id;
@@ -1423,8 +1423,8 @@ as String?,
 /// @nodoc
 @JsonSerializable()
 
-class Tag with DiagnosticableTreeMixin implements MangaDexEntity {
-  const Tag({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'tag';
+class Tag extends MangaDexEntity with DiagnosticableTreeMixin {
+  const Tag({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'tag',super._();
   factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
 
 @override final  String id;

@@ -363,6 +363,8 @@ abstract class CreatorType implements MangaDexUUID {
 
 @Freezed(unionKey: 'type')
 sealed class MangaDexEntity with _$MangaDexEntity implements MangaDexUUID {
+  const MangaDexEntity._();
+
   @With<ChapterOps>()
   factory MangaDexEntity.chapter({
     required String id,
@@ -483,7 +485,7 @@ mixin ChapterOps {
   List<MangaDexEntity> get relationships;
 
   late final title = _getTitle();
-  late final groups = _getGroups();
+  late final List<Group> groups = List.unmodifiable(_getGroups());
   late final manga = _getManga();
   late final uploadUser = _getUploadUser();
 
@@ -542,11 +544,11 @@ mixin MangaOps {
   List<MangaDexEntity>? get relationships;
   MangaRelations? get related;
 
-  late final List<CreatorType>? author = _getAuthor();
-  late final List<CreatorType>? artist = _getArtist();
+  late final List<CreatorType> author = List.unmodifiable(_getAuthor());
+  late final List<CreatorType> artist = List.unmodifiable(_getArtist());
   late final longStrip = _isLongStrip();
-  late final covers = _getAllCoverArt();
-  late final relatedMangas = _getRelatedManga();
+  late final List<CoverArtUrl> covers = List.unmodifiable(_getAllCoverArt());
+  late final List<Manga> relatedMangas = List.unmodifiable(_getRelatedManga());
 
   List<CoverArtUrl> _getAllCoverArt() {
     final coverRelations = <CoverArtAttributes>[];
@@ -600,24 +602,24 @@ mixin MangaOps {
     );
   }
 
-  List<CreatorType>? _getAuthor() {
+  List<CreatorType> _getAuthor() {
     final authorRs = relationships?.whereType<Author>();
 
     if (authorRs != null && authorRs.isNotEmpty) {
       return authorRs.toList();
     }
 
-    return null;
+    return [];
   }
 
-  List<CreatorType>? _getArtist() {
+  List<CreatorType> _getArtist() {
     final artistRs = relationships?.whereType<Artist>();
 
     if (artistRs != null && artistRs.isNotEmpty) {
       return artistRs.toList();
     }
 
-    return null;
+    return [];
   }
 
   bool _isLongStrip() {
@@ -652,7 +654,7 @@ mixin CustomListOps {
   CustomListAttributes get attributes;
   List<MangaDexEntity> get relationships;
 
-  late final set = _convertIDs();
+  late final set = Set.unmodifiable(_convertIDs());
   late final user = _getUser();
 
   Set<String> _convertIDs() {
