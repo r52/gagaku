@@ -17,7 +17,7 @@ part 'creator_view.g.dart';
 @riverpod
 Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
   final api = ref.watch(mangadexProvider);
-  final creator = await api.fetchCreators([creatorId]);
+  final creator = await api.fetchCreators(uuids: [creatorId]);
   return creator.first;
 }
 

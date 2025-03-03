@@ -1323,51 +1323,80 @@ class MangaDexModel {
   }
 
   /// Fetches creator info of the given [uuids]
-  Future<List<CreatorType>> fetchCreators(Iterable<String> uuids) async {
+  Future<List<CreatorType>> fetchCreators({
+    Iterable<String>? uuids,
+    String? name,
+  }) async {
+    assert(uuids != null || name != null);
+
     final list = <CreatorType>[];
 
-    final fetch =
-        (await uuids.whereAsync(
-          (id) async => !await _cache.exists(id),
-        )).toList();
+    if (uuids != null) {
+      final fetch =
+          (await uuids.whereAsync(
+            (id) async => !await _cache.exists(id),
+          )).toList();
 
-    if (fetch.isNotEmpty) {
-      int start = 0, end = 0;
+      if (fetch.isNotEmpty) {
+        int start = 0, end = 0;
 
-      var queryParams = <String, dynamic>{
-        'limit': MangaDexEndpoints.breakLimit.toString(),
-      };
+        var queryParams = <String, dynamic>{
+          'limit': MangaDexEndpoints.breakLimit.toString(),
+        };
 
-      while (end < fetch.length) {
-        start = end;
-        end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
+        while (end < fetch.length) {
+          start = end;
+          end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
-        queryParams['ids[]'] = fetch.getRange(start, end);
+          queryParams['ids[]'] = fetch.getRange(start, end);
 
-        final uri = MangaDexEndpoints.api.replace(
-          path: MangaDexEndpoints.creator,
-          queryParameters: queryParams,
-        );
+          final uri = MangaDexEndpoints.api.replace(
+            path: MangaDexEndpoints.creator,
+            queryParameters: queryParams,
+          );
 
-        final response = await _client.get(uri);
+          final response = await _client.get(uri);
 
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> body = json.decode(response.body);
-          final result = MDEntityList.fromJson(body);
+          if (response.statusCode == 200) {
+            final Map<String, dynamic> body = json.decode(response.body);
+            final result = MDEntityList.fromJson(body);
 
-          // Cache the data
-          await _cache.putAllAPIResolved(result.data);
-        } else {
-          // Throw if failure
-          throw createException("fetchCreators() failed.", response);
+            // Cache the data
+            await _cache.putAllAPIResolved(result.data);
+          } else {
+            // Throw if failure
+            throw createException("fetchCreators() failed.", response);
+          }
         }
       }
-    }
 
-    // Craft the list
-    for (final id in uuids) {
-      if (await _cache.exists(id)) {
-        list.add(_cache.get(id, Author.fromJson).get<CreatorType>());
+      // Craft the list
+      for (final id in uuids) {
+        if (await _cache.exists(id)) {
+          list.add(_cache.get(id, Author.fromJson).get<CreatorType>());
+        }
+      }
+    } else {
+      // name search
+      final queryParams = <String, dynamic>{'limit': '10', 'name': name};
+
+      final uri = MangaDexEndpoints.api.replace(
+        path: MangaDexEndpoints.creator,
+        queryParameters: queryParams,
+      );
+
+      final response = await _client.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = json.decode(response.body);
+        final result = MDEntityList.fromJson(body);
+
+        // Cache the data
+        await _cache.putAllAPIResolved(result.data);
+        list.addAll(result.data.cast<CreatorType>());
+      } else {
+        // Throw if failure
+        throw createException("fetchCreators() failed.", response);
       }
     }
 

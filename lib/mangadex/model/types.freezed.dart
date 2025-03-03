@@ -12,39 +12,36 @@ part of 'types.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$MangaFilters implements DiagnosticableTreeMixin {
 
- Set<Tag> get includedTags; TagMode get includedTagsMode; Set<Tag> get excludedTags; TagMode get excludedTagsMode; Set<MangaStatus> get status; Set<MangaDemographic> get publicationDemographic; Set<ContentRating> get contentRating; FilterOrder get order;
+ Set<Tag> get includedTags; TagMode get includedTagsMode; Set<Tag> get excludedTags; TagMode get excludedTagsMode; Set<CreatorType> get author; Set<CreatorType> get artist; Set<MangaStatus> get status; Set<MangaDemographic> get publicationDemographic; Set<ContentRating> get contentRating; FilterOrder get order;
 /// Create a copy of MangaFilters
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $MangaFiltersCopyWith<MangaFilters> get copyWith => _$MangaFiltersCopyWithImpl<MangaFilters>(this as MangaFilters, _$identity);
 
-  /// Serializes this MangaFilters to a JSON map.
-  Map<String, dynamic> toJson();
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'MangaFilters'))
-    ..add(DiagnosticsProperty('includedTags', includedTags))..add(DiagnosticsProperty('includedTagsMode', includedTagsMode))..add(DiagnosticsProperty('excludedTags', excludedTags))..add(DiagnosticsProperty('excludedTagsMode', excludedTagsMode))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('order', order));
+    ..add(DiagnosticsProperty('includedTags', includedTags))..add(DiagnosticsProperty('includedTagsMode', includedTagsMode))..add(DiagnosticsProperty('excludedTags', excludedTags))..add(DiagnosticsProperty('excludedTagsMode', excludedTagsMode))..add(DiagnosticsProperty('author', author))..add(DiagnosticsProperty('artist', artist))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('order', order));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaFilters&&const DeepCollectionEquality().equals(other.includedTags, includedTags)&&(identical(other.includedTagsMode, includedTagsMode) || other.includedTagsMode == includedTagsMode)&&const DeepCollectionEquality().equals(other.excludedTags, excludedTags)&&(identical(other.excludedTagsMode, excludedTagsMode) || other.excludedTagsMode == excludedTagsMode)&&const DeepCollectionEquality().equals(other.status, status)&&const DeepCollectionEquality().equals(other.publicationDemographic, publicationDemographic)&&const DeepCollectionEquality().equals(other.contentRating, contentRating)&&(identical(other.order, order) || other.order == order));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaFilters&&const DeepCollectionEquality().equals(other.includedTags, includedTags)&&(identical(other.includedTagsMode, includedTagsMode) || other.includedTagsMode == includedTagsMode)&&const DeepCollectionEquality().equals(other.excludedTags, excludedTags)&&(identical(other.excludedTagsMode, excludedTagsMode) || other.excludedTagsMode == excludedTagsMode)&&const DeepCollectionEquality().equals(other.author, author)&&const DeepCollectionEquality().equals(other.artist, artist)&&const DeepCollectionEquality().equals(other.status, status)&&const DeepCollectionEquality().equals(other.publicationDemographic, publicationDemographic)&&const DeepCollectionEquality().equals(other.contentRating, contentRating)&&(identical(other.order, order) || other.order == order));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(includedTags),includedTagsMode,const DeepCollectionEquality().hash(excludedTags),excludedTagsMode,const DeepCollectionEquality().hash(status),const DeepCollectionEquality().hash(publicationDemographic),const DeepCollectionEquality().hash(contentRating),order);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(includedTags),includedTagsMode,const DeepCollectionEquality().hash(excludedTags),excludedTagsMode,const DeepCollectionEquality().hash(author),const DeepCollectionEquality().hash(artist),const DeepCollectionEquality().hash(status),const DeepCollectionEquality().hash(publicationDemographic),const DeepCollectionEquality().hash(contentRating),order);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
+  return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, author: $author, artist: $artist, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
 }
 
 
@@ -55,7 +52,7 @@ abstract mixin class $MangaFiltersCopyWith<$Res>  {
   factory $MangaFiltersCopyWith(MangaFilters value, $Res Function(MangaFilters) _then) = _$MangaFiltersCopyWithImpl;
 @useResult
 $Res call({
- Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, FilterOrder order
+ Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<CreatorType> author, Set<CreatorType> artist, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, FilterOrder order
 });
 
 
@@ -72,13 +69,15 @@ class _$MangaFiltersCopyWithImpl<$Res>
 
 /// Create a copy of MangaFilters
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? includedTags = null,Object? includedTagsMode = null,Object? excludedTags = null,Object? excludedTagsMode = null,Object? status = null,Object? publicationDemographic = null,Object? contentRating = null,Object? order = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? includedTags = null,Object? includedTagsMode = null,Object? excludedTags = null,Object? excludedTagsMode = null,Object? author = null,Object? artist = null,Object? status = null,Object? publicationDemographic = null,Object? contentRating = null,Object? order = null,}) {
   return _then(_self.copyWith(
 includedTags: null == includedTags ? _self.includedTags : includedTags // ignore: cast_nullable_to_non_nullable
 as Set<Tag>,includedTagsMode: null == includedTagsMode ? _self.includedTagsMode : includedTagsMode // ignore: cast_nullable_to_non_nullable
 as TagMode,excludedTags: null == excludedTags ? _self.excludedTags : excludedTags // ignore: cast_nullable_to_non_nullable
 as Set<Tag>,excludedTagsMode: null == excludedTagsMode ? _self.excludedTagsMode : excludedTagsMode // ignore: cast_nullable_to_non_nullable
-as TagMode,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as TagMode,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as Set<CreatorType>,artist: null == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
+as Set<CreatorType>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as Set<MangaStatus>,publicationDemographic: null == publicationDemographic ? _self.publicationDemographic : publicationDemographic // ignore: cast_nullable_to_non_nullable
 as Set<MangaDemographic>,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
 as Set<ContentRating>,order: null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable
@@ -90,11 +89,11 @@ as FilterOrder,
 
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _MangaFilters extends MangaFilters with DiagnosticableTreeMixin {
-  const _MangaFilters({final  Set<Tag> includedTags = const {}, this.includedTagsMode = TagMode.and, final  Set<Tag> excludedTags = const {}, this.excludedTagsMode = TagMode.or, final  Set<MangaStatus> status = const {}, final  Set<MangaDemographic> publicationDemographic = const {}, final  Set<ContentRating> contentRating = const {}, this.order = FilterOrder.relevance_desc}): _includedTags = includedTags,_excludedTags = excludedTags,_status = status,_publicationDemographic = publicationDemographic,_contentRating = contentRating,super._();
-  factory _MangaFilters.fromJson(Map<String, dynamic> json) => _$MangaFiltersFromJson(json);
+  const _MangaFilters({final  Set<Tag> includedTags = const {}, this.includedTagsMode = TagMode.and, final  Set<Tag> excludedTags = const {}, this.excludedTagsMode = TagMode.or, final  Set<CreatorType> author = const {}, final  Set<CreatorType> artist = const {}, final  Set<MangaStatus> status = const {}, final  Set<MangaDemographic> publicationDemographic = const {}, final  Set<ContentRating> contentRating = const {}, this.order = FilterOrder.relevance_desc}): _includedTags = includedTags,_excludedTags = excludedTags,_author = author,_artist = artist,_status = status,_publicationDemographic = publicationDemographic,_contentRating = contentRating,super._();
+  
 
  final  Set<Tag> _includedTags;
 @override@JsonKey() Set<Tag> get includedTags {
@@ -112,6 +111,20 @@ class _MangaFilters extends MangaFilters with DiagnosticableTreeMixin {
 }
 
 @override@JsonKey() final  TagMode excludedTagsMode;
+ final  Set<CreatorType> _author;
+@override@JsonKey() Set<CreatorType> get author {
+  if (_author is EqualUnmodifiableSetView) return _author;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_author);
+}
+
+ final  Set<CreatorType> _artist;
+@override@JsonKey() Set<CreatorType> get artist {
+  if (_artist is EqualUnmodifiableSetView) return _artist;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_artist);
+}
+
  final  Set<MangaStatus> _status;
 @override@JsonKey() Set<MangaStatus> get status {
   if (_status is EqualUnmodifiableSetView) return _status;
@@ -141,29 +154,26 @@ class _MangaFilters extends MangaFilters with DiagnosticableTreeMixin {
 @pragma('vm:prefer-inline')
 _$MangaFiltersCopyWith<_MangaFilters> get copyWith => __$MangaFiltersCopyWithImpl<_MangaFilters>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$MangaFiltersToJson(this, );
-}
+
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'MangaFilters'))
-    ..add(DiagnosticsProperty('includedTags', includedTags))..add(DiagnosticsProperty('includedTagsMode', includedTagsMode))..add(DiagnosticsProperty('excludedTags', excludedTags))..add(DiagnosticsProperty('excludedTagsMode', excludedTagsMode))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('order', order));
+    ..add(DiagnosticsProperty('includedTags', includedTags))..add(DiagnosticsProperty('includedTagsMode', includedTagsMode))..add(DiagnosticsProperty('excludedTags', excludedTags))..add(DiagnosticsProperty('excludedTagsMode', excludedTagsMode))..add(DiagnosticsProperty('author', author))..add(DiagnosticsProperty('artist', artist))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('order', order));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaFilters&&const DeepCollectionEquality().equals(other._includedTags, _includedTags)&&(identical(other.includedTagsMode, includedTagsMode) || other.includedTagsMode == includedTagsMode)&&const DeepCollectionEquality().equals(other._excludedTags, _excludedTags)&&(identical(other.excludedTagsMode, excludedTagsMode) || other.excludedTagsMode == excludedTagsMode)&&const DeepCollectionEquality().equals(other._status, _status)&&const DeepCollectionEquality().equals(other._publicationDemographic, _publicationDemographic)&&const DeepCollectionEquality().equals(other._contentRating, _contentRating)&&(identical(other.order, order) || other.order == order));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaFilters&&const DeepCollectionEquality().equals(other._includedTags, _includedTags)&&(identical(other.includedTagsMode, includedTagsMode) || other.includedTagsMode == includedTagsMode)&&const DeepCollectionEquality().equals(other._excludedTags, _excludedTags)&&(identical(other.excludedTagsMode, excludedTagsMode) || other.excludedTagsMode == excludedTagsMode)&&const DeepCollectionEquality().equals(other._author, _author)&&const DeepCollectionEquality().equals(other._artist, _artist)&&const DeepCollectionEquality().equals(other._status, _status)&&const DeepCollectionEquality().equals(other._publicationDemographic, _publicationDemographic)&&const DeepCollectionEquality().equals(other._contentRating, _contentRating)&&(identical(other.order, order) || other.order == order));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_includedTags),includedTagsMode,const DeepCollectionEquality().hash(_excludedTags),excludedTagsMode,const DeepCollectionEquality().hash(_status),const DeepCollectionEquality().hash(_publicationDemographic),const DeepCollectionEquality().hash(_contentRating),order);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_includedTags),includedTagsMode,const DeepCollectionEquality().hash(_excludedTags),excludedTagsMode,const DeepCollectionEquality().hash(_author),const DeepCollectionEquality().hash(_artist),const DeepCollectionEquality().hash(_status),const DeepCollectionEquality().hash(_publicationDemographic),const DeepCollectionEquality().hash(_contentRating),order);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
+  return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, author: $author, artist: $artist, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
 }
 
 
@@ -174,7 +184,7 @@ abstract mixin class _$MangaFiltersCopyWith<$Res> implements $MangaFiltersCopyWi
   factory _$MangaFiltersCopyWith(_MangaFilters value, $Res Function(_MangaFilters) _then) = __$MangaFiltersCopyWithImpl;
 @override @useResult
 $Res call({
- Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, FilterOrder order
+ Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<CreatorType> author, Set<CreatorType> artist, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, FilterOrder order
 });
 
 
@@ -191,13 +201,15 @@ class __$MangaFiltersCopyWithImpl<$Res>
 
 /// Create a copy of MangaFilters
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? includedTags = null,Object? includedTagsMode = null,Object? excludedTags = null,Object? excludedTagsMode = null,Object? status = null,Object? publicationDemographic = null,Object? contentRating = null,Object? order = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? includedTags = null,Object? includedTagsMode = null,Object? excludedTags = null,Object? excludedTagsMode = null,Object? author = null,Object? artist = null,Object? status = null,Object? publicationDemographic = null,Object? contentRating = null,Object? order = null,}) {
   return _then(_MangaFilters(
 includedTags: null == includedTags ? _self._includedTags : includedTags // ignore: cast_nullable_to_non_nullable
 as Set<Tag>,includedTagsMode: null == includedTagsMode ? _self.includedTagsMode : includedTagsMode // ignore: cast_nullable_to_non_nullable
 as TagMode,excludedTags: null == excludedTags ? _self._excludedTags : excludedTags // ignore: cast_nullable_to_non_nullable
 as Set<Tag>,excludedTagsMode: null == excludedTagsMode ? _self.excludedTagsMode : excludedTagsMode // ignore: cast_nullable_to_non_nullable
-as TagMode,status: null == status ? _self._status : status // ignore: cast_nullable_to_non_nullable
+as TagMode,author: null == author ? _self._author : author // ignore: cast_nullable_to_non_nullable
+as Set<CreatorType>,artist: null == artist ? _self._artist : artist // ignore: cast_nullable_to_non_nullable
+as Set<CreatorType>,status: null == status ? _self._status : status // ignore: cast_nullable_to_non_nullable
 as Set<MangaStatus>,publicationDemographic: null == publicationDemographic ? _self._publicationDemographic : publicationDemographic // ignore: cast_nullable_to_non_nullable
 as Set<MangaDemographic>,contentRating: null == contentRating ? _self._contentRating : contentRating // ignore: cast_nullable_to_non_nullable
 as Set<ContentRating>,order: null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable

@@ -183,6 +183,8 @@ class MangaFilterAction {
     Set<MangaStatus>? status,
     Set<MangaDemographic>? publicationDemographic,
     Set<ContentRating>? contentRating,
+    Set<CreatorType>? author,
+    Set<CreatorType>? artist,
   }) {
     MangaFilters updated = state.copyWith(
       includedTags: includedTags ?? state.includedTags,
@@ -193,6 +195,8 @@ class MangaFilterAction {
       publicationDemographic:
           publicationDemographic ?? state.publicationDemographic,
       contentRating: contentRating ?? state.contentRating,
+      author: author ?? state.author,
+      artist: artist ?? state.artist,
     );
 
     return updated;
@@ -208,14 +212,16 @@ abstract class MangaFilters with _$MangaFilters {
     @Default(TagMode.and) TagMode includedTagsMode,
     @Default({}) Set<Tag> excludedTags,
     @Default(TagMode.or) TagMode excludedTagsMode,
+    @Default({}) Set<CreatorType> author,
+    @Default({}) Set<CreatorType> artist,
     @Default({}) Set<MangaStatus> status,
     @Default({}) Set<MangaDemographic> publicationDemographic,
     @Default({}) Set<ContentRating> contentRating,
     @Default(FilterOrder.relevance_desc) FilterOrder order,
   }) = _MangaFilters;
 
-  factory MangaFilters.fromJson(Map<String, dynamic> json) =>
-      _$MangaFiltersFromJson(json);
+  // factory MangaFilters.fromJson(Map<String, dynamic> json) =>
+  //     _$MangaFiltersFromJson(json);
 
   Map<String, dynamic> getMap() {
     var params = <String, dynamic>{};
@@ -241,6 +247,14 @@ abstract class MangaFilters with _$MangaFilters {
 
     if (contentRating.isNotEmpty) {
       params['contentRating[]'] = contentRating.map((e) => e.name).toList();
+    }
+
+    if (author.isNotEmpty) {
+      params['authors[]'] = author.map((e) => e.id).toList();
+    }
+
+    if (artist.isNotEmpty) {
+      params['artists[]'] = artist.map((e) => e.id).toList();
     }
 
     params.addEntries([order.json]);
@@ -479,8 +493,7 @@ abstract class MDEntityList with _$MDEntityList {
       _$MDEntityListFromJson(json);
 }
 
-mixin ChapterOps {
-  String get id;
+mixin ChapterOps on MangaDexEntity {
   ChapterAttributes get attributes;
   List<MangaDexEntity> get relationships;
 
@@ -538,8 +551,7 @@ mixin ChapterOps {
   }
 }
 
-mixin MangaOps {
-  String get id;
+mixin MangaOps on MangaDexEntity {
   MangaAttributes? get attributes;
   List<MangaDexEntity>? get relationships;
   MangaRelations? get related;
@@ -649,8 +661,7 @@ mixin MangaOps {
   }
 }
 
-mixin CustomListOps {
-  String get id;
+mixin CustomListOps on MangaDexEntity {
   CustomListAttributes get attributes;
   List<MangaDexEntity> get relationships;
 

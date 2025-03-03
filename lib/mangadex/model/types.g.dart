@@ -6,101 +6,6 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_MangaFilters _$MangaFiltersFromJson(Map<String, dynamic> json) =>
-    _MangaFilters(
-      includedTags:
-          (json['includedTags'] as List<dynamic>?)
-              ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
-              .toSet() ??
-          const {},
-      includedTagsMode:
-          $enumDecodeNullable(_$TagModeEnumMap, json['includedTagsMode']) ??
-          TagMode.and,
-      excludedTags:
-          (json['excludedTags'] as List<dynamic>?)
-              ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
-              .toSet() ??
-          const {},
-      excludedTagsMode:
-          $enumDecodeNullable(_$TagModeEnumMap, json['excludedTagsMode']) ??
-          TagMode.or,
-      status:
-          (json['status'] as List<dynamic>?)
-              ?.map((e) => $enumDecode(_$MangaStatusEnumMap, e))
-              .toSet() ??
-          const {},
-      publicationDemographic:
-          (json['publicationDemographic'] as List<dynamic>?)
-              ?.map((e) => $enumDecode(_$MangaDemographicEnumMap, e))
-              .toSet() ??
-          const {},
-      contentRating:
-          (json['contentRating'] as List<dynamic>?)
-              ?.map((e) => $enumDecode(_$ContentRatingEnumMap, e))
-              .toSet() ??
-          const {},
-      order:
-          $enumDecodeNullable(_$FilterOrderEnumMap, json['order']) ??
-          FilterOrder.relevance_desc,
-    );
-
-Map<String, dynamic> _$MangaFiltersToJson(
-  _MangaFilters instance,
-) => <String, dynamic>{
-  'includedTags': instance.includedTags.map((e) => e.toJson()).toList(),
-  'includedTagsMode': _$TagModeEnumMap[instance.includedTagsMode]!,
-  'excludedTags': instance.excludedTags.map((e) => e.toJson()).toList(),
-  'excludedTagsMode': _$TagModeEnumMap[instance.excludedTagsMode]!,
-  'status': instance.status.map((e) => _$MangaStatusEnumMap[e]!).toList(),
-  'publicationDemographic':
-      instance.publicationDemographic
-          .map((e) => _$MangaDemographicEnumMap[e]!)
-          .toList(),
-  'contentRating':
-      instance.contentRating.map((e) => _$ContentRatingEnumMap[e]!).toList(),
-  'order': _$FilterOrderEnumMap[instance.order]!,
-};
-
-const _$TagModeEnumMap = {TagMode.and: 'and', TagMode.or: 'or'};
-
-const _$MangaStatusEnumMap = {
-  MangaStatus.completed: 'completed',
-  MangaStatus.ongoing: 'ongoing',
-  MangaStatus.cancelled: 'cancelled',
-  MangaStatus.hiatus: 'hiatus',
-};
-
-const _$MangaDemographicEnumMap = {
-  MangaDemographic.shounen: 'shounen',
-  MangaDemographic.shoujo: 'shoujo',
-  MangaDemographic.josei: 'josei',
-  MangaDemographic.seinen: 'seinen',
-};
-
-const _$ContentRatingEnumMap = {
-  ContentRating.safe: 'safe',
-  ContentRating.suggestive: 'suggestive',
-  ContentRating.erotica: 'erotica',
-  ContentRating.pornographic: 'pornographic',
-};
-
-const _$FilterOrderEnumMap = {
-  FilterOrder.relevance_asc: 'relevance_asc',
-  FilterOrder.relevance_desc: 'relevance_desc',
-  FilterOrder.followedCount_asc: 'followedCount_asc',
-  FilterOrder.followedCount_desc: 'followedCount_desc',
-  FilterOrder.latestUploadedChapter_asc: 'latestUploadedChapter_asc',
-  FilterOrder.latestUploadedChapter_desc: 'latestUploadedChapter_desc',
-  FilterOrder.updatedAt_asc: 'updatedAt_asc',
-  FilterOrder.updatedAt_desc: 'updatedAt_desc',
-  FilterOrder.createdAt_asc: 'createdAt_asc',
-  FilterOrder.createdAt_desc: 'createdAt_desc',
-  FilterOrder.year_asc: 'year_asc',
-  FilterOrder.year_desc: 'year_desc',
-  FilterOrder.title_asc: 'title_asc',
-  FilterOrder.title_desc: 'title_desc',
-};
-
 Chapter _$ChapterFromJson(Map<String, dynamic> json) => Chapter(
   id: json['id'] as String,
   attributes: ChapterAttributes.fromJson(
@@ -415,6 +320,27 @@ Map<String, dynamic> _$MangaAttributesToJson(_MangaAttributes instance) =>
       'createdAt': const TimestampSerializer().toJson(instance.createdAt),
       'updatedAt': const TimestampSerializer().toJson(instance.updatedAt),
     };
+
+const _$MangaDemographicEnumMap = {
+  MangaDemographic.shounen: 'shounen',
+  MangaDemographic.shoujo: 'shoujo',
+  MangaDemographic.josei: 'josei',
+  MangaDemographic.seinen: 'seinen',
+};
+
+const _$MangaStatusEnumMap = {
+  MangaStatus.completed: 'completed',
+  MangaStatus.ongoing: 'ongoing',
+  MangaStatus.cancelled: 'cancelled',
+  MangaStatus.hiatus: 'hiatus',
+};
+
+const _$ContentRatingEnumMap = {
+  ContentRating.safe: 'safe',
+  ContentRating.suggestive: 'suggestive',
+  ContentRating.erotica: 'erotica',
+  ContentRating.pornographic: 'pornographic',
+};
 
 _ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) =>
     _ChapterAttributes(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -330,6 +332,8 @@ class _MangaDexFilterWidget extends HookWidget {
                       contentRating: {},
                       publicationDemographic: {},
                       status: {},
+                      author: {},
+                      artist: {},
                     );
                   },
                   icon: const Icon(Icons.clear_all),
@@ -355,7 +359,7 @@ class _MangaDexFilterWidget extends HookWidget {
         builder: (context, tags) {
           return HookBuilder(
             builder: (context) {
-              final expanded = useState(List.generate(4, (_) => false));
+              final expanded = useState(List.generate(6, (_) => false));
 
               final panelItems = [
                 ExpansionPanel(
@@ -592,6 +596,212 @@ class _MangaDexFilterWidget extends HookWidget {
                 ExpansionPanel(
                   canTapOnHeader: true,
                   isExpanded: expanded.value[3],
+                  headerBuilder:
+                      (context, isExpanded) => HookBuilder(
+                        builder: (context) {
+                          final selected = useListenableSelector(
+                            fil,
+                            () => fil.value.author,
+                          );
+
+                          return ListTile(
+                            title: Text(
+                              'mangaView.author'.tr(context: context),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle:
+                                selected.isEmpty
+                                    ? Text('search.any'.tr(context: context))
+                                    : Text(
+                                      selected
+                                          .map((e) => e.attributes.name)
+                                          .join(', '),
+                                    ),
+                          );
+                        },
+                      ),
+                  body: SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        HookBuilder(
+                          builder: (context) {
+                            final selected = useListenableSelector(
+                              fil,
+                              () => fil.value.author,
+                            );
+
+                            return _CreatorSearchAnchor(
+                              isSelected: (e) => selected.contains(e),
+                              onSelect: (e, value) {
+                                if (value == true) {
+                                  fil.value = MangaFilterAction.action(
+                                    fil.value,
+                                    author: {...fil.value.author, e},
+                                  );
+                                } else {
+                                  fil.value = MangaFilterAction.action(
+                                    fil.value,
+                                    author:
+                                        fil.value.author
+                                            .where((element) => element != e)
+                                            .toSet(),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        HookBuilder(
+                          builder: (context) {
+                            final selected = useListenableSelector(
+                              fil,
+                              () => fil.value.author,
+                            );
+
+                            return _SectionChildren(
+                              key: const ValueKey("_selectedAuthors"),
+                              children:
+                                  selected
+                                      .map(
+                                        (e) => InputChip(
+                                          label: Text(e.attributes.name),
+                                          showCheckmark: false,
+                                          selected: true,
+                                          onDeleted: () {
+                                            fil.value =
+                                                MangaFilterAction.action(
+                                                  fil.value,
+                                                  author:
+                                                      fil.value.author
+                                                          .where(
+                                                            (element) =>
+                                                                element != e,
+                                                          )
+                                                          .toSet(),
+                                                );
+                                          },
+                                          selectedColor: selectedChipColor,
+                                        ),
+                                      )
+                                      .toList(),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: expanded.value[4],
+                  headerBuilder:
+                      (context, isExpanded) => HookBuilder(
+                        builder: (context) {
+                          final selected = useListenableSelector(
+                            fil,
+                            () => fil.value.artist,
+                          );
+
+                          return ListTile(
+                            title: Text(
+                              'mangaView.artist'.tr(context: context),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle:
+                                selected.isEmpty
+                                    ? Text('search.any'.tr(context: context))
+                                    : Text(
+                                      selected
+                                          .map((e) => e.attributes.name)
+                                          .join(', '),
+                                    ),
+                          );
+                        },
+                      ),
+                  body: SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        HookBuilder(
+                          builder: (context) {
+                            final selected = useListenableSelector(
+                              fil,
+                              () => fil.value.artist,
+                            );
+
+                            return _CreatorSearchAnchor(
+                              isSelected: (e) => selected.contains(e),
+                              onSelect: (e, value) {
+                                if (value == true) {
+                                  fil.value = MangaFilterAction.action(
+                                    fil.value,
+                                    artist: {...fil.value.artist, e},
+                                  );
+                                } else {
+                                  fil.value = MangaFilterAction.action(
+                                    fil.value,
+                                    artist:
+                                        fil.value.artist
+                                            .where((element) => element != e)
+                                            .toSet(),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        HookBuilder(
+                          builder: (context) {
+                            final selected = useListenableSelector(
+                              fil,
+                              () => fil.value.artist,
+                            );
+
+                            return _SectionChildren(
+                              key: const ValueKey("_selectedArtists"),
+                              children:
+                                  selected
+                                      .map(
+                                        (e) => InputChip(
+                                          label: Text(e.attributes.name),
+                                          showCheckmark: false,
+                                          selected: true,
+                                          onDeleted: () {
+                                            fil.value =
+                                                MangaFilterAction.action(
+                                                  fil.value,
+                                                  artist:
+                                                      fil.value.artist
+                                                          .where(
+                                                            (element) =>
+                                                                element != e,
+                                                          )
+                                                          .toSet(),
+                                                );
+                                          },
+                                          selectedColor: selectedChipColor,
+                                        ),
+                                      )
+                                      .toList(),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: expanded.value[5],
                   headerBuilder:
                       (context, isExpanded) => HookBuilder(
                         builder: (context) {
@@ -886,4 +1096,126 @@ class _SectionChildren extends StatelessWidget {
       child: Wrap(spacing: 4.0, runSpacing: 4.0, children: children),
     );
   }
+}
+
+typedef _CreatorSelected = bool Function(CreatorType);
+typedef _OnCreatorSelect = void Function(CreatorType, bool?);
+
+class _CreatorSearchAnchor extends ConsumerStatefulWidget {
+  const _CreatorSearchAnchor({
+    required this.isSelected,
+    required this.onSelect,
+  });
+
+  final _CreatorSelected isSelected;
+  final _OnCreatorSelect onSelect;
+
+  @override
+  ConsumerState<_CreatorSearchAnchor> createState() =>
+      _CreatorSearchAnchorState();
+}
+
+class _CreatorSearchAnchorState extends ConsumerState<_CreatorSearchAnchor> {
+  String? _currentQuery;
+
+  late Iterable<Widget> _lastOptions = <Widget>[];
+
+  late final _Debounceable<List<CreatorType>?, String> _debouncedSearch;
+
+  Future<List<CreatorType>?> _search(String query) async {
+    _currentQuery = query;
+
+    final api = ref.watch(mangadexProvider);
+    final options = await api.fetchCreators(name: _currentQuery!);
+
+    if (_currentQuery != query) {
+      return null;
+    }
+    _currentQuery = null;
+
+    return options;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _debouncedSearch = _debounce<List<CreatorType>?, String>(_search);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SearchAnchor.bar(
+      suggestionsBuilder: (
+        BuildContext context,
+        SearchController controller,
+      ) async {
+        final List<CreatorType>? options =
+            (await _debouncedSearch(controller.text))?.toList();
+        if (options == null) {
+          return _lastOptions;
+        }
+
+        _lastOptions = options.map((e) {
+          return CheckboxListTile(
+            title: Text(e.attributes.name),
+            value: widget.isSelected(e),
+            onChanged: (value) {
+              widget.onSelect(e, value);
+              // XXX: Not very good UX
+              controller.closeView(null);
+            },
+          );
+        });
+
+        return _lastOptions;
+      },
+    );
+  }
+}
+
+typedef _Debounceable<S, T> = Future<S?> Function(T parameter);
+
+/// Specific debounce implementation for SearchAnchor
+/// from https://api.flutter.dev/flutter/material/SearchAnchor-class.html
+_Debounceable<S, T> _debounce<S, T>(_Debounceable<S?, T> function) {
+  _DebounceTimer? debounceTimer;
+
+  return (T parameter) async {
+    if (debounceTimer != null && !debounceTimer!.isCompleted) {
+      debounceTimer!.cancel();
+    }
+    debounceTimer = _DebounceTimer();
+    try {
+      await debounceTimer!.future;
+    } on _CancelException {
+      return null;
+    }
+    return function(parameter);
+  };
+}
+
+class _DebounceTimer {
+  _DebounceTimer() {
+    _timer = Timer(const Duration(milliseconds: 500), _onComplete);
+  }
+
+  late final Timer _timer;
+  final Completer<void> _completer = Completer<void>();
+
+  void _onComplete() {
+    _completer.complete();
+  }
+
+  Future<void> get future => _completer.future;
+
+  bool get isCompleted => _completer.isCompleted;
+
+  void cancel() {
+    _timer.cancel();
+    _completer.completeError(const _CancelException());
+  }
+}
+
+class _CancelException implements Exception {
+  const _CancelException();
 }
