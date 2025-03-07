@@ -366,18 +366,20 @@ _SearchRequest _$SearchRequestFromJson(Map<String, dynamic> json) =>
       includedTags:
           (json['includedTags'] as List<dynamic>?)
               ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
-              .toList(),
+              .toList() ??
+          const [],
       excludedTags:
           (json['excludedTags'] as List<dynamic>?)
               ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
-              .toList(),
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$SearchRequestToJson(_SearchRequest instance) =>
     <String, dynamic>{
       'title': instance.title,
-      'includedTags': instance.includedTags?.map((e) => e.toJson()).toList(),
-      'excludedTags': instance.excludedTags?.map((e) => e.toJson()).toList(),
+      'includedTags': instance.includedTags.map((e) => e.toJson()).toList(),
+      'excludedTags': instance.excludedTags.map((e) => e.toJson()).toList(),
     };
 
 _HomeSection _$HomeSectionFromJson(Map<String, dynamic> json) => _HomeSection(

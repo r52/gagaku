@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/log.dart';
 import 'package:path/path.dart' as p;
@@ -28,7 +29,10 @@ Future<void> runExtensionHostServer() async {
   logger.i('Serving at http://${server.address.host}:${server.port}');
 }
 
-final _assetHandler = createAssetHandler(rootPath: 'assets/extensionhost/', defaultDocument: 'index.html');
+final _assetHandler = createAssetHandler(
+  rootPath: 'assets/extensionhost/',
+  defaultDocument: 'index.html',
+);
 
 final _router = shelf_router.Router()..get('/proxy/<url|.*>', _proxyHandler);
 
@@ -39,10 +43,11 @@ Future<Response> _proxyHandler(Request request, String url) async {
   final nonNullClient = http.Client();
 
   final requestUrl = Uri.parse(uri);
-  final clientRequest = http.StreamedRequest(request.method, requestUrl)
-    ..followRedirects = false
-    ..headers.addAll(request.headers)
-    ..headers['Host'] = requestUrl.authority;
+  final clientRequest =
+      http.StreamedRequest(request.method, requestUrl)
+        ..followRedirects = false
+        ..headers.addAll(request.headers)
+        ..headers['Host'] = requestUrl.authority;
 
   request
       .read()
@@ -69,7 +74,8 @@ Future<Response> _proxyHandler(Request request, String url) async {
 
   // Make sure the Location header is pointing to the proxy server rather
   // than the destination server, if possible.
-  if (clientResponse.isRedirect && clientResponse.headers.containsKey('location')) {
+  if (clientResponse.isRedirect &&
+      clientResponse.headers.containsKey('location')) {
     final encoded = b64.encode(clientResponse.headers['location']!);
     final location = 'http://$host:$port/proxy/$encoded';
 
@@ -85,8 +91,11 @@ Future<Response> _proxyHandler(Request request, String url) async {
 
 final _defaultMimeTypeResolver = MimeTypeResolver();
 
-Handler createAssetHandler(
-    {String? defaultDocument, String rootPath = 'assets', MimeTypeResolver? contentTypeResolver}) {
+Handler createAssetHandler({
+  String? defaultDocument,
+  String rootPath = 'assets',
+  MimeTypeResolver? contentTypeResolver,
+}) {
   final mimeResolver = contentTypeResolver ?? _defaultMimeTypeResolver;
 
   return (Request request) async {
@@ -115,7 +124,10 @@ Handler createAssetHandler(
       if (contentType != null) HttpHeaders.contentTypeHeader: contentType,
     };
 
-    return Response.ok((request.method == 'HEAD') ? null : body, headers: headers);
+    return Response.ok(
+      (request.method == 'HEAD') ? null : body,
+      headers: headers,
+    );
   };
 }
 

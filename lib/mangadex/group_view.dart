@@ -7,8 +7,8 @@ import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,57 +22,6 @@ Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   final api = ref.watch(mangadexProvider);
   final group = await api.fetchGroups([groupId]);
   return group.first;
-}
-
-@Riverpod(retry: noRetry)
-Future<List<ChapterFeedItemData>> _fetchGroupFeed(Ref ref, Group group) async {
-  final me = await ref.watch(loggedUserProvider.future);
-  final api = ref.watch(mangadexProvider);
-
-  final chapters = await ref.watch(groupFeedProvider(group).future);
-
-  final mangaIds = chapters.map((e) => e.manga.id).toSet();
-  final mangas = await api.fetchManga(
-    ids: mangaIds,
-    limit: MangaDexEndpoints.breakLimit,
-  );
-
-  await ref.read(statisticsProvider.get)(mangas);
-  await ref.read(readChaptersProvider(me?.id).get)(mangas);
-
-  final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
-
-  // Craft feed items
-  final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
-    final mid = chapter.manga.id;
-    if (mid.isNotEmpty && mangaMap.containsKey(mid)) {
-      ChapterFeedItemData? item;
-      if (list.isNotEmpty && list.last.mangaId == mid) {
-        item = list.last;
-      } else {
-        item = ChapterFeedItemData(manga: mangaMap[mid]!);
-        list.add(item);
-      }
-
-      item.chapters.add(chapter);
-    }
-
-    return list;
-  });
-
-  ref.disposeAfter(const Duration(minutes: 5));
-
-  return dlist;
-}
-
-@Riverpod(retry: noRetry)
-Future<List<Manga>> _fetchGroupTitles(Ref ref, Group group) async {
-  final mangas = await ref.watch(groupTitlesProvider(group).future);
-  await ref.read(statisticsProvider.get)(mangas);
-
-  ref.disposeAfter(const Duration(minutes: 5));
-
-  return mangas;
 }
 
 @RoutePage()
@@ -139,6 +88,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
       useScrollController(),
       useScrollController(),
     ];
+
+    final groupFeedInfo = MangaDexFeeds.groupFeed;
 
     final tab = switch (view.value) {
       _ViewType.info => CustomScrollView(
@@ -208,77 +159,19 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
           ),
         ],
       ),
-      _ViewType.feed => Consumer(
+      _ViewType.feed => InfiniteScrollChapterFeedWidget(
         key: const Key('/group?tab=feed'),
-        builder: (context, ref, child) {
-          final getNextPage = ref.watch(groupFeedProvider(group).getNextPage);
-
-          return ChapterFeedWidget(
-            provider: _fetchGroupFeedProvider(group),
-            title: 'mangadex.groupFeed'.tr(context: context),
-            emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
-            onAtEdge: () {
-              if (getNextPage.state is! PendingMutationState) {
-                getNextPage();
-              }
-            },
-            onRefresh: () async {
-              ref.invalidate(groupFeedProvider(group));
-              return ref.refresh(_fetchGroupFeedProvider(group).future);
-            },
-            controller: controllers[1],
-            restorationId: 'group_feed_offset',
-            isLoading: getNextPage.state is PendingMutationState,
-          );
-        },
+        feedKey: groupFeedInfo.key,
+        limit: groupFeedInfo.limit,
+        path: groupFeedInfo.path!,
+        entity: group,
+        scrollController: controllers[1],
+        restorationId: 'group_feed_offset',
       ),
-      _ViewType.titles => Consumer(
+      _ViewType.titles => _GroupTitlesTab(
         key: const Key('/group?tab=titles'),
-        builder: (context, ref, child) {
-          final titleProvider = ref.watch(_fetchGroupTitlesProvider(group));
-          final getNextPage = ref.watch(groupTitlesProvider(group).getNextPage);
-          final isLoading =
-              getNextPage.state is PendingMutationState ||
-              (titleProvider.isLoading && !titleProvider.isRefreshing);
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(groupTitlesProvider(group));
-              return ref.refresh(_fetchGroupTitlesProvider(group).future);
-            },
-            child: DataProviderWhenWidget(
-              provider: _fetchGroupTitlesProvider(group),
-              initialData: titleProvider,
-              builder:
-                  (context, mangas) => MangaListWidget(
-                    title: Text(
-                      'mangadex.groupTitles'.tr(context: context),
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: controllers[2],
-                    onAtEdge: () {
-                      if (getNextPage.state is! PendingMutationState) {
-                        getNextPage();
-                      }
-                    },
-                    isLoading: isLoading,
-                    children: [
-                      if (mangas.isEmpty)
-                        SliverToBoxAdapter(
-                          child: Center(
-                            child: Text('errors.notitles'.tr(context: context)),
-                          ),
-                        ),
-                      MangaListViewSliver(items: mangas),
-                    ],
-                  ),
-              loadingBuilder:
-                  (_, progress) =>
-                      LoadingOverlayStack(progress: progress?.toDouble()),
-            ),
-          );
-        },
+        group: group,
+        controller: controllers[2],
       ),
     };
 
@@ -359,6 +252,71 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
             view.value = _ViewType.values[index];
           }
         },
+      ),
+    );
+  }
+}
+
+class _GroupTitlesTab extends ConsumerStatefulWidget {
+  const _GroupTitlesTab({
+    super.key,
+    required this.group,
+    required this.controller,
+  });
+
+  final Group group;
+  final ScrollController controller;
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      __GroupTitlesTabState();
+}
+
+class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
+  static const info = MangaDexFeeds.groupTitles;
+
+  late final _pagingController = GagakuPagingController<int, Manga>(
+    getNextPageKey:
+        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    fetchPage: (pageKey) async {
+      final api = ref.watch(mangadexProvider);
+      final list = await api.fetchMangaList(
+        limit: info.limit,
+        feedKey: info.key,
+        offset: pageKey,
+        entity: widget.group,
+      );
+
+      final newItems = list.data.cast<Manga>();
+
+      await ref.read(statisticsProvider.get)(newItems);
+
+      return newItems;
+    },
+    refresh: () async {
+      final api = ref.watch(mangadexProvider);
+      await api.invalidateAll('${info.key}(${widget.group.id}');
+    },
+  );
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async => _pagingController.refresh(),
+      child: MangaListWidget(
+        title: Text(
+          'mangadex.groupTitles'.tr(context: context),
+          style: TextStyle(fontSize: 24),
+        ),
+        physics: const AlwaysScrollableScrollPhysics(),
+        controller: widget.controller,
+        children: [MangaListViewSliver(controller: _pagingController)],
       ),
     );
   }

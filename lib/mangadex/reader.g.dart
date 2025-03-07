@@ -71,7 +71,7 @@ final class _FetchChapterDataProvider
   }
 }
 
-String _$fetchChapterDataHash() => r'c4909aa08d41ca302c89b1c1394ca421e311a30e';
+String _$fetchChapterDataHash() => r'bd8f9de01ae3994fb8c48e31214f6d5cd6d7ed42';
 
 final class _FetchChapterDataFamily extends Family {
   const _FetchChapterDataFamily._()

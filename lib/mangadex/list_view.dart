@@ -20,50 +20,6 @@ part 'list_view.g.dart';
 enum _ViewType { titles, feed }
 
 @Riverpod(retry: noRetry)
-Future<List<ChapterFeedItemData>> _fetchListFeed(
-  Ref ref,
-  CustomList list,
-) async {
-  final me = await ref.watch(loggedUserProvider.future);
-  final api = ref.watch(mangadexProvider);
-
-  final chapters = await ref.watch(customListFeedProvider(list).future);
-
-  final mangaIds = chapters.map((e) => e.manga.id).toSet();
-  final mangas = await api.fetchManga(
-    ids: mangaIds,
-    limit: MangaDexEndpoints.breakLimit,
-  );
-
-  await ref.read(statisticsProvider.get)(mangas);
-  await ref.read(readChaptersProvider(me?.id).get)(mangas);
-
-  final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
-
-  // Craft feed items
-  final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
-    final mid = chapter.manga.id;
-    if (mangaMap.containsKey(mid)) {
-      ChapterFeedItemData? item;
-      if (list.isNotEmpty && list.last.mangaId == mid) {
-        item = list.last;
-      } else {
-        item = ChapterFeedItemData(manga: mangaMap[mid]!);
-        list.add(item);
-      }
-
-      item.chapters.add(chapter);
-    }
-
-    return list;
-  });
-
-  ref.disposeAfter(const Duration(minutes: 5));
-
-  return dlist;
-}
-
-@Riverpod(retry: noRetry)
 Future<CustomList?> _getList(Ref ref, String listId) async {
   final me = await ref.watch(loggedUserProvider.future);
 
@@ -116,6 +72,8 @@ class MangaDexListViewPage extends HookConsumerWidget {
     ];
 
     final controllers = [useScrollController(), useScrollController()];
+
+    final customFeedInfo = MangaDexFeeds.customListFeed;
 
     switch (listProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
@@ -260,31 +218,15 @@ class MangaDexListViewPage extends HookConsumerWidget {
                     );
                   },
                 ),
-                _ViewType.feed => Consumer(
+                _ViewType.feed => InfiniteScrollChapterFeedWidget(
                   key: const Key('/list?tab=feed'),
-                  builder: (context, ref, child) {
-                    final getNextPage = ref.watch(
-                      customListFeedProvider(list).getNextPage,
-                    );
-
-                    return ChapterFeedWidget(
-                      provider: _fetchListFeedProvider(list),
-                      title: 'mangadex.listFeed'.tr(context: context),
-                      emptyText: 'mangaView.noChaptersMsg'.tr(context: context),
-                      onAtEdge: () {
-                        if (getNextPage.state is! PendingMutationState) {
-                          getNextPage();
-                        }
-                      },
-                      onRefresh: () async {
-                        ref.invalidate(customListFeedProvider(list));
-                        return ref.refresh(_fetchListFeedProvider(list).future);
-                      },
-                      controller: controllers[1],
-                      restorationId: 'list_feed_offset',
-                      isLoading: getNextPage.state is PendingMutationState,
-                    );
-                  },
+                  feedKey: customFeedInfo.key,
+                  limit: customFeedInfo.limit,
+                  path: customFeedInfo.path!.replaceFirst('{id}', list.id),
+                  entity: list,
+                  title: 'mangadex.listFeed'.tr(context: context),
+                  scrollController: controllers[1],
+                  restorationId: 'list_feed_offset',
                 ),
               },
             ),

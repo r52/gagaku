@@ -50,7 +50,7 @@ final class _PopularTitlesProvider
   }
 }
 
-String _$popularTitlesHash() => r'3e3dd7db23591547693673d72487f8b5b108fbc6';
+String _$popularTitlesHash() => r'bd736590bbe6e6adcb7fbb060e3794725e3fc049';
 
 @ProviderFor(_recentlyAdded)
 const _recentlyAddedProvider = _RecentlyAddedProvider._();
@@ -96,7 +96,7 @@ final class _RecentlyAddedProvider
   }
 }
 
-String _$recentlyAddedHash() => r'549bd9c62f2ce2ad5336a6d8e753c7248b7e55c9';
+String _$recentlyAddedHash() => r'c674998b67a04d66d78727ed66605b1af2dfa8db';
 
 @ProviderFor(_latestUpdates)
 const _latestUpdatesProvider = _LatestUpdatesProvider._();
@@ -142,7 +142,7 @@ final class _LatestUpdatesProvider
   }
 }
 
-String _$latestUpdatesHash() => r'ca3c517ed27d802704ceb8b9497617ee4c33da7f';
+String _$latestUpdatesHash() => r'7681a094cf7bb2e9c23ef54b0bd3d06a8fc198ec';
 
 @ProviderFor(_fetchCustomListManga)
 const _fetchCustomListMangaProvider = _FetchCustomListMangaFamily._();
@@ -211,7 +211,7 @@ final class _FetchCustomListMangaProvider
 }
 
 String _$fetchCustomListMangaHash() =>
-    r'62a0353c93fce0ca94c66dee7883e3c9e5d7bb90';
+    r'648d090100f7187d80742bc2314663f501e62bc1';
 
 final class _FetchCustomListMangaFamily extends Family {
   const _FetchCustomListMangaFamily._()

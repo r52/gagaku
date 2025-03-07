@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -39,7 +40,7 @@ class _SearchParams extends _$SearchParams {
 }
 
 @RoutePage()
-class MangaDexSearchPage extends HookConsumerWidget {
+class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({
     super.key,
     this.selectMode = false,
@@ -50,21 +51,50 @@ class MangaDexSearchPage extends HookConsumerWidget {
   final Set<String>? selectedTitles;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _MangaDexSearchPageState();
+}
+
+class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
+  static const info = MangaDexFeeds.search;
+
+  late final _pagingController = GagakuPagingController<int, Manga>(
+    getNextPageKey:
+        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    fetchPage: (pageKey) async {
+      final api = ref.watch(mangadexProvider);
+      final filter = ref.watch(_searchParamsProvider);
+
+      final manga = await api.searchManga(
+        filter.query,
+        limit: info.limit,
+        filter: filter.filter,
+        offset: pageKey,
+      );
+
+      if (manga.isNotEmpty) {
+        await ref.read(statisticsProvider.get)(manga);
+      }
+
+      return manga;
+    },
+  );
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final nav = Navigator.of(context);
     final filter = ref.watch(_searchParamsProvider);
     final controller = useSearchController();
 
-    final searchProvider = ref.watch(mangaSearchProvider(filter));
-    final getNextPage = ref.watch(mangaSearchProvider(filter).getNextPage);
-
-    final isLoading =
-        getNextPage.state is PendingMutationState ||
-        (searchProvider.isLoading && searchProvider.isReloading);
-
     final selected = useReducer(
       MangaSetAction.modify,
-      initialState: selectedTitles ?? <String>{},
+      initialState: widget.selectedTitles ?? <String>{},
       initialAction: MangaSetAction(action: MangaSetActions.none),
     );
 
@@ -76,16 +106,12 @@ class MangaDexSearchPage extends HookConsumerWidget {
     return Scaffold(
       body: MangaListWidget(
         physics: const AlwaysScrollableScrollPhysics(),
-        onAtEdge: () {
-          final lt = ref.read(_searchParamsProvider);
-          ref.read(mangaSearchProvider(lt).getNextPage)();
-        },
-        showToggle: !selectMode,
+        showToggle: !widget.selectMode,
         leading: [
           SliverAppBar(
             leading: BackButton(
               onPressed: () {
-                context.maybePop(selectMode ? selected.state : null);
+                context.maybePop(widget.selectMode ? selected.state : null);
               },
             ),
             pinned: true,
@@ -125,6 +151,10 @@ class MangaDexSearchPage extends HookConsumerWidget {
                               query: filter.query,
                               filter: result,
                             );
+
+                            setState(() {
+                              _pagingController.refresh();
+                            });
                           }
                         },
                         icon: const Icon(Icons.filter_list),
@@ -149,6 +179,10 @@ class MangaDexSearchPage extends HookConsumerWidget {
                         .copyWith(query: term, filter: filter.filter);
 
                     unfocusSearchBar();
+
+                    setState(() {
+                      _pagingController.refresh();
+                    });
                   },
                 );
               },
@@ -165,6 +199,10 @@ class MangaDexSearchPage extends HookConsumerWidget {
                     .copyWith(query: term, filter: filter.filter);
 
                 unfocusSearchBar();
+
+                setState(() {
+                  _pagingController.refresh();
+                });
               },
               suggestionsBuilder: (
                 BuildContext context,
@@ -193,6 +231,10 @@ class MangaDexSearchPage extends HookConsumerWidget {
                           );
 
                           unfocusSearchBar();
+
+                          setState(() {
+                            _pagingController.refresh();
+                          });
                         },
                       ),
                     )
@@ -226,6 +268,10 @@ class MangaDexSearchPage extends HookConsumerWidget {
                           query: filter.query,
                           filter: filter.filter.copyWith(order: order),
                         );
+
+                    setState(() {
+                      _pagingController.refresh();
+                    });
                   }
                 },
                 dropdownMenuEntries:
@@ -242,54 +288,35 @@ class MangaDexSearchPage extends HookConsumerWidget {
             ],
           ),
         ],
-        isLoading: isLoading,
         children: [
-          switch (searchProvider) {
-            AsyncValue(:final error?, :final stackTrace?) => SliverToBoxAdapter(
-              child: ErrorList(
-                error: error,
-                stackTrace: stackTrace,
-                message: "mangaSearchProvider() failed",
-              ),
-            ),
-            AsyncValue(value: final results?) when results.isNotEmpty =>
-              MangaListViewSliver(
-                items: results,
-                selectMode: selectMode,
-                selectButton: (manga) {
-                  if (selected.state.contains(manga.id)) {
-                    return const Icon(Icons.remove);
-                  }
+          MangaListViewSliver(
+            controller: _pagingController,
+            selectMode: widget.selectMode,
+            selectButton: (manga) {
+              if (selected.state.contains(manga.id)) {
+                return const Icon(Icons.remove);
+              }
 
-                  return const Icon(Icons.add);
-                },
-                onSelected: (manga) {
-                  if (selected.state.contains(manga.id)) {
-                    selected.dispatch(
-                      MangaSetAction(
-                        action: MangaSetActions.remove,
-                        element: manga.id,
-                      ),
-                    );
-                  } else {
-                    selected.dispatch(
-                      MangaSetAction(
-                        action: MangaSetActions.add,
-                        element: manga.id,
-                      ),
-                    );
-                  }
-                },
-              ),
-            AsyncValue(value: final _?) => SliverToBoxAdapter(
-              child: Center(
-                child: Text('errors.noresults'.tr(context: context)),
-              ),
-            ),
-            _ => const SliverToBoxAdapter(
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          },
+              return const Icon(Icons.add);
+            },
+            onSelected: (manga) {
+              if (selected.state.contains(manga.id)) {
+                selected.dispatch(
+                  MangaSetAction(
+                    action: MangaSetActions.remove,
+                    element: manga.id,
+                  ),
+                );
+              } else {
+                selected.dispatch(
+                  MangaSetAction(
+                    action: MangaSetActions.add,
+                    element: manga.id,
+                  ),
+                );
+              }
+            },
+          ),
         ],
       ),
     );

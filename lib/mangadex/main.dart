@@ -13,16 +13,14 @@ class MangaDexHomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final lifecycle = useAppLifecycleState();
-
-    useEffect(() {
-      if (lifecycle == AppLifecycleState.resumed && ref.exists(authControlProvider)) {
+    useOnAppLifecycleStateChange((_, current) {
+      if (current == AppLifecycleState.resumed &&
+          ref.exists(authControlProvider)) {
         ref.read(authControlProvider.notifier).invalidate();
       }
-      return null;
-    }, [lifecycle]);
+    });
 
-    return AutoTabsRouter(
+    return AutoTabsScaffold(
       routes: [
         MangaDexFrontRoute(),
         MangaDexChapterFeedRoute(),
@@ -30,27 +28,36 @@ class MangaDexHomePage extends HookConsumerWidget {
         MangaDexListsRoute(),
         MangaDexHistoryFeedRoute(),
       ],
-      builder: (context, child) {
-        final tabsRouter = AutoTabsRouter.of(context);
-
-        return Scaffold(
-          restorationId: 'md_home_restore',
-          drawer: const MainDrawer(),
-          //body: Center(child: DefaultScrollController(controller: controllers[index], child: AutoRouter())),
-          body: child,
-          bottomNavigationBar: NavigationBar(
-            height: 60,
-            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-            destinations: [
-              NavigationDestination(icon: Icon(Icons.home), label: 'mangadex.home'.tr(context: context)),
-              NavigationDestination(icon: Icon(Icons.menu_book), label: 'mangadex.myFeed'.tr(context: context)),
-              NavigationDestination(icon: Icon(Icons.collections), label: 'library.text'.tr(context: context)),
-              NavigationDestination(icon: Icon(Icons.list), label: 'mangadex.myLists'.tr(context: context)),
-              NavigationDestination(icon: Icon(Icons.history), label: 'history.text'.tr(context: context)),
-            ],
-            selectedIndex: tabsRouter.activeIndex,
-            onDestinationSelected: tabsRouter.setActiveIndex,
-          ),
+      restorationId: 'md_home_restore',
+      drawer: const MainDrawer(),
+      bottomNavigationBuilder: (context, tabsRouter) {
+        return NavigationBar(
+          height: 60,
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.home),
+              label: 'mangadex.home'.tr(context: context),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.menu_book),
+              label: 'mangadex.myFeed'.tr(context: context),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.collections),
+              label: 'library.text'.tr(context: context),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.list),
+              label: 'mangadex.myLists'.tr(context: context),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.history),
+              label: 'history.text'.tr(context: context),
+            ),
+          ],
+          selectedIndex: tabsRouter.activeIndex,
+          onDestinationSelected: tabsRouter.setActiveIndex,
         );
       },
     );

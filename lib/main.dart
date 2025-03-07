@@ -12,11 +12,11 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/version.dart';
 import 'package:gagaku/web/server.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:timeago/timeago.dart' as timeago;
@@ -65,15 +65,17 @@ void main() async {
         DeviceContext.isDesktop()
             ? (kReleaseMode
                 ? FileOutput(file: File(p.join(appdir.path, 'gagaku.log')))
-                : MultiOutput([FileOutput(file: File(p.join(appdir.path, 'gagaku.log'))), ConsoleOutput()]))
+                : MultiOutput([
+                  FileOutput(file: File(p.join(appdir.path, 'gagaku.log'))),
+                  ConsoleOutput(),
+                ]))
             : null,
   );
 
   runExtensionHostServer();
 
-  final pkg = await PackageInfo.fromPlatform();
   final gdat = GagakuData();
-  gdat.gagakuUserAgent = '${pkg.appName}/${pkg.version}';
+  gdat.gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
   runApp(
     ProviderScope(
@@ -103,9 +105,14 @@ class App extends ConsumerWidget {
       locale: context.locale,
       theme: ThemeData(
         brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(seedColor: config.theme.color, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: config.theme.color,
+          brightness: Brightness.light,
+        ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.transparent),
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: Colors.transparent,
+        ),
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
@@ -116,12 +123,17 @@ class App extends ConsumerWidget {
           dynamicSchemeVariant: DynamicSchemeVariant.content,
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.transparent),
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: Colors.transparent,
+        ),
         useMaterial3: true,
       ),
       themeMode: config.themeMode,
       debugShowCheckedModeBanner: false,
-      routerConfig: _router.config(rebuildStackOnDeepLink: true, deepLinkBuilder: handleDeepLink),
+      routerConfig: _router.config(
+        rebuildStackOnDeepLink: true,
+        deepLinkBuilder: handleDeepLink,
+      ),
       restorationScopeId: 'app_root_restore',
     );
   }
@@ -136,8 +148,13 @@ class NotFoundScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('pageNotFound.header'.tr(context: context)), leading: AutoLeadingButton()),
-      body: Center(child: Text('pageNotFound.error'.tr(context: context, args: [uri]))),
+      appBar: AppBar(
+        title: Text('pageNotFound.header'.tr(context: context)),
+        leading: AutoLeadingButton(),
+      ),
+      body: Center(
+        child: Text('pageNotFound.error'.tr(context: context, args: [uri])),
+      ),
     );
   }
 }

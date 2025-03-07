@@ -2,10 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -25,8 +27,11 @@ Future<List<Manga>> _popularTitles(Ref ref) async {
     'createdAtSince': format.format(popularTime),
   };
 
-  final manga = await api.fetchManga(
-    limit: 15,
+  final info = MangaDexFeeds.popularTitles;
+
+  final manga = await api.fetchMangaList(
+    limit: info.limit,
+    feedKey: info.key,
     offset: 0,
     order: FilterOrder.followedCount_desc,
     extraParams: extraParams,
@@ -34,25 +39,58 @@ Future<List<Manga>> _popularTitles(Ref ref) async {
 
   ref.disposeAfter(const Duration(minutes: 60));
 
-  return manga;
+  return manga.data.cast<Manga>();
 }
 
 @Riverpod(retry: noRetry)
 Future<List<Manga>> _recentlyAdded(Ref ref) async {
-  final manga = await ref.watch(recentlyAddedProvider.future);
+  final api = ref.watch(mangadexProvider);
+  final settings = ref.watch(mdConfigProvider);
+
+  final extraParams = {
+    'hasAvailableChapters': 'true',
+    'availableTranslatedLanguage[]':
+        settings.translatedLanguages
+            .map(const LanguageConverter().toJson)
+            .toList(),
+    'originalLanguage[]':
+        settings.originalLanguage
+            .map(const LanguageConverter().toJson)
+            .toList(),
+  };
+
+  final info = MangaDexFeeds.recentlyAdded;
+
+  final list = await api.fetchMangaList(
+    limit: info.limit,
+    feedKey: info.key,
+    offset: 0,
+    order: FilterOrder.createdAt_desc,
+    extraParams: extraParams,
+  );
+
+  final newItems = list.data.cast<Manga>();
 
   ref.disposeAfter(const Duration(minutes: 10));
 
-  return manga.take(15).toList();
+  return newItems.take(15).toList();
 }
 
 @Riverpod(retry: noRetry)
 Future<List<Manga>> _latestUpdates(Ref ref) async {
+  const info = MangaDexFeeds.globalFeed;
   final api = ref.watch(mangadexProvider);
-  final chapters = await ref.watch(latestGlobalFeedProvider.future);
+  final chapterlist = await api.fetchFeed(
+    path: info.path!,
+    feedKey: info.key,
+    limit: info.limit,
+    offset: 0,
+  );
+
+  final chapters = chapterlist.data.cast<Chapter>();
 
   final mangaIds = chapters.map((e) => e.manga.id).toSet().take(15);
-  final mangas = await api.fetchManga(
+  final mangas = await api.fetchMangaById(
     ids: mangaIds,
     limit: MangaDexEndpoints.breakLimit,
   );
@@ -71,7 +109,7 @@ Future<List<Manga>> _fetchCustomListManga(Ref ref, String listid) async {
     return [];
   }
 
-  final mangas = await api.fetchManga(
+  final mangas = await api.fetchMangaById(
     ids: list.set.take(15),
     limit: MangaDexEndpoints.breakLimit,
   );
@@ -197,9 +235,7 @@ class _FrontPageWidget extends HookConsumerWidget {
         ref.invalidate(staffPicks);
         ref.invalidate(seasonal);
         ref.invalidate(_recentlyAddedProvider);
-        ref.invalidate(recentlyAddedProvider);
         ref.invalidate(_latestUpdatesProvider);
-        ref.invalidate(latestGlobalFeedProvider);
         return Future.wait([
           ref.refresh(_popularTitlesProvider.future),
           ref.refresh(_latestUpdatesProvider.future),

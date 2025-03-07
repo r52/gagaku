@@ -477,8 +477,8 @@ abstract class ChapterDetails with _$ChapterDetails {
 abstract class SearchRequest with _$SearchRequest {
   const factory SearchRequest({
     String? title,
-    List<Tag>? includedTags,
-    List<Tag>? excludedTags,
+    @Default([]) List<Tag> includedTags,
+    @Default([]) List<Tag> excludedTags,
   }) = _SearchRequest;
 
   factory SearchRequest.fromJson(Map<String, dynamic> json) =>

@@ -7,7 +7,6 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MainDrawer extends ConsumerWidget {
@@ -16,7 +15,8 @@ class MainDrawer extends ConsumerWidget {
   static int _calculateSelectedIndex(BuildContext context) {
     final location = cleanBaseDomains(AutoRouter.of(context).currentUrl);
 
-    if (location.startsWith(GagakuRoute.web) || location.startsWith(GagakuRoute.extension)) {
+    if (location.startsWith(GagakuRoute.web) ||
+        location.startsWith(GagakuRoute.extension)) {
       return 2;
     }
 
@@ -58,7 +58,9 @@ class MainDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final index = _calculateSelectedIndex(context);
-    const appicon = CircleAvatar(foregroundImage: AssetImage('assets/icon.png'));
+    const appicon = CircleAvatar(
+      foregroundImage: AssetImage('assets/icon.png'),
+    );
 
     return NavigationDrawer(
       onDestinationSelected: (index) {
@@ -77,7 +79,12 @@ class MainDrawer extends ConsumerWidget {
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    shadows: <Shadow>[Shadow(offset: Offset(1.0, 1.0), color: Color.fromARGB(255, 0, 0, 0))],
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(1.0, 1.0),
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -105,49 +112,42 @@ class MainDrawer extends ConsumerWidget {
           label: Text('settings'.tr(context: context)),
         ),
         const Divider(),
-        FutureBuilder(
-          future: PackageInfo.fromPlatform(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return AboutListTile(
-                icon: const Icon(Icons.info),
-                applicationIcon: appicon,
-                applicationName: snapshot.data!.appName,
-                applicationVersion: snapshot.data!.version,
-                applicationLegalese: '\u{a9} 2024 r52',
-                aboutBoxChildren: [
-                  const SizedBox(height: 4),
-                  const Text('Flutter: $kFlutterFrameworkVersion'),
-                  const SizedBox(height: 4),
-                  const Text('Dart: $kFlutterDartSdkVersion'),
-                  const SizedBox(height: 4),
-                  const Text('Built on: $kBuildTimestamp'),
-                  const SizedBox(height: 4),
-                  const Text('License: MIT'),
-                  const SizedBox(height: 4),
-                  RichText(
-                    text: TextSpan(
-                      children: <TextSpan>[
-                        const TextSpan(text: 'Source code available at '),
-                        TextSpan(
-                          style: const TextStyle(color: Colors.blue),
-                          text: 'GitHub',
-                          recognizer:
-                              TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(Uri.parse('https://github.com/r52/gagaku'));
-                                },
-                        ),
-                        const TextSpan(text: '.'),
-                      ],
-                    ),
+        AboutListTile(
+          icon: const Icon(Icons.info),
+          applicationIcon: appicon,
+          applicationName: kPackageName,
+          applicationVersion: kPackageVersion,
+          applicationLegalese: '\u{a9} 2025 r52',
+          aboutBoxChildren: [
+            const SizedBox(height: 4),
+            const Text('Flutter: $kFlutterFrameworkVersion'),
+            const SizedBox(height: 4),
+            const Text('Dart: $kFlutterDartSdkVersion'),
+            const SizedBox(height: 4),
+            const Text('Built on: $kBuildTimestamp'),
+            const SizedBox(height: 4),
+            const Text('License: MIT'),
+            const SizedBox(height: 4),
+            RichText(
+              text: TextSpan(
+                children: <TextSpan>[
+                  const TextSpan(text: 'Source code available at '),
+                  TextSpan(
+                    style: const TextStyle(color: Colors.blue),
+                    text: 'GitHub',
+                    recognizer:
+                        TapGestureRecognizer()
+                          ..onTap = () {
+                            launchUrl(
+                              Uri.parse('https://github.com/r52/gagaku'),
+                            );
+                          },
                   ),
+                  const TextSpan(text: '.'),
                 ],
-              );
-            }
-
-            return const ListTile(leading: Icon(Icons.info), title: Text('About gagaku'));
-          },
+              ),
+            ),
+          ],
         ),
       ],
     );

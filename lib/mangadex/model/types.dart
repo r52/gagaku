@@ -971,16 +971,39 @@ class ChapterFeedItemData {
 
   final List<Chapter> chapters = [];
 
-  void clear() {
-    chapters.clear();
-  }
-
   int generateKey() {
     if (chapters.isNotEmpty) {
       return Object.hash(runtimeType, mangaId, chapters.first.id);
     }
 
     return Object.hash(runtimeType, mangaId);
+  }
+
+  static List<ChapterFeedItemData> toData(
+    List<Chapter> chapters,
+    List<Manga> mangas,
+  ) {
+    final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
+
+    // Craft feed items
+    final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
+      final mid = chapter.manga.id;
+      if (mangaMap.containsKey(mid)) {
+        ChapterFeedItemData? item;
+        if (list.isNotEmpty && list.last.mangaId == mid) {
+          item = list.last;
+        } else {
+          item = ChapterFeedItemData(manga: mangaMap[mid]!);
+          list.add(item);
+        }
+
+        item.chapters.add(chapter);
+      }
+
+      return list;
+    });
+
+    return dlist;
   }
 }
 

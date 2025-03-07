@@ -3188,7 +3188,7 @@ as List<String>,
 /// @nodoc
 mixin _$SearchRequest {
 
- String? get title; List<Tag>? get includedTags; List<Tag>? get excludedTags;
+ String? get title; List<Tag> get includedTags; List<Tag> get excludedTags;
 /// Create a copy of SearchRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3221,7 +3221,7 @@ abstract mixin class $SearchRequestCopyWith<$Res>  {
   factory $SearchRequestCopyWith(SearchRequest value, $Res Function(SearchRequest) _then) = _$SearchRequestCopyWithImpl;
 @useResult
 $Res call({
- String? title, List<Tag>? includedTags, List<Tag>? excludedTags
+ String? title, List<Tag> includedTags, List<Tag> excludedTags
 });
 
 
@@ -3238,12 +3238,12 @@ class _$SearchRequestCopyWithImpl<$Res>
 
 /// Create a copy of SearchRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? includedTags = freezed,Object? excludedTags = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? includedTags = null,Object? excludedTags = null,}) {
   return _then(_self.copyWith(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String?,includedTags: freezed == includedTags ? _self.includedTags : includedTags // ignore: cast_nullable_to_non_nullable
-as List<Tag>?,excludedTags: freezed == excludedTags ? _self.excludedTags : excludedTags // ignore: cast_nullable_to_non_nullable
-as List<Tag>?,
+as String?,includedTags: null == includedTags ? _self.includedTags : includedTags // ignore: cast_nullable_to_non_nullable
+as List<Tag>,excludedTags: null == excludedTags ? _self.excludedTags : excludedTags // ignore: cast_nullable_to_non_nullable
+as List<Tag>,
   ));
 }
 
@@ -3254,26 +3254,22 @@ as List<Tag>?,
 @JsonSerializable()
 
 class _SearchRequest implements SearchRequest {
-  const _SearchRequest({this.title, final  List<Tag>? includedTags, final  List<Tag>? excludedTags}): _includedTags = includedTags,_excludedTags = excludedTags;
+  const _SearchRequest({this.title, final  List<Tag> includedTags = const [], final  List<Tag> excludedTags = const []}): _includedTags = includedTags,_excludedTags = excludedTags;
   factory _SearchRequest.fromJson(Map<String, dynamic> json) => _$SearchRequestFromJson(json);
 
 @override final  String? title;
- final  List<Tag>? _includedTags;
-@override List<Tag>? get includedTags {
-  final value = _includedTags;
-  if (value == null) return null;
+ final  List<Tag> _includedTags;
+@override@JsonKey() List<Tag> get includedTags {
   if (_includedTags is EqualUnmodifiableListView) return _includedTags;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
+  return EqualUnmodifiableListView(_includedTags);
 }
 
- final  List<Tag>? _excludedTags;
-@override List<Tag>? get excludedTags {
-  final value = _excludedTags;
-  if (value == null) return null;
+ final  List<Tag> _excludedTags;
+@override@JsonKey() List<Tag> get excludedTags {
   if (_excludedTags is EqualUnmodifiableListView) return _excludedTags;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
+  return EqualUnmodifiableListView(_excludedTags);
 }
 
 
@@ -3310,7 +3306,7 @@ abstract mixin class _$SearchRequestCopyWith<$Res> implements $SearchRequestCopy
   factory _$SearchRequestCopyWith(_SearchRequest value, $Res Function(_SearchRequest) _then) = __$SearchRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String? title, List<Tag>? includedTags, List<Tag>? excludedTags
+ String? title, List<Tag> includedTags, List<Tag> excludedTags
 });
 
 
@@ -3327,12 +3323,12 @@ class __$SearchRequestCopyWithImpl<$Res>
 
 /// Create a copy of SearchRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? includedTags = freezed,Object? excludedTags = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? includedTags = null,Object? excludedTags = null,}) {
   return _then(_SearchRequest(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String?,includedTags: freezed == includedTags ? _self._includedTags : includedTags // ignore: cast_nullable_to_non_nullable
-as List<Tag>?,excludedTags: freezed == excludedTags ? _self._excludedTags : excludedTags // ignore: cast_nullable_to_non_nullable
-as List<Tag>?,
+as String?,includedTags: null == includedTags ? _self._includedTags : includedTags // ignore: cast_nullable_to_non_nullable
+as List<Tag>,excludedTags: null == excludedTags ? _self._excludedTags : excludedTags // ignore: cast_nullable_to_non_nullable
+as List<Tag>,
   ));
 }
 

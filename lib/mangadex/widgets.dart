@@ -13,11 +13,12 @@ import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -262,116 +263,198 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
-class ChapterFeedWidget extends HookConsumerWidget {
+class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
-    required this.provider,
-    this.title,
-    this.emptyText,
-    this.onAtEdge,
+    required this.controller,
     required this.onRefresh,
-    this.controller,
+    this.title,
+    this.scrollController,
     this.restorationId,
     this.leading = const [],
-    this.isLoading = false,
   });
 
-  final Refreshable<AsyncValue<List<ChapterFeedItemData>>> provider;
-  final String? title;
-  final String? emptyText;
-  final VoidCallback? onAtEdge;
   final RefreshCallback onRefresh;
-  final ScrollController? controller;
+  final String? title;
+  final ScrollController? scrollController;
   final String? restorationId;
   final List<Widget> leading;
-  final bool isLoading;
+
+  final PagingController<int, ChapterFeedItemData> controller;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = controller ?? useScrollController();
-    final resultProvider = ref.watch(provider);
-    final loadingState =
-        isLoading || (resultProvider.isLoading && !resultProvider.isRefreshing);
-
-    useEffect(() {
-      void controllerAtEdge() {
-        if (onAtEdge != null &&
-            scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
-          onAtEdge!();
-        }
-      }
-
-      scrollController.addListener(controllerAtEdge);
-      return () => scrollController.removeListener(controllerAtEdge);
-    }, [scrollController]);
+  Widget build(BuildContext context) {
+    final scroller = scrollController ?? useScrollController();
 
     return Center(
       child: RefreshIndicator(
         onRefresh: onRefresh,
-        child: DataProviderWhenWidget(
-          provider: provider,
-          initialData: resultProvider,
-          builder:
-              (context, results) => CustomScrollView(
-                scrollBehavior: const MouseTouchScrollBehavior(),
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: scrollController,
-                restorationId: restorationId,
-                cacheExtent: MediaQuery.sizeOf(context).height,
-                slivers: [
-                  ...leading,
-                  if (title != null)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 10.0,
-                        ),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            title!,
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (results.isEmpty)
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Text(
-                          emptyText ?? 'errors.noresults'.tr(context: context),
-                        ),
-                      ),
-                    ),
-                  SuperSliverList.builder(
-                    itemCount: results.length,
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: scroller,
+          restorationId: restorationId,
+          cacheExtent: MediaQuery.sizeOf(context).height,
+          slivers: [
+            ...leading,
+            if (title != null)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 10.0,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(title!, style: const TextStyle(fontSize: 24)),
+                  ),
+                ),
+              ),
+            PagingListener(
+              controller: controller,
+              builder:
+                  (context, state, fetchNextPage) => PagedSuperSliverList(
+                    state: state,
+                    fetchNextPage: fetchNextPage,
                     findChildIndexCallback: (key) {
                       final valueKey = key as ValueKey<int>;
-                      final val = results.indexWhere(
+                      final val = state.items!.indexWhere(
                         (i) => i.id == valueKey.value,
                       );
                       return val >= 0 ? val : null;
                     },
-                    itemBuilder: (context, index) {
-                      final elem = results.elementAt(index);
-                      return ChapterFeedItem(
-                        key: ValueKey(elem.id),
-                        state: elem,
-                      );
-                    },
+                    builderDelegate:
+                        PagedChildBuilderDelegate<ChapterFeedItemData>(
+                          animateTransitions: true,
+                          itemBuilder:
+                              (context, item, index) => ChapterFeedItem(
+                                key: ValueKey(item.id),
+                                state: item,
+                              ),
+                        ),
                   ),
-                  if (loadingState)
-                    const SliverToBoxAdapter(child: ListSpinner()),
-                ],
-              ),
-          loadingBuilder:
-              (context, progress) =>
-                  LoadingOverlayStack(progress: progress?.toDouble()),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
+  const InfiniteScrollChapterFeedWidget({
+    super.key,
+    this.title,
+    this.scrollController,
+    this.restorationId,
+    this.leading = const [],
+    required this.feedKey,
+    required this.limit,
+    required this.path,
+    this.entity,
+    this.orderKey = 'publishAt',
+    this.order = 'desc',
+  });
+
+  // List params
+  final String? title;
+  final ScrollController? scrollController;
+  final String? restorationId;
+  final List<Widget> leading;
+
+  // Feed params
+  final String feedKey;
+  final int limit;
+  final String path;
+  final MangaDexEntity? entity;
+  final String orderKey;
+  final String order;
+
+  @override
+  ConsumerState<InfiniteScrollChapterFeedWidget> createState() =>
+      _InfiniteScrollFeedState();
+}
+
+class _InfiniteScrollFeedState
+    extends ConsumerState<InfiniteScrollChapterFeedWidget> {
+  late final _pagingController =
+      GagakuPagingController<int, ChapterFeedItemData>(
+        getNextPageKey:
+            (state) =>
+                state.keys?.last != null ? state.keys!.last + widget.limit : 0,
+        fetchPage: (pageKey) async {
+          final me = await ref.watch(loggedUserProvider.future);
+          final api = ref.watch(mangadexProvider);
+
+          final chapterlist = await api.fetchFeed(
+            path: widget.path,
+            feedKey: widget.feedKey,
+            limit: widget.limit,
+            offset: pageKey,
+            entity: widget.entity,
+            orderKey: widget.orderKey,
+            order: widget.order,
+          );
+
+          final chapters = chapterlist.data.cast<Chapter>();
+
+          final mangaIds = chapters.map((e) => e.manga.id).toSet();
+          final mangas = await api.fetchMangaById(
+            ids: mangaIds,
+            limit: MangaDexEndpoints.breakLimit,
+          );
+
+          await ref.read(statisticsProvider.get)(mangas);
+          await ref.read(readChaptersProvider(me?.id).get)(mangas);
+          await ref.read(chapterStatsProvider.get)(chapters);
+
+          return ChapterFeedItemData.toData(chapters, mangas);
+        },
+        refresh: () async {
+          final api = ref.watch(mangadexProvider);
+          await api.invalidateAll(
+            widget.entity == null
+                ? widget.feedKey
+                : '${widget.feedKey}(${widget.entity!.id}',
+          );
+        },
+      );
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pagingController.addListener(_showError);
+  }
+
+  Future<void> _showError() async {
+    if (_pagingController.value.status == PagingStatus.subsequentPageError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('errors.fetchFail'.tr(context: context)),
+          action: SnackBarAction(
+            label: 'ui.retry'.tr(context: context),
+            onPressed: () => _pagingController.fetchNextPage(),
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChapterFeedWidget(
+      controller: _pagingController,
+      onRefresh: () async => _pagingController.refresh(),
+      title: widget.title,
+      scrollController: widget.scrollController,
+      restorationId: widget.restorationId,
+      leading: widget.leading,
     );
   }
 }
@@ -844,7 +927,6 @@ class MangaListWidget extends HookConsumerWidget {
     required this.children,
     this.leading = const <Widget>[],
     this.physics,
-    this.onAtEdge,
     this.controller,
     this.noController = false,
     this.showToggle = true,
@@ -855,7 +937,6 @@ class MangaListWidget extends HookConsumerWidget {
   final List<Widget> children;
   final List<Widget> leading;
   final ScrollPhysics? physics;
-  final VoidCallback? onAtEdge;
   final ScrollController? controller;
   final bool noController;
   final bool showToggle;
@@ -867,21 +948,6 @@ class MangaListWidget extends HookConsumerWidget {
         controller ?? (noController ? null : useScrollController());
     final view =
         showToggle ? ref.watch(_mangaListViewProvider) : MangaListView.grid;
-
-    useEffect(() {
-      void controllerAtEdge() {
-        if (scrollController != null &&
-            onAtEdge != null &&
-            scrollController.position.atEdge &&
-            scrollController.position.pixels ==
-                scrollController.position.maxScrollExtent) {
-          onAtEdge!();
-        }
-      }
-
-      scrollController?.addListener(controllerAtEdge);
-      return () => scrollController?.removeListener(controllerAtEdge);
-    }, [scrollController]);
 
     return Stack(
       children: [
@@ -948,22 +1014,25 @@ class MangaListWidget extends HookConsumerWidget {
 class MangaListViewSliver extends ConsumerWidget {
   const MangaListViewSliver({
     super.key,
-    required this.items,
+    this.items,
+    this.controller,
     this.selectMode = false,
     this.selectButton,
     this.onSelected,
     this.headers,
-  });
+  }) : assert(items != null || controller != null);
 
-  final List<Manga> items;
+  final List<Manga>? items;
   final bool selectMode;
   final MangaButtonBuilderCallback? selectButton;
   final MangaSelectCallback? onSelected;
   final Map<String, String>? headers;
 
+  final PagingController<int, Manga>? controller;
+
   int? _findChildIndexCb(Key? key) {
     final valueKey = key as ValueKey<String>;
-    final val = items.indexWhere((i) => i.id == valueKey.value);
+    final val = items!.indexWhere((i) => i.id == valueKey.value);
     return val >= 0 ? val : null;
   }
 
@@ -975,64 +1044,141 @@ class MangaListViewSliver extends ConsumerWidget {
     final view =
         selectMode ? MangaListView.grid : ref.watch(_mangaListViewProvider);
 
-    switch (view) {
-      case MangaListView.list:
-        return SliverList.builder(
-          findChildIndexCallback: _findChildIndexCb,
-          itemBuilder: (BuildContext context, int index) {
-            final manga = items.elementAt(index);
-            return _ListMangaItem(
-              key: ValueKey(manga.id),
-              manga: manga,
-              header: headers?[manga.id],
-            );
-          },
-          itemCount: items.length,
-        );
-      case MangaListView.detailed:
-        return SliverGrid.builder(
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+    if (items != null) {
+      switch (view) {
+        case MangaListView.list:
+          return SliverList.builder(
+            findChildIndexCallback: _findChildIndexCb,
+            itemBuilder: (BuildContext context, int index) {
+              final manga = items!.elementAt(index);
+              return _ListMangaItem(
+                key: ValueKey(manga.id),
+                manga: manga,
+                header: headers?[manga.id],
+              );
+            },
+            itemCount: items!.length,
+          );
+
+        case MangaListView.detailed:
+          final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: gridExtent.detailed,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio:
                 DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
-          ),
-          findChildIndexCallback: _findChildIndexCb,
-          itemBuilder: (context, index) {
-            final manga = items.elementAt(index);
-            return GridMangaDetailedItem(
-              key: ValueKey(manga.id),
-              manga: manga,
-              header: headers?[manga.id],
-            );
-          },
-          itemCount: items.length,
-        );
+          );
 
-      case MangaListView.grid:
-        return SliverGrid.builder(
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          return SliverGrid.builder(
+            gridDelegate: delegate,
+            findChildIndexCallback: _findChildIndexCb,
+            itemBuilder: (context, index) {
+              final manga = items!.elementAt(index);
+              return GridMangaDetailedItem(
+                key: ValueKey(manga.id),
+                manga: manga,
+                header: headers?[manga.id],
+              );
+            },
+            itemCount: items!.length,
+          );
+
+        case MangaListView.grid:
+          final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: gridExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
-          ),
-          findChildIndexCallback: _findChildIndexCb,
-          itemBuilder: (context, index) {
-            final manga = items.elementAt(index);
-            return GridMangaItem(
-              key: ValueKey(manga.id),
-              manga: manga,
-              selectMode: selectMode,
-              selectButton: selectButton,
-              onSelected: onSelected,
-              header: headers?[manga.id],
-            );
-          },
-          itemCount: items.length,
-        );
+          );
+
+          return SliverGrid.builder(
+            gridDelegate: delegate,
+            findChildIndexCallback: _findChildIndexCb,
+            itemBuilder: (context, index) {
+              final manga = items!.elementAt(index);
+              return GridMangaItem(
+                key: ValueKey(manga.id),
+                manga: manga,
+                selectMode: selectMode,
+                selectButton: selectButton,
+                onSelected: onSelected,
+                header: headers?[manga.id],
+              );
+            },
+            itemCount: items!.length,
+          );
+      }
     }
+
+    return PagingListener(
+      controller: controller!,
+      builder: (context, state, fetchNextPage) {
+        switch (view) {
+          case MangaListView.list:
+            return PagedSliverList(
+              state: state,
+              fetchNextPage: fetchNextPage,
+              builderDelegate: PagedChildBuilderDelegate<Manga>(
+                animateTransitions: true,
+                itemBuilder:
+                    (context, item, index) => _ListMangaItem(
+                      key: ValueKey(item.id),
+                      manga: item,
+                      header: headers?[item.id],
+                    ),
+              ),
+            );
+          case MangaListView.detailed:
+            final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: gridExtent.detailed,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio:
+                  DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
+            );
+
+            return PagedSliverGrid(
+              gridDelegate: delegate,
+              state: state,
+              fetchNextPage: fetchNextPage,
+              builderDelegate: PagedChildBuilderDelegate<Manga>(
+                animateTransitions: true,
+                itemBuilder:
+                    (context, item, index) => GridMangaDetailedItem(
+                      key: ValueKey(item.id),
+                      manga: item,
+                      header: headers?[item.id],
+                    ),
+              ),
+            );
+          case MangaListView.grid:
+            final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: gridExtent.grid,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 0.7,
+            );
+
+            return PagedSliverGrid(
+              gridDelegate: delegate,
+              state: state,
+              fetchNextPage: fetchNextPage,
+              builderDelegate: PagedChildBuilderDelegate<Manga>(
+                animateTransitions: true,
+                itemBuilder:
+                    (context, item, index) => GridMangaItem(
+                      key: ValueKey(item.id),
+                      manga: item,
+                      selectMode: selectMode,
+                      selectButton: selectButton,
+                      onSelected: onSelected,
+                      header: headers?[item.id],
+                    ),
+              ),
+            );
+        }
+      },
+    );
   }
 }
 

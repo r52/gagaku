@@ -15,7 +15,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'reader.g.dart';
 
 class ReaderData {
-  const ReaderData({required this.title, required this.chapter, required this.manga, this.link, this.onLinkPressed});
+  const ReaderData({
+    required this.title,
+    required this.chapter,
+    required this.manga,
+    this.link,
+    this.onLinkPressed,
+  });
 
   final String title;
   final Chapter chapter;
@@ -32,7 +38,10 @@ Future<ReaderData> _fetchChapterData(Ref ref, String chapterId) async {
   final chapter = chapters.first;
 
   final mangaId = chapter.manga.id;
-  final mangas = await api.fetchManga(ids: [mangaId], limit: MangaDexEndpoints.breakLimit);
+  final mangas = await api.fetchMangaById(
+    ids: [mangaId],
+    limit: MangaDexEndpoints.breakLimit,
+  );
   final manga = mangas.first;
 
   final data = ReaderData(title: chapter.title, chapter: chapter, manga: manga);
@@ -60,7 +69,11 @@ Future<List<ReaderPage>> _fetchChapterPages(Ref ref, Chapter chapter) async {
 
 @RoutePage()
 class MangaDexReaderPage extends ConsumerWidget {
-  const MangaDexReaderPage({super.key, @PathParam() required this.chapterId, this.readerData});
+  const MangaDexReaderPage({
+    super.key,
+    @PathParam() required this.chapterId,
+    this.readerData,
+  });
 
   final String chapterId;
   final ReaderData? readerData;
@@ -147,7 +160,11 @@ class MangaDexReaderWidget extends HookConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchChapterPagesProvider(chapter),
-      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: const BackButton()), body: child),
+      errorBuilder:
+          (context, child) => Scaffold(
+            appBar: AppBar(leading: const BackButton()),
+            body: child,
+          ),
       builder:
           (context, pages) => ReaderWidget(
             pages: pages,

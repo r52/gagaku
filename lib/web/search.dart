@@ -1,8 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/log.dart';
-import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -20,58 +19,69 @@ class _SearchHistory extends _$SearchHistory {
 
   @override
   set state(List<String> newState) => super.state = newState;
-  List<String> update(List<String> Function(List<String> state) cb) => state = cb(state);
+  List<String> update(List<String> Function(List<String> state) cb) =>
+      state = cb(state);
 }
 
-class WebSourceSearchWidget extends HookConsumerWidget {
-  final SourceIdentifier source;
-
+class WebSourceSearchWidget extends StatefulHookConsumerWidget {
   const WebSourceSearchWidget({super.key, required this.source});
 
+  final SourceIdentifier source;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
-    final controller = useSearchController();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _WebSourceSearchWidgetState();
+}
 
-    final items = useState(<HistoryLink>[]);
-    final trigger = useState(UniqueKey());
-    final metadata = useRef<Map<String, dynamic>?>({'page': 1});
-    final searchTerm = useRef<String?>(null);
+class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
+  Map<String, dynamic>? metadata = {'page': 1};
+  String? searchTerm;
 
-    final results = useMemoized(() async {
-      if (metadata.value != null) {
-        final results = await ref
-            .read(extensionSourceProvider(source.internal.id).notifier)
-            .searchManga(SearchRequest(title: searchTerm.value?.toLowerCase()), metadata.value);
-
-        final m = results.results?.map((e) => HistoryLink.fromPartialSourceManga(source.internal.id, e));
-        if (m != null) {
-          items.value.addAll(m);
-        }
-
-        metadata.value = results.metadata;
+  late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
+    getNextPageKey:
+        (state) => state.keys?.last == null ? {'page': 1} : metadata,
+    fetchPage: (pageKey) async {
+      if (searchTerm == null || searchTerm!.isEmpty) {
+        return [];
       }
 
-      return items.value;
-    }, [trigger.value]);
-    final future = useFuture(results);
+      final results = await ref
+          .read(extensionSourceProvider(widget.source.internal.id).notifier)
+          .searchManga(
+            SearchRequest(title: searchTerm?.toLowerCase()),
+            metadata,
+          );
 
-    Widget? errorList;
+      final m = results.results?.map(
+        (e) => HistoryLink.fromPartialSourceManga(widget.source.internal.id, e),
+      );
 
-    if (future.hasError) {
-      final error = future.error!;
-      final stackTrace = future.stackTrace!;
-      final msg = "ExtensionSource(${source.internal.id}).searchManga() failed";
+      metadata = results.metadata;
 
-      final messenger = ScaffoldMessenger.of(context);
-      Styles.showErrorSnackBar(messenger, '$error');
-      logger.e(msg, error: error, stackTrace: stackTrace);
+      if (m != null) {
+        return m.toList();
+      }
 
-      errorList = SliverList.list(children: [
-        Text('$error'),
-        Text(stackTrace.toString()),
-      ]);
-    }
+      return [];
+    },
+    getIsLastPage: (_, __) => metadata == null,
+    refresh: () async {
+      metadata = {'page': 1};
+    },
+  );
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultCategory = ref.watch(
+      webConfigProvider.select((cfg) => cfg.defaultCategory),
+    );
+    final controller = useSearchController();
 
     return Scaffold(
       body: WebMangaListWidget(
@@ -81,12 +91,6 @@ class WebSourceSearchWidget extends HookConsumerWidget {
           'webSources.sourceSearch'.tr(context: context),
           style: const TextStyle(fontSize: 24),
         ),
-        onAtEdge: () {
-          if (metadata.value != null) {
-            trigger.value = UniqueKey();
-          }
-        },
-        isLoading: future.connectionState == ConnectionState.waiting || !future.hasData,
         leading: [
           SliverAppBar(
             leading: const BackButton(),
@@ -101,7 +105,10 @@ class WebSourceSearchWidget extends HookConsumerWidget {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: 'search.arg'.tr(context: context, args: [source.external.name]),
+                  hintText: 'search.arg'.tr(
+                    context: context,
+                    args: [widget.source.external.name],
+                  ),
                   onTap: () {
                     controller.openView();
                   },
@@ -112,15 +119,20 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                     final term = value.trim();
                     if (term.isNotEmpty) {
                       final history = ref.read(_searchHistoryProvider);
-                      ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                      ref.read(_searchHistoryProvider.notifier).state =
+                          {term, ...history}.take(5).toList();
                     }
 
-                    searchTerm.value = term;
-                    metadata.value = {'page': 1};
-                    items.value = [];
-                    trigger.value = UniqueKey();
+                    if (controller.isOpen) {
+                      controller.closeView(term);
+                    }
 
                     unfocusSearchBar();
+
+                    setState(() {
+                      searchTerm = term;
+                    });
+                    _pagingController.refresh();
                   },
                 );
               },
@@ -128,48 +140,60 @@ class WebSourceSearchWidget extends HookConsumerWidget {
                 final term = value.trim();
                 if (term.isNotEmpty) {
                   final history = ref.read(_searchHistoryProvider);
-                  ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
+                  ref.read(_searchHistoryProvider.notifier).state =
+                      {term, ...history}.take(5).toList();
                 }
 
-                controller.closeView(term);
-                searchTerm.value = term;
-                metadata.value = {'page': 1};
-                items.value = [];
-                trigger.value = UniqueKey();
+                if (controller.isOpen) {
+                  controller.closeView(term);
+                }
 
                 unfocusSearchBar();
+
+                setState(() {
+                  searchTerm = term;
+                });
+                _pagingController.refresh();
               },
-              suggestionsBuilder: (BuildContext context, SearchController controller) {
+              suggestionsBuilder: (
+                BuildContext context,
+                SearchController controller,
+              ) {
                 final history = ref.read(_searchHistoryProvider);
                 return history
-                    .map((e) => ListTile(
-                          titleAlignment: ListTileTitleAlignment.center,
-                          title: Text(e),
-                          onTap: () {
-                            final term = e.trim();
-                            if (term.isNotEmpty) {
-                              final history = ref.read(_searchHistoryProvider);
-                              ref.read(_searchHistoryProvider.notifier).state = {term, ...history}.take(5).toList();
-                            }
+                    .map(
+                      (e) => ListTile(
+                        titleAlignment: ListTileTitleAlignment.center,
+                        title: Text(e),
+                        onTap: () {
+                          final term = e.trim();
+                          if (term.isNotEmpty) {
+                            final history = ref.read(_searchHistoryProvider);
+                            ref.read(_searchHistoryProvider.notifier).state =
+                                {term, ...history}.take(5).toList();
+                          }
 
+                          if (controller.isOpen) {
                             controller.closeView(term);
-                            searchTerm.value = term;
-                            metadata.value = {'page': 1};
-                            items.value = [];
-                            trigger.value = UniqueKey();
+                          }
 
-                            unfocusSearchBar();
-                          },
-                        ))
+                          unfocusSearchBar();
+
+                          setState(() {
+                            searchTerm = term;
+                          });
+                          _pagingController.refresh();
+                        },
+                      ),
+                    )
                     .toList();
               },
             ),
           ),
         ],
         children: [
-          if (errorList != null) errorList,
           WebMangaListViewSliver(
-            items: items.value,
+            controller: _pagingController,
             favoritesKey: defaultCategory,
             showRemoveButton: false,
             removeFromAll: true,

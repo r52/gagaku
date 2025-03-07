@@ -33,7 +33,8 @@
     "copyClipboard": "Copied to clipboard!",
     "pasteClipboard": "Paste from Clipboard",
     "dragHint": "Hint: Drag to reorder",
-    "makeDefault": "Make Default"
+    "makeDefault": "Make Default",
+    "retry": "Retry"
   },
   "errors": {
     "noresults": "No results",
@@ -46,7 +47,8 @@
     "loginFail": "Failed to login: {}",
     "notLoggedIn": "Operation failed. User not logged in",
     "unsupportedSource": "Unsupported extension type",
-    "unknownSourceID": "Unknown source ID {}"
+    "unknownSourceID": "Unknown source ID {}",
+    "fetchFail": "Something went wrong while fetching a new page"
   },
   "auth": {
     "login": "Login",

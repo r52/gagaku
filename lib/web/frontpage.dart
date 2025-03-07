@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -23,7 +24,10 @@ class WebSourceFrontPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
+    final scrollController =
+        DefaultScrollController.maybeOf(context) ??
+        controller ??
+        useScrollController();
 
     useEffect(() {
       if (process != null && process!.isScheme('paperback')) {
@@ -48,7 +52,12 @@ class WebSourceFrontPage extends HookConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('webSources.repo.addConfirm'.tr(context: context, args: [name])),
+                      Text(
+                        'webSources.repo.addConfirm'.tr(
+                          context: context,
+                          args: [name],
+                        ),
+                      ),
                       Text('webSources.repo.addWarning'.tr(context: context)),
                     ],
                   ),
@@ -80,17 +89,23 @@ class WebSourceFrontPage extends HookConsumerWidget {
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text('webSources.repo.repoExists'.tr(context: context)),
+                      content: Text(
+                        'webSources.repo.repoExists'.tr(context: context),
+                      ),
                       backgroundColor: Colors.orange,
                     ),
                   );
               } else {
-                ref.read(webConfigProvider.saveWith)(repoList: [...list, RepoInfo(name: name, url: url)]);
+                ref.read(webConfigProvider.saveWith)(
+                  repoList: [...list, RepoInfo(name: name, url: url)],
+                );
                 messenger
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text('webSources.repo.repoAddOK'.tr(context: context)),
+                      content: Text(
+                        'webSources.repo.repoAddOK'.tr(context: context),
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -119,10 +134,19 @@ class WebSourceFrontPage extends HookConsumerWidget {
             SliverAppBar(
               automaticallyImplyLeading: false,
               pinned: true,
-              title: Text('webSources.homepages'.tr(context: context), style: TextStyle(fontSize: 24)),
+              title: Text(
+                'webSources.homepages'.tr(context: context),
+                style: TextStyle(fontSize: 24),
+              ),
             ),
             if (homepageSources.isEmpty)
-              SliverToBoxAdapter(child: Center(child: Text("webSources.noSourcesWarning".tr(context: context)))),
+              SliverToBoxAdapter(
+                child: Center(
+                  child: Text(
+                    "webSources.noSourcesWarning".tr(context: context),
+                  ),
+                ),
+              ),
             if (homepageSources.isNotEmpty)
               SliverList.builder(
                 itemCount: homepageSources.length,
@@ -133,7 +157,11 @@ class WebSourceFrontPage extends HookConsumerWidget {
                     child: ListTile(
                       leading:
                           item.internal.icon != null
-                              ? Image.network(item.internal.icon!, width: 36, height: 36)
+                              ? Image.network(
+                                item.internal.icon!,
+                                width: 36,
+                                height: 36,
+                              )
                               : const Icon(Icons.rss_feed),
                       title: Text(item.external.name),
                       onTap: () {
@@ -164,10 +192,13 @@ class ExtensionHomePage extends HookConsumerWidget {
     const style = TextStyle(fontSize: 24);
     final controller = useScrollController();
     final refresh = useState(0);
-    final results = useMemoized(() => ref.read(extensionSourceProvider(source.internal.id).notifier).getHomePage(), [
-      source,
-      refresh.value,
-    ]);
+    final results = useMemoized(
+      () =>
+          ref
+              .read(extensionSourceProvider(source.internal.id).notifier)
+              .getHomePage(),
+      [source, refresh.value],
+    );
     final future = useFuture(results);
     final slivers = <Widget>[];
 
@@ -179,11 +210,19 @@ class ExtensionHomePage extends HookConsumerWidget {
       Styles.showErrorSnackBar(messenger, '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
 
-      slivers.add(SliverList.list(children: [Text('$error'), Text(stackTrace.toString())]));
+      slivers.add(
+        SliverList.list(
+          children: [Text('$error'), Text(stackTrace.toString())],
+        ),
+      );
     }
 
     if (future.connectionState == ConnectionState.waiting || !future.hasData) {
-      slivers.add(const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())));
+      slivers.add(
+        const SliverToBoxAdapter(
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
     }
 
     if (future.data != null) {
@@ -198,7 +237,8 @@ class ExtensionHomePage extends HookConsumerWidget {
                 nav.push(
                   SlideTransitionRouteBuilder(
                     pageBuilder:
-                        (context, animation, secondaryAnimation) => _HomeSectionPage(source: source, section: section),
+                        (context, animation, secondaryAnimation) =>
+                            _HomeSectionPage(source: source, section: section),
                   ),
                 );
               },
@@ -210,7 +250,13 @@ class ExtensionHomePage extends HookConsumerWidget {
         } else {
           homepageWidgets.add(Center(child: Text(section.title, style: style)));
         }
-        final mangas = section.items.map((e) => HistoryLink.fromPartialSourceManga(source.internal.id, e)).toList();
+        final mangas =
+            section.items
+                .map(
+                  (e) =>
+                      HistoryLink.fromPartialSourceManga(source.internal.id, e),
+                )
+                .toList();
         homepageWidgets.add(MangaCarousel(items: mangas));
       }
 
@@ -231,7 +277,11 @@ class ExtensionHomePage extends HookConsumerWidget {
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
+            controller.animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.easeOutCirc,
+            );
           },
           child: TitleFlexBar(title: source.external.name),
         ),
@@ -246,10 +296,15 @@ class ExtensionHomePage extends HookConsumerWidget {
                 onPressed:
                     () => nav.push(
                       SlideTransitionRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) => WebSourceSearchWidget(source: source),
+                        pageBuilder:
+                            (context, animation, secondaryAnimation) =>
+                                WebSourceSearchWidget(source: source),
                       ),
                     ),
-                tooltip: 'search.arg'.tr(context: context, args: [source.external.name]),
+                tooltip: 'search.arg'.tr(
+                  context: context,
+                  args: [source.external.name],
+                ),
               ),
               if (source.external.hasIntent(SourceIntents.settingsUI))
                 IconButton(
@@ -259,7 +314,8 @@ class ExtensionHomePage extends HookConsumerWidget {
                       () => nav.push(
                         SlideTransitionRouteBuilder(
                           pageBuilder:
-                              (context, animation, secondaryAnimation) => ExtensionSettingsPage(source: source),
+                              (context, animation, secondaryAnimation) =>
+                                  ExtensionSettingsPage(source: source),
                         ),
                       ),
                   tooltip: 'webSources.source.settings'.tr(context: context),
@@ -284,84 +340,82 @@ class ExtensionHomePage extends HookConsumerWidget {
   }
 }
 
-class _HomeSectionPage extends HookConsumerWidget {
+class _HomeSectionPage extends StatefulHookConsumerWidget {
+  const _HomeSectionPage({required this.source, required this.section});
+
   final SourceIdentifier source;
   final HomeSection section;
 
-  const _HomeSectionPage({required this.source, required this.section});
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final messenger = ScaffoldMessenger.of(context);
-    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
-    final controller = useScrollController();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      __HomeSectionPageState();
+}
 
-    final items = useState(<HistoryLink>[]);
-    final metadata = useRef<Map<String, dynamic>?>({'page': 1});
-    final page = useState(1);
+class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
+  Map<String, dynamic>? metadata = {'page': 1};
 
-    final results = useMemoized(() async {
-      if (metadata.value != null) {
-        final results = await ref
-            .read(extensionSourceProvider(source.internal.id).notifier)
-            .getHomeSectionMore(section.id, metadata.value);
+  late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
+    getNextPageKey:
+        (state) => state.keys?.last == null ? {'page': 1} : metadata,
+    fetchPage: (pageKey) async {
+      final results = await ref
+          .read(extensionSourceProvider(widget.source.internal.id).notifier)
+          .getHomeSectionMore(widget.section.id, metadata);
 
-        final m = results.results?.map((e) => HistoryLink.fromPartialSourceManga(source.internal.id, e));
-        if (m != null) {
-          items.value.addAll(m);
-        }
+      final m = results.results?.map(
+        (e) => HistoryLink.fromPartialSourceManga(widget.source.internal.id, e),
+      );
 
-        metadata.value = results.metadata;
+      metadata = results.metadata;
+
+      if (m != null) {
+        return m.toList();
       }
 
-      return items.value;
-    }, [page.value]);
-    final future = useFuture(results);
+      return [];
+    },
+    getIsLastPage: (_, __) => metadata == null,
+    refresh: () async {
+      metadata = {'page': 1};
+    },
+  );
 
-    Widget? errorList;
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
 
-    if (future.hasError) {
-      final error = future.error!;
-      final stackTrace = future.stackTrace!;
-      final msg = "ExtensionSource(${source.internal.id}).getHomeSectionMore() failed";
-
-      Styles.showErrorSnackBar(messenger, '$error');
-      logger.e(msg, error: error, stackTrace: stackTrace);
-
-      errorList = SliverList.list(children: [Text('$error'), Text(stackTrace.toString())]);
-    }
+  @override
+  Widget build(BuildContext context) {
+    final defaultCategory = ref.watch(
+      webConfigProvider.select((cfg) => cfg.defaultCategory),
+    );
+    final controller = useScrollController();
 
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controller.animateTo(0.0, duration: const Duration(milliseconds: 1000), curve: Curves.easeOutCirc);
+            controller.animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.easeOutCirc,
+            );
           },
-          child: TitleFlexBar(title: section.title),
+          child: TitleFlexBar(title: widget.section.title),
         ),
         leading: AutoLeadingButton(),
       ),
       body: RefreshIndicator(
-        onRefresh: () {
-          items.value = [];
-          metadata.value = {'page': 1};
-          page.value = 1;
-          return results;
-        },
+        onRefresh: () async => _pagingController.refresh(),
         child: WebMangaListWidget(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: controller,
           showToggle: false,
-          onAtEdge: () {
-            if (metadata.value != null) {
-              page.value++;
-            }
-          },
-          isLoading: future.connectionState == ConnectionState.waiting || !future.hasData,
           children: [
-            if (errorList != null) errorList,
             WebMangaListViewSliver(
-              items: items.value,
+              controller: _pagingController,
               favoritesKey: defaultCategory,
               removeFromAll: true,
               showRemoveButton: false,
@@ -380,7 +434,9 @@ class MangaCarousel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
+    final defaultCategory = ref.watch(
+      webConfigProvider.select((cfg) => cfg.defaultCategory),
+    );
 
     return Center(
       child: ConstrainedBox(

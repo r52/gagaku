@@ -851,12 +851,13 @@ return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
     await future;
 
     if ((query.title == null || query.title!.isEmpty) &&
-        query.includedTags == null) {
+        query.includedTags.isEmpty) {
       return const PagedResults();
     }
 
+    final params = query.toJson();
     final result = await _controller.callAsyncJavaScript(
-      arguments: {'query': query.toJson(), 'metadata': metadata},
+      arguments: {'query': params, 'metadata': metadata},
       functionBody: """
 return await $sourceId.getSearchResults(query, metadata)
 """,
