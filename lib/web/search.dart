@@ -42,7 +42,7 @@ class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
         (state) => state.keys?.last == null ? {'page': 1} : metadata,
     fetchPage: (pageKey) async {
       if (searchTerm == null || searchTerm!.isEmpty) {
-        return [];
+        return PageResultsMetaData([]);
       }
 
       final results = await ref
@@ -59,10 +59,10 @@ class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
       metadata = results.metadata;
 
       if (m != null) {
-        return m.toList();
+        return PageResultsMetaData(m.toList());
       }
 
-      return [];
+      return PageResultsMetaData([]);
     },
     getIsLastPage: (_, __) => metadata == null,
     refresh: () async {

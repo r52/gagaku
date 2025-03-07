@@ -40,6 +40,8 @@ Future<Response> _proxyHandler(Request request, String url) async {
   final norm = base64Url.normalize(url);
   final uri = b64.decode(norm);
 
+  debugPrint('Proxying: $uri');
+
   final nonNullClient = http.Client();
 
   final requestUrl = Uri.parse(uri);

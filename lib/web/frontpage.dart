@@ -369,10 +369,10 @@ class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
       metadata = results.metadata;
 
       if (m != null) {
-        return m.toList();
+        return PageResultsMetaData(m.toList());
       }
 
-      return [];
+      return PageResultsMetaData([]);
     },
     getIsLastPage: (_, __) => metadata == null,
     refresh: () async {

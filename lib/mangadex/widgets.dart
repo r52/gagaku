@@ -280,7 +280,7 @@ class ChapterFeedWidget extends HookWidget {
   final String? restorationId;
   final List<Widget> leading;
 
-  final PagingController<int, ChapterFeedItemData> controller;
+  final PagingController<int, Chapter> controller;
 
   @override
   Widget build(BuildContext context) {
@@ -313,25 +313,70 @@ class ChapterFeedWidget extends HookWidget {
             PagingListener(
               controller: controller,
               builder:
-                  (context, state, fetchNextPage) => PagedSuperSliverList(
-                    state: state,
-                    fetchNextPage: fetchNextPage,
-                    findChildIndexCallback: (key) {
-                      final valueKey = key as ValueKey<int>;
-                      final val = state.items!.indexWhere(
-                        (i) => i.id == valueKey.value,
+                  (context, state, fetchNextPage) => HookConsumer(
+                    builder: (context, ref, child) {
+                      final api = ref.watch(mangadexProvider);
+                      final chapters = state.items;
+
+                      final builtItems = useMemoized(() async {
+                        if (chapters == null) {
+                          return null;
+                        }
+
+                        final mangaIds =
+                            chapters.map((e) => e.manga.id).toSet();
+                        final mangas = await api.fetchMangaById(
+                          ids: mangaIds,
+                          limit: MangaDexEndpoints.breakLimit,
+                        );
+
+                        final items = ChapterFeedItemData.toData(
+                          chapters,
+                          mangas,
+                        );
+
+                        return items;
+                      }, [state]);
+
+                      final future = useFuture(builtItems);
+
+                      final newState = PagingState<int, ChapterFeedItemData>(
+                        pages:
+                            state.keys == null || !future.hasData
+                                ? null
+                                : List.generate(
+                                  state.keys!.length,
+                                  (i) => i == 0 ? future.data! : [],
+                                ),
+                        keys: future.hasData ? state.keys : null,
+                        hasNextPage: state.hasNextPage,
+                        isLoading:
+                            future.connectionState == ConnectionState.waiting ||
+                            !future.hasData ||
+                            state.isLoading,
                       );
-                      return val >= 0 ? val : null;
+
+                      return PagedSuperSliverList(
+                        state: newState,
+                        fetchNextPage: fetchNextPage,
+                        findChildIndexCallback: (key) {
+                          final valueKey = key as ValueKey<int>;
+                          final val = newState.items!.indexWhere(
+                            (i) => i.id == valueKey.value,
+                          );
+                          return val >= 0 ? val : null;
+                        },
+                        builderDelegate:
+                            PagedChildBuilderDelegate<ChapterFeedItemData>(
+                              animateTransitions: true,
+                              itemBuilder:
+                                  (context, item, index) => ChapterFeedItem(
+                                    key: ValueKey(item.id),
+                                    state: item,
+                                  ),
+                            ),
+                      );
                     },
-                    builderDelegate:
-                        PagedChildBuilderDelegate<ChapterFeedItemData>(
-                          animateTransitions: true,
-                          itemBuilder:
-                              (context, item, index) => ChapterFeedItem(
-                                key: ValueKey(item.id),
-                                state: item,
-                              ),
-                        ),
                   ),
             ),
           ],
@@ -377,48 +422,47 @@ class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
 
 class _InfiniteScrollFeedState
     extends ConsumerState<InfiniteScrollChapterFeedWidget> {
-  late final _pagingController =
-      GagakuPagingController<int, ChapterFeedItemData>(
-        getNextPageKey:
-            (state) =>
-                state.keys?.last != null ? state.keys!.last + widget.limit : 0,
-        fetchPage: (pageKey) async {
-          final me = await ref.watch(loggedUserProvider.future);
-          final api = ref.watch(mangadexProvider);
+  late final _pagingController = GagakuPagingController<int, Chapter>(
+    getNextPageKey:
+        (state) =>
+            state.keys?.last != null ? state.keys!.last + widget.limit : 0,
+    fetchPage: (pageKey) async {
+      final me = await ref.watch(loggedUserProvider.future);
+      final api = ref.watch(mangadexProvider);
 
-          final chapterlist = await api.fetchFeed(
-            path: widget.path,
-            feedKey: widget.feedKey,
-            limit: widget.limit,
-            offset: pageKey,
-            entity: widget.entity,
-            orderKey: widget.orderKey,
-            order: widget.order,
-          );
-
-          final chapters = chapterlist.data.cast<Chapter>();
-
-          final mangaIds = chapters.map((e) => e.manga.id).toSet();
-          final mangas = await api.fetchMangaById(
-            ids: mangaIds,
-            limit: MangaDexEndpoints.breakLimit,
-          );
-
-          await ref.read(statisticsProvider.get)(mangas);
-          await ref.read(readChaptersProvider(me?.id).get)(mangas);
-          await ref.read(chapterStatsProvider.get)(chapters);
-
-          return ChapterFeedItemData.toData(chapters, mangas);
-        },
-        refresh: () async {
-          final api = ref.watch(mangadexProvider);
-          await api.invalidateAll(
-            widget.entity == null
-                ? widget.feedKey
-                : '${widget.feedKey}(${widget.entity!.id}',
-          );
-        },
+      final chapterlist = await api.fetchFeed(
+        path: widget.path,
+        feedKey: widget.feedKey,
+        limit: widget.limit,
+        offset: pageKey,
+        entity: widget.entity,
+        orderKey: widget.orderKey,
+        order: widget.order,
       );
+
+      final chapters = chapterlist.data.cast<Chapter>();
+
+      final mangaIds = chapters.map((e) => e.manga.id).toSet();
+      final mangas = await api.fetchMangaById(
+        ids: mangaIds,
+        limit: MangaDexEndpoints.breakLimit,
+      );
+
+      await ref.read(statisticsProvider.get)(mangas);
+      await ref.read(readChaptersProvider(me?.id).get)(mangas);
+      await ref.read(chapterStatsProvider.get)(chapters);
+
+      return PageResultsMetaData(chapters, chapterlist.total);
+    },
+    refresh: () async {
+      final api = ref.watch(mangadexProvider);
+      await api.invalidateAll(
+        widget.entity == null
+            ? widget.feedKey
+            : '${widget.feedKey}(${widget.entity!.id}',
+      );
+    },
+  );
 
   @override
   void dispose() {

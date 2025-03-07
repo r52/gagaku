@@ -46,12 +46,14 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
 
       await ref.read(statisticsProvider.get)(mangas);
 
-      return mangas;
+      return PageResultsMetaData(mangas, chapterlist.total);
     },
     refresh: () async {
       final api = ref.watch(mangadexProvider);
       await api.invalidateAll(info.key);
     },
+    getIsLastPage:
+        (state, data) => (state.keys?.last ?? 0) + info.limit >= data.total!,
   );
 
   @override

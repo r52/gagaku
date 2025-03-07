@@ -234,28 +234,53 @@ class AppendedFindingSliverChildBuilderDelegate
        );
 }
 
+class PageResultsMetaData<ItemType> {
+  const PageResultsMetaData(this.results, [this.total]);
+
+  final List<ItemType> results;
+  final int? total;
+}
+
+typedef MetadataFetchPageCallback<PageKeyType, ItemType> =
+    FutureOr<PageResultsMetaData<ItemType>> Function(PageKeyType pageKey);
+
 typedef PostGetLastPageCallback<PageKeyType, ItemType> =
-    bool Function(PagingState<PageKeyType, ItemType>, List<ItemType>);
+    bool Function(
+      PagingState<PageKeyType, ItemType> state,
+      PageResultsMetaData<ItemType> data,
+    );
 
 class GagakuPagingController<PageKeyType, ItemType>
-    extends PagingController<PageKeyType, ItemType> {
+    extends ValueNotifier<PagingState<PageKeyType, ItemType>>
+    implements PagingController<PageKeyType, ItemType> {
   GagakuPagingController({
-    super.value,
-    required super.getNextPageKey,
-    required super.fetchPage,
+    PagingState<PageKeyType, ItemType>? value,
+    required NextPageKeyCallback<PageKeyType, ItemType> getNextPageKey,
+    required MetadataFetchPageCallback<PageKeyType, ItemType> fetchPage,
     RefreshCallback? refresh,
     PostGetLastPageCallback<PageKeyType, ItemType>? getIsLastPage,
   }) : _getNextPageKey = getNextPageKey,
        _fetchPage = fetchPage,
        _refresh = refresh,
-       _getIsLastPage = getIsLastPage;
+       _getIsLastPage = getIsLastPage,
+       super(value ?? PagingState<PageKeyType, ItemType>());
 
   /// The function to get the next page key.
   /// If this function returns `null`, it indicates that there are no more pages to load.
   final NextPageKeyCallback<PageKeyType, ItemType> _getNextPageKey;
 
   /// The function to fetch a page.
-  final FetchPageCallback<PageKeyType, ItemType> _fetchPage;
+  final MetadataFetchPageCallback<PageKeyType, ItemType> _fetchPage;
+
+  /// Keeps track of the current operation.
+  /// If the operation changes during its execution, the operation is cancelled.
+  ///
+  /// Instead of using this property directly, use [fetchNextPage], [refresh], or [cancel].
+  /// If you are extending this class, check and set this property before and after the fetch operation.
+  @override
+  @protected
+  @visibleForTesting
+  Object? operation;
 
   final RefreshCallback? _refresh;
   final PostGetLastPageCallback<PageKeyType, ItemType>? _getIsLastPage;
@@ -286,26 +311,29 @@ class GagakuPagingController<PageKeyType, ItemType>
       }
 
       final fetchResult = _fetchPage(nextPageKey);
-      List<ItemType> newItems;
+      PageResultsMetaData<ItemType> data;
 
       // If the result is synchronous, we can directly assign it in the same tick.
       if (fetchResult is Future) {
-        newItems = await fetchResult;
+        data = await fetchResult;
       } else {
-        newItems = fetchResult;
+        data = fetchResult;
       }
 
       final isLastPage =
           _getIsLastPage != null
-              ? _getIsLastPage(state, newItems)
-              : newItems.isEmpty;
+              ? _getIsLastPage(state, data)
+              : (data.total != null
+                  ? ((state.items?.length ?? 0) + data.results.length >=
+                      data.total!)
+                  : data.results.isEmpty);
 
       // Update our state in case it was modified during the fetch operation.
       // This beaks atomicity, but is necessary to allow users to modify the state during a fetch.
       state = value;
 
       state = state.copyWith(
-        pages: [...?state.pages, newItems],
+        pages: [...?state.pages, data.results],
         keys: [...?state.keys, nextPageKey],
         hasNextPage: !isLastPage,
       );
@@ -335,5 +363,11 @@ class GagakuPagingController<PageKeyType, ItemType>
     }
 
     value = value.reset();
+  }
+
+  @override
+  void cancel() {
+    operation = null;
+    value = value.copyWith(isLoading: false);
   }
 }

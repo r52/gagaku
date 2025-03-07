@@ -65,18 +65,20 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
       final api = ref.watch(mangadexProvider);
       final filter = ref.watch(_searchParamsProvider);
 
-      final manga = await api.searchManga(
+      final results = await api.searchManga(
         filter.query,
         limit: info.limit,
         filter: filter.filter,
         offset: pageKey,
       );
 
+      final manga = results.data.cast<Manga>();
+
       if (manga.isNotEmpty) {
         await ref.read(statisticsProvider.get)(manga);
       }
 
-      return manga;
+      return PageResultsMetaData(manga, results.total);
     },
   );
 

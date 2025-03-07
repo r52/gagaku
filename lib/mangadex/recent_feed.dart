@@ -56,7 +56,7 @@ class _MangaDexRecentFeedPageState
 
       await ref.read(statisticsProvider.get)(newItems);
 
-      return newItems;
+      return PageResultsMetaData(newItems, list.total);
     },
     refresh: () async {
       final api = ref.watch(mangadexProvider);

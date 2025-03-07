@@ -498,7 +498,7 @@ class MangaDexModel {
     bool ignoreOriginalLanguage = false,
   }) async {
     final key =
-        '$feedKey(${entity != null ? '${entity.id},' : ''},$orderKey=$order,$offset)';
+        '$feedKey(${entity != null ? '${entity.id},' : ''}$orderKey=$order,$offset)';
 
     if (await _cache.exists(key)) {
       return await _cache.getEntityList(key);
@@ -740,7 +740,7 @@ class MangaDexModel {
   /// [limit] number of items.
   ///
   /// [offset] denotes the nth item to start fetching from.
-  Future<List<Manga>> searchManga(
+  Future<MDEntityList> searchManga(
     String searchTerm, {
     required int limit,
     required MangaFilters filter,
@@ -783,7 +783,7 @@ class MangaDexModel {
       // Cache the data
       await _cache.putAllAPIResolved(result.data);
 
-      return result.data.cast<Manga>();
+      return result;
     }
 
     // Throw if failure

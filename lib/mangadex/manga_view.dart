@@ -131,7 +131,7 @@ class _MangaDexMangaViewWidgetState
 
       await ref.read(chapterStatsProvider.get)(chapters);
 
-      return chapters.toList();
+      return PageResultsMetaData(chapters, chapterlist.total);
     },
     refresh: () async {
       final api = ref.watch(mangadexProvider);
@@ -147,7 +147,7 @@ class _MangaDexMangaViewWidgetState
       final api = ref.watch(mangadexProvider);
       final covers = await api.getCoverList(widget.manga, offset: pageKey);
 
-      return covers.data.cast<CoverArt>();
+      return PageResultsMetaData(covers.data.cast<CoverArt>(), covers.total);
     },
     refresh: () async {
       final api = ref.watch(mangadexProvider);
@@ -157,6 +157,10 @@ class _MangaDexMangaViewWidgetState
 
   late final _relatedController = GagakuPagingController<int, Manga>(
     getNextPageKey: (state) {
+      if (widget.manga.relatedMangas.isEmpty) {
+        return null;
+      }
+
       if (state.keys?.last == null) {
         return 0;
       }
@@ -172,7 +176,7 @@ class _MangaDexMangaViewWidgetState
       final related = widget.manga.relatedMangas;
 
       if (related.isEmpty) {
-        return [];
+        return PageResultsMetaData([]);
       }
 
       final me = await ref.watch(loggedUserProvider.future);
@@ -190,7 +194,7 @@ class _MangaDexMangaViewWidgetState
       await ref.read(statisticsProvider.get)(mangas);
       await ref.read(readChaptersProvider(me?.id).get)(mangas);
 
-      return mangas;
+      return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
     },
   );
 

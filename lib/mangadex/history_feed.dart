@@ -21,32 +21,31 @@ class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
 }
 
 class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
-  late final _pagingController =
-      GagakuPagingController<int, ChapterFeedItemData>(
-        getNextPageKey: (state) => state.keys?.last ?? 0,
-        fetchPage: (pageKey) async {
-          final me = await ref.watch(loggedUserProvider.future);
-          final api = ref.watch(mangadexProvider);
+  late final _pagingController = GagakuPagingController<int, Chapter>(
+    getNextPageKey: (state) => state.keys?.last ?? 0,
+    fetchPage: (pageKey) async {
+      final me = await ref.watch(loggedUserProvider.future);
+      final api = ref.watch(mangadexProvider);
 
-          final chapters = await ref.watch(mangaDexHistoryProvider.future);
+      final chapters = await ref.watch(mangaDexHistoryProvider.future);
 
-          final mangaIds = chapters.map((e) => e.manga.id).toSet();
-          final mangas = await api.fetchMangaById(
-            ids: mangaIds,
-            limit: MangaDexEndpoints.breakLimit,
-          );
-
-          await ref.read(statisticsProvider.get)(mangas);
-          await ref.read(readChaptersProvider(me?.id).get)(mangas);
-          await ref.read(chapterStatsProvider.get)(chapters);
-
-          return ChapterFeedItemData.toData(chapters.toList(), mangas);
-        },
-        refresh: () async {
-          ref.invalidate(mangaDexHistoryProvider);
-        },
-        getIsLastPage: (_, __) => true,
+      final mangaIds = chapters.map((e) => e.manga.id).toSet();
+      final mangas = await api.fetchMangaById(
+        ids: mangaIds,
+        limit: MangaDexEndpoints.breakLimit,
       );
+
+      await ref.read(statisticsProvider.get)(mangas);
+      await ref.read(readChaptersProvider(me?.id).get)(mangas);
+      await ref.read(chapterStatsProvider.get)(chapters);
+
+      return PageResultsMetaData(chapters.toList());
+    },
+    refresh: () async {
+      ref.invalidate(mangaDexHistoryProvider);
+    },
+    getIsLastPage: (_, __) => true,
+  );
 
   @override
   void dispose() {

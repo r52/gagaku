@@ -55,12 +55,17 @@ class WebMangaViewPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final installed = ref.read(webConfigProvider.select((cfg) => cfg.installedSources));
+    final installed = ref.read(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
 
     final hndl =
         handle ??
         SourceHandler(
-          type: (installed.indexWhere((e) => e.id == source) > -1) ? SourceType.source : SourceType.proxy,
+          type:
+              (installed.indexWhere((e) => e.id == source) > -1)
+                  ? SourceType.source
+                  : SourceType.proxy,
           source: source,
           location: mangaId,
         );
@@ -90,7 +95,11 @@ class WebMangaViewPage extends ConsumerWidget {
 }
 
 class WebMangaViewWidget extends HookConsumerWidget {
-  const WebMangaViewWidget({super.key, required this.manga, required this.handle});
+  const WebMangaViewWidget({
+    super.key,
+    required this.manga,
+    required this.handle,
+  });
 
   final WebManga manga;
   final SourceHandler handle;
@@ -99,8 +108,15 @@ class WebMangaViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
-    final link = HistoryLink(title: '${handle.source}: ${manga.title}', url: handle.getURL(), cover: manga.cover);
-    final chapterlist = manga.chapters.entries.map((e) => ChapterEntry(e.key, e.value)).toList();
+    final link = HistoryLink(
+      title: '${handle.source}: ${manga.title}',
+      url: handle.getURL(),
+      cover: manga.cover,
+    );
+    final chapterlist =
+        manga.chapters.entries
+            .map((e) => ChapterEntry(e.key, e.value))
+            .toList();
     //chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
     chapterlist.sort((a, b) => compareNatural(b.name, a.name));
 
@@ -135,7 +151,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    shadows: <Shadow>[Shadow(offset: Offset(1.0, 1.0), color: Color.fromARGB(255, 0, 0, 0))],
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(1.0, 1.0),
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ],
                   ),
                 ),
                 background: CachedNetworkImage(
@@ -144,7 +165,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   color: Colors.grey,
                   fit: BoxFit.cover,
                   progressIndicatorBuilder:
-                      (context, url, downloadProgress) => const Center(child: CircularProgressIndicator()),
+                      (context, url, downloadProgress) =>
+                          const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
@@ -160,7 +182,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         return IconButton(
                           tooltip: 'webSources.resetRead'.tr(context: context),
                           style: Styles.squareIconButtonStyle(
-                            backgroundColor: theme.colorScheme.surface.withAlpha(200),
+                            backgroundColor: theme.colorScheme.surface
+                                .withAlpha(200),
                           ),
                           onPressed: () async {
                             final result = await showDialog<bool>(
@@ -168,11 +191,20 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               builder: (BuildContext context) {
                                 final nav = Navigator.of(context);
                                 return AlertDialog(
-                                  title: Text('webSources.resetRead'.tr(context: context)),
+                                  title: Text(
+                                    'webSources.resetRead'.tr(context: context),
+                                  ),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [Text('webSources.resetReadWarning'.tr(context: context))],
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'webSources.resetReadWarning'.tr(
+                                          context: context,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   actions: <Widget>[
                                     ElevatedButton(
@@ -185,7 +217,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                       onPressed: () {
                                         nav.pop(true);
                                       },
-                                      child: Text('ui.yes'.tr(context: context)),
+                                      child: Text(
+                                        'ui.yes'.tr(context: context),
+                                      ),
                                     ),
                                   ],
                                 );
@@ -244,20 +278,29 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         if (handle.type == SourceType.proxy)
                           ButtonChip(
                             onPressed: () async {
-                              final route = cleanBaseDomains(context.router.currentUrl);
+                              final route = cleanBaseDomains(
+                                context.router.currentUrl,
+                              );
                               final url = Uri.parse('http://cubari.moe$route');
 
                               if (!await launchUrl(url)) {
                                 throw 'Could not launch $url';
                               }
                             },
-                            text: 'mangaView.openOn'.tr(context: context, args: ['cubari.moe']),
+                            text: 'mangaView.openOn'.tr(
+                              context: context,
+                              args: ['cubari.moe'],
+                            ),
                           ),
                         if (handle.type == SourceType.source)
                           ButtonChip(
                             onPressed: () async {
                               final url = await ref
-                                  .read(extensionSourceProvider(handle.source).notifier)
+                                  .read(
+                                    extensionSourceProvider(
+                                      handle.source,
+                                    ).notifier,
+                                  )
                                   .getMangaURL(handle.location);
                               final uri = Uri.parse(url);
 
@@ -265,7 +308,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                 throw 'Could not launch $url';
                               }
                             },
-                            text: 'mangaView.openOn'.tr(context: context, args: [handle.source]),
+                            text: 'mangaView.openOn'.tr(
+                              context: context,
+                              args: [handle.source],
+                            ),
                           ),
                       ],
                     ),
@@ -273,7 +319,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.all(8),
-                  child: Text('mangaView.chapters'.tr(context: context), style: TextStyle(fontSize: 24)),
+                  child: Text(
+                    'mangaView.chapters'.tr(context: context),
+                    style: TextStyle(fontSize: 24),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -287,34 +336,54 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           final allRead = ref.watch(
                             webReadMarkersProvider.select(
                               (value) => switch (value) {
-                                AsyncValue(value: final data?) => data[key]?.containsAll(names) ?? false,
+                                AsyncValue(value: final data?) =>
+                                  data[key]?.containsAll(names) ?? false,
                                 _ => false,
                               },
                             ),
                           );
 
                           final opt =
-                              allRead ? 'mangaView.unread'.tr(context: context) : 'mangaView.read'.tr(context: context);
+                              allRead
+                                  ? 'mangaView.unread'.tr(context: context)
+                                  : 'mangaView.read'.tr(context: context);
 
                           return ElevatedButton(
-                            style: Styles.buttonStyle(padding: const EdgeInsets.symmetric(horizontal: 8.0)),
+                            style: Styles.buttonStyle(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                            ),
                             onPressed: () async {
                               final result = await showDialog<bool>(
                                 context: context,
                                 builder: (BuildContext context) {
                                   final nav = Navigator.of(context);
                                   return AlertDialog(
-                                    title: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
+                                    title: Text(
+                                      'mangaView.markAllAs'.tr(
+                                        context: context,
+                                        args: [opt],
+                                      ),
+                                    ),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text('mangaView.markAllWarning'.tr(context: context, args: [opt])),
+                                        Text(
+                                          'mangaView.markAllWarning'.tr(
+                                            context: context,
+                                            args: [opt],
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     actions: <Widget>[
                                       ElevatedButton(
-                                        child: Text('ui.no'.tr(context: context)),
+                                        child: Text(
+                                          'ui.no'.tr(context: context),
+                                        ),
                                         onPressed: () {
                                           nav.pop(false);
                                         },
@@ -323,7 +392,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                         onPressed: () {
                                           nav.pop(true);
                                         },
-                                        child: Text('ui.yes'.tr(context: context)),
+                                        child: Text(
+                                          'ui.yes'.tr(context: context),
+                                        ),
                                       ),
                                     ],
                                   );
@@ -338,7 +409,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                 );
                               }
                             },
-                            child: Text('mangaView.markAllAs'.tr(context: context, args: [opt])),
+                            child: Text(
+                              'mangaView.markAllAs'.tr(
+                                context: context,
+                                args: [opt],
+                              ),
+                            ),
                           );
                         },
                       ),
@@ -350,14 +426,21 @@ class WebMangaViewWidget extends HookConsumerWidget {
             SliverList.separated(
               findChildIndexCallback: (key) {
                 final valueKey = key as ValueKey<int>;
-                final val = chapterlist.indexWhere((i) => i.id == valueKey.value);
+                final val = chapterlist.indexWhere(
+                  (i) => i.id == valueKey.value,
+                );
                 return val >= 0 ? val : null;
               },
               separatorBuilder: (_, __) => const SizedBox(height: 4.0),
               itemBuilder: (BuildContext context, int index) {
                 final e = chapterlist.elementAt(index);
 
-                return ChapterButtonWidget(key: ValueKey(e.id), data: e, manga: manga, handle: handle);
+                return ChapterButtonWidget(
+                  key: ValueKey(e.id),
+                  data: e,
+                  manga: manga,
+                  handle: handle,
+                );
               },
               itemCount: manga.chapters.length,
             ),
@@ -414,9 +497,16 @@ class ChapterButtonWidget extends HookConsumerWidget {
       timestamp = timeago.format(data.chapter.releaseDate!, locale: lang);
     }
 
-    final border = Border(left: BorderSide(color: isRead == true ? tileColor : Colors.blue, width: 4.0));
+    final border = Border(
+      left: BorderSide(
+        color: isRead == true ? tileColor : Colors.blue,
+        width: 4.0,
+      ),
+    );
 
-    final textstyle = TextStyle(color: (isRead == true ? theme.disabledColor : theme.colorScheme.primary));
+    final textstyle = TextStyle(
+      color: (isRead == true ? theme.disabledColor : theme.colorScheme.primary),
+    );
 
     final markReadBtn = IconButton(
       onPressed: () async {
@@ -429,13 +519,25 @@ class ChapterButtonWidget extends HookConsumerWidget {
       iconSize: 20,
       tooltip: 'mangaView.markAs'.tr(
         context: context,
-        args: [isRead == true ? 'mangaView.unread'.tr(context: context) : 'mangaView.read'.tr(context: context)],
+        args: [
+          isRead == true
+              ? 'mangaView.unread'.tr(context: context)
+              : 'mangaView.read'.tr(context: context),
+        ],
       ),
       icon: Icon(
         isRead == true ? Icons.visibility_off : Icons.visibility,
-        color: (isRead == true ? theme.disabledColor : theme.primaryIconTheme.color),
+        color:
+            (isRead == true
+                ? theme.disabledColor
+                : theme.primaryIconTheme.color),
       ),
-      constraints: const BoxConstraints(minWidth: 20.0, minHeight: 20.0, maxWidth: 30.0, maxHeight: 30.0),
+      constraints: const BoxConstraints(
+        minWidth: 20.0,
+        minHeight: 20.0,
+        maxWidth: 30.0,
+        maxHeight: 30.0,
+      ),
       visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
     );
 
@@ -471,7 +573,9 @@ class ChapterButtonWidget extends HookConsumerWidget {
       tileColor: theme.colorScheme.primaryContainer,
       dense: true,
       minVerticalPadding: 0.0,
-      contentPadding: EdgeInsets.symmetric(horizontal: (screenSizeSmall ? 4.0 : 10.0)),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: (screenSizeSmall ? 4.0 : 10.0),
+      ),
       minLeadingWidth: 0.0,
       leading: markReadBtn,
       shape: border,
@@ -484,7 +588,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
             if (!screenSizeSmall)
               IconTextChip(
                 icon: const Icon(Icons.group, size: 20),
-                text: manga.groups != null && manga.groups?.containsKey(group) == true ? manga.groups![group]! : group,
+                text:
+                    manga.groups != null &&
+                            manga.groups?.containsKey(group) == true
+                        ? manga.groups![group]!
+                        : group,
               ),
             if (!screenSizeSmall) const SizedBox(width: 10),
             const Icon(Icons.schedule, size: 20),
@@ -505,7 +613,9 @@ class _FavoritesMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final categories = ref.watch(webConfigProvider.select((cfg) => cfg.categories));
+    final categories = ref.watch(
+      webConfigProvider.select((cfg) => cfg.categories),
+    );
 
     final favorites = ref.watch(
       webSourceFavoritesProvider.select(
@@ -516,9 +626,14 @@ class _FavoritesMenu extends HookConsumerWidget {
       ),
     );
 
-    final favorited = useMemoized(() => favorites?.values.any((l) => l.any((e) => e.url == handle.getURL())) ?? false, [
-      favorites,
-    ]);
+    final favorited = useMemoized(
+      () =>
+          favorites?.values.any(
+            (l) => l.any((e) => e.url == handle.getURL()),
+          ) ??
+          false,
+      [favorites],
+    );
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -530,7 +645,10 @@ class _FavoritesMenu extends HookConsumerWidget {
                   ? const SizedBox(
                     width: 36,
                     height: 36,
-                    child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator()),
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
                   )
                   : InkWell(
                     onTap: () {
@@ -557,9 +675,15 @@ class _FavoritesMenu extends HookConsumerWidget {
                       value: favorites[cat.id]?.contains(link) ?? false,
                       onChanged: (bool? value) async {
                         if (value == true) {
-                          await ref.read(webSourceFavoritesProvider.add)(cat.id, link);
+                          await ref.read(webSourceFavoritesProvider.add)(
+                            cat.id,
+                            link,
+                          );
                         } else {
-                          await ref.read(webSourceFavoritesProvider.remove)(cat.id, link);
+                          await ref.read(webSourceFavoritesProvider.remove)(
+                            cat.id,
+                            link,
+                          );
                         }
                       },
                     );
