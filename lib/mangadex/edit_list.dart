@@ -302,7 +302,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         () => getMangaListByPage(ref, selected.state, page),
                         [selected.state, page],
                       );
-
                       final future = useFuture(data);
 
                       return MangaListWidget(
@@ -312,9 +311,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         ),
                         physics: const AlwaysScrollableScrollPhysics(),
                         showToggle: false,
-                        isLoading:
-                            future.connectionState == ConnectionState.waiting ||
-                            !future.hasData,
+                        future: future,
                         children: [
                           if (future.hasData)
                             MangaListViewSliver(

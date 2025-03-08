@@ -41,6 +41,9 @@ class MangaDexHomePage extends HookConsumerWidget {
         MangaDexListsRoute(),
         MangaDexHistoryFeedRoute(),
       ],
+      transitionBuilder:
+          (context, child, animation) =>
+              FadeTransition(opacity: animation, child: child),
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
 

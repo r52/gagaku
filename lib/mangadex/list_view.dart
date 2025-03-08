@@ -183,7 +183,6 @@ class MangaDexListViewPage extends HookConsumerWidget {
                                   () => getMangaListByPage(ref, list.set, page),
                                   [list.set, page, refresh.value],
                                 );
-
                                 final future = useFuture(data);
 
                                 return MangaListWidget(
@@ -194,10 +193,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),
                                   controller: controllers[0],
-                                  isLoading:
-                                      future.connectionState ==
-                                          ConnectionState.waiting ||
-                                      !future.hasData,
+                                  future: future,
                                   children: [
                                     if (future.hasData)
                                       MangaListViewSliver(items: future.data),

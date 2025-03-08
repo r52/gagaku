@@ -38,6 +38,9 @@ class WebSourceHomePage extends HookConsumerWidget {
         WebSourceFavoritesRoute(),
         WebSourceHistoryRoute(),
       ],
+      transitionBuilder:
+          (context, child, animation) =>
+              FadeTransition(opacity: animation, child: child),
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
 

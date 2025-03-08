@@ -970,9 +970,9 @@ class MangaListWidget extends HookConsumerWidget {
     this.leading = const <Widget>[],
     this.physics,
     this.controller,
+    this.future,
     this.noController = false,
     this.showToggle = true,
-    this.isLoading = false,
   });
 
   final Widget? title;
@@ -980,9 +980,9 @@ class MangaListWidget extends HookConsumerWidget {
   final List<Widget> leading;
   final ScrollPhysics? physics;
   final ScrollController? controller;
+  final AsyncSnapshot? future;
   final bool noController;
   final bool showToggle;
-  final bool isLoading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -990,6 +990,12 @@ class MangaListWidget extends HookConsumerWidget {
         controller ?? (noController ? null : useScrollController());
     final view =
         showToggle ? ref.watch(_mangaListViewProvider) : MangaListView.grid;
+
+    final isLoading =
+        future != null
+            ? (future!.connectionState == ConnectionState.waiting ||
+                !future!.hasData)
+            : false;
 
     return Stack(
       children: [
@@ -1044,6 +1050,13 @@ class MangaListWidget extends HookConsumerWidget {
                 ),
               ),
             ),
+            if (future != null && future!.hasError)
+              SliverList.list(
+                children: [
+                  Text('${future!.error}'),
+                  Text(future!.stackTrace.toString()),
+                ],
+              ),
             ...children,
           ],
         ),

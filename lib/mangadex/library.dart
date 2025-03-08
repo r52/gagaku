@@ -151,7 +151,6 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                                     () => getMangaListByPage(ref, list, page),
                                     [list, page],
                                   );
-
                                   final future = useFuture(data);
 
                                   return MangaListWidget(
@@ -162,10 +161,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                                     physics:
                                         const AlwaysScrollableScrollPhysics(),
                                     noController: true,
-                                    isLoading:
-                                        future.connectionState ==
-                                            ConnectionState.waiting ||
-                                        !future.hasData,
+                                    future: future,
                                     leading: [
                                       SliverOverlapInjector(
                                         handle:
