@@ -8,7 +8,7 @@ import 'package:gagaku/log.dart';
 /// XXX: this may break because its depending on an internal riverpod class
 mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   int offset = 0;
-  bool atEnd = false;
+  bool hasNextPage = true;
 
   @protected
   @mustBeOverridden
@@ -25,17 +25,17 @@ mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   Future<List<T>> getMore() async {
     final current = await future;
 
-    if (atEnd) {
+    if (!hasNextPage) {
       return [];
     }
 
     // If there is more content, get more
-    if (current.length == offset + limit && !atEnd) {
+    if (current.length == offset + limit && hasNextPage) {
       final result = await fetchData(offset + limit);
       offset += limit;
 
       if (result.isEmpty) {
-        atEnd = true;
+        hasNextPage = false;
       }
 
       state = AsyncData([...current, ...result]);
@@ -44,7 +44,7 @@ mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
     }
 
     // Otherwise, do nothing because there is no more content
-    atEnd = true;
+    hasNextPage = false;
 
     return [];
   }

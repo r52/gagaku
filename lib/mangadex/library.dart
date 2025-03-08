@@ -128,7 +128,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
           for (final type in statuses)
             HookConsumer(
               builder: (context, ref, child) {
-                final currentPage = useState(0);
+                final currentPage = useValueNotifier(0);
 
                 return RefreshIndicator(
                   key: ValueKey('LibraryTab(${me?.id}, $type)'),
@@ -141,65 +141,63 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                   child: DataProviderWhenWidget(
                     provider: _getLibraryListByTypeProvider(type),
                     builder:
-                        (context, list) => Consumer(
-                          builder: (context, ref, child) {
-                            final titlesProvider = ref.watch(
-                              getMangaListByPageProvider(
-                                list,
-                                currentPage.value,
-                              ),
-                            );
+                        (context, list) => Column(
+                          children: [
+                            Expanded(
+                              child: HookConsumer(
+                                builder: (context, ref, child) {
+                                  final page = useValueListenable(currentPage);
+                                  final data = useMemoized(
+                                    () => getMangaListByPage(ref, list, page),
+                                    [list, page],
+                                  );
 
-                            return Column(
-                              children: [
-                                Expanded(
-                                  child: switch (titlesProvider) {
-                                    AsyncValue(
-                                      :final error?,
-                                      :final stackTrace?,
-                                    ) =>
-                                      ErrorList(
-                                        error: error,
-                                        stackTrace: stackTrace,
-                                        message:
-                                            "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
+                                  final future = useFuture(data);
+
+                                  return MangaListWidget(
+                                    title: Text(
+                                      'num_manga'.plural(list.length),
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    noController: true,
+                                    isLoading:
+                                        future.connectionState ==
+                                            ConnectionState.waiting ||
+                                        !future.hasData,
+                                    leading: [
+                                      SliverOverlapInjector(
+                                        handle:
+                                            NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                              context,
+                                            ),
                                       ),
-                                    AsyncValue(value: final mangas) =>
-                                      MangaListWidget(
-                                        title: Text(
-                                          'num_manga'.plural(list.length),
-                                          style: const TextStyle(fontSize: 24),
-                                        ),
-                                        physics:
-                                            const AlwaysScrollableScrollPhysics(),
-                                        noController: true,
-                                        isLoading: titlesProvider.isLoading,
-                                        leading: [
-                                          SliverOverlapInjector(
-                                            handle:
-                                                NestedScrollView.sliverOverlapAbsorberHandleFor(
-                                                  context,
-                                                ),
-                                          ),
-                                        ],
-                                        children: [
-                                          if (mangas == null || mangas.isEmpty)
-                                            SliverToBoxAdapter(
-                                              child: Center(
-                                                child: Text(
-                                                  'errors.notitles'.tr(
-                                                    context: context,
-                                                  ),
-                                                ),
+                                    ],
+                                    children: [
+                                      if (future.hasData &&
+                                          (future.data == null ||
+                                              future.data!.isEmpty))
+                                        SliverToBoxAdapter(
+                                          child: Center(
+                                            child: Text(
+                                              'errors.notitles'.tr(
+                                                context: context,
                                               ),
                                             ),
-                                          if (mangas != null)
-                                            MangaListViewSliver(items: mangas),
-                                        ],
-                                      ),
-                                  },
-                                ),
-                                NumberPaginator(
+                                          ),
+                                        ),
+                                      if (future.hasData && future.data != null)
+                                        MangaListViewSliver(items: future.data),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            HookBuilder(
+                              builder: (context) {
+                                final _ = useValueListenable(currentPage);
+                                return NumberPaginator(
                                   numberPages: max(
                                     (list.length /
                                             MangaDexEndpoints.searchLimit)
@@ -209,10 +207,10 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                                   onPageChange: (int index) {
                                     currentPage.value = index;
                                   },
-                                ),
-                              ],
-                            );
-                          },
+                                );
+                              },
+                            ),
+                          ],
                         ),
                   ),
                 );

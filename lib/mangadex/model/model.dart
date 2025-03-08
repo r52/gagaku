@@ -13,6 +13,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meta/meta.dart';
 import 'package:mutex/mutex.dart';
 import 'package:openid_client/openid_client.dart';
@@ -2210,9 +2211,8 @@ class FollowedLists extends _$FollowedLists
   }
 }
 
-@riverpod
 Future<List<Manga>> getMangaListByPage(
-  Ref ref,
+  WidgetRef ref,
   Iterable<String> list,
   int page,
 ) async {
@@ -2230,69 +2230,6 @@ Future<List<Manga>> getMangaListByPage(
   await ref.read(statisticsProvider.get)(mangas);
 
   return mangas;
-}
-
-@riverpod
-class PersistentMangaListPaginator extends _$PersistentMangaListPaginator {
-  Iterable<String>? _list;
-  int _currentPage = 0;
-
-  Future<List<Manga>> fetchData(int page) async {
-    if (_list == null) {
-      return [];
-    }
-
-    final start = page * MangaDexEndpoints.searchLimit;
-    final end = min((page + 1) * MangaDexEndpoints.searchLimit, _list!.length);
-
-    final range = _list!.toList().getRange(start, end);
-
-    final api = ref.watch(mangadexProvider);
-    final mangas = await api.fetchMangaById(
-      limit: MangaDexEndpoints.searchLimit,
-      ids: range,
-    );
-
-    await ref.read(statisticsProvider.get)(mangas);
-
-    return mangas;
-  }
-
-  @override
-  FutureOr<List<Manga>> build(String id) {
-    return fetchData(_currentPage);
-  }
-
-  @mutation
-  Future<List<Manga>> getPage(int page) async {
-    final result = await fetchData(page);
-    _currentPage = page;
-
-    state = AsyncData([...result]);
-
-    return result;
-  }
-
-  @mutation
-  Future<List<Manga>> updateList(Iterable<String> list) async {
-    _list = list;
-    final result = await fetchData(_currentPage);
-
-    state = AsyncData([...result]);
-
-    return result;
-  }
-
-  @mutation
-  Future<List<Manga>> updateListPage(Iterable<String> list, int page) async {
-    _list = list;
-    final result = await fetchData(page);
-    _currentPage = page;
-
-    state = AsyncData([...result]);
-
-    return result;
-  }
 }
 
 @riverpod

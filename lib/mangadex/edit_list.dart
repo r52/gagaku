@@ -13,7 +13,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 class QueriedMangaDexEditListScreen extends ConsumerWidget {
   const QueriedMangaDexEditListScreen({super.key, required this.listId});
@@ -63,7 +62,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = AutoRouter.of(context);
     final me = ref.watch(loggedUserProvider).value;
-    final id = useRef(list?.id ?? const Uuid().v4());
     final listNameController = useTextEditingController(
       text: list?.attributes.name,
     );
@@ -83,6 +81,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
       initialState: list != null ? {...list!.set} : <String>{},
       initialAction: MangaSetAction(action: MangaSetActions.none),
     );
+
+    final currentPage = useValueNotifier(0);
 
     ref.listen(userListsProvider(me?.id).editList, (_, edit) {
       if (edit.state is ErrorMutationState) {
@@ -289,11 +289,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                 replacement: result,
                               ),
                             );
-                            ref.read(
-                              persistentMangaListPaginatorProvider(
-                                id.value,
-                              ).updateList,
-                            )(selected.state);
                           }
                         });
                   },
@@ -302,71 +297,49 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 Expanded(
                   child: HookConsumer(
                     builder: (context, ref, child) {
-                      final titlesProvider = ref.watch(
-                        persistentMangaListPaginatorProvider(id.value),
-                      );
-                      final updateList = ref.watch(
-                        persistentMangaListPaginatorProvider(
-                          id.value,
-                        ).updateList,
-                      );
-                      final getPage = ref.watch(
-                        persistentMangaListPaginatorProvider(id.value).getPage,
+                      final page = useValueListenable(currentPage);
+                      final data = useMemoized(
+                        () => getMangaListByPage(ref, selected.state, page),
+                        [selected.state, page],
                       );
 
-                      useEffect(() {
-                        Future.delayed(
-                          Duration.zero,
-                          () => updateList(selected.state),
-                        );
+                      final future = useFuture(data);
 
-                        return null;
-                      }, []);
-
-                      return DataProviderWhenWidget(
-                        provider: persistentMangaListPaginatorProvider(
-                          id.value,
+                      return MangaListWidget(
+                        title: Text(
+                          '${'titles'.tr(context: context)} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
+                          style: const TextStyle(fontSize: 24),
                         ),
-                        initialData: titlesProvider,
-                        builder:
-                            (context, mangas) => MangaListWidget(
-                              title: Text(
-                                '${'titles'.tr(context: context)} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
-                                style: const TextStyle(fontSize: 24),
-                              ),
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              showToggle: false,
-                              isLoading:
-                                  titlesProvider.isLoading ||
-                                  updateList.state is PendingMutationState ||
-                                  getPage.state is PendingMutationState,
-                              children: [
-                                MangaListViewSliver(
-                                  items: mangas,
-                                  selectMode: true,
-                                  selectButton: (manga) {
-                                    return const Icon(Icons.remove);
-                                  },
-                                  onSelected: (manga) {
-                                    selected.dispatch(
-                                      MangaSetAction(
-                                        action: MangaSetActions.remove,
-                                        element: manga.id,
-                                      ),
-                                    );
-                                    updateList(selected.state);
-                                  },
-                                ),
-                              ],
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        showToggle: false,
+                        isLoading:
+                            future.connectionState == ConnectionState.waiting ||
+                            !future.hasData,
+                        children: [
+                          if (future.hasData)
+                            MangaListViewSliver(
+                              items: future.data,
+                              selectMode: true,
+                              selectButton: (manga) {
+                                return const Icon(Icons.remove);
+                              },
+                              onSelected: (manga) {
+                                selected.dispatch(
+                                  MangaSetAction(
+                                    action: MangaSetActions.remove,
+                                    element: manga.id,
+                                  ),
+                                );
+                              },
                             ),
-                        loadingWidget: const LoadingOverlayStack(),
+                        ],
                       );
                     },
                   ),
                 ),
                 HookBuilder(
                   builder: (context) {
-                    final currentPage = useState(0);
+                    final _ = useValueListenable(currentPage);
                     return NumberPaginator(
                       numberPages: max(
                         (selected.state.length / MangaDexEndpoints.searchLimit)
@@ -375,11 +348,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                       ),
                       onPageChange: (int index) {
                         currentPage.value = index;
-                        ref.read(
-                          persistentMangaListPaginatorProvider(
-                            id.value,
-                          ).getPage,
-                        )(index);
                       },
                     );
                   },
