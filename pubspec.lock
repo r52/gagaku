@@ -626,10 +626,10 @@ packages:
     dependency: "direct main"
     description:
       name: gpt_markdown
-      sha256: "55919f2665033bb1090b2d70677626a21ee00e725f8768cd32b0616bed0dec87"
+      sha256: e2e1ae4fff84bcc75d8f19cb6e8595671957f14aed8194d22a31caa02e5478bd
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.11"
+    version: "1.0.12"
   graphs:
     dependency: transitive
     description:
@@ -1124,10 +1124,10 @@ packages:
     dependency: transitive
     description:
       name: pub_semver
-      sha256: "7b3cfbf654f3edd0c6298ecd5be782ce997ddf0e00531b9464b55245185bbbbd"
+      sha256: "5bfcf68ca79ef689f8990d1160781b4bad40a3bd5e5218ad4076ddb7f4081585"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.5"
+    version: "2.2.0"
   pubspec_parse:
     dependency: transitive
     description:

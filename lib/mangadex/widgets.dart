@@ -12,7 +12,6 @@ import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/reader/main.dart';
-import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -73,8 +72,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
 
     final flex = GestureDetector(
       onTap: () {
-        final c = controller ?? DefaultScrollController.maybeOf(context);
-        c?.animateTo(
+        controller?.animateTo(
           0.0,
           duration: const Duration(milliseconds: 1000),
           curve: Curves.easeOutCirc,

@@ -18,9 +18,17 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
-    final categories = ref.watch(webConfigProvider.select((cfg) => cfg.categories));
-    final tabController = useTabController(initialLength: categories.length, keys: [categories]);
+    final scrollController =
+        DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
+        controller ??
+        useScrollController();
+    final categories = ref.watch(
+      webConfigProvider.select((cfg) => cfg.categories),
+    );
+    final tabController = useTabController(
+      initialLength: categories.length,
+      keys: [categories],
+    );
 
     // Pre-initialize sources
     final _ = ref.watch(extensionInfoListProvider);
@@ -34,7 +42,10 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
               tabAlignment: TabAlignment.center,
               isScrollable: true,
               controller: tabController,
-              tabs: List<Tab>.generate(categories.length, (int index) => Tab(text: categories.elementAt(index).name)),
+              tabs: List<Tab>.generate(
+                categories.length,
+                (int index) => Tab(text: categories.elementAt(index).name),
+              ),
             ),
           ),
           Expanded(
@@ -48,14 +59,18 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                         webSourceFavoritesProvider.select(
                           (value) => switch (value) {
                             AsyncValue(value: final data?) =>
-                              data.containsKey(cat.id) ? data[cat.id]! : <HistoryLink>[],
+                              data.containsKey(cat.id)
+                                  ? data[cat.id]!
+                                  : <HistoryLink>[],
                             _ => <HistoryLink>[],
                           },
                         ),
                       );
 
                       if (items.isEmpty) {
-                        return Center(child: Text('errors.noitems'.tr(context: context)));
+                        return Center(
+                          child: Text('errors.noitems'.tr(context: context)),
+                        );
                       }
 
                       return WebMangaListWidget(

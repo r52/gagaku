@@ -23,15 +23,24 @@ class LibraryViewType extends _$LibraryViewType {
 
   @override
   set state(MangaReadingStatus newState) => super.state = newState;
-  MangaReadingStatus update(MangaReadingStatus Function(MangaReadingStatus state) cb) => state = cb(state);
+  MangaReadingStatus update(
+    MangaReadingStatus Function(MangaReadingStatus state) cb,
+  ) => state = cb(state);
 }
 
 @riverpod
-Future<List<String>> _getLibraryListByType(Ref ref, MangaReadingStatus type) async {
+Future<List<String>> _getLibraryListByType(
+  Ref ref,
+  MangaReadingStatus type,
+) async {
   final me = await ref.watch(loggedUserProvider.future);
   final library = await ref.watch(userLibraryProvider(me?.id).future);
 
-  final results = library.entries.where((element) => element.value == type).map((e) => e.key).toList();
+  final results =
+      library.entries
+          .where((element) => element.value == type)
+          .map((e) => e.key)
+          .toList();
 
   return results;
 }
@@ -44,7 +53,9 @@ class MangaDexLibraryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MangaDexLoginWidget(builder: (context) => MangaDexLibraryWidget());
+    return MangaDexLoginWidget(
+      builder: (context) => MangaDexLibraryWidget(controller: controller),
+    );
   }
 }
 
@@ -56,15 +67,25 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
-    final statuses = useMemoized(() => MangaReadingStatus.values.skip(1).toList());
+    final scrollController =
+        DefaultScrollController.maybeOf(context, 'MangaDexLibraryPage') ??
+        controller ??
+        useScrollController();
+    final statuses = useMemoized(
+      () => MangaReadingStatus.values.skip(1).toList(),
+    );
     final initialtype = ref.read(libraryViewTypeProvider);
-    final tabController = useTabController(initialLength: statuses.length, initialIndex: statuses.indexOf(initialtype));
+    final tabController = useTabController(
+      initialLength: statuses.length,
+      initialIndex: statuses.indexOf(initialtype),
+    );
 
     useEffect(() {
       void tabCallback() {
         if (!tabController.indexIsChanging) {
-          ref.read(libraryViewTypeProvider.notifier).state = statuses.elementAt(tabController.index);
+          ref.read(libraryViewTypeProvider.notifier).state = statuses.elementAt(
+            tabController.index,
+          );
         }
       }
 
@@ -76,7 +97,10 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
       controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
-          MangaDexSliverAppBar(title: 'library'.tr(context: context), controller: scrollController),
+          MangaDexSliverAppBar(
+            title: 'library'.tr(context: context),
+            controller: scrollController,
+          ),
           SliverOverlapAbsorber(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             sliver: SliverAppBar(
@@ -90,7 +114,8 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                 controller: tabController,
                 tabs: List<Tab>.generate(
                   statuses.length,
-                  (int index) => Tab(text: context.tr(statuses.elementAt(index).label)),
+                  (int index) =>
+                      Tab(text: context.tr(statuses.elementAt(index).label)),
                 ),
               ),
             ),
@@ -109,50 +134,78 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                   key: ValueKey('LibraryTab(${me?.id}, $type)'),
                   onRefresh: () async {
                     ref.read(userLibraryProvider(me?.id).notifier).clear();
-                    return ref.refresh(_getLibraryListByTypeProvider(type).future);
+                    return ref.refresh(
+                      _getLibraryListByTypeProvider(type).future,
+                    );
                   },
                   child: DataProviderWhenWidget(
                     provider: _getLibraryListByTypeProvider(type),
                     builder:
                         (context, list) => Consumer(
                           builder: (context, ref, child) {
-                            final titlesProvider = ref.watch(getMangaListByPageProvider(list, currentPage.value));
+                            final titlesProvider = ref.watch(
+                              getMangaListByPageProvider(
+                                list,
+                                currentPage.value,
+                              ),
+                            );
 
                             return Column(
                               children: [
                                 Expanded(
                                   child: switch (titlesProvider) {
-                                    AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                                      error: error,
-                                      stackTrace: stackTrace,
-                                      message:
-                                          "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
-                                    ),
-                                    AsyncValue(value: final mangas) => MangaListWidget(
-                                      title: Text(
-                                        'num_manga'.plural(list.length),
-                                        style: const TextStyle(fontSize: 24),
+                                    AsyncValue(
+                                      :final error?,
+                                      :final stackTrace?,
+                                    ) =>
+                                      ErrorList(
+                                        error: error,
+                                        stackTrace: stackTrace,
+                                        message:
+                                            "getMangaListByPageProvider(${list.toString()}, ${currentPage.value}) failed",
                                       ),
-                                      physics: const AlwaysScrollableScrollPhysics(),
-                                      noController: true,
-                                      isLoading: titlesProvider.isLoading,
-                                      leading: [
-                                        SliverOverlapInjector(
-                                          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                                    AsyncValue(value: final mangas) =>
+                                      MangaListWidget(
+                                        title: Text(
+                                          'num_manga'.plural(list.length),
+                                          style: const TextStyle(fontSize: 24),
                                         ),
-                                      ],
-                                      children: [
-                                        if (mangas == null || mangas.isEmpty)
-                                          SliverToBoxAdapter(
-                                            child: Center(child: Text('errors.notitles'.tr(context: context))),
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        noController: true,
+                                        isLoading: titlesProvider.isLoading,
+                                        leading: [
+                                          SliverOverlapInjector(
+                                            handle:
+                                                NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                                  context,
+                                                ),
                                           ),
-                                        if (mangas != null) MangaListViewSliver(items: mangas),
-                                      ],
-                                    ),
+                                        ],
+                                        children: [
+                                          if (mangas == null || mangas.isEmpty)
+                                            SliverToBoxAdapter(
+                                              child: Center(
+                                                child: Text(
+                                                  'errors.notitles'.tr(
+                                                    context: context,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          if (mangas != null)
+                                            MangaListViewSliver(items: mangas),
+                                        ],
+                                      ),
                                   },
                                 ),
                                 NumberPaginator(
-                                  numberPages: max((list.length / MangaDexEndpoints.searchLimit).ceil(), 1),
+                                  numberPages: max(
+                                    (list.length /
+                                            MangaDexEndpoints.searchLimit)
+                                        .ceil(),
+                                    1,
+                                  ),
                                   onPageChange: (int index) {
                                     currentPage.value = index;
                                   },

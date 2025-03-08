@@ -174,7 +174,7 @@ class _FrontPageWidget extends HookConsumerWidget {
     final seasonal = _fetchCustomListMangaProvider(data.seasonal);
 
     final scrollController =
-        DefaultScrollController.maybeOf(context) ??
+        DefaultScrollController.maybeOf(context, 'MangaDexFrontPage') ??
         controller ??
         useScrollController();
 

@@ -19,9 +19,14 @@ class WebSourceHistoryPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
-    final defaultCategory = ref.watch(webConfigProvider.select((cfg) => cfg.defaultCategory));
+    final defaultCategory = ref.watch(
+      webConfigProvider.select((cfg) => cfg.defaultCategory),
+    );
 
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller ?? useScrollController();
+    final scrollController =
+        DefaultScrollController.maybeOf(context, 'WebSourceHistoryPage') ??
+        controller ??
+        useScrollController();
     final historyProvider = ref.watch(webSourceHistoryProvider);
 
     // Pre-initialize sources
@@ -38,7 +43,12 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                 message: 'Supported URLs:\ncubari.moe\nimgur.com',
                 padding: EdgeInsets.all(6),
                 triggerMode: TooltipTriggerMode.tap,
-                child: Wrap(children: [Text('Supported URLs'), Icon(Icons.help, size: 20)]),
+                child: Wrap(
+                  children: [
+                    Text('Supported URLs'),
+                    Icon(Icons.help, size: 20),
+                  ],
+                ),
               ),
               ElevatedButton.icon(
                 onPressed: () => openLinkDialog(context, api),
@@ -55,7 +65,10 @@ class WebSourceHistoryPage extends HookConsumerWidget {
             SliverAppBar(
               automaticallyImplyLeading: false,
               pinned: true,
-              title: Text('history.text'.tr(context: context), style: TextStyle(fontSize: 24)),
+              title: Text(
+                'history.text'.tr(context: context),
+                style: TextStyle(fontSize: 24),
+              ),
               actions: [
                 ElevatedButton.icon(
                   style: Styles.buttonStyle(),
@@ -65,7 +78,9 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title: const Text('Clear History'),
-                          content: const Text('Are you sure you want to remove all history?'),
+                          content: const Text(
+                            'Are you sure you want to remove all history?',
+                          ),
                           actions: <Widget>[
                             TextButton(
                               child: const Text('No'),
@@ -95,10 +110,17 @@ class WebSourceHistoryPage extends HookConsumerWidget {
             ),
           ],
           children: [
-            WebMangaListViewSliver(items: history.toList(), favoritesKey: defaultCategory, removeFromAll: true),
+            WebMangaListViewSliver(
+              items: history.toList(),
+              favoritesKey: defaultCategory,
+              removeFromAll: true,
+            ),
           ],
         ),
-        AsyncValue(:final error?, :final stackTrace?) => ErrorList(error: error, stackTrace: stackTrace),
+        AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+          error: error,
+          stackTrace: stackTrace,
+        ),
         _ => const Center(child: CircularProgressIndicator()),
       },
     );

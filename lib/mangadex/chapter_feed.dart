@@ -19,7 +19,7 @@ class MangaDexChapterFeedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MangaDexLoginWidget(
-      builder: (context) => MangaDexChapterFeedWidget(),
+      builder: (context) => MangaDexChapterFeedWidget(controller: controller),
     );
   }
 }
@@ -31,7 +31,7 @@ class MangaDexChapterFeedWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final scrollController =
-        DefaultScrollController.maybeOf(context) ??
+        DefaultScrollController.maybeOf(context, 'MangaDexChapterFeedPage') ??
         controller ??
         useScrollController();
     final view = useState(_FeedViewType.chapters);

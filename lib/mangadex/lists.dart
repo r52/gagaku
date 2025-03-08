@@ -24,7 +24,9 @@ class MangaDexListsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MangaDexLoginWidget(builder: (context) => MangaDexListsWidget());
+    return MangaDexLoginWidget(
+      builder: (context) => MangaDexListsWidget(controller: controller),
+    );
   }
 }
 
@@ -38,7 +40,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
     final router = AutoRouter.of(context);
     final theme = Theme.of(context);
     final scrollController =
-        DefaultScrollController.maybeOf(context) ??
+        DefaultScrollController.maybeOf(context, 'MangaDexListsPage') ??
         controller ??
         useScrollController();
     final view = useState(_ListViewType.self);
