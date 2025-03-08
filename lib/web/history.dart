@@ -77,19 +77,19 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: const Text('Clear History'),
-                          content: const Text(
-                            'Are you sure you want to remove all history?',
+                          title: Text('history.clear'.tr(context: context)),
+                          content: Text(
+                            'history.clearWarning'.tr(context: context),
                           ),
                           actions: <Widget>[
                             TextButton(
-                              child: const Text('No'),
+                              child: Text('ui.no'.tr(context: context)),
                               onPressed: () {
                                 Navigator.of(context).pop(false);
                               },
                             ),
                             ElevatedButton(
-                              child: const Text('Yes'),
+                              child: Text('ui.yes'.tr(context: context)),
                               onPressed: () {
                                 Navigator.of(context).pop(true);
                               },
@@ -104,7 +104,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                     }
                   },
                   icon: const Icon(Icons.clear_all),
-                  label: const Text('Clear History'),
+                  label: Text('history.clear'.tr(context: context)),
                 ),
               ],
             ),

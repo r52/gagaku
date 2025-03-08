@@ -1,8 +1,4 @@
 {
-  "pageNotFound": {
-    "header": "Page Not Found",
-    "error": "Can't find a page for: {}"
-  },
   "ui": {
     "add": "Add",
     "addNew": "Add New",
@@ -34,7 +30,8 @@
     "pasteClipboard": "Paste from Clipboard",
     "dragHint": "Hint: Drag to reorder",
     "makeDefault": "Make Default",
-    "retry": "Retry"
+    "retry": "Retry",
+    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE"
   },
   "errors": {
     "noresults": "No results",
@@ -48,7 +45,9 @@
     "notLoggedIn": "Operation failed. User not logged in",
     "unsupportedSource": "Unsupported extension type",
     "unknownSourceID": "Unknown source ID {}",
-    "fetchFail": "Something went wrong while fetching a new page"
+    "fetchFail": "Something went wrong while fetching a new page",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundArg": "Can't find a page for: {}"
   },
   "auth": {
     "login": "Login",
@@ -71,7 +70,8 @@
   "library": "Library",
   "history": {
     "text": "History",
-    "clear": "Clear History"
+    "clear": "Clear History",
+    "clearWarning": "Are you sure you want to remove all history?"
   },
   "localLibrary": {
     "text": "Local Library",
@@ -241,7 +241,6 @@
     "deleteListOk": "List deleted",
     "deleteListError": "Failed to delete list: {}",
     "deleteListWarning": "Are you sure you want to permanently delete '{}'?",
-    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
     "privateList": "Private list",
     "newList": "New List",
     "newListOk": "New list created",
@@ -443,5 +442,11 @@
     "orange": "Orange",
     "yellow": "Yellow",
     "purple": "Purple"
+  },
+  "cache": {
+    "clear": "Clear Cache",
+    "clearSub": "Deletes all cached data. ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING!",
+    "clearWarning": "Are you sure you want to delete all cached data?",
+    "clearSuccess": "Cache cleared"
   }
 }

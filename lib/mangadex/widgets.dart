@@ -1851,7 +1851,7 @@ Future<bool?> showDeleteListDialog(
           Text(
             'mangadex.deleteListWarning'.tr(context: context, args: [listName]),
           ),
-          Text('mangadex.irreversibleWarning'.tr(context: context)),
+          Text('ui.irreversibleWarning'.tr(context: context)),
         ],
       ),
       actions: <Widget>[

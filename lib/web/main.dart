@@ -91,8 +91,10 @@ class WebSourceHomePage extends HookConsumerWidget {
                                     context: context,
                                   ),
                                 ),
-                                content: const Text(
-                                  'Are you sure you want to reset all read markers?',
+                                content: Text(
+                                  'webSources.resetAllReadWarning'.tr(
+                                    context: context,
+                                  ),
                                 ),
                                 actions: <Widget>[
                                   TextButton(

@@ -1141,7 +1141,7 @@ class MangaDexModel {
         CacheLists.tags,
         result,
         resolve: false,
-        expiry: const Duration(days: 7),
+        expiry: const Duration(days: 1),
       );
 
       return result;

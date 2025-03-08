@@ -149,11 +149,11 @@ class NotFoundScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('pageNotFound.header'.tr(context: context)),
+        title: Text('errors.pageNotFound'.tr(context: context)),
         leading: AutoLeadingButton(),
       ),
       body: Center(
-        child: Text('pageNotFound.error'.tr(context: context, args: [uri])),
+        child: Text('errors.pageNotFoundArg'.tr(context: context, args: [uri])),
       ),
     );
   }
