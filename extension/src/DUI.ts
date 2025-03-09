@@ -40,7 +40,7 @@ export type RDUISection = Omit<CSection, "rows" | "_rows"> & {
 export interface CForm extends DUIForm, CType {
   readonly type: "DUIForm";
   sections: () => Promise<DUISection[]>;
-  onSubmit?: (arg0: Record<any, any>) => Promise<void>;
+  onSubmit?: (values: Record<any, any>) => Promise<void>;
 }
 
 export type RDUIForm = Pick<CForm, "type"> & {
