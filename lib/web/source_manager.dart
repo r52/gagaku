@@ -12,15 +12,13 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 
-const _supportedVersion = '0.8';
-
 class SourceManager extends HookConsumerWidget {
   const SourceManager({super.key});
 
-  Future<Map<RepoInfo, List<SourceVersion>>> fetchRepo(
+  Future<Map<RepoData, List<SourceVersion>>> fetchRepo(
     List<RepoInfo> repoList,
   ) async {
-    final list = <RepoInfo, List<SourceVersion>>{};
+    final list = <RepoData, List<SourceVersion>>{};
 
     for (final repo in repoList) {
       final uri = Uri.parse('${repo.url}/versioning.json');
@@ -29,9 +27,21 @@ class SourceManager extends HookConsumerWidget {
       try {
         final data = Versioning.fromJson(json.decode(response.body));
 
-        if (data.builtWith.types.startsWith(_supportedVersion) &&
+        if (SupportedVersion.values.any(
+              (v) => data.builtWith.types.startsWith(v.version),
+            ) &&
             data.sources.isNotEmpty) {
-          list.addEntries([MapEntry(repo, data.sources)]);
+          list.addEntries([
+            MapEntry(
+              RepoData.fromInfo(
+                repo,
+                SupportedVersion.values.firstWhere(
+                  (v) => data.builtWith.types.startsWith(v.version),
+                ),
+              ),
+              data.sources,
+            ),
+          ]);
         }
       } catch (e) {
         logger.w('Error parsing ${repo.url}/versioning.json', error: e);
@@ -137,6 +147,7 @@ class SourceManager extends HookConsumerWidget {
                                                       id: source.id,
                                                       name: source.name,
                                                       repo: repo.url,
+                                                      version: repo.version,
                                                       icon: icon,
                                                     ),
                                                   ],

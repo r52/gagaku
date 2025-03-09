@@ -6,6 +6,28 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+RepoInfo _$RepoInfoFromJson(Map<String, dynamic> json) =>
+    RepoInfo(name: json['name'] as String, url: json['url'] as String);
+
+Map<String, dynamic> _$RepoInfoToJson(RepoInfo instance) => <String, dynamic>{
+  'name': instance.name,
+  'url': instance.url,
+};
+
+RepoData _$RepoDataFromJson(Map<String, dynamic> json) => RepoData(
+  name: json['name'] as String,
+  url: json['url'] as String,
+  version: $enumDecode(_$SupportedVersionEnumMap, json['version']),
+);
+
+Map<String, dynamic> _$RepoDataToJson(RepoData instance) => <String, dynamic>{
+  'name': instance.name,
+  'url': instance.url,
+  'version': _$SupportedVersionEnumMap[instance.version]!,
+};
+
+const _$SupportedVersionEnumMap = {SupportedVersion.v0_8: 'v0_8'};
+
 _HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => _HistoryLink(
   title: json['title'] as String,
   url: json['url'] as String,
@@ -78,6 +100,9 @@ _WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String,
       repo: json['repo'] as String,
+      version:
+          $enumDecodeNullable(_$SupportedVersionEnumMap, json['version']) ??
+          SupportedVersion.v0_8,
       icon: json['icon'] as String?,
     );
 
@@ -86,6 +111,7 @@ Map<String, dynamic> _$WebSourceInfoToJson(_WebSourceInfo instance) =>
       'id': instance.id,
       'name': instance.name,
       'repo': instance.repo,
+      'version': _$SupportedVersionEnumMap[instance.version]!,
       'icon': instance.icon,
     };
 
@@ -207,14 +233,6 @@ Map<String, dynamic> _$VersioningToJson(_Versioning instance) =>
       'sources': instance.sources.map((e) => e.toJson()).toList(),
       'builtWith': instance.builtWith.toJson(),
     };
-
-_RepoInfo _$RepoInfoFromJson(Map<String, dynamic> json) =>
-    _RepoInfo(name: json['name'] as String, url: json['url'] as String);
-
-Map<String, dynamic> _$RepoInfoToJson(_RepoInfo instance) => <String, dynamic>{
-  'name': instance.name,
-  'url': instance.url,
-};
 
 _PartialSourceManga _$PartialSourceMangaFromJson(Map<String, dynamic> json) =>
     _PartialSourceManga(

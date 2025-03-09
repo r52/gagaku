@@ -756,7 +756,7 @@ as String,
 /// @nodoc
 mixin _$WebSourceInfo {
 
- String get id; String get name; String get repo; String? get icon;
+ String get id; String get name; String get repo; SupportedVersion get version; String? get icon;
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -769,16 +769,16 @@ $WebSourceInfoCopyWith<WebSourceInfo> get copyWith => _$WebSourceInfoCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.icon, icon) || other.icon == icon));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,repo,icon);
+int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon);
 
 @override
 String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, icon: $icon)';
+  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon)';
 }
 
 
@@ -789,7 +789,7 @@ abstract mixin class $WebSourceInfoCopyWith<$Res>  {
   factory $WebSourceInfoCopyWith(WebSourceInfo value, $Res Function(WebSourceInfo) _then) = _$WebSourceInfoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String repo, String? icon
+ String id, String name, String repo, SupportedVersion version, String? icon
 });
 
 
@@ -806,12 +806,13 @@ class _$WebSourceInfoCopyWithImpl<$Res>
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? icon = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
-as String,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
+as SupportedVersion,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -823,12 +824,13 @@ as String?,
 @JsonSerializable()
 
 class _WebSourceInfo implements WebSourceInfo {
-  const _WebSourceInfo({required this.id, required this.name, required this.repo, this.icon});
+  const _WebSourceInfo({required this.id, required this.name, required this.repo, this.version = SupportedVersion.v0_8, this.icon});
   factory _WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override final  String repo;
+@override@JsonKey() final  SupportedVersion version;
 @override final  String? icon;
 
 /// Create a copy of WebSourceInfo
@@ -844,16 +846,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.icon, icon) || other.icon == icon));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,repo,icon);
+int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon);
 
 @override
 String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, icon: $icon)';
+  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon)';
 }
 
 
@@ -864,7 +866,7 @@ abstract mixin class _$WebSourceInfoCopyWith<$Res> implements $WebSourceInfoCopy
   factory _$WebSourceInfoCopyWith(_WebSourceInfo value, $Res Function(_WebSourceInfo) _then) = __$WebSourceInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String repo, String? icon
+ String id, String name, String repo, SupportedVersion version, String? icon
 });
 
 
@@ -881,12 +883,13 @@ class __$WebSourceInfoCopyWithImpl<$Res>
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? icon = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = freezed,}) {
   return _then(_WebSourceInfo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
-as String,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
+as SupportedVersion,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -1854,8 +1857,6 @@ mixin _$RepoInfo {
 @pragma('vm:prefer-inline')
 $RepoInfoCopyWith<RepoInfo> get copyWith => _$RepoInfoCopyWithImpl<RepoInfo>(this as RepoInfo, _$identity);
 
-  /// Serializes this RepoInfo to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -1898,7 +1899,7 @@ class _$RepoInfoCopyWithImpl<$Res>
 /// Create a copy of RepoInfo
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? url = null,}) {
-  return _then(_self.copyWith(
+  return _then(RepoInfo(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,
@@ -1908,50 +1909,42 @@ as String,
 }
 
 
+
 /// @nodoc
-@JsonSerializable()
+mixin _$RepoData {
 
-class _RepoInfo implements RepoInfo {
-  const _RepoInfo({required this.name, required this.url});
-  factory _RepoInfo.fromJson(Map<String, dynamic> json) => _$RepoInfoFromJson(json);
-
-@override final  String name;
-@override final  String url;
-
-/// Create a copy of RepoInfo
+ String get name; String get url; SupportedVersion get version;
+/// Create a copy of RepoData
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$RepoInfoCopyWith<_RepoInfo> get copyWith => __$RepoInfoCopyWithImpl<_RepoInfo>(this, _$identity);
+$RepoDataCopyWith<RepoData> get copyWith => _$RepoDataCopyWithImpl<RepoData>(this as RepoData, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$RepoInfoToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RepoInfo&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoData&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.version, version) || other.version == version));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,url);
+int get hashCode => Object.hash(runtimeType,name,url,version);
 
 @override
 String toString() {
-  return 'RepoInfo(name: $name, url: $url)';
+  return 'RepoData(name: $name, url: $url, version: $version)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$RepoInfoCopyWith<$Res> implements $RepoInfoCopyWith<$Res> {
-  factory _$RepoInfoCopyWith(_RepoInfo value, $Res Function(_RepoInfo) _then) = __$RepoInfoCopyWithImpl;
-@override @useResult
+abstract mixin class $RepoDataCopyWith<$Res> implements $RepoInfoCopyWith<$Res> {
+  factory $RepoDataCopyWith(RepoData value, $Res Function(RepoData) _then) = _$RepoDataCopyWithImpl;
+@useResult
 $Res call({
- String name, String url
+ String name, String url, SupportedVersion version
 });
 
 
@@ -1959,25 +1952,26 @@ $Res call({
 
 }
 /// @nodoc
-class __$RepoInfoCopyWithImpl<$Res>
-    implements _$RepoInfoCopyWith<$Res> {
-  __$RepoInfoCopyWithImpl(this._self, this._then);
+class _$RepoDataCopyWithImpl<$Res>
+    implements $RepoDataCopyWith<$Res> {
+  _$RepoDataCopyWithImpl(this._self, this._then);
 
-  final _RepoInfo _self;
-  final $Res Function(_RepoInfo) _then;
+  final RepoData _self;
+  final $Res Function(RepoData) _then;
 
-/// Create a copy of RepoInfo
+/// Create a copy of RepoData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? url = null,}) {
-  return _then(_RepoInfo(
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? url = null,Object? version = null,}) {
+  return _then(RepoData(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
-as String,
+as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
+as SupportedVersion,
   ));
 }
 
-
 }
+
 
 
 /// @nodoc

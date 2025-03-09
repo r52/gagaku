@@ -216,6 +216,7 @@ abstract class WebSourceInfo with _$WebSourceInfo {
     required String id,
     required String name,
     required String repo,
+    @Default(SupportedVersion.v0_8) SupportedVersion version,
     String? icon,
   }) = _WebSourceInfo;
 
@@ -232,6 +233,13 @@ abstract class SourceIdentifier with _$SourceIdentifier {
 
   factory SourceIdentifier.fromJson(Map<String, dynamic> json) =>
       _$SourceIdentifierFromJson(json);
+}
+
+enum SupportedVersion {
+  v0_8('0.8');
+
+  final String version;
+  const SupportedVersion(this.version);
 }
 
 ///////////////////////////////////////////////////////////////////// PB types
@@ -356,12 +364,44 @@ abstract class Versioning with _$Versioning {
 }
 
 @freezed
-abstract class RepoInfo with _$RepoInfo {
-  const factory RepoInfo({required String name, required String url}) =
-      _RepoInfo;
+@JsonSerializable()
+class RepoInfo with _$RepoInfo {
+  const RepoInfo({required this.name, required this.url});
+
+  @override
+  final String name;
+  @override
+  final String url;
 
   factory RepoInfo.fromJson(Map<String, dynamic> json) =>
       _$RepoInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RepoInfoToJson(this);
+}
+
+@freezed
+@JsonSerializable()
+class RepoData with _$RepoData implements RepoInfo {
+  const RepoData({
+    required this.name,
+    required this.url,
+    required this.version,
+  });
+
+  @override
+  final String name;
+  @override
+  final String url;
+  @override
+  final SupportedVersion version;
+
+  factory RepoData.fromInfo(RepoInfo info, SupportedVersion version) =>
+      RepoData(name: info.name, url: info.url, version: version);
+
+  factory RepoData.fromJson(Map<String, dynamic> json) =>
+      _$RepoDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RepoDataToJson(this);
 }
 
 @freezed
