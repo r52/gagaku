@@ -129,13 +129,13 @@
       "nameEmptyWarning": "Name cannot be empty",
       "urlInvalidWarning": "Must be a valid URL",
       "repoAddOK": "Repo added",
-      "repoExists": "Repo already exists"
+      "repoExists": "Repo already exists",
+      "missingRepo": "Missing Repo"
     },
     "source": {
       "settings": "Extension Settings",
       "manager": "Extension Manager",
-      "noDirWarning": "Please set a directory for source storage",
-      "noRepoDataWarning": "No repo data. Showing enabled extensions only",
+      "noDataWarning": "No repos nor extensions installed!",
       "refresh": "Refresh repos",
       "delete": "@:ui.delete {}",
       "add": "@:ui.add {}",
