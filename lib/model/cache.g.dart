@@ -12,24 +12,19 @@ const cacheProvider = CacheProvider._();
 final class CacheProvider
     extends $FunctionalProvider<CacheManager, CacheManager>
     with $Provider<CacheManager> {
-  const CacheProvider._(
-      {CacheManager Function(
-        Ref ref,
-      )? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'cacheProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const CacheProvider._({CacheManager Function(Ref ref)? create})
+    : _createCb = create,
+      super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'cacheProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        allTransitiveDependencies: null,
+      );
 
-  final CacheManager Function(
-    Ref ref,
-  )? _createCb;
+  final CacheManager Function(Ref ref)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$cacheHash();
@@ -48,11 +43,7 @@ final class CacheProvider
       $ProviderElement(this, pointer);
 
   @override
-  CacheProvider $copyWithCreate(
-    CacheManager Function(
-      Ref ref,
-    ) create,
-  ) {
+  CacheProvider $copyWithCreate(CacheManager Function(Ref ref) create) {
     return CacheProvider._(create: create);
   }
 

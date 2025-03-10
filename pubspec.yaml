@@ -19,8 +19,8 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0
 
 environment:
-  sdk: "^3.6.0"
-  flutter: ">=3.27.0"
+  sdk: "^3.7.0"
+  flutter: ">=3.29.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,13 +31,11 @@ environment:
 dependencies:
   animations: ^2.0.7
   archive: ^4.0.1
-  file_picker: ^8.1.6
+  file_picker: ^9.0.0
   flutter:
     sdk: flutter
-  flutter_hooks: ^0.20.0
-  flutter_markdown: ^0.7.1
-  freezed_annotation: ^2.2.0
-  go_router: ^14.1.1
+  flutter_hooks: ^0.21.2
+  freezed_annotation: ^3.0.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hooks_riverpod: ^3.0.0-dev.3
@@ -50,13 +48,16 @@ dependencies:
   logger: ^2.0.0
   meta:
   mutex: ^3.0.1
-  package_info_plus: ^8.0.0
   path: ^1.9.0
   path_provider: ^2.0.15
   photo_view: ^0.15.0
   riverpod: ^3.0.0-dev.3
   riverpod_annotation: ^3.0.0-dev.3
-  timeago: ^3.4.0
+  timeago:
+    git:
+      url: https://github.com/andresaraujo/timeago.dart
+      path: packages/timeago
+      ref: c23ec0f
   url_launcher: ^6.1.10
   number_paginator: ^0.4.0
   collection: ^1.19.0
@@ -65,11 +66,18 @@ dependencies:
   uuid: ^4.4.0
   permission_handler: ^11.3.1
   cached_network_image: ^3.4.0
-  intl: ^0.19.0
-  html: ^0.15.4
+  intl: ^0.20.0
   cronet_http: ^1.3.2
-  dart_eval: ^0.7.9
   easy_localization: ^3.0.7
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  flutter_inappwebview: ^6.2.0-beta.2
+  mime: ^2.0.0
+  expansion_tile_list: ^1.0.2
+  input_quantity: ^2.5.1
+  gpt_markdown: ^1.0.11
+  auto_route: ^10.0.0
+  infinite_scroll_pagination: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -85,10 +93,12 @@ dev_dependencies:
   riverpod_lint: ^3.0.0-dev.4
   build_runner:
   riverpod_generator: ^3.0.0-dev.11
-  freezed: ^2.5.2
+  freezed: ^3.0.2
   json_serializable: ^6.6.1
   flutter_native_splash: ^2.2.19
   flutter_launcher_icons: "^0.14.1"
+  auto_route_generator:
+  yaml: ^3.1.3
 
 dependency_overrides:
   flutter_riverpod:
@@ -141,6 +151,7 @@ flutter:
   assets:
     - assets/
     - assets/translations/
+    - assets/extensionhost/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

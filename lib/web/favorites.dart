@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,19 +10,28 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class WebSourceFavoritesWidget extends HookConsumerWidget {
-  const WebSourceFavoritesWidget({
-    super.key,
-    this.controller,
-  });
+@RoutePage()
+class WebSourceFavoritesPage extends HookConsumerWidget {
+  const WebSourceFavoritesPage({super.key, this.controller});
 
   final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = DefaultScrollController.maybeOf(context) ?? controller;
-    final cfg = ref.watch(webConfigProvider);
-    final tabController = useTabController(initialLength: cfg.categories.length, keys: [cfg]);
+    final scrollController =
+        DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
+        controller ??
+        useScrollController();
+    final categories = ref.watch(
+      webConfigProvider.select((cfg) => cfg.categories),
+    );
+    final tabController = useTabController(
+      initialLength: categories.length,
+      keys: [categories],
+    );
+
+    // Pre-initialize sources
+    final _ = ref.watch(extensionInfoListProvider);
 
     return Material(
       child: Column(
@@ -33,10 +43,8 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
               isScrollable: true,
               controller: tabController,
               tabs: List<Tab>.generate(
-                cfg.categories.length,
-                (int index) => Tab(
-                  text: cfg.categories.elementAt(index).name,
-                ),
+                categories.length,
+                (int index) => Tab(text: categories.elementAt(index).name),
               ),
             ),
           ),
@@ -44,15 +52,20 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
             child: TabBarView(
               controller: tabController,
               children: [
-                for (final cat in cfg.categories)
+                for (final cat in categories)
                   Consumer(
                     builder: (context, ref, child) {
-                      final items = ref.watch(webSourceFavoritesProvider.select(
-                        (value) => switch (value) {
-                          AsyncValue(value: final data?) => data.containsKey(cat.id) ? data[cat.id]! : <HistoryLink>[],
-                          _ => <HistoryLink>[],
-                        },
-                      ));
+                      final items = ref.watch(
+                        webSourceFavoritesProvider.select(
+                          (value) => switch (value) {
+                            AsyncValue(value: final data?) =>
+                              data.containsKey(cat.id)
+                                  ? data[cat.id]!
+                                  : <HistoryLink>[],
+                            _ => <HistoryLink>[],
+                          },
+                        ),
+                      );
 
                       if (items.isEmpty) {
                         return Center(
@@ -73,7 +86,7 @@ class WebSourceFavoritesWidget extends HookConsumerWidget {
                         ],
                       );
                     },
-                  )
+                  ),
               ],
             ),
           ),

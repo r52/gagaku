@@ -11,18 +11,19 @@ const _searchHistoryProvider = _SearchHistoryProvider._();
 
 final class _SearchHistoryProvider
     extends $NotifierProvider<_SearchHistory, List<String>> {
-  const _SearchHistoryProvider._(
-      {super.runNotifierBuildOverride, _SearchHistory Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'_searchHistoryProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _SearchHistoryProvider._({
+    super.runNotifierBuildOverride,
+    _SearchHistory Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'_searchHistoryProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final _SearchHistory Function()? _createCb;
 
@@ -43,19 +44,14 @@ final class _SearchHistoryProvider
 
   @$internal
   @override
-  _SearchHistoryProvider $copyWithCreate(
-    _SearchHistory Function() create,
-  ) {
+  _SearchHistoryProvider $copyWithCreate(_SearchHistory Function() create) {
     return _SearchHistoryProvider._(create: create);
   }
 
   @$internal
   @override
   _SearchHistoryProvider $copyWithBuild(
-    List<String> Function(
-      Ref,
-      _SearchHistory,
-    ) build,
+    List<String> Function(Ref, _SearchHistory) build,
   ) {
     return _SearchHistoryProvider._(runNotifierBuildOverride: build);
   }
@@ -63,8 +59,8 @@ final class _SearchHistoryProvider
   @$internal
   @override
   $NotifierProviderElement<_SearchHistory, List<String>> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$searchHistoryHash() => r'03b2bdeb09ccc897e60e3e498de7f80aa8df9377';
@@ -73,7 +69,19 @@ abstract class _$SearchHistory extends $Notifier<List<String>> {
   List<String> build();
   @$internal
   @override
-  List<String> runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<List<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<List<String>>,
+              List<String>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
 }
 
 // ignore_for_file: type=lint

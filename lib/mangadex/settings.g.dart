@@ -12,26 +12,21 @@ const _fetchGroupDataProvider = _FetchGroupDataFamily._();
 final class _FetchGroupDataProvider
     extends $FunctionalProvider<AsyncValue<Set<Group>>, FutureOr<Set<Group>>>
     with $FutureModifier<Set<Group>>, $FutureProvider<Set<Group>> {
-  const _FetchGroupDataProvider._(
-      {required _FetchGroupDataFamily super.from,
-      required Iterable<String> super.argument,
-      FutureOr<Set<Group>> Function(
-        Ref ref,
-        Iterable<String> uuids,
-      )? create})
-      : _createCb = create,
-        super(
-          retry: null,
-          name: r'_fetchGroupDataProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _FetchGroupDataProvider._({
+    required _FetchGroupDataFamily super.from,
+    required Iterable<String> super.argument,
+    FutureOr<Set<Group>> Function(Ref ref, Iterable<String> uuids)? create,
+  }) : _createCb = create,
+       super(
+         retry: null,
+         name: r'_fetchGroupDataProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
-  final FutureOr<Set<Group>> Function(
-    Ref ref,
-    Iterable<String> uuids,
-  )? _createCb;
+  final FutureOr<Set<Group>> Function(Ref ref, Iterable<String> uuids)?
+  _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchGroupDataHash();
@@ -50,28 +45,20 @@ final class _FetchGroupDataProvider
 
   @override
   _FetchGroupDataProvider $copyWithCreate(
-    FutureOr<Set<Group>> Function(
-      Ref ref,
-    ) create,
+    FutureOr<Set<Group>> Function(Ref ref) create,
   ) {
     return _FetchGroupDataProvider._(
-        argument: argument as Iterable<String>,
-        from: from! as _FetchGroupDataFamily,
-        create: (
-          ref,
-          Iterable<String> uuids,
-        ) =>
-            create(ref));
+      argument: argument as Iterable<String>,
+      from: from! as _FetchGroupDataFamily,
+      create: (ref, Iterable<String> uuids) => create(ref),
+    );
   }
 
   @override
   FutureOr<Set<Group>> create(Ref ref) {
     final _$cb = _createCb ?? _fetchGroupData;
     final argument = this.argument as Iterable<String>;
-    return _$cb(
-      ref,
-      argument,
-    );
+    return _$cb(ref, argument);
   }
 
   @override
@@ -89,17 +76,15 @@ String _$fetchGroupDataHash() => r'24d9984bf59cd196477e31f308827f4594f6115a';
 
 final class _FetchGroupDataFamily extends Family {
   const _FetchGroupDataFamily._()
-      : super(
-          retry: null,
-          name: r'_fetchGroupDataProvider',
-          dependencies: null,
-          allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'_fetchGroupDataProvider',
+        dependencies: null,
+        allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  _FetchGroupDataProvider call(
-    Iterable<String> uuids,
-  ) =>
+  _FetchGroupDataProvider call(Iterable<String> uuids) =>
       _FetchGroupDataProvider._(argument: uuids, from: this);
 
   @override
@@ -110,10 +95,7 @@ final class _FetchGroupDataFamily extends Family {
 
   /// {@macro riverpod.override_with}
   Override overrideWith(
-    FutureOr<Set<Group>> Function(
-      Ref ref,
-      Iterable<String> args,
-    ) create,
+    FutureOr<Set<Group>> Function(Ref ref, Iterable<String> args) create,
   ) {
     return $FamilyOverride(
       from: this,
@@ -129,5 +111,6 @@ final class _FetchGroupDataFamily extends Family {
     );
   }
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

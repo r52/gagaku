@@ -12,10 +12,10 @@ class MouseTouchScrollBehavior extends MaterialScrollBehavior {
 
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+  };
 }
 
 class GridExtentSlider extends ConsumerWidget {
@@ -36,7 +36,9 @@ class GridExtentSlider extends ConsumerWidget {
           divisions: 3,
           label: cfg.gridAlbumExtent.name.capitalize(),
           onChanged: (double value) {
-            final c = cfg.copyWith(gridAlbumExtent: GridAlbumExtent.values.elementAt(value.toInt()));
+            final c = cfg.copyWith(
+              gridAlbumExtent: GridAlbumExtent.values.elementAt(value.toInt()),
+            );
             ref.read(gagakuSettingsProvider.save)(c);
           },
         ),
@@ -71,7 +73,9 @@ class GridAlbumImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         fit: StackFit.passthrough,
@@ -162,7 +166,8 @@ class KeepAliveImage extends Image {
   State<KeepAliveImage> createState() => _KeepAliveImageState();
 }
 
-class _KeepAliveImageState extends State<KeepAliveImage> with AutomaticKeepAliveClientMixin {
+class _KeepAliveImageState extends State<KeepAliveImage>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -212,11 +217,7 @@ class MultiChildExpansionTile extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
-          child: Wrap(
-            spacing: 4.0,
-            runSpacing: 4.0,
-            children: children,
-          ),
+          child: Wrap(spacing: 4.0, runSpacing: 4.0, children: children),
         ),
       ],
     );
@@ -265,28 +266,34 @@ class ButtonChip extends StatelessWidget {
 
     final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
-      textStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
+      textStyle: theme.textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.normal,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
     );
 
     return (icon != null)
         ? ElevatedButton.icon(
-            style: bstyle,
-            onPressed: onPressed,
-            icon: icon!,
-            label: Text(
-              text,
-              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
-            ),
-          )
+          style: bstyle,
+          onPressed: onPressed,
+          icon: icon!,
+          label: Text(
+            text,
+            style:
+                style ??
+                TextStyle(color: theme.colorScheme.onTertiaryContainer),
+          ),
+        )
         : ElevatedButton(
-            style: bstyle,
-            onPressed: onPressed,
-            child: Text(
-              text,
-              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
-            ),
-          );
+          style: bstyle,
+          onPressed: onPressed,
+          child: Text(
+            text,
+            style:
+                style ??
+                TextStyle(color: theme.colorScheme.onTertiaryContainer),
+          ),
+        );
   }
 }
 
@@ -320,19 +327,18 @@ class IconTextChip extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style: style ?? TextStyle(color: theme.colorScheme.onTertiaryContainer),
+              style:
+                  style ??
+                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
               overflow: TextOverflow.ellipsis,
             ),
-          )
+          ),
         ],
       ),
     );
 
     if (onPressed != null) {
-      child = InkWell(
-        onTap: onPressed,
-        child: child,
-      );
+      child = InkWell(onTap: onPressed, child: child);
     }
 
     return ConstrainedBox(
@@ -365,8 +371,9 @@ class TriStateChip extends StatelessWidget {
     this.elevation,
     this.shadowColor,
     this.selectedColor,
-  })  : assert(onChanged != null),
-        assert(elevation == null || elevation >= 0.0);
+    this.unselectedColor,
+  }) : assert(onChanged != null),
+       assert(elevation == null || elevation >= 0.0);
 
   final Widget label;
   final TextStyle? labelStyle;
@@ -385,6 +392,7 @@ class TriStateChip extends StatelessWidget {
   final bool? value;
   final ValueChanged<bool?>? onChanged;
   final Color? selectedColor;
+  final Color? unselectedColor;
 
   void _onPressed() {
     switch (value) {
@@ -401,12 +409,12 @@ class TriStateChip extends StatelessWidget {
   }
 
   BorderSide? _getBorder(Set<WidgetState> states) {
-    if (selectedColor == null) {
-      return null;
+    if (value == true && selectedColor != null) {
+      return BorderSide(color: selectedColor!);
     }
 
-    if (value == false) {
-      return BorderSide(color: selectedColor!);
+    if (value == false && unselectedColor != null) {
+      return BorderSide(color: unselectedColor!);
     }
 
     return null;
@@ -424,9 +432,10 @@ class TriStateChip extends StatelessWidget {
         break;
       case true:
         selected = true;
+        avatar = Icon(Icons.add, color: selectedColor);
         break;
       case false:
-        avatar = const Icon(Icons.remove);
+        avatar = Icon(Icons.remove, color: unselectedColor);
         selected = false;
         break;
     }
@@ -436,7 +445,7 @@ class TriStateChip extends StatelessWidget {
       label: label,
       onPressed: _onPressed,
       labelStyle: labelStyle,
-      selectedColor: selectedColor,
+      // selectedColor: selectedColor,
       side: WidgetStateBorderSide.resolveWith(_getBorder),
       shape: shape,
       clipBehavior: clipBehavior,
@@ -451,6 +460,7 @@ class TriStateChip extends StatelessWidget {
       materialTapTargetSize: materialTapTargetSize,
       elevation: elevation,
       shadowColor: shadowColor,
+      showCheckmark: false,
     );
   }
 }
@@ -478,10 +488,8 @@ class SettingCardWidget extends StatelessWidget {
         children: [
           ColoredBox(
             color: Theme.of(context).cardColor,
-            child: Center(
-              child: builder(context),
-            ),
-          )
+            child: Center(child: builder(context)),
+          ),
         ],
       );
     }
@@ -494,13 +502,10 @@ class SettingCardWidget extends StatelessWidget {
             Expanded(
               child: Column(
                 spacing: 10.0,
-                children: [
-                  title,
-                  if (subtitle != null) subtitle!,
-                ],
+                children: [title, if (subtitle != null) subtitle!],
               ),
             ),
-            Expanded(child: builder(context))
+            Expanded(child: builder(context)),
           ],
         ),
       ),
@@ -530,7 +535,9 @@ class TitleFlexBar extends StatelessWidget {
           ],
         ),
       ),
-      background: ColoredBox(color: Theme.of(context).colorScheme.primaryContainer),
+      background: ColoredBox(
+        color: Theme.of(context).colorScheme.primaryContainer,
+      ),
     );
   }
 }
@@ -558,10 +565,7 @@ class ErrorList extends StatelessWidget {
         behavior: const MouseTouchScrollBehavior(),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            Text('$error'),
-            Text(stackTrace.toString()),
-          ],
+          children: [Text('$error'), Text(stackTrace.toString())],
         ),
       ),
     );
@@ -569,10 +573,7 @@ class ErrorList extends StatelessWidget {
 }
 
 class LoadingOverlayStack extends StatelessWidget {
-  const LoadingOverlayStack({
-    super.key,
-    this.progress,
-  });
+  const LoadingOverlayStack({super.key, this.progress});
 
   final double? progress;
 
@@ -581,21 +582,14 @@ class LoadingOverlayStack extends StatelessWidget {
     return Stack(
       children: [
         const ModalBarrier(dismissible: false, color: Colors.black87),
-        Center(
-          child: CircularProgressIndicator(
-            value: progress,
-          ),
-        )
+        Center(child: CircularProgressIndicator(value: progress)),
       ],
     );
   }
 }
 
 class ListSpinner extends StatelessWidget {
-  const ListSpinner({
-    super.key,
-    this.progress,
-  });
+  const ListSpinner({super.key, this.progress});
 
   final double? progress;
 
@@ -603,24 +597,22 @@ class ListSpinner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: Center(
-        child: CircularProgressIndicator(
-          value: progress,
-        ),
-      ),
+      child: Center(child: CircularProgressIndicator(value: progress)),
     );
   }
 }
 
-typedef DataProviderOrBuilder<T> = Widget Function(BuildContext context, T data);
+typedef DataProviderOrBuilder<T> =
+    Widget Function(BuildContext context, T data);
 typedef LoadingBuilder = Widget Function(BuildContext context, num? progress);
-typedef ErrorWrapperBuilder = Widget Function(BuildContext context, Widget child);
+typedef ErrorWrapperBuilder =
+    Widget Function(BuildContext context, Widget child);
 
 class DataProviderWhenWidget<T> extends ConsumerWidget {
   const DataProviderWhenWidget({
     super.key,
     required this.provider,
-    this.data,
+    this.initialData,
     required this.builder,
     this.errorBuilder,
     this.loadingBuilder,
@@ -628,7 +620,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
   });
 
   final Refreshable<AsyncValue<T>> provider;
-  final AsyncValue<T>? data;
+  final AsyncValue<T>? initialData;
   final DataProviderOrBuilder<T> builder;
   final ErrorWrapperBuilder? errorBuilder;
   final Widget? loadingWidget;
@@ -636,7 +628,8 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dataProvider = (data != null) ? data! : ref.watch(provider);
+    final dataProvider =
+        (initialData != null) ? initialData! : ref.watch(provider);
 
     switch (dataProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
@@ -665,17 +658,13 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
 }
 
 class Styles {
-  static ButtonStyle squareIconButtonStyle({
-    Color? backgroundColor,
-  }) =>
+  static ButtonStyle squareIconButtonStyle({Color? backgroundColor}) =>
       IconButton.styleFrom(
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: EdgeInsets.zero,
         backgroundColor: backgroundColor,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(6.0),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(6.0)),
         ),
       );
 
@@ -683,86 +672,117 @@ class Styles {
     Color? backgroundColor,
     TextStyle? textStyle,
     EdgeInsetsGeometry? padding,
-  }) =>
-      ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        textStyle: textStyle,
-        padding: padding,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(6.0)),
-        ),
-      );
+  }) => ElevatedButton.styleFrom(
+    backgroundColor: backgroundColor,
+    textStyle: textStyle,
+    padding: padding,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(6.0)),
+    ),
+  );
 
-  static final coverArtGradientTween = Tween(begin: FractionalOffset.center, end: FractionalOffset.topCenter);
+  static final coverArtGradientTween = Tween(
+    begin: FractionalOffset.center,
+    end: FractionalOffset.topCenter,
+  );
 
   static const List<Widget> loadingOverlay = [
     ModalBarrier(dismissible: false, color: Colors.black87),
-    Center(
-      child: CircularProgressIndicator(),
-    ),
+    Center(child: CircularProgressIndicator()),
   ];
 
   static void showErrorSnackBar(ScaffoldMessengerState state, String content) {
     Future.delayed(
       Duration.zero,
-      () => state
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(content),
-            backgroundColor: Colors.red,
-          ),
-        ),
+      () =>
+          state
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text(content), backgroundColor: Colors.red),
+            ),
     );
   }
 
-  static final slideTween =
-      Tween(begin: const Offset(0.0, 1.0), end: Offset.zero).chain(CurveTween(curve: Curves.ease));
+  static final slideTween = Tween(
+    begin: const Offset(0.0, 1.0),
+    end: Offset.zero,
+  ).chain(CurveTween(curve: Curves.ease));
 
   static Widget slideTransitionBuilder(
-          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
-      SlideTransition(
-        position: animation.drive(slideTween),
-        child: child,
-      );
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => SlideTransition(position: animation.drive(slideTween), child: child);
 
   static Widget scaledSharedAxisTransitionBuilder(
-          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
-      SharedAxisTransition(
-        animation: animation,
-        secondaryAnimation: secondaryAnimation,
-        transitionType: SharedAxisTransitionType.scaled,
-        child: child,
-      );
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => SharedAxisTransition(
+    animation: animation,
+    secondaryAnimation: secondaryAnimation,
+    transitionType: SharedAxisTransitionType.scaled,
+    child: child,
+  );
 
   static Widget horizontalSharedAxisTransitionBuilder(
-          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
-      SharedAxisTransition(
-        animation: animation,
-        secondaryAnimation: secondaryAnimation,
-        transitionType: SharedAxisTransitionType.horizontal,
-        child: child,
-      );
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => SharedAxisTransition(
+    animation: animation,
+    secondaryAnimation: secondaryAnimation,
+    transitionType: SharedAxisTransitionType.horizontal,
+    child: child,
+  );
 
   static Widget fadeThroughTransitionBuilder(
-          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
-      FadeThroughTransition(
-        animation: animation,
-        secondaryAnimation: secondaryAnimation,
-        child: child,
-      );
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => FadeThroughTransition(
+    animation: animation,
+    secondaryAnimation: secondaryAnimation,
+    child: child,
+  );
 }
 
 class SlideTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
-  SlideTransitionRouteBuilder({
+  SlideTransitionRouteBuilder({required super.pageBuilder})
+    : super(transitionsBuilder: Styles.slideTransitionBuilder);
+}
+
+class PageTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
+  final PageTransitionsBuilder pageTransitionsBuilder;
+
+  PageTransitionRouteBuilder({
     required super.pageBuilder,
-  }) : super(transitionsBuilder: Styles.slideTransitionBuilder);
+    required this.pageTransitionsBuilder,
+  });
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return pageTransitionsBuilder.buildTransitions(
+      this,
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+    );
+  }
 }
 
 class TransparentOverlay<T> extends ModalRoute<T> {
-  TransparentOverlay({
-    required this.builder,
-  }) : super();
+  TransparentOverlay({required this.builder}) : super();
 
   final WidgetBuilder builder;
 
@@ -800,9 +820,6 @@ class TransparentOverlay<T> extends ModalRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return FadeTransition(
-      opacity: animation,
-      child: child,
-    );
+    return FadeTransition(opacity: animation, child: child);
   }
 }

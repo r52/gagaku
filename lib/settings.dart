@@ -1,22 +1,28 @@
+import 'package:auto_route/annotations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SettingsHome extends ConsumerWidget {
-  const SettingsHome({super.key});
+@RoutePage()
+class AppSettingsPage extends ConsumerWidget {
+  const AppSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cache = ref.watch(cacheProvider);
     final cfg = ref.watch(gagakuSettingsProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: TitleFlexBar(title: 'arg_settings'.tr(context: context, args: ['Gagaku'])),
+        flexibleSpace: TitleFlexBar(
+          title: 'arg_settings'.tr(context: context, args: ['Gagaku']),
+        ),
       ),
       drawer: const MainDrawer(),
       body: SafeArea(
@@ -26,10 +32,7 @@ class SettingsHome extends ConsumerWidget {
             SettingCardWidget(
               title: Text(
                 'theme.mode'.tr(context: context),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               builder: (context) {
                 return Center(
@@ -39,9 +42,18 @@ class SettingsHome extends ConsumerWidget {
                     enableSearch: false,
                     enableFilter: false,
                     dropdownMenuEntries: [
-                      DropdownMenuEntry(value: ThemeMode.light, label: 'theme.light'.tr(context: context)),
-                      DropdownMenuEntry(value: ThemeMode.dark, label: 'theme.dark'.tr(context: context)),
-                      DropdownMenuEntry(value: ThemeMode.system, label: 'theme.system'.tr(context: context)),
+                      DropdownMenuEntry(
+                        value: ThemeMode.light,
+                        label: 'theme.light'.tr(context: context),
+                      ),
+                      DropdownMenuEntry(
+                        value: ThemeMode.dark,
+                        label: 'theme.dark'.tr(context: context),
+                      ),
+                      DropdownMenuEntry(
+                        value: ThemeMode.system,
+                        label: 'theme.system'.tr(context: context),
+                      ),
                     ],
                     onSelected: (ThemeMode? value) {
                       if (value != null) {
@@ -56,10 +68,7 @@ class SettingsHome extends ConsumerWidget {
             SettingCardWidget(
               title: Text(
                 'theme.color'.tr(context: context),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               builder: (context) {
                 return Center(
@@ -74,8 +83,12 @@ class SettingsHome extends ConsumerWidget {
                           leadingIcon: Container(
                             width: 15,
                             height: 15,
-                            decoration:
-                                BoxDecoration(color: c.color, border: Border.all(color: theme.colorScheme.onSurface)),
+                            decoration: BoxDecoration(
+                              color: c.color,
+                              border: Border.all(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
                           ),
                           value: c,
                           label: context.tr(c.label),
@@ -87,6 +100,71 @@ class SettingsHome extends ConsumerWidget {
                         ref.read(gagakuSettingsProvider.save)(c);
                       }
                     },
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(
+                'cache.clear'.tr(context: context),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text('cache.clearSub'.tr(context: context)),
+              builder: (context) {
+                return Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          final nav = Navigator.of(context);
+                          return AlertDialog(
+                            title: Text('cache.clear'.tr(context: context)),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('cache.clearWarning'.tr(context: context)),
+                                Text(
+                                  'ui.irreversibleWarning'.tr(context: context),
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              ElevatedButton(
+                                child: Text('ui.no'.tr(context: context)),
+                                onPressed: () {
+                                  nav.pop(null);
+                                },
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  nav.pop(true);
+                                },
+                                child: Text('ui.yes'.tr(context: context)),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (result == true) {
+                        await cache.clearAll();
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context)
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'cache.clearSuccess'.tr(context: context),
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                      }
+                    },
+                    icon: const Icon(Icons.delete_sweep),
+                    label: Text('cache.clear'.tr(context: context)),
                   ),
                 );
               },

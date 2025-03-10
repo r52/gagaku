@@ -28,7 +28,7 @@ class LibraryListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cfg = ref.watch(gagakuSettingsProvider);
+    final gridExtent = ref.watch(gagakuSettingsProvider.select((c) => c.gridAlbumExtent));
     return CustomScrollView(
       scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
@@ -86,7 +86,7 @@ class LibraryListWidget extends ConsumerWidget {
         ),
         SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: cfg.gridAlbumExtent.grid,
+            maxCrossAxisExtent: gridExtent.grid,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,

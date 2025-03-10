@@ -15,21 +15,14 @@ class DirectoryReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
   final String path;
   final String? title;
   final String? link;
-  final VoidCallback? onLinkPressed;
+  final CtxCallback? onLinkPressed;
 
-  DirectoryReaderRouteBuilder({
-    required this.path,
-    this.title,
-    this.link,
-    this.onLinkPressed,
-  }) : super(
-          pageBuilder: (context, animation, secondaryAnimation) => DirectoryReaderWidget(
-            path: path,
-            title: title,
-            link: link,
-            onLinkPressed: onLinkPressed,
-          ),
-        );
+  DirectoryReaderRouteBuilder({required this.path, this.title, this.link, this.onLinkPressed})
+    : super(
+        pageBuilder:
+            (context, animation, secondaryAnimation) =>
+                DirectoryReaderWidget(path: path, title: title, link: link, onLinkPressed: onLinkPressed),
+      );
 }
 
 @riverpod
@@ -39,13 +32,16 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
   final entities = await dir.list().toList();
   final files = entities.whereType<File>();
 
-  final pageFiles = files
-      .where((element) =>
-          element.path.endsWith('.png') ||
-          element.path.endsWith('.jpg') ||
-          element.path.endsWith('.jpeg') ||
-          (formats.avif && element.path.endsWith(".avif")))
-      .toList();
+  final pageFiles =
+      files
+          .where(
+            (element) =>
+                element.path.endsWith('.png') ||
+                element.path.endsWith('.jpg') ||
+                element.path.endsWith('.jpeg') ||
+                (formats.avif && element.path.endsWith(".avif")),
+          )
+          .toList();
 
   pageFiles.sort((a, b) => compareNatural(a.uri.pathSegments.last, b.uri.pathSegments.last));
 
@@ -66,18 +62,12 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
 }
 
 class DirectoryReaderWidget extends StatelessWidget {
-  const DirectoryReaderWidget({
-    super.key,
-    required this.path,
-    this.title,
-    this.link,
-    this.onLinkPressed,
-  });
+  const DirectoryReaderWidget({super.key, required this.path, this.title, this.link, this.onLinkPressed});
 
   final String path;
   final String? title;
   final String? link;
-  final VoidCallback? onLinkPressed;
+  final CtxCallback? onLinkPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -91,21 +81,12 @@ class DirectoryReaderWidget extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _getDirectoryPagesProvider(path),
-      errorBuilder: (context, child) => Scaffold(
-        appBar: AppBar(
-          leading: const BackButton(),
-        ),
-        body: child,
-      ),
+      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: const BackButton()), body: child),
       builder: (context, pages) {
         if (pages.isEmpty) {
           return Scaffold(
-            appBar: AppBar(
-              leading: const BackButton(),
-            ),
-            body: Center(
-              child: Text('localLibrary.dirUnreadableWarning'.tr(context: context)),
-            ),
+            appBar: AppBar(leading: const BackButton()),
+            body: Center(child: Text('localLibrary.dirUnreadableWarning'.tr(context: context))),
           );
         }
 
@@ -131,7 +112,7 @@ class DirectoryReaderWidget extends StatelessWidget {
                 decoration: TextDecoration.none,
               ),
             ),
-            const CircularProgressIndicator()
+            const CircularProgressIndicator(),
           ],
         ),
       ),

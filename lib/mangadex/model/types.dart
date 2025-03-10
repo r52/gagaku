@@ -2,12 +2,12 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:gagaku/util/freezed.dart';
 import 'package:gagaku/util/util.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
 
-typedef LocalizedString = Map<String, String>;
 typedef LibraryMap = Map<String, MangaReadingStatus>;
 typedef ReadChaptersMap = Map<String, ReadChapterSet>;
 typedef CoverArtUrl = String;
@@ -31,7 +31,7 @@ extension CoverArtUrlExt on CoverArtUrl {
   }
 }
 
-extension LocalizedStringExt on LocalizedString {
+extension LocalizedStringExt on Map<String, String> {
   String get(String code) {
     return containsKey(code) ? this[code]! : entries.first.value;
   }
@@ -183,6 +183,8 @@ class MangaFilterAction {
     Set<MangaStatus>? status,
     Set<MangaDemographic>? publicationDemographic,
     Set<ContentRating>? contentRating,
+    Set<CreatorType>? author,
+    Set<CreatorType>? artist,
   }) {
     MangaFilters updated = state.copyWith(
       includedTags: includedTags ?? state.includedTags,
@@ -190,8 +192,11 @@ class MangaFilterAction {
       excludedTags: excludedTags ?? state.excludedTags,
       excludedTagsMode: excludedTagsMode ?? state.excludedTagsMode,
       status: status ?? state.status,
-      publicationDemographic: publicationDemographic ?? state.publicationDemographic,
+      publicationDemographic:
+          publicationDemographic ?? state.publicationDemographic,
       contentRating: contentRating ?? state.contentRating,
+      author: author ?? state.author,
+      artist: artist ?? state.artist,
     );
 
     return updated;
@@ -199,7 +204,7 @@ class MangaFilterAction {
 }
 
 @freezed
-class MangaFilters with _$MangaFilters {
+abstract class MangaFilters with _$MangaFilters {
   const MangaFilters._();
 
   const factory MangaFilters({
@@ -207,13 +212,16 @@ class MangaFilters with _$MangaFilters {
     @Default(TagMode.and) TagMode includedTagsMode,
     @Default({}) Set<Tag> excludedTags,
     @Default(TagMode.or) TagMode excludedTagsMode,
+    @Default({}) Set<CreatorType> author,
+    @Default({}) Set<CreatorType> artist,
     @Default({}) Set<MangaStatus> status,
     @Default({}) Set<MangaDemographic> publicationDemographic,
     @Default({}) Set<ContentRating> contentRating,
     @Default(FilterOrder.relevance_desc) FilterOrder order,
   }) = _MangaFilters;
 
-  factory MangaFilters.fromJson(Map<String, dynamic> json) => _$MangaFiltersFromJson(json);
+  // factory MangaFilters.fromJson(Map<String, dynamic> json) =>
+  //     _$MangaFiltersFromJson(json);
 
   Map<String, dynamic> getMap() {
     var params = <String, dynamic>{};
@@ -233,11 +241,20 @@ class MangaFilters with _$MangaFilters {
     }
 
     if (publicationDemographic.isNotEmpty) {
-      params['publicationDemographic[]'] = publicationDemographic.map((e) => e.name).toList();
+      params['publicationDemographic[]'] =
+          publicationDemographic.map((e) => e.name).toList();
     }
 
     if (contentRating.isNotEmpty) {
       params['contentRating[]'] = contentRating.map((e) => e.name).toList();
+    }
+
+    if (author.isNotEmpty) {
+      params['authors[]'] = author.map((e) => e.id).toList();
+    }
+
+    if (artist.isNotEmpty) {
+      params['artists[]'] = artist.map((e) => e.id).toList();
     }
 
     params.addEntries([order.json]);
@@ -247,21 +264,11 @@ class MangaFilters with _$MangaFilters {
 }
 
 @freezed
-class MangaSearchParameters with _$MangaSearchParameters {
+abstract class MangaSearchParameters with _$MangaSearchParameters {
   const factory MangaSearchParameters({
     required String query,
     required MangaFilters filter,
   }) = _MangaSearchParameters;
-}
-
-class TimestampSerializer implements JsonConverter<DateTime, dynamic> {
-  const TimestampSerializer();
-
-  @override
-  DateTime fromJson(dynamic timestamp) => DateTime.parse(timestamp);
-
-  @override
-  dynamic toJson(DateTime date) => date.toString();
 }
 
 class LanguageConverter implements JsonConverter<Language, dynamic> {
@@ -344,7 +351,8 @@ enum Language {
 }
 
 class Languages {
-  static Iterable<Language> get languages => Language.values.where((element) => element.nonStandard == false);
+  static Iterable<Language> get languages =>
+      Language.values.where((element) => element.nonStandard == false);
 
   static Language get(String code) {
     final langs = Language.values.where((element) => element.code == code);
@@ -368,7 +376,9 @@ abstract class CreatorType implements MangaDexUUID {
 }
 
 @Freezed(unionKey: 'type')
-class MangaDexEntity with _$MangaDexEntity implements MangaDexUUID {
+sealed class MangaDexEntity with _$MangaDexEntity implements MangaDexUUID {
+  const MangaDexEntity._();
+
   @With<ChapterOps>()
   factory MangaDexEntity.chapter({
     required String id,
@@ -401,9 +411,7 @@ class MangaDexEntity with _$MangaDexEntity implements MangaDexUUID {
     required AuthorAttributes attributes,
   }) = Author;
 
-  const factory MangaDexEntity.creator({
-    required String id,
-  }) = CreatorID;
+  const factory MangaDexEntity.creator({required String id}) = CreatorID;
 
   @FreezedUnionValue('cover_art')
   const factory MangaDexEntity.cover({
@@ -438,22 +446,24 @@ class MangaDexEntity with _$MangaDexEntity implements MangaDexUUID {
     required TagAttributes attributes,
   }) = Tag;
 
-  factory MangaDexEntity.fromJson(Map<String, dynamic> json) => _$MangaDexEntityFromJson(json);
+  factory MangaDexEntity.fromJson(Map<String, dynamic> json) =>
+      _$MangaDexEntityFromJson(json);
 }
 
 @freezed
-class ChapterAPIData with _$ChapterAPIData {
+abstract class ChapterAPIData with _$ChapterAPIData {
   const factory ChapterAPIData({
     required String hash,
     required List<String> data,
     required List<String> dataSaver,
   }) = _ChapterAPIData;
 
-  factory ChapterAPIData.fromJson(Map<String, dynamic> json) => _$ChapterAPIDataFromJson(json);
+  factory ChapterAPIData.fromJson(Map<String, dynamic> json) =>
+      _$ChapterAPIDataFromJson(json);
 }
 
 @freezed
-class ChapterAPI with _$ChapterAPI {
+abstract class ChapterAPI with _$ChapterAPI {
   const ChapterAPI._();
 
   const factory ChapterAPI({
@@ -461,13 +471,15 @@ class ChapterAPI with _$ChapterAPI {
     required ChapterAPIData chapter,
   }) = _ChapterAPI;
 
-  factory ChapterAPI.fromJson(Map<String, dynamic> json) => _$ChapterAPIFromJson(json);
+  factory ChapterAPI.fromJson(Map<String, dynamic> json) =>
+      _$ChapterAPIFromJson(json);
 
-  String getUrl(bool datasaver) => '$baseUrl/${datasaver ? 'data-saver' : 'data'}/${chapter.hash}/';
+  String getUrl(bool datasaver) =>
+      '$baseUrl/${datasaver ? 'data-saver' : 'data'}/${chapter.hash}/';
 }
 
 @freezed
-class MDEntityList with _$MDEntityList {
+abstract class MDEntityList with _$MDEntityList {
   const factory MDEntityList({
     required String result,
     required String response,
@@ -477,16 +489,16 @@ class MDEntityList with _$MDEntityList {
     required int total,
   }) = _MDEntityList;
 
-  factory MDEntityList.fromJson(Map<String, dynamic> json) => _$MDEntityListFromJson(json);
+  factory MDEntityList.fromJson(Map<String, dynamic> json) =>
+      _$MDEntityListFromJson(json);
 }
 
-mixin ChapterOps {
-  String get id;
+mixin ChapterOps on MangaDexEntity {
   ChapterAttributes get attributes;
   List<MangaDexEntity> get relationships;
 
   late final title = _getTitle();
-  late final groups = _getGroups();
+  late final List<Group> groups = List.unmodifiable(_getGroups());
   late final manga = _getManga();
   late final uploadUser = _getUploadUser();
 
@@ -539,17 +551,16 @@ mixin ChapterOps {
   }
 }
 
-mixin MangaOps {
-  String get id;
+mixin MangaOps on MangaDexEntity {
   MangaAttributes? get attributes;
   List<MangaDexEntity>? get relationships;
   MangaRelations? get related;
 
-  late final List<CreatorType>? author = _getAuthor();
-  late final List<CreatorType>? artist = _getArtist();
+  late final List<CreatorType> author = List.unmodifiable(_getAuthor());
+  late final List<CreatorType> artist = List.unmodifiable(_getArtist());
   late final longStrip = _isLongStrip();
-  late final covers = _getAllCoverArt();
-  late final relatedMangas = _getRelatedManga();
+  late final List<CoverArtUrl> covers = List.unmodifiable(_getAllCoverArt());
+  late final List<Manga> relatedMangas = List.unmodifiable(_getRelatedManga());
 
   List<CoverArtUrl> _getAllCoverArt() {
     final coverRelations = <CoverArtAttributes>[];
@@ -588,34 +599,39 @@ mixin MangaOps {
     return covers.first.quality(quality: quality);
   }
 
-  CoverArtUrl getUrlFromCover(CoverArt cover, {CoverArtQuality quality = CoverArtQuality.best}) {
+  CoverArtUrl getUrlFromCover(
+    CoverArt cover, {
+    CoverArtQuality quality = CoverArtQuality.best,
+  }) {
     final filename = cover.attributes?.fileName;
 
     if (filename == null) {
       return 'https://mangadex.org/img/cover-placeholder.jpg';
     }
 
-    return 'https://uploads.mangadex.org/covers/$id/$filename'.quality(quality: quality);
+    return 'https://uploads.mangadex.org/covers/$id/$filename'.quality(
+      quality: quality,
+    );
   }
 
-  List<CreatorType>? _getAuthor() {
+  List<CreatorType> _getAuthor() {
     final authorRs = relationships?.whereType<Author>();
 
     if (authorRs != null && authorRs.isNotEmpty) {
       return authorRs.toList();
     }
 
-    return null;
+    return [];
   }
 
-  List<CreatorType>? _getArtist() {
+  List<CreatorType> _getArtist() {
     final artistRs = relationships?.whereType<Artist>();
 
     if (artistRs != null && artistRs.isNotEmpty) {
       return artistRs.toList();
     }
 
-    return null;
+    return [];
   }
 
   bool _isLongStrip() {
@@ -625,7 +641,11 @@ mixin MangaOps {
 
     final tags = attributes!.tags;
 
-    final lstag = tags.any((e) => e.attributes.group == TagGroup.format && e.attributes.name.get('en') == "Long Strip");
+    final lstag = tags.any(
+      (e) =>
+          e.attributes.group == TagGroup.format &&
+          e.attributes.name.get('en') == "Long Strip",
+    );
 
     return lstag;
   }
@@ -641,12 +661,11 @@ mixin MangaOps {
   }
 }
 
-mixin CustomListOps {
-  String get id;
+mixin CustomListOps on MangaDexEntity {
   CustomListAttributes get attributes;
   List<MangaDexEntity> get relationships;
 
-  late final set = _convertIDs();
+  late final set = Set.unmodifiable(_convertIDs());
   late final user = _getUser();
 
   Set<String> _convertIDs() {
@@ -671,23 +690,20 @@ mixin CustomListOps {
 }
 
 @freezed
-class MangaLinks with _$MangaLinks {
-  const factory MangaLinks({
-    String? raw,
-    String? al,
-    String? mu,
-    String? mal,
-  }) = _MangaLinks;
+abstract class MangaLinks with _$MangaLinks {
+  const factory MangaLinks({String? raw, String? al, String? mu, String? mal}) =
+      _MangaLinks;
 
-  factory MangaLinks.fromJson(Map<String, dynamic> json) => _$MangaLinksFromJson(json);
+  factory MangaLinks.fromJson(Map<String, dynamic> json) =>
+      _$MangaLinksFromJson(json);
 }
 
 @freezed
-class MangaAttributes with _$MangaAttributes {
+abstract class MangaAttributes with _$MangaAttributes {
   const factory MangaAttributes({
-    required LocalizedString title,
-    required List<LocalizedString> altTitles,
-    required LocalizedString description,
+    required Map<String, String> title,
+    required List<Map<String, String>> altTitles,
+    required Map<String, String> description,
     MangaLinks? links,
     @LanguageConverter() required Language originalLanguage,
     String? lastVolume,
@@ -702,11 +718,12 @@ class MangaAttributes with _$MangaAttributes {
     @TimestampSerializer() required DateTime updatedAt,
   }) = _MangaAttributes;
 
-  factory MangaAttributes.fromJson(Map<String, dynamic> json) => _$MangaAttributesFromJson(json);
+  factory MangaAttributes.fromJson(Map<String, dynamic> json) =>
+      _$MangaAttributesFromJson(json);
 }
 
 @freezed
-class ChapterAttributes with _$ChapterAttributes {
+abstract class ChapterAttributes with _$ChapterAttributes {
   const factory ChapterAttributes({
     String? title,
     String? volume,
@@ -720,11 +737,12 @@ class ChapterAttributes with _$ChapterAttributes {
     @TimestampSerializer() required DateTime publishAt,
   }) = _ChapterAttributes;
 
-  factory ChapterAttributes.fromJson(Map<String, dynamic> json) => _$ChapterAttributesFromJson(json);
+  factory ChapterAttributes.fromJson(Map<String, dynamic> json) =>
+      _$ChapterAttributesFromJson(json);
 }
 
 @freezed
-class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
+abstract class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
   const factory ScanlationGroupAttributes({
     required String name,
     String? website,
@@ -732,11 +750,12 @@ class ScanlationGroupAttributes with _$ScanlationGroupAttributes {
     String? description,
   }) = _ScanlationGroupAttributes;
 
-  factory ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) => _$ScanlationGroupAttributesFromJson(json);
+  factory ScanlationGroupAttributes.fromJson(Map<String, dynamic> json) =>
+      _$ScanlationGroupAttributesFromJson(json);
 }
 
 @freezed
-class CoverArtAttributes with _$CoverArtAttributes {
+abstract class CoverArtAttributes with _$CoverArtAttributes {
   const factory CoverArtAttributes({
     String? volume,
     required String fileName,
@@ -744,24 +763,24 @@ class CoverArtAttributes with _$CoverArtAttributes {
     String? locale,
   }) = _CoverArtAttributes;
 
-  factory CoverArtAttributes.fromJson(Map<String, dynamic> json) => _$CoverArtAttributesFromJson(json);
+  factory CoverArtAttributes.fromJson(Map<String, dynamic> json) =>
+      _$CoverArtAttributesFromJson(json);
 }
 
 @freezed
-class UserAttributes with _$UserAttributes {
-  const factory UserAttributes({
-    required String username,
-  }) = _UserAttributes;
+abstract class UserAttributes with _$UserAttributes {
+  const factory UserAttributes({required String username}) = _UserAttributes;
 
-  factory UserAttributes.fromJson(Map<String, dynamic> json) => _$UserAttributesFromJson(json);
+  factory UserAttributes.fromJson(Map<String, dynamic> json) =>
+      _$UserAttributesFromJson(json);
 }
 
 @freezed
-class AuthorAttributes with _$AuthorAttributes {
+abstract class AuthorAttributes with _$AuthorAttributes {
   const factory AuthorAttributes({
     required String name,
     String? imageUrl,
-    required LocalizedString biography,
+    required Map<String, String> biography,
     String? twitter,
     String? pixiv,
     String? youtube,
@@ -770,89 +789,96 @@ class AuthorAttributes with _$AuthorAttributes {
     @TimestampSerializer() required DateTime updatedAt,
   }) = _AuthorAttributes;
 
-  factory AuthorAttributes.fromJson(Map<String, dynamic> json) => _$AuthorAttributesFromJson(json);
+  factory AuthorAttributes.fromJson(Map<String, dynamic> json) =>
+      _$AuthorAttributesFromJson(json);
 }
 
 @freezed
-class TagAttributes with _$TagAttributes {
+abstract class TagAttributes with _$TagAttributes {
   const factory TagAttributes({
-    required LocalizedString name,
-    required LocalizedString description,
+    required Map<String, String> name,
+    required Map<String, String> description,
     required TagGroup group,
   }) = _TagAttributes;
 
-  factory TagAttributes.fromJson(Map<String, dynamic> json) => _$TagAttributesFromJson(json);
+  factory TagAttributes.fromJson(Map<String, dynamic> json) =>
+      _$TagAttributesFromJson(json);
 }
 
 @freezed
-class MangaStatisticsResponse with _$MangaStatisticsResponse {
+abstract class MangaStatisticsResponse with _$MangaStatisticsResponse {
   const factory MangaStatisticsResponse(
     Map<String, MangaStatistics> statistics,
   ) = _MangaStatisticsResponse;
 
-  factory MangaStatisticsResponse.fromJson(Map<String, dynamic> json) => _$MangaStatisticsResponseFromJson(json);
+  factory MangaStatisticsResponse.fromJson(Map<String, dynamic> json) =>
+      _$MangaStatisticsResponseFromJson(json);
 }
 
 @freezed
-class ChapterStatisticsResponse with _$ChapterStatisticsResponse {
+abstract class ChapterStatisticsResponse with _$ChapterStatisticsResponse {
   const factory ChapterStatisticsResponse(
     Map<String, ChapterStatistics> statistics,
   ) = _ChapterStatisticsResponse;
 
-  factory ChapterStatisticsResponse.fromJson(Map<String, dynamic> json) => _$ChapterStatisticsResponseFromJson(json);
+  factory ChapterStatisticsResponse.fromJson(Map<String, dynamic> json) =>
+      _$ChapterStatisticsResponseFromJson(json);
 }
 
 @freezed
-class MangaStatistics with _$MangaStatistics {
+abstract class MangaStatistics with _$MangaStatistics {
   const factory MangaStatistics({
     StatisticsDetailsComments? comments,
     required StatisticsDetailsRating rating,
     required int follows,
   }) = _MangaStatistics;
 
-  factory MangaStatistics.fromJson(Map<String, dynamic> json) => _$MangaStatisticsFromJson(json);
+  factory MangaStatistics.fromJson(Map<String, dynamic> json) =>
+      _$MangaStatisticsFromJson(json);
 }
 
 @freezed
-class ChapterStatistics with _$ChapterStatistics {
-  const factory ChapterStatistics({
-    StatisticsDetailsComments? comments,
-  }) = _ChapterStatistics;
+abstract class ChapterStatistics with _$ChapterStatistics {
+  const factory ChapterStatistics({StatisticsDetailsComments? comments}) =
+      _ChapterStatistics;
 
-  factory ChapterStatistics.fromJson(Map<String, dynamic> json) => _$ChapterStatisticsFromJson(json);
+  factory ChapterStatistics.fromJson(Map<String, dynamic> json) =>
+      _$ChapterStatisticsFromJson(json);
 }
 
 @freezed
-class StatisticsDetailsComments with _$StatisticsDetailsComments {
+abstract class StatisticsDetailsComments with _$StatisticsDetailsComments {
   const factory StatisticsDetailsComments({
     required int threadId,
     required int repliesCount,
   }) = _StatisticsDetailsComments;
 
-  factory StatisticsDetailsComments.fromJson(Map<String, dynamic> json) => _$StatisticsDetailsCommentsFromJson(json);
+  factory StatisticsDetailsComments.fromJson(Map<String, dynamic> json) =>
+      _$StatisticsDetailsCommentsFromJson(json);
 }
 
 @freezed
-class StatisticsDetailsRating with _$StatisticsDetailsRating {
+abstract class StatisticsDetailsRating with _$StatisticsDetailsRating {
   const factory StatisticsDetailsRating({
     double? average,
     required double bayesian,
   }) = _StatisticsDetailsRating;
 
-  factory StatisticsDetailsRating.fromJson(Map<String, dynamic> json) => _$StatisticsDetailsRatingFromJson(json);
+  factory StatisticsDetailsRating.fromJson(Map<String, dynamic> json) =>
+      _$StatisticsDetailsRatingFromJson(json);
 }
 
 @freezed
-class SelfRatingResponse with _$SelfRatingResponse {
-  const factory SelfRatingResponse(
-    Map<String, SelfRating> ratings,
-  ) = _SelfRatingResponse;
+abstract class SelfRatingResponse with _$SelfRatingResponse {
+  const factory SelfRatingResponse(Map<String, SelfRating> ratings) =
+      _SelfRatingResponse;
 
-  factory SelfRatingResponse.fromJson(Map<String, dynamic> json) => _$SelfRatingResponseFromJson(json);
+  factory SelfRatingResponse.fromJson(Map<String, dynamic> json) =>
+      _$SelfRatingResponseFromJson(json);
 }
 
 @freezed
-class SelfRating with _$SelfRating, ExpiringData {
+abstract class SelfRating with _$SelfRating, ExpiringData {
   SelfRating._();
 
   factory SelfRating({
@@ -863,38 +889,40 @@ class SelfRating with _$SelfRating, ExpiringData {
   @override
   final expiry = DateTime.now().add(const Duration(minutes: 10));
 
-  factory SelfRating.fromJson(Map<String, dynamic> json) => _$SelfRatingFromJson(json);
+  factory SelfRating.fromJson(Map<String, dynamic> json) =>
+      _$SelfRatingFromJson(json);
 }
 
 @freezed
-class CustomListAttributes with _$CustomListAttributes {
+abstract class CustomListAttributes with _$CustomListAttributes {
   const factory CustomListAttributes({
     required String name,
     required CustomListVisibility visibility,
     required int version,
   }) = _CustomListAttributes;
 
-  factory CustomListAttributes.fromJson(Map<String, dynamic> json) => _$CustomListAttributesFromJson(json);
+  factory CustomListAttributes.fromJson(Map<String, dynamic> json) =>
+      _$CustomListAttributesFromJson(json);
 }
 
 @freezed
-class ErrorResponse with _$ErrorResponse {
-  const factory ErrorResponse(
-    String result,
-    List<MDError> errors,
-  ) = _ErrorResponse;
+abstract class ErrorResponse with _$ErrorResponse {
+  const factory ErrorResponse(String result, List<MDError> errors) =
+      _ErrorResponse;
 
-  factory ErrorResponse.fromJson(Map<String, dynamic> json) => _$ErrorResponseFromJson(json);
+  factory ErrorResponse.fromJson(Map<String, dynamic> json) =>
+      _$ErrorResponseFromJson(json);
 }
 
 @freezed
-class FrontPageData with _$FrontPageData {
+abstract class FrontPageData with _$FrontPageData {
   const factory FrontPageData({
     required String staffPicks,
     required String seasonal,
   }) = _FrontPageData;
 
-  factory FrontPageData.fromJson(Map<String, dynamic> json) => _$FrontPageDataFromJson(json);
+  factory FrontPageData.fromJson(Map<String, dynamic> json) =>
+      _$FrontPageDataFromJson(json);
 }
 
 class MangaDexException implements Exception {
@@ -943,16 +971,39 @@ class ChapterFeedItemData {
 
   final List<Chapter> chapters = [];
 
-  void clear() {
-    chapters.clear();
-  }
-
   int generateKey() {
     if (chapters.isNotEmpty) {
       return Object.hash(runtimeType, mangaId, chapters.first.id);
     }
 
     return Object.hash(runtimeType, mangaId);
+  }
+
+  static List<ChapterFeedItemData> toData(
+    List<Chapter> chapters,
+    List<Manga> mangas,
+  ) {
+    final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
+
+    // Craft feed items
+    final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
+      final mid = chapter.manga.id;
+      if (mangaMap.containsKey(mid)) {
+        ChapterFeedItemData? item;
+        if (list.isNotEmpty && list.last.mangaId == mid) {
+          item = list.last;
+        } else {
+          item = ChapterFeedItemData(manga: mangaMap[mid]!);
+          list.add(item);
+        }
+
+        item.chapters.add(chapter);
+      }
+
+      return list;
+    });
+
+    return dlist;
   }
 }
 
@@ -1005,9 +1056,11 @@ class MangaSetAction {
   final String? element;
 
   MangaSetAction({required this.action, this.replacement, this.element})
-      : assert(action == MangaSetActions.none
+    : assert(
+        action == MangaSetActions.none
             ? (replacement == null || element == null)
-            : (replacement != null || element != null));
+            : (replacement != null || element != null),
+      );
 
   static Set<String> modify(Set<String> state, MangaSetAction action) {
     switch (action.action) {

@@ -1,21 +1,20 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:dart_eval/dart_eval.dart';
-import 'package:dart_eval/dart_eval_security.dart';
-import 'package:dart_eval/stdlib/core.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/eval/plugin.dart';
-import 'package:gagaku/web/eval/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:go_router/go_router.dart';
+import 'package:gagaku/web/server.dart' show port;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -46,12 +45,30 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
-  Future<bool> handleUrl({required String url, required BuildContext context}) async {
+  Future<bool> handleUrl({
+    required String url,
+    required BuildContext context,
+  }) async {
     if (url.startsWith('https://imgur.com/a/')) {
       final src = url.substring(20);
       final code = '/read/api/imgur/chapter/$src';
-      GoRouter.of(context).push('/read/imgur/$src/1/1/',
-          extra: WebReaderData(source: code, info: SourceInfo(type: SourceType.proxy, source: 'imgur', location: src)));
+      AutoRouter.of(context).push(
+        ProxyWebSourceReaderRoute(
+          proxy: 'imgur',
+          code: src,
+          chapter: '1',
+          page: '1',
+          readerData: WebReaderData(
+            source: code,
+            handle: SourceHandler(
+              type: SourceType.proxy,
+              source: 'imgur',
+              location: src,
+            ),
+          ),
+        ),
+      );
+
       ref.read(webSourceHistoryProvider.add)(HistoryLink(title: url, url: url));
       return true;
     }
@@ -65,30 +82,60 @@ class ProxyHandler {
 
       if (!context.mounted) return false;
       if (info.chapter != null) {
-        GoRouter.of(context).push('/read/${info.source}/${info.location}/${info.chapter}/1/');
+        AutoRouter.of(context).push(
+          ProxyWebSourceReaderRoute(
+            proxy: info.source,
+            code: info.location,
+            chapter: info.chapter!,
+            page: '1',
+          ),
+        );
       } else {
-        GoRouter.of(context).push('/read/${info.source}/${info.location}', extra: info);
+        AutoRouter.of(context).push(
+          WebMangaViewRoute(
+            source: info.source,
+            mangaId: info.location,
+            handle: info,
+          ),
+        );
       }
 
       return true;
     }
 
-    final sourceMgr = await ref.watch(webSourceManagerProvider.future);
-    if (sourceMgr != null) {
-      for (final MapEntry(key: key, value: src) in sourceMgr.sources.entries) {
-        if (url.startsWith('${src.baseUrl}${src.mangaPath}')) {
-          if (!context.mounted) return false;
-          GoRouter.of(context).push('/read/${src.name}/$url',
-              extra: SourceInfo(type: SourceType.source, source: src.name, location: url, parser: key));
-          return true;
+    final installed = ref.watch(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
+    for (final src in installed) {
+      if (url.startsWith('${src.id}/')) {
+        final parts = url.split('/');
+        if (parts.length != 2) {
+          continue;
         }
+        final loc = parts[1];
+        if (!context.mounted) return false;
+
+        AutoRouter.of(context).push(
+          WebMangaViewRoute(
+            source: src.id,
+            mangaId: loc,
+            handle: SourceHandler(
+              type: SourceType.source,
+              source: src.id,
+              location: loc,
+              parser: src,
+            ),
+          ),
+        );
+
+        return true;
       }
     }
 
     return false;
   }
 
-  Future<SourceInfo?> parseUrl(String url) async {
+  Future<SourceHandler?> parseUrl(String url) async {
     var src = cleanBaseDomains(url);
 
     if (!src.startsWith('/')) {
@@ -105,7 +152,7 @@ class ProxyHandler {
     switch (proxy[0]) {
       case 'read':
         if (proxy.length >= 4) {
-          return SourceInfo(
+          return SourceHandler(
             type: SourceType.proxy,
             source: proxy[1],
             location: proxy[2],
@@ -113,16 +160,19 @@ class ProxyHandler {
           );
         }
 
-        return SourceInfo(
+        return SourceHandler(
           type: SourceType.proxy,
           source: proxy[1],
           location: proxy[2],
         );
       default:
         logger.d('ProxyHandler: retrieving url $url');
-        final response = await client.send((http.Request('GET', Uri.parse(url))..followRedirects = false));
+        final response = await client.send(
+          (http.Request('GET', Uri.parse(url))..followRedirects = false),
+        );
 
-        if (response.statusCode != 302 || !response.headers.containsKey('location')) {
+        if (response.statusCode != 302 ||
+            !response.headers.containsKey('location')) {
           return null;
         }
 
@@ -138,32 +188,34 @@ class ProxyHandler {
     }
   }
 
-  Future<WebManga?> handleSource(SourceInfo info) async {
-    switch (info.type) {
+  Future<WebManga?> handleSource(SourceHandler handle) async {
+    switch (handle.type) {
       case SourceType.source:
-        final srcMgr = await ref.watch(webSourceManagerProvider.future);
-
-        if (srcMgr != null) {
-          if (info.parser != null) {
-            return await srcMgr.parseManga(info.parser!, Uri.parse(info.location), client);
-          } else {
-            for (final MapEntry(key: key, value: src) in srcMgr.sources.entries) {
-              if (info.source == src.name) {
-                return await srcMgr.parseManga(key, Uri.parse(info.location), client);
-              }
+        if (handle.parser != null) {
+          return await ref
+              .read(extensionSourceProvider(handle.parser!.id).notifier)
+              .getManga(handle.location);
+        } else {
+          final installed = await ref.watch(extensionInfoListProvider.future);
+          for (final src in installed) {
+            if (handle.source == src.internal.id) {
+              return await ref
+                  .read(extensionSourceProvider(handle.source).notifier)
+                  .getManga(handle.location);
             }
           }
         }
 
         return null;
       case SourceType.proxy:
-        return await _getMangaFromProxy(info);
+        return await _getMangaFromProxy(handle);
     }
   }
 
-  Future<WebManga> _getMangaFromProxy(SourceInfo info) async {
-    final key = info.getKey();
-    final url = "https://cubari.moe/read/api/${info.source}/series/${info.location}/";
+  Future<WebManga> _getMangaFromProxy(SourceHandler handle) async {
+    final key = handle.getKey();
+    final url =
+        "https://cubari.moe/read/api/${handle.source}/series/${handle.location}/";
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
@@ -185,7 +237,8 @@ class ProxyHandler {
     }
 
     throw Exception(
-        "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
+      "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}",
+    );
   }
 
   Future<dynamic> getProxyAPI(String path) async {
@@ -200,7 +253,8 @@ class ProxyHandler {
     }
 
     throw Exception(
-        "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}");
+      "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}",
+    );
   }
 }
 
@@ -219,12 +273,14 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     if (content is List) {
       final links = content.map((e) => HistoryLink.fromJson(e)).toList();
-      return {
-        cfg.defaultCategory: links,
-      };
+      return {cfg.defaultCategory: links};
     } else if (content is Map) {
-      final map = (content as Map<String, dynamic>)
-          .map((key, value) => MapEntry(key, (value as List).map((e) => HistoryLink.fromJson(e)).toList()));
+      final map = (content as Map<String, dynamic>).map(
+        (key, value) => MapEntry(
+          key,
+          (value as List).map((e) => HistoryLink.fromJson(e)).toList(),
+        ),
+      );
 
       final keys = map.keys.toList();
       for (final key in keys) {
@@ -248,18 +304,21 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> clear() async {
+  Future<void> clear() async {
     await future;
     final empty = <String, List<HistoryLink>>{};
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(empty));
 
-    return empty;
+    state = AsyncData(empty);
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> add(String category, HistoryLink link) async {
+  Future<Map<String, List<HistoryLink>>> add(
+    String category,
+    HistoryLink link,
+  ) async {
     final oldstate = await future;
     final list = oldstate[category];
 
@@ -273,6 +332,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
+
+    state = AsyncData(udp);
 
     return udp;
   }
@@ -293,31 +354,47 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
 
+    state = AsyncData(udp);
+
     return udp;
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> remove(String category, HistoryLink link) async {
+  Future<Map<String, List<HistoryLink>>> remove(
+    String category,
+    HistoryLink link,
+  ) async {
     final oldstate = await future;
 
-    final list = oldstate[category];
+    final categoriesToEdit =
+        category == 'all' ? oldstate.keys.toList() : [category];
 
-    while (list?.contains(link) ?? false) {
-      list?.remove(link);
+    for (final c in categoriesToEdit) {
+      final list = oldstate[c];
+
+      while (list?.contains(link) ?? false) {
+        list?.remove(link);
+      }
+
+      oldstate[c] = [...?list];
     }
-
-    oldstate[category] = [...?list];
 
     final udp = {...oldstate};
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
 
+    state = AsyncData(udp);
+
     return udp;
   }
 
   @mutation
-  Future<Map<String, List<HistoryLink>>> updateList(String category, int oldIndex, int newIndex) async {
+  Future<Map<String, List<HistoryLink>>> updateList(
+    String category,
+    int oldIndex,
+    int newIndex,
+  ) async {
     final oldstate = await future;
     if (oldIndex < newIndex) {
       // removing the item at oldIndex will shorten the list by 1.
@@ -334,12 +411,16 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
 
+    state = AsyncData(udp);
+
     return udp;
   }
 
   @mutation
   Future<Map<String, List<HistoryLink>>> reconfigureCategories(
-      List<WebSourceCategory> categories, String defaultCategory) async {
+    List<WebSourceCategory> categories,
+    String defaultCategory,
+  ) async {
     final oldstate = await future;
 
     // Move all deleted category lists to default
@@ -355,6 +436,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final box = Hive.box(gagakuBox);
     await box.put('web_favorites', json.encode(udp));
+
+    state = AsyncData(udp);
 
     return udp;
   }
@@ -393,6 +476,8 @@ class WebSourceHistory extends _$WebSourceHistory {
     final box = Hive.box(gagakuBox);
     await box.put('web_history', json.encode(links));
 
+    state = AsyncData(empty);
+
     return empty;
   }
 
@@ -416,6 +501,8 @@ class WebSourceHistory extends _$WebSourceHistory {
     final box = Hive.box(gagakuBox);
     await box.put('web_history', json.encode(links));
 
+    state = AsyncData(cpy);
+
     return cpy;
   }
 
@@ -436,6 +523,8 @@ class WebSourceHistory extends _$WebSourceHistory {
 
     final box = Hive.box(gagakuBox);
     await box.put('web_history', json.encode(links));
+
+    state = AsyncData(cpy);
 
     return cpy;
   }
@@ -470,11 +559,17 @@ class WebReadMarkers extends _$WebReadMarkers {
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode({}));
 
+    state = AsyncData(empty);
+
     return empty;
   }
 
   @mutation
-  Future<Map<String, Set<String>>> set(String manga, String chapter, bool setRead) async {
+  Future<Map<String, Set<String>>> set(
+    String manga,
+    String chapter,
+    bool setRead,
+  ) async {
     final oldstate = await future;
     final keyExists = oldstate.containsKey(manga);
 
@@ -498,12 +593,16 @@ class WebReadMarkers extends _$WebReadMarkers {
       }
     }
 
-    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+    final converted = oldstate.map(
+      (key, value) => MapEntry(key, value.toList()),
+    );
 
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode(converted));
 
-    return {...oldstate};
+    state = AsyncData({...oldstate});
+
+    return oldstate;
   }
 
   @mutation
@@ -538,12 +637,16 @@ class WebReadMarkers extends _$WebReadMarkers {
       }
     }
 
-    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+    final converted = oldstate.map(
+      (key, value) => MapEntry(key, value.toList()),
+    );
 
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode(converted));
 
-    return {...oldstate};
+    state = AsyncData({...oldstate});
+
+    return oldstate;
   }
 
   @mutation
@@ -556,108 +659,308 @@ class WebReadMarkers extends _$WebReadMarkers {
       oldstate.remove(manga);
     }
 
-    final converted = oldstate.map((key, value) => MapEntry(key, value.toList()));
+    final converted = oldstate.map(
+      (key, value) => MapEntry(key, value.toList()),
+    );
 
     final box = Hive.box(gagakuBox);
     await box.put('web_read_history', json.encode(converted));
 
-    return {...oldstate};
+    state = AsyncData({...oldstate});
+
+    return oldstate;
   }
 }
 
 @Riverpod(keepAlive: true)
-class WebSourceManager extends _$WebSourceManager {
-  Future<WebSource?> fetchData() async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
-
-    if (path.isNotEmpty && dir.existsSync()) {
-      final plugin = WebSourcePlugin();
-      final compiler = Compiler();
-      compiler.addPlugin(plugin);
-
-      final entities = await dir.list().toList();
-      final sourcefiles = <String, String>{};
-
-      for (final e in entities) {
-        if (e is File && e.path.endsWith('.dart')) {
-          final filename = e.uri.pathSegments.last;
-          String dat = await e.readAsString();
-
-          sourcefiles.putIfAbsent(filename, () => dat);
-          compiler.entrypoints.add('${GagakuWebSources.getPackagePath}/$filename');
-        }
-      }
-
-      final program = compiler.compile({GagakuWebSources.packageName: sourcefiles});
-      final runtime = Runtime.ofProgram(program);
-      runtime.addPlugin(plugin);
-
-      final source = WebSource(runtime: runtime);
-
-      for (final key in sourcefiles.keys) {
-        final result =
-            (runtime.executeLib('${GagakuWebSources.getPackagePath}/$key', 'getSourceInfo') as $String).$value;
-
-        final Map<String, dynamic> dat = json.decode(result);
-        final info = WebSourceInfo.fromJson(dat);
-
-        source.sources.putIfAbsent(key, () => info);
-        runtime.grant(NetworkPermission.url(info.baseUrl));
-      }
-
-      return source;
-    }
-
-    return null;
-  }
+class ExtensionSource extends _$ExtensionSource {
+  HeadlessInAppWebView? _view;
+  late InAppWebViewController _controller;
+  late SourceIdentifier _info;
 
   @override
-  FutureOr<WebSource?> build() async {
-    return fetchData();
+  Future<SourceIdentifier> build(String sourceId) async {
+    final completer = Completer<void>();
+    final installed = ref.watch(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
+    late SourceInfo extinfo;
+
+    // Let this throw here if not found
+    final source = installed.firstWhere((e) => e.id == sourceId);
+
+    _view = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
+      initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
+      onWebViewCreated: (controller) {
+        controller.addJavaScriptHandler(
+          handlerName: 'getState',
+          callback: (JavaScriptHandlerFunctionData data) {
+            return ref
+                .read(extensionStateProvider.notifier)
+                .getState(sourceId, data.args[0]);
+          },
+        );
+
+        controller.addJavaScriptHandler(
+          handlerName: 'setState',
+          callback: (JavaScriptHandlerFunctionData data) {
+            ref
+                .read(extensionStateProvider.notifier)
+                .setState(sourceId, data.args[0], data.args[1]);
+          },
+        );
+      },
+      onConsoleMessage: (controller, consoleMessage) {
+        logger.d('Console Message: ${consoleMessage.message}');
+      },
+      onLoadStop: (controller, url) async {
+        final scriptUrl = '${source.repo}/${source.id}/source.js';
+        final response = await http.get(Uri.parse(scriptUrl));
+
+        if (response.statusCode != 200) {
+          final err = "Failed to load $scriptUrl";
+          logger.d(err);
+          completer.completeError(err);
+          return;
+        }
+
+        final script = response.body;
+        await controller.evaluateJavascript(source: script);
+
+        await controller.evaluateJavascript(
+          source:
+              "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
+        );
+
+        final rinfo = await controller.evaluateJavascript(
+          source: "window.Sources['${source.id}Info'];",
+        );
+        final info = SourceInfo.fromJson(rinfo);
+        extinfo = info;
+
+        _controller = controller;
+        logger.d("Extension ${extinfo.name} ready");
+        completer.complete();
+      },
+    );
+
+    ref.onDispose(() {
+      _view?.dispose();
+    });
+
+    await _view?.run();
+    await completer.future;
+
+    _info = SourceIdentifier(internal: source, external: extinfo);
+
+    return _info;
   }
 
-  Future<void> addSource(String key, RepoInfo value) async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
-
-    if (path.isNotEmpty && dir.existsSync()) {
-      final api = ref.watch(proxyProvider);
-      final url = Uri.parse(value.url);
-
-      final response = await api.client.get(url);
-      await File('${dir.path}${Platform.pathSeparator}$key').writeAsBytes(response.bodyBytes, flush: true);
-    }
-
-    ref.invalidateSelf();
+  SourceIdentifier getInfo() {
+    return _info;
   }
 
-  Future<void> removeSource(String key) async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
-
-    if (path.isNotEmpty && dir.existsSync()) {
-      final file = File('${dir.path}${Platform.pathSeparator}$key');
-      if (file.existsSync()) {
-        await file.delete();
-      }
-    }
-
-    ref.invalidateSelf();
+  Future<dynamic> callBinding(
+    String bindingId, [
+    List<dynamic> args = const [],
+  ]) async {
+    final arg = args.map((e) => json.encode(e)).toList().join(",");
+    final result = await _controller.callAsyncJavaScript(
+      functionBody: "return await window.callBinding('$bindingId', $arg)",
+    );
+    return result!.value;
   }
 
-  Future<void> updateSource(String key, RepoInfo value) async {
-    final path = ref.watch(webConfigProvider.select((c) => c.sourceDirectory));
-    final dir = Directory(path);
+  Future<DUISection> getSourceMenu() async {
+    await future;
 
-    if (path.isNotEmpty && dir.existsSync()) {
-      final api = ref.watch(proxyProvider);
-      final url = Uri.parse(value.url);
-
-      final response = await api.client.get(url);
-      await File('${dir.path}${Platform.pathSeparator}$key').writeAsBytes(response.bodyBytes, flush: true);
+    if (!_info.external.hasIntent(SourceIntents.settingsUI)) {
+      throw Exception("Source does not support settings");
     }
 
-    ref.invalidateSelf();
+    final result = await _controller.callAsyncJavaScript(
+      functionBody: "return await window.processSourceMenu($sourceId)",
+    );
+
+    final menu = DUIType.fromJson(result!.value);
+    if (menu is! DUISection) {
+      throw Exception("Source getSourceMenu() did not return a valid menu");
+    }
+
+    return menu;
+  }
+
+  Future<List<HomeSection>> getHomePage() async {
+    await future;
+
+    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
+      throw Exception("Source does not support homepages");
+    }
+
+    final result = await _controller.callAsyncJavaScript(
+      functionBody: """
+var homesections = [];
+var cb = function (section) {
+  var idx = homesections.findIndex((e) => e.id == section.id);
+
+  if (idx == -1) {
+    homesections.push(section);
+  } else {
+    homesections[idx] = section;
+  }
+};
+
+await $sourceId.getHomePageSections(cb);
+return homesections;
+""",
+    );
+
+    final rsec = result!.value as List<dynamic>;
+    final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
+
+    return sections;
+  }
+
+  Future<PagedResults> getHomeSectionMore(
+    String homepageSectionId,
+    dynamic metadata,
+  ) async {
+    await future;
+
+    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
+      throw Exception("Source does not support homepages");
+    }
+
+    final result = await _controller.callAsyncJavaScript(
+      arguments: {'homepageSectionId': homepageSectionId, 'metadata': metadata},
+      functionBody: """
+return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
+""",
+    );
+
+    final pmangas = PagedResults.fromJson(result!.value);
+
+    return pmangas;
+  }
+
+  Future<PagedResults> searchManga(
+    SearchRequest query,
+    dynamic metadata,
+  ) async {
+    await future;
+
+    if ((query.title == null || query.title!.isEmpty) &&
+        query.includedTags.isEmpty) {
+      return const PagedResults();
+    }
+
+    final params = query.toJson();
+    final result = await _controller.callAsyncJavaScript(
+      arguments: {'query': params, 'metadata': metadata},
+      functionBody: """
+return await $sourceId.getSearchResults(query, metadata)
+""",
+    );
+
+    final pmangas = PagedResults.fromJson(result!.value);
+
+    return pmangas;
+  }
+
+  Future<WebManga?> getManga(String mangaId) async {
+    await future;
+
+    if (mangaId.isEmpty) {
+      return null;
+    }
+
+    final mdeets = await _controller.callAsyncJavaScript(
+      functionBody: "return await $sourceId.getMangaDetails('$mangaId')",
+    );
+
+    final smanga = SourceManga.fromJson(mdeets!.value);
+
+    final chaps = await _controller.callAsyncJavaScript(
+      functionBody: """
+var p = await $sourceId.getChapters('$mangaId');
+p.forEach((e) => e.time = e.time.toISOString());
+return p;
+""",
+    );
+
+    final clist = chaps!.value as List<dynamic>;
+    final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
+    final chapmap = Map.fromEntries(
+      chapters.map(
+        (e) => MapEntry(
+          e.chapNum.toString(),
+          WebChapter(
+            title: e.name,
+            volume: e.volume?.toString(),
+            groups: {e.group ?? sourceId: e.id},
+            releaseDate: e.time,
+          ),
+        ),
+      ),
+    );
+
+    final manga = WebManga(
+      title: smanga.mangaInfo.titles.first,
+      description: smanga.mangaInfo.desc,
+      artist: smanga.mangaInfo.artist ?? 'Unknown',
+      author: smanga.mangaInfo.author ?? 'Unknown',
+      cover: smanga.mangaInfo.image,
+      chapters: chapmap,
+    );
+
+    // logger.d(result);
+
+    return manga;
+  }
+
+  Future<List<String>> getChapterPages(String mangaId, String chapterId) async {
+    await future;
+
+    if (mangaId.isEmpty || chapterId.isEmpty) {
+      return [];
+    }
+
+    final cdeets = await _controller.callAsyncJavaScript(
+      functionBody:
+          "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')",
+    );
+
+    final chapterd = ChapterDetails.fromJson(cdeets!.value);
+
+    return chapterd.pages;
+  }
+
+  Future<String> getMangaURL(String mangaId) async {
+    await future;
+
+    if (mangaId.isEmpty) {
+      return '';
+    }
+
+    final result = await _controller.evaluateJavascript(
+      source: "$sourceId.getMangaShareUrl('$mangaId')",
+    );
+
+    return result as String;
+  }
+}
+
+@riverpod
+class ExtensionInfoList extends _$ExtensionInfoList {
+  @override
+  Future<List<SourceIdentifier>> build() async {
+    final installed = ref.watch(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
+
+    return await Future.wait(
+      installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
+    );
   }
 }

@@ -11,18 +11,19 @@ const _mangaListViewProvider = _MangaListViewProvider._();
 
 final class _MangaListViewProvider
     extends $NotifierProvider<_MangaListView, MangaListView> {
-  const _MangaListViewProvider._(
-      {super.runNotifierBuildOverride, _MangaListView Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'_mangaListViewProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _MangaListViewProvider._({
+    super.runNotifierBuildOverride,
+    _MangaListView Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'_mangaListViewProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final _MangaListView Function()? _createCb;
 
@@ -43,19 +44,14 @@ final class _MangaListViewProvider
 
   @$internal
   @override
-  _MangaListViewProvider $copyWithCreate(
-    _MangaListView Function() create,
-  ) {
+  _MangaListViewProvider $copyWithCreate(_MangaListView Function() create) {
     return _MangaListViewProvider._(create: create);
   }
 
   @$internal
   @override
   _MangaListViewProvider $copyWithBuild(
-    MangaListView Function(
-      Ref,
-      _MangaListView,
-    ) build,
+    MangaListView Function(Ref, _MangaListView) build,
   ) {
     return _MangaListViewProvider._(runNotifierBuildOverride: build);
   }
@@ -63,8 +59,8 @@ final class _MangaListViewProvider
   @$internal
   @override
   $NotifierProviderElement<_MangaListView, MangaListView> $createElement(
-          $ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$mangaListViewHash() => r'a50742a83f1633f48634570c1cd45301db55fad3';
@@ -73,7 +69,19 @@ abstract class _$MangaListView extends $Notifier<MangaListView> {
   MangaListView build();
   @$internal
   @override
-  MangaListView runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<MangaListView>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<MangaListView>,
+              MangaListView,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
 }
 
 // ignore_for_file: type=lint

@@ -8,13 +8,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'config.freezed.dart';
 part 'config.g.dart';
 
-@unfreezed
-class LocalLibConfig with _$LocalLibConfig {
-  factory LocalLibConfig({
-    @Default('') String libraryDirectory,
-  }) = _LocalLibConfig;
+@freezed
+abstract class LocalLibConfig with _$LocalLibConfig {
+  factory LocalLibConfig({@Default('') String libraryDirectory}) =
+      _LocalLibConfig;
 
-  factory LocalLibConfig.fromJson(Map<String, dynamic> json) => _$LocalLibConfigFromJson(json);
+  factory LocalLibConfig.fromJson(Map<String, dynamic> json) =>
+      _$LocalLibConfigFromJson(json);
 }
 
 @Riverpod(keepAlive: true)
@@ -38,7 +38,8 @@ class LocalConfig extends _$LocalConfig {
   }
 
   @mutation
-  FutureOr<LocalLibConfig> save(LocalLibConfig update) async {
+  LocalLibConfig save(LocalLibConfig update) {
+    state = update;
     final box = Hive.box(gagakuBox);
     box.put('locallib', json.encode(update.toJson()));
 

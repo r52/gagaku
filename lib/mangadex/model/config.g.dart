@@ -6,46 +6,49 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$MangaDexConfigImpl _$$MangaDexConfigImplFromJson(Map<String, dynamic> json) =>
-    _$MangaDexConfigImpl(
-      translatedLanguages: (json['translatedLanguages'] as List<dynamic>?)
+_MangaDexConfig _$MangaDexConfigFromJson(Map<String, dynamic> json) =>
+    _MangaDexConfig(
+      translatedLanguages:
+          (json['translatedLanguages'] as List<dynamic>?)
               ?.map(const LanguageConverter().fromJson)
               .toSet() ??
           const {},
-      originalLanguage: (json['originalLanguage'] as List<dynamic>?)
+      originalLanguage:
+          (json['originalLanguage'] as List<dynamic>?)
               ?.map(const LanguageConverter().fromJson)
               .toSet() ??
           const {},
-      contentRating: (json['contentRating'] as List<dynamic>?)
+      contentRating:
+          (json['contentRating'] as List<dynamic>?)
               ?.map((e) => $enumDecode(_$ContentRatingEnumMap, e))
               .toSet() ??
           const {
             ContentRating.safe,
             ContentRating.suggestive,
-            ContentRating.erotica
+            ContentRating.erotica,
           },
       dataSaver: json['dataSaver'] as bool? ?? false,
-      groupBlacklist: (json['groupBlacklist'] as List<dynamic>?)
+      groupBlacklist:
+          (json['groupBlacklist'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toSet() ??
           const {},
     );
 
-Map<String, dynamic> _$$MangaDexConfigImplToJson(
-        _$MangaDexConfigImpl instance) =>
-    <String, dynamic>{
-      'translatedLanguages': instance.translatedLanguages
+Map<String, dynamic> _$MangaDexConfigToJson(
+  _MangaDexConfig instance,
+) => <String, dynamic>{
+  'translatedLanguages':
+      instance.translatedLanguages
           .map(const LanguageConverter().toJson)
           .toList(),
-      'originalLanguage': instance.originalLanguage
-          .map(const LanguageConverter().toJson)
-          .toList(),
-      'contentRating': instance.contentRating
-          .map((e) => _$ContentRatingEnumMap[e]!)
-          .toList(),
-      'dataSaver': instance.dataSaver,
-      'groupBlacklist': instance.groupBlacklist.toList(),
-    };
+  'originalLanguage':
+      instance.originalLanguage.map(const LanguageConverter().toJson).toList(),
+  'contentRating':
+      instance.contentRating.map((e) => _$ContentRatingEnumMap[e]!).toList(),
+  'dataSaver': instance.dataSaver,
+  'groupBlacklist': instance.groupBlacklist.toList(),
+};
 
 const _$ContentRatingEnumMap = {
   ContentRating.safe: 'safe',
@@ -63,18 +66,19 @@ const mdConfigProvider = MdConfigProvider._();
 
 final class MdConfigProvider
     extends $NotifierProvider<MdConfig, MangaDexConfig> {
-  const MdConfigProvider._(
-      {super.runNotifierBuildOverride, MdConfig Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'mdConfigProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const MdConfigProvider._({
+    super.runNotifierBuildOverride,
+    MdConfig Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'mdConfigProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final MdConfig Function()? _createCb;
 
@@ -95,19 +99,14 @@ final class MdConfigProvider
 
   @$internal
   @override
-  MdConfigProvider $copyWithCreate(
-    MdConfig Function() create,
-  ) {
+  MdConfigProvider $copyWithCreate(MdConfig Function() create) {
     return MdConfigProvider._(create: create);
   }
 
   @$internal
   @override
   MdConfigProvider $copyWithBuild(
-    MangaDexConfig Function(
-      Ref,
-      MdConfig,
-    ) build,
+    MangaDexConfig Function(Ref, MdConfig) build,
   ) {
     return MdConfigProvider._(runNotifierBuildOverride: build);
   }
@@ -118,23 +117,32 @@ final class MdConfigProvider
       _$MdConfigElement(this, pointer);
 
   ProviderListenable<MdConfig$Save> get save =>
-      $LazyProxyListenable<MdConfig$Save, MangaDexConfig>(
-        this,
-        (element) {
-          element as _$MdConfigElement;
+      $LazyProxyListenable<MdConfig$Save, MangaDexConfig>(this, (element) {
+        element as _$MdConfigElement;
 
-          return element._$save;
-        },
-      );
+        return element._$save;
+      });
 }
 
-String _$mdConfigHash() => r'1adb0a68f5f631151a2d471a52904ab2fbeedba5';
+String _$mdConfigHash() => r'1960773775590f451cf940bceddd1957277654d4';
 
 abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   MangaDexConfig build();
   @$internal
   @override
-  MangaDexConfig runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<MangaDexConfig>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<MangaDexConfig>,
+              MangaDexConfig,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$MdConfigElement
@@ -150,14 +158,10 @@ class _$MdConfigElement
   }
 
   @override
-  void visitChildren({
-    required void Function(ProviderElement element) elementVisitor,
-    required void Function($ElementLense element) listenableVisitor,
-  }) {
-    super.visitChildren(
-      elementVisitor: elementVisitor,
-      listenableVisitor: listenableVisitor,
-    );
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$save);
   }
@@ -173,15 +177,12 @@ sealed class MdConfig$Save extends MutationBase<MangaDexConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<MangaDexConfig> call(MangaDexConfig update);
+  MangaDexConfig call(MangaDexConfig update);
 }
 
 final class _$MdConfig$Save
@@ -196,22 +197,18 @@ final class _$MdConfig$Save
   $ElementLense<_$MdConfig$Save> get listenable => element._$save;
 
   @override
-  Future<MangaDexConfig> call(MangaDexConfig update) {
-    return mutateAsync(
-      Invocation.method(
-        #save,
-        [update],
-      ),
-      ($notifier) => $notifier.save(
-        update,
-      ),
+  MangaDexConfig call(MangaDexConfig update) {
+    return mutate(
+      Invocation.method(#save, [update]),
+      ($notifier) => $notifier.save(update),
     );
   }
 
   @override
-  _$MdConfig$Save copyWith(MutationState<MangaDexConfig> state,
-          {Object? key}) =>
-      _$MdConfig$Save(element, state: state, key: key);
+  _$MdConfig$Save copyWith(
+    MutationState<MangaDexConfig> state, {
+    Object? key,
+  }) => _$MdConfig$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

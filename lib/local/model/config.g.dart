@@ -6,16 +6,13 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$LocalLibConfigImpl _$$LocalLibConfigImplFromJson(Map<String, dynamic> json) =>
-    _$LocalLibConfigImpl(
+_LocalLibConfig _$LocalLibConfigFromJson(Map<String, dynamic> json) =>
+    _LocalLibConfig(
       libraryDirectory: json['libraryDirectory'] as String? ?? '',
     );
 
-Map<String, dynamic> _$$LocalLibConfigImplToJson(
-        _$LocalLibConfigImpl instance) =>
-    <String, dynamic>{
-      'libraryDirectory': instance.libraryDirectory,
-    };
+Map<String, dynamic> _$LocalLibConfigToJson(_LocalLibConfig instance) =>
+    <String, dynamic>{'libraryDirectory': instance.libraryDirectory};
 
 // **************************************************************************
 // RiverpodGenerator
@@ -26,18 +23,19 @@ const localConfigProvider = LocalConfigProvider._();
 
 final class LocalConfigProvider
     extends $NotifierProvider<LocalConfig, LocalLibConfig> {
-  const LocalConfigProvider._(
-      {super.runNotifierBuildOverride, LocalConfig Function()? create})
-      : _createCb = create,
-        super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'localConfigProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const LocalConfigProvider._({
+    super.runNotifierBuildOverride,
+    LocalConfig Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'localConfigProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
   final LocalConfig Function()? _createCb;
 
@@ -58,19 +56,14 @@ final class LocalConfigProvider
 
   @$internal
   @override
-  LocalConfigProvider $copyWithCreate(
-    LocalConfig Function() create,
-  ) {
+  LocalConfigProvider $copyWithCreate(LocalConfig Function() create) {
     return LocalConfigProvider._(create: create);
   }
 
   @$internal
   @override
   LocalConfigProvider $copyWithBuild(
-    LocalLibConfig Function(
-      Ref,
-      LocalConfig,
-    ) build,
+    LocalLibConfig Function(Ref, LocalConfig) build,
   ) {
     return LocalConfigProvider._(runNotifierBuildOverride: build);
   }
@@ -81,23 +74,32 @@ final class LocalConfigProvider
       _$LocalConfigElement(this, pointer);
 
   ProviderListenable<LocalConfig$Save> get save =>
-      $LazyProxyListenable<LocalConfig$Save, LocalLibConfig>(
-        this,
-        (element) {
-          element as _$LocalConfigElement;
+      $LazyProxyListenable<LocalConfig$Save, LocalLibConfig>(this, (element) {
+        element as _$LocalConfigElement;
 
-          return element._$save;
-        },
-      );
+        return element._$save;
+      });
 }
 
-String _$localConfigHash() => r'fb372f5d9185395eac934b890e8f1c409970d07b';
+String _$localConfigHash() => r'2d256629dac8ccaf6abbfd3d1ef120a1b718a2c1';
 
 abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();
   @$internal
   @override
-  LocalLibConfig runBuild() => build();
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<LocalLibConfig>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<LocalLibConfig>,
+              LocalLibConfig,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
 }
 
 class _$LocalConfigElement
@@ -113,14 +115,10 @@ class _$LocalConfigElement
   }
 
   @override
-  void visitChildren({
-    required void Function(ProviderElement element) elementVisitor,
-    required void Function($ElementLense element) listenableVisitor,
-  }) {
-    super.visitChildren(
-      elementVisitor: elementVisitor,
-      listenableVisitor: listenableVisitor,
-    );
+  void visitListenables(
+    void Function($ElementLense element) listenableVisitor,
+  ) {
+    super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$save);
   }
@@ -136,15 +134,12 @@ sealed class LocalConfig$Save extends MutationBase<LocalLibConfig> {
   /// [SuccessMutationState] or [ErrorMutationState] based on if the method
   /// threw or not.
   ///
-  /// Lastly, if the method completes without throwing, the Notifier's state
-  /// will be updated with the new value.
-  ///
   /// **Note**:
   /// If the notifier threw in its constructor, the mutation won't start
   /// and [call] will throw.
   /// This should generally never happen though, as Notifiers are not supposed
   /// to have logic in their constructors.
-  Future<LocalLibConfig> call(LocalLibConfig update);
+  LocalLibConfig call(LocalLibConfig update);
 }
 
 final class _$LocalConfig$Save
@@ -159,22 +154,18 @@ final class _$LocalConfig$Save
   $ElementLense<_$LocalConfig$Save> get listenable => element._$save;
 
   @override
-  Future<LocalLibConfig> call(LocalLibConfig update) {
-    return mutateAsync(
-      Invocation.method(
-        #save,
-        [update],
-      ),
-      ($notifier) => $notifier.save(
-        update,
-      ),
+  LocalLibConfig call(LocalLibConfig update) {
+    return mutate(
+      Invocation.method(#save, [update]),
+      ($notifier) => $notifier.save(update),
     );
   }
 
   @override
-  _$LocalConfig$Save copyWith(MutationState<LocalLibConfig> state,
-          {Object? key}) =>
-      _$LocalConfig$Save(element, state: state, key: key);
+  _$LocalConfig$Save copyWith(
+    MutationState<LocalLibConfig> state, {
+    Object? key,
+  }) => _$LocalConfig$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

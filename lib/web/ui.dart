@@ -20,7 +20,7 @@ Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
       messenger
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(
-          content: Text('ui.unsupportedUrl'.tr(context: context)),
+          content: Text('errors.unsupportedUrl'.tr(context: context)),
           backgroundColor: Colors.red,
         ));
     }

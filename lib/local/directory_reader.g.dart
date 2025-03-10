@@ -9,29 +9,27 @@ part of 'directory_reader.dart';
 @ProviderFor(_getDirectoryPages)
 const _getDirectoryPagesProvider = _GetDirectoryPagesFamily._();
 
-final class _GetDirectoryPagesProvider extends $FunctionalProvider<
-        AsyncValue<List<ReaderPage>>, FutureOr<List<ReaderPage>>>
+final class _GetDirectoryPagesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ReaderPage>>,
+          FutureOr<List<ReaderPage>>
+        >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
-  const _GetDirectoryPagesProvider._(
-      {required _GetDirectoryPagesFamily super.from,
-      required String super.argument,
-      FutureOr<List<ReaderPage>> Function(
-        Ref ref,
-        String path,
-      )? create})
-      : _createCb = create,
-        super(
-          retry: null,
-          name: r'_getDirectoryPagesProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          allTransitiveDependencies: null,
-        );
+  const _GetDirectoryPagesProvider._({
+    required _GetDirectoryPagesFamily super.from,
+    required String super.argument,
+    FutureOr<List<ReaderPage>> Function(Ref ref, String path)? create,
+  }) : _createCb = create,
+       super(
+         retry: null,
+         name: r'_getDirectoryPagesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
 
-  final FutureOr<List<ReaderPage>> Function(
-    Ref ref,
-    String path,
-  )? _createCb;
+  final FutureOr<List<ReaderPage>> Function(Ref ref, String path)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$getDirectoryPagesHash();
@@ -46,33 +44,25 @@ final class _GetDirectoryPagesProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ReaderPage>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(this, pointer);
 
   @override
   _GetDirectoryPagesProvider $copyWithCreate(
-    FutureOr<List<ReaderPage>> Function(
-      Ref ref,
-    ) create,
+    FutureOr<List<ReaderPage>> Function(Ref ref) create,
   ) {
     return _GetDirectoryPagesProvider._(
-        argument: argument as String,
-        from: from! as _GetDirectoryPagesFamily,
-        create: (
-          ref,
-          String path,
-        ) =>
-            create(ref));
+      argument: argument as String,
+      from: from! as _GetDirectoryPagesFamily,
+      create: (ref, String path) => create(ref),
+    );
   }
 
   @override
   FutureOr<List<ReaderPage>> create(Ref ref) {
     final _$cb = _createCb ?? _getDirectoryPages;
     final argument = this.argument as String;
-    return _$cb(
-      ref,
-      argument,
-    );
+    return _$cb(ref, argument);
   }
 
   @override
@@ -90,17 +80,15 @@ String _$getDirectoryPagesHash() => r'599be990d7fb9529e4c9f52cd1d9057e839a3eab';
 
 final class _GetDirectoryPagesFamily extends Family {
   const _GetDirectoryPagesFamily._()
-      : super(
-          retry: null,
-          name: r'_getDirectoryPagesProvider',
-          dependencies: null,
-          allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'_getDirectoryPagesProvider',
+        dependencies: null,
+        allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  _GetDirectoryPagesProvider call(
-    String path,
-  ) =>
+  _GetDirectoryPagesProvider call(String path) =>
       _GetDirectoryPagesProvider._(argument: path, from: this);
 
   @override
@@ -111,10 +99,7 @@ final class _GetDirectoryPagesFamily extends Family {
 
   /// {@macro riverpod.override_with}
   Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(
-      Ref ref,
-      String args,
-    ) create,
+    FutureOr<List<ReaderPage>> Function(Ref ref, String args) create,
   ) {
     return $FamilyOverride(
       from: this,
@@ -130,5 +115,6 @@ final class _GetDirectoryPagesFamily extends Family {
     );
   }
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

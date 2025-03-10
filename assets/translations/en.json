@@ -1,8 +1,4 @@
 {
-  "pageNotFound": {
-    "header": "Page Not Found",
-    "error": "Can't find a page for: {}"
-  },
   "ui": {
     "add": "Add",
     "addNew": "Add New",
@@ -33,7 +29,9 @@
     "copyClipboard": "Copied to clipboard!",
     "pasteClipboard": "Paste from Clipboard",
     "dragHint": "Hint: Drag to reorder",
-    "makeDefault": "Make Default"
+    "makeDefault": "Make Default",
+    "retry": "Retry",
+    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE"
   },
   "errors": {
     "noresults": "No results",
@@ -44,7 +42,12 @@
     "noitems": "No items",
     "unsupportedUrl": "Unsupported URL",
     "loginFail": "Failed to login: {}",
-    "notLoggedIn": "Operation failed. User not logged in"
+    "notLoggedIn": "Operation failed. User not logged in",
+    "unsupportedSource": "Unsupported extension type",
+    "unknownSourceID": "Unknown source ID {}",
+    "fetchFail": "Something went wrong while fetching a new page",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundArg": "Can't find a page for: {}"
   },
   "auth": {
     "login": "Login",
@@ -67,7 +70,8 @@
   "library": "Library",
   "history": {
     "text": "History",
-    "clear": "Clear History"
+    "clear": "Clear History",
+    "clearWarning": "Are you sure you want to remove all history?"
   },
   "localLibrary": {
     "text": "Local Library",
@@ -97,10 +101,10 @@
   },
   "webSources": {
     "text": "Web Sources",
+    "home": "Home",
+    "homepages": "Homepages",
     "openUrl": "Open URL",
     "settings": {
-      "sourcePath": "Sources Path",
-      "sourcePathDesc": "Choose where to store your downloaded sources",
       "repos": "Repos",
       "reposDesc": "Configure source repos",
       "categories": "Categories",
@@ -117,25 +121,31 @@
       "newRepo": "@:ui.addNew Repo",
       "browser": "View in browser",
       "add": "@:ui.add Repo",
+      "addConfirm": "Are you sure you want to add the repo {}?",
       "addWarning": "Ensure that you are only adding trusted sources!",
-      "urlHint": ".json repo URL",
+      "urlHint": "Repo URL",
+      "nameHint": "Repo Name",
       "urlEmptyWarning": "URL cannot be empty",
-      "urlInvalidWarning": "URL must be a .json file"
+      "nameEmptyWarning": "Name cannot be empty",
+      "urlInvalidWarning": "Must be a valid URL",
+      "repoAddOK": "Repo added",
+      "repoExists": "Repo already exists",
+      "missingRepo": "Missing Repo"
     },
     "source": {
-      "manager": "Source Manager",
-      "noDirWarning": "Please set a directory for source storage",
-      "noRepoDataWarning": "No repo data. Showing installed sources only",
+      "settings": "Extension Settings",
+      "manager": "Extension Manager",
+      "noDataWarning": "No repos nor extensions installed!",
       "refresh": "Refresh repos",
       "delete": "@:ui.delete {}",
       "add": "@:ui.add {}",
       "update": "Update/Replace {}",
-      "sourceDeleteOK": "Source deleted",
-      "sourceUpdateOK": "Source updated",
-      "sourceAddOK": "Source updated",
+      "sourceDeleteOK": "Extension disabled",
+      "sourceUpdateOK": "Extension updated",
+      "sourceAddOK": "Extension enabled",
       "installedVersion": " (installed: v{})"
     },
-    "noSourcesWarning": "No sources installed!",
+    "noSourcesWarning": "No extensions installed!",
     "sourceSearch": "Source Search",
     "resetRead": "Reset Read Markers",
     "resetReadWarning": "Are you sure you want to reset all read markers for this manga?",
@@ -150,9 +160,11 @@
     "resetFilters": "Reset Filters",
     "applyFilters": "Apply Filters",
     "selectedTagFilters": "Selected Tag Filters",
+    "filterTags": "Filter tags",
     "otherOptions": "Other Options",
     "inclusion": "Inclusion Mode",
-    "exclusion": "Exclusion Mode"
+    "exclusion": "Exclusion Mode",
+    "any": "Any"
   },
   "settings": "Settings",
   "arg_settings": "{} @:settings",
@@ -229,7 +241,6 @@
     "deleteListOk": "List deleted",
     "deleteListError": "Failed to delete list: {}",
     "deleteListWarning": "Are you sure you want to permanently delete '{}'?",
-    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
     "privateList": "Private list",
     "newList": "New List",
     "newListOk": "New list created",
@@ -431,5 +442,11 @@
     "orange": "Orange",
     "yellow": "Yellow",
     "purple": "Purple"
+  },
+  "cache": {
+    "clear": "Clear Cache",
+    "clearSub": "Deletes all cached data. ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING!",
+    "clearWarning": "Are you sure you want to delete all cached data?",
+    "clearSuccess": "Cache cleared"
   }
 }

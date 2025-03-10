@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,9 @@ import 'package:gagaku/local/widgets.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class LocalLibraryHome extends StatelessWidget {
-  const LocalLibraryHome({super.key});
+@RoutePage()
+class LocalLibraryHomeScreen extends StatelessWidget {
+  const LocalLibraryHomeScreen({super.key});
 
   Future<PlatformFile?> _pickMangaArchive() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -51,17 +53,18 @@ class LocalLibraryHome extends StatelessWidget {
             spacing: 8.0,
             children: [
               MenuAnchor(
-                builder: (context, controller, child) => IconButton(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  icon: const Icon(Icons.more_vert),
-                ),
+                builder:
+                    (context, controller, child) => IconButton(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      onPressed: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                      icon: const Icon(Icons.more_vert),
+                    ),
                 menuChildren: [
                   MenuItemButton(
                     onPressed: () async {
@@ -86,7 +89,7 @@ class LocalLibraryHome extends StatelessWidget {
       drawer: const MainDrawer(),
       body: HookConsumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          final settings = ref.watch(localConfigProvider);
+          final libDir = ref.watch(localConfigProvider.select((c) => c.libraryDirectory));
           final libraryProvider = ref.watch(localLibraryProvider);
           final sort = ref.watch(librarySortTypeProvider);
           final currentItem = useState<LocalLibraryItem?>(libraryProvider.value);
@@ -114,7 +117,7 @@ class LocalLibraryHome extends StatelessWidget {
             return null;
           }, [currentItem.value, sort]);
 
-          if (settings.libraryDirectory.isEmpty) {
+          if (libDir.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -145,54 +148,63 @@ class LocalLibraryHome extends StatelessWidget {
             onRefresh: () async => ref.refresh(localLibraryProvider.future),
             child: switch (libraryProvider) {
               AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                  error: error,
-                  stackTrace: stackTrace,
-                  message: "localLibraryProvider failed",
-                ),
+                error: error,
+                stackTrace: stackTrace,
+                message: "localLibraryProvider failed",
+              ),
               AsyncValue(value: final top?) when top.error != null => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10.0,
-                    children: [
-                      Text(top.error!),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          await _readArchive(nav);
-                        },
-                        icon: const Icon(Icons.folder_open),
-                        label: Text('localLibrary.readArchive'.tr(context: context)),
-                      ),
-                    ],
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10.0,
+                  children: [
+                    Text(top.error!),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await _readArchive(nav);
+                      },
+                      icon: const Icon(Icons.folder_open),
+                      label: Text('localLibrary.readArchive'.tr(context: context)),
+                    ),
+                  ],
                 ),
+              ),
               AsyncValue(value: final top?) when currentItem.value != null => LibraryListWidget(
-                  title: Text(
-                    currentItem.value!.path,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                  item: currentItem.value!,
-                  onTap: (item) {
-                    if (item.isReadable) {
-                      switch (item.type) {
-                        case LibraryItemType.directory:
-                          nav.push(DirectoryReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
-                          break;
-                        case LibraryItemType.archive:
-                          nav.push(ArchiveReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
-                          break;
-                      }
-                    } else {
-                      currentItem.value = item;
+                title: Text(currentItem.value!.path, style: const TextStyle(fontSize: 24)),
+                item: currentItem.value!,
+                onTap: (item) {
+                  if (item.isReadable) {
+                    switch (item.type) {
+                      case LibraryItemType.directory:
+                        nav.push(DirectoryReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
+                        break;
+                      case LibraryItemType.archive:
+                        nav.push(ArchiveReaderRouteBuilder(path: item.path, title: item.name ?? item.path));
+                        break;
                     }
-                  },
-                ),
+                  } else {
+                    currentItem.value = item;
+                  }
+                },
+              ),
               AsyncValue(value: final top?) => const ListSpinner(),
               AsyncValue(:final progress) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'localLibrary.scanning'.tr(context: context),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 18,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    CircularProgressIndicator(value: progress?.toDouble()),
+                    if (progress != null)
                       Text(
-                        'localLibrary.scanning'.tr(context: context),
+                        '${(progress * 100).floor()}%',
                         style: TextStyle(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.normal,
@@ -200,23 +212,9 @@ class LocalLibraryHome extends StatelessWidget {
                           decoration: TextDecoration.none,
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      CircularProgressIndicator(value: progress?.toDouble()),
-                      if (progress != null)
-                        Text(
-                          '${(progress * 100).floor()}%',
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18,
-                            decoration: TextDecoration.none,
-                          ),
-                        )
-                    ],
-                  ),
+                  ],
                 ),
+              ),
             },
           );
         },

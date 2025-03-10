@@ -16,6 +16,7 @@ Gagaku is licensed under the MIT license.
 
 - MangaDex client
 - Local CBZ/CBT file support, directory cataloging/scanning
+- Basic PB extension support (not all features supported)
 - cubari.moe links
 - Deep link support
   - Android only, supports mangadex.org/cubari.moe links
@@ -31,6 +32,10 @@ Gagaku does NOT feature:
 Install [Flutter](https://flutter.dev/) and all of its requirements for the platform(s) you wish to build for
 
 ```bash
+cd extension/
+npm ci
+npm run deploy
+cd ..
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter build <windows/linux/apk etc>

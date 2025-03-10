@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/model/types.dart' show RepoInfo;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const _urlStartValidation = 'http';
-const _urlEndValidation = '.json';
 
 class RepoListManager extends HookConsumerWidget {
   const RepoListManager({super.key});
@@ -16,7 +16,9 @@ class RepoListManager extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
-    final list = useState(ref.watch(webConfigProvider.select((c) => c.repoList)));
+    final list = useState(
+      ref.watch(webConfigProvider.select((c) => c.repoList)),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -25,11 +27,12 @@ class RepoListManager extends HookConsumerWidget {
           IconButton(
             tooltip: 'webSources.repo.newRepo'.tr(context: context),
             onPressed: () async {
-              final result = await showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const NewRepoDialog();
-                  });
+              final result = await showDialog<RepoInfo>(
+                context: context,
+                builder: (BuildContext context) {
+                  return const NewRepoDialog();
+                },
+              );
 
               if (result != null && context.mounted) {
                 list.value = [...list.value, result];
@@ -48,41 +51,46 @@ class RepoListManager extends HookConsumerWidget {
         ],
       ),
       body: Center(
-        child: list.value.isEmpty
-            ? Text('errors.norepos'.tr(context: context))
-            : ListView.builder(
-                itemCount: list.value.length,
-                itemBuilder: (context, index) {
-                  final item = list.value.elementAt(index);
-                  return Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.cloud_download),
-                      title: Text(item),
-                      trailing: OverflowBar(
-                        children: [
-                          IconButton(
-                            tooltip: 'webSources.repo.browser'.tr(context: context),
-                            onPressed: () async {
-                              if (!await launchUrl(Uri.parse(item))) {
-                                throw 'Could not launch $item';
-                              }
-                            },
-                            icon: const Icon(Icons.open_in_new),
-                          ),
-                          IconButton(
-                            tooltip: 'ui.delete'.tr(context: context),
-                            onPressed: () {
-                              list.value.remove(item);
-                              list.value = [...list.value];
-                            },
-                            icon: const Icon(Icons.delete),
-                          ),
-                        ],
+        child:
+            list.value.isEmpty
+                ? Text('errors.norepos'.tr(context: context))
+                : ListView.builder(
+                  itemCount: list.value.length,
+                  itemBuilder: (context, index) {
+                    final item = list.value.elementAt(index);
+                    return Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.cloud_download),
+                        title: Text(item.name),
+                        subtitle: Text(item.url),
+                        trailing: OverflowBar(
+                          children: [
+                            IconButton(
+                              tooltip: 'webSources.repo.browser'.tr(
+                                context: context,
+                              ),
+                              onPressed: () async {
+                                if (!await launchUrl(Uri.parse(item.url))) {
+                                  throw 'Could not launch $item';
+                                }
+                              },
+                              icon: const Icon(Icons.open_in_new),
+                            ),
+                            IconButton(
+                              tooltip: 'ui.delete'.tr(context: context),
+                              onPressed: () {
+                                list.value = [
+                                  ...list.value.where((e) => e.url != item.url),
+                                ];
+                              },
+                              icon: const Icon(Icons.delete),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
       ),
     );
   }
@@ -93,6 +101,7 @@ class NewRepoDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final nameFieldController = useTextEditingController();
     final urlFieldController = useTextEditingController();
 
     return AlertDialog(
@@ -102,17 +111,35 @@ class NewRepoDialog extends HookWidget {
         children: [
           Text('webSources.repo.addWarning'.tr(context: context)),
           TextFormField(
-            controller: urlFieldController,
-            decoration: InputDecoration(hintText: 'webSources.repo.urlHint'.tr(context: context)),
+            controller: nameFieldController,
+            decoration: InputDecoration(
+              hintText: 'webSources.repo.nameHint'.tr(context: context),
+            ),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (String? value) {
-              if (value == null || value.isEmpty) return 'webSources.repo.urlEmptyWarning'.tr(context: context);
+              if (value == null || value.isEmpty) {
+                return 'webSources.repo.nameEmptyWarning'.tr(context: context);
+              }
 
-              return value.startsWith(_urlStartValidation) && value.endsWith(_urlEndValidation)
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: urlFieldController,
+            decoration: InputDecoration(
+              hintText: 'webSources.repo.urlHint'.tr(context: context),
+            ),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (String? value) {
+              if (value == null || value.isEmpty) {
+                return 'webSources.repo.urlEmptyWarning'.tr(context: context);
+              }
+
+              return value.startsWith(_urlStartValidation)
                   ? null
                   : 'webSources.repo.urlInvalidWarning'.tr(context: context);
             },
-          )
+          ),
         ],
       ),
       actions: <Widget>[
@@ -134,19 +161,30 @@ class NewRepoDialog extends HookWidget {
         ),
         HookBuilder(
           builder: (_) {
+            final nameIsValid = useListenableSelector(
+              nameFieldController,
+              () => nameFieldController.text.isNotEmpty,
+            );
             final urlIsValid = useListenableSelector(
-                urlFieldController,
-                () =>
-                    urlFieldController.text.isNotEmpty &&
-                    urlFieldController.text.startsWith(_urlStartValidation) &&
-                    urlFieldController.text.endsWith(_urlEndValidation));
+              urlFieldController,
+              () =>
+                  urlFieldController.text.isNotEmpty &&
+                  urlFieldController.text.startsWith(_urlStartValidation),
+            );
             return ElevatedButton(
-              onPressed: urlIsValid
-                  ? () {
-                      Navigator.of(context).pop(urlFieldController.text);
-                      urlFieldController.clear();
-                    }
-                  : null,
+              onPressed:
+                  urlIsValid && nameIsValid
+                      ? () {
+                        Navigator.of(context).pop(
+                          RepoInfo(
+                            name: nameFieldController.text,
+                            url: urlFieldController.text,
+                          ),
+                        );
+                        nameFieldController.clear();
+                        urlFieldController.clear();
+                      }
+                      : null,
               child: Text('ui.add'.tr(context: context)),
             );
           },
