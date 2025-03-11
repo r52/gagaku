@@ -6,14 +6,18 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
 
-const _baseUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0';
+const _baseUserAgent =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0';
 
 http.Client _createHttpClient([bool useCustomUA = false]) {
   final userAgent = useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
 
   if (Platform.isAndroid) {
-    final engine =
-        CronetEngine.build(cacheMode: CacheMode.memory, cacheMaxSize: 10 * 1024 * 1024, userAgent: userAgent);
+    final engine = CronetEngine.build(
+      cacheMode: CacheMode.memory,
+      cacheMaxSize: 10 * 1024 * 1024,
+      userAgent: userAgent,
+    );
     return CronetClient.fromCronetEngine(engine, closeEngine: true);
   }
 
@@ -44,12 +48,14 @@ class CustomClient extends http.BaseClient {
   final http.Client _baseClient;
 
   CustomClient({bool useCustomUA = false})
-      : _baseClient = RetryClient(
-          _createHttpClient(useCustomUA),
-          retries: 2,
-          when: (response) => false,
-          whenError: (error, stacktrace) => error is HttpException || error is http.ClientException,
-        );
+    : _baseClient = RetryClient(
+        _createHttpClient(useCustomUA),
+        retries: 2,
+        when: (response) => false,
+        whenError:
+            (error, stacktrace) =>
+                error is HttpException || error is http.ClientException,
+      );
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
