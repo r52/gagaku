@@ -710,6 +710,24 @@ class ExtensionSource extends _$ExtensionSource {
                 .setState(sourceId, data.args[0], data.args[1]);
           },
         );
+
+        controller.addJavaScriptHandler(
+          handlerName: 'getSecureState',
+          callback: (JavaScriptHandlerFunctionData data) {
+            return ref
+                .read(extensionSecureStateProvider.notifier)
+                .getState(sourceId, data.args[0]);
+          },
+        );
+
+        controller.addJavaScriptHandler(
+          handlerName: 'setSecureState',
+          callback: (JavaScriptHandlerFunctionData data) {
+            ref
+                .read(extensionSecureStateProvider.notifier)
+                .setState(sourceId, data.args[0], data.args[1]);
+          },
+        );
       },
       onConsoleMessage: (controller, consoleMessage) {
         logger.d('Console Message: ${consoleMessage.message}');
