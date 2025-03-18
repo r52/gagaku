@@ -561,7 +561,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       route = ExtensionReaderRoute(
         source: handle.source,
         mangaId: handle.location,
-        chapterId: data.chapter.groups.entries.first.value,
+        chapterId: (data.chapter.groups.entries.first.value as Chapter).id,
         readerData: readerData,
       );
     }

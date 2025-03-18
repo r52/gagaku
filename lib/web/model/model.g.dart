@@ -1216,7 +1216,7 @@ final class _$WebReadMarkers$DeleteKey
 const extensionSourceProvider = ExtensionSourceFamily._();
 
 final class ExtensionSourceProvider
-    extends $AsyncNotifierProvider<ExtensionSource, SourceIdentifier> {
+    extends $AsyncNotifierProvider<ExtensionSource, WebSourceInfo> {
   const ExtensionSourceProvider._({
     required ExtensionSourceFamily super.from,
     required String super.argument,
@@ -1260,7 +1260,7 @@ final class ExtensionSourceProvider
   @$internal
   @override
   ExtensionSourceProvider $copyWithBuild(
-    FutureOr<SourceIdentifier> Function(Ref, ExtensionSource) build,
+    FutureOr<WebSourceInfo> Function(Ref, ExtensionSource) build,
   ) {
     return ExtensionSourceProvider._(
       argument: argument as String,
@@ -1271,9 +1271,9 @@ final class ExtensionSourceProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<ExtensionSource, SourceIdentifier>
-  $createElement($ProviderPointer pointer) =>
-      $AsyncNotifierProviderElement(this, pointer);
+  $AsyncNotifierProviderElement<ExtensionSource, WebSourceInfo> $createElement(
+    $ProviderPointer pointer,
+  ) => $AsyncNotifierProviderElement(this, pointer);
 
   @override
   bool operator ==(Object other) {
@@ -1286,7 +1286,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'3d9070df3a875f204cefc14080b48d1d1ef1e79d';
+String _$extensionSourceHash() => r'cbf89c7430842c83d3aec619908caab7dee03886';
 
 final class ExtensionSourceFamily extends Family {
   const ExtensionSourceFamily._()
@@ -1325,7 +1325,7 @@ final class ExtensionSourceFamily extends Family {
 
   /// {@macro riverpod.override_with_build}
   Override overrideWithBuild(
-    FutureOr<SourceIdentifier> Function(
+    FutureOr<WebSourceInfo> Function(
       Ref ref,
       ExtensionSource notifier,
       String argument,
@@ -1347,21 +1347,21 @@ final class ExtensionSourceFamily extends Family {
   }
 }
 
-abstract class _$ExtensionSource extends $AsyncNotifier<SourceIdentifier> {
+abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
   late final _$args = ref.$arg as String;
   String get sourceId => _$args;
 
-  FutureOr<SourceIdentifier> build(String sourceId);
+  FutureOr<WebSourceInfo> build(String sourceId);
   @$internal
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref = this.ref as $Ref<AsyncValue<SourceIdentifier>>;
+    final ref = this.ref as $Ref<AsyncValue<WebSourceInfo>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<SourceIdentifier>>,
-              AsyncValue<SourceIdentifier>,
+              NotifierBase<AsyncValue<WebSourceInfo>>,
+              AsyncValue<WebSourceInfo>,
               Object?,
               Object?
             >;
@@ -1373,7 +1373,7 @@ abstract class _$ExtensionSource extends $AsyncNotifier<SourceIdentifier> {
 const extensionInfoListProvider = ExtensionInfoListProvider._();
 
 final class ExtensionInfoListProvider
-    extends $AsyncNotifierProvider<ExtensionInfoList, List<SourceIdentifier>> {
+    extends $AsyncNotifierProvider<ExtensionInfoList, List<WebSourceInfo>> {
   const ExtensionInfoListProvider._({
     super.runNotifierBuildOverride,
     ExtensionInfoList Function()? create,
@@ -1408,33 +1408,32 @@ final class ExtensionInfoListProvider
   @$internal
   @override
   ExtensionInfoListProvider $copyWithBuild(
-    FutureOr<List<SourceIdentifier>> Function(Ref, ExtensionInfoList) build,
+    FutureOr<List<WebSourceInfo>> Function(Ref, ExtensionInfoList) build,
   ) {
     return ExtensionInfoListProvider._(runNotifierBuildOverride: build);
   }
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<ExtensionInfoList, List<SourceIdentifier>>
+  $AsyncNotifierProviderElement<ExtensionInfoList, List<WebSourceInfo>>
   $createElement($ProviderPointer pointer) =>
       $AsyncNotifierProviderElement(this, pointer);
 }
 
-String _$extensionInfoListHash() => r'bfc269003680eb97cf6bac32bc0a8e298adabcef';
+String _$extensionInfoListHash() => r'0665e8257c6673036644f3e598bf43e023b1bd12';
 
-abstract class _$ExtensionInfoList
-    extends $AsyncNotifier<List<SourceIdentifier>> {
-  FutureOr<List<SourceIdentifier>> build();
+abstract class _$ExtensionInfoList extends $AsyncNotifier<List<WebSourceInfo>> {
+  FutureOr<List<WebSourceInfo>> build();
   @$internal
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<List<SourceIdentifier>>>;
+    final ref = this.ref as $Ref<AsyncValue<List<WebSourceInfo>>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<List<SourceIdentifier>>>,
-              AsyncValue<List<SourceIdentifier>>,
+              NotifierBase<AsyncValue<List<WebSourceInfo>>>,
+              AsyncValue<List<WebSourceInfo>>,
               Object?,
               Object?
             >;

@@ -304,7 +304,7 @@ as String?,
 /// @nodoc
 mixin _$WebManga {
 
- String get title; String get description; String get artist; String get author; String get cover; Map<String, String>? get groups; Map<String, WebChapter> get chapters;
+ String get title; String get description; String get artist; String get author; String get cover; Map<String, String>? get groups; Map<String, WebChapter> get chapters; dynamic get data;
 /// Create a copy of WebManga
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -317,16 +317,16 @@ $WebMangaCopyWith<WebManga> get copyWith => _$WebMangaCopyWithImpl<WebManga>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebManga&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.cover, cover) || other.cover == cover)&&const DeepCollectionEquality().equals(other.groups, groups)&&const DeepCollectionEquality().equals(other.chapters, chapters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebManga&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.cover, cover) || other.cover == cover)&&const DeepCollectionEquality().equals(other.groups, groups)&&const DeepCollectionEquality().equals(other.chapters, chapters)&&const DeepCollectionEquality().equals(other.data, data));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,description,artist,author,cover,const DeepCollectionEquality().hash(groups),const DeepCollectionEquality().hash(chapters));
+int get hashCode => Object.hash(runtimeType,title,description,artist,author,cover,const DeepCollectionEquality().hash(groups),const DeepCollectionEquality().hash(chapters),const DeepCollectionEquality().hash(data));
 
 @override
 String toString() {
-  return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, chapters: $chapters)';
+  return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, chapters: $chapters, data: $data)';
 }
 
 
@@ -337,7 +337,7 @@ abstract mixin class $WebMangaCopyWith<$Res>  {
   factory $WebMangaCopyWith(WebManga value, $Res Function(WebManga) _then) = _$WebMangaCopyWithImpl;
 @useResult
 $Res call({
- String title, String description, String artist, String author, String cover, Map<String, String>? groups, Map<String, WebChapter> chapters
+ String title, String description, String artist, String author, String cover, Map<String, String>? groups, Map<String, WebChapter> chapters, dynamic data
 });
 
 
@@ -354,7 +354,7 @@ class _$WebMangaCopyWithImpl<$Res>
 
 /// Create a copy of WebManga
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = null,Object? artist = null,Object? author = null,Object? cover = null,Object? groups = freezed,Object? chapters = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = null,Object? artist = null,Object? author = null,Object? cover = null,Object? groups = freezed,Object? chapters = null,Object? data = freezed,}) {
   return _then(_self.copyWith(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -363,7 +363,8 @@ as String,author: null == author ? _self.author : author // ignore: cast_nullabl
 as String,cover: null == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
 as String,groups: freezed == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
-as Map<String, WebChapter>,
+as Map<String, WebChapter>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as dynamic,
   ));
 }
 
@@ -374,7 +375,7 @@ as Map<String, WebChapter>,
 @JsonSerializable()
 
 class _WebManga extends WebManga {
-  const _WebManga({required this.title, required this.description, required this.artist, required this.author, required this.cover, final  Map<String, String>? groups, required final  Map<String, WebChapter> chapters}): _groups = groups,_chapters = chapters,super._();
+  const _WebManga({required this.title, required this.description, required this.artist, required this.author, required this.cover, final  Map<String, String>? groups, required final  Map<String, WebChapter> chapters, this.data}): _groups = groups,_chapters = chapters,super._();
   factory _WebManga.fromJson(Map<String, dynamic> json) => _$WebMangaFromJson(json);
 
 @override final  String title;
@@ -398,6 +399,7 @@ class _WebManga extends WebManga {
   return EqualUnmodifiableMapView(_chapters);
 }
 
+@override final  dynamic data;
 
 /// Create a copy of WebManga
 /// with the given fields replaced by the non-null parameter values.
@@ -412,16 +414,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebManga&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.cover, cover) || other.cover == cover)&&const DeepCollectionEquality().equals(other._groups, _groups)&&const DeepCollectionEquality().equals(other._chapters, _chapters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebManga&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.cover, cover) || other.cover == cover)&&const DeepCollectionEquality().equals(other._groups, _groups)&&const DeepCollectionEquality().equals(other._chapters, _chapters)&&const DeepCollectionEquality().equals(other.data, data));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,description,artist,author,cover,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_chapters));
+int get hashCode => Object.hash(runtimeType,title,description,artist,author,cover,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_chapters),const DeepCollectionEquality().hash(data));
 
 @override
 String toString() {
-  return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, chapters: $chapters)';
+  return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, chapters: $chapters, data: $data)';
 }
 
 
@@ -432,7 +434,7 @@ abstract mixin class _$WebMangaCopyWith<$Res> implements $WebMangaCopyWith<$Res>
   factory _$WebMangaCopyWith(_WebManga value, $Res Function(_WebManga) _then) = __$WebMangaCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String description, String artist, String author, String cover, Map<String, String>? groups, Map<String, WebChapter> chapters
+ String title, String description, String artist, String author, String cover, Map<String, String>? groups, Map<String, WebChapter> chapters, dynamic data
 });
 
 
@@ -449,7 +451,7 @@ class __$WebMangaCopyWithImpl<$Res>
 
 /// Create a copy of WebManga
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = null,Object? artist = null,Object? author = null,Object? cover = null,Object? groups = freezed,Object? chapters = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = null,Object? artist = null,Object? author = null,Object? cover = null,Object? groups = freezed,Object? chapters = null,Object? data = freezed,}) {
   return _then(_WebManga(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -458,7 +460,8 @@ as String,author: null == author ? _self.author : author // ignore: cast_nullabl
 as String,cover: null == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
 as String,groups: freezed == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,chapters: null == chapters ? _self._chapters : chapters // ignore: cast_nullable_to_non_nullable
-as Map<String, WebChapter>,
+as Map<String, WebChapter>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as dynamic,
   ));
 }
 
@@ -469,7 +472,7 @@ as Map<String, WebChapter>,
 /// @nodoc
 mixin _$WebChapter {
 
- String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate; Map<String, dynamic> get groups;
+ String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate; Map<String, dynamic> get groups; dynamic get data;
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -482,16 +485,16 @@ $WebChapterCopyWith<WebChapter> get copyWith => _$WebChapterCopyWithImpl<WebChap
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups)&&const DeepCollectionEquality().equals(other.data, data));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups));
+int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups),const DeepCollectionEquality().hash(data));
 
 @override
 String toString() {
-  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
+  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups, data: $data)';
 }
 
 
@@ -502,7 +505,7 @@ abstract mixin class $WebChapterCopyWith<$Res>  {
   factory $WebChapterCopyWith(WebChapter value, $Res Function(WebChapter) _then) = _$WebChapterCopyWithImpl;
 @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups, dynamic data
 });
 
 
@@ -519,14 +522,15 @@ class _$WebChapterCopyWithImpl<$Res>
 
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,Object? data = freezed,}) {
   return _then(_self.copyWith(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,releaseDate: freezed == releaseDate ? _self.releaseDate : releaseDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,groups: null == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+as Map<String, dynamic>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as dynamic,
   ));
 }
 
@@ -537,7 +541,7 @@ as Map<String, dynamic>,
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _WebChapter extends WebChapter {
-  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required final  Map<String, dynamic> groups}): _groups = groups,super._();
+  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required final  Map<String, dynamic> groups, this.data}): _groups = groups,super._();
   factory _WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
 
 @override final  String? title;
@@ -551,6 +555,7 @@ class _WebChapter extends WebChapter {
   return EqualUnmodifiableMapView(_groups);
 }
 
+@override final  dynamic data;
 
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
@@ -565,16 +570,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other._groups, _groups));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other._groups, _groups)&&const DeepCollectionEquality().equals(other.data, data));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(_groups));
+int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(data));
 
 @override
 String toString() {
-  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
+  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups, data: $data)';
 }
 
 
@@ -585,7 +590,7 @@ abstract mixin class _$WebChapterCopyWith<$Res> implements $WebChapterCopyWith<$
   factory _$WebChapterCopyWith(_WebChapter value, $Res Function(_WebChapter) _then) = __$WebChapterCopyWithImpl;
 @override @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups, dynamic data
 });
 
 
@@ -602,14 +607,15 @@ class __$WebChapterCopyWithImpl<$Res>
 
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,Object? data = freezed,}) {
   return _then(_WebChapter(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,releaseDate: freezed == releaseDate ? _self.releaseDate : releaseDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,groups: null == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+as Map<String, dynamic>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as dynamic,
   ));
 }
 
@@ -756,7 +762,7 @@ as String,
 /// @nodoc
 mixin _$WebSourceInfo {
 
- String get id; String get name; String get repo; SupportedVersion get version; String? get icon;
+ String get id; String get name; String get repo; SupportedVersion get version; String get icon;@SourceIntentParser() List<SourceIntents> get capabilities;
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -769,16 +775,16 @@ $WebSourceInfoCopyWith<WebSourceInfo> get copyWith => _$WebSourceInfoCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon);
+int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon,const DeepCollectionEquality().hash(capabilities));
 
 @override
 String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon)';
+  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon, capabilities: $capabilities)';
 }
 
 
@@ -789,7 +795,7 @@ abstract mixin class $WebSourceInfoCopyWith<$Res>  {
   factory $WebSourceInfoCopyWith(WebSourceInfo value, $Res Function(WebSourceInfo) _then) = _$WebSourceInfoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String repo, SupportedVersion version, String? icon
+ String id, String name, String repo, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
 });
 
 
@@ -806,14 +812,15 @@ class _$WebSourceInfoCopyWithImpl<$Res>
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
 as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
-as SupportedVersion,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as String?,
+as SupportedVersion,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,capabilities: null == capabilities ? _self.capabilities : capabilities // ignore: cast_nullable_to_non_nullable
+as List<SourceIntents>,
   ));
 }
 
@@ -823,15 +830,22 @@ as String?,
 /// @nodoc
 @JsonSerializable()
 
-class _WebSourceInfo implements WebSourceInfo {
-  const _WebSourceInfo({required this.id, required this.name, required this.repo, this.version = SupportedVersion.v0_8, this.icon});
+class _WebSourceInfo extends WebSourceInfo {
+  const _WebSourceInfo({required this.id, required this.name, required this.repo, this.version = SupportedVersion.v0_8, required this.icon, @SourceIntentParser() final  List<SourceIntents> capabilities = const [SourceIntents.mangaChapters]}): _capabilities = capabilities,super._();
   factory _WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override final  String repo;
 @override@JsonKey() final  SupportedVersion version;
-@override final  String? icon;
+@override final  String icon;
+ final  List<SourceIntents> _capabilities;
+@override@JsonKey()@SourceIntentParser() List<SourceIntents> get capabilities {
+  if (_capabilities is EqualUnmodifiableListView) return _capabilities;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_capabilities);
+}
+
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
@@ -846,16 +860,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other._capabilities, _capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon);
+int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon,const DeepCollectionEquality().hash(_capabilities));
 
 @override
 String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon)';
+  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon, capabilities: $capabilities)';
 }
 
 
@@ -866,7 +880,7 @@ abstract mixin class _$WebSourceInfoCopyWith<$Res> implements $WebSourceInfoCopy
   factory _$WebSourceInfoCopyWith(_WebSourceInfo value, $Res Function(_WebSourceInfo) _then) = __$WebSourceInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String repo, SupportedVersion version, String? icon
+ String id, String name, String repo, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
 });
 
 
@@ -883,190 +897,19 @@ class __$WebSourceInfoCopyWithImpl<$Res>
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
   return _then(_WebSourceInfo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
 as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
-as SupportedVersion,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as String?,
+as SupportedVersion,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,capabilities: null == capabilities ? _self._capabilities : capabilities // ignore: cast_nullable_to_non_nullable
+as List<SourceIntents>,
   ));
 }
 
 
-}
-
-
-/// @nodoc
-mixin _$SourceIdentifier {
-
- WebSourceInfo get internal; SourceInfo get external;
-/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SourceIdentifierCopyWith<SourceIdentifier> get copyWith => _$SourceIdentifierCopyWithImpl<SourceIdentifier>(this as SourceIdentifier, _$identity);
-
-  /// Serializes this SourceIdentifier to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceIdentifier&&(identical(other.internal, internal) || other.internal == internal)&&(identical(other.external, external) || other.external == external));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,internal,external);
-
-@override
-String toString() {
-  return 'SourceIdentifier(internal: $internal, external: $external)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SourceIdentifierCopyWith<$Res>  {
-  factory $SourceIdentifierCopyWith(SourceIdentifier value, $Res Function(SourceIdentifier) _then) = _$SourceIdentifierCopyWithImpl;
-@useResult
-$Res call({
- WebSourceInfo internal, SourceInfo external
-});
-
-
-$WebSourceInfoCopyWith<$Res> get internal;$SourceInfoCopyWith<$Res> get external;
-
-}
-/// @nodoc
-class _$SourceIdentifierCopyWithImpl<$Res>
-    implements $SourceIdentifierCopyWith<$Res> {
-  _$SourceIdentifierCopyWithImpl(this._self, this._then);
-
-  final SourceIdentifier _self;
-  final $Res Function(SourceIdentifier) _then;
-
-/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? internal = null,Object? external = null,}) {
-  return _then(_self.copyWith(
-internal: null == internal ? _self.internal : internal // ignore: cast_nullable_to_non_nullable
-as WebSourceInfo,external: null == external ? _self.external : external // ignore: cast_nullable_to_non_nullable
-as SourceInfo,
-  ));
-}
-/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebSourceInfoCopyWith<$Res> get internal {
-  
-  return $WebSourceInfoCopyWith<$Res>(_self.internal, (value) {
-    return _then(_self.copyWith(internal: value));
-  });
-}/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$SourceInfoCopyWith<$Res> get external {
-  
-  return $SourceInfoCopyWith<$Res>(_self.external, (value) {
-    return _then(_self.copyWith(external: value));
-  });
-}
-}
-
-
-/// @nodoc
-@JsonSerializable()
-
-class _SourceIdentifier implements SourceIdentifier {
-  const _SourceIdentifier({required this.internal, required this.external});
-  factory _SourceIdentifier.fromJson(Map<String, dynamic> json) => _$SourceIdentifierFromJson(json);
-
-@override final  WebSourceInfo internal;
-@override final  SourceInfo external;
-
-/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$SourceIdentifierCopyWith<_SourceIdentifier> get copyWith => __$SourceIdentifierCopyWithImpl<_SourceIdentifier>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$SourceIdentifierToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceIdentifier&&(identical(other.internal, internal) || other.internal == internal)&&(identical(other.external, external) || other.external == external));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,internal,external);
-
-@override
-String toString() {
-  return 'SourceIdentifier(internal: $internal, external: $external)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$SourceIdentifierCopyWith<$Res> implements $SourceIdentifierCopyWith<$Res> {
-  factory _$SourceIdentifierCopyWith(_SourceIdentifier value, $Res Function(_SourceIdentifier) _then) = __$SourceIdentifierCopyWithImpl;
-@override @useResult
-$Res call({
- WebSourceInfo internal, SourceInfo external
-});
-
-
-@override $WebSourceInfoCopyWith<$Res> get internal;@override $SourceInfoCopyWith<$Res> get external;
-
-}
-/// @nodoc
-class __$SourceIdentifierCopyWithImpl<$Res>
-    implements _$SourceIdentifierCopyWith<$Res> {
-  __$SourceIdentifierCopyWithImpl(this._self, this._then);
-
-  final _SourceIdentifier _self;
-  final $Res Function(_SourceIdentifier) _then;
-
-/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? internal = null,Object? external = null,}) {
-  return _then(_SourceIdentifier(
-internal: null == internal ? _self.internal : internal // ignore: cast_nullable_to_non_nullable
-as WebSourceInfo,external: null == external ? _self.external : external // ignore: cast_nullable_to_non_nullable
-as SourceInfo,
-  ));
-}
-
-/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebSourceInfoCopyWith<$Res> get internal {
-  
-  return $WebSourceInfoCopyWith<$Res>(_self.internal, (value) {
-    return _then(_self.copyWith(internal: value));
-  });
-}/// Create a copy of SourceIdentifier
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$SourceInfoCopyWith<$Res> get external {
-  
-  return $SourceInfoCopyWith<$Res>(_self.external, (value) {
-    return _then(_self.copyWith(external: value));
-  });
-}
 }
 
 
@@ -1282,8 +1125,8 @@ as int?,
 /// @nodoc
 @JsonSerializable()
 
-class _SourceVersion implements SourceVersion {
-  const _SourceVersion({required this.id, required this.name, required this.author, required this.desc, this.website, required this.contentRating, required this.version, required this.icon, final  List<Badge>? tags, required this.websiteBaseURL, this.intents}): _tags = tags;
+class _SourceVersion extends SourceVersion {
+  const _SourceVersion({required this.id, required this.name, required this.author, required this.desc, this.website, required this.contentRating, required this.version, required this.icon, final  List<Badge>? tags, required this.websiteBaseURL, this.intents}): _tags = tags,super._();
   factory _SourceVersion.fromJson(Map<String, dynamic> json) => _$SourceVersionFromJson(json);
 
 @override final  String id;
@@ -1369,177 +1212,6 @@ as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non
 as String,tags: freezed == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
 as List<Badge>?,websiteBaseURL: null == websiteBaseURL ? _self.websiteBaseURL : websiteBaseURL // ignore: cast_nullable_to_non_nullable
 as String,intents: freezed == intents ? _self.intents : intents // ignore: cast_nullable_to_non_nullable
-as int?,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
-mixin _$SourceInfo {
-
- String get name; String get author; String get description; ContentRating get contentRating; String get version; String get icon; String get websiteBaseURL; String? get authorWebsite; String? get language; List<Badge>? get sourceTags; int? get intents;
-/// Create a copy of SourceInfo
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SourceInfoCopyWith<SourceInfo> get copyWith => _$SourceInfoCopyWithImpl<SourceInfo>(this as SourceInfo, _$identity);
-
-  /// Serializes this SourceInfo to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceInfo&&(identical(other.name, name) || other.name == name)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.websiteBaseURL, websiteBaseURL) || other.websiteBaseURL == websiteBaseURL)&&(identical(other.authorWebsite, authorWebsite) || other.authorWebsite == authorWebsite)&&(identical(other.language, language) || other.language == language)&&const DeepCollectionEquality().equals(other.sourceTags, sourceTags)&&(identical(other.intents, intents) || other.intents == intents));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,name,author,description,contentRating,version,icon,websiteBaseURL,authorWebsite,language,const DeepCollectionEquality().hash(sourceTags),intents);
-
-@override
-String toString() {
-  return 'SourceInfo(name: $name, author: $author, description: $description, contentRating: $contentRating, version: $version, icon: $icon, websiteBaseURL: $websiteBaseURL, authorWebsite: $authorWebsite, language: $language, sourceTags: $sourceTags, intents: $intents)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SourceInfoCopyWith<$Res>  {
-  factory $SourceInfoCopyWith(SourceInfo value, $Res Function(SourceInfo) _then) = _$SourceInfoCopyWithImpl;
-@useResult
-$Res call({
- String name, String author, String description, ContentRating contentRating, String version, String icon, String websiteBaseURL, String? authorWebsite, String? language, List<Badge>? sourceTags, int? intents
-});
-
-
-
-
-}
-/// @nodoc
-class _$SourceInfoCopyWithImpl<$Res>
-    implements $SourceInfoCopyWith<$Res> {
-  _$SourceInfoCopyWithImpl(this._self, this._then);
-
-  final SourceInfo _self;
-  final $Res Function(SourceInfo) _then;
-
-/// Create a copy of SourceInfo
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? author = null,Object? description = null,Object? contentRating = null,Object? version = null,Object? icon = null,Object? websiteBaseURL = null,Object? authorWebsite = freezed,Object? language = freezed,Object? sourceTags = freezed,Object? intents = freezed,}) {
-  return _then(_self.copyWith(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
-as ContentRating,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
-as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as String,websiteBaseURL: null == websiteBaseURL ? _self.websiteBaseURL : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-as String,authorWebsite: freezed == authorWebsite ? _self.authorWebsite : authorWebsite // ignore: cast_nullable_to_non_nullable
-as String?,language: freezed == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
-as String?,sourceTags: freezed == sourceTags ? _self.sourceTags : sourceTags // ignore: cast_nullable_to_non_nullable
-as List<Badge>?,intents: freezed == intents ? _self.intents : intents // ignore: cast_nullable_to_non_nullable
-as int?,
-  ));
-}
-
-}
-
-
-/// @nodoc
-@JsonSerializable()
-
-class _SourceInfo extends SourceInfo {
-  const _SourceInfo({required this.name, required this.author, required this.description, required this.contentRating, required this.version, required this.icon, required this.websiteBaseURL, this.authorWebsite, this.language, final  List<Badge>? sourceTags, this.intents}): _sourceTags = sourceTags,super._();
-  factory _SourceInfo.fromJson(Map<String, dynamic> json) => _$SourceInfoFromJson(json);
-
-@override final  String name;
-@override final  String author;
-@override final  String description;
-@override final  ContentRating contentRating;
-@override final  String version;
-@override final  String icon;
-@override final  String websiteBaseURL;
-@override final  String? authorWebsite;
-@override final  String? language;
- final  List<Badge>? _sourceTags;
-@override List<Badge>? get sourceTags {
-  final value = _sourceTags;
-  if (value == null) return null;
-  if (_sourceTags is EqualUnmodifiableListView) return _sourceTags;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
-}
-
-@override final  int? intents;
-
-/// Create a copy of SourceInfo
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$SourceInfoCopyWith<_SourceInfo> get copyWith => __$SourceInfoCopyWithImpl<_SourceInfo>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$SourceInfoToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceInfo&&(identical(other.name, name) || other.name == name)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.websiteBaseURL, websiteBaseURL) || other.websiteBaseURL == websiteBaseURL)&&(identical(other.authorWebsite, authorWebsite) || other.authorWebsite == authorWebsite)&&(identical(other.language, language) || other.language == language)&&const DeepCollectionEquality().equals(other._sourceTags, _sourceTags)&&(identical(other.intents, intents) || other.intents == intents));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,name,author,description,contentRating,version,icon,websiteBaseURL,authorWebsite,language,const DeepCollectionEquality().hash(_sourceTags),intents);
-
-@override
-String toString() {
-  return 'SourceInfo(name: $name, author: $author, description: $description, contentRating: $contentRating, version: $version, icon: $icon, websiteBaseURL: $websiteBaseURL, authorWebsite: $authorWebsite, language: $language, sourceTags: $sourceTags, intents: $intents)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$SourceInfoCopyWith<$Res> implements $SourceInfoCopyWith<$Res> {
-  factory _$SourceInfoCopyWith(_SourceInfo value, $Res Function(_SourceInfo) _then) = __$SourceInfoCopyWithImpl;
-@override @useResult
-$Res call({
- String name, String author, String description, ContentRating contentRating, String version, String icon, String websiteBaseURL, String? authorWebsite, String? language, List<Badge>? sourceTags, int? intents
-});
-
-
-
-
-}
-/// @nodoc
-class __$SourceInfoCopyWithImpl<$Res>
-    implements _$SourceInfoCopyWith<$Res> {
-  __$SourceInfoCopyWithImpl(this._self, this._then);
-
-  final _SourceInfo _self;
-  final $Res Function(_SourceInfo) _then;
-
-/// Create a copy of SourceInfo
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? author = null,Object? description = null,Object? contentRating = null,Object? version = null,Object? icon = null,Object? websiteBaseURL = null,Object? authorWebsite = freezed,Object? language = freezed,Object? sourceTags = freezed,Object? intents = freezed,}) {
-  return _then(_SourceInfo(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
-as ContentRating,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
-as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as String,websiteBaseURL: null == websiteBaseURL ? _self.websiteBaseURL : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-as String,authorWebsite: freezed == authorWebsite ? _self.authorWebsite : authorWebsite // ignore: cast_nullable_to_non_nullable
-as String?,language: freezed == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
-as String?,sourceTags: freezed == sourceTags ? _self._sourceTags : sourceTags // ignore: cast_nullable_to_non_nullable
-as List<Badge>?,intents: freezed == intents ? _self.intents : intents // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
@@ -2883,7 +2555,7 @@ $MangaInfoCopyWith<$Res> get mangaInfo {
 /// @nodoc
 mixin _$Chapter {
 
- String get id; num get chapNum; String? get langCode; String? get name; num? get volume; String? get group;@TimestampSerializer() DateTime? get time; num? get sortingIndex;
+ String get id; num get chapNum; String? get langCode; String? get name; num? get volume; String? get group;@NullableTimestampSerializer() DateTime? get time; num? get sortingIndex;
 /// Create a copy of Chapter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2916,7 +2588,7 @@ abstract mixin class $ChapterCopyWith<$Res>  {
   factory $ChapterCopyWith(Chapter value, $Res Function(Chapter) _then) = _$ChapterCopyWithImpl;
 @useResult
 $Res call({
- String id, num chapNum, String? langCode, String? name, num? volume, String? group,@TimestampSerializer() DateTime? time, num? sortingIndex
+ String id, num chapNum, String? langCode, String? name, num? volume, String? group,@NullableTimestampSerializer() DateTime? time, num? sortingIndex
 });
 
 
@@ -2954,7 +2626,7 @@ as num?,
 @JsonSerializable()
 
 class _Chapter implements Chapter {
-  const _Chapter({required this.id, required this.chapNum, this.langCode, this.name, this.volume, this.group, @TimestampSerializer() this.time, this.sortingIndex});
+  const _Chapter({required this.id, required this.chapNum, this.langCode, this.name, this.volume, this.group, @NullableTimestampSerializer() this.time, this.sortingIndex});
   factory _Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
 
 @override final  String id;
@@ -2963,7 +2635,7 @@ class _Chapter implements Chapter {
 @override final  String? name;
 @override final  num? volume;
 @override final  String? group;
-@override@TimestampSerializer() final  DateTime? time;
+@override@NullableTimestampSerializer() final  DateTime? time;
 @override final  num? sortingIndex;
 
 /// Create a copy of Chapter
@@ -2999,7 +2671,7 @@ abstract mixin class _$ChapterCopyWith<$Res> implements $ChapterCopyWith<$Res> {
   factory _$ChapterCopyWith(_Chapter value, $Res Function(_Chapter) _then) = __$ChapterCopyWithImpl;
 @override @useResult
 $Res call({
- String id, num chapNum, String? langCode, String? name, num? volume, String? group,@TimestampSerializer() DateTime? time, num? sortingIndex
+ String id, num chapNum, String? langCode, String? name, num? volume, String? group,@NullableTimestampSerializer() DateTime? time, num? sortingIndex
 });
 
 

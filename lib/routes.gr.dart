@@ -61,7 +61,7 @@ class AppSettingsRoute extends _i26.PageRouteInfo<void> {
 class ExtensionHomeRoute extends _i26.PageRouteInfo<ExtensionHomeRouteArgs> {
   ExtensionHomeRoute({
     _i27.Key? key,
-    required _i28.SourceIdentifier source,
+    required _i28.WebSourceInfo source,
     List<_i26.PageRouteInfo>? children,
   }) : super(
          ExtensionHomeRoute.name,
@@ -85,7 +85,7 @@ class ExtensionHomeRouteArgs {
 
   final _i27.Key? key;
 
-  final _i28.SourceIdentifier source;
+  final _i28.WebSourceInfo source;
 
   @override
   String toString() {

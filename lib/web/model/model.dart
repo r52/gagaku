@@ -198,7 +198,7 @@ class ProxyHandler {
         } else {
           final installed = await ref.watch(extensionInfoListProvider.future);
           for (final src in installed) {
-            if (handle.source == src.internal.id) {
+            if (handle.source == src.id) {
               return await ref
                   .read(extensionSourceProvider(handle.source).notifier)
                   .getManga(handle.location);
@@ -676,15 +676,13 @@ class WebReadMarkers extends _$WebReadMarkers {
 class ExtensionSource extends _$ExtensionSource {
   HeadlessInAppWebView? _view;
   late InAppWebViewController _controller;
-  late SourceIdentifier _info;
 
   @override
-  Future<SourceIdentifier> build(String sourceId) async {
+  Future<WebSourceInfo> build(String sourceId) async {
     final completer = Completer<void>();
     final installed = ref.watch(
       webConfigProvider.select((cfg) => cfg.installedSources),
     );
-    late SourceInfo extinfo;
 
     // Let this throw here if not found
     final source = installed.firstWhere((e) => e.id == sourceId);
@@ -729,9 +727,9 @@ class ExtensionSource extends _$ExtensionSource {
           },
         );
       },
-      onConsoleMessage: (controller, consoleMessage) {
-        logger.d('Console Message: ${consoleMessage.message}');
-      },
+      // onConsoleMessage: (controller, consoleMessage) {
+      //   logger.d('Console Message: ${consoleMessage.message}');
+      // },
       onLoadStop: (controller, url) async {
         final scriptUrl = '${source.repo}/${source.id}/source.js';
         final response = await http.get(Uri.parse(scriptUrl));
@@ -751,14 +749,8 @@ class ExtensionSource extends _$ExtensionSource {
               "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
         );
 
-        final rinfo = await controller.evaluateJavascript(
-          source: "window.Sources['${source.id}Info'];",
-        );
-        final info = SourceInfo.fromJson(rinfo);
-        extinfo = info;
-
         _controller = controller;
-        logger.d("Extension ${extinfo.name} ready");
+        logger.d("Extension ${source.name} ready");
         completer.complete();
       },
     );
@@ -770,13 +762,7 @@ class ExtensionSource extends _$ExtensionSource {
     await _view?.run();
     await completer.future;
 
-    _info = SourceIdentifier(internal: source, external: extinfo);
-
-    return _info;
-  }
-
-  SourceIdentifier getInfo() {
-    return _info;
+    return source;
   }
 
   Future<dynamic> callBinding(
@@ -787,13 +773,14 @@ class ExtensionSource extends _$ExtensionSource {
     final result = await _controller.callAsyncJavaScript(
       functionBody: "return await window.callBinding('$bindingId', $arg)",
     );
+
     return result!.value;
   }
 
   Future<DUISection> getSourceMenu() async {
-    await future;
+    final source = await future;
 
-    if (!_info.external.hasIntent(SourceIntents.settingsUI)) {
+    if (!source.hasCapability(SourceIntents.settingsUI)) {
       throw Exception("Source does not support settings");
     }
 
@@ -801,7 +788,11 @@ class ExtensionSource extends _$ExtensionSource {
       functionBody: "return await window.processSourceMenu($sourceId)",
     );
 
-    final menu = DUIType.fromJson(result!.value);
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final menu = DUIType.fromJson(result.value);
     if (menu is! DUISection) {
       throw Exception("Source getSourceMenu() did not return a valid menu");
     }
@@ -810,9 +801,9 @@ class ExtensionSource extends _$ExtensionSource {
   }
 
   Future<List<HomeSection>> getHomePage() async {
-    await future;
+    final source = await future;
 
-    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
+    if (!source.hasCapability(SourceIntents.homepageSections)) {
       throw Exception("Source does not support homepages");
     }
 
@@ -834,7 +825,11 @@ return homesections;
 """,
     );
 
-    final rsec = result!.value as List<dynamic>;
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final rsec = result.value as List<dynamic>;
     final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
 
     return sections;
@@ -844,9 +839,9 @@ return homesections;
     String homepageSectionId,
     dynamic metadata,
   ) async {
-    await future;
+    final source = await future;
 
-    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
+    if (!source.hasCapability(SourceIntents.homepageSections)) {
       throw Exception("Source does not support homepages");
     }
 
@@ -857,7 +852,11 @@ return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
 """,
     );
 
-    final pmangas = PagedResults.fromJson(result!.value);
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final pmangas = PagedResults.fromJson(result.value);
 
     return pmangas;
   }
@@ -881,7 +880,11 @@ return await $sourceId.getSearchResults(query, metadata)
 """,
     );
 
-    final pmangas = PagedResults.fromJson(result!.value);
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final pmangas = PagedResults.fromJson(result.value);
 
     return pmangas;
   }
@@ -897,7 +900,11 @@ return await $sourceId.getSearchResults(query, metadata)
       functionBody: "return await $sourceId.getMangaDetails('$mangaId')",
     );
 
-    final smanga = SourceManga.fromJson(mdeets!.value);
+    if (mdeets == null || mdeets.error != null) {
+      throw Exception('JavaScript error: ${mdeets?.error}');
+    }
+
+    final smanga = SourceManga.fromJson(mdeets.value);
 
     final chaps = await _controller.callAsyncJavaScript(
       functionBody: """
@@ -907,7 +914,11 @@ return p;
 """,
     );
 
-    final clist = chaps!.value as List<dynamic>;
+    if (chaps == null || chaps.error != null) {
+      throw Exception('JavaScript error: ${chaps?.error}');
+    }
+
+    final clist = chaps.value as List<dynamic>;
     final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
     final chapmap = Map.fromEntries(
       chapters.map(
@@ -916,8 +927,9 @@ return p;
           WebChapter(
             title: e.name,
             volume: e.volume?.toString(),
-            groups: {e.group ?? sourceId: e.id},
+            groups: {e.group ?? sourceId: e},
             releaseDate: e.time,
+            data: e,
           ),
         ),
       ),
@@ -930,6 +942,7 @@ return p;
       author: smanga.mangaInfo.author ?? 'Unknown',
       cover: smanga.mangaInfo.image,
       chapters: chapmap,
+      data: smanga,
     );
 
     // logger.d(result);
@@ -949,7 +962,11 @@ return p;
           "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')",
     );
 
-    final chapterd = ChapterDetails.fromJson(cdeets!.value);
+    if (cdeets == null || cdeets.error != null) {
+      throw Exception('JavaScript error: ${cdeets?.error}');
+    }
+
+    final chapterd = ChapterDetails.fromJson(cdeets.value);
 
     return chapterd.pages;
   }
@@ -972,7 +989,7 @@ return p;
 @riverpod
 class ExtensionInfoList extends _$ExtensionInfoList {
   @override
-  Future<List<SourceIdentifier>> build() async {
+  Future<List<WebSourceInfo>> build() async {
     final installed = ref.watch(
       webConfigProvider.select((cfg) => cfg.installedSources),
     );

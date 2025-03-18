@@ -26,7 +26,7 @@ class _SearchHistory extends _$SearchHistory {
 class WebSourceSearchWidget extends StatefulHookConsumerWidget {
   const WebSourceSearchWidget({super.key, required this.source});
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -46,14 +46,14 @@ class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
       }
 
       final results = await ref
-          .read(extensionSourceProvider(widget.source.internal.id).notifier)
+          .read(extensionSourceProvider(widget.source.id).notifier)
           .searchManga(
             SearchRequest(title: searchTerm?.toLowerCase()),
             metadata,
           );
 
       final m = results.results?.map(
-        (e) => HistoryLink.fromPartialSourceManga(widget.source.internal.id, e),
+        (e) => HistoryLink.fromPartialSourceManga(widget.source.id, e),
       );
 
       metadata = results.metadata;
@@ -107,7 +107,7 @@ class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
                   controller: controller,
                   hintText: 'search.arg'.tr(
                     context: context,
-                    args: [widget.source.external.name],
+                    args: [widget.source.name],
                   ),
                   onTap: () {
                     controller.openView();

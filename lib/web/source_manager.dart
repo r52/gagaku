@@ -149,6 +149,9 @@ class SourceManager extends HookConsumerWidget {
                                                       repo: repo.url,
                                                       version: repo.version,
                                                       icon: icon,
+                                                      capabilities:
+                                                          source
+                                                              .getCapabilities(),
                                                     ),
                                                   ],
                                                 );
@@ -263,9 +266,9 @@ class SourceManager extends HookConsumerWidget {
                                 key: ValueKey(item.id),
                                 child: ListTile(
                                   leading:
-                                      item.icon != null
+                                      item.icon.isNotEmpty
                                           ? Image.network(
-                                            item.icon!,
+                                            item.icon,
                                             width: 36,
                                             height: 36,
                                           )
