@@ -78,6 +78,7 @@ dependencies:
   gpt_markdown: ^1.0.11
   auto_route: ^10.0.0
   infinite_scroll_pagination: ^5.0.0
+  flutter_cache_manager: ^3.4.1
 
 dev_dependencies:
   flutter_test:

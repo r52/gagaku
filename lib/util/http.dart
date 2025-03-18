@@ -26,20 +26,29 @@ http.Client _createHttpClient([bool useCustomUA = false]) {
 
 class RateLimitedClient extends CustomClient {
   static const _rateLimit = Duration(milliseconds: 200); // 5 per second
-  final _pendingCalls = <int>[];
+  final _pendingCalls = <String, List<int>>{};
 
   RateLimitedClient({super.useCustomUA});
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final numPending = _pendingCalls.length;
-    _pendingCalls.add(request.hashCode);
+    final host = request.url.host;
+
+    if (!_pendingCalls.containsKey(host)) {
+      _pendingCalls[host] = [];
+    }
+
+    final numPending = _pendingCalls[host]!.length;
+    _pendingCalls[host]!.add(request.hashCode);
 
     final wait = _rateLimit * numPending;
     await Future.delayed(wait);
 
     return _baseClient.send(request).whenComplete(() {
-      _pendingCalls.remove(request.hashCode);
+      _pendingCalls[host]!.remove(request.hashCode);
+      if (_pendingCalls[host]!.isEmpty) {
+        _pendingCalls.remove(host);
+      }
     });
   }
 }

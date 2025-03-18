@@ -10,6 +10,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -355,6 +356,7 @@ class _MangaDexMangaViewWidgetState
                         imageUrl: widget.manga.getFirstCoverUrl(
                           quality: CoverArtQuality.medium,
                         ),
+                        cacheManager: gagakuImageCache,
                         colorBlendMode: BlendMode.modulate,
                         color: Colors.grey,
                         fit: BoxFit.cover,
@@ -1080,6 +1082,7 @@ class _MangaCoversView extends StatelessWidget {
                                               },
                                               child: CachedNetworkImage(
                                                 imageUrl: url,
+                                                cacheManager: gagakuImageCache,
                                                 imageBuilder: (
                                                   context,
                                                   imageProvider,
@@ -1374,6 +1377,7 @@ class _CoverArtItem extends HookWidget {
       gradient: gradient,
       child: CachedNetworkImage(
         imageUrl: url.quality(quality: CoverArtQuality.medium),
+        cacheManager: gagakuImageCache,
         width: 256.0,
         progressIndicatorBuilder:
             (context, url, downloadProgress) =>

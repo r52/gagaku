@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/reader/main.dart' show CtxCallback;
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -161,6 +162,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 ),
                 background: CachedNetworkImage(
                   imageUrl: manga.cover,
+                  cacheManager: gagakuImageCache,
                   colorBlendMode: BlendMode.modulate,
                   color: Colors.grey,
                   fit: BoxFit.cover,

@@ -12,6 +12,7 @@ import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/reader/main.dart';
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -528,6 +529,7 @@ class _CoverButton extends ConsumerWidget {
       ),
       child: CachedNetworkImage(
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.small),
+        cacheManager: gagakuImageCache,
         imageBuilder:
             (context, imageProvider) => DecoratedBox(
               decoration: BoxDecoration(
@@ -1271,6 +1273,7 @@ class GridMangaItem extends HookConsumerWidget {
       gradient: gradient,
       child: CachedNetworkImage(
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+        cacheManager: gagakuImageCache,
         width: 256.0,
         fit: BoxFit.cover,
         progressIndicatorBuilder:
@@ -1395,6 +1398,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                       imageUrl: manga.getFirstCoverUrl(
                         quality: CoverArtQuality.small,
                       ),
+                      cacheManager: gagakuImageCache,
                       width: screenSizeSmall ? 80.0 : 128.0,
                       progressIndicatorBuilder:
                           (context, url, downloadProgress) =>
@@ -1472,6 +1476,7 @@ class _ListMangaItem extends HookConsumerWidget {
                 imageUrl: manga.getFirstCoverUrl(
                   quality: CoverArtQuality.small,
                 ),
+                cacheManager: gagakuImageCache,
                 width: 80.0,
                 progressIndicatorBuilder:
                     (context, url, downloadProgress) =>
