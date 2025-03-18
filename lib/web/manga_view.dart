@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/reader/main.dart' show CtxCallback;
 import 'package:gagaku/util/cached_network_image.dart';
@@ -12,7 +13,6 @@ import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -252,11 +252,13 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(8),
                         color: theme.colorScheme.surfaceContainerHighest,
-                        child: GptMarkdown(
-                          manga.description,
-                          onLinkTab: (url, title) async {
-                            if (!await launchUrl(Uri.parse(url))) {
-                              throw 'Could not launch $url';
+                        child: MarkdownBody(
+                          data: manga.description,
+                          onTapLink: (text, url, title) async {
+                            if (url != null) {
+                              if (!await launchUrl(Uri.parse(url))) {
+                                throw 'Could not launch $url';
+                              }
                             }
                           },
                         ),
