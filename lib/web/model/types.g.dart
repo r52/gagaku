@@ -104,6 +104,7 @@ _WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String,
       repo: json['repo'] as String,
+      baseUrl: json['baseUrl'] as String,
       version:
           $enumDecodeNullable(_$SupportedVersionEnumMap, json['version']) ??
           SupportedVersion.v0_8,
@@ -120,6 +121,7 @@ Map<String, dynamic> _$WebSourceInfoToJson(_WebSourceInfo instance) =>
       'id': instance.id,
       'name': instance.name,
       'repo': instance.repo,
+      'baseUrl': instance.baseUrl,
       'version': _$SupportedVersionEnumMap[instance.version]!,
       'icon': instance.icon,
       'capabilities':

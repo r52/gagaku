@@ -157,6 +157,7 @@ abstract class WebSourceInfo with _$WebSourceInfo {
     required String id,
     required String name,
     required String repo,
+    required String baseUrl,
     @Default(SupportedVersion.v0_8) SupportedVersion version,
     required String icon,
     @Default([SourceIntents.mangaChapters])

@@ -89,19 +89,28 @@ Future<List<ReaderPage>> _getSourcePages(
     id = chapter.id;
   }
 
+  String referer = '';
   List<String>? links = [];
 
   if (handle.parser != null) {
+    final ext = await ref.watch(
+      extensionSourceProvider(handle.parser!.id).future,
+    );
     links = await ref
         .read(extensionSourceProvider(handle.parser!.id).notifier)
         .getChapterPages(handle.location, id);
+    referer = ext.baseUrl;
   } else {
     final installed = await ref.watch(extensionInfoListProvider.future);
     for (final src in installed) {
       if (handle.source == src.id) {
+        final ext = await ref.watch(
+          extensionSourceProvider(handle.parser!.id).future,
+        );
         links = await ref
             .read(extensionSourceProvider(handle.source).notifier)
             .getChapterPages(handle.location, id);
+        referer = ext.baseUrl;
         break;
       }
     }
@@ -113,8 +122,18 @@ Future<List<ReaderPage>> _getSourcePages(
     );
   }
 
+  if (referer.isNotEmpty && !referer.endsWith('/')) {
+    referer = '$referer/';
+  }
+
   final pages =
-      links.map((e) => ReaderPage(provider: NetworkImage(e))).toList();
+      links
+          .map(
+            (e) => ReaderPage(
+              provider: NetworkImage(e, headers: {'referer': referer}),
+            ),
+          )
+          .toList();
 
   ref.onDispose(() {
     pages.clear();

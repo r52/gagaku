@@ -762,7 +762,7 @@ as String,
 /// @nodoc
 mixin _$WebSourceInfo {
 
- String get id; String get name; String get repo; SupportedVersion get version; String get icon;@SourceIntentParser() List<SourceIntents> get capabilities;
+ String get id; String get name; String get repo; String get baseUrl; SupportedVersion get version; String get icon;@SourceIntentParser() List<SourceIntents> get capabilities;
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -775,16 +775,16 @@ $WebSourceInfoCopyWith<WebSourceInfo> get copyWith => _$WebSourceInfoCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon,const DeepCollectionEquality().hash(capabilities));
+int get hashCode => Object.hash(runtimeType,id,name,repo,baseUrl,version,icon,const DeepCollectionEquality().hash(capabilities));
 
 @override
 String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon, capabilities: $capabilities)';
+  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, baseUrl: $baseUrl, version: $version, icon: $icon, capabilities: $capabilities)';
 }
 
 
@@ -795,7 +795,7 @@ abstract mixin class $WebSourceInfoCopyWith<$Res>  {
   factory $WebSourceInfoCopyWith(WebSourceInfo value, $Res Function(WebSourceInfo) _then) = _$WebSourceInfoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String repo, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
+ String id, String name, String repo, String baseUrl, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
 });
 
 
@@ -812,11 +812,12 @@ class _$WebSourceInfoCopyWithImpl<$Res>
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? baseUrl = null,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
+as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as SupportedVersion,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String,capabilities: null == capabilities ? _self.capabilities : capabilities // ignore: cast_nullable_to_non_nullable
@@ -831,12 +832,13 @@ as List<SourceIntents>,
 @JsonSerializable()
 
 class _WebSourceInfo extends WebSourceInfo {
-  const _WebSourceInfo({required this.id, required this.name, required this.repo, this.version = SupportedVersion.v0_8, required this.icon, @SourceIntentParser() final  List<SourceIntents> capabilities = const [SourceIntents.mangaChapters]}): _capabilities = capabilities,super._();
+  const _WebSourceInfo({required this.id, required this.name, required this.repo, required this.baseUrl, this.version = SupportedVersion.v0_8, required this.icon, @SourceIntentParser() final  List<SourceIntents> capabilities = const [SourceIntents.mangaChapters]}): _capabilities = capabilities,super._();
   factory _WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override final  String repo;
+@override final  String baseUrl;
 @override@JsonKey() final  SupportedVersion version;
 @override final  String icon;
  final  List<SourceIntents> _capabilities;
@@ -860,16 +862,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other._capabilities, _capabilities));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other._capabilities, _capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,repo,version,icon,const DeepCollectionEquality().hash(_capabilities));
+int get hashCode => Object.hash(runtimeType,id,name,repo,baseUrl,version,icon,const DeepCollectionEquality().hash(_capabilities));
 
 @override
 String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, version: $version, icon: $icon, capabilities: $capabilities)';
+  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, baseUrl: $baseUrl, version: $version, icon: $icon, capabilities: $capabilities)';
 }
 
 
@@ -880,7 +882,7 @@ abstract mixin class _$WebSourceInfoCopyWith<$Res> implements $WebSourceInfoCopy
   factory _$WebSourceInfoCopyWith(_WebSourceInfo value, $Res Function(_WebSourceInfo) _then) = __$WebSourceInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String repo, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
+ String id, String name, String repo, String baseUrl, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
 });
 
 
@@ -897,11 +899,12 @@ class __$WebSourceInfoCopyWithImpl<$Res>
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? baseUrl = null,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
   return _then(_WebSourceInfo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
+as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as SupportedVersion,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String,capabilities: null == capabilities ? _self._capabilities : capabilities // ignore: cast_nullable_to_non_nullable

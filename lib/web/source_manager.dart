@@ -146,6 +146,8 @@ class SourceManager extends HookConsumerWidget {
                                                     WebSourceInfo(
                                                       id: source.id,
                                                       name: source.name,
+                                                      baseUrl:
+                                                          source.websiteBaseURL,
                                                       repo: repo.url,
                                                       version: repo.version,
                                                       icon: icon,
