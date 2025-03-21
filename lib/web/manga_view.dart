@@ -120,6 +120,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
             .toList();
     //chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
     chapterlist.sort((a, b) => compareNatural(b.name, a.name));
+    final extdata =
+        manga.data != null && manga.data is SourceManga
+            ? manga.data as SourceManga
+            : null;
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
@@ -276,6 +280,16 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       title: 'mangaView.artist'.tr(context: context),
                       children: [IconTextChip(text: manga.artist)],
                     ),
+                    if (extdata != null)
+                      for (final tagsec
+                          in (extdata.mangaInfo.tags ?? <TagSection>[]))
+                        MultiChildExpansionTile(
+                          title: tagsec.label.capitalize(),
+                          children:
+                              tagsec.tags
+                                  .map((e) => IconTextChip(text: e.label))
+                                  .toList(),
+                        ),
                     MultiChildExpansionTile(
                       title: 'tracking.links'.tr(context: context),
                       children: [
