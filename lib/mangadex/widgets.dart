@@ -9,7 +9,6 @@ import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
-import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/util/cached_network_image.dart';
@@ -86,24 +85,11 @@ class MangaDexSliverAppBar extends StatelessWidget {
       OverflowBar(
         spacing: 8.0,
         children: [
-          Tooltip(
-            message: 'search.arg'.tr(context: context, args: ['MangaDex']),
-            child: OpenContainer(
-              closedColor: theme.colorScheme.primaryContainer,
-              closedShape: const CircleBorder(),
-              closedElevation: 0.0,
-              closedBuilder: (context, openContainer) {
-                return IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    openContainer();
-                  },
-                );
-              },
-              openBuilder: (context, closedContainer) {
-                return const MangaDexSearchPage();
-              },
-            ),
+          IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
+            icon: const Icon(Icons.search),
+            onPressed: () => context.router.push(MangaDexSearchRoute()),
+            tooltip: 'search.arg'.tr(context: context, args: ['MangaDex']),
           ),
           Tooltip(
             message: 'arg_settings'.tr(context: context, args: ['MangaDex']),
@@ -191,6 +177,36 @@ class MangaDexSliverAppBar extends StatelessWidget {
     ];
 
     return SliverAppBar(floating: true, flexibleSpace: flex, actions: actions);
+  }
+}
+
+class MangaProviderCarousel extends StatelessWidget {
+  const MangaProviderCarousel({super.key, required this.provider});
+
+  final Refreshable<AsyncValue<List<Manga>>> provider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: DataProviderWhenWidget(
+        provider: provider,
+        builder:
+            (context, items) => ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 256),
+              child: CarouselView(
+                itemExtent: 180,
+                shrinkExtent: 180,
+                enableSplash: false,
+                children:
+                    items
+                        .map(
+                          (e) => GridMangaItem(key: ValueKey(e.id), manga: e),
+                        )
+                        .toList(),
+              ),
+            ),
+      ),
+    );
   }
 }
 
@@ -1586,7 +1602,7 @@ class MangaGenreRow extends HookWidget {
           .map(
             (e) => ContentChip(
               key: ValueKey(e.id),
-              content: e.attributes.name.get('en'),
+              content: e.attributes.name.get(context.locale.languageCode),
             ),
           );
     }, [manga]);
@@ -1597,7 +1613,11 @@ class MangaGenreRow extends HookWidget {
           .map(
             (e) => IconTextChip(
               key: ValueKey(e.id),
-              text: e.attributes.name.get('en'),
+              text: e.attributes.name.get(context.locale.languageCode),
+              onPressed:
+                  () => context.router.push(
+                    MangaDexTagViewRoute(tagId: e.id, tag: e),
+                  ),
             ),
           );
     }, [manga]);

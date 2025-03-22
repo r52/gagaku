@@ -11,6 +11,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
@@ -254,7 +255,11 @@ class _MangaDexMangaViewWidgetState
               .map(
                 (e) => IconTextChip(
                   key: ValueKey(e.id),
-                  text: e.attributes.name.get('en'),
+                  text: e.attributes.name.get(context.locale.languageCode),
+                  onPressed:
+                      () => router.push(
+                        MangaDexTagViewRoute(tagId: e.id, tag: e),
+                      ),
                 ),
               )
               .toList(),

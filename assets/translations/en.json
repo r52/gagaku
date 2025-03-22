@@ -254,6 +254,9 @@
     "contentRating": "Content Rating",
     "demographic": "Demographic",
     "pubStatus": "Publication Status",
+    "trendingThisYear": "Trending this year",
+    "byPopularity": "By Popularity",
+    "tagTitles": "Browse all {} titles",
     "creator": {
       "biography": "Biography",
       "follow": "Follow",

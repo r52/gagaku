@@ -167,6 +167,7 @@ class _FrontPageWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final api = ref.watch(mangadexProvider);
     final router = AutoRouter.of(context);
     const style = TextStyle(fontSize: 24);
 
@@ -231,15 +232,20 @@ class _FrontPageWidget extends HookConsumerWidget {
     ];
 
     return RefreshIndicator(
-      onRefresh: () {
+      onRefresh: () async {
+        await api.invalidateAll(MangaDexFeeds.popularTitles.key);
+        await api.invalidateAll(MangaDexFeeds.recentlyAdded.key);
+        await api.invalidateAll(MangaDexFeeds.globalFeed.key);
         ref.invalidate(staffPicks);
         ref.invalidate(seasonal);
         ref.invalidate(_recentlyAddedProvider);
-        ref.invalidate(_latestUpdatesProvider);
-        return Future.wait([
+
+        await (
           ref.refresh(_popularTitlesProvider.future),
           ref.refresh(_latestUpdatesProvider.future),
-        ]);
+        ).wait;
+
+        return;
       },
       child: ScrollConfiguration(
         behavior: const MouseTouchScrollBehavior(),
@@ -258,36 +264,6 @@ class _FrontPageWidget extends HookConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class MangaProviderCarousel extends StatelessWidget {
-  const MangaProviderCarousel({super.key, required this.provider});
-
-  final Refreshable<AsyncValue<List<Manga>>> provider;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: DataProviderWhenWidget(
-        provider: provider,
-        builder:
-            (context, items) => ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 256),
-              child: CarouselView(
-                itemExtent: 180,
-                shrinkExtent: 180,
-                enableSplash: false,
-                children:
-                    items
-                        .map(
-                          (e) => GridMangaItem(key: ValueKey(e.id), manga: e),
-                        )
-                        .toList(),
-              ),
-            ),
       ),
     );
   }

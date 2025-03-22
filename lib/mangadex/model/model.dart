@@ -704,6 +704,9 @@ class MangaDexModel {
         case Group(:final id):
           queryParams['group'] = id;
           break;
+        case Tag(:final id):
+          queryParams['includedTags[]'] = id;
+          break;
         default:
           final msg =
               "fetchMangaList() failed. Invalid filter type ${entity.runtimeType}.";

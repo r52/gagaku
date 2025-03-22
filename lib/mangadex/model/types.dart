@@ -261,6 +261,12 @@ abstract class MangaFilters with _$MangaFilters {
 
     return params;
   }
+
+  bool get isEmpty {
+    return this == const MangaFilters();
+  }
+
+  bool get isDefault => isEmpty;
 }
 
 @freezed

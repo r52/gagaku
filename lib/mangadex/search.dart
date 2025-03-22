@@ -26,29 +26,18 @@ class _SearchHistory extends _$SearchHistory {
       state = cb(state);
 }
 
-@Riverpod(keepAlive: true)
-class _SearchParams extends _$SearchParams {
-  @override
-  MangaSearchParameters build() =>
-      const MangaSearchParameters(query: '', filter: MangaFilters());
-
-  @override
-  set state(MangaSearchParameters newState) => super.state = newState;
-  MangaSearchParameters update(
-    MangaSearchParameters Function(MangaSearchParameters state) cb,
-  ) => state = cb(state);
-}
-
 @RoutePage()
 class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({
     super.key,
     this.selectMode = false,
     this.selectedTitles,
+    this.parameters,
   });
 
   final bool selectMode;
   final Set<String>? selectedTitles;
+  final MangaSearchParameters? parameters;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -58,12 +47,16 @@ class MangaDexSearchPage extends StatefulHookConsumerWidget {
 class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
   static const info = MangaDexFeeds.search;
 
+  late MangaSearchParameters _searchParameters =
+      widget.parameters ??
+      const MangaSearchParameters(query: '', filter: MangaFilters());
+
   late final _pagingController = GagakuPagingController<int, Manga>(
     getNextPageKey:
         (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
-      final filter = ref.watch(_searchParamsProvider);
+      final filter = _searchParameters;
 
       final results = await api.searchManga(
         filter.query,
@@ -90,8 +83,9 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final nav = Navigator.of(context);
-    final filter = ref.watch(_searchParamsProvider);
+    final filter = _searchParameters;
     final controller = useSearchController();
 
     final selected = useReducer(
@@ -147,18 +141,20 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                           );
 
                           if (result != null) {
-                            ref
-                                .read(_searchParamsProvider.notifier)
-                                .state = filter.copyWith(
-                              query: filter.query,
-                              filter: result,
-                            );
-
                             setState(() {
+                              _searchParameters = filter.copyWith(
+                                query: filter.query,
+                                filter: result,
+                              );
+
                               _pagingController.refresh();
                             });
                           }
                         },
+                        color:
+                            _searchParameters.filter.isEmpty
+                                ? theme.disabledColor
+                                : null,
                         icon: const Icon(Icons.filter_list),
                       ),
                     ),
@@ -177,12 +173,14 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                           {term, ...history}.take(5).toList();
                     }
 
-                    ref.read(_searchParamsProvider.notifier).state = filter
-                        .copyWith(query: term, filter: filter.filter);
-
                     unfocusSearchBar();
 
                     setState(() {
+                      _searchParameters = filter.copyWith(
+                        query: term,
+                        filter: filter.filter,
+                      );
+
                       _pagingController.refresh();
                     });
                   },
@@ -197,12 +195,15 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                 }
 
                 controller.closeView(term);
-                ref.read(_searchParamsProvider.notifier).state = filter
-                    .copyWith(query: term, filter: filter.filter);
 
                 unfocusSearchBar();
 
                 setState(() {
+                  _searchParameters = filter.copyWith(
+                    query: term,
+                    filter: filter.filter,
+                  );
+
                   _pagingController.refresh();
                 });
               },
@@ -225,16 +226,15 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                           }
 
                           controller.closeView(term);
-                          ref
-                              .read(_searchParamsProvider.notifier)
-                              .state = filter.copyWith(
-                            query: term,
-                            filter: filter.filter,
-                          );
 
                           unfocusSearchBar();
 
                           setState(() {
+                            _searchParameters = filter.copyWith(
+                              query: term,
+                              filter: filter.filter,
+                            );
+
                             _pagingController.refresh();
                           });
                         },
@@ -265,13 +265,12 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                 ),
                 onSelected: (FilterOrder? order) async {
                   if (order != null) {
-                    ref.read(_searchParamsProvider.notifier).state = filter
-                        .copyWith(
-                          query: filter.query,
-                          filter: filter.filter.copyWith(order: order),
-                        );
-
                     setState(() {
+                      _searchParameters = filter.copyWith(
+                        query: filter.query,
+                        filter: filter.filter.copyWith(order: order),
+                      );
+
                       _pagingController.refresh();
                     });
                   }
