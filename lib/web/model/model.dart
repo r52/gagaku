@@ -675,7 +675,8 @@ class WebReadMarkers extends _$WebReadMarkers {
 @Riverpod(keepAlive: true)
 class ExtensionSource extends _$ExtensionSource {
   HeadlessInAppWebView? _view;
-  late InAppWebViewController _controller;
+  InAppWebViewController? get _controller =>
+      (_view?.isRunning() ?? false) ? _view?.webViewController : null;
 
   @override
   Future<WebSourceInfo> build(String sourceId) async {
@@ -749,18 +750,17 @@ class ExtensionSource extends _$ExtensionSource {
               "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
         );
 
-        _controller = controller;
         logger.d("Extension ${source.name} ready");
         completer.complete();
       },
     );
 
+    await _view?.run();
+    await completer.future;
+
     ref.onDispose(() {
       _view?.dispose();
     });
-
-    await _view?.run();
-    await completer.future;
 
     return source;
   }
@@ -769,12 +769,14 @@ class ExtensionSource extends _$ExtensionSource {
     String bindingId, [
     List<dynamic> args = const [],
   ]) async {
+    await future;
+
     final arg = args.map((e) => json.encode(e)).toList().join(",");
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       functionBody: "return await window.callBinding('$bindingId', $arg)",
     );
 
-    return result!.value;
+    return result?.value;
   }
 
   Future<DUISection> getSourceMenu() async {
@@ -784,7 +786,7 @@ class ExtensionSource extends _$ExtensionSource {
       throw Exception("Source does not support settings");
     }
 
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       functionBody: "return await window.processSourceMenu($sourceId)",
     );
 
@@ -807,7 +809,7 @@ class ExtensionSource extends _$ExtensionSource {
       throw Exception("Source does not support homepages");
     }
 
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       functionBody: """
 var homesections = [];
 var cb = function (section) {
@@ -845,7 +847,7 @@ return homesections;
       throw Exception("Source does not support homepages");
     }
 
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       arguments: {'homepageSectionId': homepageSectionId, 'metadata': metadata},
       functionBody: """
 return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
@@ -873,7 +875,7 @@ return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
     }
 
     final params = query.toJson();
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       arguments: {'query': params, 'metadata': metadata},
       functionBody: """
 return await $sourceId.getSearchResults(query, metadata)
@@ -896,7 +898,7 @@ return await $sourceId.getSearchResults(query, metadata)
       return null;
     }
 
-    final mdeets = await _controller.callAsyncJavaScript(
+    final mdeets = await _controller?.callAsyncJavaScript(
       functionBody: "return await $sourceId.getMangaDetails('$mangaId')",
     );
 
@@ -906,7 +908,7 @@ return await $sourceId.getSearchResults(query, metadata)
 
     final smanga = SourceManga.fromJson(mdeets.value);
 
-    final chaps = await _controller.callAsyncJavaScript(
+    final chaps = await _controller?.callAsyncJavaScript(
       functionBody: """
 var p = await $sourceId.getChapters('$mangaId');
 p.forEach((e) => e.time = e.time.toISOString());
@@ -957,7 +959,7 @@ return p;
       return [];
     }
 
-    final cdeets = await _controller.callAsyncJavaScript(
+    final cdeets = await _controller?.callAsyncJavaScript(
       functionBody:
           "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')",
     );
@@ -971,18 +973,18 @@ return p;
     return chapterd.pages;
   }
 
-  Future<String> getMangaURL(String mangaId) async {
+  Future<String?> getMangaURL(String mangaId) async {
     await future;
 
     if (mangaId.isEmpty) {
-      return '';
+      return null;
     }
 
-    final result = await _controller.evaluateJavascript(
-      source: "$sourceId.getMangaShareUrl('$mangaId')",
+    final result = await _controller?.evaluateJavascript(
+      source: "$sourceId?.getMangaShareUrl('$mangaId')",
     );
 
-    return result as String;
+    return result;
   }
 }
 

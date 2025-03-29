@@ -301,22 +301,33 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             text: tr.mangaView.openOn(arg: 'cubari.moe'),
                           ),
                         if (handle.type == SourceType.source)
-                          ButtonChip(
-                            onPressed: () async {
-                              final url = await ref
-                                  .read(
-                                    extensionSourceProvider(
-                                      handle.source,
-                                    ).notifier,
-                                  )
-                                  .getMangaURL(handle.location);
-                              final uri = Uri.parse(url);
-
-                              if (!await launchUrl(uri)) {
-                                throw 'Could not launch $url';
+                          SimpleFutureBuilder(
+                            futureBuilder:
+                                () => ref
+                                    .read(
+                                      extensionSourceProvider(
+                                        handle.source,
+                                      ).notifier,
+                                    )
+                                    .getMangaURL(handle.location),
+                            keys: [handle],
+                            builder: (context, data) {
+                              if (data == null) {
+                                return SizedBox.shrink();
                               }
+
+                              return ButtonChip(
+                                onPressed: () async {
+                                  final url = data;
+                                  final uri = Uri.parse(url);
+
+                                  if (!await launchUrl(uri)) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                text: tr.mangaView.openOn(arg: handle.source),
+                              );
                             },
-                            text: tr.mangaView.openOn(arg: handle.source),
                           ),
                       ],
                     ),
