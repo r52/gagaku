@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
@@ -17,12 +17,20 @@ class DirectoryReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
   final String? link;
   final CtxCallback? onLinkPressed;
 
-  DirectoryReaderRouteBuilder({required this.path, this.title, this.link, this.onLinkPressed})
-    : super(
-        pageBuilder:
-            (context, animation, secondaryAnimation) =>
-                DirectoryReaderWidget(path: path, title: title, link: link, onLinkPressed: onLinkPressed),
-      );
+  DirectoryReaderRouteBuilder({
+    required this.path,
+    this.title,
+    this.link,
+    this.onLinkPressed,
+  }) : super(
+         pageBuilder:
+             (context, animation, secondaryAnimation) => DirectoryReaderWidget(
+               path: path,
+               title: title,
+               link: link,
+               onLinkPressed: onLinkPressed,
+             ),
+       );
 }
 
 @riverpod
@@ -43,7 +51,9 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
           )
           .toList();
 
-  pageFiles.sort((a, b) => compareNatural(a.uri.pathSegments.last, b.uri.pathSegments.last));
+  pageFiles.sort(
+    (a, b) => compareNatural(a.uri.pathSegments.last, b.uri.pathSegments.last),
+  );
 
   if (pageFiles.isEmpty) {
     return [];
@@ -51,7 +61,9 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
 
   final pages = <ReaderPage>[];
   for (final f in pageFiles) {
-    pages.add(ReaderPage(provider: FileImage(f), sortKey: f.uri.pathSegments.last));
+    pages.add(
+      ReaderPage(provider: FileImage(f), sortKey: f.uri.pathSegments.last),
+    );
   }
 
   ref.onDispose(() {
@@ -62,7 +74,13 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
 }
 
 class DirectoryReaderWidget extends StatelessWidget {
-  const DirectoryReaderWidget({super.key, required this.path, this.title, this.link, this.onLinkPressed});
+  const DirectoryReaderWidget({
+    super.key,
+    required this.path,
+    this.title,
+    this.link,
+    this.onLinkPressed,
+  });
 
   final String path;
   final String? title;
@@ -71,6 +89,7 @@ class DirectoryReaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final theme = Theme.of(context);
 
     String strtitle = path;
@@ -81,12 +100,16 @@ class DirectoryReaderWidget extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _getDirectoryPagesProvider(path),
-      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: const BackButton()), body: child),
+      errorBuilder:
+          (context, child) => Scaffold(
+            appBar: AppBar(leading: const BackButton()),
+            body: child,
+          ),
       builder: (context, pages) {
         if (pages.isEmpty) {
           return Scaffold(
             appBar: AppBar(leading: const BackButton()),
-            body: Center(child: Text('localLibrary.dirUnreadableWarning'.tr(context: context))),
+            body: Center(child: Text(tr.localLibrary.dirUnreadableWarning)),
           );
         }
 
@@ -104,7 +127,7 @@ class DirectoryReaderWidget extends StatelessWidget {
           spacing: 20.0,
           children: [
             Text(
-              'localLibrary.loadingDir'.tr(context: context),
+              tr.localLibrary.loadingDir,
               style: TextStyle(
                 color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.normal,

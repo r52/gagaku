@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
@@ -12,6 +12,7 @@ class MangaDexGlobalFeedPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final controller = useScrollController();
     final info = MangaDexFeeds.globalFeed;
 
@@ -25,9 +26,7 @@ class MangaDexGlobalFeedPage extends HookWidget {
               curve: Curves.easeOutCirc,
             );
           },
-          child: TitleFlexBar(
-            title: 'mangadex.latestUpdates'.tr(context: context),
-          ),
+          child: TitleFlexBar(title: t.mangadex.latestUpdates),
         ),
         leading: AutoLeadingButton(),
       ),

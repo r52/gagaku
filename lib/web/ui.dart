@@ -1,16 +1,18 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/web/model/model.dart';
 
 Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
+  final tr = context.t;
   final messenger = ScaffoldMessenger.of(context);
   final result = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return const OpenLinkDialog();
-      });
+    context: context,
+    builder: (BuildContext context) {
+      return const OpenLinkDialog();
+    },
+  );
 
   if (result != null && context.mounted) {
     final parseResult = await api.handleUrl(url: result, context: context);
@@ -19,10 +21,12 @@ Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
     if (!parseResult) {
       messenger
         ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text('errors.unsupportedUrl'.tr(context: context)),
-          backgroundColor: Colors.red,
-        ));
+        ..showSnackBar(
+          SnackBar(
+            content: Text(tr.errors.unsupportedUrl),
+            backgroundColor: Colors.red,
+          ),
+        );
     }
   }
 }
@@ -32,17 +36,20 @@ class OpenLinkDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final urlFieldController = useTextEditingController();
 
     return AlertDialog(
-      title: Text('webSources.openUrl'.tr(context: context)),
+      title: Text(tr.webSources.openUrl),
       content: TextField(
         controller: urlFieldController,
-        decoration: const InputDecoration(hintText: 'cubari.moe, imgur.com etc.'),
+        decoration: const InputDecoration(
+          hintText: 'cubari.moe, imgur.com etc.',
+        ),
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('ui.pasteClipboard'.tr(context: context)),
+          child: Text(tr.ui.pasteClipboard),
           onPressed: () async {
             var result = await Clipboard.getData('text/plain');
             if (result != null) {
@@ -51,14 +58,14 @@ class OpenLinkDialog extends HookWidget {
           },
         ),
         TextButton(
-          child: Text('ui.cancel'.tr(context: context)),
+          child: Text(tr.ui.cancel),
           onPressed: () {
             Navigator.of(context).pop();
             urlFieldController.clear();
           },
         ),
         ElevatedButton(
-          child: Text('ui.go'.tr(context: context)),
+          child: Text(tr.ui.go),
           onPressed: () {
             Navigator.of(context).pop(urlFieldController.text);
             urlFieldController.clear();

@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
@@ -23,12 +23,13 @@ class GridExtentSlider extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final cfg = ref.watch(gagakuSettingsProvider);
     return MenuAnchor(
       menuChildren: <Widget>[
         Padding(
           padding: EdgeInsets.only(left: 10, top: 10),
-          child: Text('ui.gridSize'.tr(context: context)),
+          child: Text(tr.ui.gridSize),
         ),
         Slider(
           value: cfg.gridAlbumExtent.index.toDouble(),
@@ -45,7 +46,7 @@ class GridExtentSlider extends ConsumerWidget {
       ],
       builder: (_, MenuController controller, Widget? child) {
         return IconButton(
-          tooltip: 'ui.gridSize'.tr(context: context),
+          tooltip: tr.ui.gridSize,
           onPressed: () {
             if (controller.isOpen) {
               controller.close();

@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -13,6 +13,7 @@ import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -132,6 +133,7 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final api = ref.watch(mangadexProvider);
     const style = TextStyle(fontSize: 24);
 
@@ -153,12 +155,7 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
     final scrollController = useScrollController();
 
     final widgets = [
-      Center(
-        child: Text(
-          'mangadex.trendingThisYear'.tr(context: context),
-          style: style,
-        ),
-      ),
+      Center(child: Text(tr.mangadex.trendingThisYear, style: style)),
       MangaProviderCarousel(provider: _trendingThisYearProvider(tag)),
       TextButton.icon(
         onPressed: () {
@@ -172,21 +169,15 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
           );
         },
         label: Text(
-          'mangadex.tagTitles'.tr(
-            context: context,
-            args: [tag.attributes.name.get(context.locale.languageCode)],
+          tr.mangadex.tagTitles(
+            tag: tag.attributes.name.get(tr.$meta.locale.languageCode),
           ),
           style: style,
         ),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
-      Center(
-        child: Text(
-          'mangadex.recentlyAdded'.tr(context: context),
-          style: style,
-        ),
-      ),
+      Center(child: Text(tr.mangadex.recentlyAdded, style: style)),
       MangaProviderCarousel(provider: _recentlyAddedProvider(tag)),
     ];
 
@@ -202,7 +193,7 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
             );
           },
           child: TitleFlexBar(
-            title: tag.attributes.name.get(context.locale.languageCode),
+            title: tag.attributes.name.get(tr.$meta.locale.languageCode),
           ),
         ),
       ),
@@ -225,10 +216,7 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
             child: MangaListWidget(
               controller: scrollController,
               future: popularFuture,
-              title: Text(
-                'mangadex.byPopularity'.tr(context: context),
-                style: style,
-              ),
+              title: Text(tr.mangadex.byPopularity, style: style),
               leading: [
                 SliverList.separated(
                   itemCount: widgets.length,

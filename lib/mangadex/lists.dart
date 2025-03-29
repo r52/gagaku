@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -37,6 +37,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final router = AutoRouter.of(context);
     final theme = Theme.of(context);
     final scrollController =
@@ -59,9 +60,8 @@ class MangaDexListsWidget extends HookConsumerWidget {
           ..showSnackBar(
             SnackBar(
               content: Text(
-                'mangadex.deleteListError'.tr(
-                  context: context,
-                  args: [(state.state as ErrorMutationState).error.toString()],
+                t.mangadex.deleteListError(
+                  error: (state.state as ErrorMutationState).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,
@@ -72,7 +72,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
           ..removeCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
-              content: Text('mangadex.deleteListOk'.tr(context: context)),
+              content: Text(t.mangadex.deleteListOk),
               backgroundColor: Colors.green,
             ),
           );
@@ -106,7 +106,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
     }, [scrollController, me]);
 
     final appbar = MangaDexSliverAppBar(
-      title: 'mangadex.myLists'.tr(context: context),
+      title: t.mangadex.myLists,
       controller: scrollController,
     );
 
@@ -124,11 +124,11 @@ class MangaDexListsWidget extends HookConsumerWidget {
           segments: <ButtonSegment<_ListViewType>>[
             ButtonSegment<_ListViewType>(
               value: _ListViewType.self,
-              label: Text('mangadex.myLists'.tr(context: context)),
+              label: Text(t.mangadex.myLists),
             ),
             ButtonSegment<_ListViewType>(
               value: _ListViewType.followed,
-              label: Text('mangadex.followedLists'.tr(context: context)),
+              label: Text(t.mangadex.followedLists),
             ),
           ],
           selected: <_ListViewType>{view.value},
@@ -142,9 +142,9 @@ class MangaDexListsWidget extends HookConsumerWidget {
     return Scaffold(
       drawer: const MainDrawer(),
       floatingActionButton: FloatingActionButton.extended(
-        tooltip: 'mangadex.newList'.tr(context: context),
+        tooltip: t.mangadex.newList,
         icon: const Icon(Icons.playlist_add),
-        label: Text('mangadex.newList'.tr(context: context)),
+        label: Text(t.mangadex.newList),
         onPressed: () {
           final messenger = ScaffoldMessenger.of(context);
           router.push<bool>(MangaDexEditListRoute()).then((success) {
@@ -154,7 +154,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                 ..removeCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content: Text('mangadex.newListOk'.tr(context: context)),
+                    content: Text(t.mangadex.newListOk),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -179,9 +179,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                         appbar,
                         leading,
                         if (lists.isEmpty)
-                          SliverToBoxAdapter(
-                            child: Text('errors.nolists'.tr(context: context)),
-                          ),
+                          SliverToBoxAdapter(child: Text(t.errors.nolists)),
                         SliverList.builder(
                           itemCount: lists.length,
                           findChildIndexCallback: (key) {
@@ -218,9 +216,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                   ),
                                 ),
                                 title: Text(item.attributes.name),
-                                subtitle: Text(
-                                  'num_items'.plural(item.set.length),
-                                ),
+                                subtitle: Text(t.num_items(n: item.set.length)),
                                 trailing: MenuAnchor(
                                   builder:
                                       (context, controller, child) =>
@@ -256,12 +252,8 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                               () => followList(item, idx == -1),
                                           child: Text(
                                             idx == -1
-                                                ? 'ui.follow'.tr(
-                                                  context: context,
-                                                )
-                                                : 'ui.unfollow'.tr(
-                                                  context: context,
-                                                ),
+                                                ? t.ui.follow
+                                                : t.ui.unfollow,
                                           ),
                                         );
                                       },
@@ -277,9 +269,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                           deleteList(item);
                                         }
                                       },
-                                      child: Text(
-                                        'ui.delete'.tr(context: context),
-                                      ),
+                                      child: Text(t.ui.delete),
                                     ),
                                     MenuItemButton(
                                       onPressed: () {
@@ -287,9 +277,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                           MangaDexEditListRoute(list: item),
                                         );
                                       },
-                                      child: Text(
-                                        'ui.edit'.tr(context: context),
-                                      ),
+                                      child: Text(t.ui.edit),
                                     ),
                                   ],
                                 ),
@@ -333,9 +321,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                         appbar,
                         leading,
                         if (lists.isEmpty)
-                          SliverToBoxAdapter(
-                            child: Text('errors.nolists'.tr(context: context)),
-                          ),
+                          SliverToBoxAdapter(child: Text(t.errors.nolists)),
                         SliverList.builder(
                           itemCount: lists.length,
                           findChildIndexCallback: (key) {
@@ -372,9 +358,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                   ),
                                 ),
                                 title: Text(item.attributes.name),
-                                subtitle: Text(
-                                  'num_items'.plural(item.set.length),
-                                ),
+                                subtitle: Text(t.num_items(n: item.set.length)),
                                 trailing: MenuAnchor(
                                   builder:
                                       (context, controller, child) =>
@@ -393,9 +377,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                       onPressed: () async {
                                         followList(item, false);
                                       },
-                                      child: Text(
-                                        'ui.unfollow'.tr(context: context),
-                                      ),
+                                      child: Text(t.ui.unfollow),
                                     ),
                                     if (item.user != null &&
                                         me != null &&
@@ -411,9 +393,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                             deleteList(item);
                                           }
                                         },
-                                        child: Text(
-                                          'ui.delete'.tr(context: context),
-                                        ),
+                                        child: Text(t.ui.delete),
                                       ),
                                     if (item.user != null &&
                                         me != null &&
@@ -424,9 +404,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                             MangaDexEditListRoute(list: item),
                                           );
                                         },
-                                        child: Text(
-                                          'ui.edit'.tr(context: context),
-                                        ),
+                                        child: Text(t.ui.edit),
                                       ),
                                   ],
                                 ),

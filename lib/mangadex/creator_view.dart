@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -106,6 +106,7 @@ class _MangaDexCreatorViewWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final scrollController = useScrollController();
     final theme = Theme.of(context);
 
@@ -134,9 +135,7 @@ class _MangaDexCreatorViewWidgetState
               children: [
                 if (widget.creator.attributes.biography.isNotEmpty)
                   ExpansionTile(
-                    title: Text(
-                      'mangadex.creator.biography'.tr(context: context),
-                    ),
+                    title: Text(tr.mangadex.creator.biography),
                     children: [
                       for (final MapEntry(key: prop, value: desc)
                           in widget.creator.attributes.biography.entries)
@@ -168,7 +167,7 @@ class _MangaDexCreatorViewWidgetState
                     widget.creator.attributes.website != null)
                   ExpansionTile(
                     expandedAlignment: Alignment.centerLeft,
-                    title: Text('mangadex.creator.follow'.tr(context: context)),
+                    title: Text(tr.mangadex.creator.follow),
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8),
@@ -205,7 +204,7 @@ class _MangaDexCreatorViewWidgetState
             ),
           ],
           title: Text(
-            'mangadex.creator.works'.tr(context: context),
+            tr.mangadex.creator.works,
             style: TextStyle(fontSize: 24),
           ),
           physics: const AlwaysScrollableScrollPhysics(),

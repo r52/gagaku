@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -15,6 +15,7 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final results = useMemoized(
       () =>
           ref.read(extensionSourceProvider(source.id).notifier).getSourceMenu(),
@@ -38,7 +39,7 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('arg_settings'.tr(context: context, args: [source.name])),
+        title: Text(tr.arg_settings(arg: source.name)),
         leading: AutoLeadingButton(),
       ),
       body: SafeArea(child: body),

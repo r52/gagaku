@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:animations/animations.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -54,6 +54,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final router = AutoRouter.of(context);
     final theme = Theme.of(context);
     final view = useState(_ViewType.titles);
@@ -61,14 +62,8 @@ class MangaDexListViewPage extends HookConsumerWidget {
     final listProvider = ref.watch(_getListProvider(listId));
 
     final bottomNavigationBarItems = <Widget>[
-      NavigationDestination(
-        icon: Icon(Icons.menu_book),
-        label: 'titles'.tr(context: context),
-      ),
-      NavigationDestination(
-        icon: Icon(Icons.feed),
-        label: 'feed'.tr(context: context),
-      ),
+      NavigationDestination(icon: Icon(Icons.menu_book), label: t.titles),
+      NavigationDestination(icon: Icon(Icons.feed), label: t.feed),
     ];
 
     final controllers = [useScrollController(), useScrollController()];
@@ -131,10 +126,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                           idx == -1 ? Icons.bookmark_border : Icons.bookmark,
                           color: idx == -1 ? null : theme.colorScheme.primary,
                         ),
-                        tooltip:
-                            idx == -1
-                                ? 'ui.follow'.tr(context: context)
-                                : 'ui.unfollow'.tr(context: context),
+                        tooltip: idx == -1 ? t.ui.follow : t.ui.unfollow,
                       );
                     },
                   ),
@@ -147,7 +139,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                         router.push(MangaDexEditListRoute(list: list));
                       },
                       icon: const Icon(Icons.edit),
-                      tooltip: 'ui.edit'.tr(context: context),
+                      tooltip: t.ui.edit,
                     ),
                   const SizedBox.shrink(),
                 ],
@@ -187,7 +179,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
 
                                 return MangaListWidget(
                                   title: Text(
-                                    '${'titles'.tr(context: context)} (${list.set.length})',
+                                    '${t.titles} (${list.set.length})',
                                     style: const TextStyle(fontSize: 24),
                                   ),
                                   physics:
@@ -229,7 +221,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                   limit: customFeedInfo.limit,
                   path: customFeedInfo.path!.replaceFirst('{id}', list.id),
                   entity: list,
-                  title: 'mangadex.listFeed'.tr(context: context),
+                  title: t.mangadex.listFeed,
                   scrollController: controllers[1],
                   restorationId: 'list_feed_offset',
                 ),
@@ -261,11 +253,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
       case AsyncValue(hasValue: true, value: final list) when list == null:
         return Scaffold(
           appBar: AppBar(),
-          body: Center(
-            child: Text(
-              'mangadex.listNotExistError'.tr(context: context, args: [listId]),
-            ),
-          ),
+          body: Center(child: Text(t.mangadex.listNotExistError(id: listId))),
         );
       case AsyncValue(:final progress):
         return Scaffold(body: ListSpinner(progress: progress?.toDouble()));

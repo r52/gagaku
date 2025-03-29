@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
@@ -24,6 +24,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final scrollController =
         DefaultScrollController.maybeOf(context, 'WebSourceFrontPage') ??
         controller ??
@@ -47,23 +48,18 @@ class WebSourceFrontPage extends HookConsumerWidget {
               builder: (BuildContext context) {
                 final nav = Navigator.of(context);
                 return AlertDialog(
-                  title: Text('webSources.repo.add'.tr(context: context)),
+                  title: Text(tr.webSources.repo.add),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'webSources.repo.addConfirm'.tr(
-                          context: context,
-                          args: [name],
-                        ),
-                      ),
-                      Text('webSources.repo.addWarning'.tr(context: context)),
+                      Text(tr.webSources.repo.addConfirm(repo: name)),
+                      Text(tr.webSources.repo.addWarning),
                     ],
                   ),
                   actions: <Widget>[
                     ElevatedButton(
-                      child: Text('ui.no'.tr(context: context)),
+                      child: Text(tr.ui.no),
                       onPressed: () {
                         nav.pop(null);
                       },
@@ -72,7 +68,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
                       onPressed: () {
                         nav.pop(true);
                       },
-                      child: Text('ui.yes'.tr(context: context)),
+                      child: Text(tr.ui.yes),
                     ),
                   ],
                 );
@@ -89,9 +85,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text(
-                        'webSources.repo.repoExists'.tr(context: context),
-                      ),
+                      content: Text(tr.webSources.repo.repoExists),
                       backgroundColor: Colors.orange,
                     ),
                   );
@@ -103,9 +97,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text(
-                        'webSources.repo.repoAddOK'.tr(context: context),
-                      ),
+                      content: Text(tr.webSources.repo.repoAddOK),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -135,17 +127,13 @@ class WebSourceFrontPage extends HookConsumerWidget {
               automaticallyImplyLeading: false,
               pinned: true,
               title: Text(
-                'webSources.homepages'.tr(context: context),
+                tr.webSources.homepages,
                 style: TextStyle(fontSize: 24),
               ),
             ),
             if (homepageSources.isEmpty)
               SliverToBoxAdapter(
-                child: Center(
-                  child: Text(
-                    "webSources.noSourcesWarning".tr(context: context),
-                  ),
-                ),
+                child: Center(child: Text(tr.webSources.noSourcesWarning)),
               ),
             if (homepageSources.isNotEmpty)
               SliverList.builder(
@@ -182,6 +170,7 @@ class ExtensionHomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final theme = Theme.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
@@ -291,7 +280,7 @@ class ExtensionHomePage extends HookConsumerWidget {
                                 WebSourceSearchWidget(source: source),
                       ),
                     ),
-                tooltip: 'search.arg'.tr(context: context, args: [source.name]),
+                tooltip: tr.search.arg(arg: source.name),
               ),
               if (source.hasCapability(SourceIntents.settingsUI))
                 IconButton(
@@ -305,7 +294,7 @@ class ExtensionHomePage extends HookConsumerWidget {
                                   ExtensionSettingsPage(source: source),
                         ),
                       ),
-                  tooltip: 'webSources.source.settings'.tr(context: context),
+                  tooltip: tr.webSources.source.settings,
                 ),
             ],
           ),

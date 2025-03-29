@@ -1,5 +1,5 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 
@@ -10,6 +10,7 @@ class MangaDexLoginWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     return DataProviderWhenWidget(
       provider: authControlProvider,
       builder: (context, loggedin) {
@@ -19,17 +20,14 @@ class MangaDexLoginWidget extends StatelessWidget {
 
         return Center(
           child: ElevatedButton.icon(
-            onPressed: () => {} /*ref.read(authControlProvider.notifier).login()*/,
-            label: Text('mangadex.login'.tr(context: context)),
-            icon: const Icon(
-              Icons.https,
-            ),
+            onPressed:
+                () => {} /*ref.read(authControlProvider.notifier).login()*/,
+            label: Text(t.mangadex.login),
+            icon: const Icon(Icons.https),
           ),
         );
       },
-      loadingWidget: const Center(
-        child: CircularProgressIndicator(),
-      ),
+      loadingWidget: const Center(child: CircularProgressIndicator()),
     );
   }
 }

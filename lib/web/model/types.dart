@@ -358,6 +358,7 @@ class RepoData with _$RepoData implements RepoInfo {
   factory RepoData.fromJson(Map<String, dynamic> json) =>
       _$RepoDataFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$RepoDataToJson(this);
 }
 

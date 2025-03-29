@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/reader/model/controller_hooks.dart';
 import 'package:gagaku/reader/model/types.dart';
@@ -64,11 +64,16 @@ class ReaderWidget extends HookConsumerWidget {
     page.cached = true;
   }
 
-  void cachePages(ValueNotifier<int> currentPage, int precacheCount, BuildContext context) {
+  void cachePages(
+    ValueNotifier<int> currentPage,
+    int precacheCount,
+    BuildContext context,
+  ) {
     final pageCount = pages.length;
 
     // Forward cache precacheCount() pages
-    if (currentPage.value + 1 < pageCount && !pages.elementAt(currentPage.value + 1).cached) {
+    if (currentPage.value + 1 < pageCount &&
+        !pages.elementAt(currentPage.value + 1).cached) {
       while (!pages.elementAt(currentPage.value + 1).cached) {
         pages.skip(currentPage.value).take(precacheCount).forEach((element) {
           if (!element.cached) {
@@ -118,7 +123,11 @@ class ReaderWidget extends HookConsumerWidget {
     switch (format) {
       case ReaderFormat.longstrip:
         if (listController.isAttached) {
-          listController.jumpToItem(index: page, scrollController: scrollController, alignment: 0);
+          listController.jumpToItem(
+            index: page,
+            scrollController: scrollController,
+            alignment: 0,
+          );
         }
 
         break;
@@ -294,7 +303,8 @@ class ReaderWidget extends HookConsumerWidget {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position = viewController[currentPage.value].position + Offset(0.0, offset);
+        viewController[currentPage.value].position =
+            viewController[currentPage.value].position + Offset(0.0, offset);
         break;
     }
 
@@ -318,7 +328,8 @@ class ReaderWidget extends HookConsumerWidget {
 
         if (max == pages.length - 1 &&
             scrollController.position.atEdge &&
-            scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+            scrollController.position.pixels ==
+                scrollController.position.maxScrollExtent) {
           context.maybePop();
         } else {
           scrollController.animateTo(
@@ -335,7 +346,8 @@ class ReaderWidget extends HookConsumerWidget {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position = viewController[currentPage.value].position - Offset(0.0, offset);
+        viewController[currentPage.value].position =
+            viewController[currentPage.value].position - Offset(0.0, offset);
         break;
     }
 
@@ -344,6 +356,7 @@ class ReaderWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final pageCount = pages.length;
     final focusNode = useFocusNode();
     final pageController = usePageController(initialPage: 0);
@@ -351,19 +364,28 @@ class ReaderWidget extends HookConsumerWidget {
       pageCount,
       (index) => usePhotoViewScaleStateController(),
     );
-    final viewController = List<PhotoViewController>.generate(pageCount, (index) => usePhotoViewController());
+    final viewController = List<PhotoViewController>.generate(
+      pageCount,
+      (index) => usePhotoViewController(),
+    );
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
     final currentPage = useValueNotifier(0);
     final listController = useListController();
     final scrollController = useScrollController();
-    final subtext = useValueNotifier<String?>(subtitle ?? (pages.isNotEmpty ? pages.elementAt(0).sortKey : ''));
+    final subtext = useValueNotifier<String?>(
+      subtitle ?? (pages.isNotEmpty ? pages.elementAt(0).sortKey : ''),
+    );
     final format = longstrip ? ReaderFormat.longstrip : settings.format;
     final isPortrait = DeviceContext.isPortraitMode(context);
-    final longStripScale = useValueNotifier(isPortrait ? LongStripScale.full : LongStripScale.small);
+    final longStripScale = useValueNotifier(
+      isPortrait ? LongStripScale.full : LongStripScale.small,
+    );
 
     final precacheCount = useCallback(() {
-      return (settings.precacheCount > 9 || format == ReaderFormat.longstrip) ? pageCount : settings.precacheCount;
+      return (settings.precacheCount > 9 || format == ReaderFormat.longstrip)
+          ? pageCount
+          : settings.precacheCount;
     }, [settings, format]);
 
     useEffect(() {
@@ -413,7 +435,8 @@ class ReaderWidget extends HookConsumerWidget {
 
     final pageDropdownItems = List<DropdownMenuEntry<int>>.generate(
       pageCount,
-      (int index) => DropdownMenuEntry<int>(value: index, label: (index + 1).toString()),
+      (int index) =>
+          DropdownMenuEntry<int>(value: index, label: (index + 1).toString()),
     );
 
     return Scaffold(
@@ -421,7 +444,10 @@ class ReaderWidget extends HookConsumerWidget {
       appBar: AppBar(
         leading: AutoLeadingButton(),
         title: ListTile(
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           subtitle: HookBuilder(
             builder: (_) {
               final value = useValueListenable(subtext);
@@ -439,7 +465,7 @@ class ReaderWidget extends HookConsumerWidget {
                 (context) => IconButton(
                   icon: const Icon(Icons.settings),
                   onPressed: () => Scaffold.of(context).openEndDrawer(),
-                  tooltip: 'reader.settings'.tr(context: context),
+                  tooltip: tr.reader.settings,
                 ),
           ),
         ],
@@ -463,12 +489,18 @@ class ReaderWidget extends HookConsumerWidget {
 
                       onHeaderPressed!(context);
                     },
-                    child: Text(drawerHeader!, style: const TextStyle(fontSize: 18)),
+                    child: Text(
+                      drawerHeader!,
+                      style: const TextStyle(fontSize: 18),
+                    ),
                   ),
                 if (drawerHeader != null && onHeaderPressed == null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(drawerHeader!, style: theme.textTheme.labelLarge?.copyWith(fontSize: 18)),
+                    child: Text(
+                      drawerHeader!,
+                      style: theme.textTheme.labelLarge?.copyWith(fontSize: 18),
+                    ),
                   ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -503,7 +535,10 @@ class ReaderWidget extends HookConsumerWidget {
                           requestFocusOnTap: false,
                           inputDecorationTheme: InputDecorationTheme(
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(width: 2.0, color: theme.colorScheme.inversePrimary),
+                              borderSide: BorderSide(
+                                width: 2.0,
+                                color: theme.colorScheme.inversePrimary,
+                              ),
                             ),
                           ),
                           onSelected: (int? index) {
@@ -543,7 +578,7 @@ class ReaderWidget extends HookConsumerWidget {
                 ),
                 const Divider(),
                 Text(
-                  'reader.settings'.tr(context: context),
+                  tr.reader.settings,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Wrap(
@@ -552,14 +587,16 @@ class ReaderWidget extends HookConsumerWidget {
                     for (final f in ReaderFormat.values)
                       ChoiceChip(
                         avatar: Icon(f.icon, color: theme.iconTheme.color),
-                        label: Text(context.tr(f.label)),
+                        label: Text(tr[f.label]),
                         selected: settings.format == f,
                         onSelected:
                             (longstrip)
                                 ? null
                                 : (value) {
                                   if (value) {
-                                    ref.read(readerSettingsProvider.save)(settings.copyWith(format: f));
+                                    ref.read(readerSettingsProvider.save)(
+                                      settings.copyWith(format: f),
+                                    );
                                   }
                                 },
                       ),
@@ -567,15 +604,19 @@ class ReaderWidget extends HookConsumerWidget {
                 ),
                 ActionChip(
                   avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
-                  label: Text('reader.togglePageSize'.tr(context: context)),
+                  label: Text(tr.reader.togglePageSize),
                   onPressed:
                       (format == ReaderFormat.longstrip)
                           ? () {
-                            longStripScale.value = toggleLongStripScale(longStripScale.value);
+                            longStripScale.value = toggleLongStripScale(
+                              longStripScale.value,
+                            );
                           }
                           : () {
-                            scaleStateController[currentPage.value].scaleState = defaultScaleStateCycle(
-                              scaleStateController[currentPage.value].scaleState,
+                            scaleStateController[currentPage.value]
+                                .scaleState = defaultScaleStateCycle(
+                              scaleStateController[currentPage.value]
+                                  .scaleState,
                             );
                           },
                 ),
@@ -585,14 +626,16 @@ class ReaderWidget extends HookConsumerWidget {
                     for (final dir in ReaderDirection.values)
                       ChoiceChip(
                         avatar: Icon(dir.icon, color: theme.iconTheme.color),
-                        label: Text(context.tr(dir.label)),
+                        label: Text(tr[dir.label]),
                         selected: settings.direction == dir,
                         onSelected:
                             (format == ReaderFormat.longstrip)
                                 ? null
                                 : (value) {
                                   if (value) {
-                                    ref.read(readerSettingsProvider.save)(settings.copyWith(direction: dir));
+                                    ref.read(readerSettingsProvider.save)(
+                                      settings.copyWith(direction: dir),
+                                    );
                                   }
                                 },
                       ),
@@ -600,40 +643,57 @@ class ReaderWidget extends HookConsumerWidget {
                 ),
                 ActionChip(
                   avatar: Icon(
-                    settings.showProgressBar ? Icons.donut_small : Icons.donut_small_outlined,
+                    settings.showProgressBar
+                        ? Icons.donut_small
+                        : Icons.donut_small_outlined,
                     color: theme.iconTheme.color,
                   ),
-                  label: Text('reader.progressBar'.tr(context: context)),
+                  label: Text(tr.reader.progressBar),
                   onPressed: () {
                     ref.read(readerSettingsProvider.save)(
-                      settings.copyWith(showProgressBar: !settings.showProgressBar),
+                      settings.copyWith(
+                        showProgressBar: !settings.showProgressBar,
+                      ),
                     );
                   },
                 ),
                 ActionChip(
                   avatar: Icon(
                     Icons.swipe,
-                    color: settings.swipeGestures ? theme.iconTheme.color : theme.disabledColor,
+                    color:
+                        settings.swipeGestures
+                            ? theme.iconTheme.color
+                            : theme.disabledColor,
                   ),
-                  label: Text('reader.swipeGestures'.tr(context: context)),
+                  label: Text(tr.reader.swipeGestures),
                   onPressed:
                       (format == ReaderFormat.longstrip)
                           ? null
                           : () {
                             ref.read(readerSettingsProvider.save)(
-                              settings.copyWith(swipeGestures: !settings.swipeGestures),
+                              settings.copyWith(
+                                swipeGestures: !settings.swipeGestures,
+                              ),
                             );
                           },
                 ),
                 ActionChip(
-                  avatar: Icon(Icons.mouse, color: settings.clickToTurn ? theme.iconTheme.color : theme.disabledColor),
-                  label: Text('reader.clickToTurn'.tr(context: context)),
+                  avatar: Icon(
+                    Icons.mouse,
+                    color:
+                        settings.clickToTurn
+                            ? theme.iconTheme.color
+                            : theme.disabledColor,
+                  ),
+                  label: Text(tr.reader.clickToTurn),
                   onPressed:
                       (format == ReaderFormat.longstrip)
                           ? null
                           : () {
                             ref.read(readerSettingsProvider.save)(
-                              settings.copyWith(clickToTurn: !settings.clickToTurn),
+                              settings.copyWith(
+                                clickToTurn: !settings.clickToTurn,
+                              ),
                             );
                           },
                 ),
@@ -641,7 +701,7 @@ class ReaderWidget extends HookConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 10.0,
                   children: [
-                    Text('reader.precacheCount'.tr(context: context)),
+                    Text(tr.reader.precacheCount),
                     DropdownMenu<int>(
                       initialSelection: settings.precacheCount,
                       width: 160.0,
@@ -650,21 +710,30 @@ class ReaderWidget extends HookConsumerWidget {
                       requestFocusOnTap: false,
                       inputDecorationTheme: InputDecorationTheme(
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(width: 2.0, color: theme.colorScheme.inversePrimary),
+                          borderSide: BorderSide(
+                            width: 2.0,
+                            color: theme.colorScheme.inversePrimary,
+                          ),
                         ),
                       ),
                       onSelected: (int? value) {
                         if (value != null) {
-                          ref.read(readerSettingsProvider.save)(settings.copyWith(precacheCount: value));
+                          ref.read(readerSettingsProvider.save)(
+                            settings.copyWith(precacheCount: value),
+                          );
                         }
                       },
-                      dropdownMenuEntries: List<DropdownMenuEntry<int>>.generate(
-                        10,
-                        (int index) => DropdownMenuEntry<int>(
-                          value: index + 1,
-                          label: (index + 1 > 9) ? 'Max (not recommended)' : (index + 1).toString(),
-                        ),
-                      ),
+                      dropdownMenuEntries:
+                          List<DropdownMenuEntry<int>>.generate(
+                            10,
+                            (int index) => DropdownMenuEntry<int>(
+                              value: index + 1,
+                              label:
+                                  (index + 1 > 9)
+                                      ? 'Max (not recommended)'
+                                      : (index + 1).toString(),
+                            ),
+                          ),
                     ),
                   ],
                 ),
@@ -836,10 +905,15 @@ class ReaderWidget extends HookConsumerWidget {
                             key: ValueKey(page.id),
                             child: HookBuilder(
                               builder: (context) {
-                                final scale = useValueListenable(longStripScale);
+                                final scale = useValueListenable(
+                                  longStripScale,
+                                );
                                 final width = mediaSize.width * scale.scale;
                                 return ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: width, maxWidth: width),
+                                  constraints: BoxConstraints(
+                                    minWidth: width,
+                                    maxWidth: width,
+                                  ),
                                   child: KeepAliveImage(
                                     image: page.provider,
                                     fit: BoxFit.contain,
@@ -853,7 +927,8 @@ class ReaderWidget extends HookConsumerWidget {
                                         child: CircularProgressIndicator(
                                           value:
                                               event.expectedTotalBytes != null
-                                                  ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                                                  ? event.cumulativeBytesLoaded /
+                                                      event.expectedTotalBytes!
                                                   : null,
                                         ),
                                       );
@@ -871,7 +946,10 @@ class ReaderWidget extends HookConsumerWidget {
             return PhotoViewGallery.builder(
               allowImplicitScrolling: true,
               reverse: settings.direction == ReaderDirection.rightToLeft,
-              scrollPhysics: !settings.swipeGestures ? const NeverScrollableScrollPhysics() : null,
+              scrollPhysics:
+                  !settings.swipeGestures
+                      ? const NeverScrollableScrollPhysics()
+                      : null,
               backgroundDecoration: const BoxDecoration(color: Colors.black),
               pageController: pageController,
               onPageChanged: (int index) {
@@ -884,7 +962,8 @@ class ReaderWidget extends HookConsumerWidget {
                       child: LinearProgressIndicator(
                         value:
                             event != null && event.expectedTotalBytes != null
-                                ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                                ? event.cumulativeBytesLoaded /
+                                    event.expectedTotalBytes!
                                 : null,
                       ),
                     ),
@@ -947,7 +1026,9 @@ class ReaderWidget extends HookConsumerWidget {
       bottomNavigationBar:
           settings.showProgressBar
               ? ProgressIndicator(
-                reverse: (format != ReaderFormat.longstrip) && settings.direction == ReaderDirection.rightToLeft,
+                reverse:
+                    (format != ReaderFormat.longstrip) &&
+                    settings.direction == ReaderDirection.rightToLeft,
                 currentPage: currentPage,
                 itemCount: pageCount,
                 color: theme.colorScheme.primary,
@@ -1050,7 +1131,10 @@ class _ProgressBarSection extends StatelessWidget {
               builder: (context) {
                 final page = useValueListenable(currentPage);
                 return Material(
-                  color: (index == 0 || page >= index) ? color : Colors.transparent,
+                  color:
+                      (index == 0 || page >= index)
+                          ? color
+                          : Colors.transparent,
                   child: SizedBox(height: height, width: double.infinity),
                 );
               },

@@ -1,15 +1,20 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/model/config.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class LocalLibrarySettingsRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
+class LocalLibrarySettingsRouteBuilder<T>
+    extends SlideTransitionRouteBuilder<T> {
   LocalLibrarySettingsRouteBuilder()
-      : super(pageBuilder: (context, animation, secondaryAnimation) => const LocalLibrarySettingsWidget());
+    : super(
+        pageBuilder:
+            (context, animation, secondaryAnimation) =>
+                const LocalLibrarySettingsWidget(),
+      );
 }
 
 class LocalLibrarySettingsWidget extends HookConsumerWidget {
@@ -17,16 +22,17 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final nav = Navigator.of(context);
     final cfg = ref.watch(localConfigProvider);
     final config = useState(cfg);
 
-    final saveSettings = 'saveSettings'.tr(context: context);
+    final saveSettings = tr.saveSettings;
 
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text('arg_settings'.tr(context: context, args: ['library'.tr(context: context)])),
+        title: Text(tr.arg_settings(arg: tr.library)),
         actions: [
           OverflowBar(
             spacing: 8.0,
@@ -43,7 +49,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
       body: SafeArea(
@@ -52,13 +58,10 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
           children: [
             SettingCardWidget(
               title: Text(
-                'localLibrary.settings.libraryPath'.tr(context: context),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                tr.localLibrary.settings.libraryPath,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              subtitle: Text('localLibrary.settings.libraryPathDesc'.tr(context: context)),
+              subtitle: Text(tr.localLibrary.settings.libraryPathDesc),
               builder: (context) {
                 return Center(
                   child: Row(
@@ -68,18 +71,22 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                       Text(config.value.libraryDirectory),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          final perms = await Permission.manageExternalStorage.request();
+                          final perms =
+                              await Permission.manageExternalStorage.request();
 
                           if (perms.isGranted) {
-                            String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+                            String? selectedDirectory =
+                                await FilePicker.platform.getDirectoryPath();
 
                             if (selectedDirectory != null) {
-                              config.value = config.value.copyWith(libraryDirectory: selectedDirectory);
+                              config.value = config.value.copyWith(
+                                libraryDirectory: selectedDirectory,
+                              );
                             }
                           }
                         },
                         icon: const Icon(Icons.folder_open),
-                        label: Text('ui.browse'.tr(context: context)),
+                        label: Text(tr.ui.browse),
                       ),
                     ],
                   ),

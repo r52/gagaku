@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
@@ -14,6 +14,7 @@ class MangaDexHomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final controllers = List.generate(5, (_) => useScrollController());
     final controllerSet = useMemoized(
       () => {
@@ -60,23 +61,23 @@ class MangaDexHomePage extends HookConsumerWidget {
             destinations: [
               NavigationDestination(
                 icon: Icon(Icons.home),
-                label: 'mangadex.home'.tr(context: context),
+                label: t.mangadex.home,
               ),
               NavigationDestination(
                 icon: Icon(Icons.menu_book),
-                label: 'mangadex.myFeed'.tr(context: context),
+                label: t.mangadex.myFeed,
               ),
               NavigationDestination(
                 icon: Icon(Icons.collections),
-                label: 'library.text'.tr(context: context),
+                label: t.library,
               ),
               NavigationDestination(
                 icon: Icon(Icons.list),
-                label: 'mangadex.myLists'.tr(context: context),
+                label: t.mangadex.myLists,
               ),
               NavigationDestination(
                 icon: Icon(Icons.history),
-                label: 'history.text'.tr(context: context),
+                label: t.history.text,
               ),
             ],
             selectedIndex: tabsRouter.activeIndex,

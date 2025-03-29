@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -18,6 +18,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final scrollController =
         DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
         controller ??
@@ -68,9 +69,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                       );
 
                       if (items.isEmpty) {
-                        return Center(
-                          child: Text('errors.noitems'.tr(context: context)),
-                        );
+                        return Center(child: Text(tr.errors.noitems));
                       }
 
                       return WebMangaListWidget(

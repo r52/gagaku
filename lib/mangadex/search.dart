@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -83,6 +83,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final filter = _searchParameters;
@@ -121,13 +122,10 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: 'search.arg'.tr(
-                    context: context,
-                    args: ['MangaDex'],
-                  ),
+                  hintText: tr.search.arg(arg: 'MangaDex'),
                   trailing: <Widget>[
                     Tooltip(
-                      message: 'search.filters'.tr(context: context),
+                      message: tr.search.filters,
                       child: IconButton(
                         onPressed: () async {
                           final result = await nav.push<MangaFilters>(
@@ -247,7 +245,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
           SliverAppBar(
             automaticallyImplyLeading: false,
             primary: false,
-            title: Text('search.text'.tr(context: context)),
+            title: Text(tr.search.text),
             actions: [
               DropdownMenu<FilterOrder>(
                 initialSelection: filter.filter.order,
@@ -280,9 +278,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                       FilterOrder.values.length,
                       (int index) => DropdownMenuEntry<FilterOrder>(
                         value: FilterOrder.values.elementAt(index),
-                        label: context.tr(
-                          FilterOrder.values.elementAt(index).label,
-                        ),
+                        label: tr[FilterOrder.values.elementAt(index).label],
                       ),
                     ),
               ),
@@ -331,6 +327,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final fil = useValueNotifier(filter);
@@ -344,13 +341,13 @@ class _MangaDexFilterWidget extends HookWidget {
             nav.pop(null);
           },
         ),
-        title: Text('search.filters'.tr(context: context)),
+        title: Text(tr.search.filters),
         actions: [
           OverflowBar(
             spacing: 8.0,
             children: [
               Tooltip(
-                message: 'search.resetFilters'.tr(context: context),
+                message: tr.search.resetFilters,
                 child: ElevatedButton.icon(
                   onPressed: () {
                     fil.value = MangaFilterAction.action(
@@ -365,17 +362,17 @@ class _MangaDexFilterWidget extends HookWidget {
                     );
                   },
                   icon: const Icon(Icons.clear_all),
-                  label: Text('search.resetFilters'.tr(context: context)),
+                  label: Text(tr.search.resetFilters),
                 ),
               ),
               Tooltip(
-                message: 'search.applyFilters'.tr(context: context),
+                message: tr.search.applyFilters,
                 child: ElevatedButton.icon(
                   onPressed: () {
                     nav.pop(fil.value);
                   },
                   icon: const Icon(Icons.filter_list),
-                  label: Text('search.applyFilters'.tr(context: context)),
+                  label: Text(tr.search.applyFilters),
                 ),
               ),
             ],
@@ -403,7 +400,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
                           return ListTile(
                             title: Text(
-                              'mangadex.contentRating'.tr(context: context),
+                              tr.mangadex.contentRating,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -411,10 +408,10 @@ class _MangaDexFilterWidget extends HookWidget {
                             ),
                             subtitle:
                                 selected.isEmpty
-                                    ? Text('search.any'.tr(context: context))
+                                    ? Text(tr.search.any)
                                     : Text(
                                       selected
-                                          .map((e) => context.tr(e.label))
+                                          .map((e) => tr[e.label])
                                           .join(', '),
                                     ),
                           );
@@ -435,7 +432,7 @@ class _MangaDexFilterWidget extends HookWidget {
                                     );
 
                                     return FilterChip(
-                                      label: Text(context.tr(e.label)),
+                                      label: Text(tr[e.label]),
                                       selectedColor: selectedChipColor,
                                       selected: selected,
                                       onSelected: (bool value) {
@@ -480,7 +477,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
                           return ListTile(
                             title: Text(
-                              'mangadex.demographic'.tr(context: context),
+                              tr.mangadex.demographic,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -488,10 +485,10 @@ class _MangaDexFilterWidget extends HookWidget {
                             ),
                             subtitle:
                                 selected.isEmpty
-                                    ? Text('search.any'.tr(context: context))
+                                    ? Text(tr.search.any)
                                     : Text(
                                       selected
-                                          .map((e) => context.tr(e.label))
+                                          .map((e) => tr[e.label])
                                           .join(', '),
                                     ),
                           );
@@ -560,7 +557,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
                           return ListTile(
                             title: Text(
-                              'mangadex.pubStatus'.tr(context: context),
+                              tr.mangadex.pubStatus,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -568,10 +565,10 @@ class _MangaDexFilterWidget extends HookWidget {
                             ),
                             subtitle:
                                 selected.isEmpty
-                                    ? Text('search.any'.tr(context: context))
+                                    ? Text(tr.search.any)
                                     : Text(
                                       selected
-                                          .map((e) => context.tr(e.label))
+                                          .map((e) => tr[e.label])
                                           .join(', '),
                                     ),
                           );
@@ -592,7 +589,7 @@ class _MangaDexFilterWidget extends HookWidget {
                                     );
 
                                     return FilterChip(
-                                      label: Text(context.tr(e.label)),
+                                      label: Text(tr[e.label]),
                                       selectedColor: selectedChipColor,
                                       selected: selected,
                                       onSelected: (bool value) {
@@ -634,7 +631,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
                           return ListTile(
                             title: Text(
-                              'mangaView.author'.tr(context: context),
+                              tr.mangaView.author,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -642,7 +639,7 @@ class _MangaDexFilterWidget extends HookWidget {
                             ),
                             subtitle:
                                 selected.isEmpty
-                                    ? Text('search.any'.tr(context: context))
+                                    ? Text(tr.search.any)
                                     : Text(
                                       selected
                                           .map((e) => e.attributes.name)
@@ -737,7 +734,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
                           return ListTile(
                             title: Text(
-                              'mangaView.artist'.tr(context: context),
+                              tr.mangaView.artist,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -745,7 +742,7 @@ class _MangaDexFilterWidget extends HookWidget {
                             ),
                             subtitle:
                                 selected.isEmpty
-                                    ? Text('search.any'.tr(context: context))
+                                    ? Text(tr.search.any)
                                     : Text(
                                       selected
                                           .map((e) => e.attributes.name)
@@ -843,15 +840,23 @@ class _MangaDexFilterWidget extends HookWidget {
                           );
 
                           final includedString = included
-                              .map((e) => e.attributes.name.get('en'))
+                              .map(
+                                (e) => e.attributes.name.get(
+                                  tr.$meta.locale.languageCode,
+                                ),
+                              )
                               .join(', ');
                           final excludedString = excluded
-                              .map((e) => e.attributes.name.get('en'))
+                              .map(
+                                (e) => e.attributes.name.get(
+                                  tr.$meta.locale.languageCode,
+                                ),
+                              )
                               .join(', ');
 
                           return ListTile(
                             title: Text(
-                              'search.filterTags'.tr(context: context),
+                              tr.search.filterTags,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -859,7 +864,7 @@ class _MangaDexFilterWidget extends HookWidget {
                             ),
                             subtitle:
                                 included.isEmpty && excluded.isEmpty
-                                    ? Text('search.any'.tr(context: context))
+                                    ? Text(tr.search.any)
                                     : Text.rich(
                                       TextSpan(
                                         children: [
@@ -926,7 +931,9 @@ class _MangaDexFilterWidget extends HookWidget {
 
                                           return TriStateChip(
                                             label: Text(
-                                              e.attributes.name.get('en'),
+                                              e.attributes.name.get(
+                                                tr.$meta.locale.languageCode,
+                                              ),
                                             ),
                                             selectedColor: Colors.green,
                                             unselectedColor: Colors.red,
@@ -1014,15 +1021,13 @@ class _MangaDexFilterWidget extends HookWidget {
                         ],
                         _SectionHeader(
                           key: ValueKey("Modes"),
-                          header: 'search.otherOptions'.tr(context: context),
+                          header: tr.search.otherOptions,
                         ),
                         _SectionChildren(
                           key: const ValueKey("_modesChildren"),
                           children: [
                             DropdownMenu<TagMode>(
-                              label: Text(
-                                'search.inclusion'.tr(context: context),
-                              ),
+                              label: Text(tr.search.inclusion),
                               initialSelection: fil.value.includedTagsMode,
                               requestFocusOnTap: false,
                               enableSearch: false,
@@ -1044,9 +1049,7 @@ class _MangaDexFilterWidget extends HookWidget {
                               },
                             ),
                             DropdownMenu<TagMode>(
-                              label: Text(
-                                'search.exclusion'.tr(context: context),
-                              ),
+                              label: Text(tr.search.exclusion),
                               initialSelection: fil.value.excludedTagsMode,
                               requestFocusOnTap: false,
                               enableSearch: false,

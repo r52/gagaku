@@ -1,6 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -78,6 +78,7 @@ class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final defaultCategory = ref.watch(
       webConfigProvider.select((cfg) => cfg.defaultCategory),
     );
@@ -88,7 +89,7 @@ class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
         physics: const AlwaysScrollableScrollPhysics(),
         showToggle: false,
         title: Text(
-          'webSources.sourceSearch'.tr(context: context),
+          tr.webSources.sourceSearch,
           style: const TextStyle(fontSize: 24),
         ),
         leading: [
@@ -105,10 +106,7 @@ class _WebSourceSearchWidgetState extends ConsumerState<WebSourceSearchWidget> {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: 'search.arg'.tr(
-                    context: context,
-                    args: [widget.source.name],
-                  ),
+                  hintText: tr.search.arg(arg: widget.source.name),
                   onTap: () {
                     controller.openView();
                   },

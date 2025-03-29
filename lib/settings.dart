@@ -1,6 +1,6 @@
 import 'package:auto_route/annotations.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
@@ -14,15 +14,14 @@ class AppSettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final cache = ref.watch(cacheProvider);
     final cfg = ref.watch(gagakuSettingsProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: TitleFlexBar(
-          title: 'arg_settings'.tr(context: context, args: ['Gagaku']),
-        ),
+        flexibleSpace: TitleFlexBar(title: t.arg_settings(arg: 'Gagaku')),
       ),
       drawer: const MainDrawer(),
       body: SafeArea(
@@ -31,7 +30,7 @@ class AppSettingsPage extends ConsumerWidget {
           children: [
             SettingCardWidget(
               title: Text(
-                'theme.mode'.tr(context: context),
+                t.theme.mode,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               builder: (context) {
@@ -44,15 +43,15 @@ class AppSettingsPage extends ConsumerWidget {
                     dropdownMenuEntries: [
                       DropdownMenuEntry(
                         value: ThemeMode.light,
-                        label: 'theme.light'.tr(context: context),
+                        label: t.theme.light,
                       ),
                       DropdownMenuEntry(
                         value: ThemeMode.dark,
-                        label: 'theme.dark'.tr(context: context),
+                        label: t.theme.dark,
                       ),
                       DropdownMenuEntry(
                         value: ThemeMode.system,
-                        label: 'theme.system'.tr(context: context),
+                        label: t.theme.system,
                       ),
                     ],
                     onSelected: (ThemeMode? value) {
@@ -67,7 +66,7 @@ class AppSettingsPage extends ConsumerWidget {
             ),
             SettingCardWidget(
               title: Text(
-                'theme.color'.tr(context: context),
+                t.theme.color,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               builder: (context) {
@@ -91,7 +90,7 @@ class AppSettingsPage extends ConsumerWidget {
                             ),
                           ),
                           value: c,
-                          label: context.tr(c.label),
+                          label: t[c.label],
                         ),
                     ],
                     onSelected: (GagakuTheme? value) {
@@ -106,10 +105,10 @@ class AppSettingsPage extends ConsumerWidget {
             ),
             SettingCardWidget(
               title: Text(
-                'cache.clear'.tr(context: context),
+                t.cache.clear,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              subtitle: Text('cache.clearSub'.tr(context: context)),
+              subtitle: Text(t.cache.clearSub),
               builder: (context) {
                 return Center(
                   child: ElevatedButton.icon(
@@ -119,20 +118,18 @@ class AppSettingsPage extends ConsumerWidget {
                         builder: (BuildContext context) {
                           final nav = Navigator.of(context);
                           return AlertDialog(
-                            title: Text('cache.clear'.tr(context: context)),
+                            title: Text(t.cache.clear),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('cache.clearWarning'.tr(context: context)),
-                                Text(
-                                  'ui.irreversibleWarning'.tr(context: context),
-                                ),
+                                Text(t.cache.clearWarning),
+                                Text(t.ui.irreversibleWarning),
                               ],
                             ),
                             actions: <Widget>[
                               ElevatedButton(
-                                child: Text('ui.no'.tr(context: context)),
+                                child: Text(t.ui.no),
                                 onPressed: () {
                                   nav.pop(null);
                                 },
@@ -141,7 +138,7 @@ class AppSettingsPage extends ConsumerWidget {
                                 onPressed: () {
                                   nav.pop(true);
                                 },
-                                child: Text('ui.yes'.tr(context: context)),
+                                child: Text(t.ui.yes),
                               ),
                             ],
                           );
@@ -155,16 +152,14 @@ class AppSettingsPage extends ConsumerWidget {
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
                             SnackBar(
-                              content: Text(
-                                'cache.clearSuccess'.tr(context: context),
-                              ),
+                              content: Text(t.cache.clearSuccess),
                               backgroundColor: Colors.green,
                             ),
                           );
                       }
                     },
                     icon: const Icon(Icons.delete_sweep),
-                    label: Text('cache.clear'.tr(context: context)),
+                    label: Text(t.cache.clear),
                   ),
                 );
               },

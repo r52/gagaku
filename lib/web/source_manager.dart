@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:expansion_tile_list/expansion_tile_list.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -53,6 +53,7 @@ class SourceManager extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final nav = Navigator.of(context);
     final forceRefresh = useState(0);
     final cfg = ref.watch(webConfigProvider);
@@ -77,11 +78,7 @@ class SourceManager extends HookConsumerWidget {
       final orphaned = [...installed];
       body =
           installed.isEmpty && availableSources.data!.isEmpty
-              ? Center(
-                child: Text(
-                  'webSources.source.noDataWarning'.tr(context: context),
-                ),
-              )
+              ? Center(child: Text(tr.webSources.source.noDataWarning))
               : SingleChildScrollView(
                 child: ExpansionTileList(
                   children: [
@@ -163,10 +160,10 @@ class SourceManager extends HookConsumerWidget {
                                                   ..showSnackBar(
                                                     SnackBar(
                                                       content: Text(
-                                                        'webSources.source.sourceAddOK'
-                                                            .tr(
-                                                              context: context,
-                                                            ),
+                                                        tr
+                                                            .webSources
+                                                            .source
+                                                            .sourceAddOK,
                                                       ),
                                                       backgroundColor:
                                                           Colors.green,
@@ -190,10 +187,10 @@ class SourceManager extends HookConsumerWidget {
                                                   ..showSnackBar(
                                                     SnackBar(
                                                       content: Text(
-                                                        'webSources.source.sourceDeleteOK'
-                                                            .tr(
-                                                              context: context,
-                                                            ),
+                                                        tr
+                                                            .webSources
+                                                            .source
+                                                            .sourceDeleteOK,
                                                       ),
                                                       backgroundColor:
                                                           Colors.green,
@@ -203,8 +200,8 @@ class SourceManager extends HookConsumerWidget {
                                             },
                                           )
                                           : Tooltip(
-                                            message: 'errors.unsupportedSource'
-                                                .tr(context: context),
+                                            message:
+                                                tr.errors.unsupportedSource,
                                             child: Icon(Icons.error),
                                           ),
                                 ),
@@ -213,9 +210,7 @@ class SourceManager extends HookConsumerWidget {
                       ),
                     if (orphaned.isNotEmpty)
                       ExpansionTile(
-                        title: Text(
-                          'webSources.repo.missingRepo'.tr(context: context),
-                        ),
+                        title: Text(tr.webSources.repo.missingRepo),
                         leading: Icon(Icons.question_mark),
                         maintainState: true,
                         shape: const Border(),
@@ -227,9 +222,8 @@ class SourceManager extends HookConsumerWidget {
                             orphaned.map((item) {
                               final actions = <Widget>[
                                 IconButton(
-                                  tooltip: 'webSources.source.delete'.tr(
-                                    context: context,
-                                    args: [item.name],
+                                  tooltip: tr.webSources.source.delete(
+                                    arg: item.name,
                                   ),
                                   onPressed: () {
                                     final messenger = ScaffoldMessenger.of(
@@ -250,8 +244,7 @@ class SourceManager extends HookConsumerWidget {
                                       ..showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            'webSources.source.sourceDeleteOK'
-                                                .tr(context: context),
+                                            tr.webSources.source.sourceDeleteOK,
                                           ),
                                           backgroundColor: Colors.green,
                                         ),
@@ -289,24 +282,19 @@ class SourceManager extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: TitleFlexBar(
-          title: 'webSources.source.manager'.tr(context: context),
-        ),
+        flexibleSpace: TitleFlexBar(title: tr.webSources.source.manager),
         actions: [
           IconButton(
             onPressed: () {
               forceRefresh.value += 1;
             },
             icon: const Icon(Icons.refresh),
-            tooltip: 'webSources.source.refresh'.tr(context: context),
+            tooltip: tr.webSources.source.refresh,
           ),
           IconButton(
             onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
             icon: const Icon(Icons.settings),
-            tooltip: 'arg_settings'.tr(
-              context: context,
-              args: ['webSources.text'.tr(context: context)],
-            ),
+            tooltip: tr.arg_settings(arg: tr.webSources.text),
           ),
         ],
       ),

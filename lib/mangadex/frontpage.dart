@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -11,6 +11,7 @@ import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'frontpage.g.dart';
@@ -167,6 +168,7 @@ class _FrontPageWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final api = ref.watch(mangadexProvider);
     final router = AutoRouter.of(context);
     const style = TextStyle(fontSize: 24);
@@ -180,21 +182,13 @@ class _FrontPageWidget extends HookConsumerWidget {
         useScrollController();
 
     final frontPageWidgets = [
-      Center(
-        child: Text(
-          'mangadex.popularNewTitles'.tr(context: context),
-          style: style,
-        ),
-      ),
+      Center(child: Text(t.mangadex.popularNewTitles, style: style)),
       const MangaProviderCarousel(provider: _popularTitlesProvider),
       TextButton.icon(
         onPressed: () {
           router.pushPath('/titles/latest');
         },
-        label: Text(
-          'mangadex.latestUpdates'.tr(context: context),
-          style: style,
-        ),
+        label: Text(t.mangadex.latestUpdates, style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
@@ -203,7 +197,7 @@ class _FrontPageWidget extends HookConsumerWidget {
         onPressed: () {
           router.pushPath('/list/${data.staffPicks}');
         },
-        label: Text('mangadex.staffPicks'.tr(context: context), style: style),
+        label: Text(t.mangadex.staffPicks, style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
@@ -212,7 +206,7 @@ class _FrontPageWidget extends HookConsumerWidget {
         onPressed: () {
           router.pushPath('/list/${data.seasonal}');
         },
-        label: Text('mangadex.seasonal'.tr(context: context), style: style),
+        label: Text(t.mangadex.seasonal, style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
@@ -221,10 +215,7 @@ class _FrontPageWidget extends HookConsumerWidget {
         onPressed: () {
           router.pushPath('/titles/recent');
         },
-        label: Text(
-          'mangadex.recentlyAdded'.tr(context: context),
-          style: style,
-        ),
+        label: Text(t.mangadex.recentlyAdded, style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
