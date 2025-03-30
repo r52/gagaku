@@ -607,7 +607,12 @@ class ListSpinner extends StatelessWidget {
 typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
 typedef LoadingBuilder = Widget Function(BuildContext context, num? progress);
 typedef ErrorWrapperBuilder =
-    Widget Function(BuildContext context, Widget child);
+    Widget Function(
+      BuildContext context,
+      Widget defaultChild,
+      Object error,
+      StackTrace stacktrace,
+    );
 typedef ErrorBuilder =
     Widget Function(BuildContext context, Object error, StackTrace stacktrace);
 
@@ -643,7 +648,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
         );
 
         if (errorBuilder != null) {
-          return errorBuilder!(context, errorlist);
+          return errorBuilder!(context, errorlist, error, stackTrace);
         }
 
         return errorlist;

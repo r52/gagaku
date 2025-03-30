@@ -454,7 +454,7 @@ class MangaDexModel {
     final key = 'FrontPageData';
 
     if (await _cache.exists(key)) {
-      return _cache.get(key, FrontPageData.fromJson).get<FrontPageData>();
+      return _cache.get<FrontPageData>(key, FrontPageData.fromJson);
     }
 
     final uri = Uri.parse(
@@ -604,7 +604,7 @@ class MangaDexModel {
     // Craft the list
     for (final id in uuids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get(id, Chapter.fromJson).get<Chapter>());
+        list.add(_cache.get<Chapter>(id, Chapter.fromJson));
       }
     }
 
@@ -659,7 +659,7 @@ class MangaDexModel {
     // Craft the list
     for (final id in ids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get(id, Manga.fromJson).get<Manga>());
+        list.add(_cache.get<Manga>(id, Manga.fromJson));
       }
     }
 
@@ -1093,10 +1093,9 @@ class MangaDexModel {
 
     if (await _cache.exists(cachekey)) {
       logger.d("Retrieving cached user library of user $userId");
-      final libMap =
-          _cache.get(cachekey, (decoded) {
-            return decoded.map(decoder);
-          }).get<LibraryMap>();
+      final libMap = _cache.get<LibraryMap>(cachekey, (decoded) {
+        return decoded.map(decoder);
+      });
       return libMap;
     }
 
@@ -1397,7 +1396,7 @@ class MangaDexModel {
     // Craft the list
     for (final id in uuids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get(id, Group.fromJson).get<Group>());
+        list.add(_cache.get<Group>(id, Group.fromJson));
       }
     }
 
@@ -1455,7 +1454,7 @@ class MangaDexModel {
       // Craft the list
       for (final id in uuids) {
         if (await _cache.exists(id)) {
-          list.add(_cache.get(id, Author.fromJson).get<CreatorType>());
+          list.add(_cache.get<CreatorType>(id, Author.fromJson));
         }
       }
     } else {
@@ -1493,7 +1492,7 @@ class MangaDexModel {
     }
 
     if (await _cache.exists(listId)) {
-      return _cache.get(listId, CustomList.fromJson).get<CustomList>();
+      return _cache.get<CustomList>(listId, CustomList.fromJson);
     }
 
     final uri = MangaDexEndpoints.api.replace(
@@ -1507,13 +1506,13 @@ class MangaDexModel {
       final result = CustomList.fromJson(body['data']);
 
       // Cache the result
-      return (await _cache.put(
+      return await _cache.put(
         listId,
         json.encode(result.toJson()),
         result,
         true,
         unserializer: CustomList.fromJson,
-      )).get<CustomList>();
+      );
     } else if (response.statusCode == 404) {
       // List not found
       return null;
@@ -1559,7 +1558,7 @@ class MangaDexModel {
       final list = <CustomList>[];
 
       for (final e in result.data) {
-        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
+        list.add(_cache.get<CustomList>(e.id, CustomList.fromJson));
       }
 
       return list;
@@ -1644,7 +1643,7 @@ class MangaDexModel {
       final list = <CustomList>[];
 
       for (final e in result.data) {
-        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
+        list.add(_cache.get<CustomList>(e.id, CustomList.fromJson));
       }
 
       return list;
@@ -1701,13 +1700,13 @@ class MangaDexModel {
           relationships: relationships,
         );
 
-        return (await _cache.put(
+        return await _cache.put(
           updated.id,
           json.encode(updated.toJson()),
           updated,
           true,
           unserializer: CustomList.fromJson,
-        )).get<CustomList>();
+        );
       }
     }
 
@@ -1792,13 +1791,13 @@ class MangaDexModel {
         final nlist = CustomList.fromJson(body['data']);
 
         // Cache the result
-        return (await _cache.put(
+        return await _cache.put(
           nlist.id,
           json.encode(nlist.toJson()),
           nlist,
           true,
           unserializer: CustomList.fromJson,
-        )).get<CustomList>();
+        );
       }
     }
 
@@ -1853,13 +1852,13 @@ class MangaDexModel {
         final nlist = CustomList.fromJson(body['data']);
 
         // Cache the result
-        return (await _cache.put(
+        return await _cache.put(
           nlist.id,
           json.encode(nlist.toJson()),
           nlist,
           true,
           unserializer: CustomList.fromJson,
-        )).get<CustomList>();
+        );
       }
     }
 

@@ -14,7 +14,8 @@ part 'cache.g.dart';
 /// Mainly to stop gagaku from querying the API for the same stuff
 /// too often.
 
-typedef UnserializeCallback<T extends Object> = T Function(Map<String, dynamic> json);
+typedef UnserializeCallback<T extends Object> =
+    T Function(Map<String, dynamic> json);
 
 @Riverpod(keepAlive: true)
 CacheManager cache(Ref ref) {
@@ -44,10 +45,10 @@ class CacheEntry with ExpiringData {
   @override
   DateTime expiry;
 
-  String _data;
+  final String _data;
   String get data => _data;
 
-  CRef? _ref;
+  Object? _ref;
   UnserializeCallback? unserializer;
 
   CacheEntry(
@@ -56,12 +57,12 @@ class CacheEntry with ExpiringData {
     Duration duration = const Duration(minutes: 15),
     Object? reference,
     this.unserializer,
-  })  : expiry = (expire != null) ? expire : DateTime.now().add(duration),
-        _ref = (reference != null) ? CRef(reference) : null;
+  }) : expiry = (expire != null) ? expire : DateTime.now().add(duration),
+       _ref = reference;
 
-  CRef get([UnserializeCallback? unserialize]) {
+  T get<T>([UnserializeCallback? unserialize]) {
     if (_ref != null) {
-      return _ref!;
+      return _ref! as T;
     }
 
     // Load from data if a ref doesn't already exist
@@ -69,63 +70,14 @@ class CacheEntry with ExpiringData {
     final interm = json.decode(data);
 
     if (unserialize == null && unserializer == null) {
-      _ref = CRef(interm);
+      _ref = interm;
     } else if (unserialize != null) {
-      _ref = CRef(unserialize(interm));
+      _ref = unserialize(interm);
     } else {
-      _ref = CRef(unserializer!(interm));
+      _ref = unserializer!(interm);
     }
 
-    return _ref!;
-  }
-
-  void overwrite(CacheEntry other) {
-    _data = other._data;
-    expiry = other.expiry;
-    unserializer = other.unserializer;
-
-    if (other._ref != null) {
-      if (_ref != null) {
-        _ref!.replace(other._ref!.get());
-      } else {
-        _ref = other._ref;
-      }
-    } else {
-      if (_ref != null && unserializer != null) {
-        final interm = json.decode(data);
-        _ref!.replace(unserializer!(interm));
-      } else {
-        // Not enough data to reproduce a new ref
-        _ref = null;
-      }
-    }
-  }
-
-  void overwriteRaw(
-    String data, [
-    Duration expires = const Duration(minutes: 15),
-    Object? reference,
-    UnserializeCallback? unserialize,
-  ]) {
-    _data = data;
-    expiry = DateTime.now().add(expires);
-    unserializer = unserialize;
-
-    if (reference != null) {
-      if (_ref != null) {
-        _ref!.replace(reference);
-      } else {
-        _ref = CRef(reference);
-      }
-    } else {
-      if (_ref != null && unserializer != null) {
-        final interm = json.decode(data);
-        _ref!.replace(unserializer!(interm));
-      } else {
-        // Not enough data to reproduce a new ref
-        _ref = null;
-      }
-    }
+    return _ref! as T;
   }
 }
 
@@ -245,29 +197,37 @@ class CacheManager {
   }
 
   /// Returns a single entry from the cache. Assumes the entry [exists].
-  CRef get(String key, [UnserializeCallback? unserializer]) => _cache[key]!.get(unserializer);
+  T get<T>(String key, [UnserializeCallback? unserializer]) =>
+      _cache[key]!.get(unserializer);
 
   /// Inserts a single entry into the cache if it doesn't [exists]
   /// If [overwrite] is true, then the entry is inserted regardless, overwriting
   /// existing values
-  Future<CRef> put(
+  Future<T> put<T>(
     String key,
     String data,
-    Object reference,
+    T reference,
     bool overwrite, {
     Duration expiry = const Duration(minutes: 15),
     UnserializeCallback? unserializer,
   }) async {
-    final entry = CacheEntry(data, duration: expiry, reference: reference, unserializer: unserializer);
+    final entry = CacheEntry(
+      data,
+      duration: expiry,
+      reference: reference,
+      unserializer: unserializer,
+    );
     if (!await exists(key)) {
       _cache.putIfAbsent(key, () => entry);
-      await _box.put(key, entry);
     } else if (overwrite) {
-      _cache[key]!.overwrite(entry);
-      await _box.put(key, entry);
+      _cache[key] = entry;
     }
 
-    logger.d("CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
+    await _box.put(key, entry);
+
+    logger.d(
+      "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}",
+    );
 
     return _cache[key]!.get(unserializer);
   }
@@ -279,35 +239,14 @@ class CacheManager {
       if (!await exists(key)) {
         _cache.putIfAbsent(key, () => entry);
       } else {
-        _cache[key]!.overwrite(entry);
+        _cache[key] = entry;
       }
     }
 
     await _box.putAll(map);
 
-    logger.d("CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}");
+    logger.d(
+      "CacheManager: memory cache size: ${_cache.length}; disk cache size: ${_box.length}",
+    );
   }
-}
-
-class CRef {
-  Object ref;
-
-  CRef(this.ref);
-
-  T get<T>() {
-    return ref as T;
-  }
-
-  void replace(Object other) {
-    ref = other;
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is CRef && other.ref.runtimeType == ref.runtimeType && identical(other.ref, ref));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, ref);
 }

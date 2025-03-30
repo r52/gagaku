@@ -552,7 +552,7 @@ packages:
     description:
       path: "packages/flutter_riverpod"
       ref: dev
-      resolved-ref: "523ff4b0e43fd7e7d896b42dcf031f167b30c683"
+      resolved-ref: "34a89331b6c946c0badac8c1b7927fd1938c9ed0"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -635,7 +635,7 @@ packages:
     description:
       path: "packages/hooks_riverpod"
       ref: dev
-      resolved-ref: "523ff4b0e43fd7e7d896b42dcf031f167b30c683"
+      resolved-ref: "34a89331b6c946c0badac8c1b7927fd1938c9ed0"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -1117,7 +1117,7 @@ packages:
     description:
       path: "packages/riverpod"
       ref: dev
-      resolved-ref: "523ff4b0e43fd7e7d896b42dcf031f167b30c683"
+      resolved-ref: "34a89331b6c946c0badac8c1b7927fd1938c9ed0"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -1126,7 +1126,7 @@ packages:
     description:
       path: "packages/riverpod_analyzer_utils"
       ref: dev
-      resolved-ref: "523ff4b0e43fd7e7d896b42dcf031f167b30c683"
+      resolved-ref: "34a89331b6c946c0badac8c1b7927fd1938c9ed0"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "1.0.0-dev.1"
@@ -1135,7 +1135,7 @@ packages:
     description:
       path: "packages/riverpod_annotation"
       ref: dev
-      resolved-ref: "523ff4b0e43fd7e7d896b42dcf031f167b30c683"
+      resolved-ref: "34a89331b6c946c0badac8c1b7927fd1938c9ed0"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.3"
@@ -1144,7 +1144,7 @@ packages:
     description:
       path: "packages/riverpod_generator"
       ref: dev
-      resolved-ref: "523ff4b0e43fd7e7d896b42dcf031f167b30c683"
+      resolved-ref: "34a89331b6c946c0badac8c1b7927fd1938c9ed0"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.11"
@@ -1153,7 +1153,7 @@ packages:
     description:
       path: "packages/riverpod_lint"
       ref: dev
-      resolved-ref: "523ff4b0e43fd7e7d896b42dcf031f167b30c683"
+      resolved-ref: "34a89331b6c946c0badac8c1b7927fd1938c9ed0"
       url: "https://github.com/rrousselGit/riverpod"
     source: git
     version: "3.0.0-dev.4"

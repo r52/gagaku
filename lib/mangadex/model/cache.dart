@@ -46,52 +46,7 @@ extension MDCacheManagerExt on CacheManager {
   Future<MDEntityList> getEntityList(String key) async {
     logger.d('CacheManager: retrieving entity list: $key');
 
-    final list = get(key, MDEntityList.fromJson).get<MDEntityList>();
-    return list;
-  }
-
-  /// Adds all API data from a [list] into the cache, resolving its ids automatically
-  /// if requested, as a part of a special query given by [key]
-  Future<void> putSpecialList(
-    String key,
-    Iterable<MangaDexEntity> list, {
-    bool resolve = true,
-    Duration expiry = const Duration(minutes: 15),
-    UnserializeCallback? unserializer,
-  }) async {
-    logger.d('CacheManager: caching list: $key for ${expiry.toString()}');
-
-    // Transform data list to a list of uuids
-    final ids = list.map((e) => e.id).toList();
-
-    // Overwrite any previous entries
-    await put(key, json.encode(ids), ids, true, expiry: expiry);
-
-    if (resolve) {
-      await putAllAPIResolved(list, expiry, unserializer);
-    }
-  }
-
-  /// Gets all API data that is a part of a special query given by [key]
-  /// Assumes the special query [key] exists.
-  Future<Iterable<CRef>> getSpecialList(
-    String key, [
-    UnserializeCallback? unserializer,
-  ]) async {
-    logger.d('CacheManager: retrieving list: $key');
-
-    final entry = get(key).get<List<dynamic>>();
-    final List<String> ids = List<String>.from(entry);
-
-    List<CRef> list = [];
-
-    for (var e in ids) {
-      if (await exists(e)) {
-        final entry = get(e, unserializer);
-        list.add(entry);
-      }
-    }
-
+    final list = get<MDEntityList>(key, MDEntityList.fromJson);
     return list;
   }
 }

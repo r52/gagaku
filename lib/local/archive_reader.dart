@@ -126,7 +126,7 @@ class ArchiveReaderWidget extends StatelessWidget {
     return DataProviderWhenWidget(
       provider: _getArchivePagesProvider(path),
       errorBuilder:
-          (context, child) => Scaffold(
+          (context, child, _, __) => Scaffold(
             appBar: AppBar(leading: const BackButton()),
             body: child,
           ),

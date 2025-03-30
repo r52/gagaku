@@ -83,7 +83,7 @@ class MangaDexMangaViewPage extends ConsumerWidget {
     return DataProviderWhenWidget(
       provider: _fetchMangaFromIdProvider(mangaId),
       errorBuilder:
-          (context, child) => Scaffold(
+          (context, child, _, __) => Scaffold(
             body: RefreshIndicator(
               onRefresh:
                   () async =>

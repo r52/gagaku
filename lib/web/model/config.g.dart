@@ -151,8 +151,8 @@ class _$WebConfigElement
   @override
   void mount() {
     super.mount();
-    _$saveWith.result!.stateOrNull!.reset();
-    _$save.result!.stateOrNull!.reset();
+    _$saveWith.result!.value!.reset();
+    _$save.result!.value!.reset();
   }
 
   @override

@@ -74,7 +74,7 @@ class WebMangaViewPage extends ConsumerWidget {
     return DataProviderWhenWidget(
       provider: _fetchWebMangaInfoProvider(hndl),
       errorBuilder:
-          (context, child) => Scaffold(
+          (context, child, _, __) => Scaffold(
             appBar: AppBar(leading: AutoLeadingButton()),
             body: Consumer(
               child: child,

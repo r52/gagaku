@@ -325,8 +325,8 @@ class _$ReadChaptersElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
-    _$set.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -618,7 +618,7 @@ class _$UserLibraryElement
   @override
   void mount() {
     super.mount();
-    _$set.result!.stateOrNull!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -910,11 +910,11 @@ class _$UserListsElement
   @override
   void mount() {
     super.mount();
-    _$updateList.result!.stateOrNull!.reset();
-    _$editList.result!.stateOrNull!.reset();
-    _$deleteList.result!.stateOrNull!.reset();
-    _$newList.result!.stateOrNull!.reset();
-    _$getNextPage.result!.stateOrNull!.reset();
+    _$updateList.result!.value!.reset();
+    _$editList.result!.value!.reset();
+    _$deleteList.result!.value!.reset();
+    _$newList.result!.value!.reset();
+    _$getNextPage.result!.value!.reset();
   }
 
   @override
@@ -1358,8 +1358,8 @@ class _$FollowedListsElement
   @override
   void mount() {
     super.mount();
-    _$setFollow.result!.stateOrNull!.reset();
-    _$getNextPage.result!.stateOrNull!.reset();
+    _$setFollow.result!.value!.reset();
+    _$getNextPage.result!.value!.reset();
   }
 
   @override
@@ -1787,7 +1787,7 @@ class _$StatisticsElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
   }
 
   @override
@@ -1942,7 +1942,7 @@ class _$ChapterStatsElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
   }
 
   @override
@@ -2192,8 +2192,8 @@ class _$RatingsElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
-    _$set.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -2468,7 +2468,7 @@ class _$ReadingStatusElement
   @override
   void mount() {
     super.mount();
-    _$set.result!.stateOrNull!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -2693,7 +2693,7 @@ class _$FollowingStatusElement
   @override
   void mount() {
     super.mount();
-    _$set.result!.stateOrNull!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -2836,7 +2836,7 @@ class _$MangaDexHistoryElement
   @override
   void mount() {
     super.mount();
-    _$add.result!.stateOrNull!.reset();
+    _$add.result!.value!.reset();
   }
 
   @override
@@ -3059,8 +3059,8 @@ class _$AuthControlElement
   @override
   void mount() {
     super.mount();
-    _$login.result!.stateOrNull!.reset();
-    _$logout.result!.stateOrNull!.reset();
+    _$login.result!.value!.reset();
+    _$logout.result!.value!.reset();
   }
 
   @override

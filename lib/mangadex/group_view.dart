@@ -56,7 +56,7 @@ class MangaDexGroupViewPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchGroupFromIdProvider(groupId),
-      errorBuilder: (context, child) => Scaffold(body: child),
+      errorBuilder: (context, child, _, __) => Scaffold(body: child),
       builder: (context, data) {
         return MangaDexGroupViewWidget(group: data);
       },

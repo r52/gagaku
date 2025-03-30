@@ -206,6 +206,11 @@ class MangaProviderCarousel extends StatelessWidget {
                         .toList(),
               ),
             ),
+        errorBuilder: (context, defaultChild, error, stacktrace) {
+          return Column(
+            children: [Text('$error'), Text(stacktrace.toString())],
+          );
+        },
       ),
     );
   }

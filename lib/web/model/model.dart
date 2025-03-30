@@ -219,7 +219,7 @@ class ProxyHandler {
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
-      return _cache.get(key, WebManga.fromJson).get<WebManga>();
+      return _cache.get<WebManga>(key, WebManga.fromJson);
     }
 
     final response = await client.get(Uri.parse(url));

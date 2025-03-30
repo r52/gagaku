@@ -97,7 +97,7 @@ class MangaDexReaderPage extends ConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchChapterDataProvider(chapterId),
-      errorBuilder: (context, child) => Scaffold(body: child),
+      errorBuilder: (context, child, _, __) => Scaffold(body: child),
       builder:
           (context, data) => MangaDexReaderWidget(
             chapter: data.chapter,
@@ -161,7 +161,7 @@ class MangaDexReaderWidget extends HookConsumerWidget {
     return DataProviderWhenWidget(
       provider: _fetchChapterPagesProvider(chapter),
       errorBuilder:
-          (context, child) => Scaffold(
+          (context, child, _, __) => Scaffold(
             appBar: AppBar(leading: const BackButton()),
             body: child,
           ),

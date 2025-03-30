@@ -219,12 +219,12 @@ class _$WebSourceFavoritesElement
   @override
   void mount() {
     super.mount();
-    _$clear.result!.stateOrNull!.reset();
-    _$add.result!.stateOrNull!.reset();
-    _$updateAll.result!.stateOrNull!.reset();
-    _$remove.result!.stateOrNull!.reset();
-    _$updateList.result!.stateOrNull!.reset();
-    _$reconfigureCategories.result!.stateOrNull!.reset();
+    _$clear.result!.value!.reset();
+    _$add.result!.value!.reset();
+    _$updateAll.result!.value!.reset();
+    _$remove.result!.value!.reset();
+    _$updateList.result!.value!.reset();
+    _$reconfigureCategories.result!.value!.reset();
   }
 
   @override
@@ -686,9 +686,9 @@ class _$WebSourceHistoryElement
   @override
   void mount() {
     super.mount();
-    _$clear.result!.stateOrNull!.reset();
-    _$add.result!.stateOrNull!.reset();
-    _$remove.result!.stateOrNull!.reset();
+    _$clear.result!.value!.reset();
+    _$add.result!.value!.reset();
+    _$remove.result!.value!.reset();
   }
 
   @override
@@ -977,10 +977,10 @@ class _$WebReadMarkersElement
   @override
   void mount() {
     super.mount();
-    _$clear.result!.stateOrNull!.reset();
-    _$set.result!.stateOrNull!.reset();
-    _$setBulk.result!.stateOrNull!.reset();
-    _$deleteKey.result!.stateOrNull!.reset();
+    _$clear.result!.value!.reset();
+    _$set.result!.value!.reset();
+    _$setBulk.result!.value!.reset();
+    _$deleteKey.result!.value!.reset();
   }
 
   @override
