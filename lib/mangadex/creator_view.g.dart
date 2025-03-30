@@ -18,7 +18,7 @@ final class _FetchCreatorFromIdProvider
     FutureOr<CreatorType> Function(Ref ref, String creatorId)? create,
   }) : _createCb = create,
        super(
-         retry: null,
+         retry: noRetry,
          name: r'_fetchCreatorFromIdProvider',
          isAutoDispose: true,
          dependencies: null,
@@ -73,12 +73,12 @@ final class _FetchCreatorFromIdProvider
 }
 
 String _$fetchCreatorFromIdHash() =>
-    r'9812310f1a61abe9e0b219aae3e49f8f58f09298';
+    r'4c8996715ea032e63f63141f4711917fa730362f';
 
 final class _FetchCreatorFromIdFamily extends Family {
   const _FetchCreatorFromIdFamily._()
     : super(
-        retry: null,
+        retry: noRetry,
         name: r'_fetchCreatorFromIdProvider',
         dependencies: null,
         allTransitiveDependencies: null,

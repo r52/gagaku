@@ -2235,7 +2235,7 @@ Future<List<Manga>> getMangaListByPage(
   return mangas;
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 class ListSource extends _$ListSource {
   @override
   Future<CustomList?> build(String listId) async {

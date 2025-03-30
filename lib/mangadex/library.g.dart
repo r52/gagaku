@@ -97,7 +97,7 @@ final class _GetLibraryListByTypeProvider
     FutureOr<List<String>> Function(Ref ref, MangaReadingStatus type)? create,
   }) : _createCb = create,
        super(
-         retry: null,
+         retry: noRetry,
          name: r'_getLibraryListByTypeProvider',
          isAutoDispose: true,
          dependencies: null,
@@ -153,12 +153,12 @@ final class _GetLibraryListByTypeProvider
 }
 
 String _$getLibraryListByTypeHash() =>
-    r'748e235cf8af47055ca070f34f55bd5c07d82229';
+    r'a6aea92fe0c99298555dacf03ab6856d99923016';
 
 final class _GetLibraryListByTypeFamily extends Family {
   const _GetLibraryListByTypeFamily._()
     : super(
-        retry: null,
+        retry: noRetry,
         name: r'_getLibraryListByTypeProvider',
         dependencies: null,
         allTransitiveDependencies: null,

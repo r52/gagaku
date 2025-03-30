@@ -8,13 +8,14 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'creator_view.g.dart';
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
   final api = ref.watch(mangadexProvider);
   final creator = await api.fetchCreators(uuids: [creatorId]);

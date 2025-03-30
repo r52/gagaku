@@ -10,6 +10,7 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -28,7 +29,7 @@ class LibraryViewType extends _$LibraryViewType {
   ) => state = cb(state);
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<List<String>> _getLibraryListByType(
   Ref ref,
   MangaReadingStatus type,

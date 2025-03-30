@@ -18,7 +18,7 @@ final class _FetchGroupFromIdProvider
     FutureOr<Group> Function(Ref ref, String groupId)? create,
   }) : _createCb = create,
        super(
-         retry: null,
+         retry: noRetry,
          name: r'_fetchGroupFromIdProvider',
          isAutoDispose: true,
          dependencies: null,
@@ -71,12 +71,12 @@ final class _FetchGroupFromIdProvider
   }
 }
 
-String _$fetchGroupFromIdHash() => r'a2edf2a8397c422faa6458d9bf2a3ae6bb7ba27d';
+String _$fetchGroupFromIdHash() => r'f1a1c9382f6e492c172d9eeb3e8622b544612bea';
 
 final class _FetchGroupFromIdFamily extends Family {
   const _FetchGroupFromIdFamily._()
     : super(
-        retry: null,
+        retry: noRetry,
         name: r'_fetchGroupFromIdProvider',
         dependencies: null,
         allTransitiveDependencies: null,

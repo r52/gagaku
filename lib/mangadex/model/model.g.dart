@@ -1480,7 +1480,7 @@ final class ListSourceProvider
     ListSource Function()? create,
   }) : _createCb = create,
        super(
-         retry: null,
+         retry: noRetry,
          name: r'listSourceProvider',
          isAutoDispose: true,
          dependencies: null,
@@ -1542,12 +1542,12 @@ final class ListSourceProvider
   }
 }
 
-String _$listSourceHash() => r'24238a33758da64d216549cf99c749434c4a4059';
+String _$listSourceHash() => r'575eca076e9ff7c789405a12de393a29900e3175';
 
 final class ListSourceFamily extends Family {
   const ListSourceFamily._()
     : super(
-        retry: null,
+        retry: noRetry,
         name: r'listSourceProvider',
         dependencies: null,
         allTransitiveDependencies: null,

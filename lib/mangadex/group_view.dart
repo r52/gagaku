@@ -9,6 +9,7 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,7 +18,7 @@ part 'group_view.g.dart';
 
 enum _ViewType { info, feed, titles }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   final api = ref.watch(mangadexProvider);
   final group = await api.fetchGroups([groupId]);
