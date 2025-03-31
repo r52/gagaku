@@ -163,6 +163,7 @@ class TranslationsAuthEn {
 	String get clientSecretEmptyWarning => 'Client Secret cannot be empty';
 	String get fieldsEmptyWarning => 'Username/Password/Client ID/Client Secret cannot be empty';
 	String loggedInAs({required Object user}) => 'Logged in as: ${user}';
+	String get authenticating => 'Authenticating...';
 }
 
 // Path: sort
@@ -843,6 +844,7 @@ extension on Translations {
 			case 'auth.clientSecretEmptyWarning': return 'Client Secret cannot be empty';
 			case 'auth.fieldsEmptyWarning': return 'Username/Password/Client ID/Client Secret cannot be empty';
 			case 'auth.loggedInAs': return ({required Object user}) => 'Logged in as: ${user}';
+			case 'auth.authenticating': return 'Authenticating...';
 			case 'sort.desc': return 'Descending';
 			case 'sort.asc': return 'Ascending';
 			case 'library': return 'Library';

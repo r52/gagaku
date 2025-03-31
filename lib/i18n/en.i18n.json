@@ -61,7 +61,8 @@
     "clientIdEmptyWarning": "Client ID cannot be empty",
     "clientSecretEmptyWarning": "Client Secret cannot be empty",
     "fieldsEmptyWarning": "Username/Password/Client ID/Client Secret cannot be empty",
-    "loggedInAs": "Logged in as: $user"
+    "loggedInAs": "Logged in as: $user",
+    "authenticating": "Authenticating..."
   },
   "sort": {
     "desc": "Descending",

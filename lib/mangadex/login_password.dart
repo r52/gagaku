@@ -39,7 +39,22 @@ class MangaDexLoginWidget extends ConsumerWidget {
         ),
       ),
       AsyncValue(:final progress) => Center(
-        child: CircularProgressIndicator(value: progress?.toDouble()),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 20.0,
+          children: [
+            Text(
+              tr.auth.authenticating,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.normal,
+                fontSize: 18,
+                decoration: TextDecoration.none,
+              ),
+            ),
+            CircularProgressIndicator(value: progress?.toDouble()),
+          ],
+        ),
       ),
     };
   }
