@@ -183,7 +183,7 @@ abstract class MangaDexFeeds {
   );
   static const userLists = FeedInfo(
     'UserLists',
-    MangaDexEndpoints.breakLimit,
+    100,
     MangaDexEndpoints.userList,
   );
   static const followedLists = FeedInfo(
@@ -2086,6 +2086,7 @@ class UserLists extends _$UserLists
       final idx = oldstate.indexWhere((e) => e.id == result.id);
       if (idx >= 0) {
         oldstate[idx] = result;
+        ref.invalidate(listSourceProvider(result.id));
       }
     }
 
@@ -2108,6 +2109,7 @@ class UserLists extends _$UserLists
     final idx = oldstate.indexWhere((e) => e.id == result.id);
     if (idx >= 0) {
       oldstate[idx] = result;
+      ref.invalidate(listSourceProvider(result.id));
     }
 
     state = AsyncData([...oldstate]);
@@ -2124,6 +2126,7 @@ class UserLists extends _$UserLists
 
     if (result) {
       oldstate.removeWhere((e) => e.id == list.id);
+      ref.invalidate(listSourceProvider(list.id));
     }
 
     state = AsyncData([...oldstate]);

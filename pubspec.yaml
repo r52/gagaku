@@ -61,7 +61,7 @@ dependencies:
       path: packages/timeago
       ref: c23ec0f
   url_launcher: ^6.1.10
-  number_paginator: ^0.4.0
+  number_paginator: ^1.0.0
   collection: ^1.19.0
   device_info_plus: ^11.0.0
   super_sliver_list: ^0.4.0

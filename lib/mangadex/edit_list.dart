@@ -66,6 +66,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final listNameController = useTextEditingController(
       text: list?.attributes.name,
     );
+    final scrollController = useScrollController();
 
     final visibility = useValueNotifier(
       list != null ? list!.attributes.visibility : CustomListVisibility.private,
@@ -298,6 +299,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                           style: const TextStyle(fontSize: 24),
                         ),
                         physics: const AlwaysScrollableScrollPhysics(),
+                        controller: scrollController,
                         showToggle: false,
                         future: future,
                         children: [
@@ -332,6 +334,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         1,
                       ),
                       onPageChange: (int index) {
+                        scrollController.jumpTo(0.0);
                         currentPage.value = index;
                       },
                     );

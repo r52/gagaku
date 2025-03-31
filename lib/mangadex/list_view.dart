@@ -7,33 +7,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
-import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'list_view.g.dart';
 
 enum _ViewType { titles, feed }
-
-@Riverpod(retry: noRetry)
-Future<CustomList?> _getList(Ref ref, String listId) async {
-  final me = await ref.watch(loggedUserProvider.future);
-
-  if (me != null) {
-    final userlists = await ref.watch(userListsProvider(me.id).future);
-    final found = userlists.indexWhere((e) => e.id == listId);
-    if (found >= 0) {
-      return userlists.elementAt(found);
-    }
-  }
-
-  final list = await ref.watch(listSourceProvider(listId).future);
-  return list;
-}
 
 @RoutePage()
 class MangaDexListViewWithNamePage extends MangaDexListViewPage {
@@ -59,7 +38,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).value;
-    final listProvider = ref.watch(_getListProvider(listId));
+    final listProvider = ref.watch(listSourceProvider(listId));
 
     final bottomNavigationBarItems = <Widget>[
       NavigationDestination(icon: Icon(Icons.menu_book), label: t.titles),
@@ -164,7 +143,10 @@ class MangaDexListViewPage extends HookConsumerWidget {
                     final currentPage = useValueNotifier(0);
 
                     return RefreshIndicator(
-                      onRefresh: () async => refresh.value = UniqueKey(),
+                      onRefresh: () async {
+                        refresh.value = UniqueKey();
+                        return ref.refresh(listSourceProvider(listId).future);
+                      },
                       child: Column(
                         children: [
                           Expanded(
@@ -205,6 +187,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                                   1,
                                 ),
                                 onPageChange: (int index) {
+                                  controllers[0].jumpTo(0.0);
                                   currentPage.value = index;
                                 },
                               );

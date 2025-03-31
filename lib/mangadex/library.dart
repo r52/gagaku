@@ -195,6 +195,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                                     1,
                                   ),
                                   onPageChange: (int index) {
+                                    scrollController.jumpTo(0.0);
                                     currentPage.value = index;
                                   },
                                 );
