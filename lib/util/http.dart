@@ -9,6 +9,9 @@ import 'package:http/retry.dart';
 const _baseUserAgent =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0';
 
+// global base shared client with no custom UA
+final baseGagakuClient = RateLimitedClient();
+
 String getUserAgent([bool useCustomUA = false]) {
   return useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
 }

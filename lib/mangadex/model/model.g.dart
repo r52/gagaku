@@ -54,7 +54,7 @@ final class MangadexProvider
   }
 }
 
-String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
+String _$mangadexHash() => r'2e60803c3e0b7b0065c423dcb31c862de55d8e53';
 
 @ProviderFor(MangaChaptersListSort)
 const mangaChaptersListSortProvider = MangaChaptersListSortProvider._();

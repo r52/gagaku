@@ -204,11 +204,13 @@ extension TokenHelper on TokenResponse {
 
 @Riverpod(keepAlive: true)
 MangaDexModel mangadex(Ref ref) {
-  return MangaDexModel(ref);
+  return MangaDexModel(ref, RateLimitedClient(useCustomUA: true));
 }
 
 class MangaDexModel {
-  MangaDexModel(this.ref) {
+  MangaDexModel(this.ref, http.Client client)
+    : _baseClient = client,
+      _client = client {
     _cache = ref.watch(cacheProvider);
     _future = refreshToken();
   }
@@ -217,7 +219,8 @@ class MangaDexModel {
   TokenResponse? _token;
   Credential? _credential;
   final _tokenMutex = ReadWriteMutex();
-  http.Client _client = RateLimitedClient(useCustomUA: true);
+  final http.Client _baseClient;
+  http.Client _client;
   late Future _future;
   Future get future => _future;
 
@@ -277,11 +280,16 @@ class MangaDexModel {
             _credential?.client.issuer ??
             await Issuer.discover(
               MangaDexEndpoints.provider,
-              httpClient: _client,
+              httpClient: _baseClient,
             );
         final client =
             _credential?.client ??
-            Client(issuer, clientId, clientSecret: clientSecret);
+            Client(
+              issuer,
+              clientId,
+              clientSecret: clientSecret,
+              httpClient: _baseClient,
+            );
 
         final credential =
             _credential ??
@@ -299,7 +307,7 @@ class MangaDexModel {
             _saveToken(token);
 
             _token = token;
-            _client = credential.createHttpClient(_client);
+            _client = credential.createHttpClient(_baseClient);
             _credential = credential;
             logger.i("refreshToken(): MangaDex token refreshed");
             return;
@@ -310,10 +318,10 @@ class MangaDexModel {
             "refreshToken() returned error ${token['error']}",
             error: token.toString(),
           );
-          _client = RateLimitedClient(useCustomUA: true);
+          _client = _baseClient;
         } catch (e) {
           logger.w("refreshToken() error ${e.toString()}", error: e);
-          _client = RateLimitedClient(useCustomUA: true);
+          _client = _baseClient;
 
           // remove broken tokens
           await storage.delete('accessToken');
@@ -333,10 +341,15 @@ class MangaDexModel {
   ) async {
     final issuer = await Issuer.discover(
       MangaDexEndpoints.provider,
-      httpClient: _client,
+      httpClient: _baseClient,
     );
 
-    final client = Client(issuer, clientId, clientSecret: clientSecret);
+    final client = Client(
+      issuer,
+      clientId,
+      clientSecret: clientSecret,
+      httpClient: _baseClient,
+    );
 
     final flow = Flow.password(client);
 
@@ -352,7 +365,7 @@ class MangaDexModel {
         await _saveToken(token);
         await _saveCredentials(user, clientId, clientSecret);
         _token = token;
-        _client = credential.createHttpClient(_client);
+        _client = credential.createHttpClient(_baseClient);
         _credential = credential;
 
         logger.i("authenticate(): MangaDex user logged in");
@@ -395,7 +408,7 @@ class MangaDexModel {
         if (response.statusCode == 200) {
           return await _tokenMutex.protectWrite(() async {
             _token = null;
-            _client = RateLimitedClient(useCustomUA: true);
+            _client = _baseClient;
             _credential = null;
 
             final storage = Hive.box(gagakuBox);
