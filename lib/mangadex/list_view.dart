@@ -38,6 +38,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).value;
+    final api = ref.watch(mangadexProvider);
     final listProvider = ref.watch(listSourceProvider(listId));
 
     final bottomNavigationBarItems = <Widget>[
@@ -54,8 +55,10 @@ class MangaDexListViewPage extends HookConsumerWidget {
         return Scaffold(
           appBar: AppBar(),
           body: RefreshIndicator(
-            onRefresh:
-                () async => ref.refresh(listSourceProvider(listId).future),
+            onRefresh: () async {
+              await api.invalidateCacheItem(listId);
+              return ref.refresh(listSourceProvider(listId).future);
+            },
             child: ErrorList(
               error: error,
               stackTrace: stackTrace,
@@ -144,6 +147,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
 
                     return RefreshIndicator(
                       onRefresh: () async {
+                        await api.invalidateCacheItem(listId);
                         refresh.value = UniqueKey();
                         return ref.refresh(listSourceProvider(listId).future);
                       },

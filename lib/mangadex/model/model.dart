@@ -188,7 +188,7 @@ abstract class MangaDexFeeds {
   );
   static const followedLists = FeedInfo(
     'FollowedLists',
-    MangaDexEndpoints.breakLimit,
+    100,
     MangaDexEndpoints.followedList,
   );
   static const search = FeedInfo(
@@ -2150,6 +2150,16 @@ class UserLists extends _$UserLists
     return result;
   }
 
+  Future<void> replaceList(CustomList list) async {
+    final oldstate = await future;
+    final idx = oldstate.indexWhere((e) => e.id == list.id);
+    if (idx >= 0) {
+      oldstate[idx] = list;
+    }
+
+    state = AsyncData([...oldstate]);
+  }
+
   @override
   @mutation
   Future<List<CustomList>> getNextPage() async {
@@ -2209,6 +2219,16 @@ class FollowedLists extends _$FollowedLists
     return result;
   }
 
+  Future<void> replaceList(CustomList list) async {
+    final oldstate = await future;
+    final idx = oldstate.indexWhere((e) => e.id == list.id);
+    if (idx >= 0) {
+      oldstate[idx] = list;
+    }
+
+    state = AsyncData([...oldstate]);
+  }
+
   @override
   @mutation
   Future<List<CustomList>> getNextPage() async {
@@ -2243,6 +2263,20 @@ class ListSource extends _$ListSource {
   Future<CustomList?> build(String listId) async {
     final api = ref.watch(mangadexProvider);
     final list = await api.fetchListById(listId);
+
+    if (list != null) {
+      final me = await ref.watch(loggedUserProvider.future);
+      if (me != null) {
+        if (ref.exists(userListsProvider(me.id))) {
+          ref.read(userListsProvider(me.id).notifier).replaceList(list);
+        }
+
+        if (ref.exists(followedListsProvider(me.id))) {
+          ref.read(followedListsProvider(me.id).notifier).replaceList(list);
+        }
+      }
+    }
+
     return list;
   }
 }
