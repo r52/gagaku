@@ -7,6 +7,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -170,6 +171,11 @@ class SourceManager extends HookConsumerWidget {
                                                     ),
                                                   );
                                               } else {
+                                                ref.invalidate(
+                                                  extensionSourceProvider(
+                                                    source.id,
+                                                  ),
+                                                );
                                                 ref.read(
                                                   webConfigProvider.saveWith,
                                                 )(
@@ -228,6 +234,9 @@ class SourceManager extends HookConsumerWidget {
                                   onPressed: () {
                                     final messenger = ScaffoldMessenger.of(
                                       context,
+                                    );
+                                    ref.invalidate(
+                                      extensionSourceProvider(item.id),
                                     );
                                     ref.read(webConfigProvider.saveWith)(
                                       installedSources: [

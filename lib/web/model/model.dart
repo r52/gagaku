@@ -681,12 +681,13 @@ class ExtensionSource extends _$ExtensionSource {
   @override
   Future<WebSourceInfo> build(String sourceId) async {
     final completer = Completer<void>();
-    final installed = ref.watch(
-      webConfigProvider.select((cfg) => cfg.installedSources),
-    );
 
     // Let this throw here if not found
-    final source = installed.firstWhere((e) => e.id == sourceId);
+    final source = ref.watch(
+      webConfigProvider.select(
+        (cfg) => cfg.installedSources.firstWhere((e) => e.id == sourceId),
+      ),
+    );
 
     _view = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
