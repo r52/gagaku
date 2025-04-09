@@ -34,7 +34,7 @@ abstract class SourceHandler with _$SourceHandler {
 
   const factory SourceHandler({
     required SourceType type,
-    required String source,
+    required String sourceId,
     required String location,
     String? chapter,
     WebSourceInfo? parser,
@@ -42,9 +42,9 @@ abstract class SourceHandler with _$SourceHandler {
 
   String getURL() =>
       type == SourceType.proxy
-          ? 'https://cubari.moe/read/$source/$location/'
-          : '$source/$location';
-  String getKey() => '$source/$location';
+          ? 'https://cubari.moe/read/$sourceId/$location/'
+          : '$sourceId/$location';
+  String getKey() => '$sourceId/$location';
 }
 
 @freezed
@@ -476,6 +476,8 @@ abstract class ChapterDetails with _$ChapterDetails {
 
 @freezed
 abstract class SearchRequest with _$SearchRequest {
+  const SearchRequest._();
+
   const factory SearchRequest({
     String? title,
     @Default([]) List<Tag> includedTags,
@@ -484,6 +486,13 @@ abstract class SearchRequest with _$SearchRequest {
 
   factory SearchRequest.fromJson(Map<String, dynamic> json) =>
       _$SearchRequestFromJson(json);
+
+  bool get isEmpty =>
+      (title == null || title!.isEmpty) &&
+      includedTags.isEmpty &&
+      excludedTags.isEmpty;
+
+  bool get isFiltersEmpty => includedTags.isEmpty && excludedTags.isEmpty;
 }
 
 @freezed

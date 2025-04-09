@@ -62,7 +62,7 @@ class ProxyHandler {
             source: code,
             handle: SourceHandler(
               type: SourceType.proxy,
-              source: 'imgur',
+              sourceId: 'imgur',
               location: src,
             ),
           ),
@@ -84,7 +84,7 @@ class ProxyHandler {
       if (info.chapter != null) {
         AutoRouter.of(context).push(
           ProxyWebSourceReaderRoute(
-            proxy: info.source,
+            proxy: info.sourceId,
             code: info.location,
             chapter: info.chapter!,
             page: '1',
@@ -93,7 +93,7 @@ class ProxyHandler {
       } else {
         AutoRouter.of(context).push(
           WebMangaViewRoute(
-            source: info.source,
+            sourceId: info.sourceId,
             mangaId: info.location,
             handle: info,
           ),
@@ -117,11 +117,11 @@ class ProxyHandler {
 
         AutoRouter.of(context).push(
           WebMangaViewRoute(
-            source: src.id,
+            sourceId: src.id,
             mangaId: loc,
             handle: SourceHandler(
               type: SourceType.source,
-              source: src.id,
+              sourceId: src.id,
               location: loc,
               parser: src,
             ),
@@ -154,7 +154,7 @@ class ProxyHandler {
         if (proxy.length >= 4) {
           return SourceHandler(
             type: SourceType.proxy,
-            source: proxy[1],
+            sourceId: proxy[1],
             location: proxy[2],
             chapter: proxy[3],
           );
@@ -162,7 +162,7 @@ class ProxyHandler {
 
         return SourceHandler(
           type: SourceType.proxy,
-          source: proxy[1],
+          sourceId: proxy[1],
           location: proxy[2],
         );
       default:
@@ -198,9 +198,9 @@ class ProxyHandler {
         } else {
           final installed = await ref.watch(extensionInfoListProvider.future);
           for (final src in installed) {
-            if (handle.source == src.id) {
+            if (handle.sourceId == src.id) {
               return await ref
-                  .read(extensionSourceProvider(handle.source).notifier)
+                  .read(extensionSourceProvider(handle.sourceId).notifier)
                   .getManga(handle.location);
             }
           }
@@ -215,7 +215,7 @@ class ProxyHandler {
   Future<WebManga> _getMangaFromProxy(SourceHandler handle) async {
     final key = handle.getKey();
     final url =
-        "https://cubari.moe/read/api/${handle.source}/series/${handle.location}/";
+        "https://cubari.moe/read/api/${handle.sourceId}/series/${handle.location}/";
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
@@ -678,6 +678,8 @@ class ExtensionSource extends _$ExtensionSource {
   InAppWebViewController? get _controller =>
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
 
+  List<TagSection>? _tags;
+
   @override
   Future<WebSourceInfo> build(String sourceId) async {
     final completer = Completer<void>();
@@ -750,6 +752,20 @@ class ExtensionSource extends _$ExtensionSource {
           source:
               "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
         );
+
+        // Get tags
+        final result = await _controller?.callAsyncJavaScript(
+          functionBody: "return await ${source.id}?.getSearchTags();",
+        );
+
+        if (result == null || result.error != null) {
+          throw Exception('JavaScript error: ${result?.error}');
+        }
+
+        if (result.value != null) {
+          final rsec = result.value as List<dynamic>;
+          _tags = rsec.map((e) => TagSection.fromJson(e)).toList();
+        }
 
         logger.d("Extension ${source.name} ready");
         completer.complete();
@@ -987,6 +1003,11 @@ return p;
 
     return result;
   }
+
+  Future<List<TagSection>?> getTags() async {
+    await future;
+    return _tags;
+  }
 }
 
 @riverpod
@@ -1001,4 +1022,11 @@ class ExtensionInfoList extends _$ExtensionInfoList {
       installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
     );
   }
+}
+
+@Riverpod(retry: noRetry)
+Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
+  final sources = await ref.watch(extensionInfoListProvider.future);
+
+  return sources.firstWhere((e) => e.id == sourceId);
 }

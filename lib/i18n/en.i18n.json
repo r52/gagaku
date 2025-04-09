@@ -149,7 +149,8 @@
       "sourceDeleteOK": "Extension disabled",
       "sourceUpdateOK": "Extension updated",
       "sourceAddOK": "Extension enabled",
-      "installedVersion": " (installed: v${version})"
+      "installedVersion": " (installed: v${version})",
+      "noTagsWarning": "This extension provides no filter options"
     },
     "noSourcesWarning": "No extensions installed!",
     "sourceSearch": "Source Search",

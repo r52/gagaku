@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SourceHandler {
 
- SourceType get type; String get source; String get location; String? get chapter; WebSourceInfo? get parser;
+ SourceType get type; String get sourceId; String get location; String? get chapter; WebSourceInfo? get parser;
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $SourceHandlerCopyWith<SourceHandler> get copyWith => _$SourceHandlerCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceHandler&&(identical(other.type, type) || other.type == type)&&(identical(other.source, source) || other.source == source)&&(identical(other.location, location) || other.location == location)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.parser, parser) || other.parser == parser));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceHandler&&(identical(other.type, type) || other.type == type)&&(identical(other.sourceId, sourceId) || other.sourceId == sourceId)&&(identical(other.location, location) || other.location == location)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.parser, parser) || other.parser == parser));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,type,source,location,chapter,parser);
+int get hashCode => Object.hash(runtimeType,type,sourceId,location,chapter,parser);
 
 @override
 String toString() {
-  return 'SourceHandler(type: $type, source: $source, location: $location, chapter: $chapter, parser: $parser)';
+  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter, parser: $parser)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $SourceHandlerCopyWith<$Res>  {
   factory $SourceHandlerCopyWith(SourceHandler value, $Res Function(SourceHandler) _then) = _$SourceHandlerCopyWithImpl;
 @useResult
 $Res call({
- SourceType type, String source, String location, String? chapter, WebSourceInfo? parser
+ SourceType type, String sourceId, String location, String? chapter, WebSourceInfo? parser
 });
 
 
@@ -63,10 +63,10 @@ class _$SourceHandlerCopyWithImpl<$Res>
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? source = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as SourceType,source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
+as SourceType,sourceId: null == sourceId ? _self.sourceId : sourceId // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,chapter: freezed == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
 as String?,parser: freezed == parser ? _self.parser : parser // ignore: cast_nullable_to_non_nullable
@@ -93,11 +93,11 @@ $WebSourceInfoCopyWith<$Res>? get parser {
 
 
 class _SourceHandler extends SourceHandler {
-  const _SourceHandler({required this.type, required this.source, required this.location, this.chapter, this.parser}): super._();
+  const _SourceHandler({required this.type, required this.sourceId, required this.location, this.chapter, this.parser}): super._();
   
 
 @override final  SourceType type;
-@override final  String source;
+@override final  String sourceId;
 @override final  String location;
 @override final  String? chapter;
 @override final  WebSourceInfo? parser;
@@ -112,16 +112,16 @@ _$SourceHandlerCopyWith<_SourceHandler> get copyWith => __$SourceHandlerCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceHandler&&(identical(other.type, type) || other.type == type)&&(identical(other.source, source) || other.source == source)&&(identical(other.location, location) || other.location == location)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.parser, parser) || other.parser == parser));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceHandler&&(identical(other.type, type) || other.type == type)&&(identical(other.sourceId, sourceId) || other.sourceId == sourceId)&&(identical(other.location, location) || other.location == location)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.parser, parser) || other.parser == parser));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,type,source,location,chapter,parser);
+int get hashCode => Object.hash(runtimeType,type,sourceId,location,chapter,parser);
 
 @override
 String toString() {
-  return 'SourceHandler(type: $type, source: $source, location: $location, chapter: $chapter, parser: $parser)';
+  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter, parser: $parser)';
 }
 
 
@@ -132,7 +132,7 @@ abstract mixin class _$SourceHandlerCopyWith<$Res> implements $SourceHandlerCopy
   factory _$SourceHandlerCopyWith(_SourceHandler value, $Res Function(_SourceHandler) _then) = __$SourceHandlerCopyWithImpl;
 @override @useResult
 $Res call({
- SourceType type, String source, String location, String? chapter, WebSourceInfo? parser
+ SourceType type, String sourceId, String location, String? chapter, WebSourceInfo? parser
 });
 
 
@@ -149,10 +149,10 @@ class __$SourceHandlerCopyWithImpl<$Res>
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? source = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
   return _then(_SourceHandler(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as SourceType,source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
+as SourceType,sourceId: null == sourceId ? _self.sourceId : sourceId // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,chapter: freezed == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
 as String?,parser: freezed == parser ? _self.parser : parser // ignore: cast_nullable_to_non_nullable
@@ -2922,8 +2922,8 @@ as List<Tag>,
 /// @nodoc
 @JsonSerializable()
 
-class _SearchRequest implements SearchRequest {
-  const _SearchRequest({this.title, final  List<Tag> includedTags = const [], final  List<Tag> excludedTags = const []}): _includedTags = includedTags,_excludedTags = excludedTags;
+class _SearchRequest extends SearchRequest {
+  const _SearchRequest({this.title, final  List<Tag> includedTags = const [], final  List<Tag> excludedTags = const []}): _includedTags = includedTags,_excludedTags = excludedTags,super._();
   factory _SearchRequest.fromJson(Map<String, dynamic> json) => _$SearchRequestFromJson(json);
 
 @override final  String? title;

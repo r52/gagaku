@@ -1286,7 +1286,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'4e8eb3d283bb1a4b5dc6a73c3b030d7689141c11';
+String _$extensionSourceHash() => r'4655c9562c84c5e1b3561f2d4ae615f07b039ec1';
 
 final class ExtensionSourceFamily extends Family {
   const ExtensionSourceFamily._()
@@ -1438,6 +1438,114 @@ abstract class _$ExtensionInfoList extends $AsyncNotifier<List<WebSourceInfo>> {
               Object?
             >;
     element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(getExtensionFromId)
+const getExtensionFromIdProvider = GetExtensionFromIdFamily._();
+
+final class GetExtensionFromIdProvider
+    extends
+        $FunctionalProvider<AsyncValue<WebSourceInfo>, FutureOr<WebSourceInfo>>
+    with $FutureModifier<WebSourceInfo>, $FutureProvider<WebSourceInfo> {
+  const GetExtensionFromIdProvider._({
+    required GetExtensionFromIdFamily super.from,
+    required String super.argument,
+    FutureOr<WebSourceInfo> Function(Ref ref, String sourceId)? create,
+  }) : _createCb = create,
+       super(
+         retry: noRetry,
+         name: r'getExtensionFromIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
+
+  final FutureOr<WebSourceInfo> Function(Ref ref, String sourceId)? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$getExtensionFromIdHash();
+
+  @override
+  String toString() {
+    return r'getExtensionFromIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<WebSourceInfo> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(this, pointer);
+
+  @override
+  GetExtensionFromIdProvider $copyWithCreate(
+    FutureOr<WebSourceInfo> Function(Ref ref) create,
+  ) {
+    return GetExtensionFromIdProvider._(
+      argument: argument as String,
+      from: from! as GetExtensionFromIdFamily,
+      create: (ref, String sourceId) => create(ref),
+    );
+  }
+
+  @override
+  FutureOr<WebSourceInfo> create(Ref ref) {
+    final _$cb = _createCb ?? getExtensionFromId;
+    final argument = this.argument as String;
+    return _$cb(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GetExtensionFromIdProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$getExtensionFromIdHash() =>
+    r'b5bf3c8a25a75348d4400be94e8864bff3bafdea';
+
+final class GetExtensionFromIdFamily extends Family {
+  const GetExtensionFromIdFamily._()
+    : super(
+        retry: noRetry,
+        name: r'getExtensionFromIdProvider',
+        dependencies: null,
+        allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  GetExtensionFromIdProvider call(String sourceId) =>
+      GetExtensionFromIdProvider._(argument: sourceId, from: this);
+
+  @override
+  String debugGetCreateSourceHash() => _$getExtensionFromIdHash();
+
+  @override
+  String toString() => r'getExtensionFromIdProvider';
+
+  /// {@macro riverpod.override_with}
+  Override overrideWith(
+    FutureOr<WebSourceInfo> Function(Ref ref, String args) create,
+  ) {
+    return $FamilyOverride(
+      from: this,
+      createElement: (pointer) {
+        final provider = pointer.origin as GetExtensionFromIdProvider;
+
+        final argument = provider.argument as String;
+
+        return provider
+            .$copyWithCreate((ref) => create(ref, argument))
+            .$createElement(pointer);
+      },
+    );
   }
 }
 

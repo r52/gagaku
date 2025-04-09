@@ -11,7 +11,6 @@ import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:gagaku/web/search.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -149,7 +148,9 @@ class WebSourceFrontPage extends HookConsumerWidget {
                               : const Icon(Icons.rss_feed),
                       title: Text(item.name),
                       onTap: () {
-                        context.router.push(ExtensionHomeRoute(source: item));
+                        context.router.push(
+                          ExtensionHomeRoute(sourceId: item.id, source: item),
+                        );
                       },
                     ),
                   );
@@ -163,10 +164,36 @@ class WebSourceFrontPage extends HookConsumerWidget {
 }
 
 @RoutePage()
-class ExtensionHomePage extends HookConsumerWidget {
+class ExtensionHomePage extends StatelessWidget {
+  const ExtensionHomePage({
+    super.key,
+    @PathParam() required this.sourceId,
+    this.source,
+  });
+
+  final String sourceId;
+  final WebSourceInfo? source;
+
+  @override
+  Widget build(BuildContext context) {
+    if (source != null) {
+      return ExtensionHomeWidget(source: source!);
+    }
+
+    return DataProviderWhenWidget(
+      provider: getExtensionFromIdProvider(sourceId),
+      errorBuilder: (context, child, _, __) => Scaffold(body: child),
+      builder: (context, data) {
+        return ExtensionHomeWidget(source: data);
+      },
+    );
+  }
+}
+
+class ExtensionHomeWidget extends HookConsumerWidget {
   final WebSourceInfo source;
 
-  const ExtensionHomePage({super.key, required this.source});
+  const ExtensionHomeWidget({super.key, required this.source});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -273,12 +300,8 @@ class ExtensionHomePage extends HookConsumerWidget {
                 color: theme.colorScheme.onPrimaryContainer,
                 icon: const Icon(Icons.search),
                 onPressed:
-                    () => nav.push(
-                      SlideTransitionRouteBuilder(
-                        pageBuilder:
-                            (context, animation, secondaryAnimation) =>
-                                WebSourceSearchWidget(source: source),
-                      ),
+                    () => context.router.push(
+                      ExtensionSearchRoute(sourceId: source.id, source: source),
                     ),
                 tooltip: tr.search.arg(arg: source.name),
               ),

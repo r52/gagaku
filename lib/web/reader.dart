@@ -25,7 +25,7 @@ Future<WebReaderData> _fetchWebChapterInfo(
   if (manga != null) {
     ref.read(webSourceHistoryProvider.add)(
       HistoryLink(
-        title: '${handle.source}: ${manga.title}',
+        title: '${handle.sourceId}: ${manga.title}',
         url: handle.getURL(),
         cover: manga.cover,
       ),
@@ -103,12 +103,12 @@ Future<List<ReaderPage>> _getSourcePages(
   } else {
     final installed = await ref.watch(extensionInfoListProvider.future);
     for (final src in installed) {
-      if (handle.source == src.id) {
+      if (handle.sourceId == src.id) {
         final ext = await ref.watch(
           extensionSourceProvider(handle.parser!.id).future,
         );
         links = await ref
-            .read(extensionSourceProvider(handle.source).notifier)
+            .read(extensionSourceProvider(handle.sourceId).notifier)
             .getChapterPages(handle.location, id);
         referer = ext.baseUrl;
         break;
@@ -118,7 +118,7 @@ Future<List<ReaderPage>> _getSourcePages(
 
   if (links == null) {
     throw Exception(
-      'Failed to download pages from source ${handle.source}, chapter id $id',
+      'Failed to download pages from source ${handle.sourceId}, chapter id $id',
     );
   }
 
@@ -175,7 +175,7 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
 
     final handle = SourceHandler(
       type: SourceType.proxy,
-      source: proxy,
+      sourceId: proxy,
       location: code,
       chapter: chapter.replaceFirst('-', '.'),
     );
@@ -204,13 +204,13 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
 class ExtensionReaderPage extends StatelessWidget {
   const ExtensionReaderPage({
     super.key,
-    @PathParam() required this.source,
+    @PathParam() required this.sourceId,
     @PathParam() required this.mangaId,
     @PathParam() required this.chapterId,
     this.readerData,
   });
 
-  final String source;
+  final String sourceId;
   final String mangaId;
   final String chapterId;
   final WebReaderData? readerData;
@@ -230,7 +230,7 @@ class ExtensionReaderPage extends StatelessWidget {
 
     final handle = SourceHandler(
       type: SourceType.source,
-      source: source,
+      sourceId: sourceId,
       location: mangaId,
       chapter: chapterId,
     );

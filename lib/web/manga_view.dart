@@ -45,12 +45,12 @@ class ChapterEntry {
 class WebMangaViewPage extends ConsumerWidget {
   const WebMangaViewPage({
     super.key,
-    @PathParam() required this.source,
+    @PathParam() required this.sourceId,
     @PathParam() required this.mangaId,
     this.handle,
   });
 
-  final String source;
+  final String sourceId;
   final String mangaId;
   final SourceHandler? handle;
 
@@ -64,10 +64,10 @@ class WebMangaViewPage extends ConsumerWidget {
         handle ??
         SourceHandler(
           type:
-              (installed.indexWhere((e) => e.id == source) > -1)
+              (installed.indexWhere((e) => e.id == sourceId) > -1)
                   ? SourceType.source
                   : SourceType.proxy,
-          source: source,
+          sourceId: sourceId,
           location: mangaId,
         );
 
@@ -111,7 +111,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
     final link = HistoryLink(
-      title: '${handle.source}: ${manga.title}',
+      title: '${handle.sourceId}: ${manga.title}',
       url: handle.getURL(),
       cover: manga.cover,
     );
@@ -280,7 +280,21 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           title: tagsec.label.capitalize(),
                           children:
                               tagsec.tags
-                                  .map((e) => IconTextChip(text: e.label))
+                                  .map(
+                                    (e) => IconTextChip(
+                                      text: e.label,
+                                      onPressed:
+                                          () => context.router.push(
+                                            ExtensionSearchRoute(
+                                              sourceId: handle.sourceId,
+                                              source: handle.parser,
+                                              query: SearchRequest(
+                                                includedTags: [e],
+                                              ),
+                                            ),
+                                          ),
+                                    ),
+                                  )
                                   .toList(),
                         ),
                     MultiChildExpansionTile(
@@ -306,7 +320,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                 () => ref
                                     .read(
                                       extensionSourceProvider(
-                                        handle.source,
+                                        handle.sourceId,
                                       ).notifier,
                                     )
                                     .getMangaURL(handle.location),
@@ -325,7 +339,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                     throw 'Could not launch $url';
                                   }
                                 },
-                                text: tr.mangaView.openOn(arg: handle.source),
+                                text: tr.mangaView.openOn(arg: handle.sourceId),
                               );
                             },
                           ),
@@ -546,7 +560,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     );
 
     PageRouteInfo route = ProxyWebSourceReaderRoute(
-      proxy: handle.source,
+      proxy: handle.sourceId,
       code: handle.location,
       chapter: name,
       readerData: readerData,
@@ -554,7 +568,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
     if (handle.type == SourceType.source) {
       route = ExtensionReaderRoute(
-        source: handle.source,
+        sourceId: handle.sourceId,
         mangaId: handle.location,
         chapterId: (data.chapter.groups.entries.first.value as Chapter).id,
         readerData: readerData,

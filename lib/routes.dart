@@ -160,6 +160,11 @@ class AppRouter extends RootStackRouter {
       transitionsBuilder: Styles.slideTransitionBuilder,
     ),
     CustomRoute(
+      path: GagakuRoute.extensionSearch,
+      page: ExtensionSearchRoute.page,
+      transitionsBuilder: Styles.slideTransitionBuilder,
+    ),
+    CustomRoute(
       path: GagakuRoute.webManga,
       page: WebMangaViewRoute.page,
       transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,

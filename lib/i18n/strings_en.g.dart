@@ -693,6 +693,7 @@ class TranslationsWebSourcesSourceEn {
 	String get sourceUpdateOK => 'Extension updated';
 	String get sourceAddOK => 'Extension enabled';
 	String installedVersion({required Object version}) => ' (installed: v${version})';
+	String get noTagsWarning => 'This extension provides no filter options';
 }
 
 // Path: reader.direction
@@ -911,6 +912,7 @@ extension on Translations {
 			case 'webSources.source.sourceUpdateOK': return 'Extension updated';
 			case 'webSources.source.sourceAddOK': return 'Extension enabled';
 			case 'webSources.source.installedVersion': return ({required Object version}) => ' (installed: v${version})';
+			case 'webSources.source.noTagsWarning': return 'This extension provides no filter options';
 			case 'webSources.noSourcesWarning': return 'No extensions installed!';
 			case 'webSources.sourceSearch': return 'Source Search';
 			case 'webSources.resetRead': return 'Reset Read Markers';

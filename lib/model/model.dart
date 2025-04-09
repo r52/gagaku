@@ -27,11 +27,12 @@ abstract class GagakuRoute {
   static const extension = '/extensions';
   static const extensionSaved = 'saved';
   static const extensionHistory = 'history';
-  static const extensionHomePage = '/extensions/home';
+  static const extensionHomePage = '/extensions/:sourceId/home';
+  static const extensionSearch = '/extensions/:sourceId/search';
   static const web = '/read';
-  static const webManga = '/read/:source/:mangaId';
+  static const webManga = '/read/:sourceId/:mangaId';
   static const proxyChapter = '/read/:proxy/:code/:chapter/:page';
-  static const extensionChapter = '/read-chapter/:source/:mangaId/:chapterId';
+  static const extensionChapter = '/read-chapter/:sourceId/:mangaId/:chapterId';
 
   static const config = '/config';
 }
