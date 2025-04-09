@@ -1,13 +1,12 @@
 import 'dart:io';
 
-import 'package:cronet_http/cronet_http.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
+import 'package:rhttp/rhttp.dart';
 
 const _baseUserAgent =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0';
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0';
 
 // global base shared client with no custom UA
 final baseGagakuClient = RateLimitedClient();
@@ -19,21 +18,19 @@ String getUserAgent([bool useCustomUA = false]) {
 http.Client _createHttpClient([bool useCustomUA = false]) {
   final userAgent = getUserAgent(useCustomUA);
 
-  if (Platform.isAndroid) {
-    final engine = CronetEngine.build(
-      cacheMode: CacheMode.memory,
-      cacheMaxSize: 10 * 1024 * 1024,
+  return RhttpCompatibleClient.createSync(
+    settings: ClientSettings(
+      timeoutSettings: TimeoutSettings(connectTimeout: Duration(seconds: 5)),
       userAgent: userAgent,
-    );
-    return CronetClient.fromCronetEngine(engine, closeEngine: true);
-  }
-
-  return IOClient(HttpClient()..userAgent = userAgent);
+    ),
+  );
 }
 
 class RateLimitedClient extends CustomClient {
-  static const _rateLimit = Duration(milliseconds: 200); // 5 per second
-  final _pendingCalls = <String, List<int>>{};
+  static const _maxConcurrentRequests = 5;
+  static const _buffer = Duration(milliseconds: 500);
+  static const _rateLimit = Duration(milliseconds: 250);
+  final _pendingCalls = <String, List<String>>{};
 
   RateLimitedClient({super.useCustomUA});
 
@@ -45,18 +42,31 @@ class RateLimitedClient extends CustomClient {
       _pendingCalls[host] = [];
     }
 
+    if (_pendingCalls[host]!.length >= _maxConcurrentRequests) {
+      // logger.d(
+      //   'RateLimit: Max concurrent requests reached for host: $host. Waiting...',
+      // );
+      while (_pendingCalls[host]!.length >= _maxConcurrentRequests) {
+        await Future.delayed(_buffer);
+      }
+    }
+
     final numPending = _pendingCalls[host]!.length;
-    _pendingCalls[host]!.add(request.hashCode);
+    _pendingCalls[host]!.add(request.toString());
+    // logger.d('RateLimit: PendingCalls[$host] = ${_pendingCalls[host]!.length}');
 
     final wait = _rateLimit * numPending;
     await Future.delayed(wait);
 
-    return _baseClient.send(request).whenComplete(() {
-      _pendingCalls[host]!.remove(request.hashCode);
-      if (_pendingCalls[host]!.isEmpty) {
-        _pendingCalls.remove(host);
-      }
-    });
+    return _baseClient
+        .send(request)
+        .timeout(const Duration(seconds: 10))
+        .whenComplete(() {
+          _pendingCalls[host]!.remove(request.toString());
+          // logger.d(
+          //   'RateLimit: PendingCalls[$host] = ${_pendingCalls[host]!.length}',
+          // );
+        });
   }
 }
 
