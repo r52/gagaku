@@ -124,6 +124,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
+          merge-multiple: true
           path: artifacts
       - name: Create release
         id: create_release
@@ -133,7 +134,7 @@ jobs:
           RELDATE="$(date +'%Y-%m-%d %H:%M')"
           NAME="${{ github.event.inputs.tagName }}"
           TAGNAME="${{ github.event.inputs.tagName }}"
-          gh release create "$TAGNAME" --target "main" --title "$NAME" artifacts/**/*.{zip,tar.xz,.apk}
+          gh release create "$TAGNAME" --target "main" --title "$NAME" artifacts/*
           echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
           echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
         env:
@@ -150,6 +151,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
+          merge-multiple: true
           path: artifacts
       - name: Create preview release
         id: create_release
@@ -161,6 +163,6 @@ jobs:
           TAGNAME="dev-preview"
           gh release delete --cleanup-tag --yes "$TAGNAME" || true
           sleep 15
-          gh release create "$TAGNAME" --prerelease --target "${{ github.ref }}" --title "$NAME" artifacts/**/*.{zip,tar.xz,.apk}
+          gh release create "$TAGNAME" --prerelease --target "${{ github.ref }}" --title "$NAME" artifacts/*
         env:
           GITHUB_TOKEN: ${{ github.token }}
