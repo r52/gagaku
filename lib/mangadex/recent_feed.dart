@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -72,6 +72,7 @@ class _MangaDexRecentFeedPageState
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final ctrler = widget.controller ?? useScrollController();
 
     return Scaffold(
@@ -84,9 +85,7 @@ class _MangaDexRecentFeedPageState
               curve: Curves.easeInOut,
             );
           },
-          child: TitleFlexBar(
-            title: 'mangadex.recentlyAdded'.tr(context: context),
-          ),
+          child: TitleFlexBar(title: tr.mangadex.recentlyAdded),
         ),
         leading: AutoLeadingButton(),
       ),

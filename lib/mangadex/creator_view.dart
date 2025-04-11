@@ -1,20 +1,21 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'creator_view.g.dart';
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
   final api = ref.watch(mangadexProvider);
   final creator = await api.fetchCreators(uuids: [creatorId]);
@@ -52,7 +53,7 @@ class MangaDexCreatorViewPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchCreatorFromIdProvider(creatorId),
-      errorBuilder: (context, child) => Scaffold(body: child),
+      errorBuilder: (context, child, _, __) => Scaffold(body: child),
       builder: (context, data) {
         return MangaDexCreatorViewWidget(creator: data);
       },
@@ -106,6 +107,7 @@ class _MangaDexCreatorViewWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final scrollController = useScrollController();
     final theme = Theme.of(context);
 
@@ -134,9 +136,7 @@ class _MangaDexCreatorViewWidgetState
               children: [
                 if (widget.creator.attributes.biography.isNotEmpty)
                   ExpansionTile(
-                    title: Text(
-                      'mangadex.creator.biography'.tr(context: context),
-                    ),
+                    title: Text(tr.mangadex.creator.biography),
                     children: [
                       for (final MapEntry(key: prop, value: desc)
                           in widget.creator.attributes.biography.entries)
@@ -147,11 +147,13 @@ class _MangaDexCreatorViewWidgetState
                               width: double.infinity,
                               padding: const EdgeInsets.all(8),
                               color: theme.colorScheme.surfaceContainerHighest,
-                              child: GptMarkdown(
-                                desc,
-                                onLinkTab: (url, title) async {
-                                  if (!await launchUrl(Uri.parse(url))) {
-                                    throw 'Could not launch $url';
+                              child: MarkdownBody(
+                                data: desc,
+                                onTapLink: (text, url, title) async {
+                                  if (url != null) {
+                                    if (!await launchUrl(Uri.parse(url))) {
+                                      throw 'Could not launch $url';
+                                    }
                                   }
                                 },
                               ),
@@ -166,7 +168,7 @@ class _MangaDexCreatorViewWidgetState
                     widget.creator.attributes.website != null)
                   ExpansionTile(
                     expandedAlignment: Alignment.centerLeft,
-                    title: Text('mangadex.creator.follow'.tr(context: context)),
+                    title: Text(tr.mangadex.creator.follow),
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8),
@@ -203,7 +205,7 @@ class _MangaDexCreatorViewWidgetState
             ),
           ],
           title: Text(
-            'mangadex.creator.works'.tr(context: context),
+            tr.mangadex.creator.works,
             style: TextStyle(fontSize: 24),
           ),
           physics: const AlwaysScrollableScrollPhysics(),

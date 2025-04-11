@@ -1,6 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -21,6 +21,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final nav = Navigator.of(context);
     final cfg = ref.watch(webConfigProvider);
     final config = useState(cfg.copyWith());
@@ -28,21 +29,16 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text(
-          'arg_settings'.tr(
-            context: context,
-            args: ['webSources.text'.tr(context: context)],
-          ),
-        ),
+        title: Text(tr.arg_settings(arg: tr.webSources.text)),
         actions: [
           OverflowBar(
             spacing: 8.0,
             children: [
               Tooltip(
-                message: 'saveSettings'.tr(context: context),
+                message: tr.saveSettings,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.save),
-                  label: Text('saveSettings'.tr(context: context)),
+                  label: Text(tr.saveSettings),
                   onPressed: () {
                     ref.read(webConfigProvider.saveWith)(
                       installedSources: config.value.installedSources,
@@ -67,12 +63,10 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
           children: [
             SettingCardWidget(
               title: Text(
-                'webSources.settings.repos'.tr(context: context),
+                tr.webSources.settings.repos,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(
-                'webSources.settings.reposDesc'.tr(context: context),
-              ),
+              subtitle: Text(tr.webSources.settings.reposDesc),
               builder: (context) {
                 return Center(
                   child: ElevatedButton.icon(
@@ -86,19 +80,17 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       );
                     },
                     icon: const Icon(Icons.library_add),
-                    label: Text('ui.manage'.tr(context: context)),
+                    label: Text(tr.ui.manage),
                   ),
                 );
               },
             ),
             SettingCardWidget(
               title: Text(
-                'webSources.settings.categories'.tr(context: context),
+                tr.webSources.settings.categories,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(
-                'webSources.settings.categoriesDesc'.tr(context: context),
-              ),
+              subtitle: Text(tr.webSources.settings.categoriesDesc),
               builder: (context) {
                 return Center(
                   child: ElevatedButton.icon(
@@ -126,7 +118,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       }
                     },
                     icon: const Icon(Icons.library_add),
-                    label: Text('ui.manage'.tr(context: context)),
+                    label: Text(tr.ui.manage),
                   ),
                 );
               },
@@ -150,18 +142,17 @@ class CategoryManager extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final nav = Navigator.of(context);
     final list = useState(categories);
     final defaultCat = useState(defaultCategory);
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: TitleFlexBar(
-          title: 'webSources.settings.categories'.tr(context: context),
-        ),
+        flexibleSpace: TitleFlexBar(title: tr.webSources.settings.categories),
         actions: [
           IconButton(
-            tooltip: 'webSources.settings.newCategory'.tr(context: context),
+            tooltip: tr.webSources.settings.newCategory,
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
@@ -179,7 +170,7 @@ class CategoryManager extends HookConsumerWidget {
             icon: const Icon(Icons.add),
           ),
           IconButton(
-            tooltip: 'ui.save'.tr(context: context),
+            tooltip: tr.ui.save,
             onPressed: () {
               nav.pop((list.value, defaultCat.value));
             },
@@ -191,7 +182,7 @@ class CategoryManager extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ui.dragHint'.tr(context: context)),
+            Text(tr.ui.dragHint),
             Expanded(
               child: ReorderableListView.builder(
                 onReorder: (oldIndex, newIndex) {
@@ -223,10 +214,10 @@ class CategoryManager extends HookConsumerWidget {
                                     : () {
                                       defaultCat.value = item.id;
                                     },
-                            child: Text('ui.makeDefault'.tr(context: context)),
+                            child: Text(tr.ui.makeDefault),
                           ),
                           IconButton(
-                            tooltip: 'ui.rename'.tr(context: context),
+                            tooltip: tr.ui.rename,
                             onPressed: () async {
                               final result = await showDialog<String>(
                                 context: context,
@@ -252,7 +243,7 @@ class CategoryManager extends HookConsumerWidget {
                             icon: const Icon(Icons.edit),
                           ),
                           IconButton(
-                            tooltip: 'ui.delete'.tr(context: context),
+                            tooltip: tr.ui.delete,
                             color: Colors.red,
                             onPressed:
                                 list.value.length != 1
@@ -289,30 +280,27 @@ class NewCategoryDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final fieldController = useTextEditingController(text: rename);
 
     return AlertDialog(
       title: Text(
         rename == null
-            ? 'webSources.settings.addCategory'.tr(context: context)
-            : 'webSources.settings.renameCategory'.tr(context: context),
+            ? tr.webSources.settings.addCategory
+            : tr.webSources.settings.renameCategory,
       ),
       content: TextFormField(
         controller: fieldController,
         decoration: InputDecoration(
-          hintText: 'webSources.settings.categoryName'.tr(context: context),
+          hintText: tr.webSources.settings.categoryName,
         ),
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (String? value) {
           if (value == null || value.isEmpty) {
-            return 'webSources.settings.emptyCategoryWarning'.tr(
-              context: context,
-            );
+            return tr.webSources.settings.emptyCategoryWarning;
           }
           if (list.indexWhere((e) => e.name == value) != -1) {
-            return 'webSources.settings.usedCategoryWarning'.tr(
-              context: context,
-            );
+            return tr.webSources.settings.usedCategoryWarning;
           }
 
           return null;
@@ -320,7 +308,7 @@ class NewCategoryDialog extends HookWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('ui.cancel'.tr(context: context)),
+          child: Text(tr.ui.cancel),
           onPressed: () {
             Navigator.of(context).pop();
             fieldController.clear();
@@ -342,11 +330,7 @@ class NewCategoryDialog extends HookWidget {
                         fieldController.clear();
                       }
                       : null,
-              child: Text(
-                rename == null
-                    ? 'ui.add'.tr(context: context)
-                    : 'ui.rename'.tr(context: context),
-              ),
+              child: Text(rename == null ? tr.ui.add : tr.ui.rename),
             );
           },
         ),

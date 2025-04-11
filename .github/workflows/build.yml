@@ -17,6 +17,11 @@ on:
         type: boolean
         default: false
         required: false
+      doDevPreview:
+        description: 'Publish new dev preview'
+        type: boolean
+        default: false
+        required: false
 
 jobs:
   build:
@@ -131,5 +136,31 @@ jobs:
           gh release create "$TAGNAME" --target "main" --title "$NAME" artifacts/**/*.{zip,tar.xz,.apk}
           echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
           echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  publish_dev:
+    name: Publish Dev Preview
+    if: ${{ !cancelled() && github.event.inputs.doDevPreview == 'true' && needs.build.result == 'success' }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Create preview release
+        id: create_release
+        run: |
+          set -xe
+          shopt -s nullglob
+          RELDATE="$(date +'%Y-%m-%d %H:%M')"
+          NAME="Dev Preview ($RELDATE)"
+          TAGNAME="dev-preview"
+          gh release delete --cleanup-tag --yes "$TAGNAME" || true
+          sleep 15
+          gh release create "$TAGNAME" --prerelease --target "${{ github.ref }}" --title "$NAME" artifacts/**/*.{zip,tar.xz,.apk}
         env:
           GITHUB_TOKEN: ${{ github.token }}

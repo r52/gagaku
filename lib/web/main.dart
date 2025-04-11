@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
@@ -18,6 +18,7 @@ class WebSourceHomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final controllers = List.generate(3, (idx) => useScrollController());
     final controllerSet = useMemoized(
       () => {
@@ -55,9 +56,7 @@ class WebSourceHomePage extends HookConsumerWidget {
                   curve: Curves.easeOutCirc,
                 );
               },
-              child: TitleFlexBar(
-                title: 'webSources.text'.tr(context: context),
-              ),
+              child: TitleFlexBar(title: tr.webSources.text),
             ),
             actions: [
               OverflowBar(
@@ -67,7 +66,7 @@ class WebSourceHomePage extends HookConsumerWidget {
                     color: theme.colorScheme.onPrimaryContainer,
                     onPressed: () => openLinkDialog(context, api),
                     icon: const Icon(Icons.open_in_browser),
-                    tooltip: 'mangaActions.openLink'.tr(context: context),
+                    tooltip: tr.webSources.openLink,
                   ),
                   MenuAnchor(
                     builder:
@@ -89,25 +88,19 @@ class WebSourceHomePage extends HookConsumerWidget {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: Text(
-                                  'webSources.resetAllRead'.tr(
-                                    context: context,
-                                  ),
-                                ),
+                                title: Text(tr.webSources.resetAllRead),
                                 content: Text(
-                                  'webSources.resetAllReadWarning'.tr(
-                                    context: context,
-                                  ),
+                                  tr.webSources.resetAllReadWarning,
                                 ),
                                 actions: <Widget>[
                                   TextButton(
-                                    child: Text('ui.no'.tr(context: context)),
+                                    child: Text(tr.ui.no),
                                     onPressed: () {
                                       Navigator.of(context).pop(false);
                                     },
                                   ),
                                   ElevatedButton(
-                                    child: Text('ui.yes'.tr(context: context)),
+                                    child: Text(tr.ui.yes),
                                     onPressed: () {
                                       Navigator.of(context).pop(true);
                                     },
@@ -122,9 +115,7 @@ class WebSourceHomePage extends HookConsumerWidget {
                           }
                         },
                         leadingIcon: const Icon(Icons.restore),
-                        child: Text(
-                          'webSources.resetAllRead'.tr(context: context),
-                        ),
+                        child: Text(tr.webSources.resetAllRead),
                       ),
                       MenuItemButton(
                         onPressed:
@@ -136,20 +127,13 @@ class WebSourceHomePage extends HookConsumerWidget {
                               ),
                             ),
                         leadingIcon: const Icon(Icons.collections_bookmark),
-                        child: Text(
-                          'webSources.source.manager'.tr(context: context),
-                        ),
+                        child: Text(tr.webSources.source.manager),
                       ),
                       MenuItemButton(
                         onPressed:
                             () => nav.push(WebSourceSettingsRouteBuilder()),
                         leadingIcon: const Icon(Icons.settings),
-                        child: Text(
-                          'arg_settings'.tr(
-                            context: context,
-                            args: ['webSources.text'.tr(context: context)],
-                          ),
-                        ),
+                        child: Text(tr.arg_settings(arg: tr.webSources.text)),
                       ),
                     ],
                   ),
@@ -171,16 +155,16 @@ class WebSourceHomePage extends HookConsumerWidget {
               NavigationDestination(
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home),
-                label: 'webSources.home'.tr(context: context),
+                label: tr.webSources.home,
               ),
               NavigationDestination(
                 icon: Icon(Icons.favorite_border),
                 selectedIcon: Icon(Icons.favorite),
-                label: 'webSources.favorites'.tr(context: context),
+                label: tr.webSources.favorites,
               ),
               NavigationDestination(
                 icon: Icon(Icons.history),
-                label: 'history.text'.tr(context: context),
+                label: tr.history.text,
               ),
             ],
             selectedIndex: tabsRouter.activeIndex,

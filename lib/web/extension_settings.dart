@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -11,15 +11,14 @@ import 'package:input_quantity/input_quantity.dart';
 class ExtensionSettingsPage extends HookConsumerWidget {
   const ExtensionSettingsPage({super.key, required this.source});
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final results = useMemoized(
       () =>
-          ref
-              .read(extensionSourceProvider(source.internal.id).notifier)
-              .getSourceMenu(),
+          ref.read(extensionSourceProvider(source.id).notifier).getSourceMenu(),
       [source],
     );
     final future = useFuture(results);
@@ -28,9 +27,8 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
     if (future.hasError) {
       body = ErrorList(error: future.error!, stackTrace: future.stackTrace!);
-    }
-
-    if (future.connectionState == ConnectionState.waiting || !future.hasData) {
+    } else if (future.connectionState == ConnectionState.waiting ||
+        !future.hasData) {
       body = Center(child: CircularProgressIndicator());
     }
 
@@ -41,9 +39,7 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'arg_settings'.tr(context: context, args: [source.external.name]),
-        ),
+        title: Text(tr.arg_settings(arg: source.name)),
         leading: AutoLeadingButton(),
       ),
       body: SafeArea(child: body),
@@ -58,7 +54,7 @@ class DUIDelegateBuilder extends StatelessWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUIType element;
 
   @override
@@ -122,7 +118,7 @@ class DUISectionBuilder extends StatelessWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUISection element;
 
   @override
@@ -153,7 +149,7 @@ class DUIButtonBuilder extends ConsumerWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUIButton element;
 
   @override
@@ -163,7 +159,7 @@ class DUIButtonBuilder extends ConsumerWidget {
         title: Text(element.label),
         onTap: () async {
           await ref
-              .read(extensionSourceProvider(source.internal.id).notifier)
+              .read(extensionSourceProvider(source.id).notifier)
               .callBinding(element.id);
         },
       ),
@@ -178,7 +174,7 @@ class DUISelectBuilder extends HookConsumerWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUISelect element;
 
   @override
@@ -186,7 +182,7 @@ class DUISelectBuilder extends HookConsumerWidget {
     final theme = Theme.of(context);
     final initFuture = useMemoized(
       () => ref
-          .read(extensionSourceProvider(source.internal.id).notifier)
+          .read(extensionSourceProvider(source.id).notifier)
           .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
@@ -224,11 +220,7 @@ class DUISelectBuilder extends HookConsumerWidget {
                   onSelected: (String? value) {
                     if (value != null) {
                       ref
-                          .read(
-                            extensionSourceProvider(
-                              source.internal.id,
-                            ).notifier,
-                          )
+                          .read(extensionSourceProvider(source.id).notifier)
                           .callBinding('${element.id}.set', [
                             [value],
                           ]);
@@ -282,9 +274,7 @@ class DUISelectBuilder extends HookConsumerWidget {
 
                             ref
                                 .read(
-                                  extensionSourceProvider(
-                                    source.internal.id,
-                                  ).notifier,
+                                  extensionSourceProvider(source.id).notifier,
                                 )
                                 .callBinding('${element.id}.set', [data.value]);
                           },
@@ -305,7 +295,7 @@ class DUISelectBuilder extends HookConsumerWidget {
                                 ref
                                     .read(
                                       extensionSourceProvider(
-                                        source.internal.id,
+                                        source.id,
                                       ).notifier,
                                     )
                                     .callBinding('${element.id}.set', [
@@ -338,7 +328,7 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
     this.secure = false,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUIInputType element;
   final bool secure;
 
@@ -346,7 +336,7 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
       () => ref
-          .read(extensionSourceProvider(source.internal.id).notifier)
+          .read(extensionSourceProvider(source.id).notifier)
           .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
@@ -380,9 +370,7 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
               Future.delayed(Duration.zero, () {
                 if (debouncedInput != null) {
                   ref
-                      .read(
-                        extensionSourceProvider(source.internal.id).notifier,
-                      )
+                      .read(extensionSourceProvider(source.id).notifier)
                       .callBinding('${element.id}.set', [debouncedInput]);
                 }
               });
@@ -408,7 +396,7 @@ class DUINavigationButtonBuilder extends StatelessWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUINavigationButton element;
 
   @override
@@ -444,14 +432,14 @@ class DUISwitchBuilder extends HookConsumerWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUISwitch element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
       () => ref
-          .read(extensionSourceProvider(source.internal.id).notifier)
+          .read(extensionSourceProvider(source.id).notifier)
           .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
@@ -472,9 +460,10 @@ class DUISwitchBuilder extends HookConsumerWidget {
         return Switch(
           value: data.value,
           onChanged: (value) {
-            ref
-                .read(extensionSourceProvider(source.internal.id).notifier)
-                .callBinding('${element.id}.set', [value]);
+            ref.read(extensionSourceProvider(source.id).notifier).callBinding(
+              '${element.id}.set',
+              [value],
+            );
             data.value = value;
           },
         );
@@ -490,14 +479,14 @@ class DUIStepperBuilder extends HookConsumerWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUIStepper element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initFuture = useMemoized(
       () => ref
-          .read(extensionSourceProvider(source.internal.id).notifier)
+          .read(extensionSourceProvider(source.id).notifier)
           .callBinding('${element.id}.get'),
     );
     final initial = useFuture(initFuture);
@@ -521,9 +510,10 @@ class DUIStepperBuilder extends HookConsumerWidget {
           maxVal: element.max ?? double.maxFinite,
           steps: element.step ?? 1,
           onQtyChanged: (value) {
-            ref
-                .read(extensionSourceProvider(source.internal.id).notifier)
-                .callBinding('${element.id}.set', [value]);
+            ref.read(extensionSourceProvider(source.id).notifier).callBinding(
+              '${element.id}.set',
+              [value],
+            );
             data.value = value;
           },
         );
@@ -539,7 +529,7 @@ class DUILabelBuilder extends StatelessWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUILabelType element;
 
   @override
@@ -555,7 +545,7 @@ class DUIHeaderBuilder extends StatelessWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUIHeader element;
 
   @override
@@ -577,7 +567,7 @@ class DUIOAuthButtonBuilder extends ConsumerWidget {
     required this.element,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUIOAuthButton element;
 
   @override
@@ -595,7 +585,7 @@ class DUIFormBuilder extends StatelessWidget {
     required this.parent,
   });
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final DUIForm element;
   final DUIType parent;
 

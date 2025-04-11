@@ -54,7 +54,7 @@ final class MangadexProvider
   }
 }
 
-String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
+String _$mangadexHash() => r'2e60803c3e0b7b0065c423dcb31c862de55d8e53';
 
 @ProviderFor(MangaChaptersListSort)
 const mangaChaptersListSortProvider = MangaChaptersListSortProvider._();
@@ -325,8 +325,8 @@ class _$ReadChaptersElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
-    _$set.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -618,7 +618,7 @@ class _$UserLibraryElement
   @override
   void mount() {
     super.mount();
-    _$set.result!.stateOrNull!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -810,7 +810,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'efcf16be7db920ee54ce4718dae300a7eae98d49';
+String _$userListsHash() => r'4951bb130b0667eb9730ebb159af25933675fa7b';
 
 final class UserListsFamily extends Family {
   const UserListsFamily._()
@@ -910,11 +910,11 @@ class _$UserListsElement
   @override
   void mount() {
     super.mount();
-    _$updateList.result!.stateOrNull!.reset();
-    _$editList.result!.stateOrNull!.reset();
-    _$deleteList.result!.stateOrNull!.reset();
-    _$newList.result!.stateOrNull!.reset();
-    _$getNextPage.result!.stateOrNull!.reset();
+    _$updateList.result!.value!.reset();
+    _$editList.result!.value!.reset();
+    _$deleteList.result!.value!.reset();
+    _$newList.result!.value!.reset();
+    _$getNextPage.result!.value!.reset();
   }
 
   @override
@@ -1264,7 +1264,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'9bb268218016d75081d1e26a5bf801a8a545c090';
+String _$followedListsHash() => r'0aceef3d3132e86e87bd51ea8ebd8a7486bfd73d';
 
 final class FollowedListsFamily extends Family {
   const FollowedListsFamily._()
@@ -1358,8 +1358,8 @@ class _$FollowedListsElement
   @override
   void mount() {
     super.mount();
-    _$setFollow.result!.stateOrNull!.reset();
-    _$getNextPage.result!.stateOrNull!.reset();
+    _$setFollow.result!.value!.reset();
+    _$getNextPage.result!.value!.reset();
   }
 
   @override
@@ -1480,7 +1480,7 @@ final class ListSourceProvider
     ListSource Function()? create,
   }) : _createCb = create,
        super(
-         retry: null,
+         retry: noRetry,
          name: r'listSourceProvider',
          isAutoDispose: true,
          dependencies: null,
@@ -1542,12 +1542,12 @@ final class ListSourceProvider
   }
 }
 
-String _$listSourceHash() => r'24238a33758da64d216549cf99c749434c4a4059';
+String _$listSourceHash() => r'd6b059c04284e56b5c818ebad91096b37d67ce4c';
 
 final class ListSourceFamily extends Family {
   const ListSourceFamily._()
     : super(
-        retry: null,
+        retry: noRetry,
         name: r'listSourceProvider',
         dependencies: null,
         allTransitiveDependencies: null,
@@ -1787,7 +1787,7 @@ class _$StatisticsElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
   }
 
   @override
@@ -1942,7 +1942,7 @@ class _$ChapterStatsElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
   }
 
   @override
@@ -2192,8 +2192,8 @@ class _$RatingsElement
   @override
   void mount() {
     super.mount();
-    _$get.result!.stateOrNull!.reset();
-    _$set.result!.stateOrNull!.reset();
+    _$get.result!.value!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -2468,7 +2468,7 @@ class _$ReadingStatusElement
   @override
   void mount() {
     super.mount();
-    _$set.result!.stateOrNull!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -2693,7 +2693,7 @@ class _$FollowingStatusElement
   @override
   void mount() {
     super.mount();
-    _$set.result!.stateOrNull!.reset();
+    _$set.result!.value!.reset();
   }
 
   @override
@@ -2836,7 +2836,7 @@ class _$MangaDexHistoryElement
   @override
   void mount() {
     super.mount();
-    _$add.result!.stateOrNull!.reset();
+    _$add.result!.value!.reset();
   }
 
   @override
@@ -3059,8 +3059,8 @@ class _$AuthControlElement
   @override
   void mount() {
     super.mount();
-    _$login.result!.stateOrNull!.reset();
-    _$logout.result!.stateOrNull!.reset();
+    _$login.result!.value!.reset();
+    _$logout.result!.value!.reset();
   }
 
   @override

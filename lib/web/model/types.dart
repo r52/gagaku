@@ -34,7 +34,7 @@ abstract class SourceHandler with _$SourceHandler {
 
   const factory SourceHandler({
     required SourceType type,
-    required String source,
+    required String sourceId,
     required String location,
     String? chapter,
     WebSourceInfo? parser,
@@ -42,72 +42,9 @@ abstract class SourceHandler with _$SourceHandler {
 
   String getURL() =>
       type == SourceType.proxy
-          ? 'https://cubari.moe/read/$source/$location/'
-          : '$source/$location';
-  String getKey() => '$source/$location';
-}
-
-class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
-  const EpochTimestampSerializer();
-
-  @override
-  DateTime? fromJson(dynamic timestamp) {
-    if (timestamp == null) {
-      return null;
-    }
-
-    final epoch = switch (timestamp) {
-      int t => t,
-      double d => d.round(),
-      _ => int.parse(timestamp),
-    };
-
-    return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-  }
-
-  @override
-  dynamic toJson(DateTime? date) {
-    if (date == null) {
-      return null;
-    }
-
-    return (date.millisecondsSinceEpoch / 1000).round().toString();
-  }
-}
-
-class MappedEpochTimestampSerializer
-    implements JsonConverter<DateTime?, dynamic> {
-  const MappedEpochTimestampSerializer();
-
-  @override
-  DateTime? fromJson(dynamic timestamp) {
-    if (timestamp == null) {
-      return null;
-    }
-
-    if (timestamp is! Map<String, dynamic>) {
-      return null;
-    }
-
-    final date = timestamp.entries.first.value;
-
-    final epoch = switch (date) {
-      int t => t,
-      double d => d.round(),
-      _ => int.parse(date),
-    };
-
-    return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-  }
-
-  @override
-  dynamic toJson(DateTime? date) {
-    if (date == null) {
-      return null;
-    }
-
-    return {'0': (date.millisecondsSinceEpoch / 1000).round().toString()};
-  }
+          ? 'https://cubari.moe/read/$sourceId/$location/'
+          : '$sourceId/$location';
+  String getKey() => '$sourceId/$location';
 }
 
 @freezed
@@ -156,6 +93,7 @@ abstract class WebManga with _$WebManga {
     required String cover,
     Map<String, String>? groups,
     required Map<String, WebChapter> chapters,
+    dynamic data,
   }) = _WebManga;
 
   factory WebManga.fromJson(Map<String, dynamic> json) =>
@@ -181,6 +119,7 @@ abstract class WebChapter with _$WebChapter {
     @EpochTimestampSerializer() DateTime? lastUpdated,
     @MappedEpochTimestampSerializer() DateTime? releaseDate,
     required Map<String, dynamic> groups,
+    dynamic data,
   }) = _WebChapter;
 
   factory WebChapter.fromJson(Map<String, dynamic> json) =>
@@ -212,27 +151,26 @@ abstract class ImgurPage with _$ImgurPage {
 
 @freezed
 abstract class WebSourceInfo with _$WebSourceInfo {
+  const WebSourceInfo._();
+
   const factory WebSourceInfo({
     required String id,
     required String name,
     required String repo,
+    required String baseUrl,
     @Default(SupportedVersion.v0_8) SupportedVersion version,
-    String? icon,
+    required String icon,
+    @Default([SourceIntents.mangaChapters])
+    @SourceIntentParser()
+    List<SourceIntents> capabilities,
   }) = _WebSourceInfo;
 
   factory WebSourceInfo.fromJson(Map<String, dynamic> json) =>
       _$WebSourceInfoFromJson(json);
-}
 
-@freezed
-abstract class SourceIdentifier with _$SourceIdentifier {
-  const factory SourceIdentifier({
-    required WebSourceInfo internal,
-    required SourceInfo external,
-  }) = _SourceIdentifier;
-
-  factory SourceIdentifier.fromJson(Map<String, dynamic> json) =>
-      _$SourceIdentifierFromJson(json);
+  bool hasCapability(SourceIntents intent) {
+    return capabilities.contains(intent);
+  }
 }
 
 enum SupportedVersion {
@@ -256,8 +194,44 @@ enum SourceIntents {
   const SourceIntents(this.flag);
 }
 
-// ignore: constant_identifier_names
-enum ContentRating { EVERYONE, MATURE, ADULT }
+class SourceIntentParser implements JsonConverter<SourceIntents, dynamic> {
+  const SourceIntentParser();
+
+  @override
+  SourceIntents fromJson(dynamic intent) =>
+      SourceIntents.values.firstWhere((e) => e.flag == intent);
+
+  @override
+  dynamic toJson(SourceIntents intent) => intent.flag;
+}
+
+class SourceIntentOrListParser
+    implements JsonConverter<List<SourceIntents>, dynamic> {
+  const SourceIntentOrListParser();
+
+  @override
+  List<SourceIntents> fromJson(dynamic intents) {
+    if (intents is List) {
+      return intents
+          .map((e) => SourceIntents.values.firstWhere((s) => s.flag == e))
+          .toList();
+    }
+    if (intents is int) {
+      return SourceIntents.values.fold([], (list, intent) {
+        if ((intents & intent.flag) == intent.flag) {
+          list.add(intent);
+        }
+        return list;
+      });
+    }
+
+    throw UnsupportedError('Unsupported intent type');
+  }
+
+  @override
+  dynamic toJson(List<SourceIntents> intents) =>
+      intents.map((e) => e.flag).toList();
+}
 
 class BadgeColorParser implements JsonConverter<BadgeColor, dynamic> {
   const BadgeColorParser();
@@ -294,6 +268,8 @@ enum BadgeColor {
 
 @freezed
 abstract class SourceVersion with _$SourceVersion {
+  const SourceVersion._();
+
   const factory SourceVersion({
     required String id,
     required String name,
@@ -310,36 +286,17 @@ abstract class SourceVersion with _$SourceVersion {
 
   factory SourceVersion.fromJson(Map<String, dynamic> json) =>
       _$SourceVersionFromJson(json);
-}
 
-@freezed
-abstract class SourceInfo with _$SourceInfo {
-  const SourceInfo._();
-
-  const factory SourceInfo({
-    required String name,
-    required String author,
-    required String description,
-    required ContentRating contentRating,
-    required String version,
-    required String icon,
-    required String websiteBaseURL,
-    String? authorWebsite,
-    String? language,
-    List<Badge>? sourceTags,
-    int? intents,
-  }) = _SourceInfo;
-
-  bool hasIntent(SourceIntents intent) {
-    if (intents != null && (intents! & intent.flag) == intent.flag) {
-      return true;
-    }
-
-    return false;
+  List<SourceIntents> getCapabilities() {
+    return intents == null
+        ? []
+        : SourceIntents.values.fold([], (list, intent) {
+          if ((intents! & intent.flag) == intent.flag) {
+            list.add(intent);
+          }
+          return list;
+        });
   }
-
-  factory SourceInfo.fromJson(Map<String, dynamic> json) =>
-      _$SourceInfoFromJson(json);
 }
 
 @freezed
@@ -401,8 +358,12 @@ class RepoData with _$RepoData implements RepoInfo {
   factory RepoData.fromJson(Map<String, dynamic> json) =>
       _$RepoDataFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$RepoDataToJson(this);
 }
+
+// ignore: constant_identifier_names
+enum ContentRating { EVERYONE, MATURE, ADULT }
 
 @freezed
 abstract class PartialSourceManga with _$PartialSourceManga {
@@ -493,7 +454,7 @@ abstract class Chapter with _$Chapter {
     String? name,
     num? volume,
     String? group,
-    @TimestampSerializer() DateTime? time,
+    @NullableTimestampSerializer() DateTime? time,
     num? sortingIndex,
   }) = _Chapter;
 
@@ -515,6 +476,8 @@ abstract class ChapterDetails with _$ChapterDetails {
 
 @freezed
 abstract class SearchRequest with _$SearchRequest {
+  const SearchRequest._();
+
   const factory SearchRequest({
     String? title,
     @Default([]) List<Tag> includedTags,
@@ -523,6 +486,13 @@ abstract class SearchRequest with _$SearchRequest {
 
   factory SearchRequest.fromJson(Map<String, dynamic> json) =>
       _$SearchRequestFromJson(json);
+
+  bool get isEmpty =>
+      (title == null || title!.isEmpty) &&
+      includedTags.isEmpty &&
+      excludedTags.isEmpty;
+
+  bool get isFiltersEmpty => includedTags.isEmpty && excludedTags.isEmpty;
 }
 
 @freezed

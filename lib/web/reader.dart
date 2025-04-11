@@ -15,13 +15,20 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'reader.g.dart';
 
 @Riverpod(retry: noRetry)
-Future<WebReaderData> _fetchWebChapterInfo(Ref ref, SourceHandler handle) async {
+Future<WebReaderData> _fetchWebChapterInfo(
+  Ref ref,
+  SourceHandler handle,
+) async {
   final api = ref.watch(proxyProvider);
   final manga = await api.handleSource(handle);
 
   if (manga != null) {
     ref.read(webSourceHistoryProvider.add)(
-      HistoryLink(title: '${handle.source}: ${manga.title}', url: handle.getURL(), cover: manga.cover),
+      HistoryLink(
+        title: '${handle.sourceId}: ${manga.title}',
+        url: handle.getURL(),
+        cover: manga.cover,
+      ),
     );
 
     final chapter = manga.getChapter(handle.chapter!);
@@ -60,7 +67,8 @@ Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
     links = List<String>.from(source);
   }
 
-  final pages = links.map((e) => ReaderPage(provider: NetworkImage(e))).toList();
+  final pages =
+      links.map((e) => ReaderPage(provider: NetworkImage(e))).toList();
 
   ref.onDispose(() {
     pages.clear();
@@ -70,30 +78,62 @@ Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _getSourcePages(Ref ref, dynamic chapter, SourceHandler handle) async {
+Future<List<ReaderPage>> _getSourcePages(
+  Ref ref,
+  dynamic chapter,
+  SourceHandler handle,
+) async {
+  var id = chapter;
+
+  if (chapter is Chapter) {
+    id = chapter.id;
+  }
+
+  String referer = '';
   List<String>? links = [];
 
   if (handle.parser != null) {
+    final ext = await ref.watch(
+      extensionSourceProvider(handle.parser!.id).future,
+    );
     links = await ref
         .read(extensionSourceProvider(handle.parser!.id).notifier)
-        .getChapterPages(handle.location, chapter);
+        .getChapterPages(handle.location, id);
+    referer = ext.baseUrl;
   } else {
     final installed = await ref.watch(extensionInfoListProvider.future);
     for (final src in installed) {
-      if (handle.source == src.internal.id) {
+      if (handle.sourceId == src.id) {
+        final ext = await ref.watch(
+          extensionSourceProvider(handle.parser!.id).future,
+        );
         links = await ref
-            .read(extensionSourceProvider(handle.source).notifier)
-            .getChapterPages(handle.location, chapter);
+            .read(extensionSourceProvider(handle.sourceId).notifier)
+            .getChapterPages(handle.location, id);
+        referer = ext.baseUrl;
         break;
       }
     }
   }
 
   if (links == null) {
-    throw Exception('Failed to download pages from source ${handle.source}, chapter id $chapter');
+    throw Exception(
+      'Failed to download pages from source ${handle.sourceId}, chapter id $id',
+    );
   }
 
-  final pages = links.map((e) => ReaderPage(provider: NetworkImage(e))).toList();
+  if (referer.isNotEmpty && !referer.endsWith('/')) {
+    referer = '$referer/';
+  }
+
+  final pages =
+      links
+          .map(
+            (e) => ReaderPage(
+              provider: NetworkImage(e, headers: {'referer': referer}),
+            ),
+          )
+          .toList();
 
   ref.onDispose(() {
     pages.clear();
@@ -135,14 +175,18 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
 
     final handle = SourceHandler(
       type: SourceType.proxy,
-      source: proxy,
+      sourceId: proxy,
       location: code,
       chapter: chapter.replaceFirst('-', '.'),
     );
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
-      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: AutoLeadingButton()), body: child),
+      errorBuilder:
+          (context, child, _, __) => Scaffold(
+            appBar: AppBar(leading: AutoLeadingButton()),
+            body: child,
+          ),
       builder:
           (context, data) => WebSourceReaderWidget(
             source: data.source,
@@ -160,13 +204,13 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
 class ExtensionReaderPage extends StatelessWidget {
   const ExtensionReaderPage({
     super.key,
-    @PathParam() required this.source,
+    @PathParam() required this.sourceId,
     @PathParam() required this.mangaId,
     @PathParam() required this.chapterId,
     this.readerData,
   });
 
-  final String source;
+  final String sourceId;
   final String mangaId;
   final String chapterId;
   final WebReaderData? readerData;
@@ -184,11 +228,20 @@ class ExtensionReaderPage extends StatelessWidget {
       );
     }
 
-    final handle = SourceHandler(type: SourceType.source, source: source, location: mangaId, chapter: chapterId);
+    final handle = SourceHandler(
+      type: SourceType.source,
+      sourceId: sourceId,
+      location: mangaId,
+      chapter: chapterId,
+    );
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
-      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: AutoLeadingButton()), body: child),
+      errorBuilder:
+          (context, child, _, __) => Scaffold(
+            appBar: AppBar(leading: AutoLeadingButton()),
+            body: child,
+          ),
       builder:
           (context, data) => WebSourceReaderWidget(
             source: data.source,
@@ -244,8 +297,15 @@ class WebSourceReaderWidget extends HookConsumerWidget {
     }, []);
 
     return DataProviderWhenWidget(
-      provider: handle.type == SourceType.proxy ? _getPagesProvider(source) : _getSourcePagesProvider(source, handle),
-      errorBuilder: (context, child) => Scaffold(appBar: AppBar(leading: AutoLeadingButton()), body: child),
+      provider:
+          handle.type == SourceType.proxy
+              ? _getPagesProvider(source)
+              : _getSourcePagesProvider(source, handle),
+      errorBuilder:
+          (context, child, _, __) => Scaffold(
+            appBar: AppBar(leading: AutoLeadingButton()),
+            body: child,
+          ),
       builder:
           (context, pages) => ReaderWidget(
             pages: pages,

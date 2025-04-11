@@ -21,6 +21,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
+final webSourceClient = RateLimitedClient();
+
 @Riverpod(keepAlive: true)
 ProxyHandler proxy(Ref ref) {
   return ProxyHandler(ref);
@@ -32,7 +34,7 @@ class ProxyHandler {
   }
 
   final Ref ref;
-  final http.Client client = CustomClient();
+  final http.Client client = webSourceClient;
   late final CacheManager _cache;
 
   Future<void> invalidateCacheItem(String item) async {
@@ -62,7 +64,7 @@ class ProxyHandler {
             source: code,
             handle: SourceHandler(
               type: SourceType.proxy,
-              source: 'imgur',
+              sourceId: 'imgur',
               location: src,
             ),
           ),
@@ -84,7 +86,7 @@ class ProxyHandler {
       if (info.chapter != null) {
         AutoRouter.of(context).push(
           ProxyWebSourceReaderRoute(
-            proxy: info.source,
+            proxy: info.sourceId,
             code: info.location,
             chapter: info.chapter!,
             page: '1',
@@ -93,7 +95,7 @@ class ProxyHandler {
       } else {
         AutoRouter.of(context).push(
           WebMangaViewRoute(
-            source: info.source,
+            sourceId: info.sourceId,
             mangaId: info.location,
             handle: info,
           ),
@@ -117,11 +119,11 @@ class ProxyHandler {
 
         AutoRouter.of(context).push(
           WebMangaViewRoute(
-            source: src.id,
+            sourceId: src.id,
             mangaId: loc,
             handle: SourceHandler(
               type: SourceType.source,
-              source: src.id,
+              sourceId: src.id,
               location: loc,
               parser: src,
             ),
@@ -154,7 +156,7 @@ class ProxyHandler {
         if (proxy.length >= 4) {
           return SourceHandler(
             type: SourceType.proxy,
-            source: proxy[1],
+            sourceId: proxy[1],
             location: proxy[2],
             chapter: proxy[3],
           );
@@ -162,7 +164,7 @@ class ProxyHandler {
 
         return SourceHandler(
           type: SourceType.proxy,
-          source: proxy[1],
+          sourceId: proxy[1],
           location: proxy[2],
         );
       default:
@@ -198,9 +200,9 @@ class ProxyHandler {
         } else {
           final installed = await ref.watch(extensionInfoListProvider.future);
           for (final src in installed) {
-            if (handle.source == src.internal.id) {
+            if (handle.sourceId == src.id) {
               return await ref
-                  .read(extensionSourceProvider(handle.source).notifier)
+                  .read(extensionSourceProvider(handle.sourceId).notifier)
                   .getManga(handle.location);
             }
           }
@@ -215,11 +217,11 @@ class ProxyHandler {
   Future<WebManga> _getMangaFromProxy(SourceHandler handle) async {
     final key = handle.getKey();
     final url =
-        "https://cubari.moe/read/api/${handle.source}/series/${handle.location}/";
+        "https://cubari.moe/read/api/${handle.sourceId}/series/${handle.location}/";
 
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
-      return _cache.get(key, WebManga.fromJson).get<WebManga>();
+      return _cache.get<WebManga>(key, WebManga.fromJson);
     }
 
     final response = await client.get(Uri.parse(url));
@@ -675,19 +677,21 @@ class WebReadMarkers extends _$WebReadMarkers {
 @Riverpod(keepAlive: true)
 class ExtensionSource extends _$ExtensionSource {
   HeadlessInAppWebView? _view;
-  late InAppWebViewController _controller;
-  late SourceIdentifier _info;
+  InAppWebViewController? get _controller =>
+      (_view?.isRunning() ?? false) ? _view?.webViewController : null;
+
+  List<TagSection>? _tags;
 
   @override
-  Future<SourceIdentifier> build(String sourceId) async {
+  Future<WebSourceInfo> build(String sourceId) async {
     final completer = Completer<void>();
-    final installed = ref.watch(
-      webConfigProvider.select((cfg) => cfg.installedSources),
-    );
-    late SourceInfo extinfo;
 
     // Let this throw here if not found
-    final source = installed.firstWhere((e) => e.id == sourceId);
+    final source = ref.watch(
+      webConfigProvider.select(
+        (cfg) => cfg.installedSources.firstWhere((e) => e.id == sourceId),
+      ),
+    );
 
     _view = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
@@ -710,10 +714,28 @@ class ExtensionSource extends _$ExtensionSource {
                 .setState(sourceId, data.args[0], data.args[1]);
           },
         );
+
+        controller.addJavaScriptHandler(
+          handlerName: 'getSecureState',
+          callback: (JavaScriptHandlerFunctionData data) {
+            return ref
+                .read(extensionSecureStateProvider.notifier)
+                .getState(sourceId, data.args[0]);
+          },
+        );
+
+        controller.addJavaScriptHandler(
+          handlerName: 'setSecureState',
+          callback: (JavaScriptHandlerFunctionData data) {
+            ref
+                .read(extensionSecureStateProvider.notifier)
+                .setState(sourceId, data.args[0], data.args[1]);
+          },
+        );
       },
-      onConsoleMessage: (controller, consoleMessage) {
-        logger.d('Console Message: ${consoleMessage.message}');
-      },
+      // onConsoleMessage: (controller, consoleMessage) {
+      //   logger.d('Console Message: ${consoleMessage.message}');
+      // },
       onLoadStop: (controller, url) async {
         final scriptUrl = '${source.repo}/${source.id}/source.js';
         final response = await http.get(Uri.parse(scriptUrl));
@@ -733,57 +755,65 @@ class ExtensionSource extends _$ExtensionSource {
               "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
         );
 
-        final rinfo = await controller.evaluateJavascript(
-          source: "window.Sources['${source.id}Info'];",
+        // Get tags
+        final result = await _controller?.callAsyncJavaScript(
+          functionBody: "return await ${source.id}?.getSearchTags();",
         );
-        final info = SourceInfo.fromJson(rinfo);
-        extinfo = info;
 
-        _controller = controller;
-        logger.d("Extension ${extinfo.name} ready");
+        if (result == null || result.error != null) {
+          throw Exception('JavaScript error: ${result?.error}');
+        }
+
+        if (result.value != null) {
+          final rsec = result.value as List<dynamic>;
+          _tags = rsec.map((e) => TagSection.fromJson(e)).toList();
+        }
+
+        logger.d("Extension ${source.name} ready");
         completer.complete();
       },
     );
+
+    await _view?.run();
+    await completer.future;
 
     ref.onDispose(() {
       _view?.dispose();
     });
 
-    await _view?.run();
-    await completer.future;
-
-    _info = SourceIdentifier(internal: source, external: extinfo);
-
-    return _info;
-  }
-
-  SourceIdentifier getInfo() {
-    return _info;
+    return source;
   }
 
   Future<dynamic> callBinding(
     String bindingId, [
     List<dynamic> args = const [],
   ]) async {
+    await future;
+
     final arg = args.map((e) => json.encode(e)).toList().join(",");
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       functionBody: "return await window.callBinding('$bindingId', $arg)",
     );
-    return result!.value;
+
+    return result?.value;
   }
 
   Future<DUISection> getSourceMenu() async {
-    await future;
+    final source = await future;
 
-    if (!_info.external.hasIntent(SourceIntents.settingsUI)) {
+    if (!source.hasCapability(SourceIntents.settingsUI)) {
       throw Exception("Source does not support settings");
     }
 
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       functionBody: "return await window.processSourceMenu($sourceId)",
     );
 
-    final menu = DUIType.fromJson(result!.value);
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final menu = DUIType.fromJson(result.value);
     if (menu is! DUISection) {
       throw Exception("Source getSourceMenu() did not return a valid menu");
     }
@@ -792,13 +822,13 @@ class ExtensionSource extends _$ExtensionSource {
   }
 
   Future<List<HomeSection>> getHomePage() async {
-    await future;
+    final source = await future;
 
-    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
+    if (!source.hasCapability(SourceIntents.homepageSections)) {
       throw Exception("Source does not support homepages");
     }
 
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       functionBody: """
 var homesections = [];
 var cb = function (section) {
@@ -816,7 +846,11 @@ return homesections;
 """,
     );
 
-    final rsec = result!.value as List<dynamic>;
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final rsec = result.value as List<dynamic>;
     final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
 
     return sections;
@@ -826,20 +860,24 @@ return homesections;
     String homepageSectionId,
     dynamic metadata,
   ) async {
-    await future;
+    final source = await future;
 
-    if (!_info.external.hasIntent(SourceIntents.homepageSections)) {
+    if (!source.hasCapability(SourceIntents.homepageSections)) {
       throw Exception("Source does not support homepages");
     }
 
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       arguments: {'homepageSectionId': homepageSectionId, 'metadata': metadata},
       functionBody: """
 return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
 """,
     );
 
-    final pmangas = PagedResults.fromJson(result!.value);
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final pmangas = PagedResults.fromJson(result.value);
 
     return pmangas;
   }
@@ -856,14 +894,18 @@ return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
     }
 
     final params = query.toJson();
-    final result = await _controller.callAsyncJavaScript(
+    final result = await _controller?.callAsyncJavaScript(
       arguments: {'query': params, 'metadata': metadata},
       functionBody: """
 return await $sourceId.getSearchResults(query, metadata)
 """,
     );
 
-    final pmangas = PagedResults.fromJson(result!.value);
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final pmangas = PagedResults.fromJson(result.value);
 
     return pmangas;
   }
@@ -875,13 +917,17 @@ return await $sourceId.getSearchResults(query, metadata)
       return null;
     }
 
-    final mdeets = await _controller.callAsyncJavaScript(
+    final mdeets = await _controller?.callAsyncJavaScript(
       functionBody: "return await $sourceId.getMangaDetails('$mangaId')",
     );
 
-    final smanga = SourceManga.fromJson(mdeets!.value);
+    if (mdeets == null || mdeets.error != null) {
+      throw Exception('JavaScript error: ${mdeets?.error}');
+    }
 
-    final chaps = await _controller.callAsyncJavaScript(
+    final smanga = SourceManga.fromJson(mdeets.value);
+
+    final chaps = await _controller?.callAsyncJavaScript(
       functionBody: """
 var p = await $sourceId.getChapters('$mangaId');
 p.forEach((e) => e.time = e.time.toISOString());
@@ -889,7 +935,11 @@ return p;
 """,
     );
 
-    final clist = chaps!.value as List<dynamic>;
+    if (chaps == null || chaps.error != null) {
+      throw Exception('JavaScript error: ${chaps?.error}');
+    }
+
+    final clist = chaps.value as List<dynamic>;
     final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
     final chapmap = Map.fromEntries(
       chapters.map(
@@ -898,8 +948,9 @@ return p;
           WebChapter(
             title: e.name,
             volume: e.volume?.toString(),
-            groups: {e.group ?? sourceId: e.id},
+            groups: {e.group ?? sourceId: e},
             releaseDate: e.time,
+            data: e,
           ),
         ),
       ),
@@ -912,6 +963,7 @@ return p;
       author: smanga.mangaInfo.author ?? 'Unknown',
       cover: smanga.mangaInfo.image,
       chapters: chapmap,
+      data: smanga,
     );
 
     // logger.d(result);
@@ -926,35 +978,44 @@ return p;
       return [];
     }
 
-    final cdeets = await _controller.callAsyncJavaScript(
+    final cdeets = await _controller?.callAsyncJavaScript(
       functionBody:
           "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')",
     );
 
-    final chapterd = ChapterDetails.fromJson(cdeets!.value);
+    if (cdeets == null || cdeets.error != null) {
+      throw Exception('JavaScript error: ${cdeets?.error}');
+    }
+
+    final chapterd = ChapterDetails.fromJson(cdeets.value);
 
     return chapterd.pages;
   }
 
-  Future<String> getMangaURL(String mangaId) async {
+  Future<String?> getMangaURL(String mangaId) async {
     await future;
 
     if (mangaId.isEmpty) {
-      return '';
+      return null;
     }
 
-    final result = await _controller.evaluateJavascript(
-      source: "$sourceId.getMangaShareUrl('$mangaId')",
+    final result = await _controller?.evaluateJavascript(
+      source: "$sourceId?.getMangaShareUrl('$mangaId')",
     );
 
-    return result as String;
+    return result;
+  }
+
+  Future<List<TagSection>?> getTags() async {
+    await future;
+    return _tags;
   }
 }
 
 @riverpod
 class ExtensionInfoList extends _$ExtensionInfoList {
   @override
-  Future<List<SourceIdentifier>> build() async {
+  Future<List<WebSourceInfo>> build() async {
     final installed = ref.watch(
       webConfigProvider.select((cfg) => cfg.installedSources),
     );
@@ -963,4 +1024,11 @@ class ExtensionInfoList extends _$ExtensionInfoList {
       installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
     );
   }
+}
+
+@Riverpod(retry: noRetry)
+Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
+  final sources = await ref.watch(extensionInfoListProvider.future);
+
+  return sources.firstWhere((e) => e.id == sourceId);
 }

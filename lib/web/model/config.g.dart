@@ -151,8 +151,8 @@ class _$WebConfigElement
   @override
   void mount() {
     super.mount();
-    _$saveWith.result!.stateOrNull!.reset();
-    _$save.result!.stateOrNull!.reset();
+    _$saveWith.result!.value!.reset();
+    _$save.result!.value!.reset();
   }
 
   @override
@@ -334,6 +334,87 @@ final class ExtensionStateProvider
 String _$extensionStateHash() => r'e05c4c05a9878f3b6bdf535268ffe4e9c9393eef';
 
 abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
+  ExtensionStateMap build();
+  @$internal
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<ExtensionStateMap>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              NotifierBase<ExtensionStateMap>,
+              ExtensionStateMap,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(ExtensionSecureState)
+const extensionSecureStateProvider = ExtensionSecureStateProvider._();
+
+final class ExtensionSecureStateProvider
+    extends $NotifierProvider<ExtensionSecureState, ExtensionStateMap> {
+  const ExtensionSecureStateProvider._({
+    super.runNotifierBuildOverride,
+    ExtensionSecureState Function()? create,
+  }) : _createCb = create,
+       super(
+         from: null,
+         argument: null,
+         retry: null,
+         name: r'extensionSecureStateProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         allTransitiveDependencies: null,
+       );
+
+  final ExtensionSecureState Function()? _createCb;
+
+  @override
+  String debugGetCreateSourceHash() => _$extensionSecureStateHash();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ExtensionStateMap value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<ExtensionStateMap>(value),
+    );
+  }
+
+  @$internal
+  @override
+  ExtensionSecureState create() => _createCb?.call() ?? ExtensionSecureState();
+
+  @$internal
+  @override
+  ExtensionSecureStateProvider $copyWithCreate(
+    ExtensionSecureState Function() create,
+  ) {
+    return ExtensionSecureStateProvider._(create: create);
+  }
+
+  @$internal
+  @override
+  ExtensionSecureStateProvider $copyWithBuild(
+    ExtensionStateMap Function(Ref, ExtensionSecureState) build,
+  ) {
+    return ExtensionSecureStateProvider._(runNotifierBuildOverride: build);
+  }
+
+  @$internal
+  @override
+  $NotifierProviderElement<ExtensionSecureState, ExtensionStateMap>
+  $createElement($ProviderPointer pointer) =>
+      $NotifierProviderElement(this, pointer);
+}
+
+String _$extensionSecureStateHash() =>
+    r'd1f8d6d3a5993fce5acad0aa78939d84a5a96cc3';
+
+abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateMap> {
   ExtensionStateMap build();
   @$internal
   @override

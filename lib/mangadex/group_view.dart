@@ -1,14 +1,15 @@
 import 'package:animations/animations.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,7 +18,7 @@ part 'group_view.g.dart';
 
 enum _ViewType { info, feed, titles }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   final api = ref.watch(mangadexProvider);
   final group = await api.fetchGroups([groupId]);
@@ -55,7 +56,7 @@ class MangaDexGroupViewPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchGroupFromIdProvider(groupId),
-      errorBuilder: (context, child) => Scaffold(body: child),
+      errorBuilder: (context, child, _, __) => Scaffold(body: child),
       builder: (context, data) {
         return MangaDexGroupViewWidget(group: data);
       },
@@ -70,6 +71,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final theme = Theme.of(context);
     final view = useState(_ViewType.info);
 
@@ -101,7 +103,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               if (group.attributes.description != null)
                 ExpansionTile(
                   initiallyExpanded: true,
-                  title: Text('mangadex.groupDesc'.tr(context: context)),
+                  title: Text(t.mangadex.groupDesc),
                   children: [
                     Container(
                       width: double.infinity,
@@ -116,7 +118,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 ExpansionTile(
                   initiallyExpanded: true,
                   expandedAlignment: Alignment.centerLeft,
-                  title: Text('tracking.links'.tr(context: context)),
+                  title: Text(t.tracking.links),
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8),
@@ -133,7 +135,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch ${group.attributes.website!}';
                                 }
                               },
-                              text: 'tracking.website'.tr(context: context),
+                              text: t.tracking.website,
                             ),
                           if (group.attributes.discord != null)
                             ButtonChip(
@@ -144,7 +146,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                                   throw 'Could not launch $url';
                                 }
                               },
-                              text: 'tracking.discord'.tr(context: context),
+                              text: t.tracking.discord,
                             ),
                         ],
                       ),
@@ -154,7 +156,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               if (group.attributes.description == null &&
                   group.attributes.website == null &&
                   group.attributes.discord == null)
-                Center(child: Text('tracking.nothing'.tr(context: context))),
+                Center(child: Text(t.tracking.nothing)),
             ],
           ),
         ],
@@ -211,11 +213,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
               ref.read(mdConfigProvider.save)(cfg.value);
             },
             icon: const Icon(Icons.block),
-            label: Text(
-              isBlacklisted
-                  ? 'ui.unblock'.tr(context: context)
-                  : 'ui.block'.tr(context: context),
-            ),
+            label: Text(isBlacklisted ? t.ui.unblock : t.ui.block),
           ),
         ],
       ),
@@ -307,13 +305,11 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     return RefreshIndicator(
       onRefresh: () async => _pagingController.refresh(),
       child: MangaListWidget(
-        title: Text(
-          'mangadex.groupTitles'.tr(context: context),
-          style: TextStyle(fontSize: 24),
-        ),
+        title: Text(t.mangadex.groupTitles, style: TextStyle(fontSize: 24)),
         physics: const AlwaysScrollableScrollPhysics(),
         controller: widget.controller,
         children: [MangaListViewSliver(controller: _pagingController)],

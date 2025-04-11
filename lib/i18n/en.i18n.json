@@ -41,13 +41,13 @@
     "norepos": "No repos",
     "noitems": "No items",
     "unsupportedUrl": "Unsupported URL",
-    "loginFail": "Failed to login: {}",
+    "loginFail": "Failed to login: $reason",
     "notLoggedIn": "Operation failed. User not logged in",
     "unsupportedSource": "Unsupported extension type",
-    "unknownSourceID": "Unknown source ID {}",
+    "unknownSourceID": "Unknown source ID $id",
     "fetchFail": "Something went wrong while fetching a new page",
     "pageNotFound": "Page Not Found",
-    "pageNotFoundArg": "Can't find a page for: {}"
+    "pageNotFoundArg": "Can't find a page for: $url"
   },
   "auth": {
     "login": "Login",
@@ -61,7 +61,8 @@
     "clientIdEmptyWarning": "Client ID cannot be empty",
     "clientSecretEmptyWarning": "Client Secret cannot be empty",
     "fieldsEmptyWarning": "Username/Password/Client ID/Client Secret cannot be empty",
-    "loggedInAs": "Logged in as: {}"
+    "loggedInAs": "Logged in as: $user",
+    "authenticating": "Authenticating..."
   },
   "sort": {
     "desc": "Descending",
@@ -104,6 +105,11 @@
     "home": "Home",
     "homepages": "Homepages",
     "openUrl": "Open URL",
+    "openLink": "Open Link",
+    "supportedUrl": {
+      "text": "Supported URLs",
+      "arg": "@:{webSources.supportedUrl.text}:$arg"
+    },
     "settings": {
       "repos": "Repos",
       "reposDesc": "Configure source repos",
@@ -121,7 +127,7 @@
       "newRepo": "@:ui.addNew Repo",
       "browser": "View in browser",
       "add": "@:ui.add Repo",
-      "addConfirm": "Are you sure you want to add the repo {}?",
+      "addConfirm": "Are you sure you want to add the repo ${repo}?",
       "addWarning": "Ensure that you are only adding trusted sources!",
       "urlHint": "Repo URL",
       "nameHint": "Repo Name",
@@ -137,13 +143,14 @@
       "manager": "Extension Manager",
       "noDataWarning": "No repos nor extensions installed!",
       "refresh": "Refresh repos",
-      "delete": "@:ui.delete {}",
-      "add": "@:ui.add {}",
-      "update": "Update/Replace {}",
+      "delete": "@:ui.delete $arg",
+      "add": "@:ui.add $arg",
+      "update": "Update/Replace $arg",
       "sourceDeleteOK": "Extension disabled",
       "sourceUpdateOK": "Extension updated",
       "sourceAddOK": "Extension enabled",
-      "installedVersion": " (installed: v{})"
+      "installedVersion": " (installed: v${version})",
+      "noTagsWarning": "This extension provides no filter options"
     },
     "noSourcesWarning": "No extensions installed!",
     "sourceSearch": "Source Search",
@@ -155,7 +162,7 @@
   },
   "search": {
     "text": "Search",
-    "arg": "Search {}",
+    "arg": "Search $arg",
     "filters": "Search Filters",
     "resetFilters": "Reset Filters",
     "applyFilters": "Apply Filters",
@@ -167,27 +174,21 @@
     "any": "Any"
   },
   "settings": "Settings",
-  "arg_settings": "{} @:settings",
+  "arg_settings": "$arg @:settings",
   "saveSettings": "Save Settings",
   "num_manga": {
-    "zero": "0 Manga",
-    "one": "{} Manga",
-    "many": "{} Manga",
-    "other": "{} Manga"
+    "one": "$n Manga",
+    "other": "$n Manga"
   },
   "titles": "Titles",
   "num_titles": {
-    "zero": "0 Titles",
-    "one": "{} Title",
-    "many": "{} Titles",
-    "other": "{} Titles"
+    "one": "$n Title",
+    "other": "$n Titles"
   },
   "feed": "Feed",
   "num_items": {
-    "zero": "0 items",
-    "one": "{} item",
-    "many": "{} items",
-    "other": "{} items"
+    "one": "$n item",
+    "other": "$n items"
   },
   "theme": {
     "mode": "Theme Mode",
@@ -233,18 +234,18 @@
     "listName": "List Name",
     "listFeed": "List Feed",
     "listNameEmptyWarning": "List name cannot be empty",
-    "listNotExistError": "List with ID {} does not exist!",
+    "listNotExistError": "List with ID $id does not exist!",
     "editList": "@:ui.edit List",
-    "editListError": "Failed to edit list: {}",
+    "editListError": "Failed to edit list: $error",
     "createList": "@:ui.create List",
     "deleteList": "@:ui.delete List",
     "deleteListOk": "List deleted",
-    "deleteListError": "Failed to delete list: {}",
-    "deleteListWarning": "Are you sure you want to permanently delete '{}'?",
+    "deleteListError": "Failed to delete list: $error",
+    "deleteListWarning": "Are you sure you want to permanently delete '$list'?",
     "privateList": "Private list",
     "newList": "New List",
     "newListOk": "New list created",
-    "newListError": "Failed to create list: {}",
+    "newListError": "Failed to create list: $error",
     "officialPub": "Official Publisher",
     "noGroup": "No Group",
     "groupDesc": "Group Description",
@@ -254,6 +255,9 @@
     "contentRating": "Content Rating",
     "demographic": "Demographic",
     "pubStatus": "Publication Status",
+    "trendingThisYear": "Trending this year",
+    "byPopularity": "By Popularity",
+    "tagTitles": "Browse all $tag titles",
     "creator": {
       "biography": "Biography",
       "follow": "Follow",
@@ -272,7 +276,9 @@
       "originalLanguageDesc": "Only show titles originally published in these languages. If no languages are selected, no filter will be applied",
       "contentRating": "Content Filter",
       "dataSaver": "Data Saver",
-      "groupBlacklist": "Blocked Groups"
+      "groupBlacklist": "Blocked Groups",
+      "selectLanguages": "Select Languages",
+      "selectContentFilters": "Select Content Filters"
     },
     "sort": {
       "relevance_asc": "Worst Match",
@@ -289,7 +295,20 @@
       "year_desc": "Year Descending",
       "title_asc": "Title Ascending",
       "title_desc": "Title Descending"
-    }
+    },
+    "ratings": [
+      "Remove Rating",
+      "(1) Appalling",
+      "(2) Horrible",
+      "(3) Very Bad",
+      "(4) Bad",
+      "(5) Average",
+      "(6) Fine",
+      "(7) Good",
+      "(8) Very Good",
+      "(9) Great",
+      "(10) Masterpiece"
+    ]
   },
   "mangaView": {
     "altTitles": "Alt. Titles",
@@ -302,22 +321,23 @@
     "theme": "Themes",
     "format": "Format",
     "track": "Track",
-    "openOn": "Open on {}",
+    "openOn": "Open on $arg",
     "chapters": "Chapters",
     "art": "Art",
     "related": "Related",
     "relatedTitles": "Related Titles",
-    "volume": "Volume {}",
-    "chapter": "Chapter {}",
+    "volume": "Volume $n",
+    "noVolume": "No Volume",
+    "chapter": "Chapter $n",
     "officialRaw": "Official Raw",
     "finalChapter": "Final Volume/Chapter",
-    "markAllVisibleAs": "Mark all visible as {}",
-    "markAllAs": "Mark all as {}",
+    "markAllVisibleAs": "Mark all visible as $arg",
+    "markAllAs": "Mark all as $arg",
     "read": "read",
     "unread": "unread",
-    "markAllWarning": "Are you sure you want to mark all visible chapters as {}?",
+    "markAllWarning": "Are you sure you want to mark all visible chapters as ${arg}?",
     "noChaptersMsg": "No Chapters",
-    "markAs": "Mark as {}"
+    "markAs": "Mark as $arg"
   },
   "readingStatus": {
     "remove": "Remove",
@@ -340,8 +360,7 @@
     "unfollow": "Unfollow Manga",
     "favorite": "Add to Favorites",
     "unfavorite": "Remove from Favorites",
-    "removeHistory": "Remove from History",
-    "openLink": "Open Link"
+    "removeHistory": "Remove from History"
   },
   "mangaRelations": {
     "monochrome": "Monochrome",

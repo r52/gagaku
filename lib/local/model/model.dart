@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/model/config.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,7 +32,8 @@ class LibrarySortType extends _$LibrarySortType {
 
   @override
   set state(LibrarySort newState) => super.state = newState;
-  LibrarySort update(LibrarySort Function(LibrarySort state) cb) => state = cb(state);
+  LibrarySort update(LibrarySort Function(LibrarySort state) cb) =>
+      state = cb(state);
 }
 
 int? _standardLocalLibraryItemComp(LocalLibraryItem a, LocalLibraryItem b) {
@@ -54,27 +55,45 @@ int? _standardLocalLibraryItemComp(LocalLibraryItem a, LocalLibraryItem b) {
 Map<LibrarySort, LibraryItemCompare> _libraryCompare = {
   LibrarySort.name_desc: (LocalLibraryItem a, LocalLibraryItem b) {
     return _standardLocalLibraryItemComp(a, b) ??
-        compareNatural(a.name?.toLowerCase() ?? a.path.toLowerCase(), b.name?.toLowerCase() ?? b.path.toLowerCase());
+        compareNatural(
+          a.name?.toLowerCase() ?? a.path.toLowerCase(),
+          b.name?.toLowerCase() ?? b.path.toLowerCase(),
+        );
   },
   LibrarySort.name_asc: (LocalLibraryItem a, LocalLibraryItem b) {
     return _standardLocalLibraryItemComp(a, b) ??
-        compareNatural(b.name?.toLowerCase() ?? b.path.toLowerCase(), a.name?.toLowerCase() ?? a.path.toLowerCase());
+        compareNatural(
+          b.name?.toLowerCase() ?? b.path.toLowerCase(),
+          a.name?.toLowerCase() ?? a.path.toLowerCase(),
+        );
   },
   LibrarySort.modified_desc: (LocalLibraryItem a, LocalLibraryItem b) {
-    return _standardLocalLibraryItemComp(a, b) ?? a.modified.compareTo(b.modified);
+    return _standardLocalLibraryItemComp(a, b) ??
+        a.modified.compareTo(b.modified);
   },
   LibrarySort.modified_asc: (LocalLibraryItem a, LocalLibraryItem b) {
-    return _standardLocalLibraryItemComp(a, b) ?? b.modified.compareTo(a.modified);
+    return _standardLocalLibraryItemComp(a, b) ??
+        b.modified.compareTo(a.modified);
   },
 };
 
-LocalLibraryItem? findLibraryItem(LocalLibraryItem old, LocalLibraryItem curr, LibrarySort sort) {
+LocalLibraryItem? findLibraryItem(
+  LocalLibraryItem old,
+  LocalLibraryItem curr,
+  LibrarySort sort,
+) {
   if (curr.type == old.type && curr.path == old.path) {
     return curr;
   }
 
   final children =
-      curr.children.where((element) => old.type == element.type && old.isReadable == element.isReadable).toList();
+      curr.children
+          .where(
+            (element) =>
+                old.type == element.type &&
+                old.isReadable == element.isReadable,
+          )
+          .toList();
 
   if (children.isNotEmpty) {
     final result = children.binarySearch(old, _libraryCompare[sort]!);
@@ -127,15 +146,19 @@ class LocalLibraryItem {
 
 @Riverpod(keepAlive: true)
 class LocalLibrary extends _$LocalLibrary {
-  Future<LocalLibraryItem?> _processDirectory(Directory dir, LocalLibraryItem? parent) async {
+  Future<LocalLibraryItem?> _processDirectory(
+    Directory dir,
+    LocalLibraryItem? parent,
+  ) async {
     final formats = await ref.watch(supportedFormatsProvider.future);
     final currentSort = ref.read(librarySortTypeProvider);
 
     final entities = await dir.list().toList();
     final files = entities.whereType<File>();
-    final name = (dir.uri.pathSegments.length - 2 >= 0)
-        ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
-        : dir.path;
+    final name =
+        (dir.uri.pathSegments.length - 2 >= 0)
+            ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
+            : dir.path;
 
     final stats = dir.statSync();
 
@@ -147,12 +170,15 @@ class LocalLibrary extends _$LocalLibrary {
       parent: parent,
     );
 
-    final isReadable = files.isNotEmpty &&
-        files.every((element) =>
-            element.path.endsWith(".jpg") ||
-            element.path.endsWith(".png") ||
-            element.path.endsWith(".jpeg") ||
-            (formats.avif && element.path.endsWith(".avif")));
+    final isReadable =
+        files.isNotEmpty &&
+        files.every(
+          (element) =>
+              element.path.endsWith(".jpg") ||
+              element.path.endsWith(".png") ||
+              element.path.endsWith(".jpeg") ||
+              (formats.avif && element.path.endsWith(".avif")),
+        );
 
     res.isReadable = isReadable;
 
@@ -185,7 +211,10 @@ class LocalLibrary extends _$LocalLibrary {
     return null;
   }
 
-  Future<LocalLibraryItem?> _processFile(File file, LocalLibraryItem? parent) async {
+  Future<LocalLibraryItem?> _processFile(
+    File file,
+    LocalLibraryItem? parent,
+  ) async {
     if (file.path.endsWith('.cbz') ||
         file.path.endsWith('.zip') ||
         file.path.endsWith('.cbt') ||
@@ -205,7 +234,9 @@ class LocalLibrary extends _$LocalLibrary {
   }
 
   Future<LocalLibraryItem> _scanLibrary() async {
-    final libDir = ref.watch(localConfigProvider.select((c) => c.libraryDirectory));
+    final libDir = ref.watch(
+      localConfigProvider.select((c) => c.libraryDirectory),
+    );
     final currentSort = ref.read(librarySortTypeProvider);
 
     final perms = await Permission.manageExternalStorage.request();
@@ -215,7 +246,7 @@ class LocalLibrary extends _$LocalLibrary {
         path: '',
         type: LibraryItemType.directory,
         modified: DateTime.now(),
-        error: 'localLibrary.errors.permissionDenied'.tr(),
+        error: t.localLibrary.errors.permissionDenied,
       );
     }
 
@@ -252,7 +283,7 @@ class LocalLibrary extends _$LocalLibrary {
       state = const AsyncValue.loading(progress: 1);
 
       if (top.children.isEmpty) {
-        top.error = 'localLibrary.errors.emptyLibrary'.tr();
+        top.error = t.localLibrary.errors.emptyLibrary;
       }
 
       return top;
@@ -262,7 +293,7 @@ class LocalLibrary extends _$LocalLibrary {
       path: '',
       type: LibraryItemType.directory,
       modified: DateTime.now(),
-      error: 'localLibrary.errors.pathNotSet'.tr(),
+      error: t.localLibrary.errors.pathNotSet,
     );
   }
 
@@ -280,9 +311,7 @@ class LocalLibrary extends _$LocalLibrary {
 }
 
 class FormatInfo {
-  const FormatInfo({
-    required this.avif,
-  });
+  const FormatInfo({required this.avif});
 
   final bool avif;
 }

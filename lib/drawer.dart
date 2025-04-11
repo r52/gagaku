@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
@@ -56,6 +56,7 @@ class MainDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final theme = Theme.of(context);
     final index = _calculateSelectedIndex(context);
     const appicon = CircleAvatar(
@@ -99,17 +100,17 @@ class MainDrawer extends ConsumerWidget {
         NavigationDrawerDestination(
           icon: Icon(Icons.photo_album_outlined),
           selectedIcon: Icon(Icons.photo_album),
-          label: Text('localLibrary.text'.tr(context: context)),
+          label: Text(t.localLibrary.text),
         ),
         NavigationDrawerDestination(
           icon: Icon(Icons.language_outlined),
           selectedIcon: Icon(Icons.language),
-          label: Text('webSources.text'.tr(context: context)),
+          label: Text(t.webSources.text),
         ),
         NavigationDrawerDestination(
           icon: Icon(Icons.settings_outlined),
           selectedIcon: Icon(Icons.settings),
-          label: Text('settings'.tr(context: context)),
+          label: Text(t.settings),
         ),
         const Divider(),
         AboutListTile(

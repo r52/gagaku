@@ -9,46 +9,48 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i26;
-import 'package:flutter/foundation.dart' as _i30;
-import 'package:flutter/material.dart' as _i27;
-import 'package:gagaku/local/main.dart' as _i4;
-import 'package:gagaku/main.dart' as _i21;
-import 'package:gagaku/mangadex/chapter_feed.dart' as _i5;
-import 'package:gagaku/mangadex/creator_view.dart' as _i7;
-import 'package:gagaku/mangadex/edit_list.dart' as _i6;
-import 'package:gagaku/mangadex/frontpage.dart' as _i8;
-import 'package:gagaku/mangadex/group_view.dart' as _i10;
-import 'package:gagaku/mangadex/history_feed.dart' as _i11;
-import 'package:gagaku/mangadex/latest_feed.dart' as _i9;
-import 'package:gagaku/mangadex/library.dart' as _i13;
-import 'package:gagaku/mangadex/list_view.dart' as _i14;
-import 'package:gagaku/mangadex/lists.dart' as _i15;
-import 'package:gagaku/mangadex/login_password.dart' as _i16;
-import 'package:gagaku/mangadex/main.dart' as _i12;
-import 'package:gagaku/mangadex/manga_view.dart' as _i17;
-import 'package:gagaku/mangadex/model/types.dart' as _i29;
-import 'package:gagaku/mangadex/reader.dart' as _i18;
-import 'package:gagaku/mangadex/recent_feed.dart' as _i19;
-import 'package:gagaku/mangadex/search.dart' as _i20;
+import 'package:auto_route/auto_route.dart' as _i28;
+import 'package:flutter/foundation.dart' as _i32;
+import 'package:flutter/material.dart' as _i29;
+import 'package:gagaku/local/main.dart' as _i5;
+import 'package:gagaku/main.dart' as _i23;
+import 'package:gagaku/mangadex/chapter_feed.dart' as _i6;
+import 'package:gagaku/mangadex/creator_view.dart' as _i8;
+import 'package:gagaku/mangadex/edit_list.dart' as _i7;
+import 'package:gagaku/mangadex/frontpage.dart' as _i9;
+import 'package:gagaku/mangadex/group_view.dart' as _i11;
+import 'package:gagaku/mangadex/history_feed.dart' as _i12;
+import 'package:gagaku/mangadex/latest_feed.dart' as _i10;
+import 'package:gagaku/mangadex/library.dart' as _i14;
+import 'package:gagaku/mangadex/list_view.dart' as _i15;
+import 'package:gagaku/mangadex/lists.dart' as _i16;
+import 'package:gagaku/mangadex/login_password.dart' as _i17;
+import 'package:gagaku/mangadex/main.dart' as _i13;
+import 'package:gagaku/mangadex/manga_view.dart' as _i18;
+import 'package:gagaku/mangadex/model/types.dart' as _i31;
+import 'package:gagaku/mangadex/reader.dart' as _i19;
+import 'package:gagaku/mangadex/recent_feed.dart' as _i20;
+import 'package:gagaku/mangadex/search.dart' as _i21;
+import 'package:gagaku/mangadex/tag_view.dart' as _i22;
 import 'package:gagaku/settings.dart' as _i1;
-import 'package:gagaku/web/favorites.dart' as _i23;
+import 'package:gagaku/web/favorites.dart' as _i25;
 import 'package:gagaku/web/frontpage.dart' as _i2;
-import 'package:gagaku/web/history.dart' as _i24;
-import 'package:gagaku/web/main.dart' as _i25;
-import 'package:gagaku/web/manga_view.dart' as _i22;
-import 'package:gagaku/web/model/types.dart' as _i28;
+import 'package:gagaku/web/history.dart' as _i26;
+import 'package:gagaku/web/main.dart' as _i27;
+import 'package:gagaku/web/manga_view.dart' as _i24;
+import 'package:gagaku/web/model/types.dart' as _i30;
 import 'package:gagaku/web/reader.dart' as _i3;
+import 'package:gagaku/web/search.dart' as _i4;
 
 /// generated route for
 /// [_i1.AppSettingsPage]
-class AppSettingsRoute extends _i26.PageRouteInfo<void> {
-  const AppSettingsRoute({List<_i26.PageRouteInfo>? children})
+class AppSettingsRoute extends _i28.PageRouteInfo<void> {
+  const AppSettingsRoute({List<_i28.PageRouteInfo>? children})
     : super(AppSettingsRoute.name, initialChildren: children);
 
   static const String name = 'AppSettingsRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       return const _i1.AppSettingsPage();
@@ -58,63 +60,81 @@ class AppSettingsRoute extends _i26.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.ExtensionHomePage]
-class ExtensionHomeRoute extends _i26.PageRouteInfo<ExtensionHomeRouteArgs> {
+class ExtensionHomeRoute extends _i28.PageRouteInfo<ExtensionHomeRouteArgs> {
   ExtensionHomeRoute({
-    _i27.Key? key,
-    required _i28.SourceIdentifier source,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    required String sourceId,
+    _i30.WebSourceInfo? source,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          ExtensionHomeRoute.name,
-         args: ExtensionHomeRouteArgs(key: key, source: source),
+         args: ExtensionHomeRouteArgs(
+           key: key,
+           sourceId: sourceId,
+           source: source,
+         ),
+         rawPathParams: {'sourceId': sourceId},
          initialChildren: children,
        );
 
   static const String name = 'ExtensionHomeRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ExtensionHomeRouteArgs>();
-      return _i2.ExtensionHomePage(key: args.key, source: args.source);
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<ExtensionHomeRouteArgs>(
+        orElse:
+            () => ExtensionHomeRouteArgs(
+              sourceId: pathParams.getString('sourceId'),
+            ),
+      );
+      return _i2.ExtensionHomePage(
+        key: args.key,
+        sourceId: args.sourceId,
+        source: args.source,
+      );
     },
   );
 }
 
 class ExtensionHomeRouteArgs {
-  const ExtensionHomeRouteArgs({this.key, required this.source});
+  const ExtensionHomeRouteArgs({this.key, required this.sourceId, this.source});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i28.SourceIdentifier source;
+  final String sourceId;
+
+  final _i30.WebSourceInfo? source;
 
   @override
   String toString() {
-    return 'ExtensionHomeRouteArgs{key: $key, source: $source}';
+    return 'ExtensionHomeRouteArgs{key: $key, sourceId: $sourceId, source: $source}';
   }
 }
 
 /// generated route for
 /// [_i3.ExtensionReaderPage]
 class ExtensionReaderRoute
-    extends _i26.PageRouteInfo<ExtensionReaderRouteArgs> {
+    extends _i28.PageRouteInfo<ExtensionReaderRouteArgs> {
   ExtensionReaderRoute({
-    _i27.Key? key,
-    required String source,
+    _i29.Key? key,
+    required String sourceId,
     required String mangaId,
     required String chapterId,
-    _i28.WebReaderData? readerData,
-    List<_i26.PageRouteInfo>? children,
+    _i30.WebReaderData? readerData,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          ExtensionReaderRoute.name,
          args: ExtensionReaderRouteArgs(
            key: key,
-           source: source,
+           sourceId: sourceId,
            mangaId: mangaId,
            chapterId: chapterId,
            readerData: readerData,
          ),
          rawPathParams: {
-           'source': source,
+           'sourceId': sourceId,
            'mangaId': mangaId,
            'chapterId': chapterId,
          },
@@ -123,21 +143,21 @@ class ExtensionReaderRoute
 
   static const String name = 'ExtensionReaderRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionReaderRouteArgs>(
         orElse:
             () => ExtensionReaderRouteArgs(
-              source: pathParams.getString('source'),
+              sourceId: pathParams.getString('sourceId'),
               mangaId: pathParams.getString('mangaId'),
               chapterId: pathParams.getString('chapterId'),
             ),
       );
       return _i3.ExtensionReaderPage(
         key: args.key,
-        source: args.source,
+        sourceId: args.sourceId,
         mangaId: args.mangaId,
         chapterId: args.chapterId,
         readerData: args.readerData,
@@ -149,52 +169,118 @@ class ExtensionReaderRoute
 class ExtensionReaderRouteArgs {
   const ExtensionReaderRouteArgs({
     this.key,
-    required this.source,
+    required this.sourceId,
     required this.mangaId,
     required this.chapterId,
     this.readerData,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final String source;
+  final String sourceId;
 
   final String mangaId;
 
   final String chapterId;
 
-  final _i28.WebReaderData? readerData;
+  final _i30.WebReaderData? readerData;
 
   @override
   String toString() {
-    return 'ExtensionReaderRouteArgs{key: $key, source: $source, mangaId: $mangaId, chapterId: $chapterId, readerData: $readerData}';
+    return 'ExtensionReaderRouteArgs{key: $key, sourceId: $sourceId, mangaId: $mangaId, chapterId: $chapterId, readerData: $readerData}';
   }
 }
 
 /// generated route for
-/// [_i4.LocalLibraryHomeScreen]
-class LocalLibraryHomeRoute extends _i26.PageRouteInfo<void> {
-  const LocalLibraryHomeRoute({List<_i26.PageRouteInfo>? children})
+/// [_i4.ExtensionSearchPage]
+class ExtensionSearchRoute
+    extends _i28.PageRouteInfo<ExtensionSearchRouteArgs> {
+  ExtensionSearchRoute({
+    _i29.Key? key,
+    required String sourceId,
+    _i30.WebSourceInfo? source,
+    _i30.SearchRequest? query,
+    List<_i28.PageRouteInfo>? children,
+  }) : super(
+         ExtensionSearchRoute.name,
+         args: ExtensionSearchRouteArgs(
+           key: key,
+           sourceId: sourceId,
+           source: source,
+           query: query,
+         ),
+         rawPathParams: {'sourceId': sourceId},
+         initialChildren: children,
+       );
+
+  static const String name = 'ExtensionSearchRoute';
+
+  static _i28.PageInfo page = _i28.PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<ExtensionSearchRouteArgs>(
+        orElse:
+            () => ExtensionSearchRouteArgs(
+              sourceId: pathParams.getString('sourceId'),
+            ),
+      );
+      return _i4.ExtensionSearchPage(
+        key: args.key,
+        sourceId: args.sourceId,
+        source: args.source,
+        query: args.query,
+      );
+    },
+  );
+}
+
+class ExtensionSearchRouteArgs {
+  const ExtensionSearchRouteArgs({
+    this.key,
+    required this.sourceId,
+    this.source,
+    this.query,
+  });
+
+  final _i29.Key? key;
+
+  final String sourceId;
+
+  final _i30.WebSourceInfo? source;
+
+  final _i30.SearchRequest? query;
+
+  @override
+  String toString() {
+    return 'ExtensionSearchRouteArgs{key: $key, sourceId: $sourceId, source: $source, query: $query}';
+  }
+}
+
+/// generated route for
+/// [_i5.LocalLibraryHomeScreen]
+class LocalLibraryHomeRoute extends _i28.PageRouteInfo<void> {
+  const LocalLibraryHomeRoute({List<_i28.PageRouteInfo>? children})
     : super(LocalLibraryHomeRoute.name, initialChildren: children);
 
   static const String name = 'LocalLibraryHomeRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      return const _i4.LocalLibraryHomeScreen();
+      return const _i5.LocalLibraryHomeScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i5.MangaDexChapterFeedPage]
+/// [_i6.MangaDexChapterFeedPage]
 class MangaDexChapterFeedRoute
-    extends _i26.PageRouteInfo<MangaDexChapterFeedRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexChapterFeedRouteArgs> {
   MangaDexChapterFeedRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexChapterFeedRoute.name,
          args: MangaDexChapterFeedRouteArgs(key: key, controller: controller),
@@ -203,13 +289,13 @@ class MangaDexChapterFeedRoute
 
   static const String name = 'MangaDexChapterFeedRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexChapterFeedRouteArgs>(
         orElse: () => const MangaDexChapterFeedRouteArgs(),
       );
-      return _i5.MangaDexChapterFeedPage(
+      return _i6.MangaDexChapterFeedPage(
         key: args.key,
         controller: args.controller,
       );
@@ -220,9 +306,9 @@ class MangaDexChapterFeedRoute
 class MangaDexChapterFeedRouteArgs {
   const MangaDexChapterFeedRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -231,30 +317,30 @@ class MangaDexChapterFeedRouteArgs {
 }
 
 /// generated route for
-/// [_i6.MangaDexCreateListScreen]
-class MangaDexCreateListRoute extends _i26.PageRouteInfo<void> {
-  const MangaDexCreateListRoute({List<_i26.PageRouteInfo>? children})
+/// [_i7.MangaDexCreateListScreen]
+class MangaDexCreateListRoute extends _i28.PageRouteInfo<void> {
+  const MangaDexCreateListRoute({List<_i28.PageRouteInfo>? children})
     : super(MangaDexCreateListRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexCreateListRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      return const _i6.MangaDexCreateListScreen();
+      return const _i7.MangaDexCreateListScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i7.MangaDexCreatorViewPage]
+/// [_i8.MangaDexCreatorViewPage]
 class MangaDexCreatorViewRoute
-    extends _i26.PageRouteInfo<MangaDexCreatorViewRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexCreatorViewRouteArgs> {
   MangaDexCreatorViewRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String creatorId,
-    _i29.CreatorType? creator,
-    List<_i26.PageRouteInfo>? children,
+    _i31.CreatorType? creator,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexCreatorViewRoute.name,
          args: MangaDexCreatorViewRouteArgs(
@@ -268,7 +354,7 @@ class MangaDexCreatorViewRoute
 
   static const String name = 'MangaDexCreatorViewRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -278,7 +364,7 @@ class MangaDexCreatorViewRoute
               creatorId: pathParams.getString('creatorId'),
             ),
       );
-      return _i7.MangaDexCreatorViewPage(
+      return _i8.MangaDexCreatorViewPage(
         key: args.key,
         creatorId: args.creatorId,
         creator: args.creator,
@@ -294,11 +380,11 @@ class MangaDexCreatorViewRouteArgs {
     this.creator,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String creatorId;
 
-  final _i29.CreatorType? creator;
+  final _i31.CreatorType? creator;
 
   @override
   String toString() {
@@ -307,14 +393,14 @@ class MangaDexCreatorViewRouteArgs {
 }
 
 /// generated route for
-/// [_i7.MangaDexCreatorViewWithNamePage]
+/// [_i8.MangaDexCreatorViewWithNamePage]
 class MangaDexCreatorViewWithNameRoute
-    extends _i26.PageRouteInfo<MangaDexCreatorViewWithNameRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexCreatorViewWithNameRouteArgs> {
   MangaDexCreatorViewWithNameRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String creatorId,
     String? name,
-    List<_i26.PageRouteInfo>? children,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexCreatorViewWithNameRoute.name,
          args: MangaDexCreatorViewWithNameRouteArgs(
@@ -328,7 +414,7 @@ class MangaDexCreatorViewWithNameRoute
 
   static const String name = 'MangaDexCreatorViewWithNameRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -339,7 +425,7 @@ class MangaDexCreatorViewWithNameRoute
               name: pathParams.optString('name'),
             ),
       );
-      return _i7.MangaDexCreatorViewWithNamePage(
+      return _i8.MangaDexCreatorViewWithNamePage(
         key: args.key,
         creatorId: args.creatorId,
         name: args.name,
@@ -355,7 +441,7 @@ class MangaDexCreatorViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String creatorId;
 
@@ -368,14 +454,14 @@ class MangaDexCreatorViewWithNameRouteArgs {
 }
 
 /// generated route for
-/// [_i6.MangaDexEditListScreen]
+/// [_i7.MangaDexEditListScreen]
 class MangaDexEditListRoute
-    extends _i26.PageRouteInfo<MangaDexEditListRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexEditListRouteArgs> {
   MangaDexEditListRoute({
-    _i30.Key? key,
+    _i32.Key? key,
     String? listId,
-    _i29.CustomList? list,
-    List<_i26.PageRouteInfo>? children,
+    _i31.CustomList? list,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexEditListRoute.name,
          args: MangaDexEditListRouteArgs(key: key, listId: listId, list: list),
@@ -385,7 +471,7 @@ class MangaDexEditListRoute
 
   static const String name = 'MangaDexEditListRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -395,7 +481,7 @@ class MangaDexEditListRoute
               listId: pathParams.optString('listId'),
             ),
       );
-      return _i6.MangaDexEditListScreen(
+      return _i7.MangaDexEditListScreen(
         key: args.key,
         listId: args.listId,
         list: args.list,
@@ -407,11 +493,11 @@ class MangaDexEditListRoute
 class MangaDexEditListRouteArgs {
   const MangaDexEditListRouteArgs({this.key, this.listId, this.list});
 
-  final _i30.Key? key;
+  final _i32.Key? key;
 
   final String? listId;
 
-  final _i29.CustomList? list;
+  final _i31.CustomList? list;
 
   @override
   String toString() {
@@ -420,12 +506,12 @@ class MangaDexEditListRouteArgs {
 }
 
 /// generated route for
-/// [_i8.MangaDexFrontPage]
-class MangaDexFrontRoute extends _i26.PageRouteInfo<MangaDexFrontRouteArgs> {
+/// [_i9.MangaDexFrontPage]
+class MangaDexFrontRoute extends _i28.PageRouteInfo<MangaDexFrontRouteArgs> {
   MangaDexFrontRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexFrontRoute.name,
          args: MangaDexFrontRouteArgs(key: key, controller: controller),
@@ -434,13 +520,13 @@ class MangaDexFrontRoute extends _i26.PageRouteInfo<MangaDexFrontRouteArgs> {
 
   static const String name = 'MangaDexFrontRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexFrontRouteArgs>(
         orElse: () => const MangaDexFrontRouteArgs(),
       );
-      return _i8.MangaDexFrontPage(key: args.key, controller: args.controller);
+      return _i9.MangaDexFrontPage(key: args.key, controller: args.controller);
     },
   );
 }
@@ -448,9 +534,9 @@ class MangaDexFrontRoute extends _i26.PageRouteInfo<MangaDexFrontRouteArgs> {
 class MangaDexFrontRouteArgs {
   const MangaDexFrontRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -459,30 +545,30 @@ class MangaDexFrontRouteArgs {
 }
 
 /// generated route for
-/// [_i9.MangaDexGlobalFeedPage]
-class MangaDexGlobalFeedRoute extends _i26.PageRouteInfo<void> {
-  const MangaDexGlobalFeedRoute({List<_i26.PageRouteInfo>? children})
+/// [_i10.MangaDexGlobalFeedPage]
+class MangaDexGlobalFeedRoute extends _i28.PageRouteInfo<void> {
+  const MangaDexGlobalFeedRoute({List<_i28.PageRouteInfo>? children})
     : super(MangaDexGlobalFeedRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexGlobalFeedRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      return const _i9.MangaDexGlobalFeedPage();
+      return const _i10.MangaDexGlobalFeedPage();
     },
   );
 }
 
 /// generated route for
-/// [_i10.MangaDexGroupViewPage]
+/// [_i11.MangaDexGroupViewPage]
 class MangaDexGroupViewRoute
-    extends _i26.PageRouteInfo<MangaDexGroupViewRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexGroupViewRouteArgs> {
   MangaDexGroupViewRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String groupId,
-    _i29.Group? group,
-    List<_i26.PageRouteInfo>? children,
+    _i31.Group? group,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexGroupViewRoute.name,
          args: MangaDexGroupViewRouteArgs(
@@ -496,7 +582,7 @@ class MangaDexGroupViewRoute
 
   static const String name = 'MangaDexGroupViewRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -506,7 +592,7 @@ class MangaDexGroupViewRoute
               groupId: pathParams.getString('groupId'),
             ),
       );
-      return _i10.MangaDexGroupViewPage(
+      return _i11.MangaDexGroupViewPage(
         key: args.key,
         groupId: args.groupId,
         group: args.group,
@@ -522,11 +608,11 @@ class MangaDexGroupViewRouteArgs {
     this.group,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String groupId;
 
-  final _i29.Group? group;
+  final _i31.Group? group;
 
   @override
   String toString() {
@@ -535,14 +621,14 @@ class MangaDexGroupViewRouteArgs {
 }
 
 /// generated route for
-/// [_i10.MangaDexGroupViewWithNamePage]
+/// [_i11.MangaDexGroupViewWithNamePage]
 class MangaDexGroupViewWithNameRoute
-    extends _i26.PageRouteInfo<MangaDexGroupViewWithNameRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexGroupViewWithNameRouteArgs> {
   MangaDexGroupViewWithNameRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String groupId,
     String? name,
-    List<_i26.PageRouteInfo>? children,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexGroupViewWithNameRoute.name,
          args: MangaDexGroupViewWithNameRouteArgs(
@@ -556,7 +642,7 @@ class MangaDexGroupViewWithNameRoute
 
   static const String name = 'MangaDexGroupViewWithNameRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -567,7 +653,7 @@ class MangaDexGroupViewWithNameRoute
               name: pathParams.optString('name'),
             ),
       );
-      return _i10.MangaDexGroupViewWithNamePage(
+      return _i11.MangaDexGroupViewWithNamePage(
         key: args.key,
         groupId: args.groupId,
         name: args.name,
@@ -583,7 +669,7 @@ class MangaDexGroupViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String groupId;
 
@@ -596,13 +682,13 @@ class MangaDexGroupViewWithNameRouteArgs {
 }
 
 /// generated route for
-/// [_i11.MangaDexHistoryFeedPage]
+/// [_i12.MangaDexHistoryFeedPage]
 class MangaDexHistoryFeedRoute
-    extends _i26.PageRouteInfo<MangaDexHistoryFeedRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexHistoryFeedRouteArgs> {
   MangaDexHistoryFeedRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexHistoryFeedRoute.name,
          args: MangaDexHistoryFeedRouteArgs(key: key, controller: controller),
@@ -611,13 +697,13 @@ class MangaDexHistoryFeedRoute
 
   static const String name = 'MangaDexHistoryFeedRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexHistoryFeedRouteArgs>(
         orElse: () => const MangaDexHistoryFeedRouteArgs(),
       );
-      return _i11.MangaDexHistoryFeedPage(
+      return _i12.MangaDexHistoryFeedPage(
         key: args.key,
         controller: args.controller,
       );
@@ -628,9 +714,9 @@ class MangaDexHistoryFeedRoute
 class MangaDexHistoryFeedRouteArgs {
   const MangaDexHistoryFeedRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -639,29 +725,29 @@ class MangaDexHistoryFeedRouteArgs {
 }
 
 /// generated route for
-/// [_i12.MangaDexHomePage]
-class MangaDexHomeRoute extends _i26.PageRouteInfo<void> {
-  const MangaDexHomeRoute({List<_i26.PageRouteInfo>? children})
+/// [_i13.MangaDexHomePage]
+class MangaDexHomeRoute extends _i28.PageRouteInfo<void> {
+  const MangaDexHomeRoute({List<_i28.PageRouteInfo>? children})
     : super(MangaDexHomeRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexHomeRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      return const _i12.MangaDexHomePage();
+      return const _i13.MangaDexHomePage();
     },
   );
 }
 
 /// generated route for
-/// [_i13.MangaDexLibraryPage]
+/// [_i14.MangaDexLibraryPage]
 class MangaDexLibraryRoute
-    extends _i26.PageRouteInfo<MangaDexLibraryRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexLibraryRouteArgs> {
   MangaDexLibraryRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexLibraryRoute.name,
          args: MangaDexLibraryRouteArgs(key: key, controller: controller),
@@ -670,13 +756,13 @@ class MangaDexLibraryRoute
 
   static const String name = 'MangaDexLibraryRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexLibraryRouteArgs>(
         orElse: () => const MangaDexLibraryRouteArgs(),
       );
-      return _i13.MangaDexLibraryPage(
+      return _i14.MangaDexLibraryPage(
         key: args.key,
         controller: args.controller,
       );
@@ -687,9 +773,9 @@ class MangaDexLibraryRoute
 class MangaDexLibraryRouteArgs {
   const MangaDexLibraryRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -698,13 +784,13 @@ class MangaDexLibraryRouteArgs {
 }
 
 /// generated route for
-/// [_i14.MangaDexListViewPage]
+/// [_i15.MangaDexListViewPage]
 class MangaDexListViewRoute
-    extends _i26.PageRouteInfo<MangaDexListViewRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexListViewRouteArgs> {
   MangaDexListViewRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String listId,
-    List<_i26.PageRouteInfo>? children,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexListViewRoute.name,
          args: MangaDexListViewRouteArgs(key: key, listId: listId),
@@ -714,7 +800,7 @@ class MangaDexListViewRoute
 
   static const String name = 'MangaDexListViewRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -724,7 +810,7 @@ class MangaDexListViewRoute
               listId: pathParams.getString('listId'),
             ),
       );
-      return _i14.MangaDexListViewPage(key: args.key, listId: args.listId);
+      return _i15.MangaDexListViewPage(key: args.key, listId: args.listId);
     },
   );
 }
@@ -732,7 +818,7 @@ class MangaDexListViewRoute
 class MangaDexListViewRouteArgs {
   const MangaDexListViewRouteArgs({this.key, required this.listId});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String listId;
 
@@ -743,14 +829,14 @@ class MangaDexListViewRouteArgs {
 }
 
 /// generated route for
-/// [_i14.MangaDexListViewWithNamePage]
+/// [_i15.MangaDexListViewWithNamePage]
 class MangaDexListViewWithNameRoute
-    extends _i26.PageRouteInfo<MangaDexListViewWithNameRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexListViewWithNameRouteArgs> {
   MangaDexListViewWithNameRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String listId,
     String? name,
-    List<_i26.PageRouteInfo>? children,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexListViewWithNameRoute.name,
          args: MangaDexListViewWithNameRouteArgs(
@@ -764,7 +850,7 @@ class MangaDexListViewWithNameRoute
 
   static const String name = 'MangaDexListViewWithNameRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -775,7 +861,7 @@ class MangaDexListViewWithNameRoute
               name: pathParams.optString('name'),
             ),
       );
-      return _i14.MangaDexListViewWithNamePage(
+      return _i15.MangaDexListViewWithNamePage(
         key: args.key,
         listId: args.listId,
         name: args.name,
@@ -791,7 +877,7 @@ class MangaDexListViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String listId;
 
@@ -804,12 +890,12 @@ class MangaDexListViewWithNameRouteArgs {
 }
 
 /// generated route for
-/// [_i15.MangaDexListsPage]
-class MangaDexListsRoute extends _i26.PageRouteInfo<MangaDexListsRouteArgs> {
+/// [_i16.MangaDexListsPage]
+class MangaDexListsRoute extends _i28.PageRouteInfo<MangaDexListsRouteArgs> {
   MangaDexListsRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexListsRoute.name,
          args: MangaDexListsRouteArgs(key: key, controller: controller),
@@ -818,13 +904,13 @@ class MangaDexListsRoute extends _i26.PageRouteInfo<MangaDexListsRouteArgs> {
 
   static const String name = 'MangaDexListsRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexListsRouteArgs>(
         orElse: () => const MangaDexListsRouteArgs(),
       );
-      return _i15.MangaDexListsPage(key: args.key, controller: args.controller);
+      return _i16.MangaDexListsPage(key: args.key, controller: args.controller);
     },
   );
 }
@@ -832,9 +918,9 @@ class MangaDexListsRoute extends _i26.PageRouteInfo<MangaDexListsRouteArgs> {
 class MangaDexListsRouteArgs {
   const MangaDexListsRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -843,30 +929,30 @@ class MangaDexListsRouteArgs {
 }
 
 /// generated route for
-/// [_i16.MangaDexLoginScreen]
-class MangaDexLoginRoute extends _i26.PageRouteInfo<void> {
-  const MangaDexLoginRoute({List<_i26.PageRouteInfo>? children})
+/// [_i17.MangaDexLoginScreen]
+class MangaDexLoginRoute extends _i28.PageRouteInfo<void> {
+  const MangaDexLoginRoute({List<_i28.PageRouteInfo>? children})
     : super(MangaDexLoginRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexLoginRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      return const _i16.MangaDexLoginScreen();
+      return const _i17.MangaDexLoginScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i17.MangaDexMangaViewPage]
+/// [_i18.MangaDexMangaViewPage]
 class MangaDexMangaViewRoute
-    extends _i26.PageRouteInfo<MangaDexMangaViewRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexMangaViewRouteArgs> {
   MangaDexMangaViewRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String mangaId,
-    _i29.Manga? manga,
-    List<_i26.PageRouteInfo>? children,
+    _i31.Manga? manga,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexMangaViewRoute.name,
          args: MangaDexMangaViewRouteArgs(
@@ -880,7 +966,7 @@ class MangaDexMangaViewRoute
 
   static const String name = 'MangaDexMangaViewRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -890,7 +976,7 @@ class MangaDexMangaViewRoute
               mangaId: pathParams.getString('mangaId'),
             ),
       );
-      return _i17.MangaDexMangaViewPage(
+      return _i18.MangaDexMangaViewPage(
         key: args.key,
         mangaId: args.mangaId,
         manga: args.manga,
@@ -906,11 +992,11 @@ class MangaDexMangaViewRouteArgs {
     this.manga,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String mangaId;
 
-  final _i29.Manga? manga;
+  final _i31.Manga? manga;
 
   @override
   String toString() {
@@ -919,14 +1005,14 @@ class MangaDexMangaViewRouteArgs {
 }
 
 /// generated route for
-/// [_i17.MangaDexMangaViewWithNamePage]
+/// [_i18.MangaDexMangaViewWithNamePage]
 class MangaDexMangaViewWithNameRoute
-    extends _i26.PageRouteInfo<MangaDexMangaViewWithNameRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexMangaViewWithNameRouteArgs> {
   MangaDexMangaViewWithNameRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String mangaId,
     String? name,
-    List<_i26.PageRouteInfo>? children,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexMangaViewWithNameRoute.name,
          args: MangaDexMangaViewWithNameRouteArgs(
@@ -940,7 +1026,7 @@ class MangaDexMangaViewWithNameRoute
 
   static const String name = 'MangaDexMangaViewWithNameRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -951,7 +1037,7 @@ class MangaDexMangaViewWithNameRoute
               name: pathParams.optString('name'),
             ),
       );
-      return _i17.MangaDexMangaViewWithNamePage(
+      return _i18.MangaDexMangaViewWithNamePage(
         key: args.key,
         mangaId: args.mangaId,
         name: args.name,
@@ -967,7 +1053,7 @@ class MangaDexMangaViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String mangaId;
 
@@ -980,13 +1066,13 @@ class MangaDexMangaViewWithNameRouteArgs {
 }
 
 /// generated route for
-/// [_i18.MangaDexReaderPage]
-class MangaDexReaderRoute extends _i26.PageRouteInfo<MangaDexReaderRouteArgs> {
+/// [_i19.MangaDexReaderPage]
+class MangaDexReaderRoute extends _i28.PageRouteInfo<MangaDexReaderRouteArgs> {
   MangaDexReaderRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String chapterId,
-    _i18.ReaderData? readerData,
-    List<_i26.PageRouteInfo>? children,
+    _i19.ReaderData? readerData,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexReaderRoute.name,
          args: MangaDexReaderRouteArgs(
@@ -1000,7 +1086,7 @@ class MangaDexReaderRoute extends _i26.PageRouteInfo<MangaDexReaderRouteArgs> {
 
   static const String name = 'MangaDexReaderRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1010,7 +1096,7 @@ class MangaDexReaderRoute extends _i26.PageRouteInfo<MangaDexReaderRouteArgs> {
               chapterId: pathParams.getString('chapterId'),
             ),
       );
-      return _i18.MangaDexReaderPage(
+      return _i19.MangaDexReaderPage(
         key: args.key,
         chapterId: args.chapterId,
         readerData: args.readerData,
@@ -1026,11 +1112,11 @@ class MangaDexReaderRouteArgs {
     this.readerData,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String chapterId;
 
-  final _i18.ReaderData? readerData;
+  final _i19.ReaderData? readerData;
 
   @override
   String toString() {
@@ -1039,13 +1125,13 @@ class MangaDexReaderRouteArgs {
 }
 
 /// generated route for
-/// [_i19.MangaDexRecentFeedPage]
+/// [_i20.MangaDexRecentFeedPage]
 class MangaDexRecentFeedRoute
-    extends _i26.PageRouteInfo<MangaDexRecentFeedRouteArgs> {
+    extends _i28.PageRouteInfo<MangaDexRecentFeedRouteArgs> {
   MangaDexRecentFeedRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexRecentFeedRoute.name,
          args: MangaDexRecentFeedRouteArgs(key: key, controller: controller),
@@ -1054,13 +1140,13 @@ class MangaDexRecentFeedRoute
 
   static const String name = 'MangaDexRecentFeedRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexRecentFeedRouteArgs>(
         orElse: () => const MangaDexRecentFeedRouteArgs(),
       );
-      return _i19.MangaDexRecentFeedPage(
+      return _i20.MangaDexRecentFeedPage(
         key: args.key,
         controller: args.controller,
       );
@@ -1071,9 +1157,9 @@ class MangaDexRecentFeedRoute
 class MangaDexRecentFeedRouteArgs {
   const MangaDexRecentFeedRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -1082,35 +1168,38 @@ class MangaDexRecentFeedRouteArgs {
 }
 
 /// generated route for
-/// [_i20.MangaDexSearchPage]
-class MangaDexSearchRoute extends _i26.PageRouteInfo<MangaDexSearchRouteArgs> {
+/// [_i21.MangaDexSearchPage]
+class MangaDexSearchRoute extends _i28.PageRouteInfo<MangaDexSearchRouteArgs> {
   MangaDexSearchRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     bool selectMode = false,
     Set<String>? selectedTitles,
-    List<_i26.PageRouteInfo>? children,
+    _i31.MangaSearchParameters? parameters,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          MangaDexSearchRoute.name,
          args: MangaDexSearchRouteArgs(
            key: key,
            selectMode: selectMode,
            selectedTitles: selectedTitles,
+           parameters: parameters,
          ),
          initialChildren: children,
        );
 
   static const String name = 'MangaDexSearchRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexSearchRouteArgs>(
         orElse: () => const MangaDexSearchRouteArgs(),
       );
-      return _i20.MangaDexSearchPage(
+      return _i21.MangaDexSearchPage(
         key: args.key,
         selectMode: args.selectMode,
         selectedTitles: args.selectedTitles,
+        parameters: args.parameters,
       );
     },
   );
@@ -1121,27 +1210,142 @@ class MangaDexSearchRouteArgs {
     this.key,
     this.selectMode = false,
     this.selectedTitles,
+    this.parameters,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final bool selectMode;
 
   final Set<String>? selectedTitles;
 
+  final _i31.MangaSearchParameters? parameters;
+
   @override
   String toString() {
-    return 'MangaDexSearchRouteArgs{key: $key, selectMode: $selectMode, selectedTitles: $selectedTitles}';
+    return 'MangaDexSearchRouteArgs{key: $key, selectMode: $selectMode, selectedTitles: $selectedTitles, parameters: $parameters}';
   }
 }
 
 /// generated route for
-/// [_i21.NotFoundScreen]
-class NotFoundRoute extends _i26.PageRouteInfo<NotFoundRouteArgs> {
+/// [_i22.MangaDexTagViewPage]
+class MangaDexTagViewRoute
+    extends _i28.PageRouteInfo<MangaDexTagViewRouteArgs> {
+  MangaDexTagViewRoute({
+    _i29.Key? key,
+    required String tagId,
+    _i31.Tag? tag,
+    List<_i28.PageRouteInfo>? children,
+  }) : super(
+         MangaDexTagViewRoute.name,
+         args: MangaDexTagViewRouteArgs(key: key, tagId: tagId, tag: tag),
+         rawPathParams: {'tagId': tagId},
+         initialChildren: children,
+       );
+
+  static const String name = 'MangaDexTagViewRoute';
+
+  static _i28.PageInfo page = _i28.PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<MangaDexTagViewRouteArgs>(
+        orElse:
+            () =>
+                MangaDexTagViewRouteArgs(tagId: pathParams.getString('tagId')),
+      );
+      return _i22.MangaDexTagViewPage(
+        key: args.key,
+        tagId: args.tagId,
+        tag: args.tag,
+      );
+    },
+  );
+}
+
+class MangaDexTagViewRouteArgs {
+  const MangaDexTagViewRouteArgs({this.key, required this.tagId, this.tag});
+
+  final _i29.Key? key;
+
+  final String tagId;
+
+  final _i31.Tag? tag;
+
+  @override
+  String toString() {
+    return 'MangaDexTagViewRouteArgs{key: $key, tagId: $tagId, tag: $tag}';
+  }
+}
+
+/// generated route for
+/// [_i22.MangaDexTagViewWithNamePage]
+class MangaDexTagViewWithNameRoute
+    extends _i28.PageRouteInfo<MangaDexTagViewWithNameRouteArgs> {
+  MangaDexTagViewWithNameRoute({
+    _i29.Key? key,
+    required String tagId,
+    String? name,
+    List<_i28.PageRouteInfo>? children,
+  }) : super(
+         MangaDexTagViewWithNameRoute.name,
+         args: MangaDexTagViewWithNameRouteArgs(
+           key: key,
+           tagId: tagId,
+           name: name,
+         ),
+         rawPathParams: {'tagId': tagId, 'name': name},
+         initialChildren: children,
+       );
+
+  static const String name = 'MangaDexTagViewWithNameRoute';
+
+  static _i28.PageInfo page = _i28.PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<MangaDexTagViewWithNameRouteArgs>(
+        orElse:
+            () => MangaDexTagViewWithNameRouteArgs(
+              tagId: pathParams.getString('tagId'),
+              name: pathParams.optString('name'),
+            ),
+      );
+      return _i22.MangaDexTagViewWithNamePage(
+        key: args.key,
+        tagId: args.tagId,
+        name: args.name,
+      );
+    },
+  );
+}
+
+class MangaDexTagViewWithNameRouteArgs {
+  const MangaDexTagViewWithNameRouteArgs({
+    this.key,
+    required this.tagId,
+    this.name,
+  });
+
+  final _i29.Key? key;
+
+  final String tagId;
+
+  final String? name;
+
+  @override
+  String toString() {
+    return 'MangaDexTagViewWithNameRouteArgs{key: $key, tagId: $tagId, name: $name}';
+  }
+}
+
+/// generated route for
+/// [_i23.NotFoundScreen]
+class NotFoundRoute extends _i28.PageRouteInfo<NotFoundRouteArgs> {
   NotFoundRoute({
-    _i30.Key? key,
+    _i32.Key? key,
     String uri = '',
-    List<_i26.PageRouteInfo>? children,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          NotFoundRoute.name,
          args: NotFoundRouteArgs(key: key, uri: uri),
@@ -1151,14 +1355,14 @@ class NotFoundRoute extends _i26.PageRouteInfo<NotFoundRouteArgs> {
 
   static const String name = 'NotFoundRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final queryParams = data.queryParams;
       final args = data.argsAs<NotFoundRouteArgs>(
         orElse: () => NotFoundRouteArgs(uri: queryParams.getString('uri', '')),
       );
-      return _i21.NotFoundScreen(key: args.key, uri: args.uri);
+      return _i23.NotFoundScreen(key: args.key, uri: args.uri);
     },
   );
 }
@@ -1166,7 +1370,7 @@ class NotFoundRoute extends _i26.PageRouteInfo<NotFoundRouteArgs> {
 class NotFoundRouteArgs {
   const NotFoundRouteArgs({this.key, this.uri = ''});
 
-  final _i30.Key? key;
+  final _i32.Key? key;
 
   final String uri;
 
@@ -1179,15 +1383,15 @@ class NotFoundRouteArgs {
 /// generated route for
 /// [_i3.ProxyWebSourceReaderPage]
 class ProxyWebSourceReaderRoute
-    extends _i26.PageRouteInfo<ProxyWebSourceReaderRouteArgs> {
+    extends _i28.PageRouteInfo<ProxyWebSourceReaderRouteArgs> {
   ProxyWebSourceReaderRoute({
-    _i27.Key? key,
+    _i29.Key? key,
     required String proxy,
     required String code,
     required String chapter,
     String? page,
-    _i28.WebReaderData? readerData,
-    List<_i26.PageRouteInfo>? children,
+    _i30.WebReaderData? readerData,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          ProxyWebSourceReaderRoute.name,
          args: ProxyWebSourceReaderRouteArgs(
@@ -1204,7 +1408,7 @@ class ProxyWebSourceReaderRoute
 
   static const String name = 'ProxyWebSourceReaderRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1238,7 +1442,7 @@ class ProxyWebSourceReaderRouteArgs {
     this.readerData,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
   final String proxy;
 
@@ -1248,7 +1452,7 @@ class ProxyWebSourceReaderRouteArgs {
 
   final String? page;
 
-  final _i28.WebReaderData? readerData;
+  final _i30.WebReaderData? readerData;
 
   @override
   String toString() {
@@ -1257,42 +1461,42 @@ class ProxyWebSourceReaderRouteArgs {
 }
 
 /// generated route for
-/// [_i22.WebMangaViewPage]
-class WebMangaViewRoute extends _i26.PageRouteInfo<WebMangaViewRouteArgs> {
+/// [_i24.WebMangaViewPage]
+class WebMangaViewRoute extends _i28.PageRouteInfo<WebMangaViewRouteArgs> {
   WebMangaViewRoute({
-    _i27.Key? key,
-    required String source,
+    _i29.Key? key,
+    required String sourceId,
     required String mangaId,
-    _i28.SourceHandler? handle,
-    List<_i26.PageRouteInfo>? children,
+    _i30.SourceHandler? handle,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          WebMangaViewRoute.name,
          args: WebMangaViewRouteArgs(
            key: key,
-           source: source,
+           sourceId: sourceId,
            mangaId: mangaId,
            handle: handle,
          ),
-         rawPathParams: {'source': source, 'mangaId': mangaId},
+         rawPathParams: {'sourceId': sourceId, 'mangaId': mangaId},
          initialChildren: children,
        );
 
   static const String name = 'WebMangaViewRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<WebMangaViewRouteArgs>(
         orElse:
             () => WebMangaViewRouteArgs(
-              source: pathParams.getString('source'),
+              sourceId: pathParams.getString('sourceId'),
               mangaId: pathParams.getString('mangaId'),
             ),
       );
-      return _i22.WebMangaViewPage(
+      return _i24.WebMangaViewPage(
         key: args.key,
-        source: args.source,
+        sourceId: args.sourceId,
         mangaId: args.mangaId,
         handle: args.handle,
       );
@@ -1303,33 +1507,33 @@ class WebMangaViewRoute extends _i26.PageRouteInfo<WebMangaViewRouteArgs> {
 class WebMangaViewRouteArgs {
   const WebMangaViewRouteArgs({
     this.key,
-    required this.source,
+    required this.sourceId,
     required this.mangaId,
     this.handle,
   });
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final String source;
+  final String sourceId;
 
   final String mangaId;
 
-  final _i28.SourceHandler? handle;
+  final _i30.SourceHandler? handle;
 
   @override
   String toString() {
-    return 'WebMangaViewRouteArgs{key: $key, source: $source, mangaId: $mangaId, handle: $handle}';
+    return 'WebMangaViewRouteArgs{key: $key, sourceId: $sourceId, mangaId: $mangaId, handle: $handle}';
   }
 }
 
 /// generated route for
-/// [_i23.WebSourceFavoritesPage]
+/// [_i25.WebSourceFavoritesPage]
 class WebSourceFavoritesRoute
-    extends _i26.PageRouteInfo<WebSourceFavoritesRouteArgs> {
+    extends _i28.PageRouteInfo<WebSourceFavoritesRouteArgs> {
   WebSourceFavoritesRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          WebSourceFavoritesRoute.name,
          args: WebSourceFavoritesRouteArgs(key: key, controller: controller),
@@ -1338,13 +1542,13 @@ class WebSourceFavoritesRoute
 
   static const String name = 'WebSourceFavoritesRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<WebSourceFavoritesRouteArgs>(
         orElse: () => const WebSourceFavoritesRouteArgs(),
       );
-      return _i23.WebSourceFavoritesPage(
+      return _i25.WebSourceFavoritesPage(
         key: args.key,
         controller: args.controller,
       );
@@ -1355,9 +1559,9 @@ class WebSourceFavoritesRoute
 class WebSourceFavoritesRouteArgs {
   const WebSourceFavoritesRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -1367,12 +1571,12 @@ class WebSourceFavoritesRouteArgs {
 
 /// generated route for
 /// [_i2.WebSourceFrontPage]
-class WebSourceFrontRoute extends _i26.PageRouteInfo<WebSourceFrontRouteArgs> {
+class WebSourceFrontRoute extends _i28.PageRouteInfo<WebSourceFrontRouteArgs> {
   WebSourceFrontRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
     Uri? process,
-    List<_i26.PageRouteInfo>? children,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          WebSourceFrontRoute.name,
          args: WebSourceFrontRouteArgs(
@@ -1385,7 +1589,7 @@ class WebSourceFrontRoute extends _i26.PageRouteInfo<WebSourceFrontRouteArgs> {
 
   static const String name = 'WebSourceFrontRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<WebSourceFrontRouteArgs>(
@@ -1403,9 +1607,9 @@ class WebSourceFrontRoute extends _i26.PageRouteInfo<WebSourceFrontRouteArgs> {
 class WebSourceFrontRouteArgs {
   const WebSourceFrontRouteArgs({this.key, this.controller, this.process});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   final Uri? process;
 
@@ -1416,13 +1620,13 @@ class WebSourceFrontRouteArgs {
 }
 
 /// generated route for
-/// [_i24.WebSourceHistoryPage]
+/// [_i26.WebSourceHistoryPage]
 class WebSourceHistoryRoute
-    extends _i26.PageRouteInfo<WebSourceHistoryRouteArgs> {
+    extends _i28.PageRouteInfo<WebSourceHistoryRouteArgs> {
   WebSourceHistoryRoute({
-    _i27.Key? key,
-    _i27.ScrollController? controller,
-    List<_i26.PageRouteInfo>? children,
+    _i29.Key? key,
+    _i29.ScrollController? controller,
+    List<_i28.PageRouteInfo>? children,
   }) : super(
          WebSourceHistoryRoute.name,
          args: WebSourceHistoryRouteArgs(key: key, controller: controller),
@@ -1431,13 +1635,13 @@ class WebSourceHistoryRoute
 
   static const String name = 'WebSourceHistoryRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<WebSourceHistoryRouteArgs>(
         orElse: () => const WebSourceHistoryRouteArgs(),
       );
-      return _i24.WebSourceHistoryPage(
+      return _i26.WebSourceHistoryPage(
         key: args.key,
         controller: args.controller,
       );
@@ -1448,9 +1652,9 @@ class WebSourceHistoryRoute
 class WebSourceHistoryRouteArgs {
   const WebSourceHistoryRouteArgs({this.key, this.controller});
 
-  final _i27.Key? key;
+  final _i29.Key? key;
 
-  final _i27.ScrollController? controller;
+  final _i29.ScrollController? controller;
 
   @override
   String toString() {
@@ -1459,17 +1663,17 @@ class WebSourceHistoryRouteArgs {
 }
 
 /// generated route for
-/// [_i25.WebSourceHomePage]
-class WebSourceHomeRoute extends _i26.PageRouteInfo<void> {
-  const WebSourceHomeRoute({List<_i26.PageRouteInfo>? children})
+/// [_i27.WebSourceHomePage]
+class WebSourceHomeRoute extends _i28.PageRouteInfo<void> {
+  const WebSourceHomeRoute({List<_i28.PageRouteInfo>? children})
     : super(WebSourceHomeRoute.name, initialChildren: children);
 
   static const String name = 'WebSourceHomeRoute';
 
-  static _i26.PageInfo page = _i26.PageInfo(
+  static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      return const _i25.WebSourceHomePage();
+      return const _i27.WebSourceHomePage();
     },
   );
 }

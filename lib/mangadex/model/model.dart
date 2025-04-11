@@ -183,12 +183,12 @@ abstract class MangaDexFeeds {
   );
   static const userLists = FeedInfo(
     'UserLists',
-    MangaDexEndpoints.breakLimit,
+    100,
     MangaDexEndpoints.userList,
   );
   static const followedLists = FeedInfo(
     'FollowedLists',
-    MangaDexEndpoints.breakLimit,
+    100,
     MangaDexEndpoints.followedList,
   );
   static const search = FeedInfo(
@@ -204,11 +204,13 @@ extension TokenHelper on TokenResponse {
 
 @Riverpod(keepAlive: true)
 MangaDexModel mangadex(Ref ref) {
-  return MangaDexModel(ref);
+  return MangaDexModel(ref, RateLimitedClient(useCustomUA: true));
 }
 
 class MangaDexModel {
-  MangaDexModel(this.ref) {
+  MangaDexModel(this.ref, http.Client client)
+    : _baseClient = client,
+      _client = client {
     _cache = ref.watch(cacheProvider);
     _future = refreshToken();
   }
@@ -217,7 +219,8 @@ class MangaDexModel {
   TokenResponse? _token;
   Credential? _credential;
   final _tokenMutex = ReadWriteMutex();
-  http.Client _client = RateLimitedClient(useCustomUA: true);
+  final http.Client _baseClient;
+  http.Client _client;
   late Future _future;
   Future get future => _future;
 
@@ -277,11 +280,16 @@ class MangaDexModel {
             _credential?.client.issuer ??
             await Issuer.discover(
               MangaDexEndpoints.provider,
-              httpClient: _client,
+              httpClient: _baseClient,
             );
         final client =
             _credential?.client ??
-            Client(issuer, clientId, clientSecret: clientSecret);
+            Client(
+              issuer,
+              clientId,
+              clientSecret: clientSecret,
+              httpClient: _baseClient,
+            );
 
         final credential =
             _credential ??
@@ -299,7 +307,7 @@ class MangaDexModel {
             _saveToken(token);
 
             _token = token;
-            _client = credential.createHttpClient(_client);
+            _client = credential.createHttpClient(_baseClient);
             _credential = credential;
             logger.i("refreshToken(): MangaDex token refreshed");
             return;
@@ -310,10 +318,10 @@ class MangaDexModel {
             "refreshToken() returned error ${token['error']}",
             error: token.toString(),
           );
-          _client = RateLimitedClient(useCustomUA: true);
+          _client = _baseClient;
         } catch (e) {
           logger.w("refreshToken() error ${e.toString()}", error: e);
-          _client = RateLimitedClient(useCustomUA: true);
+          _client = _baseClient;
 
           // remove broken tokens
           await storage.delete('accessToken');
@@ -333,10 +341,15 @@ class MangaDexModel {
   ) async {
     final issuer = await Issuer.discover(
       MangaDexEndpoints.provider,
-      httpClient: _client,
+      httpClient: _baseClient,
     );
 
-    final client = Client(issuer, clientId, clientSecret: clientSecret);
+    final client = Client(
+      issuer,
+      clientId,
+      clientSecret: clientSecret,
+      httpClient: _baseClient,
+    );
 
     final flow = Flow.password(client);
 
@@ -352,7 +365,7 @@ class MangaDexModel {
         await _saveToken(token);
         await _saveCredentials(user, clientId, clientSecret);
         _token = token;
-        _client = credential.createHttpClient(_client);
+        _client = credential.createHttpClient(_baseClient);
         _credential = credential;
 
         logger.i("authenticate(): MangaDex user logged in");
@@ -395,7 +408,7 @@ class MangaDexModel {
         if (response.statusCode == 200) {
           return await _tokenMutex.protectWrite(() async {
             _token = null;
-            _client = RateLimitedClient(useCustomUA: true);
+            _client = _baseClient;
             _credential = null;
 
             final storage = Hive.box(gagakuBox);
@@ -454,7 +467,7 @@ class MangaDexModel {
     final key = 'FrontPageData';
 
     if (await _cache.exists(key)) {
-      return _cache.get(key, FrontPageData.fromJson).get<FrontPageData>();
+      return _cache.get<FrontPageData>(key, FrontPageData.fromJson);
     }
 
     final uri = Uri.parse(
@@ -604,7 +617,7 @@ class MangaDexModel {
     // Craft the list
     for (final id in uuids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get(id, Chapter.fromJson).get<Chapter>());
+        list.add(_cache.get<Chapter>(id, Chapter.fromJson));
       }
     }
 
@@ -659,7 +672,7 @@ class MangaDexModel {
     // Craft the list
     for (final id in ids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get(id, Manga.fromJson).get<Manga>());
+        list.add(_cache.get<Manga>(id, Manga.fromJson));
       }
     }
 
@@ -703,6 +716,9 @@ class MangaDexModel {
           break;
         case Group(:final id):
           queryParams['group'] = id;
+          break;
+        case Tag(:final id):
+          queryParams['includedTags[]'] = id;
           break;
         default:
           final msg =
@@ -1090,10 +1106,9 @@ class MangaDexModel {
 
     if (await _cache.exists(cachekey)) {
       logger.d("Retrieving cached user library of user $userId");
-      final libMap =
-          _cache.get(cachekey, (decoded) {
-            return decoded.map(decoder);
-          }).get<LibraryMap>();
+      final libMap = _cache.get<LibraryMap>(cachekey, (decoded) {
+        return decoded.map(decoder);
+      });
       return libMap;
     }
 
@@ -1394,7 +1409,7 @@ class MangaDexModel {
     // Craft the list
     for (final id in uuids) {
       if (await _cache.exists(id)) {
-        list.add(_cache.get(id, Group.fromJson).get<Group>());
+        list.add(_cache.get<Group>(id, Group.fromJson));
       }
     }
 
@@ -1452,7 +1467,7 @@ class MangaDexModel {
       // Craft the list
       for (final id in uuids) {
         if (await _cache.exists(id)) {
-          list.add(_cache.get(id, Author.fromJson).get<CreatorType>());
+          list.add(_cache.get<CreatorType>(id, Author.fromJson));
         }
       }
     } else {
@@ -1490,7 +1505,7 @@ class MangaDexModel {
     }
 
     if (await _cache.exists(listId)) {
-      return _cache.get(listId, CustomList.fromJson).get<CustomList>();
+      return _cache.get<CustomList>(listId, CustomList.fromJson);
     }
 
     final uri = MangaDexEndpoints.api.replace(
@@ -1504,13 +1519,13 @@ class MangaDexModel {
       final result = CustomList.fromJson(body['data']);
 
       // Cache the result
-      return (await _cache.put(
+      return await _cache.put(
         listId,
         json.encode(result.toJson()),
         result,
         true,
         unserializer: CustomList.fromJson,
-      )).get<CustomList>();
+      );
     } else if (response.statusCode == 404) {
       // List not found
       return null;
@@ -1556,7 +1571,7 @@ class MangaDexModel {
       final list = <CustomList>[];
 
       for (final e in result.data) {
-        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
+        list.add(_cache.get<CustomList>(e.id, CustomList.fromJson));
       }
 
       return list;
@@ -1641,7 +1656,7 @@ class MangaDexModel {
       final list = <CustomList>[];
 
       for (final e in result.data) {
-        list.add(_cache.get(e.id, CustomList.fromJson).get<CustomList>());
+        list.add(_cache.get<CustomList>(e.id, CustomList.fromJson));
       }
 
       return list;
@@ -1698,13 +1713,13 @@ class MangaDexModel {
           relationships: relationships,
         );
 
-        return (await _cache.put(
+        return await _cache.put(
           updated.id,
           json.encode(updated.toJson()),
           updated,
           true,
           unserializer: CustomList.fromJson,
-        )).get<CustomList>();
+        );
       }
     }
 
@@ -1789,13 +1804,13 @@ class MangaDexModel {
         final nlist = CustomList.fromJson(body['data']);
 
         // Cache the result
-        return (await _cache.put(
+        return await _cache.put(
           nlist.id,
           json.encode(nlist.toJson()),
           nlist,
           true,
           unserializer: CustomList.fromJson,
-        )).get<CustomList>();
+        );
       }
     }
 
@@ -1850,13 +1865,13 @@ class MangaDexModel {
         final nlist = CustomList.fromJson(body['data']);
 
         // Cache the result
-        return (await _cache.put(
+        return await _cache.put(
           nlist.id,
           json.encode(nlist.toJson()),
           nlist,
           true,
           unserializer: CustomList.fromJson,
-        )).get<CustomList>();
+        );
       }
     }
 
@@ -2084,6 +2099,7 @@ class UserLists extends _$UserLists
       final idx = oldstate.indexWhere((e) => e.id == result.id);
       if (idx >= 0) {
         oldstate[idx] = result;
+        ref.invalidate(listSourceProvider(result.id));
       }
     }
 
@@ -2106,6 +2122,7 @@ class UserLists extends _$UserLists
     final idx = oldstate.indexWhere((e) => e.id == result.id);
     if (idx >= 0) {
       oldstate[idx] = result;
+      ref.invalidate(listSourceProvider(result.id));
     }
 
     state = AsyncData([...oldstate]);
@@ -2122,6 +2139,7 @@ class UserLists extends _$UserLists
 
     if (result) {
       oldstate.removeWhere((e) => e.id == list.id);
+      ref.invalidate(listSourceProvider(list.id));
     }
 
     state = AsyncData([...oldstate]);
@@ -2143,6 +2161,16 @@ class UserLists extends _$UserLists
     state = AsyncData([...oldstate, result]);
 
     return result;
+  }
+
+  Future<void> replaceList(CustomList list) async {
+    final oldstate = await future;
+    final idx = oldstate.indexWhere((e) => e.id == list.id);
+    if (idx >= 0) {
+      oldstate[idx] = list;
+    }
+
+    state = AsyncData([...oldstate]);
   }
 
   @override
@@ -2204,6 +2232,16 @@ class FollowedLists extends _$FollowedLists
     return result;
   }
 
+  Future<void> replaceList(CustomList list) async {
+    final oldstate = await future;
+    final idx = oldstate.indexWhere((e) => e.id == list.id);
+    if (idx >= 0) {
+      oldstate[idx] = list;
+    }
+
+    state = AsyncData([...oldstate]);
+  }
+
   @override
   @mutation
   Future<List<CustomList>> getNextPage() async {
@@ -2232,12 +2270,26 @@ Future<List<Manga>> getMangaListByPage(
   return mangas;
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 class ListSource extends _$ListSource {
   @override
   Future<CustomList?> build(String listId) async {
     final api = ref.watch(mangadexProvider);
     final list = await api.fetchListById(listId);
+
+    if (list != null) {
+      final me = await ref.watch(loggedUserProvider.future);
+      if (me != null) {
+        if (ref.exists(userListsProvider(me.id))) {
+          ref.read(userListsProvider(me.id).notifier).replaceList(list);
+        }
+
+        if (ref.exists(followedListsProvider(me.id))) {
+          ref.read(followedListsProvider(me.id).notifier).replaceList(list);
+        }
+      }
+    }
+
     return list;
   }
 }

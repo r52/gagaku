@@ -79,20 +79,6 @@ enum MangaReadingStatus {
   String get label => '$_key$name';
 }
 
-const RatingLabel = [
-  'Remove Rating',
-  '(1) Appalling',
-  '(2) Horrible',
-  '(3) Very Bad',
-  '(4) Bad',
-  '(5) Average',
-  '(6) Fine',
-  '(7) Good',
-  '(8) Very Good',
-  '(9) Great',
-  '(10) Masterpiece',
-];
-
 enum TagGroup {
   content,
   format,
@@ -261,6 +247,12 @@ abstract class MangaFilters with _$MangaFilters {
 
     return params;
   }
+
+  bool get isEmpty {
+    return this == const MangaFilters();
+  }
+
+  bool get isDefault => isEmpty;
 }
 
 @freezed

@@ -53,6 +53,7 @@ _WebManga _$WebMangaFromJson(Map<String, dynamic> json) => _WebManga(
   chapters: (json['chapters'] as Map<String, dynamic>).map(
     (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
   ),
+  data: json['data'],
 );
 
 Map<String, dynamic> _$WebMangaToJson(_WebManga instance) => <String, dynamic>{
@@ -63,6 +64,7 @@ Map<String, dynamic> _$WebMangaToJson(_WebManga instance) => <String, dynamic>{
   'cover': instance.cover,
   'groups': instance.groups,
   'chapters': instance.chapters.map((k, e) => MapEntry(k, e.toJson())),
+  'data': instance.data,
 };
 
 _WebChapter _$WebChapterFromJson(Map<String, dynamic> json) => _WebChapter(
@@ -73,6 +75,7 @@ _WebChapter _$WebChapterFromJson(Map<String, dynamic> json) => _WebChapter(
     json['release_date'],
   ),
   groups: json['groups'] as Map<String, dynamic>,
+  data: json['data'],
 );
 
 Map<String, dynamic> _$WebChapterToJson(
@@ -85,6 +88,7 @@ Map<String, dynamic> _$WebChapterToJson(
     instance.releaseDate,
   ),
   'groups': instance.groups,
+  'data': instance.data,
 };
 
 _ImgurPage _$ImgurPageFromJson(Map<String, dynamic> json) => _ImgurPage(
@@ -100,10 +104,16 @@ _WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String,
       repo: json['repo'] as String,
+      baseUrl: json['baseUrl'] as String,
       version:
           $enumDecodeNullable(_$SupportedVersionEnumMap, json['version']) ??
           SupportedVersion.v0_8,
-      icon: json['icon'] as String?,
+      icon: json['icon'] as String,
+      capabilities:
+          (json['capabilities'] as List<dynamic>?)
+              ?.map(const SourceIntentParser().fromJson)
+              .toList() ??
+          const [SourceIntents.mangaChapters],
     );
 
 Map<String, dynamic> _$WebSourceInfoToJson(_WebSourceInfo instance) =>
@@ -111,22 +121,11 @@ Map<String, dynamic> _$WebSourceInfoToJson(_WebSourceInfo instance) =>
       'id': instance.id,
       'name': instance.name,
       'repo': instance.repo,
+      'baseUrl': instance.baseUrl,
       'version': _$SupportedVersionEnumMap[instance.version]!,
       'icon': instance.icon,
-    };
-
-_SourceIdentifier _$SourceIdentifierFromJson(Map<String, dynamic> json) =>
-    _SourceIdentifier(
-      internal: WebSourceInfo.fromJson(
-        json['internal'] as Map<String, dynamic>,
-      ),
-      external: SourceInfo.fromJson(json['external'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$SourceIdentifierToJson(_SourceIdentifier instance) =>
-    <String, dynamic>{
-      'internal': instance.internal.toJson(),
-      'external': instance.external.toJson(),
+      'capabilities':
+          instance.capabilities.map(const SourceIntentParser().toJson).toList(),
     };
 
 _Badge _$BadgeFromJson(Map<String, dynamic> json) => _Badge(
@@ -177,38 +176,6 @@ const _$ContentRatingEnumMap = {
   ContentRating.MATURE: 'MATURE',
   ContentRating.ADULT: 'ADULT',
 };
-
-_SourceInfo _$SourceInfoFromJson(Map<String, dynamic> json) => _SourceInfo(
-  name: json['name'] as String,
-  author: json['author'] as String,
-  description: json['description'] as String,
-  contentRating: $enumDecode(_$ContentRatingEnumMap, json['contentRating']),
-  version: json['version'] as String,
-  icon: json['icon'] as String,
-  websiteBaseURL: json['websiteBaseURL'] as String,
-  authorWebsite: json['authorWebsite'] as String?,
-  language: json['language'] as String?,
-  sourceTags:
-      (json['sourceTags'] as List<dynamic>?)
-          ?.map((e) => Badge.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  intents: (json['intents'] as num?)?.toInt(),
-);
-
-Map<String, dynamic> _$SourceInfoToJson(_SourceInfo instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'author': instance.author,
-      'description': instance.description,
-      'contentRating': _$ContentRatingEnumMap[instance.contentRating]!,
-      'version': instance.version,
-      'icon': instance.icon,
-      'websiteBaseURL': instance.websiteBaseURL,
-      'authorWebsite': instance.authorWebsite,
-      'language': instance.language,
-      'sourceTags': instance.sourceTags?.map((e) => e.toJson()).toList(),
-      'intents': instance.intents,
-    };
 
 _BuiltWith _$BuiltWithFromJson(Map<String, dynamic> json) => _BuiltWith(
   toolchain: json['toolchain'] as String,
@@ -341,7 +308,7 @@ _Chapter _$ChapterFromJson(Map<String, dynamic> json) => _Chapter(
   name: json['name'] as String?,
   volume: json['volume'] as num?,
   group: json['group'] as String?,
-  time: const TimestampSerializer().fromJson(json['time']),
+  time: const NullableTimestampSerializer().fromJson(json['time']),
   sortingIndex: json['sortingIndex'] as num?,
 );
 
@@ -352,17 +319,9 @@ Map<String, dynamic> _$ChapterToJson(_Chapter instance) => <String, dynamic>{
   'name': instance.name,
   'volume': instance.volume,
   'group': instance.group,
-  'time': _$JsonConverterToJson<dynamic, DateTime>(
-    instance.time,
-    const TimestampSerializer().toJson,
-  ),
+  'time': const NullableTimestampSerializer().toJson(instance.time),
   'sortingIndex': instance.sortingIndex,
 };
-
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) => value == null ? null : toJson(value);
 
 _ChapterDetails _$ChapterDetailsFromJson(Map<String, dynamic> json) =>
     _ChapterDetails(

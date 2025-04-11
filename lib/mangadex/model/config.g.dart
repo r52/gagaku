@@ -154,7 +154,7 @@ class _$MdConfigElement
   @override
   void mount() {
     super.mount();
-    _$save.result!.stateOrNull!.reset();
+    _$save.result!.value!.reset();
   }
 
   @override

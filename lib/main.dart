@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
@@ -19,6 +20,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:rhttp/rhttp.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class _HttpOverrides extends HttpOverrides {
@@ -31,7 +33,8 @@ class _HttpOverrides extends HttpOverrides {
 void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
+  LocaleSettings.useDeviceLocale();
+  await Rhttp.init();
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
@@ -77,16 +80,7 @@ void main() async {
   final gdat = GagakuData();
   gdat.gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
-  runApp(
-    ProviderScope(
-      child: EasyLocalization(
-        supportedLocales: [Locale('en')],
-        path: 'assets/translations',
-        fallbackLocale: Locale('en'),
-        child: App(),
-      ),
-    ),
-  );
+  runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
 
 class App extends ConsumerWidget {
@@ -100,9 +94,9 @@ class App extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Gagaku',
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      locale: TranslationProvider.of(context).flutterLocale,
       theme: ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
@@ -147,14 +141,13 @@ class NotFoundScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     return Scaffold(
       appBar: AppBar(
-        title: Text('errors.pageNotFound'.tr(context: context)),
+        title: Text(t.errors.pageNotFound),
         leading: AutoLeadingButton(),
       ),
-      body: Center(
-        child: Text('errors.pageNotFoundArg'.tr(context: context, args: [uri])),
-      ),
+      body: Center(child: Text(t.errors.pageNotFoundArg(url: uri))),
     );
   }
 }

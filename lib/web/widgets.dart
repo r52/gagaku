@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -50,6 +51,7 @@ class WebMangaListWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final scrollController =
         controller ?? (noController ? null : useScrollController());
     final view =
@@ -85,12 +87,12 @@ class WebMangaListWidget extends HookConsumerWidget {
                           ButtonSegment<WebMangaListView>(
                             value: WebMangaListView.grid,
                             icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: 'ui.gridView'.tr(context: context),
+                            tooltip: tr.ui.gridView,
                           ),
                           ButtonSegment<WebMangaListView>(
                             value: WebMangaListView.list,
                             icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: 'ui.listView'.tr(context: context),
+                            tooltip: tr.ui.listView,
                           ),
                         ],
                         selected: <WebMangaListView>{view},
@@ -175,6 +177,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                               : theme.colorScheme.surfaceContainerHighest,
                       leading: Consumer(
                         builder: (context, refx, child) {
+                          final tr = context.t;
                           final favorited = ref.watch(
                             webSourceFavoritesProvider.select(
                               (value) => switch (value) {
@@ -192,12 +195,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           return IconButton(
                             tooltip:
                                 favorited
-                                    ? 'mangaActions.unfavorite'.tr(
-                                      context: context,
-                                    )
-                                    : 'mangaActions.favorite'.tr(
-                                      context: context,
-                                    ),
+                                    ? tr.mangaActions.unfavorite
+                                    : tr.mangaActions.favorite,
                             icon: Icon(
                               favorited
                                   ? Icons.favorite
@@ -220,6 +219,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       title: Text(item.title),
                       textColor: Colors.blue,
                       onTap: () async {
+                        final tr = context.t;
                         final messenger = ScaffoldMessenger.of(context);
                         final parseResult = await api.handleUrl(
                           url: item.url,
@@ -232,9 +232,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             ..removeCurrentSnackBar()
                             ..showSnackBar(
                               SnackBar(
-                                content: Text(
-                                  'errors.unsupportedUrl'.tr(context: context),
-                                ),
+                                content: Text(tr.errors.unsupportedUrl),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -249,6 +247,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 separatorBuilder: (_, __) => const SizedBox(height: 4.0),
                 findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
+                  final tr = context.t;
                   final item = items!.elementAt(index);
                   return ListTile(
                     key: ValueKey(item.hashCode),
@@ -276,12 +275,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         return IconButton(
                           tooltip:
                               favorited
-                                  ? 'mangaActions.unfavorite'.tr(
-                                    context: context,
-                                  )
-                                  : 'mangaActions.favorite'.tr(
-                                    context: context,
-                                  ),
+                                  ? tr.mangaActions.unfavorite
+                                  : tr.mangaActions.favorite,
                           icon: Icon(
                             favorited ? Icons.favorite : Icons.favorite_border,
                           ),
@@ -300,9 +295,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       },
                     ),
                     trailing: IconButton(
-                      tooltip: 'mangaActions.removeHistory'.tr(
-                        context: context,
-                      ),
+                      tooltip: tr.mangaActions.removeHistory,
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () async {
                         ref.read(webSourceHistoryProvider.remove)(item);
@@ -311,6 +304,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     title: Text(item.title),
                     textColor: Colors.blue,
                     onTap: () async {
+                      final tr = context.t;
                       final messenger = ScaffoldMessenger.of(context);
                       final parseResult = await api.handleUrl(
                         url: item.url,
@@ -323,9 +317,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
                             SnackBar(
-                              content: Text(
-                                'errors.unsupportedUrl'.tr(context: context),
-                              ),
+                              content: Text(tr.errors.unsupportedUrl),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -371,6 +363,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
               builderDelegate: PagedChildBuilderDelegate<HistoryLink>(
                 animateTransitions: true,
                 itemBuilder: (context, item, index) {
+                  final tr = context.t;
                   return ListTile(
                     key: ValueKey(item.hashCode),
                     tileColor:
@@ -397,12 +390,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         return IconButton(
                           tooltip:
                               favorited
-                                  ? 'mangaActions.unfavorite'.tr(
-                                    context: context,
-                                  )
-                                  : 'mangaActions.favorite'.tr(
-                                    context: context,
-                                  ),
+                                  ? tr.mangaActions.unfavorite
+                                  : tr.mangaActions.favorite,
                           icon: Icon(
                             favorited ? Icons.favorite : Icons.favorite_border,
                           ),
@@ -421,9 +410,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       },
                     ),
                     trailing: IconButton(
-                      tooltip: 'mangaActions.removeHistory'.tr(
-                        context: context,
-                      ),
+                      tooltip: tr.mangaActions.removeHistory,
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () async {
                         ref.read(webSourceHistoryProvider.remove)(item);
@@ -432,6 +419,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     title: Text(item.title),
                     textColor: Colors.blue,
                     onTap: () async {
+                      final tr = context.t;
                       final messenger = ScaffoldMessenger.of(context);
                       final parseResult = await api.handleUrl(
                         url: item.url,
@@ -444,9 +432,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
                             SnackBar(
-                              content: Text(
-                                'errors.unsupportedUrl'.tr(context: context),
-                              ),
+                              content: Text(tr.errors.unsupportedUrl),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -504,6 +490,7 @@ class GridMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     useAutomaticKeepAlive();
     final api = ref.watch(proxyProvider);
     final aniController = useAnimationController(
@@ -520,6 +507,7 @@ class GridMangaItem extends HookConsumerWidget {
           link.cover != null
               ? CachedNetworkImage(
                 imageUrl: link.cover!,
+                cacheManager: gagakuImageCache,
                 width: 256.0,
                 progressIndicatorBuilder:
                     (context, url, downloadProgress) =>
@@ -544,7 +532,7 @@ class GridMangaItem extends HookConsumerWidget {
             ..removeCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
-                content: Text('errors.unsupportedUrl'.tr(context: context)),
+                content: Text(tr.errors.unsupportedUrl),
                 backgroundColor: Colors.red,
               ),
             );
@@ -589,8 +577,8 @@ class GridMangaItem extends HookConsumerWidget {
                     shape: const CircleBorder(),
                     tooltip:
                         favorited
-                            ? 'mangaActions.unfavorite'.tr(context: context)
-                            : 'mangaActions.favorite'.tr(context: context),
+                            ? tr.mangaActions.unfavorite
+                            : tr.mangaActions.favorite,
                     onPressed: () async {
                       if (favorited) {
                         ref.read(webSourceFavoritesProvider.remove)(
@@ -618,7 +606,7 @@ class GridMangaItem extends HookConsumerWidget {
                 heroTag: UniqueKey(),
                 mini: true,
                 shape: const CircleBorder(),
-                tooltip: 'mangaActions.removeHistory'.tr(context: context),
+                tooltip: tr.mangaActions.removeHistory,
                 onPressed: () async {
                   ref.read(webSourceHistoryProvider.remove)(link);
                 },

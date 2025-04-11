@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
@@ -11,7 +11,6 @@ import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:gagaku/web/search.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -24,6 +23,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final scrollController =
         DefaultScrollController.maybeOf(context, 'WebSourceFrontPage') ??
         controller ??
@@ -47,23 +47,18 @@ class WebSourceFrontPage extends HookConsumerWidget {
               builder: (BuildContext context) {
                 final nav = Navigator.of(context);
                 return AlertDialog(
-                  title: Text('webSources.repo.add'.tr(context: context)),
+                  title: Text(tr.webSources.repo.add),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'webSources.repo.addConfirm'.tr(
-                          context: context,
-                          args: [name],
-                        ),
-                      ),
-                      Text('webSources.repo.addWarning'.tr(context: context)),
+                      Text(tr.webSources.repo.addConfirm(repo: name)),
+                      Text(tr.webSources.repo.addWarning),
                     ],
                   ),
                   actions: <Widget>[
                     ElevatedButton(
-                      child: Text('ui.no'.tr(context: context)),
+                      child: Text(tr.ui.no),
                       onPressed: () {
                         nav.pop(null);
                       },
@@ -72,7 +67,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
                       onPressed: () {
                         nav.pop(true);
                       },
-                      child: Text('ui.yes'.tr(context: context)),
+                      child: Text(tr.ui.yes),
                     ),
                   ],
                 );
@@ -89,9 +84,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text(
-                        'webSources.repo.repoExists'.tr(context: context),
-                      ),
+                      content: Text(tr.webSources.repo.repoExists),
                       backgroundColor: Colors.orange,
                     ),
                   );
@@ -103,9 +96,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text(
-                        'webSources.repo.repoAddOK'.tr(context: context),
-                      ),
+                      content: Text(tr.webSources.repo.repoAddOK),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -119,11 +110,11 @@ class WebSourceFrontPage extends HookConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: extensionInfoListProvider,
-      builder: (BuildContext context, List<SourceIdentifier> sources) {
-        final homepageSources = <SourceIdentifier>[];
+      builder: (BuildContext context, sources) {
+        final homepageSources = <WebSourceInfo>[];
 
         for (final source in sources) {
-          if (source.external.hasIntent(SourceIntents.homepageSections)) {
+          if (source.hasCapability(SourceIntents.homepageSections)) {
             homepageSources.add(source);
           }
         }
@@ -135,17 +126,13 @@ class WebSourceFrontPage extends HookConsumerWidget {
               automaticallyImplyLeading: false,
               pinned: true,
               title: Text(
-                'webSources.homepages'.tr(context: context),
+                tr.webSources.homepages,
                 style: TextStyle(fontSize: 24),
               ),
             ),
             if (homepageSources.isEmpty)
               SliverToBoxAdapter(
-                child: Center(
-                  child: Text(
-                    "webSources.noSourcesWarning".tr(context: context),
-                  ),
-                ),
+                child: Center(child: Text(tr.webSources.noSourcesWarning)),
               ),
             if (homepageSources.isNotEmpty)
               SliverList.builder(
@@ -156,16 +143,14 @@ class WebSourceFrontPage extends HookConsumerWidget {
                   return Card(
                     child: ListTile(
                       leading:
-                          item.internal.icon != null
-                              ? Image.network(
-                                item.internal.icon!,
-                                width: 36,
-                                height: 36,
-                              )
+                          item.icon.isNotEmpty
+                              ? Image.network(item.icon, width: 36, height: 36)
                               : const Icon(Icons.rss_feed),
-                      title: Text(item.external.name),
+                      title: Text(item.name),
                       onTap: () {
-                        context.router.push(ExtensionHomeRoute(source: item));
+                        context.router.push(
+                          ExtensionHomeRoute(sourceId: item.id, source: item),
+                        );
                       },
                     ),
                   );
@@ -179,13 +164,40 @@ class WebSourceFrontPage extends HookConsumerWidget {
 }
 
 @RoutePage()
-class ExtensionHomePage extends HookConsumerWidget {
-  final SourceIdentifier source;
+class ExtensionHomePage extends StatelessWidget {
+  const ExtensionHomePage({
+    super.key,
+    @PathParam() required this.sourceId,
+    this.source,
+  });
 
-  const ExtensionHomePage({super.key, required this.source});
+  final String sourceId;
+  final WebSourceInfo? source;
+
+  @override
+  Widget build(BuildContext context) {
+    if (source != null) {
+      return ExtensionHomeWidget(source: source!);
+    }
+
+    return DataProviderWhenWidget(
+      provider: getExtensionFromIdProvider(sourceId),
+      errorBuilder: (context, child, _, __) => Scaffold(body: child),
+      builder: (context, data) {
+        return ExtensionHomeWidget(source: data);
+      },
+    );
+  }
+}
+
+class ExtensionHomeWidget extends HookConsumerWidget {
+  final WebSourceInfo source;
+
+  const ExtensionHomeWidget({super.key, required this.source});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final theme = Theme.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
@@ -193,10 +205,7 @@ class ExtensionHomePage extends HookConsumerWidget {
     final controller = useScrollController();
     final refresh = useState(0);
     final results = useMemoized(
-      () =>
-          ref
-              .read(extensionSourceProvider(source.internal.id).notifier)
-              .getHomePage(),
+      () => ref.read(extensionSourceProvider(source.id).notifier).getHomePage(),
       [source, refresh.value],
     );
     final future = useFuture(results);
@@ -205,7 +214,7 @@ class ExtensionHomePage extends HookConsumerWidget {
     if (future.hasError) {
       final error = future.error!;
       final stackTrace = future.stackTrace!;
-      final msg = "ExtensionSource(${source.internal.id}).getHomePage() failed";
+      final msg = "ExtensionSource(${source.id}).getHomePage() failed";
 
       Styles.showErrorSnackBar(messenger, '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
@@ -252,10 +261,7 @@ class ExtensionHomePage extends HookConsumerWidget {
         }
         final mangas =
             section.items
-                .map(
-                  (e) =>
-                      HistoryLink.fromPartialSourceManga(source.internal.id, e),
-                )
+                .map((e) => HistoryLink.fromPartialSourceManga(source.id, e))
                 .toList();
         homepageWidgets.add(MangaCarousel(items: mangas));
       }
@@ -283,7 +289,7 @@ class ExtensionHomePage extends HookConsumerWidget {
               curve: Curves.easeOutCirc,
             );
           },
-          child: TitleFlexBar(title: source.external.name),
+          child: TitleFlexBar(title: source.name),
         ),
         leading: AutoLeadingButton(),
         actions: [
@@ -294,19 +300,12 @@ class ExtensionHomePage extends HookConsumerWidget {
                 color: theme.colorScheme.onPrimaryContainer,
                 icon: const Icon(Icons.search),
                 onPressed:
-                    () => nav.push(
-                      SlideTransitionRouteBuilder(
-                        pageBuilder:
-                            (context, animation, secondaryAnimation) =>
-                                WebSourceSearchWidget(source: source),
-                      ),
+                    () => context.router.push(
+                      ExtensionSearchRoute(sourceId: source.id, source: source),
                     ),
-                tooltip: 'search.arg'.tr(
-                  context: context,
-                  args: [source.external.name],
-                ),
+                tooltip: tr.search.arg(arg: source.name),
               ),
-              if (source.external.hasIntent(SourceIntents.settingsUI))
+              if (source.hasCapability(SourceIntents.settingsUI))
                 IconButton(
                   color: theme.colorScheme.onPrimaryContainer,
                   icon: const Icon(Icons.settings),
@@ -318,7 +317,7 @@ class ExtensionHomePage extends HookConsumerWidget {
                                   ExtensionSettingsPage(source: source),
                         ),
                       ),
-                  tooltip: 'webSources.source.settings'.tr(context: context),
+                  tooltip: tr.webSources.source.settings,
                 ),
             ],
           ),
@@ -329,11 +328,14 @@ class ExtensionHomePage extends HookConsumerWidget {
           refresh.value++;
           return results;
         },
-        child: CustomScrollView(
-          scrollBehavior: const MouseTouchScrollBehavior(),
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: controller,
-          slivers: slivers,
+        child: ScrollConfiguration(
+          behavior: const MouseTouchScrollBehavior(),
+          child: CustomScrollView(
+            scrollBehavior: const MouseTouchScrollBehavior(),
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: controller,
+            slivers: slivers,
+          ),
         ),
       ),
     );
@@ -343,7 +345,7 @@ class ExtensionHomePage extends HookConsumerWidget {
 class _HomeSectionPage extends StatefulHookConsumerWidget {
   const _HomeSectionPage({required this.source, required this.section});
 
-  final SourceIdentifier source;
+  final WebSourceInfo source;
   final HomeSection section;
 
   @override
@@ -359,11 +361,11 @@ class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
         (state) => state.keys?.last == null ? {'page': 1} : metadata,
     fetchPage: (pageKey) async {
       final results = await ref
-          .read(extensionSourceProvider(widget.source.internal.id).notifier)
+          .read(extensionSourceProvider(widget.source.id).notifier)
           .getHomeSectionMore(widget.section.id, metadata);
 
       final m = results.results?.map(
-        (e) => HistoryLink.fromPartialSourceManga(widget.source.internal.id, e),
+        (e) => HistoryLink.fromPartialSourceManga(widget.source.id, e),
       );
 
       metadata = results.metadata;

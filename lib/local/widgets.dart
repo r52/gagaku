@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/util/ui.dart';
@@ -28,7 +28,9 @@ class LibraryListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gridExtent = ref.watch(gagakuSettingsProvider.select((c) => c.gridAlbumExtent));
+    final gridExtent = ref.watch(
+      gagakuSettingsProvider.select((c) => c.gridAlbumExtent),
+    );
     return CustomScrollView(
       scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
@@ -36,13 +38,14 @@ class LibraryListWidget extends ConsumerWidget {
         ...leading,
         SliverAppBar(
           pinned: true,
-          leading: (item.parent != null && onTap != null)
-              ? BackButton(
-                  onPressed: () {
-                    onTap!(item.parent!);
-                  },
-                )
-              : const SizedBox.shrink(),
+          leading:
+              (item.parent != null && onTap != null)
+                  ? BackButton(
+                    onPressed: () {
+                      onTap!(item.parent!);
+                    },
+                  )
+                  : const SizedBox.shrink(),
           title: title,
           actions: [
             const GridExtentSlider(),
@@ -72,13 +75,17 @@ class LibraryListWidget extends ConsumerWidget {
                       ref.read(librarySortTypeProvider.notifier).state = sort;
                     }
                   },
-                  dropdownMenuEntries: List<DropdownMenuEntry<LibrarySort>>.generate(
-                    LibrarySort.values.length,
-                    (int index) => DropdownMenuEntry<LibrarySort>(
-                      value: LibrarySort.values.elementAt(index),
-                      label: context.tr(LibrarySort.values.elementAt(index).label),
-                    ),
-                  ),
+                  dropdownMenuEntries:
+                      List<DropdownMenuEntry<LibrarySort>>.generate(
+                        LibrarySort.values.length,
+                        (int index) => DropdownMenuEntry<LibrarySort>(
+                          value: LibrarySort.values.elementAt(index),
+                          label:
+                              context.t[LibrarySort.values
+                                  .elementAt(index)
+                                  .label],
+                        ),
+                      ),
                 );
               },
             ),
@@ -98,11 +105,7 @@ class LibraryListWidget extends ConsumerWidget {
           },
           itemBuilder: (context, index) {
             final i = item.children.elementAt(index);
-            return _GridLibraryItem(
-              key: ValueKey(i.id),
-              item: i,
-              onTap: onTap,
-            );
+            return _GridLibraryItem(key: ValueKey(i.id), item: i, onTap: onTap);
           },
           itemCount: item.children.length,
         ),
@@ -112,11 +115,7 @@ class LibraryListWidget extends ConsumerWidget {
 }
 
 class _GridLibraryItem extends HookWidget {
-  const _GridLibraryItem({
-    super.key,
-    required this.item,
-    this.onTap,
-  });
+  const _GridLibraryItem({super.key, required this.item, this.onTap});
 
   final LocalLibraryItem item;
   final LibraryItemTapCallback? onTap;
@@ -124,21 +123,26 @@ class _GridLibraryItem extends HookWidget {
   @override
   Widget build(BuildContext context) {
     useAutomaticKeepAlive();
-    final aniController = useAnimationController(duration: const Duration(milliseconds: 100));
-    final gradient = useAnimation(aniController.drive(Styles.coverArtGradientTween));
+    final aniController = useAnimationController(
+      duration: const Duration(milliseconds: 100),
+    );
+    final gradient = useAnimation(
+      aniController.drive(Styles.coverArtGradientTween),
+    );
 
     final image = GridAlbumImage(
       gradient: gradient,
-      child: item.thumbnail != null
-          ? Image.file(
-              File(item.thumbnail!),
-              width: 256.0,
-              fit: BoxFit.cover,
-            )
-          : Icon(
-              item.isReadable ? Icons.menu_book : Icons.folder,
-              size: 128.0,
-            ),
+      child:
+          item.thumbnail != null
+              ? Image.file(
+                File(item.thumbnail!),
+                width: 256.0,
+                fit: BoxFit.cover,
+              )
+              : Icon(
+                item.isReadable ? Icons.menu_book : Icons.folder,
+                size: 128.0,
+              ),
     );
 
     return Tooltip(
@@ -158,10 +162,7 @@ class _GridLibraryItem extends HookWidget {
           }
         },
         child: GridTile(
-          footer: GridAlbumTextBar(
-            height: 80,
-            text: item.name ?? item.path,
-          ),
+          footer: GridAlbumTextBar(height: 80, text: item.name ?? item.path),
           child: image,
         ),
       ),

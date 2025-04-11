@@ -158,3 +158,42 @@ class ExtensionState extends _$ExtensionState {
     box.put('extension-state', json.encode(state));
   }
 }
+
+@Riverpod(keepAlive: true)
+class ExtensionSecureState extends _$ExtensionSecureState {
+  ExtensionStateMap _fetch() {
+    final box = Hive.box(gagakuBox);
+    final str = box.get('extension-secure-state');
+
+    if (str == null) {
+      return {};
+    }
+
+    final content = json.decode(str) as Map<String, dynamic>;
+
+    final result = content.cast<String, Map<String, dynamic>>();
+
+    return result;
+  }
+
+  @override
+  ExtensionStateMap build() {
+    return _fetch();
+  }
+
+  dynamic getState(String sourceId, String stateName) {
+    final result = state[sourceId]?[stateName];
+    return result;
+  }
+
+  void setState(String sourceId, String stateName, dynamic data) {
+    if (!state.containsKey(sourceId)) {
+      state[sourceId] = {};
+    }
+
+    state[sourceId]![stateName] = data;
+
+    final box = Hive.box(gagakuBox);
+    box.put('extension-secure-state', json.encode(state));
+  }
+}

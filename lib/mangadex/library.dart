@@ -1,15 +1,16 @@
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -28,7 +29,7 @@ class LibraryViewType extends _$LibraryViewType {
   ) => state = cb(state);
 }
 
-@riverpod
+@Riverpod(retry: noRetry)
 Future<List<String>> _getLibraryListByType(
   Ref ref,
   MangaReadingStatus type,
@@ -66,6 +67,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
     final me = ref.watch(loggedUserProvider).value;
     final scrollController =
         DefaultScrollController.maybeOf(context, 'MangaDexLibraryPage') ??
@@ -97,10 +99,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
       controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
-          MangaDexSliverAppBar(
-            title: 'library'.tr(context: context),
-            controller: scrollController,
-          ),
+          MangaDexSliverAppBar(title: t.library, controller: scrollController),
           SliverOverlapAbsorber(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             sliver: SliverAppBar(
@@ -114,8 +113,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                 controller: tabController,
                 tabs: List<Tab>.generate(
                   statuses.length,
-                  (int index) =>
-                      Tab(text: context.tr(statuses.elementAt(index).label)),
+                  (int index) => Tab(text: t[statuses.elementAt(index).label]),
                 ),
               ),
             ),
@@ -155,7 +153,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
 
                                   return MangaListWidget(
                                     title: Text(
-                                      'num_manga'.plural(list.length),
+                                      t.num_manga(n: list.length),
                                       style: const TextStyle(fontSize: 24),
                                     ),
                                     physics:
@@ -176,11 +174,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                                               future.data!.isEmpty))
                                         SliverToBoxAdapter(
                                           child: Center(
-                                            child: Text(
-                                              'errors.notitles'.tr(
-                                                context: context,
-                                              ),
-                                            ),
+                                            child: Text(t.errors.notitles),
                                           ),
                                         ),
                                       if (future.hasData && future.data != null)
@@ -201,6 +195,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                                     1,
                                   ),
                                   onPageChange: (int index) {
+                                    scrollController.jumpTo(0.0);
                                     currentPage.value = index;
                                   },
                                 );

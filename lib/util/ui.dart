@@ -1,7 +1,8 @@
 import 'package:animations/animations.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
@@ -23,12 +24,13 @@ class GridExtentSlider extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final cfg = ref.watch(gagakuSettingsProvider);
     return MenuAnchor(
       menuChildren: <Widget>[
         Padding(
           padding: EdgeInsets.only(left: 10, top: 10),
-          child: Text('ui.gridSize'.tr(context: context)),
+          child: Text(tr.ui.gridSize),
         ),
         Slider(
           value: cfg.gridAlbumExtent.index.toDouble(),
@@ -45,7 +47,7 @@ class GridExtentSlider extends ConsumerWidget {
       ],
       builder: (_, MenuController controller, Widget? child) {
         return IconButton(
-          tooltip: 'ui.gridSize'.tr(context: context),
+          tooltip: tr.ui.gridSize,
           onPressed: () {
             if (controller.isOpen) {
               controller.close();
@@ -602,11 +604,17 @@ class ListSpinner extends StatelessWidget {
   }
 }
 
-typedef DataProviderOrBuilder<T> =
-    Widget Function(BuildContext context, T data);
+typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
 typedef LoadingBuilder = Widget Function(BuildContext context, num? progress);
 typedef ErrorWrapperBuilder =
-    Widget Function(BuildContext context, Widget child);
+    Widget Function(
+      BuildContext context,
+      Widget defaultChild,
+      Object error,
+      StackTrace stacktrace,
+    );
+typedef ErrorBuilder =
+    Widget Function(BuildContext context, Object error, StackTrace stacktrace);
 
 class DataProviderWhenWidget<T> extends ConsumerWidget {
   const DataProviderWhenWidget({
@@ -621,7 +629,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
 
   final Refreshable<AsyncValue<T>> provider;
   final AsyncValue<T>? initialData;
-  final DataProviderOrBuilder<T> builder;
+  final DataBuilder<T> builder;
   final ErrorWrapperBuilder? errorBuilder;
   final Widget? loadingWidget;
   final LoadingBuilder? loadingBuilder;
@@ -640,7 +648,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
         );
 
         if (errorBuilder != null) {
-          return errorBuilder!(context, errorlist);
+          return errorBuilder!(context, errorlist, error, stackTrace);
         }
 
         return errorlist;
@@ -654,6 +662,47 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
 
         return loadingWidget ?? ListSpinner(progress: progress?.toDouble());
     }
+  }
+}
+
+class SimpleFutureBuilder<T> extends HookWidget {
+  final Future<T> Function() futureBuilder;
+  final List<Object?> keys;
+  final DataBuilder<T?> builder;
+  final Widget Function(BuildContext)? loadingBuilder;
+  final ErrorBuilder? errorBuilder;
+
+  const SimpleFutureBuilder({
+    super.key,
+    required this.futureBuilder,
+    this.keys = const <Object>[],
+    required this.builder,
+    this.loadingBuilder,
+    this.errorBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final results = useMemoized(futureBuilder, keys);
+    final future = useFuture(results);
+
+    if (future.hasError) {
+      if (errorBuilder != null) {
+        return errorBuilder!(context, future.error!, future.stackTrace!);
+      }
+
+      return const Center(child: Icon(Icons.error));
+    }
+
+    if (future.connectionState == ConnectionState.waiting || !future.hasData) {
+      if (loadingBuilder != null) {
+        return loadingBuilder!(context);
+      }
+
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return builder(context, future.data);
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -18,6 +18,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final api = ref.watch(proxyProvider);
     final defaultCategory = ref.watch(
       webConfigProvider.select((cfg) => cfg.defaultCategory),
@@ -39,13 +40,15 @@ class WebSourceHistoryPage extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10.0,
             children: [
-              const Tooltip(
-                message: 'Supported URLs:\ncubari.moe\nimgur.com',
+              Tooltip(
+                message: tr.webSources.supportedUrl.arg(
+                  arg: '\ncubari.moe\nimgur.com',
+                ),
                 padding: EdgeInsets.all(6),
                 triggerMode: TooltipTriggerMode.tap,
                 child: Wrap(
                   children: [
-                    Text('Supported URLs'),
+                    Text(tr.webSources.supportedUrl.text),
                     Icon(Icons.help, size: 20),
                   ],
                 ),
@@ -53,7 +56,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
               ElevatedButton.icon(
                 onPressed: () => openLinkDialog(context, api),
                 icon: const Icon(Icons.link),
-                label: const Text('Open Link'),
+                label: Text(tr.webSources.openLink),
               ),
             ],
           ),
@@ -65,10 +68,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
             SliverAppBar(
               automaticallyImplyLeading: false,
               pinned: true,
-              title: Text(
-                'history.text'.tr(context: context),
-                style: TextStyle(fontSize: 24),
-              ),
+              title: Text(tr.history.text, style: TextStyle(fontSize: 24)),
               actions: [
                 ElevatedButton.icon(
                   style: Styles.buttonStyle(),
@@ -77,19 +77,17 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text('history.clear'.tr(context: context)),
-                          content: Text(
-                            'history.clearWarning'.tr(context: context),
-                          ),
+                          title: Text(tr.history.clear),
+                          content: Text(tr.history.clearWarning),
                           actions: <Widget>[
                             TextButton(
-                              child: Text('ui.no'.tr(context: context)),
+                              child: Text(tr.ui.no),
                               onPressed: () {
                                 Navigator.of(context).pop(false);
                               },
                             ),
                             ElevatedButton(
-                              child: Text('ui.yes'.tr(context: context)),
+                              child: Text(tr.ui.yes),
                               onPressed: () {
                                 Navigator.of(context).pop(true);
                               },
@@ -104,7 +102,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                     }
                   },
                   icon: const Icon(Icons.clear_all),
-                  label: Text('history.clear'.tr(context: context)),
+                  label: Text(tr.history.clear),
                 ),
               ],
             ),

@@ -92,6 +92,16 @@ class AppRouter extends RootStackRouter {
       transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
     ),
     CustomRoute(
+      path: GagakuRoute.tag,
+      page: MangaDexTagViewRoute.page,
+      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
+    ),
+    CustomRoute(
+      path: GagakuRoute.tagAlt,
+      page: MangaDexTagViewWithNameRoute.page,
+      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
+    ),
+    CustomRoute(
       path: GagakuRoute.login,
       page: MangaDexLoginRoute.page,
       transitionsBuilder: Styles.slideTransitionBuilder,
@@ -147,6 +157,11 @@ class AppRouter extends RootStackRouter {
     CustomRoute(
       path: GagakuRoute.extensionHomePage,
       page: ExtensionHomeRoute.page,
+      transitionsBuilder: Styles.slideTransitionBuilder,
+    ),
+    CustomRoute(
+      path: GagakuRoute.extensionSearch,
+      page: ExtensionSearchRoute.page,
       transitionsBuilder: Styles.slideTransitionBuilder,
     ),
     CustomRoute(

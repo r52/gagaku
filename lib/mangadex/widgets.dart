@@ -2,21 +2,22 @@
 import 'package:animations/animations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
-import 'package:gagaku/mangadex/search.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/reader/main.dart';
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -68,6 +69,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final theme = Theme.of(context);
 
     final flex = GestureDetector(
@@ -85,27 +87,14 @@ class MangaDexSliverAppBar extends StatelessWidget {
       OverflowBar(
         spacing: 8.0,
         children: [
-          Tooltip(
-            message: 'search.arg'.tr(context: context, args: ['MangaDex']),
-            child: OpenContainer(
-              closedColor: theme.colorScheme.primaryContainer,
-              closedShape: const CircleBorder(),
-              closedElevation: 0.0,
-              closedBuilder: (context, openContainer) {
-                return IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    openContainer();
-                  },
-                );
-              },
-              openBuilder: (context, closedContainer) {
-                return const MangaDexSearchPage();
-              },
-            ),
+          IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
+            icon: const Icon(Icons.search),
+            onPressed: () => context.router.push(MangaDexSearchRoute()),
+            tooltip: tr.search.arg(arg: 'MangaDex'),
           ),
           Tooltip(
-            message: 'arg_settings'.tr(context: context, args: ['MangaDex']),
+            message: tr.arg_settings(arg: 'MangaDex'),
             child: OpenContainer<bool>(
               closedColor: theme.colorScheme.primaryContainer,
               closedShape: const CircleBorder(),
@@ -133,7 +122,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                   me == null
                       ? IconButton(
                         color: theme.colorScheme.primary,
-                        tooltip: 'auth.login'.tr(context: context),
+                        tooltip: tr.auth.login,
                         icon: const Icon(Icons.login),
                         onPressed:
                             () => context.router.push(MangaDexLoginRoute()),
@@ -160,9 +149,8 @@ class MangaDexSliverAppBar extends StatelessWidget {
                                 children: [
                                   CircleAvatar(child: const Icon(Icons.person)),
                                   Text(
-                                    'auth.loggedInAs'.tr(
-                                      context: context,
-                                      args: [me.attributes?.username ?? 'null'],
+                                    tr.auth.loggedInAs(
+                                      user: me.attributes?.username ?? 'null',
                                     ),
                                   ),
                                 ],
@@ -173,7 +161,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                             onPressed:
                                 () => ref.read(authControlProvider.logout)(),
                             leadingIcon: const Icon(Icons.logout),
-                            child: Text('auth.logout'.tr(context: context)),
+                            child: Text(tr.auth.logout),
                           ),
                         ],
                       ),
@@ -193,6 +181,41 @@ class MangaDexSliverAppBar extends StatelessWidget {
   }
 }
 
+class MangaProviderCarousel extends StatelessWidget {
+  const MangaProviderCarousel({super.key, required this.provider});
+
+  final Refreshable<AsyncValue<List<Manga>>> provider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: DataProviderWhenWidget(
+        provider: provider,
+        builder:
+            (context, items) => ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 256),
+              child: CarouselView(
+                itemExtent: 180,
+                shrinkExtent: 180,
+                enableSplash: false,
+                children:
+                    items
+                        .map(
+                          (e) => GridMangaItem(key: ValueKey(e.id), manga: e),
+                        )
+                        .toList(),
+              ),
+            ),
+        errorBuilder: (context, defaultChild, error, stacktrace) {
+          return Column(
+            children: [Text('$error'), Text(stacktrace.toString())],
+          );
+        },
+      ),
+    );
+  }
+}
+
 class MarkReadButton extends ConsumerWidget {
   const MarkReadButton({super.key, required this.chapter, required this.manga});
 
@@ -201,6 +224,7 @@ class MarkReadButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final me = ref.watch(loggedUserProvider).value;
 
     if (me == null) {
@@ -237,13 +261,8 @@ class MarkReadButton extends ConsumerWidget {
         padding: EdgeInsets.zero,
         splashRadius: 15,
         iconSize: 20,
-        tooltip: 'mangaView.markAs'.tr(
-          context: context,
-          args: [
-            isRead == true
-                ? 'mangaView.unread'.tr(context: context)
-                : 'mangaView.read'.tr(context: context),
-          ],
+        tooltip: tr.mangaView.markAs(
+          arg: isRead == true ? tr.mangaView.unread : tr.mangaView.read,
         ),
         icon:
             isRead == true
@@ -476,11 +495,12 @@ class _InfiniteScrollFeedState
 
   Future<void> _showError() async {
     if (_pagingController.value.status == PagingStatus.subsequentPageError) {
+      final tr = context.t;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('errors.fetchFail'.tr(context: context)),
+          content: Text(tr.errors.fetchFail),
           action: SnackBarAction(
-            label: 'ui.retry'.tr(context: context),
+            label: tr.ui.retry,
             onPressed: () => _pagingController.fetchNextPage(),
           ),
         ),
@@ -528,6 +548,7 @@ class _CoverButton extends ConsumerWidget {
       ),
       child: CachedNetworkImage(
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.small),
+        cacheManager: gagakuImageCache,
         imageBuilder:
             (context, imageProvider) => DecoratedBox(
               decoration: BoxDecoration(
@@ -776,6 +797,7 @@ class ChapterButtonWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     useAutomaticKeepAlive();
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
@@ -792,7 +814,7 @@ class ChapterButtonWidget extends HookWidget {
       text:
           !isOfficialPub
               ? (user?.attributes?.username.crop() ?? '')
-              : 'mangadex.officialPub'.tr(context: context),
+              : tr.mangadex.officialPub,
     );
 
     final statsChip = Consumer(
@@ -986,6 +1008,7 @@ class MangaListWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final scrollController =
         controller ?? (noController ? null : useScrollController());
     final view =
@@ -1027,17 +1050,17 @@ class MangaListWidget extends HookConsumerWidget {
                           ButtonSegment<MangaListView>(
                             value: MangaListView.grid,
                             icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: 'ui.gridView'.tr(context: context),
+                            tooltip: tr.ui.gridView,
                           ),
                           ButtonSegment<MangaListView>(
                             value: MangaListView.list,
                             icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: 'ui.listView'.tr(context: context),
+                            tooltip: tr.ui.listView,
                           ),
                           ButtonSegment<MangaListView>(
                             value: MangaListView.detailed,
                             icon: Icon(Icons.view_list, size: 24),
-                            tooltip: 'ui.detailedView'.tr(context: context),
+                            tooltip: tr.ui.detailedView,
                           ),
                         ],
                         selected: <MangaListView>{view},
@@ -1271,6 +1294,7 @@ class GridMangaItem extends HookConsumerWidget {
       gradient: gradient,
       child: CachedNetworkImage(
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+        cacheManager: gagakuImageCache,
         width: 256.0,
         fit: BoxFit.cover,
         progressIndicatorBuilder:
@@ -1395,6 +1419,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                       imageUrl: manga.getFirstCoverUrl(
                         quality: CoverArtQuality.small,
                       ),
+                      cacheManager: gagakuImageCache,
                       width: screenSizeSmall ? 80.0 : 128.0,
                       progressIndicatorBuilder:
                           (context, url, downloadProgress) =>
@@ -1472,6 +1497,7 @@ class _ListMangaItem extends HookConsumerWidget {
                 imageUrl: manga.getFirstCoverUrl(
                   quality: CoverArtQuality.small,
                 ),
+                cacheManager: gagakuImageCache,
                 width: 80.0,
                 progressIndicatorBuilder:
                     (context, url, downloadProgress) =>
@@ -1575,15 +1601,11 @@ class MangaGenreRow extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final contentTagChips = useMemoized(() {
       return manga.attributes!.tags
           .where((tag) => tag.attributes.group == TagGroup.content)
-          .map(
-            (e) => ContentChip(
-              key: ValueKey(e.id),
-              content: e.attributes.name.get('en'),
-            ),
-          );
+          .map((e) => ContentChip(key: ValueKey(e.id), content: e));
     }, [manga]);
 
     final genreTagChips = useMemoized(() {
@@ -1592,7 +1614,11 @@ class MangaGenreRow extends HookWidget {
           .map(
             (e) => IconTextChip(
               key: ValueKey(e.id),
-              text: e.attributes.name.get('en'),
+              text: e.attributes.name.get(tr.$meta.locale.languageCode),
+              onPressed:
+                  () => context.router.push(
+                    MangaDexTagViewRoute(tagId: e.id, tag: e),
+                  ),
             ),
           );
     }, [manga]);
@@ -1622,6 +1648,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final statsProvider = ref.watch(
       statisticsProvider.select(
         (map) => switch (map) {
@@ -1641,8 +1668,10 @@ class MangaStatisticsRow extends HookConsumerWidget {
     }, []);
 
     final numFormatter = useMemoized(() {
-      return NumberFormat.compact(locale: context.locale.toString());
-    }, [context.locale]);
+      return NumberFormat.compact(
+        locale: tr.$meta.locale.flutterLocale.toString(),
+      );
+    }, [tr.$meta.locale]);
 
     return Wrap(
       runSpacing: 4.0,
@@ -1674,7 +1703,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
               comments: comments,
             ),
           ],
-          _ => [IconTextChip(text: 'ui.loadingDot'.tr(context: context))],
+          _ => [IconTextChip(text: tr.ui.loadingDot)],
         },
         const SizedBox.shrink(),
         MangaStatusChip(
@@ -1735,10 +1764,11 @@ class _PubTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final theme = Theme.of(context);
     //final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
-    final lang = context.locale.languageCode;
+    final lang = tr.$meta.locale.languageCode;
     //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
     final pubtime = timeago.format(time, locale: lang);
@@ -1757,9 +1787,12 @@ class CommentChip extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     final numFormatter = useMemoized(() {
-      return NumberFormat.compact(locale: context.locale.toString());
-    }, [context.locale]);
+      return NumberFormat.compact(
+        locale: tr.$meta.locale.flutterLocale.toString(),
+      );
+    }, [tr.$meta.locale]);
 
     return IconTextChip(
       icon: const Icon(Icons.chat_bubble_outline, size: 18),
@@ -1796,7 +1829,8 @@ class MangaStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = context.tr(status.label);
+    final tr = context.t;
+    final label = tr[status.label];
     return IconTextChip(
       icon: Icon(
         Icons.circle,
@@ -1820,13 +1854,14 @@ class ContentRatingChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     return IconTextChip(
       color: switch (rating) {
         ContentRating.safe => Colors.green,
         ContentRating.suggestive => Colors.orange,
         ContentRating.erotica || ContentRating.pornographic => Colors.red,
       },
-      text: context.tr(rating.label),
+      text: tr[rating.label],
     );
   }
 }
@@ -1834,16 +1869,19 @@ class ContentRatingChip extends StatelessWidget {
 class ContentChip extends StatelessWidget {
   const ContentChip({super.key, required this.content});
 
-  final String content;
+  final Tag content;
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
+    final enlabel = content.attributes.name.get('en');
+    final text = content.attributes.name.get(tr.$meta.locale.languageCode);
     return IconTextChip(
-      color: switch (content) {
+      color: switch (enlabel) {
         'Gore' || 'Sexual Violence' => Colors.red,
         _ => Colors.orange,
       },
-      text: content,
+      text: text,
     );
   }
 }
@@ -1854,22 +1892,21 @@ Future<bool?> showDeleteListDialog(
 ) async => await showDialog<bool>(
   context: context,
   builder: (BuildContext context) {
+    final tr = context.t;
     final nav = Navigator.of(context);
     return AlertDialog(
-      title: Text('mangadex.deleteList'.tr(context: context)),
+      title: Text(tr.mangadex.deleteList),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'mangadex.deleteListWarning'.tr(context: context, args: [listName]),
-          ),
-          Text('ui.irreversibleWarning'.tr(context: context)),
+          Text(tr.mangadex.deleteListWarning(list: listName)),
+          Text(tr.ui.irreversibleWarning),
         ],
       ),
       actions: <Widget>[
         ElevatedButton(
-          child: Text('ui.no'.tr(context: context)),
+          child: Text(tr.ui.no),
           onPressed: () {
             nav.pop(null);
           },
@@ -1878,7 +1915,7 @@ Future<bool?> showDeleteListDialog(
           onPressed: () {
             nav.pop(true);
           },
-          child: Text('ui.yes'.tr(context: context)),
+          child: Text(tr.ui.yes),
         ),
       ],
     );

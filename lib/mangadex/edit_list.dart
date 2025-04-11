@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -60,11 +60,13 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final router = AutoRouter.of(context);
     final me = ref.watch(loggedUserProvider).value;
     final listNameController = useTextEditingController(
       text: list?.attributes.name,
     );
+    final scrollController = useScrollController();
 
     final visibility = useValueNotifier(
       list != null ? list!.attributes.visibility : CustomListVisibility.private,
@@ -91,9 +93,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
           ..showSnackBar(
             SnackBar(
               content: Text(
-                'mangadex.editListError'.tr(
-                  context: context,
-                  args: [(edit.state as ErrorMutationState).error.toString()],
+                tr.mangadex.editListError(
+                  error: (edit.state as ErrorMutationState).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,
@@ -111,9 +112,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
           ..showSnackBar(
             SnackBar(
               content: Text(
-                'mangadex.newListError'.tr(
-                  context: context,
-                  args: [(state.state as ErrorMutationState).error.toString()],
+                tr.mangadex.newListError(
+                  error: (state.state as ErrorMutationState).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,
@@ -128,10 +128,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
       appBar: AppBar(
         leading: AutoLeadingButton(),
         flexibleSpace: TitleFlexBar(
-          title:
-              list != null
-                  ? 'mangadex.editList'.tr(context: context)
-                  : 'mangadex.createList'.tr(context: context),
+          title: list != null ? tr.mangadex.editList : tr.mangadex.createList,
         ),
         actions: [
           OverflowBar(
@@ -194,9 +191,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                   ..showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'mangadex.listNameEmptyWarning'.tr(
-                                          context: context,
-                                        ),
+                                        tr.mangadex.listNameEmptyWarning,
                                       ),
                                       backgroundColor: Colors.red,
                                     ),
@@ -204,11 +199,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                               }
                             }
                             : null,
-                    child: Text(
-                      list != null
-                          ? 'ui.save'.tr(context: context)
-                          : 'ui.create'.tr(context: context),
-                    ),
+                    child: Text(list != null ? tr.ui.save : tr.ui.create),
                   );
                 },
               ),
@@ -232,20 +223,18 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         controller: listNameController,
                         decoration: InputDecoration(
                           filled: true,
-                          labelText: 'mangadex.listName'.tr(context: context),
+                          labelText: tr.mangadex.listName,
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           return (value == null || value.isEmpty)
-                              ? 'mangadex.listNameEmptyWarning'.tr(
-                                context: context,
-                              )
+                              ? tr.mangadex.listNameEmptyWarning
                               : null;
                         },
                       ),
                     ),
                     DropdownMenu<CustomListVisibility>(
-                      label: Text('mangadex.visibility'.tr(context: context)),
+                      label: Text(tr.mangadex.visibility),
                       initialSelection: visibility.value,
                       enableFilter: false,
                       enableSearch: false,
@@ -258,11 +247,11 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                       dropdownMenuEntries: [
                         DropdownMenuEntry<CustomListVisibility>(
                           value: CustomListVisibility.private,
-                          label: context.tr(CustomListVisibility.private.label),
+                          label: tr[CustomListVisibility.private.label],
                         ),
                         DropdownMenuEntry<CustomListVisibility>(
                           value: CustomListVisibility.public,
-                          label: context.tr(CustomListVisibility.public.label),
+                          label: tr[CustomListVisibility.public.label],
                         ),
                       ],
                     ),
@@ -292,7 +281,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                           }
                         });
                   },
-                  child: Text('mangadex.addTitles'.tr(context: context)),
+                  child: Text(tr.mangadex.addTitles),
                 ),
                 Expanded(
                   child: HookConsumer(
@@ -306,10 +295,11 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
                       return MangaListWidget(
                         title: Text(
-                          '${'titles'.tr(context: context)} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
+                          '${tr.titles} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
                           style: const TextStyle(fontSize: 24),
                         ),
                         physics: const AlwaysScrollableScrollPhysics(),
+                        controller: scrollController,
                         showToggle: false,
                         future: future,
                         children: [
@@ -344,6 +334,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                         1,
                       ),
                       onPageChange: (int index) {
+                        scrollController.jumpTo(0.0);
                         currentPage.value = index;
                       },
                     );
