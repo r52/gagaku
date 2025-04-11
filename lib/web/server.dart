@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/util/http.dart';
+import 'package:gagaku/web/model/model.dart' show webSourceClient;
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -43,7 +43,7 @@ Future<Response> _proxyHandler(Request request, String url) async {
 
   debugPrint('Proxying: $uri');
 
-  final nonNullClient = baseGagakuClient;
+  final nonNullClient = webSourceClient;
 
   final requestUrl = Uri.parse(uri);
   final clientRequest =

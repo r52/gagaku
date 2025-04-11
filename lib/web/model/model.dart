@@ -21,6 +21,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
+final webSourceClient = RateLimitedClient();
+
 @Riverpod(keepAlive: true)
 ProxyHandler proxy(Ref ref) {
   return ProxyHandler(ref);
@@ -32,7 +34,7 @@ class ProxyHandler {
   }
 
   final Ref ref;
-  final http.Client client = CustomClient();
+  final http.Client client = webSourceClient;
   late final CacheManager _cache;
 
   Future<void> invalidateCacheItem(String item) async {

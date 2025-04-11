@@ -14,6 +14,9 @@ class GagakuCacheManager extends CacheManager with ImageCacheManager {
 
   GagakuCacheManager._()
     : super(
-        Config(key, fileService: HttpFileService(httpClient: baseGagakuClient)),
+        Config(
+          key,
+          fileService: HttpFileService(httpClient: RateLimitedClient()),
+        ),
       );
 }
