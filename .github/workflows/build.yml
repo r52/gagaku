@@ -2,7 +2,7 @@ name: Build Gagaku
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, closed, synchronize, reopened, ready_for_review]
     branches:
       - main
   workflow_dispatch:
@@ -25,7 +25,7 @@ on:
 
 jobs:
   build:
-    if: github.event.pull_request.draft == false
+    if: ${{ github.event.pull_request.draft == false && (github.event.action != 'closed' || github.event.pull_request.merged == true) }}
     strategy:
       fail-fast: true
       matrix:
@@ -142,7 +142,7 @@ jobs:
 
   publish_dev:
     name: Publish Dev Preview
-    if: ${{ !cancelled() && github.event.inputs.doDevPreview == 'true' && needs.build.result == 'success' }}
+    if: ${{ !cancelled() && (github.event.inputs.doDevPreview == 'true' || github.event.pull_request.merged == true) && needs.build.result == 'success' }}
     needs: build
     runs-on: ubuntu-latest
     steps:
