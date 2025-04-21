@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/mangadex/model/types.dart' show MangaDexCredentials;
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/model/model.dart';
@@ -68,9 +71,16 @@ class MangaDexLoginScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final storage = Hive.box(gagakuBox);
-    final user = storage.get('username') as String?;
-    final clientId = storage.get('clientId') as String?;
-    final clientSecret = storage.get('clientSecret') as String?;
+
+    final credstr = storage.get('mangadex_credentials');
+    final creds =
+        credstr != null
+            ? MangaDexCredentials.fromJson(json.decode(credstr))
+            : null;
+
+    final user = creds?.username;
+    final clientId = creds?.clientId;
+    final clientSecret = creds?.clientSecret;
 
     final usernameController = useTextEditingController(text: user);
     final passwordController = useTextEditingController();

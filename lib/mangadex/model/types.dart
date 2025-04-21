@@ -1069,3 +1069,28 @@ class MangaSetAction {
     return state;
   }
 }
+
+@freezed
+abstract class MangaDexCredentials with _$MangaDexCredentials {
+  const factory MangaDexCredentials({
+    required String username,
+    required String clientId,
+    required String clientSecret,
+  }) = _MangaDexCredentials;
+
+  factory MangaDexCredentials.fromJson(Map<String, dynamic> json) =>
+      _$MangaDexCredentialsFromJson(json);
+}
+
+@freezed
+abstract class MangaDexTokens with _$MangaDexTokens {
+  const factory MangaDexTokens({
+    String? accessToken,
+    String? refreshToken,
+    String? tokenType,
+    required String idToken,
+  }) = _MangaDexTokens;
+
+  factory MangaDexTokens.fromJson(Map<String, dynamic> json) =>
+      _$MangaDexTokensFromJson(json);
+}

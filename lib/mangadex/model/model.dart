@@ -267,14 +267,23 @@ class MangaDexModel {
       _token = null;
 
       final storage = Hive.box(gagakuBox);
-      bool accessTokenSaved = storage.get('accessToken') != null;
 
-      if (accessTokenSaved) {
-        final tt = storage.get('tokenType') as String;
-        final rt = storage.get('refreshToken') as String;
-        final it = storage.get('idToken') as String;
-        final clientId = storage.get('clientId') as String;
-        final clientSecret = storage.get('clientSecret') as String;
+      final tokenstr = storage.get('mangadex_tokens');
+      final tokens =
+          tokenstr != null
+              ? MangaDexTokens.fromJson(json.decode(tokenstr))
+              : null;
+
+      if (tokens != null && tokens.accessToken != null) {
+        final tt = tokens.tokenType;
+        final rt = tokens.refreshToken;
+        final it = tokens.idToken;
+
+        final creds = MangaDexCredentials.fromJson(
+          json.decode(storage.get('mangadex_credentials')),
+        );
+        final clientId = creds.clientId;
+        final clientSecret = creds.clientSecret;
 
         final issuer =
             _credential?.client.issuer ??
@@ -324,10 +333,7 @@ class MangaDexModel {
           _client = _baseClient;
 
           // remove broken tokens
-          await storage.delete('accessToken');
-          await storage.delete('refreshToken');
-          await storage.delete('tokenType');
-          await storage.delete('idToken');
+          await storage.delete('mangadex_tokens');
         }
       }
     });
@@ -385,18 +391,26 @@ class MangaDexModel {
   ) async {
     final storage = Hive.box(gagakuBox);
 
-    await storage.put('username', username);
-    await storage.put('clientId', clientId);
-    await storage.put('clientSecret', clientSecret);
+    final creds = MangaDexCredentials(
+      username: username,
+      clientId: clientId,
+      clientSecret: clientSecret,
+    );
+
+    await storage.put('mangadex_credentials', json.encode(creds.toJson()));
   }
 
   Future<void> _saveToken(TokenResponse token) async {
     final storage = Hive.box(gagakuBox);
 
-    await storage.put('accessToken', token.accessToken);
-    await storage.put('refreshToken', token.refreshToken);
-    await storage.put('tokenType', token.tokenType);
-    await storage.put('idToken', token.idToken.toCompactSerialization());
+    final tokens = MangaDexTokens(
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
+      tokenType: token.tokenType,
+      idToken: token.idToken.toCompactSerialization(),
+    );
+
+    await storage.put('mangadex_tokens', json.encode(tokens.toJson()));
   }
 
   Future<void> logout() async {
@@ -412,10 +426,7 @@ class MangaDexModel {
             _credential = null;
 
             final storage = Hive.box(gagakuBox);
-            await storage.delete('accessToken');
-            await storage.delete('refreshToken');
-            await storage.delete('tokenType');
-            await storage.delete('idToken');
+            await storage.delete('mangadex_tokens');
 
             logger.i("logout(): MangaDex user logged out");
           });

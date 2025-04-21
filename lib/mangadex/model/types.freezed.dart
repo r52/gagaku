@@ -5081,4 +5081,309 @@ as String,
 
 }
 
+
+/// @nodoc
+mixin _$MangaDexCredentials implements DiagnosticableTreeMixin {
+
+ String get username; String get clientId; String get clientSecret;
+/// Create a copy of MangaDexCredentials
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaDexCredentialsCopyWith<MangaDexCredentials> get copyWith => _$MangaDexCredentialsCopyWithImpl<MangaDexCredentials>(this as MangaDexCredentials, _$identity);
+
+  /// Serializes this MangaDexCredentials to a JSON map.
+  Map<String, dynamic> toJson();
+
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'MangaDexCredentials'))
+    ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('clientId', clientId))..add(DiagnosticsProperty('clientSecret', clientSecret));
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexCredentials&&(identical(other.username, username) || other.username == username)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.clientSecret, clientSecret) || other.clientSecret == clientSecret));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,username,clientId,clientSecret);
+
+@override
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'MangaDexCredentials(username: $username, clientId: $clientId, clientSecret: $clientSecret)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaDexCredentialsCopyWith<$Res>  {
+  factory $MangaDexCredentialsCopyWith(MangaDexCredentials value, $Res Function(MangaDexCredentials) _then) = _$MangaDexCredentialsCopyWithImpl;
+@useResult
+$Res call({
+ String username, String clientId, String clientSecret
+});
+
+
+
+
+}
+/// @nodoc
+class _$MangaDexCredentialsCopyWithImpl<$Res>
+    implements $MangaDexCredentialsCopyWith<$Res> {
+  _$MangaDexCredentialsCopyWithImpl(this._self, this._then);
+
+  final MangaDexCredentials _self;
+  final $Res Function(MangaDexCredentials) _then;
+
+/// Create a copy of MangaDexCredentials
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? clientId = null,Object? clientSecret = null,}) {
+  return _then(_self.copyWith(
+username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,clientId: null == clientId ? _self.clientId : clientId // ignore: cast_nullable_to_non_nullable
+as String,clientSecret: null == clientSecret ? _self.clientSecret : clientSecret // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _MangaDexCredentials with DiagnosticableTreeMixin implements MangaDexCredentials {
+  const _MangaDexCredentials({required this.username, required this.clientId, required this.clientSecret});
+  factory _MangaDexCredentials.fromJson(Map<String, dynamic> json) => _$MangaDexCredentialsFromJson(json);
+
+@override final  String username;
+@override final  String clientId;
+@override final  String clientSecret;
+
+/// Create a copy of MangaDexCredentials
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MangaDexCredentialsCopyWith<_MangaDexCredentials> get copyWith => __$MangaDexCredentialsCopyWithImpl<_MangaDexCredentials>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaDexCredentialsToJson(this, );
+}
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'MangaDexCredentials'))
+    ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('clientId', clientId))..add(DiagnosticsProperty('clientSecret', clientSecret));
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaDexCredentials&&(identical(other.username, username) || other.username == username)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.clientSecret, clientSecret) || other.clientSecret == clientSecret));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,username,clientId,clientSecret);
+
+@override
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'MangaDexCredentials(username: $username, clientId: $clientId, clientSecret: $clientSecret)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MangaDexCredentialsCopyWith<$Res> implements $MangaDexCredentialsCopyWith<$Res> {
+  factory _$MangaDexCredentialsCopyWith(_MangaDexCredentials value, $Res Function(_MangaDexCredentials) _then) = __$MangaDexCredentialsCopyWithImpl;
+@override @useResult
+$Res call({
+ String username, String clientId, String clientSecret
+});
+
+
+
+
+}
+/// @nodoc
+class __$MangaDexCredentialsCopyWithImpl<$Res>
+    implements _$MangaDexCredentialsCopyWith<$Res> {
+  __$MangaDexCredentialsCopyWithImpl(this._self, this._then);
+
+  final _MangaDexCredentials _self;
+  final $Res Function(_MangaDexCredentials) _then;
+
+/// Create a copy of MangaDexCredentials
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? clientId = null,Object? clientSecret = null,}) {
+  return _then(_MangaDexCredentials(
+username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,clientId: null == clientId ? _self.clientId : clientId // ignore: cast_nullable_to_non_nullable
+as String,clientSecret: null == clientSecret ? _self.clientSecret : clientSecret // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$MangaDexTokens implements DiagnosticableTreeMixin {
+
+ String? get accessToken; String? get refreshToken; String? get tokenType; String get idToken;
+/// Create a copy of MangaDexTokens
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaDexTokensCopyWith<MangaDexTokens> get copyWith => _$MangaDexTokensCopyWithImpl<MangaDexTokens>(this as MangaDexTokens, _$identity);
+
+  /// Serializes this MangaDexTokens to a JSON map.
+  Map<String, dynamic> toJson();
+
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'MangaDexTokens'))
+    ..add(DiagnosticsProperty('accessToken', accessToken))..add(DiagnosticsProperty('refreshToken', refreshToken))..add(DiagnosticsProperty('tokenType', tokenType))..add(DiagnosticsProperty('idToken', idToken));
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexTokens&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.idToken, idToken) || other.idToken == idToken));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,tokenType,idToken);
+
+@override
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'MangaDexTokens(accessToken: $accessToken, refreshToken: $refreshToken, tokenType: $tokenType, idToken: $idToken)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaDexTokensCopyWith<$Res>  {
+  factory $MangaDexTokensCopyWith(MangaDexTokens value, $Res Function(MangaDexTokens) _then) = _$MangaDexTokensCopyWithImpl;
+@useResult
+$Res call({
+ String? accessToken, String? refreshToken, String? tokenType, String idToken
+});
+
+
+
+
+}
+/// @nodoc
+class _$MangaDexTokensCopyWithImpl<$Res>
+    implements $MangaDexTokensCopyWith<$Res> {
+  _$MangaDexTokensCopyWithImpl(this._self, this._then);
+
+  final MangaDexTokens _self;
+  final $Res Function(MangaDexTokens) _then;
+
+/// Create a copy of MangaDexTokens
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = freezed,Object? refreshToken = freezed,Object? tokenType = freezed,Object? idToken = null,}) {
+  return _then(_self.copyWith(
+accessToken: freezed == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
+as String?,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
+as String?,tokenType: freezed == tokenType ? _self.tokenType : tokenType // ignore: cast_nullable_to_non_nullable
+as String?,idToken: null == idToken ? _self.idToken : idToken // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _MangaDexTokens with DiagnosticableTreeMixin implements MangaDexTokens {
+  const _MangaDexTokens({this.accessToken, this.refreshToken, this.tokenType, required this.idToken});
+  factory _MangaDexTokens.fromJson(Map<String, dynamic> json) => _$MangaDexTokensFromJson(json);
+
+@override final  String? accessToken;
+@override final  String? refreshToken;
+@override final  String? tokenType;
+@override final  String idToken;
+
+/// Create a copy of MangaDexTokens
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MangaDexTokensCopyWith<_MangaDexTokens> get copyWith => __$MangaDexTokensCopyWithImpl<_MangaDexTokens>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaDexTokensToJson(this, );
+}
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'MangaDexTokens'))
+    ..add(DiagnosticsProperty('accessToken', accessToken))..add(DiagnosticsProperty('refreshToken', refreshToken))..add(DiagnosticsProperty('tokenType', tokenType))..add(DiagnosticsProperty('idToken', idToken));
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaDexTokens&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.idToken, idToken) || other.idToken == idToken));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,tokenType,idToken);
+
+@override
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'MangaDexTokens(accessToken: $accessToken, refreshToken: $refreshToken, tokenType: $tokenType, idToken: $idToken)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MangaDexTokensCopyWith<$Res> implements $MangaDexTokensCopyWith<$Res> {
+  factory _$MangaDexTokensCopyWith(_MangaDexTokens value, $Res Function(_MangaDexTokens) _then) = __$MangaDexTokensCopyWithImpl;
+@override @useResult
+$Res call({
+ String? accessToken, String? refreshToken, String? tokenType, String idToken
+});
+
+
+
+
+}
+/// @nodoc
+class __$MangaDexTokensCopyWithImpl<$Res>
+    implements _$MangaDexTokensCopyWith<$Res> {
+  __$MangaDexTokensCopyWithImpl(this._self, this._then);
+
+  final _MangaDexTokens _self;
+  final $Res Function(_MangaDexTokens) _then;
+
+/// Create a copy of MangaDexTokens
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = freezed,Object? refreshToken = freezed,Object? tokenType = freezed,Object? idToken = null,}) {
+  return _then(_MangaDexTokens(
+accessToken: freezed == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
+as String?,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
+as String?,tokenType: freezed == tokenType ? _self.tokenType : tokenType // ignore: cast_nullable_to_non_nullable
+as String?,idToken: null == idToken ? _self.idToken : idToken // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
 // dart format on
