@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:cronet_http/cronet_http.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
-import 'package:rhttp/rhttp.dart';
 
 const _baseUserAgent =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0';
@@ -15,12 +16,23 @@ String getUserAgent([bool useCustomUA = false]) {
 http.Client _createHttpClient([bool useCustomUA = false]) {
   final userAgent = getUserAgent(useCustomUA);
 
-  return RhttpCompatibleClient.createSync(
-    settings: ClientSettings(
-      timeoutSettings: TimeoutSettings(connectTimeout: Duration(seconds: 5)),
+  // return RhttpCompatibleClient.createSync(
+  //   settings: ClientSettings(
+  //     timeoutSettings: TimeoutSettings(connectTimeout: Duration(seconds: 5)),
+  //     userAgent: userAgent,
+  //   ),
+  // );
+
+  if (Platform.isAndroid) {
+    final engine = CronetEngine.build(
+      cacheMode: CacheMode.memory,
+      cacheMaxSize: 10 * 1024 * 1024,
       userAgent: userAgent,
-    ),
-  );
+    );
+    return CronetClient.fromCronetEngine(engine, closeEngine: true);
+  }
+
+  return IOClient(HttpClient()..userAgent = userAgent);
 }
 
 class RateLimitedClient extends CustomClient {

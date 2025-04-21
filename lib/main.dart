@@ -20,7 +20,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:rhttp/rhttp.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class _HttpOverrides extends HttpOverrides {
@@ -34,7 +33,7 @@ void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale();
-  await Rhttp.init();
+  // await Rhttp.init();
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
