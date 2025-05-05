@@ -11,24 +11,29 @@ const libraryViewTypeProvider = LibraryViewTypeProvider._();
 
 final class LibraryViewTypeProvider
     extends $NotifierProvider<LibraryViewType, MangaReadingStatus> {
-  const LibraryViewTypeProvider._({
-    super.runNotifierBuildOverride,
-    LibraryViewType Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'libraryViewTypeProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final LibraryViewType Function()? _createCb;
+  const LibraryViewTypeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'libraryViewTypeProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$libraryViewTypeHash();
+
+  @$internal
+  @override
+  LibraryViewType create() => LibraryViewType();
+
+  @$internal
+  @override
+  $NotifierProviderElement<LibraryViewType, MangaReadingStatus> $createElement(
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(pointer);
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(MangaReadingStatus value) {
@@ -37,37 +42,13 @@ final class LibraryViewTypeProvider
       providerOverride: $ValueProvider<MangaReadingStatus>(value),
     );
   }
-
-  @$internal
-  @override
-  LibraryViewType create() => _createCb?.call() ?? LibraryViewType();
-
-  @$internal
-  @override
-  LibraryViewTypeProvider $copyWithCreate(LibraryViewType Function() create) {
-    return LibraryViewTypeProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  LibraryViewTypeProvider $copyWithBuild(
-    MangaReadingStatus Function(Ref, LibraryViewType) build,
-  ) {
-    return LibraryViewTypeProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  $NotifierProviderElement<LibraryViewType, MangaReadingStatus> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$libraryViewTypeHash() => r'fa2f63791b8cda5c72e6ee8d27bf417968d97753';
 
 abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
   MangaReadingStatus build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -75,7 +56,7 @@ abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<MangaReadingStatus>,
+              AnyNotifier<MangaReadingStatus>,
               MangaReadingStatus,
               Object?,
               Object?
@@ -94,18 +75,13 @@ final class _GetLibraryListByTypeProvider
   const _GetLibraryListByTypeProvider._({
     required _GetLibraryListByTypeFamily super.from,
     required MangaReadingStatus super.argument,
-    FutureOr<List<String>> Function(Ref ref, MangaReadingStatus type)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_getLibraryListByTypeProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<List<String>> Function(Ref ref, MangaReadingStatus type)?
-  _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$getLibraryListByTypeHash();
@@ -121,24 +97,12 @@ final class _GetLibraryListByTypeProvider
   @override
   $FutureProviderElement<List<String>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _GetLibraryListByTypeProvider $copyWithCreate(
-    FutureOr<List<String>> Function(Ref ref) create,
-  ) {
-    return _GetLibraryListByTypeProvider._(
-      argument: argument as MangaReadingStatus,
-      from: from! as _GetLibraryListByTypeFamily,
-      create: (ref, MangaReadingStatus type) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<String>> create(Ref ref) {
-    final _$cb = _createCb ?? _getLibraryListByType;
     final argument = this.argument as MangaReadingStatus;
-    return _$cb(ref, argument);
+    return _getLibraryListByType(ref, argument);
   }
 
   @override
@@ -155,13 +119,14 @@ final class _GetLibraryListByTypeProvider
 String _$getLibraryListByTypeHash() =>
     r'a6aea92fe0c99298555dacf03ab6856d99923016';
 
-final class _GetLibraryListByTypeFamily extends Family {
+final class _GetLibraryListByTypeFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<String>>, MangaReadingStatus> {
   const _GetLibraryListByTypeFamily._()
     : super(
         retry: noRetry,
         name: r'_getLibraryListByTypeProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -169,28 +134,7 @@ final class _GetLibraryListByTypeFamily extends Family {
       _GetLibraryListByTypeProvider._(argument: type, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$getLibraryListByTypeHash();
-
-  @override
   String toString() => r'_getLibraryListByTypeProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<List<String>> Function(Ref ref, MangaReadingStatus args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _GetLibraryListByTypeProvider;
-
-        final argument = provider.argument as MangaReadingStatus;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint

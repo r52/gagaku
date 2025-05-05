@@ -19,17 +19,13 @@ final class _GetArchivePagesProvider
   const _GetArchivePagesProvider._({
     required _GetArchivePagesFamily super.from,
     required String super.argument,
-    FutureOr<List<ReaderPage>> Function(Ref ref, String path)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'_getArchivePagesProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<List<ReaderPage>> Function(Ref ref, String path)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$getArchivePagesHash();
@@ -45,24 +41,12 @@ final class _GetArchivePagesProvider
   @override
   $FutureProviderElement<List<ReaderPage>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _GetArchivePagesProvider $copyWithCreate(
-    FutureOr<List<ReaderPage>> Function(Ref ref) create,
-  ) {
-    return _GetArchivePagesProvider._(
-      argument: argument as String,
-      from: from! as _GetArchivePagesFamily,
-      create: (ref, String path) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ReaderPage>> create(Ref ref) {
-    final _$cb = _createCb ?? _getArchivePages;
     final argument = this.argument as String;
-    return _$cb(ref, argument);
+    return _getArchivePages(ref, argument);
   }
 
   @override
@@ -78,13 +62,14 @@ final class _GetArchivePagesProvider
 
 String _$getArchivePagesHash() => r'a1e7575662cd6f4c098bd314d1b7308a3e29b50a';
 
-final class _GetArchivePagesFamily extends Family {
+final class _GetArchivePagesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {
   const _GetArchivePagesFamily._()
     : super(
         retry: null,
         name: r'_getArchivePagesProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -92,28 +77,7 @@ final class _GetArchivePagesFamily extends Family {
       _GetArchivePagesProvider._(argument: path, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$getArchivePagesHash();
-
-  @override
   String toString() => r'_getArchivePagesProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(Ref ref, String args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _GetArchivePagesProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint

@@ -23,24 +23,35 @@ const localConfigProvider = LocalConfigProvider._();
 
 final class LocalConfigProvider
     extends $NotifierProvider<LocalConfig, LocalLibConfig> {
-  const LocalConfigProvider._({
-    super.runNotifierBuildOverride,
-    LocalConfig Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'localConfigProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final LocalConfig Function()? _createCb;
+  const LocalConfigProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'localConfigProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$localConfigHash();
+
+  @$internal
+  @override
+  LocalConfig create() => LocalConfig();
+
+  @$internal
+  @override
+  _$LocalConfigElement $createElement($ProviderPointer pointer) =>
+      _$LocalConfigElement(pointer);
+
+  ProviderListenable<LocalConfig$Save> get save =>
+      $LazyProxyListenable<LocalConfig$Save, LocalLibConfig>(this, (element) {
+        element as _$LocalConfigElement;
+
+        return element._$save;
+      });
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(LocalLibConfig value) {
@@ -49,43 +60,13 @@ final class LocalConfigProvider
       providerOverride: $ValueProvider<LocalLibConfig>(value),
     );
   }
-
-  @$internal
-  @override
-  LocalConfig create() => _createCb?.call() ?? LocalConfig();
-
-  @$internal
-  @override
-  LocalConfigProvider $copyWithCreate(LocalConfig Function() create) {
-    return LocalConfigProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  LocalConfigProvider $copyWithBuild(
-    LocalLibConfig Function(Ref, LocalConfig) build,
-  ) {
-    return LocalConfigProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  _$LocalConfigElement $createElement($ProviderPointer pointer) =>
-      _$LocalConfigElement(this, pointer);
-
-  ProviderListenable<LocalConfig$Save> get save =>
-      $LazyProxyListenable<LocalConfig$Save, LocalLibConfig>(this, (element) {
-        element as _$LocalConfigElement;
-
-        return element._$save;
-      });
 }
 
 String _$localConfigHash() => r'2d256629dac8ccaf6abbfd3d1ef120a1b718a2c1';
 
 abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -93,7 +74,7 @@ abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<LocalLibConfig>,
+              AnyNotifier<LocalLibConfig>,
               LocalLibConfig,
               Object?,
               Object?
@@ -104,7 +85,7 @@ abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
 
 class _$LocalConfigElement
     extends $NotifierProviderElement<LocalConfig, LocalLibConfig> {
-  _$LocalConfigElement(super.provider, super.pointer) {
+  _$LocalConfigElement(super.pointer) {
     _$save.result = $Result.data(_$LocalConfig$Save(this));
   }
   final _$save = $ElementLense<_$LocalConfig$Save>();
@@ -127,11 +108,11 @@ class _$LocalConfigElement
 sealed class LocalConfig$Save extends MutationBase<LocalLibConfig> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [LocalConfig.save] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:

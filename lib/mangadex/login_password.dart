@@ -11,7 +11,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 
 class MangaDexLoginWidget extends ConsumerWidget {
   const MangaDexLoginWidget({required this.builder, super.key});
@@ -90,14 +90,14 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final login = ref.watch(authControlProvider.login);
 
     ref.listen(authControlProvider.login, (_, login) {
-      if (login.state is ErrorMutationState) {
+      if (login.state is ErrorMutation) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
               content: Text(
                 tr.errors.loginFail(
-                  reason: (login.state as ErrorMutationState).error.toString(),
+                  reason: (login.state as ErrorMutation).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,
@@ -221,7 +221,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                         passwordIsEmpty ||
                                         clientIdIsEmpty ||
                                         clientSecretIsEmpty ||
-                                        login.state is PendingMutationState)
+                                        login.state is PendingMutation)
                                     ? null
                                     : () async {
                                       final router = AutoRouter.of(context);
@@ -272,7 +272,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (login.state is PendingMutationState) ...Styles.loadingOverlay,
+          if (login.state is PendingMutation) ...Styles.loadingOverlay,
         ],
       ),
     );

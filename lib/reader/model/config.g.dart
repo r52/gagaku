@@ -49,24 +49,35 @@ const readerSettingsProvider = ReaderSettingsProvider._();
 
 final class ReaderSettingsProvider
     extends $NotifierProvider<ReaderSettings, ReaderConfig> {
-  const ReaderSettingsProvider._({
-    super.runNotifierBuildOverride,
-    ReaderSettings Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'readerSettingsProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final ReaderSettings Function()? _createCb;
+  const ReaderSettingsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'readerSettingsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$readerSettingsHash();
+
+  @$internal
+  @override
+  ReaderSettings create() => ReaderSettings();
+
+  @$internal
+  @override
+  _$ReaderSettingsElement $createElement($ProviderPointer pointer) =>
+      _$ReaderSettingsElement(pointer);
+
+  ProviderListenable<ReaderSettings$Save> get save =>
+      $LazyProxyListenable<ReaderSettings$Save, ReaderConfig>(this, (element) {
+        element as _$ReaderSettingsElement;
+
+        return element._$save;
+      });
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ReaderConfig value) {
@@ -75,43 +86,13 @@ final class ReaderSettingsProvider
       providerOverride: $ValueProvider<ReaderConfig>(value),
     );
   }
-
-  @$internal
-  @override
-  ReaderSettings create() => _createCb?.call() ?? ReaderSettings();
-
-  @$internal
-  @override
-  ReaderSettingsProvider $copyWithCreate(ReaderSettings Function() create) {
-    return ReaderSettingsProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  ReaderSettingsProvider $copyWithBuild(
-    ReaderConfig Function(Ref, ReaderSettings) build,
-  ) {
-    return ReaderSettingsProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  _$ReaderSettingsElement $createElement($ProviderPointer pointer) =>
-      _$ReaderSettingsElement(this, pointer);
-
-  ProviderListenable<ReaderSettings$Save> get save =>
-      $LazyProxyListenable<ReaderSettings$Save, ReaderConfig>(this, (element) {
-        element as _$ReaderSettingsElement;
-
-        return element._$save;
-      });
 }
 
 String _$readerSettingsHash() => r'8f3157aeb36d9c1ec1da041827e62fdee71c5066';
 
 abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   ReaderConfig build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -119,7 +100,7 @@ abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<ReaderConfig>,
+              AnyNotifier<ReaderConfig>,
               ReaderConfig,
               Object?,
               Object?
@@ -130,7 +111,7 @@ abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
 
 class _$ReaderSettingsElement
     extends $NotifierProviderElement<ReaderSettings, ReaderConfig> {
-  _$ReaderSettingsElement(super.provider, super.pointer) {
+  _$ReaderSettingsElement(super.pointer) {
     _$save.result = $Result.data(_$ReaderSettings$Save(this));
   }
   final _$save = $ElementLense<_$ReaderSettings$Save>();
@@ -153,11 +134,11 @@ class _$ReaderSettingsElement
 sealed class ReaderSettings$Save extends MutationBase<ReaderConfig> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [ReaderSettings.save] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:

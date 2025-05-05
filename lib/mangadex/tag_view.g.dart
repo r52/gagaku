@@ -15,17 +15,13 @@ final class _FetchTagFromIdProvider
   const _FetchTagFromIdProvider._({
     required _FetchTagFromIdFamily super.from,
     required String super.argument,
-    FutureOr<Tag> Function(Ref ref, String tagId)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_fetchTagFromIdProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<Tag> Function(Ref ref, String tagId)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchTagFromIdHash();
@@ -40,24 +36,12 @@ final class _FetchTagFromIdProvider
   @$internal
   @override
   $FutureProviderElement<Tag> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
-
-  @override
-  _FetchTagFromIdProvider $copyWithCreate(
-    FutureOr<Tag> Function(Ref ref) create,
-  ) {
-    return _FetchTagFromIdProvider._(
-      argument: argument as String,
-      from: from! as _FetchTagFromIdFamily,
-      create: (ref, String tagId) => create(ref),
-    );
-  }
+      $FutureProviderElement(pointer);
 
   @override
   FutureOr<Tag> create(Ref ref) {
-    final _$cb = _createCb ?? _fetchTagFromId;
     final argument = this.argument as String;
-    return _$cb(ref, argument);
+    return _fetchTagFromId(ref, argument);
   }
 
   @override
@@ -73,13 +57,14 @@ final class _FetchTagFromIdProvider
 
 String _$fetchTagFromIdHash() => r'2c3e3ce63b6f16972e9614f7e4b35c823accb4b8';
 
-final class _FetchTagFromIdFamily extends Family {
+final class _FetchTagFromIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Tag>, String> {
   const _FetchTagFromIdFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchTagFromIdProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -87,26 +72,7 @@ final class _FetchTagFromIdFamily extends Family {
       _FetchTagFromIdProvider._(argument: tagId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$fetchTagFromIdHash();
-
-  @override
   String toString() => r'_fetchTagFromIdProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(FutureOr<Tag> Function(Ref ref, String args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _FetchTagFromIdProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 @ProviderFor(_trendingThisYear)
@@ -118,17 +84,13 @@ final class _TrendingThisYearProvider
   const _TrendingThisYearProvider._({
     required _TrendingThisYearFamily super.from,
     required Tag super.argument,
-    FutureOr<List<Manga>> Function(Ref ref, Tag tag)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_trendingThisYearProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<List<Manga>> Function(Ref ref, Tag tag)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$trendingThisYearHash();
@@ -144,24 +106,12 @@ final class _TrendingThisYearProvider
   @override
   $FutureProviderElement<List<Manga>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _TrendingThisYearProvider $copyWithCreate(
-    FutureOr<List<Manga>> Function(Ref ref) create,
-  ) {
-    return _TrendingThisYearProvider._(
-      argument: argument as Tag,
-      from: from! as _TrendingThisYearFamily,
-      create: (ref, Tag tag) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Manga>> create(Ref ref) {
-    final _$cb = _createCb ?? _trendingThisYear;
     final argument = this.argument as Tag;
-    return _$cb(ref, argument);
+    return _trendingThisYear(ref, argument);
   }
 
   @override
@@ -177,13 +127,14 @@ final class _TrendingThisYearProvider
 
 String _$trendingThisYearHash() => r'47ab90f1630dc5d55dd7ae5fea6f357bf4b6b497';
 
-final class _TrendingThisYearFamily extends Family {
+final class _TrendingThisYearFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {
   const _TrendingThisYearFamily._()
     : super(
         retry: noRetry,
         name: r'_trendingThisYearProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -191,28 +142,7 @@ final class _TrendingThisYearFamily extends Family {
       _TrendingThisYearProvider._(argument: tag, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$trendingThisYearHash();
-
-  @override
   String toString() => r'_trendingThisYearProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<List<Manga>> Function(Ref ref, Tag args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _TrendingThisYearProvider;
-
-        final argument = provider.argument as Tag;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 @ProviderFor(_recentlyAdded)
@@ -224,17 +154,13 @@ final class _RecentlyAddedProvider
   const _RecentlyAddedProvider._({
     required _RecentlyAddedFamily super.from,
     required Tag super.argument,
-    FutureOr<List<Manga>> Function(Ref ref, Tag tag)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_recentlyAddedProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<List<Manga>> Function(Ref ref, Tag tag)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$recentlyAddedHash();
@@ -250,24 +176,12 @@ final class _RecentlyAddedProvider
   @override
   $FutureProviderElement<List<Manga>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _RecentlyAddedProvider $copyWithCreate(
-    FutureOr<List<Manga>> Function(Ref ref) create,
-  ) {
-    return _RecentlyAddedProvider._(
-      argument: argument as Tag,
-      from: from! as _RecentlyAddedFamily,
-      create: (ref, Tag tag) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Manga>> create(Ref ref) {
-    final _$cb = _createCb ?? _recentlyAdded;
     final argument = this.argument as Tag;
-    return _$cb(ref, argument);
+    return _recentlyAdded(ref, argument);
   }
 
   @override
@@ -283,13 +197,14 @@ final class _RecentlyAddedProvider
 
 String _$recentlyAddedHash() => r'db80c62e64ad17d0dc404af963c83b475bd891dd';
 
-final class _RecentlyAddedFamily extends Family {
+final class _RecentlyAddedFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {
   const _RecentlyAddedFamily._()
     : super(
         retry: noRetry,
         name: r'_recentlyAddedProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -297,28 +212,7 @@ final class _RecentlyAddedFamily extends Family {
       _RecentlyAddedProvider._(argument: tag, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$recentlyAddedHash();
-
-  @override
   String toString() => r'_recentlyAddedProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<List<Manga>> Function(Ref ref, Tag args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _RecentlyAddedProvider;
-
-        final argument = provider.argument as Tag;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint

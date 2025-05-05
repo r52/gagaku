@@ -12,7 +12,7 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 
 class QueriedMangaDexEditListScreen extends ConsumerWidget {
   const QueriedMangaDexEditListScreen({super.key, required this.listId});
@@ -75,8 +75,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final editList = ref.watch(userListsProvider(me?.id).editList);
     final newList = ref.watch(userListsProvider(me?.id).newList);
     final isLoading =
-        editList.state is PendingMutationState ||
-        newList.state is PendingMutationState;
+        editList.state is PendingMutation || newList.state is PendingMutation;
 
     final selected = useReducer(
       MangaSetAction.modify,
@@ -87,14 +86,14 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     final currentPage = useValueNotifier(0);
 
     ref.listen(userListsProvider(me?.id).editList, (_, edit) {
-      if (edit.state is ErrorMutationState) {
+      if (edit.state is ErrorMutation) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
               content: Text(
                 tr.mangadex.editListError(
-                  error: (edit.state as ErrorMutationState).error.toString(),
+                  error: (edit.state as ErrorMutation).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,
@@ -106,14 +105,14 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     });
 
     ref.listen(userListsProvider(me?.id).newList, (_, state) {
-      if (state.state is ErrorMutationState) {
+      if (state.state is ErrorMutation) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
               content: Text(
                 tr.mangadex.newListError(
-                  error: (state.state as ErrorMutationState).error.toString(),
+                  error: (state.state as ErrorMutation).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,

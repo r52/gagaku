@@ -12,7 +12,7 @@ import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 
 enum _ListViewType { self, followed }
 
@@ -54,20 +54,20 @@ class MangaDexListsWidget extends HookConsumerWidget {
     );
 
     ref.listen(userListsProvider(me?.id).deleteList, (_, state) {
-      if (state.state is ErrorMutationState) {
+      if (state.state is ErrorMutation) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
               content: Text(
                 t.mangadex.deleteListError(
-                  error: (state.state as ErrorMutationState).error.toString(),
+                  error: (state.state as ErrorMutation).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,
             ),
           );
-      } else if (state.state is SuccessMutationState) {
+      } else if (state.state is SuccessMutation) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
@@ -88,12 +88,12 @@ class MangaDexListsWidget extends HookConsumerWidget {
                 scrollController.position.maxScrollExtent) {
           switch (view.value) {
             case _ListViewType.self:
-              if (userGetNextPage.state is! PendingMutationState) {
+              if (userGetNextPage.state is! PendingMutation) {
                 userGetNextPage();
               }
               break;
             case _ListViewType.followed:
-              if (followGetNextPage.state is! PendingMutationState) {
+              if (followGetNextPage.state is! PendingMutation) {
                 followGetNextPage();
               }
               break;
@@ -289,8 +289,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                           },
                         ),
                         SliverVisibility.maintain(
-                          visible:
-                              userGetNextPage.state is PendingMutationState,
+                          visible: userGetNextPage.state is PendingMutation,
                           sliver: const SliverToBoxAdapter(
                             child: ListSpinner(),
                           ),
@@ -416,8 +415,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                           },
                         ),
                         SliverVisibility.maintain(
-                          visible:
-                              followGetNextPage.state is PendingMutationState,
+                          visible: followGetNextPage.state is PendingMutation,
                           sliver: const SliverToBoxAdapter(
                             child: ListSpinner(),
                           ),

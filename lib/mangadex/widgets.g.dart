@@ -11,24 +11,29 @@ const _mangaListViewProvider = _MangaListViewProvider._();
 
 final class _MangaListViewProvider
     extends $NotifierProvider<_MangaListView, MangaListView> {
-  const _MangaListViewProvider._({
-    super.runNotifierBuildOverride,
-    _MangaListView Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'_mangaListViewProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final _MangaListView Function()? _createCb;
+  const _MangaListViewProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'_mangaListViewProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$mangaListViewHash();
+
+  @$internal
+  @override
+  _MangaListView create() => _MangaListView();
+
+  @$internal
+  @override
+  $NotifierProviderElement<_MangaListView, MangaListView> $createElement(
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(pointer);
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(MangaListView value) {
@@ -37,37 +42,13 @@ final class _MangaListViewProvider
       providerOverride: $ValueProvider<MangaListView>(value),
     );
   }
-
-  @$internal
-  @override
-  _MangaListView create() => _createCb?.call() ?? _MangaListView();
-
-  @$internal
-  @override
-  _MangaListViewProvider $copyWithCreate(_MangaListView Function() create) {
-    return _MangaListViewProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  _MangaListViewProvider $copyWithBuild(
-    MangaListView Function(Ref, _MangaListView) build,
-  ) {
-    return _MangaListViewProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  $NotifierProviderElement<_MangaListView, MangaListView> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$mangaListViewHash() => r'a50742a83f1633f48634570c1cd45301db55fad3';
 
 abstract class _$MangaListView extends $Notifier<MangaListView> {
   MangaListView build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -75,7 +56,7 @@ abstract class _$MangaListView extends $Notifier<MangaListView> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<MangaListView>,
+              AnyNotifier<MangaListView>,
               MangaListView,
               Object?,
               Object?

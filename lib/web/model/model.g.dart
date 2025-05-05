@@ -12,22 +12,29 @@ const proxyProvider = ProxyProvider._();
 final class ProxyProvider
     extends $FunctionalProvider<ProxyHandler, ProxyHandler>
     with $Provider<ProxyHandler> {
-  const ProxyProvider._({ProxyHandler Function(Ref ref)? create})
-    : _createCb = create,
-      super(
+  const ProxyProvider._()
+    : super(
         from: null,
         argument: null,
         retry: null,
         name: r'proxyProvider',
         isAutoDispose: false,
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
       );
-
-  final ProxyHandler Function(Ref ref)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$proxyHash();
+
+  @$internal
+  @override
+  $ProviderElement<ProxyHandler> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ProxyHandler create(Ref ref) {
+    return proxy(ref);
+  }
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ProxyHandler value) {
@@ -35,22 +42,6 @@ final class ProxyProvider
       origin: this,
       providerOverride: $ValueProvider<ProxyHandler>(value),
     );
-  }
-
-  @$internal
-  @override
-  $ProviderElement<ProxyHandler> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(this, pointer);
-
-  @override
-  ProxyProvider $copyWithCreate(ProxyHandler Function(Ref ref) create) {
-    return ProxyProvider._(create: create);
-  }
-
-  @override
-  ProxyHandler create(Ref ref) {
-    final _$cb = _createCb ?? proxy;
-    return _$cb(ref);
   }
 }
 
@@ -65,50 +56,28 @@ final class WebSourceFavoritesProvider
           WebSourceFavorites,
           Map<String, List<HistoryLink>>
         > {
-  const WebSourceFavoritesProvider._({
-    super.runNotifierBuildOverride,
-    WebSourceFavorites Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'webSourceFavoritesProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final WebSourceFavorites Function()? _createCb;
+  const WebSourceFavoritesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'webSourceFavoritesProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$webSourceFavoritesHash();
 
   @$internal
   @override
-  WebSourceFavorites create() => _createCb?.call() ?? WebSourceFavorites();
-
-  @$internal
-  @override
-  WebSourceFavoritesProvider $copyWithCreate(
-    WebSourceFavorites Function() create,
-  ) {
-    return WebSourceFavoritesProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  WebSourceFavoritesProvider $copyWithBuild(
-    FutureOr<Map<String, List<HistoryLink>>> Function(Ref, WebSourceFavorites)
-    build,
-  ) {
-    return WebSourceFavoritesProvider._(runNotifierBuildOverride: build);
-  }
+  WebSourceFavorites create() => WebSourceFavorites();
 
   @$internal
   @override
   _$WebSourceFavoritesElement $createElement($ProviderPointer pointer) =>
-      _$WebSourceFavoritesElement(this, pointer);
+      _$WebSourceFavoritesElement(pointer);
 
   ProviderListenable<WebSourceFavorites$Clear> get clear =>
       $LazyProxyListenable<
@@ -176,7 +145,7 @@ String _$webSourceFavoritesHash() =>
 abstract class _$WebSourceFavorites
     extends $AsyncNotifier<Map<String, List<HistoryLink>>> {
   FutureOr<Map<String, List<HistoryLink>>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -184,7 +153,7 @@ abstract class _$WebSourceFavorites
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Map<String, List<HistoryLink>>>>,
+              AnyNotifier<AsyncValue<Map<String, List<HistoryLink>>>>,
               AsyncValue<Map<String, List<HistoryLink>>>,
               Object?,
               Object?
@@ -199,7 +168,7 @@ class _$WebSourceFavoritesElement
           WebSourceFavorites,
           Map<String, List<HistoryLink>>
         > {
-  _$WebSourceFavoritesElement(super.provider, super.pointer) {
+  _$WebSourceFavoritesElement(super.pointer) {
     _$clear.result = $Result.data(_$WebSourceFavorites$Clear(this));
     _$add.result = $Result.data(_$WebSourceFavorites$Add(this));
     _$updateAll.result = $Result.data(_$WebSourceFavorites$UpdateAll(this));
@@ -245,11 +214,11 @@ class _$WebSourceFavoritesElement
 sealed class WebSourceFavorites$Clear extends MutationBase<void> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceFavorites.clear] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -291,11 +260,11 @@ sealed class WebSourceFavorites$Add
     extends MutationBase<Map<String, List<HistoryLink>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceFavorites.add] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -347,11 +316,11 @@ sealed class WebSourceFavorites$UpdateAll
     extends MutationBase<Map<String, List<HistoryLink>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceFavorites.updateAll] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -398,11 +367,11 @@ sealed class WebSourceFavorites$Remove
     extends MutationBase<Map<String, List<HistoryLink>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceFavorites.remove] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -454,11 +423,11 @@ sealed class WebSourceFavorites$UpdateList
     extends MutationBase<Map<String, List<HistoryLink>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceFavorites.updateList] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -513,11 +482,11 @@ sealed class WebSourceFavorites$ReconfigureCategories
     extends MutationBase<Map<String, List<HistoryLink>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceFavorites.reconfigureCategories] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -580,47 +549,28 @@ const webSourceHistoryProvider = WebSourceHistoryProvider._();
 
 final class WebSourceHistoryProvider
     extends $AsyncNotifierProvider<WebSourceHistory, Queue<HistoryLink>> {
-  const WebSourceHistoryProvider._({
-    super.runNotifierBuildOverride,
-    WebSourceHistory Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'webSourceHistoryProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final WebSourceHistory Function()? _createCb;
+  const WebSourceHistoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'webSourceHistoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$webSourceHistoryHash();
 
   @$internal
   @override
-  WebSourceHistory create() => _createCb?.call() ?? WebSourceHistory();
-
-  @$internal
-  @override
-  WebSourceHistoryProvider $copyWithCreate(WebSourceHistory Function() create) {
-    return WebSourceHistoryProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  WebSourceHistoryProvider $copyWithBuild(
-    FutureOr<Queue<HistoryLink>> Function(Ref, WebSourceHistory) build,
-  ) {
-    return WebSourceHistoryProvider._(runNotifierBuildOverride: build);
-  }
+  WebSourceHistory create() => WebSourceHistory();
 
   @$internal
   @override
   _$WebSourceHistoryElement $createElement($ProviderPointer pointer) =>
-      _$WebSourceHistoryElement(this, pointer);
+      _$WebSourceHistoryElement(pointer);
 
   ProviderListenable<WebSourceHistory$Clear> get clear => $LazyProxyListenable<
     WebSourceHistory$Clear,
@@ -655,7 +605,7 @@ String _$webSourceHistoryHash() => r'034d6fd317996f812b6e81b805ccc9142082030c';
 
 abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
   FutureOr<Queue<HistoryLink>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -663,7 +613,7 @@ abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Queue<HistoryLink>>>,
+              AnyNotifier<AsyncValue<Queue<HistoryLink>>>,
               AsyncValue<Queue<HistoryLink>>,
               Object?,
               Object?
@@ -675,7 +625,7 @@ abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
 class _$WebSourceHistoryElement
     extends
         $AsyncNotifierProviderElement<WebSourceHistory, Queue<HistoryLink>> {
-  _$WebSourceHistoryElement(super.provider, super.pointer) {
+  _$WebSourceHistoryElement(super.pointer) {
     _$clear.result = $Result.data(_$WebSourceHistory$Clear(this));
     _$add.result = $Result.data(_$WebSourceHistory$Add(this));
     _$remove.result = $Result.data(_$WebSourceHistory$Remove(this));
@@ -706,11 +656,11 @@ class _$WebSourceHistoryElement
 sealed class WebSourceHistory$Clear extends MutationBase<Queue<HistoryLink>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceHistory.clear] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -755,11 +705,11 @@ final class _$WebSourceHistory$Clear
 sealed class WebSourceHistory$Add extends MutationBase<Queue<HistoryLink>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceHistory.add] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -804,11 +754,11 @@ final class _$WebSourceHistory$Add
 sealed class WebSourceHistory$Remove extends MutationBase<Queue<HistoryLink>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebSourceHistory.remove] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -855,47 +805,28 @@ const webReadMarkersProvider = WebReadMarkersProvider._();
 
 final class WebReadMarkersProvider
     extends $AsyncNotifierProvider<WebReadMarkers, Map<String, Set<String>>> {
-  const WebReadMarkersProvider._({
-    super.runNotifierBuildOverride,
-    WebReadMarkers Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'webReadMarkersProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final WebReadMarkers Function()? _createCb;
+  const WebReadMarkersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'webReadMarkersProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$webReadMarkersHash();
 
   @$internal
   @override
-  WebReadMarkers create() => _createCb?.call() ?? WebReadMarkers();
-
-  @$internal
-  @override
-  WebReadMarkersProvider $copyWithCreate(WebReadMarkers Function() create) {
-    return WebReadMarkersProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  WebReadMarkersProvider $copyWithBuild(
-    FutureOr<Map<String, Set<String>>> Function(Ref, WebReadMarkers) build,
-  ) {
-    return WebReadMarkersProvider._(runNotifierBuildOverride: build);
-  }
+  WebReadMarkers create() => WebReadMarkers();
 
   @$internal
   @override
   _$WebReadMarkersElement $createElement($ProviderPointer pointer) =>
-      _$WebReadMarkersElement(this, pointer);
+      _$WebReadMarkersElement(pointer);
 
   ProviderListenable<WebReadMarkers$Clear> get clear => $LazyProxyListenable<
     WebReadMarkers$Clear,
@@ -941,7 +872,7 @@ String _$webReadMarkersHash() => r'f7c8a9346a9e67f742205f4b2e05606b1f72b3e6';
 abstract class _$WebReadMarkers
     extends $AsyncNotifier<Map<String, Set<String>>> {
   FutureOr<Map<String, Set<String>>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -949,7 +880,7 @@ abstract class _$WebReadMarkers
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Map<String, Set<String>>>>,
+              AnyNotifier<AsyncValue<Map<String, Set<String>>>>,
               AsyncValue<Map<String, Set<String>>>,
               Object?,
               Object?
@@ -964,7 +895,7 @@ class _$WebReadMarkersElement
           WebReadMarkers,
           Map<String, Set<String>>
         > {
-  _$WebReadMarkersElement(super.provider, super.pointer) {
+  _$WebReadMarkersElement(super.pointer) {
     _$clear.result = $Result.data(_$WebReadMarkers$Clear(this));
     _$set.result = $Result.data(_$WebReadMarkers$Set(this));
     _$setBulk.result = $Result.data(_$WebReadMarkers$SetBulk(this));
@@ -1000,11 +931,11 @@ sealed class WebReadMarkers$Clear
     extends MutationBase<Map<String, Set<String>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebReadMarkers.clear] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1049,11 +980,11 @@ final class _$WebReadMarkers$Clear
 sealed class WebReadMarkers$Set extends MutationBase<Map<String, Set<String>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebReadMarkers.set] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1107,11 +1038,11 @@ sealed class WebReadMarkers$SetBulk
     extends MutationBase<Map<String, Set<String>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebReadMarkers.setBulk] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1165,11 +1096,11 @@ sealed class WebReadMarkers$DeleteKey
     extends MutationBase<Map<String, Set<String>>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebReadMarkers.deleteKey] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1220,18 +1151,13 @@ final class ExtensionSourceProvider
   const ExtensionSourceProvider._({
     required ExtensionSourceFamily super.from,
     required String super.argument,
-    super.runNotifierBuildOverride,
-    ExtensionSource Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'extensionSourceProvider',
          isAutoDispose: false,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final ExtensionSource Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$extensionSourceHash();
@@ -1245,35 +1171,13 @@ final class ExtensionSourceProvider
 
   @$internal
   @override
-  ExtensionSource create() => _createCb?.call() ?? ExtensionSource();
-
-  @$internal
-  @override
-  ExtensionSourceProvider $copyWithCreate(ExtensionSource Function() create) {
-    return ExtensionSourceProvider._(
-      argument: argument as String,
-      from: from! as ExtensionSourceFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  ExtensionSourceProvider $copyWithBuild(
-    FutureOr<WebSourceInfo> Function(Ref, ExtensionSource) build,
-  ) {
-    return ExtensionSourceProvider._(
-      argument: argument as String,
-      from: from! as ExtensionSourceFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  ExtensionSource create() => ExtensionSource();
 
   @$internal
   @override
   $AsyncNotifierProviderElement<ExtensionSource, WebSourceInfo> $createElement(
     $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  ) => $AsyncNotifierProviderElement(pointer);
 
   @override
   bool operator ==(Object other) {
@@ -1288,13 +1192,21 @@ final class ExtensionSourceProvider
 
 String _$extensionSourceHash() => r'4655c9562c84c5e1b3561f2d4ae615f07b039ec1';
 
-final class ExtensionSourceFamily extends Family {
+final class ExtensionSourceFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          ExtensionSource,
+          AsyncValue<WebSourceInfo>,
+          WebSourceInfo,
+          FutureOr<WebSourceInfo>,
+          String
+        > {
   const ExtensionSourceFamily._()
     : super(
         retry: null,
         name: r'extensionSourceProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: false,
       );
 
@@ -1302,49 +1214,7 @@ final class ExtensionSourceFamily extends Family {
       ExtensionSourceProvider._(argument: sourceId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$extensionSourceHash();
-
-  @override
   String toString() => r'extensionSourceProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(ExtensionSource Function(String args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ExtensionSourceProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<WebSourceInfo> Function(
-      Ref ref,
-      ExtensionSource notifier,
-      String argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ExtensionSourceProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
@@ -1352,7 +1222,7 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
   String get sourceId => _$args;
 
   FutureOr<WebSourceInfo> build(String sourceId);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -1360,7 +1230,7 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<WebSourceInfo>>,
+              AnyNotifier<AsyncValue<WebSourceInfo>>,
               AsyncValue<WebSourceInfo>,
               Object?,
               Object?
@@ -1374,57 +1244,36 @@ const extensionInfoListProvider = ExtensionInfoListProvider._();
 
 final class ExtensionInfoListProvider
     extends $AsyncNotifierProvider<ExtensionInfoList, List<WebSourceInfo>> {
-  const ExtensionInfoListProvider._({
-    super.runNotifierBuildOverride,
-    ExtensionInfoList Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'extensionInfoListProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final ExtensionInfoList Function()? _createCb;
+  const ExtensionInfoListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'extensionInfoListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$extensionInfoListHash();
 
   @$internal
   @override
-  ExtensionInfoList create() => _createCb?.call() ?? ExtensionInfoList();
-
-  @$internal
-  @override
-  ExtensionInfoListProvider $copyWithCreate(
-    ExtensionInfoList Function() create,
-  ) {
-    return ExtensionInfoListProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  ExtensionInfoListProvider $copyWithBuild(
-    FutureOr<List<WebSourceInfo>> Function(Ref, ExtensionInfoList) build,
-  ) {
-    return ExtensionInfoListProvider._(runNotifierBuildOverride: build);
-  }
+  ExtensionInfoList create() => ExtensionInfoList();
 
   @$internal
   @override
   $AsyncNotifierProviderElement<ExtensionInfoList, List<WebSourceInfo>>
   $createElement($ProviderPointer pointer) =>
-      $AsyncNotifierProviderElement(this, pointer);
+      $AsyncNotifierProviderElement(pointer);
 }
 
 String _$extensionInfoListHash() => r'0665e8257c6673036644f3e598bf43e023b1bd12';
 
 abstract class _$ExtensionInfoList extends $AsyncNotifier<List<WebSourceInfo>> {
   FutureOr<List<WebSourceInfo>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -1432,7 +1281,7 @@ abstract class _$ExtensionInfoList extends $AsyncNotifier<List<WebSourceInfo>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<List<WebSourceInfo>>>,
+              AnyNotifier<AsyncValue<List<WebSourceInfo>>>,
               AsyncValue<List<WebSourceInfo>>,
               Object?,
               Object?
@@ -1451,17 +1300,13 @@ final class GetExtensionFromIdProvider
   const GetExtensionFromIdProvider._({
     required GetExtensionFromIdFamily super.from,
     required String super.argument,
-    FutureOr<WebSourceInfo> Function(Ref ref, String sourceId)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'getExtensionFromIdProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<WebSourceInfo> Function(Ref ref, String sourceId)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$getExtensionFromIdHash();
@@ -1477,24 +1322,12 @@ final class GetExtensionFromIdProvider
   @override
   $FutureProviderElement<WebSourceInfo> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  GetExtensionFromIdProvider $copyWithCreate(
-    FutureOr<WebSourceInfo> Function(Ref ref) create,
-  ) {
-    return GetExtensionFromIdProvider._(
-      argument: argument as String,
-      from: from! as GetExtensionFromIdFamily,
-      create: (ref, String sourceId) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<WebSourceInfo> create(Ref ref) {
-    final _$cb = _createCb ?? getExtensionFromId;
     final argument = this.argument as String;
-    return _$cb(ref, argument);
+    return getExtensionFromId(ref, argument);
   }
 
   @override
@@ -1511,13 +1344,14 @@ final class GetExtensionFromIdProvider
 String _$getExtensionFromIdHash() =>
     r'b5bf3c8a25a75348d4400be94e8864bff3bafdea';
 
-final class GetExtensionFromIdFamily extends Family {
+final class GetExtensionFromIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<WebSourceInfo>, String> {
   const GetExtensionFromIdFamily._()
     : super(
         retry: noRetry,
         name: r'getExtensionFromIdProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -1525,28 +1359,7 @@ final class GetExtensionFromIdFamily extends Family {
       GetExtensionFromIdProvider._(argument: sourceId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$getExtensionFromIdHash();
-
-  @override
   String toString() => r'getExtensionFromIdProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<WebSourceInfo> Function(Ref ref, String args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as GetExtensionFromIdProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint

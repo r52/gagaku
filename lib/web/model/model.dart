@@ -17,6 +17,7 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/server.dart' show port;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';

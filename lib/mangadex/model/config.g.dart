@@ -66,24 +66,35 @@ const mdConfigProvider = MdConfigProvider._();
 
 final class MdConfigProvider
     extends $NotifierProvider<MdConfig, MangaDexConfig> {
-  const MdConfigProvider._({
-    super.runNotifierBuildOverride,
-    MdConfig Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'mdConfigProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final MdConfig Function()? _createCb;
+  const MdConfigProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mdConfigProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$mdConfigHash();
+
+  @$internal
+  @override
+  MdConfig create() => MdConfig();
+
+  @$internal
+  @override
+  _$MdConfigElement $createElement($ProviderPointer pointer) =>
+      _$MdConfigElement(pointer);
+
+  ProviderListenable<MdConfig$Save> get save =>
+      $LazyProxyListenable<MdConfig$Save, MangaDexConfig>(this, (element) {
+        element as _$MdConfigElement;
+
+        return element._$save;
+      });
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(MangaDexConfig value) {
@@ -92,43 +103,13 @@ final class MdConfigProvider
       providerOverride: $ValueProvider<MangaDexConfig>(value),
     );
   }
-
-  @$internal
-  @override
-  MdConfig create() => _createCb?.call() ?? MdConfig();
-
-  @$internal
-  @override
-  MdConfigProvider $copyWithCreate(MdConfig Function() create) {
-    return MdConfigProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  MdConfigProvider $copyWithBuild(
-    MangaDexConfig Function(Ref, MdConfig) build,
-  ) {
-    return MdConfigProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  _$MdConfigElement $createElement($ProviderPointer pointer) =>
-      _$MdConfigElement(this, pointer);
-
-  ProviderListenable<MdConfig$Save> get save =>
-      $LazyProxyListenable<MdConfig$Save, MangaDexConfig>(this, (element) {
-        element as _$MdConfigElement;
-
-        return element._$save;
-      });
 }
 
 String _$mdConfigHash() => r'1960773775590f451cf940bceddd1957277654d4';
 
 abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   MangaDexConfig build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -136,7 +117,7 @@ abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<MangaDexConfig>,
+              AnyNotifier<MangaDexConfig>,
               MangaDexConfig,
               Object?,
               Object?
@@ -147,7 +128,7 @@ abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
 
 class _$MdConfigElement
     extends $NotifierProviderElement<MdConfig, MangaDexConfig> {
-  _$MdConfigElement(super.provider, super.pointer) {
+  _$MdConfigElement(super.pointer) {
     _$save.result = $Result.data(_$MdConfig$Save(this));
   }
   final _$save = $ElementLense<_$MdConfig$Save>();
@@ -170,11 +151,11 @@ class _$MdConfigElement
 sealed class MdConfig$Save extends MutationBase<MangaDexConfig> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [MdConfig.save] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:

@@ -15,17 +15,13 @@ final class _FetchMangaFromIdProvider
   const _FetchMangaFromIdProvider._({
     required _FetchMangaFromIdFamily super.from,
     required String super.argument,
-    FutureOr<Manga> Function(Ref ref, String mangaId)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_fetchMangaFromIdProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<Manga> Function(Ref ref, String mangaId)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchMangaFromIdHash();
@@ -40,24 +36,12 @@ final class _FetchMangaFromIdProvider
   @$internal
   @override
   $FutureProviderElement<Manga> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
-
-  @override
-  _FetchMangaFromIdProvider $copyWithCreate(
-    FutureOr<Manga> Function(Ref ref) create,
-  ) {
-    return _FetchMangaFromIdProvider._(
-      argument: argument as String,
-      from: from! as _FetchMangaFromIdFamily,
-      create: (ref, String mangaId) => create(ref),
-    );
-  }
+      $FutureProviderElement(pointer);
 
   @override
   FutureOr<Manga> create(Ref ref) {
-    final _$cb = _createCb ?? _fetchMangaFromId;
     final argument = this.argument as String;
-    return _$cb(ref, argument);
+    return _fetchMangaFromId(ref, argument);
   }
 
   @override
@@ -73,13 +57,14 @@ final class _FetchMangaFromIdProvider
 
 String _$fetchMangaFromIdHash() => r'f62fea15fddc9b97b851c6e9779ee6bfd7448f3b';
 
-final class _FetchMangaFromIdFamily extends Family {
+final class _FetchMangaFromIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Manga>, String> {
   const _FetchMangaFromIdFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchMangaFromIdProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -87,26 +72,7 @@ final class _FetchMangaFromIdFamily extends Family {
       _FetchMangaFromIdProvider._(argument: mangaId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$fetchMangaFromIdHash();
-
-  @override
   String toString() => r'_fetchMangaFromIdProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(FutureOr<Manga> Function(Ref ref, String args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _FetchMangaFromIdProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint
