@@ -25,7 +25,9 @@ import 'package:timeago/timeago.dart' as timeago;
 class _HttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..maxConnectionsPerHost = 5;
+    return super.createHttpClient(context)
+      ..maxConnectionsPerHost = 5
+      ..connectionTimeout = const Duration(seconds: 10);
   }
 }
 
@@ -33,7 +35,6 @@ void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale();
-  // await Rhttp.init();
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);

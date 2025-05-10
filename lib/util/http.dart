@@ -7,7 +7,7 @@ import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
 
 const _baseUserAgent =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0';
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:138.0) Gecko/20100101 Firefox/138.0';
 
 String getUserAgent([bool useCustomUA = false]) {
   return useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
@@ -15,13 +15,6 @@ String getUserAgent([bool useCustomUA = false]) {
 
 http.Client _createHttpClient([bool useCustomUA = false]) {
   final userAgent = getUserAgent(useCustomUA);
-
-  // return RhttpCompatibleClient.createSync(
-  //   settings: ClientSettings(
-  //     timeoutSettings: TimeoutSettings(connectTimeout: Duration(seconds: 5)),
-  //     userAgent: userAgent,
-  //   ),
-  // );
 
   if (Platform.isAndroid) {
     final engine = CronetEngine.build(
@@ -35,13 +28,24 @@ http.Client _createHttpClient([bool useCustomUA = false]) {
   return IOClient(HttpClient()..userAgent = userAgent);
 }
 
-class RateLimitedClient extends CustomClient {
+class RateLimitedClient extends http.BaseClient {
   static const _maxConcurrentRequests = 5;
   static const _buffer = Duration(milliseconds: 500);
   static const _rateLimit = Duration(milliseconds: 250);
+
+  final http.Client _baseClient;
+
   final _pendingCalls = <String, List<String>>{};
 
-  RateLimitedClient({super.useCustomUA});
+  RateLimitedClient({bool useCustomUA = false})
+    : _baseClient = RetryClient(
+        _createHttpClient(useCustomUA),
+        retries: 2,
+        when: (response) => false,
+        whenError:
+            (error, stacktrace) =>
+                error is HttpException || error is http.ClientException,
+      );
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
@@ -67,33 +71,13 @@ class RateLimitedClient extends CustomClient {
     final wait = _rateLimit * numPending;
     await Future.delayed(wait);
 
-    return _baseClient
-        .send(request)
-        .timeout(const Duration(seconds: 10))
-        .whenComplete(() {
-          _pendingCalls[host]!.remove(request.toString());
-          // logger.d(
-          //   'RateLimit: PendingCalls[$host] = ${_pendingCalls[host]!.length}',
-          // );
-        });
-  }
-}
+    final response = await _baseClient.send(request);
 
-class CustomClient extends http.BaseClient {
-  final http.Client _baseClient;
+    _pendingCalls[host]!.remove(request.toString());
+    // logger.d(
+    //   'RateLimit: PendingCalls[$host] = ${_pendingCalls[host]!.length}',
+    // );
 
-  CustomClient({bool useCustomUA = false})
-    : _baseClient = RetryClient(
-        _createHttpClient(useCustomUA),
-        retries: 2,
-        when: (response) => false,
-        whenError:
-            (error, stacktrace) =>
-                error is HttpException || error is http.ClientException,
-      );
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    return _baseClient.send(request);
+    return response;
   }
 }
