@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/types.dart' show MangaDexCredentials;
+import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/model/model.dart';
@@ -33,12 +34,23 @@ class MangaDexLoginWidget extends ConsumerWidget {
         context,
       ),
       AsyncValue(hasValue: true, value: final me) when me == null => Center(
-        child: ElevatedButton.icon(
-          onPressed: () async {
-            AutoRouter.of(context).push(MangaDexLoginRoute());
-          },
-          label: Text(tr.mangadex.login),
-          icon: const Icon(Icons.https),
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            MangaDexSliverAppBar(title: tr.mangadex.login),
+            SliverFillRemaining(
+              child: Center(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    AutoRouter.of(context).push(MangaDexLoginRoute());
+                  },
+                  label: Text(tr.mangadex.login),
+                  icon: const Icon(Icons.https),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       AsyncValue(:final progress) => Center(
