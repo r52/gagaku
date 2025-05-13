@@ -45,9 +45,11 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
     limit: MangaDexEndpoints.breakLimit,
   );
 
-  await ref.read(statisticsProvider.get)(manga);
-  await ref.read(readChaptersProvider(me?.id).get)(manga);
-  await ref.read(ratingsProvider(me?.id).get)(manga);
+  await (
+    ref.read(statisticsProvider.get)(manga),
+    ref.read(readChaptersProvider(me?.id).get)(manga),
+    ref.read(ratingsProvider(me?.id).get)(manga),
+  ).wait;
 
   return manga.first;
 }
@@ -194,8 +196,10 @@ class _MangaDexMangaViewWidgetState
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await ref.read(statisticsProvider.get)(mangas);
-      await ref.read(readChaptersProvider(me?.id).get)(mangas);
+      await (
+        ref.read(statisticsProvider.get)(mangas),
+        ref.read(readChaptersProvider(me?.id).get)(mangas),
+      ).wait;
 
       return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
     },

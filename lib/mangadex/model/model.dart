@@ -1962,7 +1962,7 @@ class ReadChapters extends _$ReadChapters {
 
     final oldstate = await future;
     final mg = mangas.where(
-      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true,
+      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired == true,
     );
 
     if (mg.isEmpty) {
@@ -2427,7 +2427,7 @@ class Ratings extends _$Ratings {
 
     final oldstate = await future;
     final mg = mangas.where(
-      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true,
+      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired == true,
     );
 
     if (mg.isEmpty) {

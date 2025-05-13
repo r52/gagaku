@@ -466,9 +466,11 @@ class _InfiniteScrollFeedState
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await ref.read(statisticsProvider.get)(mangas);
-      await ref.read(readChaptersProvider(me?.id).get)(mangas);
-      await ref.read(chapterStatsProvider.get)(chapters);
+      await (
+        ref.read(statisticsProvider.get)(mangas),
+        ref.read(readChaptersProvider(me?.id).get)(mangas),
+        ref.read(chapterStatsProvider.get)(chapters),
+      ).wait;
 
       return PageResultsMetaData(chapters, chapterlist.total);
     },

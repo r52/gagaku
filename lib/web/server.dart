@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/web/model/model.dart' show webSourceClient;
+import 'package:gagaku/util/http.dart' show RateLimitedClient;
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -17,6 +17,8 @@ Codec<String, String> b64 = utf8.fuse(base64Url);
 const _unwantedHeaders = ['set-cookie'];
 const port = 8527;
 const host = '127.0.0.1';
+
+final _proxyClient = RateLimitedClient();
 
 Future<void> runExtensionHostServer() async {
   final cascade = Cascade().add(_assetHandler).add(_router.call);
@@ -43,7 +45,7 @@ Future<Response> _proxyHandler(Request request, String url) async {
 
   debugPrint('Proxying: $uri');
 
-  final nonNullClient = webSourceClient;
+  final nonNullClient = _proxyClient;
 
   final requestUrl = Uri.parse(uri);
   final clientRequest =

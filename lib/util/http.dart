@@ -13,15 +13,17 @@ String getUserAgent([bool useCustomUA = false]) {
   return useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
 }
 
+CronetEngine createCronetEngine(String userAgent) => CronetEngine.build(
+  cacheMode: CacheMode.memory,
+  cacheMaxSize: 10 * 1024 * 1024,
+  userAgent: userAgent,
+);
+
 http.Client _createHttpClient([bool useCustomUA = false]) {
   final userAgent = getUserAgent(useCustomUA);
 
   if (Platform.isAndroid) {
-    final engine = CronetEngine.build(
-      cacheMode: CacheMode.memory,
-      cacheMaxSize: 10 * 1024 * 1024,
-      userAgent: userAgent,
-    );
+    final engine = createCronetEngine(userAgent);
     return CronetClient.fromCronetEngine(engine, closeEngine: true);
   }
 
