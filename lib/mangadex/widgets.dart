@@ -160,7 +160,10 @@ class MangaDexSliverAppBar extends StatelessWidget {
                           ),
                           MenuItemButton(
                             onPressed:
-                                () => ref.read(authControlProvider.logout)(),
+                                () =>
+                                    ref
+                                        .read(authControlProvider.notifier)
+                                        .logout(),
                             leadingIcon: const Icon(Icons.logout),
                             child: Text(tr.auth.logout),
                           ),

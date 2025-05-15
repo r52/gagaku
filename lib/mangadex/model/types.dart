@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:gagaku/util/authentication.dart';
 import 'package:gagaku/util/freezed.dart';
 import 'package:gagaku/util/util.dart';
 
@@ -1093,4 +1094,11 @@ abstract class MangaDexTokens with _$MangaDexTokens {
 
   factory MangaDexTokens.fromJson(Map<String, dynamic> json) =>
       _$MangaDexTokensFromJson(json);
+
+  factory MangaDexTokens.fromOIDAuthToken(OIDAuthToken token) => MangaDexTokens(
+    accessToken: token.accessToken,
+    refreshToken: token.refreshToken,
+    tokenType: token.tokenType,
+    idToken: token.idToken,
+  );
 }

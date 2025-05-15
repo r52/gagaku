@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_dio/fresh_dio.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/util/ui.dart';
@@ -13,8 +14,8 @@ class MangaDexLoginWidget extends StatelessWidget {
     final t = context.t;
     return DataProviderWhenWidget(
       provider: authControlProvider,
-      builder: (context, loggedin) {
-        if (loggedin) {
+      builder: (context, status) {
+        if (status == AuthenticationStatus.authenticated) {
           return builder(context);
         }
 

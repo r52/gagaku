@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -17,12 +18,11 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/server.dart' show port;
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
 import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
-
-final webSourceClient = RateLimitedClient();
 
 @Riverpod(keepAlive: true)
 ProxyHandler proxy(Ref ref) {
@@ -32,10 +32,23 @@ ProxyHandler proxy(Ref ref) {
 class ProxyHandler {
   ProxyHandler(this.ref) {
     _cache = ref.watch(cacheProvider);
+
+    _dio.interceptors.add(RateLimitingInterceptor());
   }
 
   final Ref ref;
-  final http.Client client = webSourceClient;
+
+  final _dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+        validateStatus: (status) => true,
+      ),
+    )
+    ..httpClientAdapter = NativeAdapter(
+      createCronetEngine: () => createCronetEngine(getUserAgent(false)),
+    );
+
   late final CacheManager _cache;
 
   Future<void> invalidateCacheItem(String item) async {
@@ -170,16 +183,19 @@ class ProxyHandler {
         );
       default:
         logger.d('ProxyHandler: retrieving url $url');
-        final response = await client.send(
-          (http.Request('GET', Uri.parse(url))..followRedirects = false),
+
+        final response = await _dio.getUri(
+          Uri.parse(url),
+          options: Options(followRedirects: false),
         );
 
         if (response.statusCode != 302 ||
-            !response.headers.containsKey('location')) {
+            !response.headers.map.containsKey('location') ||
+            response.headers['location']!.isEmpty) {
           return null;
         }
 
-        final location = response.headers['location']!;
+        final location = response.headers['location']!.first;
 
         if (!location.startsWith('/read/')) {
           return null;
@@ -225,11 +241,10 @@ class ProxyHandler {
       return _cache.get<WebManga>(key, WebManga.fromJson);
     }
 
-    final response = await client.get(Uri.parse(url));
+    final response = await _dio.getUri(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-      final manga = WebManga.fromJson(body);
+      final manga = WebManga.fromJson(response.data);
 
       const expiry = Duration(minutes: 15);
 
@@ -240,23 +255,21 @@ class ProxyHandler {
     }
 
     throw Exception(
-      "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}",
+      "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
     );
   }
 
   Future<dynamic> getProxyAPI(String path) async {
     final url = "https://cubari.moe$path";
 
-    final response = await client.get(Uri.parse(url));
+    final response = await _dio.getUri(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-
-      return body;
+      return response.data;
     }
 
     throw Exception(
-      "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}",
+      "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
     );
   }
 }

@@ -289,14 +289,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
-  crypto_keys:
+  crypto_keys_plus:
     dependency: transitive
     description:
-      name: crypto_keys
-      sha256: acc19abf34623d990a0e8aec69463d74a824c31f137128f42e2810befc509ad0
+      name: crypto_keys_plus
+      sha256: a64dc8b3555e730aa183067fbb666efd9996bc2d0cfda4517c77607d9e2adf91
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0+1"
+    version: "0.5.0"
   csslib:
     dependency: transitive
     description:
@@ -313,6 +313,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
+  cupertino_http:
+    dependency: transitive
+    description:
+      name: cupertino_http
+      sha256: "8fb9e2c36d0732d9d96abd76683406b57e78a2514e27c962e0c603dbe6f2e3f8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   custom_lint:
     dependency: "direct dev"
     description:
@@ -369,6 +377,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.2"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      sha256: "253a18bbd4851fecba42f7343a1df3a9a4c1d31a2c1b37e221086b4fa8c8dbc9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.8.0+1"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   expansion_tile_list:
     dependency: "direct main"
     description:
@@ -405,10 +429,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: a222f231db4f822fc49e3b753674bda630e981873c84bf8604bceeb77fce0b24
+      sha256: "77f8e81d22d2a07d0dee2c62e1dda71dc1da73bf43bb2d45af09727406167964"
       url: "https://pub.dev"
     source: hosted
-    version: "10.1.7"
+    version: "10.1.9"
   fixnum:
     dependency: transitive
     description:
@@ -589,6 +613,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  fresh:
+    dependency: transitive
+    description:
+      name: fresh
+      sha256: "9d345f48d4685781a5d8768b05634a0b2a46dfacec42c4b9d4b49ebe5127ef2e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.3"
+  fresh_dio:
+    dependency: "direct main"
+    description:
+      name: fresh_dio
+      sha256: "3140345fd9aba5d82a8fc6809d79311ac089dd8c723523c3abcb9e8efcaba780"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.3"
   frontend_server_client:
     dependency: transitive
     description:
@@ -749,14 +789,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.2"
-  jose:
+  jose_plus:
     dependency: transitive
     description:
-      name: jose
-      sha256: "7955ec5d131960104e81fbf151abacb9d835c16c9e793ed394b2809f28b2198d"
+      name: jose_plus
+      sha256: c262694c2f8e74825a70d0b7339c24a285fd8856f9b35b0848aa23fa1d26e724
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.4"
+    version: "0.4.7"
   js:
     dependency: transitive
     description:
@@ -877,14 +917,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.5"
-  mutex:
+  native_dio_adapter:
     dependency: "direct main"
     description:
-      name: mutex
-      sha256: "8827da25de792088eb33e572115a5eb0d61d61a3c01acbc8bcbe76ed78f1a1f2"
+      name: native_dio_adapter
+      sha256: "7420bc9517b2abe09810199a19924617b45690a44ecfb0616ac9babc11875c03"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "1.4.0"
   node_preamble:
     dependency: transitive
     description:
@@ -901,6 +941,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  objective_c:
+    dependency: transitive
+    description:
+      name: objective_c
+      sha256: "9f034ba1eeca53ddb339bc8f4813cb07336a849cd735559b60cdc068ecce2dc7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.1.0"
   octo_image:
     dependency: transitive
     description:
@@ -914,7 +962,7 @@ packages:
     description:
       path: "."
       ref: password
-      resolved-ref: fdb144d304157b3bb81dc2d1bb9d46ea0c89ea67
+      resolved-ref: "9ac1837425766beb11ef8d0164963c9acc331b9e"
       url: "https://github.com/r52/openid_client.git"
     source: git
     version: "0.4.9"
@@ -1066,10 +1114,10 @@ packages:
     dependency: transitive
     description:
       name: pointycastle
-      sha256: "4be0097fcf3fd3e8449e53730c631200ebc7b88016acecab2b0da2f0149222fe"
+      sha256: "92aa3841d083cc4b0f4709b5c74fd6409a3e6ba833ffc7dc6a8fee096366acf5"
       url: "https://pub.dev"
     source: hosted
-    version: "3.9.1"
+    version: "4.0.0"
   pool:
     dependency: transitive
     description:
@@ -1102,14 +1150,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
-  quiver:
-    dependency: transitive
-    description:
-      name: quiver
-      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.2"
   riverpod:
     dependency: "direct main"
     description:
@@ -1588,14 +1628,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  x509:
+  x509_plus:
     dependency: transitive
     description:
-      name: x509
-      sha256: cbd1a63846884afd273cda247b0365284c8d85a365ca98e110413f93d105b935
+      name: x509_plus
+      sha256: f9f5caade6077c9a605125428d0bf79c002afa35a475d400849adb1a25ebeee6
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.4+3"
+    version: "0.3.3"
   xdg_directories:
     dependency: transitive
     description:

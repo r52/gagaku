@@ -167,7 +167,7 @@ extension RefWorkaround on Ref {
     }
   }
 
-  T readFuture<T>(Refreshable<T> listenable) {
+  T readFuture<T>(ProviderListenable<T> listenable) {
     T result;
     final sub = listen(listenable, (_, __) {});
 

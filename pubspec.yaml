@@ -31,7 +31,7 @@ environment:
 dependencies:
   animations: ^2.0.7
   archive: ^4.0.1
-  file_picker: ^10.0.0
+  file_picker: ^10.1.7
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -49,7 +49,6 @@ dependencies:
       ref: password
   logger: ^2.0.0
   meta:
-  mutex: ^3.0.1
   path: ^1.9.0
   path_provider: ^2.0.15
   photo_view: ^0.15.0
@@ -82,6 +81,9 @@ dependencies:
   slang: ^4.6.0
   slang_flutter: ^4.6.0
   cronet_http: ^1.3.3
+  dio: ^5.8.0+1
+  fresh_dio: ^0.4.3
+  native_dio_adapter: ^1.4.0
 
 dev_dependencies:
   flutter_test:

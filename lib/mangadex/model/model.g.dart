@@ -45,7 +45,7 @@ final class MangadexProvider
   }
 }
 
-String _$mangadexHash() => r'2e60803c3e0b7b0065c423dcb31c862de55d8e53';
+String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
 
 @ProviderFor(MangaChaptersListSort)
 const mangaChaptersListSortProvider = MangaChaptersListSortProvider._();
@@ -173,7 +173,7 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'1e52eceee5ec71ee240aa09663fbd4c633cabbdd';
+String _$readChaptersHash() => r'0af513411c25e4aae0dc00c9f14bbdf6bfc11944';
 
 final class ReadChaptersFamily extends $Family
     with
@@ -1678,7 +1678,7 @@ final class RatingsProvider
   }
 }
 
-String _$ratingsHash() => r'4cbf0300ac8e1bac2ea41d0b575b47be0d942f1f';
+String _$ratingsHash() => r'4a9d08543fc2877e2e674f88f871e5f4195661b4';
 
 final class RatingsFamily extends $Family
     with
@@ -2330,7 +2330,7 @@ final class LoggedUserProvider
   ) => $AsyncNotifierProviderElement(pointer);
 }
 
-String _$loggedUserHash() => r'661369d0e4ee922b460c6c3a86c32eaac36a80fa';
+String _$loggedUserHash() => r'd57241dc04aa26bc80bbb5b0bdb1b3b2e38c5ee2';
 
 abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
@@ -2355,7 +2355,7 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
 const authControlProvider = AuthControlProvider._();
 
 final class AuthControlProvider
-    extends $AsyncNotifierProvider<AuthControl, bool> {
+    extends $StreamNotifierProvider<AuthControl, AuthenticationStatus> {
   const AuthControlProvider._()
     : super(
         from: null,
@@ -2380,38 +2380,30 @@ final class AuthControlProvider
       _$AuthControlElement(pointer);
 
   ProviderListenable<AuthControl$Login> get login =>
-      $LazyProxyListenable<AuthControl$Login, AsyncValue<bool>>(this, (
-        element,
-      ) {
-        element as _$AuthControlElement;
+      $LazyProxyListenable<AuthControl$Login, AsyncValue<AuthenticationStatus>>(
+        this,
+        (element) {
+          element as _$AuthControlElement;
 
-        return element._$login;
-      });
-
-  ProviderListenable<AuthControl$Logout> get logout =>
-      $LazyProxyListenable<AuthControl$Logout, AsyncValue<bool>>(this, (
-        element,
-      ) {
-        element as _$AuthControlElement;
-
-        return element._$logout;
-      });
+          return element._$login;
+        },
+      );
 }
 
-String _$authControlHash() => r'74fa09c8df5d9ceef2fc2d4a4f8a80a7a34ef14a';
+String _$authControlHash() => r'5871d5ea6701a4885265d5ae3dfbd2376748c649';
 
-abstract class _$AuthControl extends $AsyncNotifier<bool> {
-  FutureOr<bool> build();
+abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
+  Stream<AuthenticationStatus> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<bool>>;
+    final ref = this.ref as $Ref<AsyncValue<AuthenticationStatus>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<bool>>,
-              AsyncValue<bool>,
+              AnyNotifier<AsyncValue<AuthenticationStatus>>,
+              AsyncValue<AuthenticationStatus>,
               Object?,
               Object?
             >;
@@ -2420,18 +2412,15 @@ abstract class _$AuthControl extends $AsyncNotifier<bool> {
 }
 
 class _$AuthControlElement
-    extends $AsyncNotifierProviderElement<AuthControl, bool> {
+    extends $StreamNotifierProviderElement<AuthControl, AuthenticationStatus> {
   _$AuthControlElement(super.pointer) {
     _$login.result = $Result.data(_$AuthControl$Login(this));
-    _$logout.result = $Result.data(_$AuthControl$Logout(this));
   }
   final _$login = $ElementLense<_$AuthControl$Login>();
-  final _$logout = $ElementLense<_$AuthControl$Logout>();
   @override
   void mount() {
     super.mount();
     _$login.result!.value!.reset();
-    _$logout.result!.value!.reset();
   }
 
   @override
@@ -2441,7 +2430,6 @@ class _$AuthControlElement
     super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$login);
-    listenableVisitor(_$logout);
   }
 }
 
@@ -2495,48 +2483,6 @@ final class _$AuthControl$Login
   @override
   _$AuthControl$Login copyWith(MutationState<bool> state, {Object? key}) =>
       _$AuthControl$Login(element, state: state, key: key);
-}
-
-sealed class AuthControl$Logout extends MutationBase<bool> {
-  /// Starts the mutation.
-  ///
-  /// This will first set the state to [PendingMutation], then
-  /// will call [AuthControl.logout] with the provided parameters.
-  ///
-  /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutation] or [ErrorMutation] based on if the method
-  /// threw or not.
-  ///
-  /// **Note**:
-  /// If the notifier threw in its constructor, the mutation won't start
-  /// and [call] will throw.
-  /// This should generally never happen though, as Notifiers are not supposed
-  /// to have logic in their constructors.
-  Future<bool> call();
-}
-
-final class _$AuthControl$Logout
-    extends $AsyncMutationBase<bool, _$AuthControl$Logout, AuthControl>
-    implements AuthControl$Logout {
-  _$AuthControl$Logout(this.element, {super.state, super.key});
-
-  @override
-  final _$AuthControlElement element;
-
-  @override
-  $ElementLense<_$AuthControl$Logout> get listenable => element._$logout;
-
-  @override
-  Future<bool> call() {
-    return mutate(
-      Invocation.method(#logout, []),
-      ($notifier) => $notifier.logout(),
-    );
-  }
-
-  @override
-  _$AuthControl$Logout copyWith(MutationState<bool> state, {Object? key}) =>
-      _$AuthControl$Logout(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint
