@@ -21,7 +21,7 @@ abstract class LocalLibConfig with _$LocalLibConfig {
 @Riverpod(keepAlive: true)
 class LocalConfig extends _$LocalConfig {
   LocalLibConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuLocalBox);
     final str = box.get('locallib');
 
     if (str == null) {
@@ -41,7 +41,7 @@ class LocalConfig extends _$LocalConfig {
   @mutation
   LocalLibConfig save(LocalLibConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuLocalBox);
     box.put('locallib', json.encode(update.toJson()));
 
     return update;

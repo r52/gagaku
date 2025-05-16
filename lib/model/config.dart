@@ -47,7 +47,7 @@ abstract class GagakuConfig with _$GagakuConfig {
 @riverpod
 class GagakuSettings extends _$GagakuSettings {
   GagakuConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('gagaku');
 
     if (str == null) {
@@ -67,7 +67,7 @@ class GagakuSettings extends _$GagakuSettings {
   @mutation
   GagakuConfig save(GagakuConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('gagaku', json.encode(update.toJson()));
 
     return update;

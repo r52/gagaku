@@ -105,7 +105,7 @@ final class MdConfigProvider
   }
 }
 
-String _$mdConfigHash() => r'1960773775590f451cf940bceddd1957277654d4';
+String _$mdConfigHash() => r'cba5feaa15f6f2f28659d9cd6523496419670a30';
 
 abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   MangaDexConfig build();

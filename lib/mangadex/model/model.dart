@@ -209,13 +209,13 @@ extension TokenHelper on TokenResponse {
 class MangaDexTokenStorage implements TokenStorage<OIDAuthToken> {
   @override
   Future<void> delete() async {
-    final storage = Hive.box(gagakuBox);
+    final storage = Hive.box(gagakuLocalBox);
     await storage.delete('mangadex_tokens');
   }
 
   @override
   Future<OIDAuthToken?> read() async {
-    final storage = Hive.box(gagakuBox);
+    final storage = Hive.box(gagakuLocalBox);
 
     final tokenstr = storage.get('mangadex_tokens');
     final token =
@@ -236,7 +236,7 @@ class MangaDexTokenStorage implements TokenStorage<OIDAuthToken> {
 
   @override
   Future<void> write(OIDAuthToken token) async {
-    final storage = Hive.box(gagakuBox);
+    final storage = Hive.box(gagakuLocalBox);
 
     final mtoken = MangaDexTokens.fromOIDAuthToken(token);
     await storage.put('mangadex_tokens', json.encode(mtoken.toJson()));
@@ -308,7 +308,7 @@ class MangaDexModel {
     // Clear old data
     _token = null;
 
-    final storage = Hive.box(gagakuBox);
+    final storage = Hive.box(gagakuLocalBox);
 
     if (token != null) {
       final tt = token.tokenType;
@@ -407,7 +407,7 @@ class MangaDexModel {
     String clientId,
     String clientSecret,
   ) async {
-    final storage = Hive.box(gagakuBox);
+    final storage = Hive.box(gagakuLocalBox);
 
     final creds = MangaDexCredentials(
       username: username,
@@ -2526,7 +2526,7 @@ class MangaDexHistory extends _$MangaDexHistory {
 
   @override
   Future<Queue<Chapter>> build() async {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('mangadex_history');
 
     if (str == null || (str as String).isEmpty) {
@@ -2561,7 +2561,7 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final uuids = cpy.map((e) => e.id).toList();
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('mangadex_history', json.encode(uuids));
 
     state = AsyncData(cpy);

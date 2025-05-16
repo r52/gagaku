@@ -62,7 +62,7 @@ final class LocalConfigProvider
   }
 }
 
-String _$localConfigHash() => r'2d256629dac8ccaf6abbfd3d1ef120a1b718a2c1';
+String _$localConfigHash() => r'95b13d718adababe7f3396ca3becff593f1cc8c3';
 
 abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();

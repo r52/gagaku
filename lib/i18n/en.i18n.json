@@ -467,5 +467,21 @@
     "clearSub": "Deletes all cached data. ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING!",
     "clearWarning": "Are you sure you want to delete all cached data?",
     "clearSuccess": "Cache cleared"
+  },
+  "backup": {
+    "data": "Backup Data",
+    "dataSub": "Backup all gagaku data and settings (excludes MangaDex login, local library files)\nNOTE: when restoring, restart the app for changes to take effect",
+    "restore": "Restore Backup",
+    "restoreWarning": "Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?",
+    "toFile": "Backup Data to File",
+    "fromFile": "Restore Data from File",
+    "success": "Backup saved",
+    "restoreSuccess": "Backup restored. Restart gagaku for changes to take effect",
+    "cancelled": "Backup cancelled",
+    "restoreCancelled": "Backup restore cancelled",
+    "restoreFail": "Backup restore failed",
+    "dataLocation": "Database Directory",
+    "dataLocSub": "Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.",
+    "dataLocDefault": "Default"
   }
 }

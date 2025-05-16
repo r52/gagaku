@@ -108,7 +108,7 @@ final class GagakuSettingsProvider
   }
 }
 
-String _$gagakuSettingsHash() => r'2fac8d25121935616099a1b26c5087025c8faf74';
+String _$gagakuSettingsHash() => r'3174dadb28b7bc4f1b2521e6e41201bdbe5d0814';
 
 abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();

@@ -1,3 +1,5 @@
+import 'package:hive_ce/hive.dart';
+
 abstract class GagakuRoute {
   static const chapterfeed = 'titles/feed';
   static const library = 'titles/follows';
@@ -37,8 +39,11 @@ abstract class GagakuRoute {
   static const config = '/config';
 }
 
-const gagakuBox = 'gagaku_box';
-const gagakuCache = 'gagaku_cache';
+const gagakuLocalBox =
+    'gagaku_box'; // local, device specific, or secure sensitive data
+const gagakuCache = 'gagaku_cache'; // disk cache
+const gagakuDataBox =
+    'gagaku_data'; // non-device specific, non-local, insecure data
 
 class GagakuData {
   GagakuData._internal();
@@ -51,4 +56,13 @@ class GagakuData {
   factory GagakuData() {
     return _instance;
   }
+}
+
+Future<void> initGagakuBoxes() async {
+  await Hive.openBox(gagakuLocalBox);
+
+  final storage = Hive.box(gagakuLocalBox);
+  final dataLocation = storage.get('data_location');
+
+  await Hive.openBox(gagakuDataBox, path: dataLocation);
 }

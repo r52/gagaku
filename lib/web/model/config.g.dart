@@ -100,7 +100,7 @@ final class WebConfigProvider
   }
 }
 
-String _$webConfigHash() => r'e29a8d2c9b8b3383dcdf068a313f6abd4da40492';
+String _$webConfigHash() => r'5e40dc510f838ca2882eaeb08c0606319221de0c';
 
 abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();
@@ -293,7 +293,7 @@ final class ExtensionStateProvider
   }
 }
 
-String _$extensionStateHash() => r'e05c4c05a9878f3b6bdf535268ffe4e9c9393eef';
+String _$extensionStateHash() => r'8ec3920b979e1c5550ad879c1d2dc3c02efcf5c9';
 
 abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
   ExtensionStateMap build();
@@ -352,7 +352,7 @@ final class ExtensionSecureStateProvider
 }
 
 String _$extensionSecureStateHash() =>
-    r'd1f8d6d3a5993fce5acad0aa78939d84a5a96cc3';
+    r'387043ca4bdfa573aff2cfc76037785ea430b5d8';
 
 abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateMap> {
   ExtensionStateMap build();

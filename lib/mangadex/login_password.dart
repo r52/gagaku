@@ -82,7 +82,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final storage = Hive.box(gagakuBox);
+    final storage = Hive.box(gagakuLocalBox);
 
     final credstr = storage.get('mangadex_credentials');
     final creds =

@@ -39,7 +39,7 @@ abstract class ReaderConfig with _$ReaderConfig {
 @riverpod
 class ReaderSettings extends _$ReaderSettings {
   ReaderConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('reader');
 
     if (str == null) {
@@ -59,7 +59,7 @@ class ReaderSettings extends _$ReaderSettings {
   @mutation
   ReaderConfig save(ReaderConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('reader', json.encode(update.toJson()));
 
     return update;

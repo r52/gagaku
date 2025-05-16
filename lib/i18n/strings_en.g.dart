@@ -78,6 +78,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsLanguageEn language = TranslationsLanguageEn.internal(_root);
 	late final TranslationsColorsEn colors = TranslationsColorsEn.internal(_root);
 	late final TranslationsCacheEn cache = TranslationsCacheEn.internal(_root);
+	late final TranslationsBackupEn backup = TranslationsBackupEn.internal(_root);
 }
 
 // Path: ui
@@ -584,6 +585,29 @@ class TranslationsCacheEn {
 	String get clearSub => 'Deletes all cached data. ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING!';
 	String get clearWarning => 'Are you sure you want to delete all cached data?';
 	String get clearSuccess => 'Cache cleared';
+}
+
+// Path: backup
+class TranslationsBackupEn {
+	TranslationsBackupEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get data => 'Backup Data';
+	String get dataSub => 'Backup all gagaku data and settings (excludes MangaDex login, local library files)\nNOTE: when restoring, restart the app for changes to take effect';
+	String get restore => 'Restore Backup';
+	String get restoreWarning => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?';
+	String get toFile => 'Backup Data to File';
+	String get fromFile => 'Restore Data from File';
+	String get success => 'Backup saved';
+	String get restoreSuccess => 'Backup restored. Restart gagaku for changes to take effect';
+	String get cancelled => 'Backup cancelled';
+	String get restoreCancelled => 'Backup restore cancelled';
+	String get restoreFail => 'Backup restore failed';
+	String get dataLocation => 'Database Directory';
+	String get dataLocSub => 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.';
+	String get dataLocDefault => 'Default';
 }
 
 // Path: localLibrary.settings
@@ -1186,6 +1210,20 @@ extension on Translations {
 			case 'cache.clearSub': return 'Deletes all cached data. ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING!';
 			case 'cache.clearWarning': return 'Are you sure you want to delete all cached data?';
 			case 'cache.clearSuccess': return 'Cache cleared';
+			case 'backup.data': return 'Backup Data';
+			case 'backup.dataSub': return 'Backup all gagaku data and settings (excludes MangaDex login, local library files)\nNOTE: when restoring, restart the app for changes to take effect';
+			case 'backup.restore': return 'Restore Backup';
+			case 'backup.restoreWarning': return 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?';
+			case 'backup.toFile': return 'Backup Data to File';
+			case 'backup.fromFile': return 'Restore Data from File';
+			case 'backup.success': return 'Backup saved';
+			case 'backup.restoreSuccess': return 'Backup restored. Restart gagaku for changes to take effect';
+			case 'backup.cancelled': return 'Backup cancelled';
+			case 'backup.restoreCancelled': return 'Backup restore cancelled';
+			case 'backup.restoreFail': return 'Backup restore failed';
+			case 'backup.dataLocation': return 'Database Directory';
+			case 'backup.dataLocSub': return 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.';
+			case 'backup.dataLocDefault': return 'Default';
 			default: return null;
 		}
 	}

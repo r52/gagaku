@@ -32,7 +32,7 @@ abstract class MangaDexConfig with _$MangaDexConfig {
 @riverpod
 class MdConfig extends _$MdConfig {
   MangaDexConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('mangadex');
 
     if (str == null) {
@@ -52,7 +52,7 @@ class MdConfig extends _$MdConfig {
   @mutation
   MangaDexConfig save(MangaDexConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('mangadex', json.encode(update.toJson()));
 
     return update;
