@@ -69,24 +69,35 @@ const gagakuSettingsProvider = GagakuSettingsProvider._();
 
 final class GagakuSettingsProvider
     extends $NotifierProvider<GagakuSettings, GagakuConfig> {
-  const GagakuSettingsProvider._({
-    super.runNotifierBuildOverride,
-    GagakuSettings Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'gagakuSettingsProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final GagakuSettings Function()? _createCb;
+  const GagakuSettingsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'gagakuSettingsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$gagakuSettingsHash();
+
+  @$internal
+  @override
+  GagakuSettings create() => GagakuSettings();
+
+  @$internal
+  @override
+  _$GagakuSettingsElement $createElement($ProviderPointer pointer) =>
+      _$GagakuSettingsElement(pointer);
+
+  ProviderListenable<GagakuSettings$Save> get save =>
+      $LazyProxyListenable<GagakuSettings$Save, GagakuConfig>(this, (element) {
+        element as _$GagakuSettingsElement;
+
+        return element._$save;
+      });
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(GagakuConfig value) {
@@ -95,43 +106,13 @@ final class GagakuSettingsProvider
       providerOverride: $ValueProvider<GagakuConfig>(value),
     );
   }
-
-  @$internal
-  @override
-  GagakuSettings create() => _createCb?.call() ?? GagakuSettings();
-
-  @$internal
-  @override
-  GagakuSettingsProvider $copyWithCreate(GagakuSettings Function() create) {
-    return GagakuSettingsProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  GagakuSettingsProvider $copyWithBuild(
-    GagakuConfig Function(Ref, GagakuSettings) build,
-  ) {
-    return GagakuSettingsProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  _$GagakuSettingsElement $createElement($ProviderPointer pointer) =>
-      _$GagakuSettingsElement(this, pointer);
-
-  ProviderListenable<GagakuSettings$Save> get save =>
-      $LazyProxyListenable<GagakuSettings$Save, GagakuConfig>(this, (element) {
-        element as _$GagakuSettingsElement;
-
-        return element._$save;
-      });
 }
 
-String _$gagakuSettingsHash() => r'2fac8d25121935616099a1b26c5087025c8faf74';
+String _$gagakuSettingsHash() => r'3174dadb28b7bc4f1b2521e6e41201bdbe5d0814';
 
 abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -139,7 +120,7 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<GagakuConfig>,
+              AnyNotifier<GagakuConfig>,
               GagakuConfig,
               Object?,
               Object?
@@ -150,7 +131,7 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
 
 class _$GagakuSettingsElement
     extends $NotifierProviderElement<GagakuSettings, GagakuConfig> {
-  _$GagakuSettingsElement(super.provider, super.pointer) {
+  _$GagakuSettingsElement(super.pointer) {
     _$save.result = $Result.data(_$GagakuSettings$Save(this));
   }
   final _$save = $ElementLense<_$GagakuSettings$Save>();
@@ -173,11 +154,11 @@ class _$GagakuSettingsElement
 sealed class GagakuSettings$Save extends MutationBase<GagakuConfig> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [GagakuSettings.save] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:

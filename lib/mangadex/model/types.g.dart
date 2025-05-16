@@ -621,3 +621,34 @@ Map<String, dynamic> _$FrontPageDataToJson(_FrontPageData instance) =>
       'staffPicks': instance.staffPicks,
       'seasonal': instance.seasonal,
     };
+
+_MangaDexCredentials _$MangaDexCredentialsFromJson(Map<String, dynamic> json) =>
+    _MangaDexCredentials(
+      username: json['username'] as String,
+      clientId: json['clientId'] as String,
+      clientSecret: json['clientSecret'] as String,
+    );
+
+Map<String, dynamic> _$MangaDexCredentialsToJson(
+  _MangaDexCredentials instance,
+) => <String, dynamic>{
+  'username': instance.username,
+  'clientId': instance.clientId,
+  'clientSecret': instance.clientSecret,
+};
+
+_MangaDexTokens _$MangaDexTokensFromJson(Map<String, dynamic> json) =>
+    _MangaDexTokens(
+      accessToken: json['accessToken'] as String?,
+      refreshToken: json['refreshToken'] as String?,
+      tokenType: json['tokenType'] as String?,
+      idToken: json['idToken'] as String,
+    );
+
+Map<String, dynamic> _$MangaDexTokensToJson(_MangaDexTokens instance) =>
+    <String, dynamic>{
+      'accessToken': instance.accessToken,
+      'refreshToken': instance.refreshToken,
+      'tokenType': instance.tokenType,
+      'idToken': instance.idToken,
+    };

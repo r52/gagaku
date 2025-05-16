@@ -23,6 +23,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final tr = context.t;
     final scrollController =
         DefaultScrollController.maybeOf(context, 'WebSourceFrontPage') ??
@@ -152,6 +153,19 @@ class WebSourceFrontPage extends HookConsumerWidget {
                           ExtensionHomeRoute(sourceId: item.id, source: item),
                         );
                       },
+                      // XXX: needs search capability check for 0.9
+                      trailing: IconButton(
+                        color: theme.colorScheme.onPrimaryContainer,
+                        icon: const Icon(Icons.search),
+                        onPressed:
+                            () => context.router.push(
+                              ExtensionSearchRoute(
+                                sourceId: item.id,
+                                source: item,
+                              ),
+                            ),
+                        tooltip: tr.search.arg(arg: item.name),
+                      ),
                     ),
                   );
                 },
@@ -296,6 +310,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           OverflowBar(
             spacing: 0.0,
             children: [
+              // XXX: needs search capability check for 0.9
               IconButton(
                 color: theme.colorScheme.onPrimaryContainer,
                 icon: const Icon(Icons.search),

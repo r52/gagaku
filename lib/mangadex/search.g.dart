@@ -11,24 +11,29 @@ const _searchHistoryProvider = _SearchHistoryProvider._();
 
 final class _SearchHistoryProvider
     extends $NotifierProvider<_SearchHistory, List<String>> {
-  const _SearchHistoryProvider._({
-    super.runNotifierBuildOverride,
-    _SearchHistory Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'_searchHistoryProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final _SearchHistory Function()? _createCb;
+  const _SearchHistoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'_searchHistoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$searchHistoryHash();
+
+  @$internal
+  @override
+  _SearchHistory create() => _SearchHistory();
+
+  @$internal
+  @override
+  $NotifierProviderElement<_SearchHistory, List<String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(pointer);
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<String> value) {
@@ -37,37 +42,13 @@ final class _SearchHistoryProvider
       providerOverride: $ValueProvider<List<String>>(value),
     );
   }
-
-  @$internal
-  @override
-  _SearchHistory create() => _createCb?.call() ?? _SearchHistory();
-
-  @$internal
-  @override
-  _SearchHistoryProvider $copyWithCreate(_SearchHistory Function() create) {
-    return _SearchHistoryProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  _SearchHistoryProvider $copyWithBuild(
-    List<String> Function(Ref, _SearchHistory) build,
-  ) {
-    return _SearchHistoryProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  $NotifierProviderElement<_SearchHistory, List<String>> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$searchHistoryHash() => r'03b2bdeb09ccc897e60e3e498de7f80aa8df9377';
 
 abstract class _$SearchHistory extends $Notifier<List<String>> {
   List<String> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -75,7 +56,7 @@ abstract class _$SearchHistory extends $Notifier<List<String>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<List<String>>,
+              AnyNotifier<List<String>>,
               List<String>,
               Object?,
               Object?

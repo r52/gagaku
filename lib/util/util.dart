@@ -18,7 +18,7 @@ Duration? noRetry(int retryCount, Object error) {
 mixin ExpiringData {
   DateTime get expiry;
 
-  bool isExpired() => DateTime.now().compareTo(expiry) >= 0;
+  bool get isExpired => DateTime.now().compareTo(expiry) >= 0;
 }
 
 extension WidgetStateSet on Set<WidgetState> {
@@ -33,22 +33,6 @@ extension IterableAsync<T> on Iterable<T> {
     final results = await Future.wait(futures);
     return results.where((e) => e.$2).map((e) => e.$1);
   }
-}
-
-extension AsExtension on Object? {
-  X as<X>() => this as X;
-  X? asOrNull<X>() {
-    var self = this;
-    return self is X ? self : null;
-  }
-}
-
-extension AsSubtypeExtension<X> on X {
-  Y asSubtype<Y extends X>() => this as Y;
-}
-
-extension AsNotNullExtension<X> on X? {
-  X asNotNull() => this as X;
 }
 
 extension StringExtension on String {

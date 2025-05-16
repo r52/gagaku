@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:gagaku/util/authentication.dart';
 import 'package:gagaku/util/freezed.dart';
 import 'package:gagaku/util/util.dart';
 
@@ -1068,4 +1069,36 @@ class MangaSetAction {
 
     return state;
   }
+}
+
+@freezed
+abstract class MangaDexCredentials with _$MangaDexCredentials {
+  const factory MangaDexCredentials({
+    required String username,
+    required String clientId,
+    required String clientSecret,
+  }) = _MangaDexCredentials;
+
+  factory MangaDexCredentials.fromJson(Map<String, dynamic> json) =>
+      _$MangaDexCredentialsFromJson(json);
+}
+
+@freezed
+abstract class MangaDexTokens with _$MangaDexTokens {
+  const factory MangaDexTokens({
+    String? accessToken,
+    String? refreshToken,
+    String? tokenType,
+    required String idToken,
+  }) = _MangaDexTokens;
+
+  factory MangaDexTokens.fromJson(Map<String, dynamic> json) =>
+      _$MangaDexTokensFromJson(json);
+
+  factory MangaDexTokens.fromOIDAuthToken(OIDAuthToken token) => MangaDexTokens(
+    accessToken: token.accessToken,
+    refreshToken: token.refreshToken,
+    tokenType: token.tokenType,
+    idToken: token.idToken,
+  );
 }

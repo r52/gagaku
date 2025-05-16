@@ -52,55 +52,28 @@ const webConfigProvider = WebConfigProvider._();
 
 final class WebConfigProvider
     extends $NotifierProvider<WebConfig, WebSourceConfig> {
-  const WebConfigProvider._({
-    super.runNotifierBuildOverride,
-    WebConfig Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'webConfigProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final WebConfig Function()? _createCb;
+  const WebConfigProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'webConfigProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$webConfigHash();
 
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(WebSourceConfig value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $ValueProvider<WebSourceConfig>(value),
-    );
-  }
-
   @$internal
   @override
-  WebConfig create() => _createCb?.call() ?? WebConfig();
-
-  @$internal
-  @override
-  WebConfigProvider $copyWithCreate(WebConfig Function() create) {
-    return WebConfigProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  WebConfigProvider $copyWithBuild(
-    WebSourceConfig Function(Ref, WebConfig) build,
-  ) {
-    return WebConfigProvider._(runNotifierBuildOverride: build);
-  }
+  WebConfig create() => WebConfig();
 
   @$internal
   @override
   _$WebConfigElement $createElement($ProviderPointer pointer) =>
-      _$WebConfigElement(this, pointer);
+      _$WebConfigElement(pointer);
 
   ProviderListenable<WebConfig$SaveWith> get saveWith =>
       $LazyProxyListenable<WebConfig$SaveWith, WebSourceConfig>(this, (
@@ -117,13 +90,21 @@ final class WebConfigProvider
 
         return element._$save;
       });
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WebSourceConfig value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $ValueProvider<WebSourceConfig>(value),
+    );
+  }
 }
 
-String _$webConfigHash() => r'e29a8d2c9b8b3383dcdf068a313f6abd4da40492';
+String _$webConfigHash() => r'5e40dc510f838ca2882eaeb08c0606319221de0c';
 
 abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -131,7 +112,7 @@ abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<WebSourceConfig>,
+              AnyNotifier<WebSourceConfig>,
               WebSourceConfig,
               Object?,
               Object?
@@ -142,7 +123,7 @@ abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
 
 class _$WebConfigElement
     extends $NotifierProviderElement<WebConfig, WebSourceConfig> {
-  _$WebConfigElement(super.provider, super.pointer) {
+  _$WebConfigElement(super.pointer) {
     _$saveWith.result = $Result.data(_$WebConfig$SaveWith(this));
     _$save.result = $Result.data(_$WebConfig$Save(this));
   }
@@ -169,11 +150,11 @@ class _$WebConfigElement
 sealed class WebConfig$SaveWith extends MutationBase<WebSourceConfig> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebConfig.saveWith] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -233,11 +214,11 @@ final class _$WebConfig$SaveWith
 sealed class WebConfig$Save extends MutationBase<WebSourceConfig> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [WebConfig.save] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -279,24 +260,29 @@ const extensionStateProvider = ExtensionStateProvider._();
 
 final class ExtensionStateProvider
     extends $NotifierProvider<ExtensionState, ExtensionStateMap> {
-  const ExtensionStateProvider._({
-    super.runNotifierBuildOverride,
-    ExtensionState Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'extensionStateProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final ExtensionState Function()? _createCb;
+  const ExtensionStateProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'extensionStateProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$extensionStateHash();
+
+  @$internal
+  @override
+  ExtensionState create() => ExtensionState();
+
+  @$internal
+  @override
+  $NotifierProviderElement<ExtensionState, ExtensionStateMap> $createElement(
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(pointer);
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ExtensionStateMap value) {
@@ -305,37 +291,13 @@ final class ExtensionStateProvider
       providerOverride: $ValueProvider<ExtensionStateMap>(value),
     );
   }
-
-  @$internal
-  @override
-  ExtensionState create() => _createCb?.call() ?? ExtensionState();
-
-  @$internal
-  @override
-  ExtensionStateProvider $copyWithCreate(ExtensionState Function() create) {
-    return ExtensionStateProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  ExtensionStateProvider $copyWithBuild(
-    ExtensionStateMap Function(Ref, ExtensionState) build,
-  ) {
-    return ExtensionStateProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  $NotifierProviderElement<ExtensionState, ExtensionStateMap> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(this, pointer);
 }
 
-String _$extensionStateHash() => r'e05c4c05a9878f3b6bdf535268ffe4e9c9393eef';
+String _$extensionStateHash() => r'8ec3920b979e1c5550ad879c1d2dc3c02efcf5c9';
 
 abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
   ExtensionStateMap build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -343,7 +305,7 @@ abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<ExtensionStateMap>,
+              AnyNotifier<ExtensionStateMap>,
               ExtensionStateMap,
               Object?,
               Object?
@@ -357,24 +319,28 @@ const extensionSecureStateProvider = ExtensionSecureStateProvider._();
 
 final class ExtensionSecureStateProvider
     extends $NotifierProvider<ExtensionSecureState, ExtensionStateMap> {
-  const ExtensionSecureStateProvider._({
-    super.runNotifierBuildOverride,
-    ExtensionSecureState Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'extensionSecureStateProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final ExtensionSecureState Function()? _createCb;
+  const ExtensionSecureStateProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'extensionSecureStateProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$extensionSecureStateHash();
+
+  @$internal
+  @override
+  ExtensionSecureState create() => ExtensionSecureState();
+
+  @$internal
+  @override
+  $NotifierProviderElement<ExtensionSecureState, ExtensionStateMap>
+  $createElement($ProviderPointer pointer) => $NotifierProviderElement(pointer);
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ExtensionStateMap value) {
@@ -383,40 +349,14 @@ final class ExtensionSecureStateProvider
       providerOverride: $ValueProvider<ExtensionStateMap>(value),
     );
   }
-
-  @$internal
-  @override
-  ExtensionSecureState create() => _createCb?.call() ?? ExtensionSecureState();
-
-  @$internal
-  @override
-  ExtensionSecureStateProvider $copyWithCreate(
-    ExtensionSecureState Function() create,
-  ) {
-    return ExtensionSecureStateProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  ExtensionSecureStateProvider $copyWithBuild(
-    ExtensionStateMap Function(Ref, ExtensionSecureState) build,
-  ) {
-    return ExtensionSecureStateProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  $NotifierProviderElement<ExtensionSecureState, ExtensionStateMap>
-  $createElement($ProviderPointer pointer) =>
-      $NotifierProviderElement(this, pointer);
 }
 
 String _$extensionSecureStateHash() =>
-    r'd1f8d6d3a5993fce5acad0aa78939d84a5a96cc3';
+    r'387043ca4bdfa573aff2cfc76037785ea430b5d8';
 
 abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateMap> {
   ExtensionStateMap build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -424,7 +364,7 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateMap> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<ExtensionStateMap>,
+              AnyNotifier<ExtensionStateMap>,
               ExtensionStateMap,
               Object?,
               Object?

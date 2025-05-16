@@ -7,6 +7,7 @@ import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod/misc.dart';
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   const MouseTouchScrollBehavior();

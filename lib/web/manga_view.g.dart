@@ -15,17 +15,13 @@ final class _FetchWebMangaInfoProvider
   const _FetchWebMangaInfoProvider._({
     required _FetchWebMangaInfoFamily super.from,
     required SourceHandler super.argument,
-    FutureOr<WebManga> Function(Ref ref, SourceHandler handle)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_fetchWebMangaInfoProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<WebManga> Function(Ref ref, SourceHandler handle)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchWebMangaInfoHash();
@@ -40,24 +36,12 @@ final class _FetchWebMangaInfoProvider
   @$internal
   @override
   $FutureProviderElement<WebManga> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
-
-  @override
-  _FetchWebMangaInfoProvider $copyWithCreate(
-    FutureOr<WebManga> Function(Ref ref) create,
-  ) {
-    return _FetchWebMangaInfoProvider._(
-      argument: argument as SourceHandler,
-      from: from! as _FetchWebMangaInfoFamily,
-      create: (ref, SourceHandler handle) => create(ref),
-    );
-  }
+      $FutureProviderElement(pointer);
 
   @override
   FutureOr<WebManga> create(Ref ref) {
-    final _$cb = _createCb ?? _fetchWebMangaInfo;
     final argument = this.argument as SourceHandler;
-    return _$cb(ref, argument);
+    return _fetchWebMangaInfo(ref, argument);
   }
 
   @override
@@ -73,13 +57,14 @@ final class _FetchWebMangaInfoProvider
 
 String _$fetchWebMangaInfoHash() => r'0622112342007844d48abb8e95b93836544d76dc';
 
-final class _FetchWebMangaInfoFamily extends Family {
+final class _FetchWebMangaInfoFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<WebManga>, SourceHandler> {
   const _FetchWebMangaInfoFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchWebMangaInfoProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -87,28 +72,7 @@ final class _FetchWebMangaInfoFamily extends Family {
       _FetchWebMangaInfoProvider._(argument: handle, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$fetchWebMangaInfoHash();
-
-  @override
   String toString() => r'_fetchWebMangaInfoProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<WebManga> Function(Ref ref, SourceHandler args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _FetchWebMangaInfoProvider;
-
-        final argument = provider.argument as SourceHandler;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint

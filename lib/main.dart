@@ -15,18 +15,19 @@ import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/version.dart';
 import 'package:gagaku/web/server.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:rhttp/rhttp.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class _HttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..maxConnectionsPerHost = 5;
+    return super.createHttpClient(context)
+      ..maxConnectionsPerHost = 5
+      ..connectionTimeout = const Duration(seconds: 10);
   }
 }
 
@@ -34,7 +35,6 @@ void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale();
-  await Rhttp.init();
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
@@ -48,8 +48,8 @@ void main() async {
 
   await Hive.initFlutter();
   Hive.registerAdapter(CacheEntryAdapter());
-  await Hive.openBox(gagakuBox);
   await Hive.openLazyBox<CacheEntry>(gagakuCache);
+  await initGagakuBoxes();
 
   final appdir = await getApplicationSupportDirectory();
 

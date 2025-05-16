@@ -4,7 +4,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
-import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -26,13 +25,6 @@ class MangaDexHomePage extends HookConsumerWidget {
       },
       [controllers],
     );
-
-    useOnAppLifecycleStateChange((_, current) {
-      if (current == AppLifecycleState.resumed &&
-          ref.exists(authControlProvider)) {
-        ref.read(authControlProvider.notifier).invalidate();
-      }
-    });
 
     return AutoTabsRouter(
       routes: [

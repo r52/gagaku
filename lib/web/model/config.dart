@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/web/model/types.dart' show RepoInfo, WebSourceInfo;
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -60,7 +61,7 @@ abstract class WebSourceConfig with _$WebSourceConfig {
 @Riverpod(keepAlive: true)
 class WebConfig extends _$WebConfig {
   WebSourceConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('websource');
 
     if (str == null) {
@@ -104,7 +105,7 @@ class WebConfig extends _$WebConfig {
 
     state = update;
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('websource', json.encode(update.toJson()));
 
     return update;
@@ -113,7 +114,7 @@ class WebConfig extends _$WebConfig {
   @mutation
   WebSourceConfig save(WebSourceConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('websource', json.encode(update.toJson()));
 
     return update;
@@ -123,7 +124,7 @@ class WebConfig extends _$WebConfig {
 @Riverpod(keepAlive: true)
 class ExtensionState extends _$ExtensionState {
   ExtensionStateMap _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('extension-state');
 
     if (str == null) {
@@ -154,7 +155,7 @@ class ExtensionState extends _$ExtensionState {
 
     state[sourceId]![stateName] = data;
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('extension-state', json.encode(state));
   }
 }
@@ -162,7 +163,7 @@ class ExtensionState extends _$ExtensionState {
 @Riverpod(keepAlive: true)
 class ExtensionSecureState extends _$ExtensionSecureState {
   ExtensionStateMap _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('extension-secure-state');
 
     if (str == null) {
@@ -193,7 +194,7 @@ class ExtensionSecureState extends _$ExtensionSecureState {
 
     state[sourceId]![stateName] = data;
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('extension-secure-state', json.encode(state));
   }
 }

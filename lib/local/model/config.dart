@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config.freezed.dart';
@@ -20,7 +21,7 @@ abstract class LocalLibConfig with _$LocalLibConfig {
 @Riverpod(keepAlive: true)
 class LocalConfig extends _$LocalConfig {
   LocalLibConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuLocalBox);
     final str = box.get('locallib');
 
     if (str == null) {
@@ -40,7 +41,7 @@ class LocalConfig extends _$LocalConfig {
   @mutation
   LocalLibConfig save(LocalLibConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuLocalBox);
     box.put('locallib', json.encode(update.toJson()));
 
     return update;

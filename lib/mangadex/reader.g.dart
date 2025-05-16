@@ -15,17 +15,13 @@ final class _FetchChapterDataProvider
   const _FetchChapterDataProvider._({
     required _FetchChapterDataFamily super.from,
     required String super.argument,
-    FutureOr<ReaderData> Function(Ref ref, String chapterId)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_fetchChapterDataProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<ReaderData> Function(Ref ref, String chapterId)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchChapterDataHash();
@@ -40,24 +36,12 @@ final class _FetchChapterDataProvider
   @$internal
   @override
   $FutureProviderElement<ReaderData> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(this, pointer);
-
-  @override
-  _FetchChapterDataProvider $copyWithCreate(
-    FutureOr<ReaderData> Function(Ref ref) create,
-  ) {
-    return _FetchChapterDataProvider._(
-      argument: argument as String,
-      from: from! as _FetchChapterDataFamily,
-      create: (ref, String chapterId) => create(ref),
-    );
-  }
+      $FutureProviderElement(pointer);
 
   @override
   FutureOr<ReaderData> create(Ref ref) {
-    final _$cb = _createCb ?? _fetchChapterData;
     final argument = this.argument as String;
-    return _$cb(ref, argument);
+    return _fetchChapterData(ref, argument);
   }
 
   @override
@@ -73,13 +57,14 @@ final class _FetchChapterDataProvider
 
 String _$fetchChapterDataHash() => r'bd8f9de01ae3994fb8c48e31214f6d5cd6d7ed42';
 
-final class _FetchChapterDataFamily extends Family {
+final class _FetchChapterDataFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<ReaderData>, String> {
   const _FetchChapterDataFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchChapterDataProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -87,28 +72,7 @@ final class _FetchChapterDataFamily extends Family {
       _FetchChapterDataProvider._(argument: chapterId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$fetchChapterDataHash();
-
-  @override
   String toString() => r'_fetchChapterDataProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<ReaderData> Function(Ref ref, String args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _FetchChapterDataProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 @ProviderFor(_fetchChapterPages)
@@ -124,18 +88,13 @@ final class _FetchChapterPagesProvider
   const _FetchChapterPagesProvider._({
     required _FetchChapterPagesFamily super.from,
     required Chapter super.argument,
-    FutureOr<List<ReaderPage>> Function(Ref ref, Chapter chapter)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_fetchChapterPagesProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<List<ReaderPage>> Function(Ref ref, Chapter chapter)?
-  _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchChapterPagesHash();
@@ -151,24 +110,12 @@ final class _FetchChapterPagesProvider
   @override
   $FutureProviderElement<List<ReaderPage>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _FetchChapterPagesProvider $copyWithCreate(
-    FutureOr<List<ReaderPage>> Function(Ref ref) create,
-  ) {
-    return _FetchChapterPagesProvider._(
-      argument: argument as Chapter,
-      from: from! as _FetchChapterPagesFamily,
-      create: (ref, Chapter chapter) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ReaderPage>> create(Ref ref) {
-    final _$cb = _createCb ?? _fetchChapterPages;
     final argument = this.argument as Chapter;
-    return _$cb(ref, argument);
+    return _fetchChapterPages(ref, argument);
   }
 
   @override
@@ -184,13 +131,14 @@ final class _FetchChapterPagesProvider
 
 String _$fetchChapterPagesHash() => r'3663bdc5e029081976b001c22486f86c43530c38';
 
-final class _FetchChapterPagesFamily extends Family {
+final class _FetchChapterPagesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, Chapter> {
   const _FetchChapterPagesFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchChapterPagesProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -198,28 +146,7 @@ final class _FetchChapterPagesFamily extends Family {
       _FetchChapterPagesProvider._(argument: chapter, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$fetchChapterPagesHash();
-
-  @override
   String toString() => r'_fetchChapterPagesProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(Ref ref, Chapter args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _FetchChapterPagesProvider;
-
-        final argument = provider.argument as Chapter;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint

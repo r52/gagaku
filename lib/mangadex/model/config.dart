@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 
@@ -31,7 +32,7 @@ abstract class MangaDexConfig with _$MangaDexConfig {
 @riverpod
 class MdConfig extends _$MdConfig {
   MangaDexConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('mangadex');
 
     if (str == null) {
@@ -51,7 +52,7 @@ class MdConfig extends _$MdConfig {
   @mutation
   MangaDexConfig save(MangaDexConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('mangadex', json.encode(update.toJson()));
 
     return update;

@@ -19,6 +19,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -44,9 +45,11 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
     limit: MangaDexEndpoints.breakLimit,
   );
 
-  await ref.read(statisticsProvider.get)(manga);
-  await ref.read(readChaptersProvider(me?.id).get)(manga);
-  await ref.read(ratingsProvider(me?.id).get)(manga);
+  await (
+    ref.read(statisticsProvider.get)(manga),
+    ref.read(readChaptersProvider(me?.id).get)(manga),
+    ref.read(ratingsProvider(me?.id).get)(manga),
+  ).wait;
 
   return manga.first;
 }
@@ -193,8 +196,10 @@ class _MangaDexMangaViewWidgetState
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await ref.read(statisticsProvider.get)(mangas);
-      await ref.read(readChaptersProvider(me?.id).get)(mangas);
+      await (
+        ref.read(statisticsProvider.get)(mangas),
+        ref.read(readChaptersProvider(me?.id).get)(mangas),
+      ).wait;
 
       return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
     },
@@ -269,20 +274,20 @@ class _MangaDexMangaViewWidgetState
     }, [widget.manga]);
 
     ref.listen(userListsProvider(me?.id).newList, (_, state) {
-      if (state.state is ErrorMutationState) {
+      if (state.state is ErrorMutation) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
               content: Text(
                 tr.mangadex.newListError(
-                  error: (state.state as ErrorMutationState).error.toString(),
+                  error: (state.state as ErrorMutation).error.toString(),
                 ),
               ),
               backgroundColor: Colors.red,
             ),
           );
-      } else if (state.state is SuccessMutationState) {
+      } else if (state.state is SuccessMutation) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
@@ -411,8 +416,7 @@ class _MangaDexMangaViewWidgetState
 
                                   if (following == null ||
                                       statusProvider.isLoading ||
-                                      setFollowing.state
-                                          is PendingMutationState) {
+                                      setFollowing.state is PendingMutation) {
                                     return _loadingAction;
                                   }
 
@@ -484,7 +488,7 @@ class _MangaDexMangaViewWidgetState
 
                                   if (readProvider.isLoading ||
                                       setReadingStatus.state
-                                          is PendingMutationState) {
+                                          is PendingMutation) {
                                     return _loadingAction;
                                   }
 
@@ -1472,8 +1476,8 @@ class _RatingMenu extends HookConsumerWidget {
             ratings.containsKey(manga.id) &&
             ratings[manga.id]!.rating > 0);
     final isLoading =
-        getRating.state is PendingMutationState ||
-        setRating.state is PendingMutationState ||
+        getRating.state is PendingMutation ||
+        setRating.state is PendingMutation ||
         ratingProv.isLoading;
 
     // Redundancy
@@ -1558,7 +1562,7 @@ class _UserListsMenu extends ConsumerWidget {
     final newList = ref.watch(userListsProvider(me?.id).newList);
     final userLists = userListsProv.value;
     final isLoading =
-        updateList.state is PendingMutationState ||
+        updateList.state is PendingMutation ||
         userListsProv.isLoading ||
         userLists == null;
 

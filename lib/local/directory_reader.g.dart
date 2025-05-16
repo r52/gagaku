@@ -19,17 +19,13 @@ final class _GetDirectoryPagesProvider
   const _GetDirectoryPagesProvider._({
     required _GetDirectoryPagesFamily super.from,
     required String super.argument,
-    FutureOr<List<ReaderPage>> Function(Ref ref, String path)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'_getDirectoryPagesProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<List<ReaderPage>> Function(Ref ref, String path)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$getDirectoryPagesHash();
@@ -45,24 +41,12 @@ final class _GetDirectoryPagesProvider
   @override
   $FutureProviderElement<List<ReaderPage>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _GetDirectoryPagesProvider $copyWithCreate(
-    FutureOr<List<ReaderPage>> Function(Ref ref) create,
-  ) {
-    return _GetDirectoryPagesProvider._(
-      argument: argument as String,
-      from: from! as _GetDirectoryPagesFamily,
-      create: (ref, String path) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ReaderPage>> create(Ref ref) {
-    final _$cb = _createCb ?? _getDirectoryPages;
     final argument = this.argument as String;
-    return _$cb(ref, argument);
+    return _getDirectoryPages(ref, argument);
   }
 
   @override
@@ -78,13 +62,14 @@ final class _GetDirectoryPagesProvider
 
 String _$getDirectoryPagesHash() => r'599be990d7fb9529e4c9f52cd1d9057e839a3eab';
 
-final class _GetDirectoryPagesFamily extends Family {
+final class _GetDirectoryPagesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {
   const _GetDirectoryPagesFamily._()
     : super(
         retry: null,
         name: r'_getDirectoryPagesProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -92,28 +77,7 @@ final class _GetDirectoryPagesFamily extends Family {
       _GetDirectoryPagesProvider._(argument: path, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$getDirectoryPagesHash();
-
-  @override
   String toString() => r'_getDirectoryPagesProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<List<ReaderPage>> Function(Ref ref, String args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _GetDirectoryPagesProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 // ignore_for_file: type=lint

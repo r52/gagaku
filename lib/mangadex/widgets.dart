@@ -18,6 +18,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:riverpod/misc.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -159,7 +160,10 @@ class MangaDexSliverAppBar extends StatelessWidget {
                           ),
                           MenuItemButton(
                             onPressed:
-                                () => ref.read(authControlProvider.logout)(),
+                                () =>
+                                    ref
+                                        .read(authControlProvider.notifier)
+                                        .logout(),
                             leadingIcon: const Icon(Icons.logout),
                             child: Text(tr.auth.logout),
                           ),
@@ -465,9 +469,11 @@ class _InfiniteScrollFeedState
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await ref.read(statisticsProvider.get)(mangas);
-      await ref.read(readChaptersProvider(me?.id).get)(mangas);
-      await ref.read(chapterStatsProvider.get)(chapters);
+      await (
+        ref.read(statisticsProvider.get)(mangas),
+        ref.read(readChaptersProvider(me?.id).get)(mangas),
+        ref.read(chapterStatsProvider.get)(chapters),
+      ).wait;
 
       return PageResultsMetaData(chapters, chapterlist.total);
     },

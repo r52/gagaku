@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -15,13 +16,13 @@ import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/server.dart' show port;
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
-
-final webSourceClient = RateLimitedClient();
 
 @Riverpod(keepAlive: true)
 ProxyHandler proxy(Ref ref) {
@@ -31,10 +32,23 @@ ProxyHandler proxy(Ref ref) {
 class ProxyHandler {
   ProxyHandler(this.ref) {
     _cache = ref.watch(cacheProvider);
+
+    _dio.interceptors.add(RateLimitingInterceptor());
   }
 
   final Ref ref;
-  final http.Client client = webSourceClient;
+
+  final _dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+        validateStatus: (status) => true,
+      ),
+    )
+    ..httpClientAdapter = NativeAdapter(
+      createCronetEngine: () => createCronetEngine(getUserAgent(false)),
+    );
+
   late final CacheManager _cache;
 
   Future<void> invalidateCacheItem(String item) async {
@@ -169,16 +183,19 @@ class ProxyHandler {
         );
       default:
         logger.d('ProxyHandler: retrieving url $url');
-        final response = await client.send(
-          (http.Request('GET', Uri.parse(url))..followRedirects = false),
+
+        final response = await _dio.getUri(
+          Uri.parse(url),
+          options: Options(followRedirects: false),
         );
 
         if (response.statusCode != 302 ||
-            !response.headers.containsKey('location')) {
+            !response.headers.map.containsKey('location') ||
+            response.headers['location']!.isEmpty) {
           return null;
         }
 
-        final location = response.headers['location']!;
+        final location = response.headers['location']!.first;
 
         if (!location.startsWith('/read/')) {
           return null;
@@ -193,19 +210,47 @@ class ProxyHandler {
   Future<WebManga?> handleSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
+        String? sourceId;
         if (handle.parser != null) {
-          return await ref
-              .read(extensionSourceProvider(handle.parser!.id).notifier)
-              .getManga(handle.location);
+          sourceId = handle.parser!.id;
         } else {
           final installed = await ref.watch(extensionInfoListProvider.future);
           for (final src in installed) {
             if (handle.sourceId == src.id) {
-              return await ref
-                  .read(extensionSourceProvider(handle.sourceId).notifier)
-                  .getManga(handle.location);
+              sourceId = handle.sourceId;
+              break;
             }
           }
+        }
+
+        if (sourceId != null) {
+          final key = handle.getKey();
+
+          if (await _cache.exists(key)) {
+            logger.d('CacheManager: retrieving entry $key');
+            return _cache.get<WebManga>(key, WebManga.fromJson);
+          }
+
+          final manga = await ref
+              .read(extensionSourceProvider(sourceId).notifier)
+              .getManga(handle.location);
+
+          if (manga != null) {
+            const expiry = Duration(days: 1);
+
+            logger.d(
+              'CacheManager: caching entry $key for ${expiry.toString()}',
+            );
+            _cache.put(
+              key,
+              json.encode(manga.toJson()),
+              manga,
+              true,
+              expiry: expiry,
+            );
+          }
+
+          return manga;
         }
 
         return null;
@@ -224,11 +269,10 @@ class ProxyHandler {
       return _cache.get<WebManga>(key, WebManga.fromJson);
     }
 
-    final response = await client.get(Uri.parse(url));
+    final response = await _dio.getUri(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-      final manga = WebManga.fromJson(body);
+      final manga = WebManga.fromJson(response.data);
 
       const expiry = Duration(minutes: 15);
 
@@ -239,23 +283,21 @@ class ProxyHandler {
     }
 
     throw Exception(
-      "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}",
+      "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
     );
   }
 
   Future<dynamic> getProxyAPI(String path) async {
     final url = "https://cubari.moe$path";
 
-    final response = await client.get(Uri.parse(url));
+    final response = await _dio.getUri(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-
-      return body;
+      return response.data;
     }
 
     throw Exception(
-      "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.reasonPhrase}",
+      "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
     );
   }
 }
@@ -264,7 +306,7 @@ class ProxyHandler {
 class WebSourceFavorites extends _$WebSourceFavorites {
   Future<Map<String, List<HistoryLink>>> _fetch() async {
     final cfg = ref.read(webConfigProvider);
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('web_favorites');
 
     if (str == null || (str as String).isEmpty) {
@@ -310,7 +352,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     await future;
     final empty = <String, List<HistoryLink>>{};
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_favorites', json.encode(empty));
 
     state = AsyncData(empty);
@@ -332,7 +374,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final udp = {...oldstate};
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_favorites', json.encode(udp));
 
     state = AsyncData(udp);
@@ -353,7 +395,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final udp = {...oldstate};
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_favorites', json.encode(udp));
 
     state = AsyncData(udp);
@@ -383,7 +425,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final udp = {...oldstate};
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_favorites', json.encode(udp));
 
     state = AsyncData(udp);
@@ -410,7 +452,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final udp = {...oldstate};
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_favorites', json.encode(udp));
 
     state = AsyncData(udp);
@@ -436,7 +478,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     final udp = {...oldstate};
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_favorites', json.encode(udp));
 
     state = AsyncData(udp);
@@ -450,7 +492,7 @@ class WebSourceHistory extends _$WebSourceHistory {
   static const _numItems = 250;
 
   Future<Queue<HistoryLink>> _fetch() async {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('web_history');
 
     if (str == null || (str as String).isEmpty) {
@@ -475,7 +517,7 @@ class WebSourceHistory extends _$WebSourceHistory {
     final empty = Queue<HistoryLink>();
     final links = empty.toList();
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_history', json.encode(links));
 
     state = AsyncData(empty);
@@ -500,7 +542,7 @@ class WebSourceHistory extends _$WebSourceHistory {
 
     final links = cpy.map((e) => e.toJson()).toList();
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_history', json.encode(links));
 
     state = AsyncData(cpy);
@@ -523,7 +565,7 @@ class WebSourceHistory extends _$WebSourceHistory {
 
     final links = cpy.map((e) => e.toJson()).toList();
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_history', json.encode(links));
 
     state = AsyncData(cpy);
@@ -535,7 +577,7 @@ class WebSourceHistory extends _$WebSourceHistory {
 @Riverpod(keepAlive: true)
 class WebReadMarkers extends _$WebReadMarkers {
   Future<Map<String, Set<String>>> _fetch() async {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('web_read_history');
 
     if (str == null || (str as String).isEmpty) {
@@ -558,7 +600,7 @@ class WebReadMarkers extends _$WebReadMarkers {
     await future;
     final empty = <String, Set<String>>{};
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_read_history', json.encode({}));
 
     state = AsyncData(empty);
@@ -599,7 +641,7 @@ class WebReadMarkers extends _$WebReadMarkers {
       (key, value) => MapEntry(key, value.toList()),
     );
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_read_history', json.encode(converted));
 
     state = AsyncData({...oldstate});
@@ -643,7 +685,7 @@ class WebReadMarkers extends _$WebReadMarkers {
       (key, value) => MapEntry(key, value.toList()),
     );
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_read_history', json.encode(converted));
 
     state = AsyncData({...oldstate});
@@ -665,7 +707,7 @@ class WebReadMarkers extends _$WebReadMarkers {
       (key, value) => MapEntry(key, value.toList()),
     );
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('web_read_history', json.encode(converted));
 
     state = AsyncData({...oldstate});

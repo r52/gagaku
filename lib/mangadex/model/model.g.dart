@@ -12,22 +12,29 @@ const mangadexProvider = MangadexProvider._();
 final class MangadexProvider
     extends $FunctionalProvider<MangaDexModel, MangaDexModel>
     with $Provider<MangaDexModel> {
-  const MangadexProvider._({MangaDexModel Function(Ref ref)? create})
-    : _createCb = create,
-      super(
+  const MangadexProvider._()
+    : super(
         from: null,
         argument: null,
         retry: null,
         name: r'mangadexProvider',
         isAutoDispose: false,
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
       );
-
-  final MangaDexModel Function(Ref ref)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$mangadexHash();
+
+  @$internal
+  @override
+  $ProviderElement<MangaDexModel> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  MangaDexModel create(Ref ref) {
+    return mangadex(ref);
+  }
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(MangaDexModel value) {
@@ -36,49 +43,38 @@ final class MangadexProvider
       providerOverride: $ValueProvider<MangaDexModel>(value),
     );
   }
-
-  @$internal
-  @override
-  $ProviderElement<MangaDexModel> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(this, pointer);
-
-  @override
-  MangadexProvider $copyWithCreate(MangaDexModel Function(Ref ref) create) {
-    return MangadexProvider._(create: create);
-  }
-
-  @override
-  MangaDexModel create(Ref ref) {
-    final _$cb = _createCb ?? mangadex;
-    return _$cb(ref);
-  }
 }
 
-String _$mangadexHash() => r'2e60803c3e0b7b0065c423dcb31c862de55d8e53';
+String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
 
 @ProviderFor(MangaChaptersListSort)
 const mangaChaptersListSortProvider = MangaChaptersListSortProvider._();
 
 final class MangaChaptersListSortProvider
     extends $NotifierProvider<MangaChaptersListSort, ListSort> {
-  const MangaChaptersListSortProvider._({
-    super.runNotifierBuildOverride,
-    MangaChaptersListSort Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'mangaChaptersListSortProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final MangaChaptersListSort Function()? _createCb;
+  const MangaChaptersListSortProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mangaChaptersListSortProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$mangaChaptersListSortHash();
+
+  @$internal
+  @override
+  MangaChaptersListSort create() => MangaChaptersListSort();
+
+  @$internal
+  @override
+  $NotifierProviderElement<MangaChaptersListSort, ListSort> $createElement(
+    $ProviderPointer pointer,
+  ) => $NotifierProviderElement(pointer);
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ListSort value) {
@@ -87,33 +83,6 @@ final class MangaChaptersListSortProvider
       providerOverride: $ValueProvider<ListSort>(value),
     );
   }
-
-  @$internal
-  @override
-  MangaChaptersListSort create() =>
-      _createCb?.call() ?? MangaChaptersListSort();
-
-  @$internal
-  @override
-  MangaChaptersListSortProvider $copyWithCreate(
-    MangaChaptersListSort Function() create,
-  ) {
-    return MangaChaptersListSortProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  MangaChaptersListSortProvider $copyWithBuild(
-    ListSort Function(Ref, MangaChaptersListSort) build,
-  ) {
-    return MangaChaptersListSortProvider._(runNotifierBuildOverride: build);
-  }
-
-  @$internal
-  @override
-  $NotifierProviderElement<MangaChaptersListSort, ListSort> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(this, pointer);
 }
 
 String _$mangaChaptersListSortHash() =>
@@ -121,7 +90,7 @@ String _$mangaChaptersListSortHash() =>
 
 abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
   ListSort build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -129,7 +98,7 @@ abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<ListSort>,
+              AnyNotifier<ListSort>,
               ListSort,
               Object?,
               Object?
@@ -146,18 +115,13 @@ final class ReadChaptersProvider
   const ReadChaptersProvider._({
     required ReadChaptersFamily super.from,
     required String? super.argument,
-    super.runNotifierBuildOverride,
-    ReadChapters Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'readChaptersProvider',
          isAutoDispose: false,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final ReadChapters Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$readChaptersHash();
@@ -171,34 +135,12 @@ final class ReadChaptersProvider
 
   @$internal
   @override
-  ReadChapters create() => _createCb?.call() ?? ReadChapters();
-
-  @$internal
-  @override
-  ReadChaptersProvider $copyWithCreate(ReadChapters Function() create) {
-    return ReadChaptersProvider._(
-      argument: argument as String?,
-      from: from! as ReadChaptersFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  ReadChaptersProvider $copyWithBuild(
-    FutureOr<ReadChaptersMap> Function(Ref, ReadChapters) build,
-  ) {
-    return ReadChaptersProvider._(
-      argument: argument as String?,
-      from: from! as ReadChaptersFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  ReadChapters create() => ReadChapters();
 
   @$internal
   @override
   _$ReadChaptersElement $createElement($ProviderPointer pointer) =>
-      _$ReadChaptersElement(this, pointer);
+      _$ReadChaptersElement(pointer);
 
   ProviderListenable<ReadChapters$Get> get get =>
       $LazyProxyListenable<ReadChapters$Get, AsyncValue<ReadChaptersMap>>(
@@ -231,15 +173,23 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'1e52eceee5ec71ee240aa09663fbd4c633cabbdd';
+String _$readChaptersHash() => r'0af513411c25e4aae0dc00c9f14bbdf6bfc11944';
 
-final class ReadChaptersFamily extends Family {
+final class ReadChaptersFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          ReadChapters,
+          AsyncValue<ReadChaptersMap>,
+          ReadChaptersMap,
+          FutureOr<ReadChaptersMap>,
+          String?
+        > {
   const ReadChaptersFamily._()
     : super(
         retry: null,
         name: r'readChaptersProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: false,
       );
 
@@ -247,49 +197,7 @@ final class ReadChaptersFamily extends Family {
       ReadChaptersProvider._(argument: userId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$readChaptersHash();
-
-  @override
   String toString() => r'readChaptersProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(ReadChapters Function(String? args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ReadChaptersProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<ReadChaptersMap> Function(
-      Ref ref,
-      ReadChapters notifier,
-      String? argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ReadChaptersProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
@@ -297,7 +205,7 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
   String? get userId => _$args;
 
   FutureOr<ReadChaptersMap> build(String? userId);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -305,7 +213,7 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<ReadChaptersMap>>,
+              AnyNotifier<AsyncValue<ReadChaptersMap>>,
               AsyncValue<ReadChaptersMap>,
               Object?,
               Object?
@@ -316,7 +224,7 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
 
 class _$ReadChaptersElement
     extends $AsyncNotifierProviderElement<ReadChapters, ReadChaptersMap> {
-  _$ReadChaptersElement(super.provider, super.pointer) {
+  _$ReadChaptersElement(super.pointer) {
     _$get.result = $Result.data(_$ReadChapters$Get(this));
     _$set.result = $Result.data(_$ReadChapters$Set(this));
   }
@@ -343,11 +251,11 @@ class _$ReadChaptersElement
 sealed class ReadChapters$Get extends MutationBase<ReadChaptersMap> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [ReadChapters.get] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -388,11 +296,11 @@ final class _$ReadChapters$Get
 sealed class ReadChapters$Set extends MutationBase<ReadChaptersMap> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [ReadChapters.set] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -447,18 +355,13 @@ final class UserLibraryProvider
   const UserLibraryProvider._({
     required UserLibraryFamily super.from,
     required String? super.argument,
-    super.runNotifierBuildOverride,
-    UserLibrary Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'userLibraryProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final UserLibrary Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$userLibraryHash();
@@ -472,34 +375,12 @@ final class UserLibraryProvider
 
   @$internal
   @override
-  UserLibrary create() => _createCb?.call() ?? UserLibrary();
-
-  @$internal
-  @override
-  UserLibraryProvider $copyWithCreate(UserLibrary Function() create) {
-    return UserLibraryProvider._(
-      argument: argument as String?,
-      from: from! as UserLibraryFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  UserLibraryProvider $copyWithBuild(
-    FutureOr<Map<String, MangaReadingStatus>> Function(Ref, UserLibrary) build,
-  ) {
-    return UserLibraryProvider._(
-      argument: argument as String?,
-      from: from! as UserLibraryFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  UserLibrary create() => UserLibrary();
 
   @$internal
   @override
   _$UserLibraryElement $createElement($ProviderPointer pointer) =>
-      _$UserLibraryElement(this, pointer);
+      _$UserLibraryElement(pointer);
 
   ProviderListenable<UserLibrary$Set> get set => $LazyProxyListenable<
     UserLibrary$Set,
@@ -523,13 +404,21 @@ final class UserLibraryProvider
 
 String _$userLibraryHash() => r'8c20b25da530b2241f508d90111dce2a68e3f3e1';
 
-final class UserLibraryFamily extends Family {
+final class UserLibraryFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          UserLibrary,
+          AsyncValue<Map<String, MangaReadingStatus>>,
+          Map<String, MangaReadingStatus>,
+          FutureOr<Map<String, MangaReadingStatus>>,
+          String?
+        > {
   const UserLibraryFamily._()
     : super(
         retry: null,
         name: r'userLibraryProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -537,49 +426,7 @@ final class UserLibraryFamily extends Family {
       UserLibraryProvider._(argument: userId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$userLibraryHash();
-
-  @override
   String toString() => r'userLibraryProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(UserLibrary Function(String? args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as UserLibraryProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<Map<String, MangaReadingStatus>> Function(
-      Ref ref,
-      UserLibrary notifier,
-      String? argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as UserLibraryProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$UserLibrary
@@ -588,7 +435,7 @@ abstract class _$UserLibrary
   String? get userId => _$args;
 
   FutureOr<Map<String, MangaReadingStatus>> build(String? userId);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -596,7 +443,7 @@ abstract class _$UserLibrary
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Map<String, MangaReadingStatus>>>,
+              AnyNotifier<AsyncValue<Map<String, MangaReadingStatus>>>,
               AsyncValue<Map<String, MangaReadingStatus>>,
               Object?,
               Object?
@@ -611,7 +458,7 @@ class _$UserLibraryElement
           UserLibrary,
           Map<String, MangaReadingStatus>
         > {
-  _$UserLibraryElement(super.provider, super.pointer) {
+  _$UserLibraryElement(super.pointer) {
     _$set.result = $Result.data(_$UserLibrary$Set(this));
   }
   final _$set = $ElementLense<_$UserLibrary$Set>();
@@ -635,11 +482,11 @@ sealed class UserLibrary$Set
     extends MutationBase<Map<String, MangaReadingStatus>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [UserLibrary.set] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -695,18 +542,13 @@ final class UserListsProvider
   const UserListsProvider._({
     required UserListsFamily super.from,
     required String? super.argument,
-    super.runNotifierBuildOverride,
-    UserLists Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'userListsProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final UserLists Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$userListsHash();
@@ -720,34 +562,12 @@ final class UserListsProvider
 
   @$internal
   @override
-  UserLists create() => _createCb?.call() ?? UserLists();
-
-  @$internal
-  @override
-  UserListsProvider $copyWithCreate(UserLists Function() create) {
-    return UserListsProvider._(
-      argument: argument as String?,
-      from: from! as UserListsFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  UserListsProvider $copyWithBuild(
-    FutureOr<List<CustomList>> Function(Ref, UserLists) build,
-  ) {
-    return UserListsProvider._(
-      argument: argument as String?,
-      from: from! as UserListsFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  UserLists create() => UserLists();
 
   @$internal
   @override
   _$UserListsElement $createElement($ProviderPointer pointer) =>
-      _$UserListsElement(this, pointer);
+      _$UserListsElement(pointer);
 
   ProviderListenable<UserLists$UpdateList> get updateList =>
       $LazyProxyListenable<UserLists$UpdateList, AsyncValue<List<CustomList>>>(
@@ -812,13 +632,21 @@ final class UserListsProvider
 
 String _$userListsHash() => r'4951bb130b0667eb9730ebb159af25933675fa7b';
 
-final class UserListsFamily extends Family {
+final class UserListsFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          UserLists,
+          AsyncValue<List<CustomList>>,
+          List<CustomList>,
+          FutureOr<List<CustomList>>,
+          String?
+        > {
   const UserListsFamily._()
     : super(
         retry: null,
         name: r'userListsProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -826,49 +654,7 @@ final class UserListsFamily extends Family {
       UserListsProvider._(argument: userId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$userListsHash();
-
-  @override
   String toString() => r'userListsProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(UserLists Function(String? args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as UserListsProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<List<CustomList>> Function(
-      Ref ref,
-      UserLists notifier,
-      String? argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as UserListsProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
@@ -876,7 +662,7 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
   String? get userId => _$args;
 
   FutureOr<List<CustomList>> build(String? userId);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -884,7 +670,7 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<List<CustomList>>>,
+              AnyNotifier<AsyncValue<List<CustomList>>>,
               AsyncValue<List<CustomList>>,
               Object?,
               Object?
@@ -895,7 +681,7 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
 
 class _$UserListsElement
     extends $AsyncNotifierProviderElement<UserLists, List<CustomList>> {
-  _$UserListsElement(super.provider, super.pointer) {
+  _$UserListsElement(super.pointer) {
     _$updateList.result = $Result.data(_$UserLists$UpdateList(this));
     _$editList.result = $Result.data(_$UserLists$EditList(this));
     _$deleteList.result = $Result.data(_$UserLists$DeleteList(this));
@@ -934,11 +720,11 @@ class _$UserListsElement
 sealed class UserLists$UpdateList extends MutationBase<CustomList?> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [UserLists.updateList] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -978,11 +764,11 @@ final class _$UserLists$UpdateList
 sealed class UserLists$EditList extends MutationBase<CustomList> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [UserLists.editList] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1032,11 +818,11 @@ final class _$UserLists$EditList
 sealed class UserLists$DeleteList extends MutationBase<CustomList> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [UserLists.deleteList] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1076,11 +862,11 @@ final class _$UserLists$DeleteList
 sealed class UserLists$NewList extends MutationBase<CustomList> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [UserLists.newList] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1128,11 +914,11 @@ final class _$UserLists$NewList
 sealed class UserLists$GetNextPage extends MutationBase<List<CustomList>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [UserLists.getNextPage] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1179,18 +965,13 @@ final class FollowedListsProvider
   const FollowedListsProvider._({
     required FollowedListsFamily super.from,
     required String? super.argument,
-    super.runNotifierBuildOverride,
-    FollowedLists Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'followedListsProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FollowedLists Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$followedListsHash();
@@ -1204,34 +985,12 @@ final class FollowedListsProvider
 
   @$internal
   @override
-  FollowedLists create() => _createCb?.call() ?? FollowedLists();
-
-  @$internal
-  @override
-  FollowedListsProvider $copyWithCreate(FollowedLists Function() create) {
-    return FollowedListsProvider._(
-      argument: argument as String?,
-      from: from! as FollowedListsFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  FollowedListsProvider $copyWithBuild(
-    FutureOr<List<CustomList>> Function(Ref, FollowedLists) build,
-  ) {
-    return FollowedListsProvider._(
-      argument: argument as String?,
-      from: from! as FollowedListsFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  FollowedLists create() => FollowedLists();
 
   @$internal
   @override
   _$FollowedListsElement $createElement($ProviderPointer pointer) =>
-      _$FollowedListsElement(this, pointer);
+      _$FollowedListsElement(pointer);
 
   ProviderListenable<FollowedLists$SetFollow> get setFollow =>
       $LazyProxyListenable<
@@ -1266,13 +1025,21 @@ final class FollowedListsProvider
 
 String _$followedListsHash() => r'0aceef3d3132e86e87bd51ea8ebd8a7486bfd73d';
 
-final class FollowedListsFamily extends Family {
+final class FollowedListsFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          FollowedLists,
+          AsyncValue<List<CustomList>>,
+          List<CustomList>,
+          FutureOr<List<CustomList>>,
+          String?
+        > {
   const FollowedListsFamily._()
     : super(
         retry: null,
         name: r'followedListsProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -1280,49 +1047,7 @@ final class FollowedListsFamily extends Family {
       FollowedListsProvider._(argument: userId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$followedListsHash();
-
-  @override
   String toString() => r'followedListsProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(FollowedLists Function(String? args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as FollowedListsProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<List<CustomList>> Function(
-      Ref ref,
-      FollowedLists notifier,
-      String? argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as FollowedListsProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
@@ -1330,7 +1055,7 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
   String? get userId => _$args;
 
   FutureOr<List<CustomList>> build(String? userId);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -1338,7 +1063,7 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<List<CustomList>>>,
+              AnyNotifier<AsyncValue<List<CustomList>>>,
               AsyncValue<List<CustomList>>,
               Object?,
               Object?
@@ -1349,7 +1074,7 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
 
 class _$FollowedListsElement
     extends $AsyncNotifierProviderElement<FollowedLists, List<CustomList>> {
-  _$FollowedListsElement(super.provider, super.pointer) {
+  _$FollowedListsElement(super.pointer) {
     _$setFollow.result = $Result.data(_$FollowedLists$SetFollow(this));
     _$getNextPage.result = $Result.data(_$FollowedLists$GetNextPage(this));
   }
@@ -1376,11 +1101,11 @@ class _$FollowedListsElement
 sealed class FollowedLists$SetFollow extends MutationBase<bool> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [FollowedLists.setFollow] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1421,11 +1146,11 @@ final class _$FollowedLists$SetFollow
 sealed class FollowedLists$GetNextPage extends MutationBase<List<CustomList>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [FollowedLists.getNextPage] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1476,18 +1201,13 @@ final class ListSourceProvider
   const ListSourceProvider._({
     required ListSourceFamily super.from,
     required String super.argument,
-    super.runNotifierBuildOverride,
-    ListSource Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'listSourceProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final ListSource Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$listSourceHash();
@@ -1501,35 +1221,13 @@ final class ListSourceProvider
 
   @$internal
   @override
-  ListSource create() => _createCb?.call() ?? ListSource();
-
-  @$internal
-  @override
-  ListSourceProvider $copyWithCreate(ListSource Function() create) {
-    return ListSourceProvider._(
-      argument: argument as String,
-      from: from! as ListSourceFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  ListSourceProvider $copyWithBuild(
-    FutureOr<CustomList?> Function(Ref, ListSource) build,
-  ) {
-    return ListSourceProvider._(
-      argument: argument as String,
-      from: from! as ListSourceFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  ListSource create() => ListSource();
 
   @$internal
   @override
   $AsyncNotifierProviderElement<ListSource, CustomList?> $createElement(
     $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  ) => $AsyncNotifierProviderElement(pointer);
 
   @override
   bool operator ==(Object other) {
@@ -1544,13 +1242,21 @@ final class ListSourceProvider
 
 String _$listSourceHash() => r'd6b059c04284e56b5c818ebad91096b37d67ce4c';
 
-final class ListSourceFamily extends Family {
+final class ListSourceFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          ListSource,
+          AsyncValue<CustomList?>,
+          CustomList?,
+          FutureOr<CustomList?>,
+          String
+        > {
   const ListSourceFamily._()
     : super(
         retry: noRetry,
         name: r'listSourceProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -1558,49 +1264,7 @@ final class ListSourceFamily extends Family {
       ListSourceProvider._(argument: listId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$listSourceHash();
-
-  @override
   String toString() => r'listSourceProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(ListSource Function(String args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ListSourceProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<CustomList?> Function(
-      Ref ref,
-      ListSource notifier,
-      String argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ListSourceProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
@@ -1608,7 +1272,7 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
   String get listId => _$args;
 
   FutureOr<CustomList?> build(String listId);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -1616,7 +1280,7 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<CustomList?>>,
+              AnyNotifier<AsyncValue<CustomList?>>,
               AsyncValue<CustomList?>,
               Object?,
               Object?
@@ -1630,55 +1294,36 @@ const tagListProvider = TagListProvider._();
 
 final class TagListProvider
     extends $AsyncNotifierProvider<TagList, Iterable<Tag>> {
-  const TagListProvider._({
-    super.runNotifierBuildOverride,
-    TagList Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'tagListProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final TagList Function()? _createCb;
+  const TagListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'tagListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$tagListHash();
 
   @$internal
   @override
-  TagList create() => _createCb?.call() ?? TagList();
-
-  @$internal
-  @override
-  TagListProvider $copyWithCreate(TagList Function() create) {
-    return TagListProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  TagListProvider $copyWithBuild(
-    FutureOr<Iterable<Tag>> Function(Ref, TagList) build,
-  ) {
-    return TagListProvider._(runNotifierBuildOverride: build);
-  }
+  TagList create() => TagList();
 
   @$internal
   @override
   $AsyncNotifierProviderElement<TagList, Iterable<Tag>> $createElement(
     $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  ) => $AsyncNotifierProviderElement(pointer);
 }
 
 String _$tagListHash() => r'7710550e802e80112d520dbd855732c41c68ab29';
 
 abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
   FutureOr<Iterable<Tag>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -1686,7 +1331,7 @@ abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Iterable<Tag>>>,
+              AnyNotifier<AsyncValue<Iterable<Tag>>>,
               AsyncValue<Iterable<Tag>>,
               Object?,
               Object?
@@ -1700,47 +1345,28 @@ const statisticsProvider = StatisticsProvider._();
 
 final class StatisticsProvider
     extends $AsyncNotifierProvider<Statistics, Map<String, MangaStatistics>> {
-  const StatisticsProvider._({
-    super.runNotifierBuildOverride,
-    Statistics Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'statisticsProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final Statistics Function()? _createCb;
+  const StatisticsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'statisticsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$statisticsHash();
 
   @$internal
   @override
-  Statistics create() => _createCb?.call() ?? Statistics();
-
-  @$internal
-  @override
-  StatisticsProvider $copyWithCreate(Statistics Function() create) {
-    return StatisticsProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  StatisticsProvider $copyWithBuild(
-    FutureOr<Map<String, MangaStatistics>> Function(Ref, Statistics) build,
-  ) {
-    return StatisticsProvider._(runNotifierBuildOverride: build);
-  }
+  Statistics create() => Statistics();
 
   @$internal
   @override
   _$StatisticsElement $createElement($ProviderPointer pointer) =>
-      _$StatisticsElement(this, pointer);
+      _$StatisticsElement(pointer);
 
   ProviderListenable<Statistics$Get> get get => $LazyProxyListenable<
     Statistics$Get,
@@ -1757,7 +1383,7 @@ String _$statisticsHash() => r'239a7a9095d0d55aefada8a1e7d64d09175443b3';
 abstract class _$Statistics
     extends $AsyncNotifier<Map<String, MangaStatistics>> {
   FutureOr<Map<String, MangaStatistics>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -1765,7 +1391,7 @@ abstract class _$Statistics
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Map<String, MangaStatistics>>>,
+              AnyNotifier<AsyncValue<Map<String, MangaStatistics>>>,
               AsyncValue<Map<String, MangaStatistics>>,
               Object?,
               Object?
@@ -1780,7 +1406,7 @@ class _$StatisticsElement
           Statistics,
           Map<String, MangaStatistics>
         > {
-  _$StatisticsElement(super.provider, super.pointer) {
+  _$StatisticsElement(super.pointer) {
     _$get.result = $Result.data(_$Statistics$Get(this));
   }
   final _$get = $ElementLense<_$Statistics$Get>();
@@ -1803,11 +1429,11 @@ class _$StatisticsElement
 sealed class Statistics$Get extends MutationBase<Map<String, MangaStatistics>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [Statistics.get] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -1855,47 +1481,28 @@ const chapterStatsProvider = ChapterStatsProvider._();
 final class ChapterStatsProvider
     extends
         $AsyncNotifierProvider<ChapterStats, Map<String, ChapterStatistics>> {
-  const ChapterStatsProvider._({
-    super.runNotifierBuildOverride,
-    ChapterStats Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'chapterStatsProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final ChapterStats Function()? _createCb;
+  const ChapterStatsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chapterStatsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$chapterStatsHash();
 
   @$internal
   @override
-  ChapterStats create() => _createCb?.call() ?? ChapterStats();
-
-  @$internal
-  @override
-  ChapterStatsProvider $copyWithCreate(ChapterStats Function() create) {
-    return ChapterStatsProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  ChapterStatsProvider $copyWithBuild(
-    FutureOr<Map<String, ChapterStatistics>> Function(Ref, ChapterStats) build,
-  ) {
-    return ChapterStatsProvider._(runNotifierBuildOverride: build);
-  }
+  ChapterStats create() => ChapterStats();
 
   @$internal
   @override
   _$ChapterStatsElement $createElement($ProviderPointer pointer) =>
-      _$ChapterStatsElement(this, pointer);
+      _$ChapterStatsElement(pointer);
 
   ProviderListenable<ChapterStats$Get> get get => $LazyProxyListenable<
     ChapterStats$Get,
@@ -1912,7 +1519,7 @@ String _$chapterStatsHash() => r'6b0d401ef5fe20f1d08ca68ea63060a9382bbc3e';
 abstract class _$ChapterStats
     extends $AsyncNotifier<Map<String, ChapterStatistics>> {
   FutureOr<Map<String, ChapterStatistics>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -1920,7 +1527,7 @@ abstract class _$ChapterStats
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Map<String, ChapterStatistics>>>,
+              AnyNotifier<AsyncValue<Map<String, ChapterStatistics>>>,
               AsyncValue<Map<String, ChapterStatistics>>,
               Object?,
               Object?
@@ -1935,7 +1542,7 @@ class _$ChapterStatsElement
           ChapterStats,
           Map<String, ChapterStatistics>
         > {
-  _$ChapterStatsElement(super.provider, super.pointer) {
+  _$ChapterStatsElement(super.pointer) {
     _$get.result = $Result.data(_$ChapterStats$Get(this));
   }
   final _$get = $ElementLense<_$ChapterStats$Get>();
@@ -1959,11 +1566,11 @@ sealed class ChapterStats$Get
     extends MutationBase<Map<String, ChapterStatistics>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [ChapterStats.get] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -2013,18 +1620,13 @@ final class RatingsProvider
   const RatingsProvider._({
     required RatingsFamily super.from,
     required String? super.argument,
-    super.runNotifierBuildOverride,
-    Ratings Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'ratingsProvider',
          isAutoDispose: false,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final Ratings Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$ratingsHash();
@@ -2038,34 +1640,12 @@ final class RatingsProvider
 
   @$internal
   @override
-  Ratings create() => _createCb?.call() ?? Ratings();
-
-  @$internal
-  @override
-  RatingsProvider $copyWithCreate(Ratings Function() create) {
-    return RatingsProvider._(
-      argument: argument as String?,
-      from: from! as RatingsFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  RatingsProvider $copyWithBuild(
-    FutureOr<Map<String, SelfRating>> Function(Ref, Ratings) build,
-  ) {
-    return RatingsProvider._(
-      argument: argument as String?,
-      from: from! as RatingsFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  Ratings create() => Ratings();
 
   @$internal
   @override
   _$RatingsElement $createElement($ProviderPointer pointer) =>
-      _$RatingsElement(this, pointer);
+      _$RatingsElement(pointer);
 
   ProviderListenable<Ratings$Get> get get =>
       $LazyProxyListenable<Ratings$Get, AsyncValue<Map<String, SelfRating>>>(
@@ -2098,15 +1678,23 @@ final class RatingsProvider
   }
 }
 
-String _$ratingsHash() => r'4cbf0300ac8e1bac2ea41d0b575b47be0d942f1f';
+String _$ratingsHash() => r'4a9d08543fc2877e2e674f88f871e5f4195661b4';
 
-final class RatingsFamily extends Family {
+final class RatingsFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          Ratings,
+          AsyncValue<Map<String, SelfRating>>,
+          Map<String, SelfRating>,
+          FutureOr<Map<String, SelfRating>>,
+          String?
+        > {
   const RatingsFamily._()
     : super(
         retry: null,
         name: r'ratingsProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: false,
       );
 
@@ -2114,49 +1702,7 @@ final class RatingsFamily extends Family {
       RatingsProvider._(argument: userId, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$ratingsHash();
-
-  @override
   String toString() => r'ratingsProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(Ratings Function(String? args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as RatingsProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<Map<String, SelfRating>> Function(
-      Ref ref,
-      Ratings notifier,
-      String? argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as RatingsProvider;
-
-        final argument = provider.argument as String?;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
@@ -2164,7 +1710,7 @@ abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
   String? get userId => _$args;
 
   FutureOr<Map<String, SelfRating>> build(String? userId);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -2172,7 +1718,7 @@ abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Map<String, SelfRating>>>,
+              AnyNotifier<AsyncValue<Map<String, SelfRating>>>,
               AsyncValue<Map<String, SelfRating>>,
               Object?,
               Object?
@@ -2183,7 +1729,7 @@ abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
 
 class _$RatingsElement
     extends $AsyncNotifierProviderElement<Ratings, Map<String, SelfRating>> {
-  _$RatingsElement(super.provider, super.pointer) {
+  _$RatingsElement(super.pointer) {
     _$get.result = $Result.data(_$Ratings$Get(this));
     _$set.result = $Result.data(_$Ratings$Set(this));
   }
@@ -2210,11 +1756,11 @@ class _$RatingsElement
 sealed class Ratings$Get extends MutationBase<Map<String, SelfRating>> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [Ratings.get] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -2254,11 +1800,11 @@ final class _$Ratings$Get
 sealed class Ratings$Set extends MutationBase<bool> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [Ratings.set] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -2301,18 +1847,13 @@ final class ReadingStatusProvider
   const ReadingStatusProvider._({
     required ReadingStatusFamily super.from,
     required Manga super.argument,
-    super.runNotifierBuildOverride,
-    ReadingStatus Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'readingStatusProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final ReadingStatus Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$readingStatusHash();
@@ -2326,34 +1867,12 @@ final class ReadingStatusProvider
 
   @$internal
   @override
-  ReadingStatus create() => _createCb?.call() ?? ReadingStatus();
-
-  @$internal
-  @override
-  ReadingStatusProvider $copyWithCreate(ReadingStatus Function() create) {
-    return ReadingStatusProvider._(
-      argument: argument as Manga,
-      from: from! as ReadingStatusFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  ReadingStatusProvider $copyWithBuild(
-    FutureOr<MangaReadingStatus?> Function(Ref, ReadingStatus) build,
-  ) {
-    return ReadingStatusProvider._(
-      argument: argument as Manga,
-      from: from! as ReadingStatusFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  ReadingStatus create() => ReadingStatus();
 
   @$internal
   @override
   _$ReadingStatusElement $createElement($ProviderPointer pointer) =>
-      _$ReadingStatusElement(this, pointer);
+      _$ReadingStatusElement(pointer);
 
   ProviderListenable<ReadingStatus$Set> get set =>
       $LazyProxyListenable<ReadingStatus$Set, AsyncValue<MangaReadingStatus?>>(
@@ -2378,13 +1897,21 @@ final class ReadingStatusProvider
 
 String _$readingStatusHash() => r'894553c73b09455414aba31e2363c6044e7e7947';
 
-final class ReadingStatusFamily extends Family {
+final class ReadingStatusFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          ReadingStatus,
+          AsyncValue<MangaReadingStatus?>,
+          MangaReadingStatus?,
+          FutureOr<MangaReadingStatus?>,
+          Manga
+        > {
   const ReadingStatusFamily._()
     : super(
         retry: null,
         name: r'readingStatusProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -2392,49 +1919,7 @@ final class ReadingStatusFamily extends Family {
       ReadingStatusProvider._(argument: manga, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$readingStatusHash();
-
-  @override
   String toString() => r'readingStatusProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(ReadingStatus Function(Manga args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ReadingStatusProvider;
-
-        final argument = provider.argument as Manga;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<MangaReadingStatus?> Function(
-      Ref ref,
-      ReadingStatus notifier,
-      Manga argument,
-    )
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as ReadingStatusProvider;
-
-        final argument = provider.argument as Manga;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
@@ -2442,7 +1927,7 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
   Manga get manga => _$args;
 
   FutureOr<MangaReadingStatus?> build(Manga manga);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -2450,7 +1935,7 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<MangaReadingStatus?>>,
+              AnyNotifier<AsyncValue<MangaReadingStatus?>>,
               AsyncValue<MangaReadingStatus?>,
               Object?,
               Object?
@@ -2461,7 +1946,7 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
 
 class _$ReadingStatusElement
     extends $AsyncNotifierProviderElement<ReadingStatus, MangaReadingStatus?> {
-  _$ReadingStatusElement(super.provider, super.pointer) {
+  _$ReadingStatusElement(super.pointer) {
     _$set.result = $Result.data(_$ReadingStatus$Set(this));
   }
   final _$set = $ElementLense<_$ReadingStatus$Set>();
@@ -2484,11 +1969,11 @@ class _$ReadingStatusElement
 sealed class ReadingStatus$Set extends MutationBase<bool> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [ReadingStatus.set] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -2531,18 +2016,13 @@ final class FollowingStatusProvider
   const FollowingStatusProvider._({
     required FollowingStatusFamily super.from,
     required Manga super.argument,
-    super.runNotifierBuildOverride,
-    FollowingStatus Function()? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: null,
          name: r'followingStatusProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FollowingStatus Function()? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$followingStatusHash();
@@ -2556,34 +2036,12 @@ final class FollowingStatusProvider
 
   @$internal
   @override
-  FollowingStatus create() => _createCb?.call() ?? FollowingStatus();
-
-  @$internal
-  @override
-  FollowingStatusProvider $copyWithCreate(FollowingStatus Function() create) {
-    return FollowingStatusProvider._(
-      argument: argument as Manga,
-      from: from! as FollowingStatusFamily,
-      create: create,
-    );
-  }
-
-  @$internal
-  @override
-  FollowingStatusProvider $copyWithBuild(
-    FutureOr<bool> Function(Ref, FollowingStatus) build,
-  ) {
-    return FollowingStatusProvider._(
-      argument: argument as Manga,
-      from: from! as FollowingStatusFamily,
-      runNotifierBuildOverride: build,
-    );
-  }
+  FollowingStatus create() => FollowingStatus();
 
   @$internal
   @override
   _$FollowingStatusElement $createElement($ProviderPointer pointer) =>
-      _$FollowingStatusElement(this, pointer);
+      _$FollowingStatusElement(pointer);
 
   ProviderListenable<FollowingStatus$Set> get set =>
       $LazyProxyListenable<FollowingStatus$Set, AsyncValue<bool>>(this, (
@@ -2607,13 +2065,21 @@ final class FollowingStatusProvider
 
 String _$followingStatusHash() => r'1de36b37907bc85db5d2581c90f5762e02d98f02';
 
-final class FollowingStatusFamily extends Family {
+final class FollowingStatusFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          FollowingStatus,
+          AsyncValue<bool>,
+          bool,
+          FutureOr<bool>,
+          Manga
+        > {
   const FollowingStatusFamily._()
     : super(
         retry: null,
         name: r'followingStatusProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -2621,45 +2087,7 @@ final class FollowingStatusFamily extends Family {
       FollowingStatusProvider._(argument: manga, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$followingStatusHash();
-
-  @override
   String toString() => r'followingStatusProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(FollowingStatus Function(Manga args) create) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as FollowingStatusProvider;
-
-        final argument = provider.argument as Manga;
-
-        return provider
-            .$copyWithCreate(() => create(argument))
-            .$createElement(pointer);
-      },
-    );
-  }
-
-  /// {@macro riverpod.override_with_build}
-  Override overrideWithBuild(
-    FutureOr<bool> Function(Ref ref, FollowingStatus notifier, Manga argument)
-    build,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as FollowingStatusProvider;
-
-        final argument = provider.argument as Manga;
-
-        return provider
-            .$copyWithBuild((ref, notifier) => build(ref, notifier, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
@@ -2667,7 +2095,7 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
   Manga get manga => _$args;
 
   FutureOr<bool> build(Manga manga);
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
@@ -2675,7 +2103,7 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<bool>>,
+              AnyNotifier<AsyncValue<bool>>,
               AsyncValue<bool>,
               Object?,
               Object?
@@ -2686,7 +2114,7 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
 
 class _$FollowingStatusElement
     extends $AsyncNotifierProviderElement<FollowingStatus, bool> {
-  _$FollowingStatusElement(super.provider, super.pointer) {
+  _$FollowingStatusElement(super.pointer) {
     _$set.result = $Result.data(_$FollowingStatus$Set(this));
   }
   final _$set = $ElementLense<_$FollowingStatus$Set>();
@@ -2709,11 +2137,11 @@ class _$FollowingStatusElement
 sealed class FollowingStatus$Set extends MutationBase<bool> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [FollowingStatus.set] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -2753,47 +2181,28 @@ const mangaDexHistoryProvider = MangaDexHistoryProvider._();
 
 final class MangaDexHistoryProvider
     extends $AsyncNotifierProvider<MangaDexHistory, Queue<Chapter>> {
-  const MangaDexHistoryProvider._({
-    super.runNotifierBuildOverride,
-    MangaDexHistory Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'mangaDexHistoryProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final MangaDexHistory Function()? _createCb;
+  const MangaDexHistoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mangaDexHistoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$mangaDexHistoryHash();
 
   @$internal
   @override
-  MangaDexHistory create() => _createCb?.call() ?? MangaDexHistory();
-
-  @$internal
-  @override
-  MangaDexHistoryProvider $copyWithCreate(MangaDexHistory Function() create) {
-    return MangaDexHistoryProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  MangaDexHistoryProvider $copyWithBuild(
-    FutureOr<Queue<Chapter>> Function(Ref, MangaDexHistory) build,
-  ) {
-    return MangaDexHistoryProvider._(runNotifierBuildOverride: build);
-  }
+  MangaDexHistory create() => MangaDexHistory();
 
   @$internal
   @override
   _$MangaDexHistoryElement $createElement($ProviderPointer pointer) =>
-      _$MangaDexHistoryElement(this, pointer);
+      _$MangaDexHistoryElement(pointer);
 
   ProviderListenable<MangaDexHistory$Add> get add =>
       $LazyProxyListenable<MangaDexHistory$Add, AsyncValue<Queue<Chapter>>>(
@@ -2806,11 +2215,11 @@ final class MangaDexHistoryProvider
       );
 }
 
-String _$mangaDexHistoryHash() => r'878b924c71458b17deb8e7f16a9e44ddf17fba91';
+String _$mangaDexHistoryHash() => r'a07ead796dcdf233df56e77c887031be568a7571';
 
 abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -2818,7 +2227,7 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<Queue<Chapter>>>,
+              AnyNotifier<AsyncValue<Queue<Chapter>>>,
               AsyncValue<Queue<Chapter>>,
               Object?,
               Object?
@@ -2829,7 +2238,7 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
 
 class _$MangaDexHistoryElement
     extends $AsyncNotifierProviderElement<MangaDexHistory, Queue<Chapter>> {
-  _$MangaDexHistoryElement(super.provider, super.pointer) {
+  _$MangaDexHistoryElement(super.pointer) {
     _$add.result = $Result.data(_$MangaDexHistory$Add(this));
   }
   final _$add = $ElementLense<_$MangaDexHistory$Add>();
@@ -2852,11 +2261,11 @@ class _$MangaDexHistoryElement
 sealed class MangaDexHistory$Add extends MutationBase<Chapter> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [MangaDexHistory.add] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -2896,55 +2305,36 @@ const loggedUserProvider = LoggedUserProvider._();
 
 final class LoggedUserProvider
     extends $AsyncNotifierProvider<LoggedUser, User?> {
-  const LoggedUserProvider._({
-    super.runNotifierBuildOverride,
-    LoggedUser Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'loggedUserProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final LoggedUser Function()? _createCb;
+  const LoggedUserProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'loggedUserProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$loggedUserHash();
 
   @$internal
   @override
-  LoggedUser create() => _createCb?.call() ?? LoggedUser();
-
-  @$internal
-  @override
-  LoggedUserProvider $copyWithCreate(LoggedUser Function() create) {
-    return LoggedUserProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  LoggedUserProvider $copyWithBuild(
-    FutureOr<User?> Function(Ref, LoggedUser) build,
-  ) {
-    return LoggedUserProvider._(runNotifierBuildOverride: build);
-  }
+  LoggedUser create() => LoggedUser();
 
   @$internal
   @override
   $AsyncNotifierProviderElement<LoggedUser, User?> $createElement(
     $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(this, pointer);
+  ) => $AsyncNotifierProviderElement(pointer);
 }
 
-String _$loggedUserHash() => r'661369d0e4ee922b460c6c3a86c32eaac36a80fa';
+String _$loggedUserHash() => r'd57241dc04aa26bc80bbb5b0bdb1b3b2e38c5ee2';
 
 abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
-  @$internal
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
@@ -2952,7 +2342,7 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<User?>>,
+              AnyNotifier<AsyncValue<User?>>,
               AsyncValue<User?>,
               Object?,
               Object?
@@ -2965,82 +2355,55 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
 const authControlProvider = AuthControlProvider._();
 
 final class AuthControlProvider
-    extends $AsyncNotifierProvider<AuthControl, bool> {
-  const AuthControlProvider._({
-    super.runNotifierBuildOverride,
-    AuthControl Function()? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: null,
-         name: r'authControlProvider',
-         isAutoDispose: false,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final AuthControl Function()? _createCb;
+    extends $StreamNotifierProvider<AuthControl, AuthenticationStatus> {
+  const AuthControlProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'authControlProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$authControlHash();
 
   @$internal
   @override
-  AuthControl create() => _createCb?.call() ?? AuthControl();
-
-  @$internal
-  @override
-  AuthControlProvider $copyWithCreate(AuthControl Function() create) {
-    return AuthControlProvider._(create: create);
-  }
-
-  @$internal
-  @override
-  AuthControlProvider $copyWithBuild(
-    FutureOr<bool> Function(Ref, AuthControl) build,
-  ) {
-    return AuthControlProvider._(runNotifierBuildOverride: build);
-  }
+  AuthControl create() => AuthControl();
 
   @$internal
   @override
   _$AuthControlElement $createElement($ProviderPointer pointer) =>
-      _$AuthControlElement(this, pointer);
+      _$AuthControlElement(pointer);
 
   ProviderListenable<AuthControl$Login> get login =>
-      $LazyProxyListenable<AuthControl$Login, AsyncValue<bool>>(this, (
-        element,
-      ) {
-        element as _$AuthControlElement;
+      $LazyProxyListenable<AuthControl$Login, AsyncValue<AuthenticationStatus>>(
+        this,
+        (element) {
+          element as _$AuthControlElement;
 
-        return element._$login;
-      });
-
-  ProviderListenable<AuthControl$Logout> get logout =>
-      $LazyProxyListenable<AuthControl$Logout, AsyncValue<bool>>(this, (
-        element,
-      ) {
-        element as _$AuthControlElement;
-
-        return element._$logout;
-      });
+          return element._$login;
+        },
+      );
 }
 
-String _$authControlHash() => r'74fa09c8df5d9ceef2fc2d4a4f8a80a7a34ef14a';
+String _$authControlHash() => r'5871d5ea6701a4885265d5ae3dfbd2376748c649';
 
-abstract class _$AuthControl extends $AsyncNotifier<bool> {
-  FutureOr<bool> build();
-  @$internal
+abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
+  Stream<AuthenticationStatus> build();
+  @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<bool>>;
+    final ref = this.ref as $Ref<AsyncValue<AuthenticationStatus>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              NotifierBase<AsyncValue<bool>>,
-              AsyncValue<bool>,
+              AnyNotifier<AsyncValue<AuthenticationStatus>>,
+              AsyncValue<AuthenticationStatus>,
               Object?,
               Object?
             >;
@@ -3049,18 +2412,15 @@ abstract class _$AuthControl extends $AsyncNotifier<bool> {
 }
 
 class _$AuthControlElement
-    extends $AsyncNotifierProviderElement<AuthControl, bool> {
-  _$AuthControlElement(super.provider, super.pointer) {
+    extends $StreamNotifierProviderElement<AuthControl, AuthenticationStatus> {
+  _$AuthControlElement(super.pointer) {
     _$login.result = $Result.data(_$AuthControl$Login(this));
-    _$logout.result = $Result.data(_$AuthControl$Logout(this));
   }
   final _$login = $ElementLense<_$AuthControl$Login>();
-  final _$logout = $ElementLense<_$AuthControl$Logout>();
   @override
   void mount() {
     super.mount();
     _$login.result!.value!.reset();
-    _$logout.result!.value!.reset();
   }
 
   @override
@@ -3070,18 +2430,17 @@ class _$AuthControlElement
     super.visitListenables(listenableVisitor);
 
     listenableVisitor(_$login);
-    listenableVisitor(_$logout);
   }
 }
 
 sealed class AuthControl$Login extends MutationBase<bool> {
   /// Starts the mutation.
   ///
-  /// This will first set the state to [PendingMutationState], then
+  /// This will first set the state to [PendingMutation], then
   /// will call [AuthControl.login] with the provided parameters.
   ///
   /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
+  /// [SuccessMutation] or [ErrorMutation] based on if the method
   /// threw or not.
   ///
   /// **Note**:
@@ -3124,48 +2483,6 @@ final class _$AuthControl$Login
   @override
   _$AuthControl$Login copyWith(MutationState<bool> state, {Object? key}) =>
       _$AuthControl$Login(element, state: state, key: key);
-}
-
-sealed class AuthControl$Logout extends MutationBase<bool> {
-  /// Starts the mutation.
-  ///
-  /// This will first set the state to [PendingMutationState], then
-  /// will call [AuthControl.logout] with the provided parameters.
-  ///
-  /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutationState] or [ErrorMutationState] based on if the method
-  /// threw or not.
-  ///
-  /// **Note**:
-  /// If the notifier threw in its constructor, the mutation won't start
-  /// and [call] will throw.
-  /// This should generally never happen though, as Notifiers are not supposed
-  /// to have logic in their constructors.
-  Future<bool> call();
-}
-
-final class _$AuthControl$Logout
-    extends $AsyncMutationBase<bool, _$AuthControl$Logout, AuthControl>
-    implements AuthControl$Logout {
-  _$AuthControl$Logout(this.element, {super.state, super.key});
-
-  @override
-  final _$AuthControlElement element;
-
-  @override
-  $ElementLense<_$AuthControl$Logout> get listenable => element._$logout;
-
-  @override
-  Future<bool> call() {
-    return mutate(
-      Invocation.method(#logout, []),
-      ($notifier) => $notifier.logout(),
-    );
-  }
-
-  @override
-  _$AuthControl$Logout copyWith(MutationState<bool> state, {Object? key}) =>
-      _$AuthControl$Logout(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

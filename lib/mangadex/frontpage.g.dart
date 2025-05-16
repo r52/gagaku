@@ -12,20 +12,16 @@ const _popularTitlesProvider = _PopularTitlesProvider._();
 final class _PopularTitlesProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _PopularTitlesProvider._({
-    FutureOr<List<Manga>> Function(Ref ref)? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: noRetry,
-         name: r'_popularTitlesProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final FutureOr<List<Manga>> Function(Ref ref)? _createCb;
+  const _PopularTitlesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: noRetry,
+        name: r'_popularTitlesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$popularTitlesHash();
@@ -34,19 +30,11 @@ final class _PopularTitlesProvider
   @override
   $FutureProviderElement<List<Manga>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _PopularTitlesProvider $copyWithCreate(
-    FutureOr<List<Manga>> Function(Ref ref) create,
-  ) {
-    return _PopularTitlesProvider._(create: create);
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Manga>> create(Ref ref) {
-    final _$cb = _createCb ?? _popularTitles;
-    return _$cb(ref);
+    return _popularTitles(ref);
   }
 }
 
@@ -58,20 +46,16 @@ const _recentlyAddedProvider = _RecentlyAddedProvider._();
 final class _RecentlyAddedProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _RecentlyAddedProvider._({
-    FutureOr<List<Manga>> Function(Ref ref)? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: noRetry,
-         name: r'_recentlyAddedProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final FutureOr<List<Manga>> Function(Ref ref)? _createCb;
+  const _RecentlyAddedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: noRetry,
+        name: r'_recentlyAddedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$recentlyAddedHash();
@@ -80,19 +64,11 @@ final class _RecentlyAddedProvider
   @override
   $FutureProviderElement<List<Manga>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _RecentlyAddedProvider $copyWithCreate(
-    FutureOr<List<Manga>> Function(Ref ref) create,
-  ) {
-    return _RecentlyAddedProvider._(create: create);
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Manga>> create(Ref ref) {
-    final _$cb = _createCb ?? _recentlyAdded;
-    return _$cb(ref);
+    return _recentlyAdded(ref);
   }
 }
 
@@ -104,20 +80,16 @@ const _latestUpdatesProvider = _LatestUpdatesProvider._();
 final class _LatestUpdatesProvider
     extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _LatestUpdatesProvider._({
-    FutureOr<List<Manga>> Function(Ref ref)? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: noRetry,
-         name: r'_latestUpdatesProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final FutureOr<List<Manga>> Function(Ref ref)? _createCb;
+  const _LatestUpdatesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: noRetry,
+        name: r'_latestUpdatesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$latestUpdatesHash();
@@ -126,19 +98,11 @@ final class _LatestUpdatesProvider
   @override
   $FutureProviderElement<List<Manga>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _LatestUpdatesProvider $copyWithCreate(
-    FutureOr<List<Manga>> Function(Ref ref) create,
-  ) {
-    return _LatestUpdatesProvider._(create: create);
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Manga>> create(Ref ref) {
-    final _$cb = _createCb ?? _latestUpdates;
-    return _$cb(ref);
+    return _latestUpdates(ref);
   }
 }
 
@@ -153,17 +117,13 @@ final class _FetchCustomListMangaProvider
   const _FetchCustomListMangaProvider._({
     required _FetchCustomListMangaFamily super.from,
     required String super.argument,
-    FutureOr<List<Manga>> Function(Ref ref, String listid)? create,
-  }) : _createCb = create,
-       super(
+  }) : super(
          retry: noRetry,
          name: r'_fetchCustomListMangaProvider',
          isAutoDispose: true,
          dependencies: null,
-         allTransitiveDependencies: null,
+         $allTransitiveDependencies: null,
        );
-
-  final FutureOr<List<Manga>> Function(Ref ref, String listid)? _createCb;
 
   @override
   String debugGetCreateSourceHash() => _$fetchCustomListMangaHash();
@@ -179,24 +139,12 @@ final class _FetchCustomListMangaProvider
   @override
   $FutureProviderElement<List<Manga>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _FetchCustomListMangaProvider $copyWithCreate(
-    FutureOr<List<Manga>> Function(Ref ref) create,
-  ) {
-    return _FetchCustomListMangaProvider._(
-      argument: argument as String,
-      from: from! as _FetchCustomListMangaFamily,
-      create: (ref, String listid) => create(ref),
-    );
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Manga>> create(Ref ref) {
-    final _$cb = _createCb ?? _fetchCustomListManga;
     final argument = this.argument as String;
-    return _$cb(ref, argument);
+    return _fetchCustomListManga(ref, argument);
   }
 
   @override
@@ -213,13 +161,14 @@ final class _FetchCustomListMangaProvider
 String _$fetchCustomListMangaHash() =>
     r'648d090100f7187d80742bc2314663f501e62bc1';
 
-final class _FetchCustomListMangaFamily extends Family {
+final class _FetchCustomListMangaFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<Manga>>, String> {
   const _FetchCustomListMangaFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchCustomListMangaProvider',
         dependencies: null,
-        allTransitiveDependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -227,28 +176,7 @@ final class _FetchCustomListMangaFamily extends Family {
       _FetchCustomListMangaProvider._(argument: listid, from: this);
 
   @override
-  String debugGetCreateSourceHash() => _$fetchCustomListMangaHash();
-
-  @override
   String toString() => r'_fetchCustomListMangaProvider';
-
-  /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<List<Manga>> Function(Ref ref, String args) create,
-  ) {
-    return $FamilyOverride(
-      from: this,
-      createElement: (pointer) {
-        final provider = pointer.origin as _FetchCustomListMangaProvider;
-
-        final argument = provider.argument as String;
-
-        return provider
-            .$copyWithCreate((ref) => create(ref, argument))
-            .$createElement(pointer);
-      },
-    );
-  }
 }
 
 @ProviderFor(_fetchFrontPageData)
@@ -258,20 +186,16 @@ final class _FetchFrontPageDataProvider
     extends
         $FunctionalProvider<AsyncValue<FrontPageData>, FutureOr<FrontPageData>>
     with $FutureModifier<FrontPageData>, $FutureProvider<FrontPageData> {
-  const _FetchFrontPageDataProvider._({
-    FutureOr<FrontPageData> Function(Ref ref)? create,
-  }) : _createCb = create,
-       super(
-         from: null,
-         argument: null,
-         retry: noRetry,
-         name: r'_fetchFrontPageDataProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         allTransitiveDependencies: null,
-       );
-
-  final FutureOr<FrontPageData> Function(Ref ref)? _createCb;
+  const _FetchFrontPageDataProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: noRetry,
+        name: r'_fetchFrontPageDataProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$fetchFrontPageDataHash();
@@ -280,19 +204,11 @@ final class _FetchFrontPageDataProvider
   @override
   $FutureProviderElement<FrontPageData> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(this, pointer);
-
-  @override
-  _FetchFrontPageDataProvider $copyWithCreate(
-    FutureOr<FrontPageData> Function(Ref ref) create,
-  ) {
-    return _FetchFrontPageDataProvider._(create: create);
-  }
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<FrontPageData> create(Ref ref) {
-    final _$cb = _createCb ?? _fetchFrontPageData;
-    return _$cb(ref);
+    return _fetchFrontPageData(ref);
   }
 }
 

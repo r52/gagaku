@@ -5,7 +5,7 @@ import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cache.g.dart';
@@ -119,7 +119,7 @@ class CacheManager {
 
     final matchingKeys = <String>{};
     for (final MapEntry(key: key, value: value) in _cache.entries) {
-      if (value.isExpired()) {
+      if (value.isExpired) {
         matchingKeys.add(key);
       }
     }
@@ -133,7 +133,7 @@ class CacheManager {
     final matchingKeys = <String>{};
     for (final (key as String) in _box.keys) {
       final entry = await _box.get(key);
-      if (entry != null && entry.isExpired()) {
+      if (entry != null && entry.isExpired) {
         matchingKeys.add(key);
       }
     }
@@ -186,7 +186,7 @@ class CacheManager {
     }
 
     if (inMemory) {
-      if (!_cache[key]!.isExpired()) {
+      if (!_cache[key]!.isExpired) {
         exists = true;
       } else {
         await remove(key);

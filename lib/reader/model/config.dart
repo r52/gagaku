@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/reader/model/types.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config.freezed.dart';
@@ -38,7 +39,7 @@ abstract class ReaderConfig with _$ReaderConfig {
 @riverpod
 class ReaderSettings extends _$ReaderSettings {
   ReaderConfig _fetch() {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('reader');
 
     if (str == null) {
@@ -58,7 +59,7 @@ class ReaderSettings extends _$ReaderSettings {
   @mutation
   ReaderConfig save(ReaderConfig update) {
     state = update;
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     box.put('reader', json.encode(update.toJson()));
 
     return update;

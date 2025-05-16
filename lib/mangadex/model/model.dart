@@ -3,6 +3,9 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
+import 'package:fresh_dio/fresh_dio.dart';
+import 'package:gagaku/util/authentication.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
@@ -12,12 +15,13 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meta/meta.dart';
-import 'package:mutex/mutex.dart';
+import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
+import 'package:riverpod_annotation/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
@@ -202,27 +206,82 @@ extension TokenHelper on TokenResponse {
   bool get isValid => accessToken != null && refreshToken != null;
 }
 
+class MangaDexTokenStorage implements TokenStorage<OIDAuthToken> {
+  @override
+  Future<void> delete() async {
+    final storage = Hive.box(gagakuLocalBox);
+    await storage.delete('mangadex_tokens');
+  }
+
+  @override
+  Future<OIDAuthToken?> read() async {
+    final storage = Hive.box(gagakuLocalBox);
+
+    final tokenstr = storage.get('mangadex_tokens');
+    final token =
+        tokenstr != null
+            ? MangaDexTokens.fromJson(json.decode(tokenstr))
+            : null;
+
+    if (token != null && token.accessToken != null) {
+      return OIDAuthToken(
+        accessToken: token.accessToken!,
+        refreshToken: token.refreshToken,
+        idToken: token.idToken,
+      );
+    }
+
+    return null;
+  }
+
+  @override
+  Future<void> write(OIDAuthToken token) async {
+    final storage = Hive.box(gagakuLocalBox);
+
+    final mtoken = MangaDexTokens.fromOIDAuthToken(token);
+    await storage.put('mangadex_tokens', json.encode(mtoken.toJson()));
+  }
+}
+
 @Riverpod(keepAlive: true)
 MangaDexModel mangadex(Ref ref) {
-  return MangaDexModel(ref, RateLimitedClient(useCustomUA: true));
+  return MangaDexModel(ref);
 }
 
 class MangaDexModel {
-  MangaDexModel(this.ref, http.Client client)
-    : _baseClient = client,
-      _client = client {
+  MangaDexModel(this.ref) {
     _cache = ref.watch(cacheProvider);
-    _future = refreshToken();
+
+    _dio.interceptors.add(RateLimitingInterceptor());
+
+    _fresh = Fresh.oAuth2<OIDAuthToken>(
+      httpClient: _dio.clone(),
+      tokenStorage: MangaDexTokenStorage(),
+      refreshToken: (token, httpClient) => refreshToken(token),
+      shouldRefresh: (response) {
+        return response?.statusCode == 401 || _token?.isExpired != false;
+      },
+    );
+
+    _dio.interceptors.add(_fresh);
   }
 
   final Ref ref;
-  TokenResponse? _token;
+
+  OIDAuthToken? _token;
   Credential? _credential;
-  final _tokenMutex = ReadWriteMutex();
-  final http.Client _baseClient;
-  http.Client _client;
-  late Future _future;
-  Future get future => _future;
+
+  final _dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+        validateStatus: (status) => true,
+      ),
+    )
+    ..httpClientAdapter = NativeAdapter(
+      createCronetEngine: () => createCronetEngine(getUserAgent(true)),
+    );
+  late final Fresh<OIDAuthToken> _fresh;
 
   late final CacheManager _cache;
 
@@ -235,121 +294,86 @@ class MangaDexModel {
   //   }
   // }
 
-  Future<Duration?> timeUntilTokenExpiry() async {
-    return await _tokenMutex.protectRead(() async {
-      if (_token == null) {
-        return null;
-      }
-
-      return _token!.expiresIn;
-    });
-  }
-
-  Future<bool> tokenExpired() async {
-    return await _tokenMutex.protectRead(() async {
-      if (_token == null) {
-        return false;
-      }
-
-      return _token!.expiresIn!.inSeconds <= 0;
-    });
-  }
+  Stream<AuthenticationStatus> get authenticationStatus =>
+      _fresh.authenticationStatus;
 
   Future<bool> loggedIn() async {
-    return await _tokenMutex.protectRead(() async {
-      return (_token != null && _credential != null && _token!.isValid);
-    });
+    final status = await authenticationStatus.firstWhere(
+      (status) => status != AuthenticationStatus.initial,
+    );
+    return status == AuthenticationStatus.authenticated;
   }
 
-  Future<void> refreshToken() async {
-    return await _tokenMutex.protectWrite(() async {
-      // Clear old data
-      _token = null;
+  Future<OIDAuthToken> refreshToken(OIDAuthToken? token) async {
+    // Clear old data
+    _token = null;
 
-      final storage = Hive.box(gagakuBox);
-      bool accessTokenSaved = storage.get('accessToken') != null;
+    final storage = Hive.box(gagakuLocalBox);
 
-      if (accessTokenSaved) {
-        final tt = storage.get('tokenType') as String;
-        final rt = storage.get('refreshToken') as String;
-        final it = storage.get('idToken') as String;
-        final clientId = storage.get('clientId') as String;
-        final clientSecret = storage.get('clientSecret') as String;
+    if (token != null) {
+      final tt = token.tokenType;
+      final rt = token.refreshToken;
+      final it = token.idToken;
 
-        final issuer =
-            _credential?.client.issuer ??
-            await Issuer.discover(
-              MangaDexEndpoints.provider,
-              httpClient: _baseClient,
-            );
-        final client =
-            _credential?.client ??
-            Client(
-              issuer,
-              clientId,
-              clientSecret: clientSecret,
-              httpClient: _baseClient,
-            );
+      final creds = MangaDexCredentials.fromJson(
+        json.decode(storage.get('mangadex_credentials')),
+      );
+      final clientId = creds.clientId;
+      final clientSecret = creds.clientSecret;
 
-        final credential =
-            _credential ??
-            client.createCredential(
-              accessToken: null, // force use refresh to get new token
-              tokenType: tt,
-              refreshToken: rt,
-              idToken: it,
-            );
+      final issuer =
+          _credential?.client.issuer ??
+          await Issuer.discover(MangaDexEndpoints.provider);
+      final client =
+          _credential?.client ??
+          Client(issuer, clientId, clientSecret: clientSecret);
 
-        try {
-          credential.validateToken(validateClaims: true, validateExpiry: true);
-          final token = await credential.getTokenResponse();
-          if (token.isValid) {
-            _saveToken(token);
-
-            _token = token;
-            _client = credential.createHttpClient(_baseClient);
-            _credential = credential;
-            logger.i("refreshToken(): MangaDex token refreshed");
-            return;
-          }
-
-          // If any steps fail, assign a default client
-          logger.w(
-            "refreshToken() returned error ${token['error']}",
-            error: token.toString(),
+      final credential =
+          _credential ??
+          client.createCredential(
+            accessToken: null, // force use refresh to get new token
+            tokenType: tt,
+            refreshToken: rt,
+            idToken: it,
           );
-          _client = _baseClient;
-        } catch (e) {
-          logger.w("refreshToken() error ${e.toString()}", error: e);
-          _client = _baseClient;
 
-          // remove broken tokens
-          await storage.delete('accessToken');
-          await storage.delete('refreshToken');
-          await storage.delete('tokenType');
-          await storage.delete('idToken');
+      try {
+        credential.validateToken(validateClaims: true, validateExpiry: true);
+        final tokenresp = await credential.getTokenResponse();
+        if (tokenresp.isValid) {
+          _token = OIDAuthToken.fromTokenResponse(tokenresp);
+
+          _credential = credential;
+          logger.i("refreshToken(): MangaDex token refreshed");
+          return _token!;
         }
+
+        // If any steps fail, assign a default client
+        logger.w(
+          "refreshToken() returned error ${tokenresp['error']}",
+          error: tokenresp.toString(),
+        );
+
+        throw RevokeTokenException;
+      } catch (e) {
+        logger.w("refreshToken() error ${e.toString()}", error: e);
+
+        throw RevokeTokenException;
       }
-    });
+    }
+
+    throw RevokeTokenException;
   }
 
-  Future<void> authenticate(
+  Future<bool> authenticate(
     String user,
     String pass,
     String clientId,
     String clientSecret,
   ) async {
-    final issuer = await Issuer.discover(
-      MangaDexEndpoints.provider,
-      httpClient: _baseClient,
-    );
+    final issuer = await Issuer.discover(MangaDexEndpoints.provider);
 
-    final client = Client(
-      issuer,
-      clientId,
-      clientSecret: clientSecret,
-      httpClient: _baseClient,
-    );
+    final client = Client(issuer, clientId, clientSecret: clientSecret);
 
     final flow = Flow.password(client);
 
@@ -361,21 +385,21 @@ class MangaDexModel {
     final token = await credential.getTokenResponse();
 
     if (token.isValid) {
-      return await _tokenMutex.protectWrite(() async {
-        await _saveToken(token);
-        await _saveCredentials(user, clientId, clientSecret);
-        _token = token;
-        _client = credential.createHttpClient(_baseClient);
-        _credential = credential;
+      await _saveCredentials(user, clientId, clientSecret);
+      _token = OIDAuthToken.fromTokenResponse(token);
+      await _fresh.setToken(_token);
+      _credential = credential;
 
-        logger.i("authenticate(): MangaDex user logged in");
-      });
+      logger.i("authenticate(): MangaDex user logged in");
+      return true;
     }
 
     logger.w(
       "authenticate() returned error ${token['error']}",
       error: token.toString(),
     );
+
+    throw Exception(token['error']);
   }
 
   Future<void> _saveCredentials(
@@ -383,42 +407,30 @@ class MangaDexModel {
     String clientId,
     String clientSecret,
   ) async {
-    final storage = Hive.box(gagakuBox);
+    final storage = Hive.box(gagakuLocalBox);
 
-    await storage.put('username', username);
-    await storage.put('clientId', clientId);
-    await storage.put('clientSecret', clientSecret);
-  }
+    final creds = MangaDexCredentials(
+      username: username,
+      clientId: clientId,
+      clientSecret: clientSecret,
+    );
 
-  Future<void> _saveToken(TokenResponse token) async {
-    final storage = Hive.box(gagakuBox);
-
-    await storage.put('accessToken', token.accessToken);
-    await storage.put('refreshToken', token.refreshToken);
-    await storage.put('tokenType', token.tokenType);
-    await storage.put('idToken', token.idToken.toCompactSerialization());
+    await storage.put('mangadex_credentials', json.encode(creds.toJson()));
   }
 
   Future<void> logout() async {
     if (await loggedIn() && _credential != null) {
       final logoutUrl = _credential!.generateLogoutUrl();
       if (logoutUrl != null) {
-        final response = await _client.post(logoutUrl);
+        final response = await http.post(logoutUrl);
 
         if (response.statusCode == 200) {
-          return await _tokenMutex.protectWrite(() async {
-            _token = null;
-            _client = _baseClient;
-            _credential = null;
+          _token = null;
+          await _fresh.setToken(null);
+          _credential = null;
 
-            final storage = Hive.box(gagakuBox);
-            await storage.delete('accessToken');
-            await storage.delete('refreshToken');
-            await storage.delete('tokenType');
-            await storage.delete('idToken');
-
-            logger.i("logout(): MangaDex user logged out");
-          });
+          logger.i("logout(): MangaDex user logged out");
+          return;
         }
 
         logger.w(
@@ -441,22 +453,21 @@ class MangaDexModel {
     await _cache.invalidateAll(startsWith);
   }
 
-  Exception createException(String msg, http.Response response) {
+  Exception createException(String msg, Response response) {
     if (response.statusCode == 503) {
       msg = 'MangaDex is down for maintanence';
     }
 
     final message =
-        "$msg\nServer returned ${response.statusCode}: ${response.reasonPhrase}";
+        "$msg\nServer returned ${response.statusCode}: ${response.statusMessage}";
 
-    if (response.statusCode >= 500) {
+    if (response.statusCode! >= 500) {
       logger.e(message);
       return Exception(message);
     }
 
     // MD API error
-    final body = json.decode(response.body);
-    final err = ErrorResponse.fromJson(body);
+    final err = ErrorResponse.fromJson(response.data);
     final ex = MangaDexException(msg, err.errors);
     logger.e(msg, error: ex);
     return ex;
@@ -473,14 +484,14 @@ class MangaDexModel {
     final uri = Uri.parse(
       'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/mangadex.json',
     );
-    final response = await http.get(uri);
+    final response = await Dio().getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
+      final Map<String, dynamic> body = json.decode(response.data);
       final result = FrontPageData.fromJson(body);
 
       // Cache the data
-      await _cache.put(key, response.body, result, true);
+      await _cache.put(key, response.data, result, true);
 
       return result;
     }
@@ -550,11 +561,10 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final result = MDEntityList.fromJson(body);
+      final result = MDEntityList.fromJson(response.data);
 
       // Cache the data and list
       await _cache.putEntityList(key, result, resolve: true);
@@ -599,11 +609,10 @@ class MangaDexModel {
           queryParameters: queryParams,
         );
 
-        final response = await _client.get(uri);
+        final response = await _dio.getUri(uri);
 
         if (response.statusCode == 200) {
-          final Map<String, dynamic> body = json.decode(response.body);
-          final result = MDEntityList.fromJson(body);
+          final result = MDEntityList.fromJson(response.data);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
@@ -654,11 +663,10 @@ class MangaDexModel {
           queryParameters: queryParams,
         );
 
-        final response = await _client.get(uri);
+        final response = await _dio.getUri(uri);
 
         if (response.statusCode == 200) {
-          final Map<String, dynamic> body = json.decode(response.body);
-          final mangalist = MDEntityList.fromJson(body);
+          final mangalist = MDEntityList.fromJson(response.data);
 
           // Cache the data
           await _cache.putAllAPIResolved(mangalist.data);
@@ -735,11 +743,10 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final result = MDEntityList.fromJson(body);
+      final result = MDEntityList.fromJson(response.data);
 
       // Cache the data
       await _cache.putEntityList(key, result, resolve: true);
@@ -791,11 +798,10 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final result = MDEntityList.fromJson(body);
+      final result = MDEntityList.fromJson(response.data);
 
       // Cache the data
       await _cache.putAllAPIResolved(result.data);
@@ -819,7 +825,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
       // User follows the manga
@@ -832,7 +838,7 @@ class MangaDexModel {
     // Throw if failure
     final msg =
         "getMangaFollowing() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.body);
+    logger.e(msg, error: response.data);
     throw Exception(msg);
   }
 
@@ -848,12 +854,12 @@ class MangaDexModel {
       path: MangaDexEndpoints.setFollow.replaceFirst('{id}', manga.id),
     );
 
-    http.Response response;
+    Response response;
 
     if (setFollow) {
-      response = await _client.post(uri);
+      response = await _dio.postUri(uri);
     } else {
-      response = await _client.delete(uri);
+      response = await _dio.deleteUri(uri);
     }
 
     if (response.statusCode == 200) {
@@ -864,7 +870,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "setMangaFollowing(${manga.id}, $setFollow) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
 
     return false;
@@ -882,10 +888,10 @@ class MangaDexModel {
       path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
+      final Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         MangaReadingStatus? status;
@@ -926,14 +932,10 @@ class MangaDexModel {
       path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _client.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(params),
-    );
+    final response = await _dio.postUri(uri, data: params);
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = json.decode(response.body);
+      Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         return true;
@@ -943,7 +945,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "setMangaReadingStatus(${manga.id}, $status) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
 
     return false;
@@ -970,10 +972,10 @@ class MangaDexModel {
         queryParameters: queryParams,
       );
 
-      final response = await _client.get(uri);
+      final response = await _dio.getUri(uri);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
+        final Map<String, dynamic> body = response.data;
 
         if (body['data'] is List) {
           // Since grouped = true, if the api returns a List, then the result
@@ -1035,11 +1037,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _client.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(params),
-    );
+    final response = await _dio.postUri(uri, data: params);
 
     if (response.statusCode == 200) {
       // Success
@@ -1049,7 +1047,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "setChaptersRead(${manga.id}, ${read.toString()}, ${unread.toString()}) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
 
     return false;
@@ -1068,11 +1066,10 @@ class MangaDexModel {
       path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id),
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final apidat = ChapterAPI.fromJson(body);
+      final apidat = ChapterAPI.fromJson(response.data);
 
       final chapterUrl = apidat.getUrl(settings.dataSaver);
 
@@ -1114,10 +1111,10 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
+      final Map<String, dynamic> body = response.data;
 
       if (body['statuses'] is List) {
         // If the api returns a List, then the result is null
@@ -1146,11 +1143,10 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final result = MDEntityList.fromJson(body);
+      final result = MDEntityList.fromJson(response.data);
 
       // Cache the data and list
       await _cache.putEntityList(
@@ -1184,11 +1180,10 @@ class MangaDexModel {
         queryParameters: queryParams,
       );
 
-      final response = await _client.get(uri);
+      final response = await _dio.getUri(uri);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
-        final resp = MangaStatisticsResponse.fromJson(body);
+        final resp = MangaStatisticsResponse.fromJson(response.data);
 
         return resp.statistics;
       } else {
@@ -1217,11 +1212,10 @@ class MangaDexModel {
         queryParameters: queryParams,
       );
 
-      final response = await _client.get(uri);
+      final response = await _dio.getUri(uri);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
-        final resp = ChapterStatisticsResponse.fromJson(body);
+        final resp = ChapterStatisticsResponse.fromJson(response.data);
 
         return resp.statistics;
       } else {
@@ -1254,11 +1248,10 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final result = MDEntityList.fromJson(body);
+      final result = MDEntityList.fromJson(response.data);
 
       // Cache the data
       await _cache.putEntityList(key, result, resolve: false);
@@ -1285,10 +1278,10 @@ class MangaDexModel {
         queryParameters: queryParams,
       );
 
-      final response = await _client.get(uri);
+      final response = await _dio.getUri(uri);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
+        final Map<String, dynamic> body = response.data;
 
         if (body['ratings'] is List) {
           // If the api returns a List, then the result is null
@@ -1333,22 +1326,18 @@ class MangaDexModel {
       path: MangaDexEndpoints.setRating.replaceFirst('{id}', manga.id),
     );
 
-    http.Response? response;
+    Response? response;
 
     if (rating != null) {
       final params = {'rating': rating};
 
-      response = await _client.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(params),
-      );
+      response = await _dio.postUri(uri, data: params);
     } else {
-      response = await _client.delete(uri);
+      response = await _dio.deleteUri(uri);
     }
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = json.decode(response.body);
+      Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         return true;
@@ -1358,7 +1347,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "setMangaRating(${manga.id}, $rating) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
 
     return false;
@@ -1391,11 +1380,10 @@ class MangaDexModel {
           queryParameters: queryParams,
         );
 
-        final response = await _client.get(uri);
+        final response = await _dio.getUri(uri);
 
         if (response.statusCode == 200) {
-          final Map<String, dynamic> body = json.decode(response.body);
-          final result = MDEntityList.fromJson(body);
+          final result = MDEntityList.fromJson(response.data);
 
           // Cache the data
           await _cache.putAllAPIResolved(result.data);
@@ -1449,11 +1437,10 @@ class MangaDexModel {
             queryParameters: queryParams,
           );
 
-          final response = await _client.get(uri);
+          final response = await _dio.getUri(uri);
 
           if (response.statusCode == 200) {
-            final Map<String, dynamic> body = json.decode(response.body);
-            final result = MDEntityList.fromJson(body);
+            final result = MDEntityList.fromJson(response.data);
 
             // Cache the data
             await _cache.putAllAPIResolved(result.data);
@@ -1479,11 +1466,10 @@ class MangaDexModel {
         queryParameters: queryParams,
       );
 
-      final response = await _client.get(uri);
+      final response = await _dio.getUri(uri);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
-        final result = MDEntityList.fromJson(body);
+        final result = MDEntityList.fromJson(response.data);
 
         // Cache the data
         await _cache.putAllAPIResolved(result.data);
@@ -1512,10 +1498,10 @@ class MangaDexModel {
       path: MangaDexEndpoints.modifyList.replaceFirst('{id}', listId),
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
+      final Map<String, dynamic> body = response.data;
       final result = CustomList.fromJson(body['data']);
 
       // Cache the result
@@ -1559,11 +1545,10 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final result = MDEntityList.fromJson(body);
+      final result = MDEntityList.fromJson(response.data);
 
       // Cache entries
       await _cache.putAllAPIResolved(result.data);
@@ -1595,16 +1580,16 @@ class MangaDexModel {
       path: MangaDexEndpoints.followList.replaceFirst('{id}', list.id),
     );
 
-    http.Response? response;
+    Response? response;
 
     if (follow) {
-      response = await _client.post(uri);
+      response = await _dio.postUri(uri);
     } else {
-      response = await _client.delete(uri);
+      response = await _dio.deleteUri(uri);
     }
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = json.decode(response.body);
+      Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         return true;
@@ -1614,7 +1599,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "setFollowList($id, $follow) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
 
     return false;
@@ -1644,11 +1629,10 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
-      final result = MDEntityList.fromJson(body);
+      final result = MDEntityList.fromJson(response.data);
 
       // Cache entries
       await _cache.putAllAPIResolved(result.data);
@@ -1686,16 +1670,16 @@ class MangaDexModel {
           .replaceFirst('{listId}', id),
     );
 
-    http.Response? response;
+    Response? response;
 
     if (add) {
-      response = await _client.post(uri);
+      response = await _dio.postUri(uri);
     } else {
-      response = await _client.delete(uri);
+      response = await _dio.deleteUri(uri);
     }
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = json.decode(response.body);
+      Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         final relationships = [...list.relationships];
@@ -1726,7 +1710,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "updateMangaInCustomList($id, ${manga.id}, $add) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
 
     return null;
@@ -1746,12 +1730,12 @@ class MangaDexModel {
       path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
     );
 
-    http.Response? response;
+    Response? response;
 
-    response = await _client.delete(uri);
+    response = await _dio.deleteUri(uri);
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = json.decode(response.body);
+      Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         // Remove the cache
@@ -1763,7 +1747,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "deleteList($id) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
     throw createException("deleteList($id) failed.", response);
   }
@@ -1790,14 +1774,10 @@ class MangaDexModel {
       'manga': mangaIds.toList(),
     };
 
-    final response = await _client.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(params),
-    );
+    final response = await _dio.postUri(uri, data: params);
 
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      final Map<String, dynamic> body = json.decode(response.body);
+    if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+      final Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         // Process new list
@@ -1817,7 +1797,7 @@ class MangaDexModel {
     // Log the failure
     logger.w(
       "createNewList($name, ${visibility.name}) returned code ${response.statusCode}",
-      error: response.body,
+      error: response.data,
     );
     throw createException(
       "createNewList($name, ${visibility.name}) failed.",
@@ -1851,14 +1831,10 @@ class MangaDexModel {
       'version': list.attributes.version,
     };
 
-    final response = await _client.put(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(params),
-    );
+    final response = await _dio.putUri(uri, data: params);
 
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      final Map<String, dynamic> body = json.decode(response.body);
+    if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+      final Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         // Process new list
@@ -1892,10 +1868,10 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.me);
 
-    final response = await _client.get(uri);
+    final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = json.decode(response.body);
+      final Map<String, dynamic> body = response.data;
 
       if (body['result'] == 'ok') {
         // Process new list
@@ -1950,7 +1926,7 @@ class ReadChapters extends _$ReadChapters {
 
     final oldstate = await future;
     final mg = mangas.where(
-      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true,
+      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired == true,
     );
 
     if (mg.isEmpty) {
@@ -2415,7 +2391,7 @@ class Ratings extends _$Ratings {
 
     final oldstate = await future;
     final mg = mangas.where(
-      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired() == true,
+      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired == true,
     );
 
     if (mg.isEmpty) {
@@ -2550,7 +2526,7 @@ class MangaDexHistory extends _$MangaDexHistory {
 
   @override
   Future<Queue<Chapter>> build() async {
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     final str = box.get('mangadex_history');
 
     if (str == null || (str as String).isEmpty) {
@@ -2585,7 +2561,7 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final uuids = cpy.map((e) => e.id).toList();
 
-    final box = Hive.box(gagakuBox);
+    final box = Hive.box(gagakuDataBox);
     await box.put('mangadex_history', json.encode(uuids));
 
     state = AsyncData(cpy);
@@ -2598,9 +2574,9 @@ class MangaDexHistory extends _$MangaDexHistory {
 class LoggedUser extends _$LoggedUser {
   @override
   Future<User?> build() async {
-    final loggedin = await ref.watch(authControlProvider.future);
+    final status = await ref.watch(authControlProvider.selectAsync((s) => s));
 
-    if (!loggedin) {
+    if (status != AuthenticationStatus.authenticated) {
       return null;
     }
 
@@ -2612,47 +2588,11 @@ class LoggedUser extends _$LoggedUser {
 }
 
 @Riverpod(keepAlive: true)
-class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
-  Future<void> invalidate() async {
-    final prevState = await future;
-
-    final refreshed = await build();
-
-    if (refreshed != prevState) {
-      state = await AsyncValue.guard(() async {
-        return refreshed;
-      });
-    }
-  }
-
-  Future<void> _setStaleTime() async {
-    final api = ref.watch(mangadexProvider);
-
-    cancelStaleTime();
-
-    final expireTime = await api.timeUntilTokenExpiry();
-
-    if (expireTime != null) {
-      logger.d(
-        "AuthControl: setting stale time to ${expireTime.inSeconds} seconds",
-      );
-      staleTime(expireTime);
-    }
-  }
-
+class AuthControl extends _$AuthControl {
   @override
-  Future<bool> build() async {
+  Stream<AuthenticationStatus> build() async* {
     final api = ref.watch(mangadexProvider);
-    await api.future;
-
-    if (await api.tokenExpired()) {
-      logger.i("MangaDex token has expired. Refreshing...");
-      await api.refreshToken();
-    }
-
-    await _setStaleTime();
-
-    return api.loggedIn();
+    yield* api.authenticationStatus;
   }
 
   @mutation
@@ -2663,17 +2603,12 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
     String clientSecret,
   ) async {
     final api = ref.watch(mangadexProvider);
-    await api.authenticate(user, pass, clientId, clientSecret);
-    await _setStaleTime();
-
-    bool result = await api.loggedIn();
-    state = AsyncData(result);
+    final result = await api.authenticate(user, pass, clientId, clientSecret);
 
     return result;
   }
 
-  @mutation
-  Future<bool> logout() async {
+  Future<void> logout() async {
     final api = ref.watch(mangadexProvider);
 
     // Invalidate stuff
@@ -2688,11 +2623,5 @@ class AuthControl extends _$AuthControl with AutoDisposeExpiryMix {
     await api.invalidateAll(MangaDexFeeds.latestChapters.key);
 
     await api.logout();
-    await _setStaleTime();
-
-    bool result = await api.loggedIn();
-    state = AsyncData(result);
-
-    return result;
   }
 }

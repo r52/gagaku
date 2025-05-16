@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meta/meta.dart';
+import 'package:riverpod/misc.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gagaku/log.dart';
 
@@ -50,7 +51,7 @@ mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   }
 }
 
-mixin AutoDisposeExpiryMix<T> on NotifierBase<AsyncValue<T>> {
+mixin AutoDisposeExpiryMix<T> on AnyNotifier<AsyncValue<T>> {
   Timer? _staleTimer;
   DateTime? _expiry;
 
@@ -166,7 +167,7 @@ extension RefWorkaround on Ref {
     }
   }
 
-  T readFuture<T>(Refreshable<T> listenable) {
+  T readFuture<T>(ProviderListenable<T> listenable) {
     T result;
     final sub = listen(listenable, (_, __) {});
 
