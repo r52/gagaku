@@ -210,19 +210,47 @@ class ProxyHandler {
   Future<WebManga?> handleSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
+        String? sourceId;
         if (handle.parser != null) {
-          return await ref
-              .read(extensionSourceProvider(handle.parser!.id).notifier)
-              .getManga(handle.location);
+          sourceId = handle.parser!.id;
         } else {
           final installed = await ref.watch(extensionInfoListProvider.future);
           for (final src in installed) {
             if (handle.sourceId == src.id) {
-              return await ref
-                  .read(extensionSourceProvider(handle.sourceId).notifier)
-                  .getManga(handle.location);
+              sourceId = handle.sourceId;
+              break;
             }
           }
+        }
+
+        if (sourceId != null) {
+          final key = handle.getKey();
+
+          if (await _cache.exists(key)) {
+            logger.d('CacheManager: retrieving entry $key');
+            return _cache.get<WebManga>(key, WebManga.fromJson);
+          }
+
+          final manga = await ref
+              .read(extensionSourceProvider(sourceId).notifier)
+              .getManga(handle.location);
+
+          if (manga != null) {
+            const expiry = Duration(days: 1);
+
+            logger.d(
+              'CacheManager: caching entry $key for ${expiry.toString()}',
+            );
+            _cache.put(
+              key,
+              json.encode(manga.toJson()),
+              manga,
+              true,
+              expiry: expiry,
+            );
+          }
+
+          return manga;
         }
 
         return null;

@@ -92,35 +92,30 @@ Future<List<ReaderPage>> _getSourcePages(
   String referer = '';
   List<String>? links = [];
 
+  String? sourceId;
   if (handle.parser != null) {
-    final ext = await ref.watch(
-      extensionSourceProvider(handle.parser!.id).future,
-    );
-    links = await ref
-        .read(extensionSourceProvider(handle.parser!.id).notifier)
-        .getChapterPages(handle.location, id);
-    referer = ext.baseUrl;
+    sourceId = handle.parser!.id;
   } else {
     final installed = await ref.watch(extensionInfoListProvider.future);
     for (final src in installed) {
       if (handle.sourceId == src.id) {
-        final ext = await ref.watch(
-          extensionSourceProvider(handle.parser!.id).future,
-        );
-        links = await ref
-            .read(extensionSourceProvider(handle.sourceId).notifier)
-            .getChapterPages(handle.location, id);
-        referer = ext.baseUrl;
+        sourceId = handle.sourceId;
         break;
       }
     }
   }
 
-  if (links == null) {
+  if (sourceId == null) {
     throw Exception(
-      'Failed to download pages from source ${handle.sourceId}, chapter id $id',
+      'Failed to allocate extension. Parser: ${handle.parser}, sourceId: ${handle.sourceId}',
     );
   }
+
+  final ext = await ref.watch(extensionSourceProvider(sourceId).future);
+  links = await ref
+      .read(extensionSourceProvider(sourceId).notifier)
+      .getChapterPages(handle.location, id);
+  referer = ext.baseUrl;
 
   if (referer.isNotEmpty && !referer.endsWith('/')) {
     referer = '$referer/';
