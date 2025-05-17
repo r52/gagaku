@@ -5,7 +5,6 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -116,9 +115,6 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
     final tr = context.t;
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
-    final defaultCategory = ref.watch(
-      webConfigProvider.select((cfg) => cfg.defaultCategory),
-    );
     final controller = useSearchController();
 
     return Scaffold(
@@ -278,9 +274,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         children: [
           WebMangaListViewSliver(
             controller: _pagingController,
-            favoritesKey: defaultCategory,
             showRemoveButton: false,
-            removeFromAll: true,
           ),
         ],
       ),

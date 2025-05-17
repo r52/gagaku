@@ -405,9 +405,6 @@ class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultCategory = ref.watch(
-      webConfigProvider.select((cfg) => cfg.defaultCategory),
-    );
     final controller = useScrollController();
 
     return Scaffold(
@@ -433,8 +430,6 @@ class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
           children: [
             WebMangaListViewSliver(
               controller: _pagingController,
-              favoritesKey: defaultCategory,
-              removeFromAll: true,
               showRemoveButton: false,
             ),
           ],
@@ -444,17 +439,13 @@ class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
   }
 }
 
-class MangaCarousel extends ConsumerWidget {
+class MangaCarousel extends StatelessWidget {
   const MangaCarousel({super.key, required this.items});
 
   final List<HistoryLink> items;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final defaultCategory = ref.watch(
-      webConfigProvider.select((cfg) => cfg.defaultCategory),
-    );
-
+  Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 256),
@@ -464,14 +455,7 @@ class MangaCarousel extends ConsumerWidget {
           enableSplash: false,
           children:
               items
-                  .map(
-                    (e) => GridMangaItem(
-                      link: e,
-                      favoritesKey: defaultCategory,
-                      showRemoveButton: false,
-                      removeFromAll: true,
-                    ),
-                  )
+                  .map((e) => GridMangaItem(link: e, showRemoveButton: false))
                   .toList(),
         ),
       ),

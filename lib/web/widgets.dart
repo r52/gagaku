@@ -5,6 +5,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -121,18 +122,18 @@ class WebMangaListViewSliver extends ConsumerWidget {
     super.key,
     this.items,
     this.controller,
-    required this.favoritesKey,
+    this.favoritesKey,
     this.reorderable = false,
     this.showRemoveButton = true,
-    this.removeFromAll = false,
-  }) : assert(items != null || controller != null);
+  }) : assert(items != null || controller != null),
+       assert(
+         reorderable == false || (reorderable == true && favoritesKey != null),
+       );
 
-  final String favoritesKey;
+  final String? favoritesKey;
   final List<HistoryLink>? items;
   final bool reorderable;
   final bool showRemoveButton;
-  final bool
-  removeFromAll; // Unfavoriting an item removes the item from all categories?
 
   final PagingController<dynamic, HistoryLink>? controller;
 
@@ -145,14 +146,14 @@ class WebMangaListViewSliver extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(proxyProvider);
-    final view = ref.watch(_mangaListViewProvider);
+    WebMangaListView view =
+        items != null
+            ? ref.watch(_mangaListViewProvider)
+            : WebMangaListView.grid;
     final gridExtent = ref.watch(
       gagakuSettingsProvider.select((c) => c.gridAlbumExtent),
     );
     final theme = Theme.of(context);
-
-    final addFavorite = ref.watch(webSourceFavoritesProvider.add);
-    final removeFavorite = ref.watch(webSourceFavoritesProvider.remove);
 
     if (items != null) {
       switch (view) {
@@ -162,9 +163,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 onReorder:
                     (int oldIndex, int newIndex) => ref.read(
                       webSourceFavoritesProvider.updateList,
-                    )(favoritesKey, oldIndex, newIndex),
+                    )(favoritesKey!, oldIndex, newIndex),
                 itemCount: items!.length,
-                findChildIndexCallback: _findChildIndexCb,
+                // findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
                   final item = items!.elementAt(index);
                   return ReorderableDelayedDragStartListener(
@@ -175,47 +176,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           index.isOdd
                               ? theme.colorScheme.surfaceContainer
                               : theme.colorScheme.surfaceContainerHighest,
-                      leading: Consumer(
-                        builder: (context, refx, child) {
-                          final tr = context.t;
-                          final favorited = ref.watch(
-                            webSourceFavoritesProvider.select(
-                              (value) => switch (value) {
-                                AsyncValue(value: final data?) => data.values
-                                    .any((l) => l.contains(item)),
-                                _ => null,
-                              },
-                            ),
-                          );
-
-                          if (favorited == null) {
-                            return const CircularProgressIndicator();
-                          }
-
-                          return IconButton(
-                            tooltip:
-                                favorited
-                                    ? tr.mangaActions.unfavorite
-                                    : tr.mangaActions.favorite,
-                            icon: Icon(
-                              favorited
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                            ),
-                            color: favorited ? theme.colorScheme.primary : null,
-                            onPressed: () async {
-                              if (favorited) {
-                                removeFavorite(
-                                  removeFromAll ? 'all' : favoritesKey,
-                                  item,
-                                );
-                              } else {
-                                addFavorite(favoritesKey, item);
-                              }
-                            },
-                          );
-                        },
-                      ),
+                      leading: FavoritesButton(link: item),
                       title: Text(item.title),
                       textColor: Colors.blue,
                       onTap: () async {
@@ -255,45 +216,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         index.isOdd
                             ? theme.colorScheme.surfaceContainer
                             : theme.colorScheme.surfaceContainerHighest,
-                    leading: Consumer(
-                      builder: (context, refx, child) {
-                        final favorited = ref.watch(
-                          webSourceFavoritesProvider.select(
-                            (value) => switch (value) {
-                              AsyncValue(value: final data?) => data.values.any(
-                                (l) => l.contains(item),
-                              ),
-                              _ => null,
-                            },
-                          ),
-                        );
-
-                        if (favorited == null) {
-                          return const CircularProgressIndicator();
-                        }
-
-                        return IconButton(
-                          tooltip:
-                              favorited
-                                  ? tr.mangaActions.unfavorite
-                                  : tr.mangaActions.favorite,
-                          icon: Icon(
-                            favorited ? Icons.favorite : Icons.favorite_border,
-                          ),
-                          color: favorited ? theme.colorScheme.primary : null,
-                          onPressed: () async {
-                            if (favorited) {
-                              removeFavorite(
-                                removeFromAll ? 'all' : favoritesKey,
-                                item,
-                              );
-                            } else {
-                              addFavorite(favoritesKey, item);
-                            }
-                          },
-                        );
-                      },
-                    ),
+                    leading: FavoritesButton(link: item),
                     trailing: IconButton(
                       tooltip: tr.mangaActions.removeHistory,
                       icon: const Icon(Icons.delete, color: Colors.red),
@@ -341,9 +264,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
               return GridMangaItem(
                 key: ValueKey(item.hashCode),
                 link: item,
-                favoritesKey: favoritesKey,
                 showRemoveButton: showRemoveButton,
-                removeFromAll: removeFromAll,
               );
             },
             itemCount: items!.length,
@@ -370,52 +291,17 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         index.isOdd
                             ? theme.colorScheme.surfaceContainer
                             : theme.colorScheme.surfaceContainerHighest,
-                    leading: Consumer(
-                      builder: (context, refx, child) {
-                        final favorited = ref.watch(
-                          webSourceFavoritesProvider.select(
-                            (value) => switch (value) {
-                              AsyncValue(value: final data?) => data.values.any(
-                                (l) => l.contains(item),
-                              ),
-                              _ => null,
-                            },
-                          ),
-                        );
-
-                        if (favorited == null) {
-                          return const CircularProgressIndicator();
-                        }
-
-                        return IconButton(
-                          tooltip:
-                              favorited
-                                  ? tr.mangaActions.unfavorite
-                                  : tr.mangaActions.favorite,
-                          icon: Icon(
-                            favorited ? Icons.favorite : Icons.favorite_border,
-                          ),
-                          color: favorited ? theme.colorScheme.primary : null,
-                          onPressed: () async {
-                            if (favorited) {
-                              removeFavorite(
-                                removeFromAll ? 'all' : favoritesKey,
-                                item,
-                              );
-                            } else {
-                              addFavorite(favoritesKey, item);
-                            }
-                          },
-                        );
-                      },
-                    ),
-                    trailing: IconButton(
-                      tooltip: tr.mangaActions.removeHistory,
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        ref.read(webSourceHistoryProvider.remove)(item);
-                      },
-                    ),
+                    leading: FavoritesButton(link: item),
+                    trailing:
+                        showRemoveButton
+                            ? IconButton(
+                              tooltip: tr.mangaActions.removeHistory,
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                ref.read(webSourceHistoryProvider.remove)(item);
+                              },
+                            )
+                            : null,
                     title: Text(item.title),
                     textColor: Colors.blue,
                     onTap: () async {
@@ -458,9 +344,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                   return GridMangaItem(
                     key: ValueKey(item.hashCode),
                     link: item,
-                    favoritesKey: favoritesKey,
                     showRemoveButton: showRemoveButton,
-                    removeFromAll: removeFromAll,
                   );
                 },
               ),
@@ -475,18 +359,13 @@ class GridMangaItem extends HookConsumerWidget {
   const GridMangaItem({
     super.key,
     required this.link,
-    required this.favoritesKey,
     this.showFavoriteButton = true,
     this.showRemoveButton = true,
-    this.removeFromAll = false,
   });
 
-  final String favoritesKey;
   final HistoryLink link;
   final bool showFavoriteButton;
   final bool showRemoveButton;
-  final bool
-  removeFromAll; // Unfavoriting an item removes the item from all categories?
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -554,50 +433,7 @@ class GridMangaItem extends HookConsumerWidget {
           if (showFavoriteButton)
             Align(
               alignment: Alignment.topLeft,
-              child: Consumer(
-                builder: (context, refx, child) {
-                  final favorited = ref.watch(
-                    webSourceFavoritesProvider.select(
-                      (value) => switch (value) {
-                        AsyncValue(value: final data?) => data.values.any(
-                          (l) => l.contains(link),
-                        ),
-                        _ => null,
-                      },
-                    ),
-                  );
-
-                  if (favorited == null) {
-                    return const CircularProgressIndicator();
-                  }
-
-                  return FloatingActionButton(
-                    heroTag: UniqueKey(),
-                    mini: true,
-                    shape: const CircleBorder(),
-                    tooltip:
-                        favorited
-                            ? tr.mangaActions.unfavorite
-                            : tr.mangaActions.favorite,
-                    onPressed: () async {
-                      if (favorited) {
-                        ref.read(webSourceFavoritesProvider.remove)(
-                          removeFromAll ? 'all' : favoritesKey,
-                          link,
-                        );
-                      } else {
-                        ref.read(webSourceFavoritesProvider.add)(
-                          favoritesKey,
-                          link,
-                        );
-                      }
-                    },
-                    child: Icon(
-                      favorited ? Icons.favorite : Icons.favorite_border,
-                    ),
-                  );
-                },
-              ),
+              child: FavoritesButton(link: link),
             ),
           if (showRemoveButton)
             Align(
@@ -618,6 +454,126 @@ class GridMangaItem extends HookConsumerWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class FavoritesButton extends HookConsumerWidget {
+  const FavoritesButton({super.key, required this.link, this.borderRadius});
+
+  final HistoryLink link;
+  final BorderRadiusGeometry? borderRadius;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final theme = Theme.of(context);
+
+    final categories = ref.watch(
+      webConfigProvider.select((cfg) => cfg.categories),
+    );
+
+    final favorites = ref.watch(
+      webSourceFavoritesProvider.select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) => data,
+          _ => null,
+        },
+      ),
+    );
+
+    final favorited = ref.watch(
+      webSourceFavoritesProvider.select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) => data.values.any(
+            (l) => l.contains(link),
+          ),
+          _ => null,
+        },
+      ),
+    );
+
+    if (favorited == null) {
+      return const CircularProgressIndicator();
+    }
+
+    return MenuAnchor(
+      builder: (context, controller, child) {
+        return Tooltip(
+          message: tr.mangaActions.favorite,
+          child: Material(
+            color: theme.colorScheme.surfaceContainerHighest,
+            shape: borderRadius == null ? const CircleBorder() : null,
+            borderRadius: borderRadius,
+            child:
+                favorites == null
+                    ? const SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                    : InkWell(
+                      onTap: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                      child: child,
+                    ),
+          ),
+        );
+      },
+      menuChildren:
+          favorites != null
+              ? [
+                ...List.generate(
+                  categories.length,
+                  (index) => Builder(
+                    builder: (context) {
+                      final cat = categories.elementAt(index);
+                      return CheckboxListTile(
+                        controlAffinity: ListTileControlAffinity.leading,
+                        title: Text(cat.name),
+                        value: favorites[cat.id]?.contains(link) ?? false,
+                        onChanged: (bool? value) async {
+                          if (value == true) {
+                            await ref.read(webSourceFavoritesProvider.add)(
+                              cat.id,
+                              link,
+                            );
+                          } else {
+                            await ref.read(webSourceFavoritesProvider.remove)(
+                              cat.id,
+                              link,
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+                MenuItemButton(
+                  onPressed:
+                      () => ref.read(webSourceFavoritesProvider.remove)(
+                        'all',
+                        link,
+                      ),
+                  child: Text(tr.ui.clear),
+                ),
+              ]
+              : [],
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Icon(
+          favorited ? Icons.favorite : Icons.favorite_border,
+          color: favorited ? theme.colorScheme.primary : null,
+        ),
       ),
     );
   }

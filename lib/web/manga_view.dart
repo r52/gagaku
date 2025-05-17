@@ -13,6 +13,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -181,7 +182,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 OverflowBar(
                   spacing: 8.0,
                   children: [
-                    _FavoritesMenu(link: link, handle: handle),
+                    FavoritesButton(
+                      link: link,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(6.0),
+                      ),
+                    ),
                     Consumer(
                       builder: (context, ref, child) {
                         final key = handle.getKey();
@@ -607,104 +613,6 @@ class ChapterButtonWidget extends HookConsumerWidget {
             const Icon(Icons.schedule, size: 20),
             if (timestamp != null) Text(' $timestamp'),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FavoritesMenu extends HookConsumerWidget {
-  const _FavoritesMenu({required this.link, required this.handle});
-
-  final HistoryLink link;
-  final SourceHandler handle;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final categories = ref.watch(
-      webConfigProvider.select((cfg) => cfg.categories),
-    );
-
-    final favorites = ref.watch(
-      webSourceFavoritesProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data,
-          _ => null,
-        },
-      ),
-    );
-
-    final favorited = useMemoized(
-      () =>
-          favorites?.values.any(
-            (l) => l.any((e) => e.url == handle.getURL()),
-          ) ??
-          false,
-      [favorites],
-    );
-
-    return MenuAnchor(
-      builder: (context, controller, child) {
-        return Material(
-          color: theme.colorScheme.surfaceContainerHighest,
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child:
-              favorites == null
-                  ? const SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                  : InkWell(
-                    onTap: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                    child: child,
-                  ),
-        );
-      },
-      menuChildren:
-          favorites != null
-              ? List.generate(
-                categories.length,
-                (index) => Builder(
-                  builder: (context) {
-                    final cat = categories.elementAt(index);
-                    return CheckboxListTile(
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(cat.name),
-                      value: favorites[cat.id]?.contains(link) ?? false,
-                      onChanged: (bool? value) async {
-                        if (value == true) {
-                          await ref.read(webSourceFavoritesProvider.add)(
-                            cat.id,
-                            link,
-                          );
-                        } else {
-                          await ref.read(webSourceFavoritesProvider.remove)(
-                            cat.id,
-                            link,
-                          );
-                        }
-                      },
-                    );
-                  },
-                ),
-              )
-              : [],
-      child: Padding(
-        padding: const EdgeInsets.all(6.0),
-        child: Icon(
-          favorited ? Icons.favorite : Icons.favorite_border,
-          color: favorited ? theme.colorScheme.primary : null,
         ),
       ),
     );
