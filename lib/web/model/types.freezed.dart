@@ -541,20 +541,14 @@ as dynamic,
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _WebChapter extends WebChapter {
-  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required final  Map<String, dynamic> groups, this.data}): _groups = groups,super._();
+  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required this.groups, this.data}): super._();
   factory _WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
 
 @override final  String? title;
 @override final  String? volume;
 @override@EpochTimestampSerializer() final  DateTime? lastUpdated;
 @override@MappedEpochTimestampSerializer() final  DateTime? releaseDate;
- final  Map<String, dynamic> _groups;
-@override Map<String, dynamic> get groups {
-  if (_groups is EqualUnmodifiableMapView) return _groups;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_groups);
-}
-
+@override final  Map<String, dynamic> groups;
 @override final  dynamic data;
 
 /// Create a copy of WebChapter
@@ -570,12 +564,12 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other._groups, _groups)&&const DeepCollectionEquality().equals(other.data, data));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups)&&const DeepCollectionEquality().equals(other.data, data));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(data));
+int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups),const DeepCollectionEquality().hash(data));
 
 @override
 String toString() {
@@ -613,7 +607,7 @@ title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nu
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,releaseDate: freezed == releaseDate ? _self.releaseDate : releaseDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,groups: null == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
+as DateTime?,groups: null == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as dynamic,
   ));

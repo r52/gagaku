@@ -228,7 +228,19 @@ class ProxyHandler {
 
           if (await _cache.exists(key)) {
             logger.d('CacheManager: retrieving entry $key');
-            return _cache.get<WebManga>(key, WebManga.fromJson);
+            final manga = _cache.get<WebManga>(key, WebManga.fromJson);
+            manga.chapters.forEach((key, chapter) {
+              chapter.groups.updateAll((g, element) {
+                if (element is Chapter) {
+                  return element;
+                }
+
+                final processed = Chapter.fromJson(element);
+                return processed;
+              });
+            });
+
+            return manga;
           }
 
           final manga = await ref

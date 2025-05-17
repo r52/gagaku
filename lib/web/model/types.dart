@@ -107,7 +107,7 @@ abstract class WebManga with _$WebManga {
   }
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 abstract class WebChapter with _$WebChapter {
   const WebChapter._();
 
