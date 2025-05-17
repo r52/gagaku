@@ -21,6 +21,7 @@
     "save": "Save",
     "delete": "Delete",
     "rename": "Rename",
+    "clear": "Clear",
     "gridView": "Grid view",
     "listView": "List view",
     "detailedView": "Detailed view",

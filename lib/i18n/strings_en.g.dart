@@ -109,6 +109,7 @@ class TranslationsUiEn {
 	String get save => 'Save';
 	String get delete => 'Delete';
 	String get rename => 'Rename';
+	String get clear => 'Clear';
 	String get gridView => 'Grid view';
 	String get listView => 'List view';
 	String get detailedView => 'Detailed view';
@@ -832,6 +833,7 @@ extension on Translations {
 			case 'ui.save': return 'Save';
 			case 'ui.delete': return 'Delete';
 			case 'ui.rename': return 'Rename';
+			case 'ui.clear': return 'Clear';
 			case 'ui.gridView': return 'Grid view';
 			case 'ui.listView': return 'List view';
 			case 'ui.detailedView': return 'Detailed view';
