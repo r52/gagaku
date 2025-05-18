@@ -188,7 +188,7 @@ class _FrontPageWidget extends HookConsumerWidget {
         onPressed: () {
           router.pushPath('/titles/latest');
         },
-        label: Text(t.mangadex.latestUpdates, style: style),
+        label: Text(t.chapterFeed.latestUpdates, style: style),
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),

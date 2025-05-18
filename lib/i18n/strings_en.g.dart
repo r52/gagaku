@@ -79,6 +79,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsColorsEn colors = TranslationsColorsEn.internal(_root);
 	late final TranslationsCacheEn cache = TranslationsCacheEn.internal(_root);
 	late final TranslationsBackupEn backup = TranslationsBackupEn.internal(_root);
+	late final TranslationsChapterFeedEn chapterFeed = TranslationsChapterFeedEn.internal(_root);
 }
 
 // Path: ui
@@ -300,11 +301,9 @@ class TranslationsMangadexEn {
 	String get myLists => 'My Lists';
 	String get followedLists => 'Followed Lists';
 	String get popularNewTitles => 'Popular New Titles';
-	String get latestUpdates => 'Latest Updates';
 	String get staffPicks => 'Staff Picks';
 	String get seasonal => 'Seasonal';
 	String get recentlyAdded => 'Recently Added';
-	String get updates => 'Updates';
 	String get byChapter => 'By Chapter';
 	String get byManga => 'By Manga';
 	String get localHistory => 'Reading History (local)';
@@ -611,6 +610,17 @@ class TranslationsBackupEn {
 	String get dataLocDefault => 'Default';
 }
 
+// Path: chapterFeed
+class TranslationsChapterFeedEn {
+	TranslationsChapterFeedEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get latestUpdates => 'Latest Updates';
+	String get updates => 'Updates';
+}
+
 // Path: localLibrary.settings
 class TranslationsLocalLibrarySettingsEn {
 	TranslationsLocalLibrarySettingsEn.internal(this._root);
@@ -667,14 +677,16 @@ class TranslationsWebSourcesSettingsEn {
 	// Translations
 	String get repos => 'Repos';
 	String get reposDesc => 'Configure source repos';
-	String get categories => 'Categories';
-	String get categoriesDesc => 'Set up categories';
+	String get categories => 'Favorite Categories';
+	String get categoriesDesc => 'Set up favourite list categories';
 	String get newCategory => '${_root.ui.addNew} Category';
 	String get addCategory => '${_root.ui.add} Category';
 	String get renameCategory => '${_root.ui.rename} Category';
 	String get categoryName => 'Category name';
 	String get emptyCategoryWarning => 'Category name cannot be empty';
 	String get usedCategoryWarning => 'Category name already used';
+	String get categoriesToUpdate => 'Categories to Update';
+	String get categoriesToUpdateDesc => 'Select categories which manga will be updated in Updates view';
 }
 
 // Path: webSources.repo
@@ -905,14 +917,16 @@ extension on Translations {
 			case 'webSources.supportedUrl.arg': return ({required Object arg}) => '${_root.webSources.supportedUrl.text}:${arg}';
 			case 'webSources.settings.repos': return 'Repos';
 			case 'webSources.settings.reposDesc': return 'Configure source repos';
-			case 'webSources.settings.categories': return 'Categories';
-			case 'webSources.settings.categoriesDesc': return 'Set up categories';
+			case 'webSources.settings.categories': return 'Favorite Categories';
+			case 'webSources.settings.categoriesDesc': return 'Set up favourite list categories';
 			case 'webSources.settings.newCategory': return '${_root.ui.addNew} Category';
 			case 'webSources.settings.addCategory': return '${_root.ui.add} Category';
 			case 'webSources.settings.renameCategory': return '${_root.ui.rename} Category';
 			case 'webSources.settings.categoryName': return 'Category name';
 			case 'webSources.settings.emptyCategoryWarning': return 'Category name cannot be empty';
 			case 'webSources.settings.usedCategoryWarning': return 'Category name already used';
+			case 'webSources.settings.categoriesToUpdate': return 'Categories to Update';
+			case 'webSources.settings.categoriesToUpdateDesc': return 'Select categories which manga will be updated in Updates view';
 			case 'webSources.repo.list': return 'Repo List';
 			case 'webSources.repo.newRepo': return '${_root.ui.addNew} Repo';
 			case 'webSources.repo.browser': return 'View in browser';
@@ -994,11 +1008,9 @@ extension on Translations {
 			case 'mangadex.myLists': return 'My Lists';
 			case 'mangadex.followedLists': return 'Followed Lists';
 			case 'mangadex.popularNewTitles': return 'Popular New Titles';
-			case 'mangadex.latestUpdates': return 'Latest Updates';
 			case 'mangadex.staffPicks': return 'Staff Picks';
 			case 'mangadex.seasonal': return 'Seasonal';
 			case 'mangadex.recentlyAdded': return 'Recently Added';
-			case 'mangadex.updates': return 'Updates';
 			case 'mangadex.byChapter': return 'By Chapter';
 			case 'mangadex.byManga': return 'By Manga';
 			case 'mangadex.localHistory': return 'Reading History (local)';
@@ -1226,6 +1238,8 @@ extension on Translations {
 			case 'backup.dataLocation': return 'Database Directory';
 			case 'backup.dataLocSub': return 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.';
 			case 'backup.dataLocDefault': return 'Default';
+			case 'chapterFeed.latestUpdates': return 'Latest Updates';
+			case 'chapterFeed.updates': return 'Updates';
 			default: return null;
 		}
 	}

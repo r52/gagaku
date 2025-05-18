@@ -114,14 +114,16 @@
     "settings": {
       "repos": "Repos",
       "reposDesc": "Configure source repos",
-      "categories": "Categories",
-      "categoriesDesc": "Set up categories",
+      "categories": "Favorite Categories",
+      "categoriesDesc": "Set up favourite list categories",
       "newCategory": "@:ui.addNew Category",
       "addCategory": "@:ui.add Category",
       "renameCategory": "@:ui.rename Category",
       "categoryName": "Category name",
       "emptyCategoryWarning": "Category name cannot be empty",
-      "usedCategoryWarning": "Category name already used"
+      "usedCategoryWarning": "Category name already used",
+      "categoriesToUpdate": "Categories to Update",
+      "categoriesToUpdateDesc": "Select categories which manga will be updated in Updates view"
     },
     "repo": {
       "list": "Repo List",
@@ -220,11 +222,9 @@
     "myLists": "My Lists",
     "followedLists": "Followed Lists",
     "popularNewTitles": "Popular New Titles",
-    "latestUpdates": "Latest Updates",
     "staffPicks": "Staff Picks",
     "seasonal": "Seasonal",
     "recentlyAdded": "Recently Added",
-    "updates": "Updates",
     "byChapter": "By Chapter",
     "byManga": "By Manga",
     "localHistory": "Reading History (local)",
@@ -484,5 +484,9 @@
     "dataLocation": "Database Directory",
     "dataLocSub": "Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.",
     "dataLocDefault": "Default"
+  },
+  "chapterFeed": {
+    "latestUpdates": "Latest Updates",
+    "updates": "Updates"
   }
 }
