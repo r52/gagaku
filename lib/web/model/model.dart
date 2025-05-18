@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
@@ -90,7 +91,7 @@ class ProxyHandler {
     }
 
     if (url.startsWith('https://cubari.moe/')) {
-      final info = await parseUrl(url);
+      final info = await _parseProxyUrl(url);
 
       if (info == null) {
         return false;
@@ -151,7 +152,7 @@ class ProxyHandler {
     return false;
   }
 
-  Future<SourceHandler?> parseUrl(String url) async {
+  Future<SourceHandler?> _parseProxyUrl(String url) async {
     var src = cleanBaseDomains(url);
 
     if (!src.startsWith('/')) {
@@ -203,11 +204,11 @@ class ProxyHandler {
 
         logger.d('ProxyHandler: location $location');
 
-        return parseUrl(location);
+        return _parseProxyUrl(location);
     }
   }
 
-  Future<WebManga?> handleSource(SourceHandler handle) async {
+  Future<WebManga?> getMangaFromSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
         String? sourceId;
@@ -229,8 +230,8 @@ class ProxyHandler {
           if (await _cache.exists(key)) {
             logger.d('CacheManager: retrieving entry $key');
             final manga = _cache.get<WebManga>(key, WebManga.fromJson);
-            manga.chapters.forEach((key, chapter) {
-              chapter.groups.updateAll((g, element) {
+            for (var entry in manga.chapters) {
+              entry.chapter.groups.updateAll((g, element) {
                 if (element is Chapter) {
                   return element;
                 }
@@ -238,7 +239,7 @@ class ProxyHandler {
                 final processed = Chapter.fromJson(element);
                 return processed;
               });
-            });
+            }
 
             return manga;
           }
@@ -286,7 +287,7 @@ class ProxyHandler {
     if (response.statusCode == 200) {
       final manga = WebManga.fromJson(response.data);
 
-      const expiry = Duration(minutes: 15);
+      const expiry = Duration(days: 1);
 
       logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
       _cache.put(key, json.encode(manga.toJson()), manga, true, expiry: expiry);
@@ -995,9 +996,10 @@ return p;
 
     final clist = chaps.value as List<dynamic>;
     final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
-    final chapmap = Map.fromEntries(
-      chapters.map(
-        (e) => MapEntry(
+    final chapmap =
+        chapters
+            .map(
+              (e) => ChapterEntry.entry(
           e.chapNum.toString(),
           WebChapter(
             title: e.name,
@@ -1007,8 +1009,9 @@ return p;
             data: e,
           ),
         ),
-      ),
-    );
+            )
+            .toList();
+    chapmap.sort((a, b) => compareNatural(b.name, a.name));
 
     final manga = WebManga(
       title: smanga.mangaInfo.titles.first,

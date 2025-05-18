@@ -1,5 +1,6 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, invalid_annotation_target
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/reader/main.dart' show CtxCallback;
@@ -26,6 +27,13 @@ class WebReaderData {
   final CtxCallback? onLinkPressed;
 }
 
+extension type ChapterEntry(MapEntry<String, WebChapter> e) {
+  ChapterEntry.entry(String key, WebChapter value) : e = MapEntry(key, value);
+
+  String get name => e.key;
+  WebChapter get chapter => e.value;
+}
+
 enum SourceType { proxy, source }
 
 @freezed
@@ -37,6 +45,7 @@ abstract class SourceHandler with _$SourceHandler {
     required String sourceId,
     required String location,
     String? chapter,
+    @JsonKey(includeFromJson: false, includeToJson: false)
     WebSourceInfo? parser,
   }) = _SourceHandler;
 
@@ -45,6 +54,9 @@ abstract class SourceHandler with _$SourceHandler {
           ? 'https://cubari.moe/read/$sourceId/$location/'
           : '$sourceId/$location';
   String getKey() => '$sourceId/$location';
+
+  factory SourceHandler.fromJson(Map<String, dynamic> json) =>
+      _$SourceHandlerFromJson(json);
 }
 
 @freezed
@@ -81,29 +93,50 @@ abstract class HistoryLink with _$HistoryLink {
   int get hashCode => Object.hash(runtimeType, url);
 }
 
-@freezed
-abstract class WebManga with _$WebManga {
-  const WebManga._();
+class WebChapterSerializer
+    implements JsonConverter<List<ChapterEntry>, dynamic> {
+  const WebChapterSerializer();
 
-  const factory WebManga({
+  @override
+  List<ChapterEntry> fromJson(dynamic chapters) {
+    final map = (chapters as Map<String, dynamic>).map(
+      (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
+    );
+
+    final chapterlist = map.entries.map((e) => ChapterEntry(e)).toList();
+    chapterlist.sort((a, b) => compareNatural(b.name, a.name));
+
+    return chapterlist;
+  }
+
+  @override
+  dynamic toJson(List<ChapterEntry> chapters) {
+    return Map.fromEntries(
+      chapters.cast<MapEntry<String, WebChapter>>(),
+    ).map((k, e) => MapEntry(k, e.toJson()));
+  }
+}
+
+@unfreezed
+abstract class WebManga with _$WebManga {
+  WebManga._();
+
+  factory WebManga({
     required String title,
     required String description,
     required String artist,
     required String author,
     required String cover,
     Map<String, String>? groups,
-    required Map<String, WebChapter> chapters,
-    dynamic data,
+    @WebChapterSerializer() required List<ChapterEntry> chapters,
+    SourceManga? data,
   }) = _WebManga;
 
   factory WebManga.fromJson(Map<String, dynamic> json) =>
       _$WebMangaFromJson(json);
 
   WebChapter? getChapter(String chapter) {
-    if (chapters.containsKey(chapter)) {
-      return chapters[chapter];
-    }
-    return null;
+    return chapters.firstWhereOrNull((e) => chapter == e.name)?.chapter;
   }
 }
 
@@ -111,7 +144,6 @@ abstract class WebManga with _$WebManga {
 abstract class WebChapter with _$WebChapter {
   const WebChapter._();
 
-  // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory WebChapter({
     String? title,

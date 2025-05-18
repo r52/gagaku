@@ -1,12 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
-import 'package:gagaku/reader/main.dart' show CtxCallback;
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -16,7 +14,6 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
 part 'manga_view.g.dart';
@@ -24,22 +21,13 @@ part 'manga_view.g.dart';
 @Riverpod(retry: noRetry)
 Future<WebManga> _fetchWebMangaInfo(Ref ref, SourceHandler handle) async {
   final api = ref.watch(proxyProvider);
-  final manga = await api.handleSource(handle);
+  final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
     return manga;
   }
 
   throw Exception('Invalid WebManga link. Data not found.');
-}
-
-class ChapterEntry {
-  const ChapterEntry(this.name, this.chapter);
-
-  final String name;
-  final WebChapter chapter;
-
-  int get id => Object.hash(name, chapter);
 }
 
 @RoutePage()
@@ -116,16 +104,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
       url: handle.getURL(),
       cover: manga.cover,
     );
-    final chapterlist =
-        manga.chapters.entries
-            .map((e) => ChapterEntry(e.key, e.value))
-            .toList();
-    //chapterlist.sort((a, b) => double.parse(b.name).compareTo(double.parse(a.name)));
-    chapterlist.sort((a, b) => compareNatural(b.name, a.name));
-    final extdata =
-        manga.data != null && manga.data is SourceManga
-            ? manga.data as SourceManga
-            : null;
+
+    final extdata = manga.data;
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
@@ -367,13 +347,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       const Spacer(),
                       Consumer(
                         builder: (context, ref, child) {
-                          final key = handle.getKey();
-                          final names = chapterlist.map((e) => e.name);
+                          final mangakey = handle.getKey();
+                          final chapterkeys = manga.chapters.map((e) => e.name);
                           final allRead = ref.watch(
                             webReadMarkersProvider.select(
                               (value) => switch (value) {
-                                AsyncValue(value: final data?) =>
-                                  data[key]?.containsAll(names) ?? false,
+                                AsyncValue(value: final map?) =>
+                                  map[mangakey]?.containsAll(chapterkeys) ??
+                                      false,
                                 _ => false,
                               },
                             ),
@@ -427,9 +408,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
 
                               if (result == true) {
                                 ref.read(webReadMarkersProvider.setBulk)(
-                                  key,
-                                  read: !allRead ? names : null,
-                                  unread: allRead ? names : null,
+                                  mangakey,
+                                  read: !allRead ? chapterkeys : null,
+                                  unread: allRead ? chapterkeys : null,
                                 );
                               }
                             },
@@ -445,17 +426,17 @@ class WebMangaViewWidget extends HookConsumerWidget {
             SliverList.separated(
               findChildIndexCallback: (key) {
                 final valueKey = key as ValueKey<int>;
-                final val = chapterlist.indexWhere(
-                  (i) => i.id == valueKey.value,
+                final val = manga.chapters.indexWhere(
+                  (i) => i.hashCode == valueKey.value,
                 );
                 return val >= 0 ? val : null;
               },
               separatorBuilder: (_, __) => const SizedBox(height: 4.0),
               itemBuilder: (BuildContext context, int index) {
-                final e = chapterlist.elementAt(index);
+                final e = manga.chapters.elementAt(index);
 
                 return ChapterButtonWidget(
-                  key: ValueKey(e.id),
+                  key: ValueKey(e.hashCode),
                   data: e,
                   manga: manga,
                   handle: handle,
@@ -463,155 +444,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
               },
               itemCount: manga.chapters.length,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ChapterButtonWidget extends HookConsumerWidget {
-  const ChapterButtonWidget({
-    super.key,
-    required this.data,
-    required this.manga,
-    required this.handle,
-    this.onLinkPressed,
-  });
-
-  final ChapterEntry data;
-  final WebManga manga;
-  final SourceHandler handle;
-  final CtxCallback? onLinkPressed;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tr = context.t;
-    useAutomaticKeepAlive();
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final theme = Theme.of(context);
-    final tileColor = theme.colorScheme.primaryContainer;
-    final name = data.name;
-    final key = handle.getKey();
-
-    final isRead = ref.watch(
-      webReadMarkersProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data[key]?.contains(name) ?? false,
-          _ => false,
-        },
-      ),
-    );
-
-    String title = data.chapter.getTitle(name);
-    String group = data.chapter.groups.entries.first.key;
-
-    final lang = tr.$meta.locale.languageCode;
-    //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
-
-    String? timestamp;
-
-    if (data.chapter.lastUpdated != null) {
-      timestamp = timeago.format(data.chapter.lastUpdated!, locale: lang);
-    } else if (data.chapter.releaseDate != null) {
-      timestamp = timeago.format(data.chapter.releaseDate!, locale: lang);
-    }
-
-    final border = Border(
-      left: BorderSide(
-        color: isRead == true ? tileColor : Colors.blue,
-        width: 4.0,
-      ),
-    );
-
-    final textstyle = TextStyle(
-      color: (isRead == true ? theme.disabledColor : theme.colorScheme.primary),
-    );
-
-    final markReadBtn = IconButton(
-      onPressed: () async {
-        bool set = !isRead;
-
-        ref.read(webReadMarkersProvider.set)(key, name, set);
-      },
-      padding: const EdgeInsets.all(0.0),
-      splashRadius: 15,
-      iconSize: 20,
-      tooltip: tr.mangaView.markAs(
-        arg: isRead == true ? tr.mangaView.unread : tr.mangaView.read,
-      ),
-      icon: Icon(
-        isRead == true ? Icons.visibility_off : Icons.visibility,
-        color:
-            (isRead == true
-                ? theme.disabledColor
-                : theme.primaryIconTheme.color),
-      ),
-      constraints: const BoxConstraints(
-        minWidth: 20.0,
-        minHeight: 20.0,
-        maxWidth: 30.0,
-        maxHeight: 30.0,
-      ),
-      visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
-    );
-
-    final readerData = WebReaderData(
-      source: data.chapter.groups.entries.first.value,
-      title: title,
-      link: manga.title,
-      handle: handle,
-      readKey: name,
-      onLinkPressed: onLinkPressed,
-    );
-
-    PageRouteInfo route = ProxyWebSourceReaderRoute(
-      proxy: handle.sourceId,
-      code: handle.location,
-      chapter: name,
-      readerData: readerData,
-    );
-
-    if (handle.type == SourceType.source) {
-      route = ExtensionReaderRoute(
-        sourceId: handle.sourceId,
-        mangaId: handle.location,
-        chapterId: (data.chapter.groups.entries.first.value as Chapter).id,
-        readerData: readerData,
-      );
-    }
-
-    return ListTile(
-      onTap: () {
-        context.router.push(route);
-      },
-      tileColor: theme.colorScheme.primaryContainer,
-      dense: true,
-      minVerticalPadding: 0.0,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: (screenSizeSmall ? 4.0 : 10.0),
-      ),
-      minLeadingWidth: 0.0,
-      leading: markReadBtn,
-      shape: border,
-      title: Text(title, style: textstyle),
-      trailing: FittedBox(
-        fit: BoxFit.fill,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!screenSizeSmall)
-              IconTextChip(
-                icon: const Icon(Icons.group, size: 20),
-                text:
-                    manga.groups != null &&
-                            manga.groups?.containsKey(group) == true
-                        ? manga.groups![group]!
-                        : group,
-              ),
-            if (!screenSizeSmall) const SizedBox(width: 10),
-            const Icon(Icons.schedule, size: 20),
-            if (timestamp != null) Text(' $timestamp'),
           ],
         ),
       ),

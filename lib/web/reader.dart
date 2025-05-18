@@ -20,7 +20,7 @@ Future<WebReaderData> _fetchWebChapterInfo(
   SourceHandler handle,
 ) async {
   final api = ref.watch(proxyProvider);
-  final manga = await api.handleSource(handle);
+  final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
     ref.read(webSourceHistoryProvider.add)(

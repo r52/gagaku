@@ -28,6 +28,27 @@ Map<String, dynamic> _$RepoDataToJson(RepoData instance) => <String, dynamic>{
 
 const _$SupportedVersionEnumMap = {SupportedVersion.v0_8: 'v0_8'};
 
+_SourceHandler _$SourceHandlerFromJson(Map<String, dynamic> json) =>
+    _SourceHandler(
+      type: $enumDecode(_$SourceTypeEnumMap, json['type']),
+      sourceId: json['sourceId'] as String,
+      location: json['location'] as String,
+      chapter: json['chapter'] as String?,
+    );
+
+Map<String, dynamic> _$SourceHandlerToJson(_SourceHandler instance) =>
+    <String, dynamic>{
+      'type': _$SourceTypeEnumMap[instance.type]!,
+      'sourceId': instance.sourceId,
+      'location': instance.location,
+      'chapter': instance.chapter,
+    };
+
+const _$SourceTypeEnumMap = {
+  SourceType.proxy: 'proxy',
+  SourceType.source: 'source',
+};
+
 _HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => _HistoryLink(
   title: json['title'] as String,
   url: json['url'] as String,
@@ -50,10 +71,11 @@ _WebManga _$WebMangaFromJson(Map<String, dynamic> json) => _WebManga(
   groups: (json['groups'] as Map<String, dynamic>?)?.map(
     (k, e) => MapEntry(k, e as String),
   ),
-  chapters: (json['chapters'] as Map<String, dynamic>).map(
-    (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
-  ),
-  data: json['data'],
+  chapters: const WebChapterSerializer().fromJson(json['chapters']),
+  data:
+      json['data'] == null
+          ? null
+          : SourceManga.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$WebMangaToJson(_WebManga instance) => <String, dynamic>{
@@ -63,8 +85,8 @@ Map<String, dynamic> _$WebMangaToJson(_WebManga instance) => <String, dynamic>{
   'author': instance.author,
   'cover': instance.cover,
   'groups': instance.groups,
-  'chapters': instance.chapters.map((k, e) => MapEntry(k, e.toJson())),
-  'data': instance.data,
+  'chapters': const WebChapterSerializer().toJson(instance.chapters),
+  'data': instance.data?.toJson(),
 };
 
 _WebChapter _$WebChapterFromJson(Map<String, dynamic> json) => _WebChapter(
