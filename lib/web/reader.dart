@@ -28,6 +28,7 @@ Future<WebReaderData> _fetchWebChapterInfo(
         title: '${handle.sourceId}: ${manga.title}',
         url: handle.getURL(),
         cover: manga.cover,
+        handle: handle,
       ),
     );
 

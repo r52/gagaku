@@ -81,7 +81,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
           .searchManga(query!, metadata);
 
       final m = results.results?.map(
-        (e) => HistoryLink.fromPartialSourceManga(widget.source.id, e),
+        (e) => HistoryLink.fromPartialSourceManga(widget.source, e),
       );
 
       metadata = results.metadata;

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SourceHandler {
 
- SourceType get type; String get sourceId; String get location; String? get chapter;@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? get parser;
+ SourceType get type; set type(SourceType value); String get sourceId; set sourceId(String value); String get location; set location(String value); String? get chapter; set chapter(String? value);@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? get parser;@JsonKey(includeFromJson: false, includeToJson: false) set parser(WebSourceInfo? value);
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,14 +27,7 @@ $SourceHandlerCopyWith<SourceHandler> get copyWith => _$SourceHandlerCopyWithImp
   Map<String, dynamic> toJson();
 
 
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceHandler&&(identical(other.type, type) || other.type == type)&&(identical(other.sourceId, sourceId) || other.sourceId == sourceId)&&(identical(other.location, location) || other.location == location)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.parser, parser) || other.parser == parser));
-}
 
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,type,sourceId,location,chapter,parser);
 
 @override
 String toString() {
@@ -96,14 +89,14 @@ $WebSourceInfoCopyWith<$Res>? get parser {
 @JsonSerializable()
 
 class _SourceHandler extends SourceHandler {
-  const _SourceHandler({required this.type, required this.sourceId, required this.location, this.chapter, @JsonKey(includeFromJson: false, includeToJson: false) this.parser}): super._();
+   _SourceHandler({required this.type, required this.sourceId, required this.location, this.chapter, @JsonKey(includeFromJson: false, includeToJson: false) this.parser}): super._();
   factory _SourceHandler.fromJson(Map<String, dynamic> json) => _$SourceHandlerFromJson(json);
 
-@override final  SourceType type;
-@override final  String sourceId;
-@override final  String location;
-@override final  String? chapter;
-@override@JsonKey(includeFromJson: false, includeToJson: false) final  WebSourceInfo? parser;
+@override  SourceType type;
+@override  String sourceId;
+@override  String location;
+@override  String? chapter;
+@override@JsonKey(includeFromJson: false, includeToJson: false)  WebSourceInfo? parser;
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
@@ -116,14 +109,7 @@ Map<String, dynamic> toJson() {
   return _$SourceHandlerToJson(this, );
 }
 
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceHandler&&(identical(other.type, type) || other.type == type)&&(identical(other.sourceId, sourceId) || other.sourceId == sourceId)&&(identical(other.location, location) || other.location == location)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.parser, parser) || other.parser == parser));
-}
 
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,type,sourceId,location,chapter,parser);
 
 @override
 String toString() {
@@ -181,11 +167,177 @@ $WebSourceInfoCopyWith<$Res>? get parser {
 }
 }
 
+/// @nodoc
+mixin _$UpdateFeedItem {
+
+ HistoryLink get link; WebManga get manga;
+/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateFeedItemCopyWith<UpdateFeedItem> get copyWith => _$UpdateFeedItemCopyWithImpl<UpdateFeedItem>(this as UpdateFeedItem, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateFeedItem&&(identical(other.link, link) || other.link == link)&&(identical(other.manga, manga) || other.manga == manga));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,link,manga);
+
+@override
+String toString() {
+  return 'UpdateFeedItem(link: $link, manga: $manga)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UpdateFeedItemCopyWith<$Res>  {
+  factory $UpdateFeedItemCopyWith(UpdateFeedItem value, $Res Function(UpdateFeedItem) _then) = _$UpdateFeedItemCopyWithImpl;
+@useResult
+$Res call({
+ HistoryLink link, WebManga manga
+});
+
+
+$HistoryLinkCopyWith<$Res> get link;$WebMangaCopyWith<$Res> get manga;
+
+}
+/// @nodoc
+class _$UpdateFeedItemCopyWithImpl<$Res>
+    implements $UpdateFeedItemCopyWith<$Res> {
+  _$UpdateFeedItemCopyWithImpl(this._self, this._then);
+
+  final UpdateFeedItem _self;
+  final $Res Function(UpdateFeedItem) _then;
+
+/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? link = null,Object? manga = null,}) {
+  return _then(_self.copyWith(
+link: null == link ? _self.link : link // ignore: cast_nullable_to_non_nullable
+as HistoryLink,manga: null == manga ? _self.manga : manga // ignore: cast_nullable_to_non_nullable
+as WebManga,
+  ));
+}
+/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HistoryLinkCopyWith<$Res> get link {
+  
+  return $HistoryLinkCopyWith<$Res>(_self.link, (value) {
+    return _then(_self.copyWith(link: value));
+  });
+}/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebMangaCopyWith<$Res> get manga {
+  
+  return $WebMangaCopyWith<$Res>(_self.manga, (value) {
+    return _then(_self.copyWith(manga: value));
+  });
+}
+}
+
+
+/// @nodoc
+
+
+class _UpdateFeedItem implements UpdateFeedItem {
+  const _UpdateFeedItem({required this.link, required this.manga});
+  
+
+@override final  HistoryLink link;
+@override final  WebManga manga;
+
+/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateFeedItemCopyWith<_UpdateFeedItem> get copyWith => __$UpdateFeedItemCopyWithImpl<_UpdateFeedItem>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateFeedItem&&(identical(other.link, link) || other.link == link)&&(identical(other.manga, manga) || other.manga == manga));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,link,manga);
+
+@override
+String toString() {
+  return 'UpdateFeedItem(link: $link, manga: $manga)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateFeedItemCopyWith<$Res> implements $UpdateFeedItemCopyWith<$Res> {
+  factory _$UpdateFeedItemCopyWith(_UpdateFeedItem value, $Res Function(_UpdateFeedItem) _then) = __$UpdateFeedItemCopyWithImpl;
+@override @useResult
+$Res call({
+ HistoryLink link, WebManga manga
+});
+
+
+@override $HistoryLinkCopyWith<$Res> get link;@override $WebMangaCopyWith<$Res> get manga;
+
+}
+/// @nodoc
+class __$UpdateFeedItemCopyWithImpl<$Res>
+    implements _$UpdateFeedItemCopyWith<$Res> {
+  __$UpdateFeedItemCopyWithImpl(this._self, this._then);
+
+  final _UpdateFeedItem _self;
+  final $Res Function(_UpdateFeedItem) _then;
+
+/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? link = null,Object? manga = null,}) {
+  return _then(_UpdateFeedItem(
+link: null == link ? _self.link : link // ignore: cast_nullable_to_non_nullable
+as HistoryLink,manga: null == manga ? _self.manga : manga // ignore: cast_nullable_to_non_nullable
+as WebManga,
+  ));
+}
+
+/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HistoryLinkCopyWith<$Res> get link {
+  
+  return $HistoryLinkCopyWith<$Res>(_self.link, (value) {
+    return _then(_self.copyWith(link: value));
+  });
+}/// Create a copy of UpdateFeedItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebMangaCopyWith<$Res> get manga {
+  
+  return $WebMangaCopyWith<$Res>(_self.manga, (value) {
+    return _then(_self.copyWith(manga: value));
+  });
+}
+}
+
 
 /// @nodoc
 mixin _$HistoryLink {
 
- String get title; String get url; String? get cover;
+ String get title; String get url; String? get cover; SourceHandler? get handle;
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -200,7 +352,7 @@ $HistoryLinkCopyWith<HistoryLink> get copyWith => _$HistoryLinkCopyWithImpl<Hist
 
 @override
 String toString() {
-  return 'HistoryLink(title: $title, url: $url, cover: $cover)';
+  return 'HistoryLink(title: $title, url: $url, cover: $cover, handle: $handle)';
 }
 
 
@@ -211,11 +363,11 @@ abstract mixin class $HistoryLinkCopyWith<$Res>  {
   factory $HistoryLinkCopyWith(HistoryLink value, $Res Function(HistoryLink) _then) = _$HistoryLinkCopyWithImpl;
 @useResult
 $Res call({
- String title, String url, String? cover
+ String title, String url, String? cover, SourceHandler? handle
 });
 
 
-
+$SourceHandlerCopyWith<$Res>? get handle;
 
 }
 /// @nodoc
@@ -228,15 +380,28 @@ class _$HistoryLinkCopyWithImpl<$Res>
 
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? url = null,Object? cover = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? url = null,Object? cover = freezed,Object? handle = freezed,}) {
   return _then(_self.copyWith(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,cover: freezed == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,handle: freezed == handle ? _self.handle : handle // ignore: cast_nullable_to_non_nullable
+as SourceHandler?,
   ));
 }
+/// Create a copy of HistoryLink
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceHandlerCopyWith<$Res>? get handle {
+    if (_self.handle == null) {
+    return null;
+  }
 
+  return $SourceHandlerCopyWith<$Res>(_self.handle!, (value) {
+    return _then(_self.copyWith(handle: value));
+  });
+}
 }
 
 
@@ -244,12 +409,13 @@ as String?,
 @JsonSerializable()
 
 class _HistoryLink extends HistoryLink {
-  const _HistoryLink({required this.title, required this.url, this.cover}): super._();
+  const _HistoryLink({required this.title, required this.url, this.cover, this.handle}): super._();
   factory _HistoryLink.fromJson(Map<String, dynamic> json) => _$HistoryLinkFromJson(json);
 
 @override final  String title;
 @override final  String url;
 @override final  String? cover;
+@override final  SourceHandler? handle;
 
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
@@ -266,7 +432,7 @@ Map<String, dynamic> toJson() {
 
 @override
 String toString() {
-  return 'HistoryLink(title: $title, url: $url, cover: $cover)';
+  return 'HistoryLink(title: $title, url: $url, cover: $cover, handle: $handle)';
 }
 
 
@@ -277,11 +443,11 @@ abstract mixin class _$HistoryLinkCopyWith<$Res> implements $HistoryLinkCopyWith
   factory _$HistoryLinkCopyWith(_HistoryLink value, $Res Function(_HistoryLink) _then) = __$HistoryLinkCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String url, String? cover
+ String title, String url, String? cover, SourceHandler? handle
 });
 
 
-
+@override $SourceHandlerCopyWith<$Res>? get handle;
 
 }
 /// @nodoc
@@ -294,16 +460,29 @@ class __$HistoryLinkCopyWithImpl<$Res>
 
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? url = null,Object? cover = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? url = null,Object? cover = freezed,Object? handle = freezed,}) {
   return _then(_HistoryLink(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,cover: freezed == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,handle: freezed == handle ? _self.handle : handle // ignore: cast_nullable_to_non_nullable
+as SourceHandler?,
   ));
 }
 
+/// Create a copy of HistoryLink
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceHandlerCopyWith<$Res>? get handle {
+    if (_self.handle == null) {
+    return null;
+  }
 
+  return $SourceHandlerCopyWith<$Res>(_self.handle!, (value) {
+    return _then(_self.copyWith(handle: value));
+  });
+}
 }
 
 
@@ -474,7 +653,7 @@ $SourceMangaCopyWith<$Res>? get data {
 /// @nodoc
 mixin _$WebChapter {
 
- String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate; Map<String, dynamic> get groups; dynamic get data;
+ String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate;@ChapterGroupSerializer() Map<String, dynamic> get groups; dynamic get data;
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -507,7 +686,7 @@ abstract mixin class $WebChapterCopyWith<$Res>  {
   factory $WebChapterCopyWith(WebChapter value, $Res Function(WebChapter) _then) = _$WebChapterCopyWithImpl;
 @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups, dynamic data
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups, dynamic data
 });
 
 
@@ -543,14 +722,14 @@ as dynamic,
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _WebChapter extends WebChapter {
-  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required this.groups, this.data}): super._();
+  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, @ChapterGroupSerializer() required this.groups, this.data}): super._();
   factory _WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
 
 @override final  String? title;
 @override final  String? volume;
 @override@EpochTimestampSerializer() final  DateTime? lastUpdated;
 @override@MappedEpochTimestampSerializer() final  DateTime? releaseDate;
-@override final  Map<String, dynamic> groups;
+@override@ChapterGroupSerializer() final  Map<String, dynamic> groups;
 @override final  dynamic data;
 
 /// Create a copy of WebChapter
@@ -586,7 +765,7 @@ abstract mixin class _$WebChapterCopyWith<$Res> implements $WebChapterCopyWith<$
   factory _$WebChapterCopyWith(_WebChapter value, $Res Function(_WebChapter) _then) = __$WebChapterCopyWithImpl;
 @override @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups, dynamic data
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups, dynamic data
 });
 
 

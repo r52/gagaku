@@ -36,11 +36,11 @@ extension type ChapterEntry(MapEntry<String, WebChapter> e) {
 
 enum SourceType { proxy, source }
 
-@freezed
+@unfreezed
 abstract class SourceHandler with _$SourceHandler {
-  const SourceHandler._();
+  SourceHandler._();
 
-  const factory SourceHandler({
+  factory SourceHandler({
     required SourceType type,
     required String sourceId,
     required String location,
@@ -57,6 +57,32 @@ abstract class SourceHandler with _$SourceHandler {
 
   factory SourceHandler.fromJson(Map<String, dynamic> json) =>
       _$SourceHandlerFromJson(json);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SourceHandler &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.sourceId, sourceId) ||
+                other.sourceId == sourceId) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.chapter, chapter) || other.chapter == chapter));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, type, sourceId, location, chapter, parser);
+}
+
+@freezed
+abstract class UpdateFeedItem with _$UpdateFeedItem {
+  const factory UpdateFeedItem({
+    required HistoryLink link,
+    required WebManga manga,
+  }) = _UpdateFeedItem;
 }
 
 @freezed
@@ -67,18 +93,25 @@ abstract class HistoryLink with _$HistoryLink {
     required String title,
     required String url,
     String? cover,
+    SourceHandler? handle,
   }) = _HistoryLink;
 
   factory HistoryLink.fromJson(Map<String, dynamic> json) =>
       _$HistoryLinkFromJson(json);
 
   factory HistoryLink.fromPartialSourceManga(
-    String sourceId,
+    WebSourceInfo source,
     PartialSourceManga manga,
   ) => HistoryLink(
     title: manga.title,
-    url: '$sourceId/${manga.mangaId}',
+    url: '${source.id}/${manga.mangaId}',
     cover: manga.image,
+    handle: SourceHandler(
+      type: SourceType.source,
+      sourceId: source.id,
+      location: manga.mangaId,
+      parser: source,
+    ),
   );
 
   @override
@@ -140,6 +173,48 @@ abstract class WebManga with _$WebManga {
   }
 }
 
+class ChapterGroupSerializer
+    implements JsonConverter<Map<String, dynamic>, dynamic> {
+  const ChapterGroupSerializer();
+
+  @override
+  Map<String, dynamic> fromJson(dynamic groups) {
+    final map = groups as Map<String, dynamic>;
+
+    if (map.isNotEmpty) {
+      final entry = map.entries.first;
+      final content = entry.value;
+
+      if (content is Map && content.containsKey('id')) {
+        map.updateAll((g, element) {
+          return Chapter.fromJson(element);
+        });
+      }
+    }
+
+    return map;
+  }
+
+  @override
+  dynamic toJson(Map<String, dynamic> groups) {
+    final map = {...groups};
+
+    if (map.isNotEmpty) {
+      final entry = map.entries.first;
+      final content = entry.value;
+
+      if (content is Chapter) {
+        map.updateAll((g, element) {
+          final processed = (element as Chapter).toJson();
+          return processed;
+        });
+      }
+    }
+
+    return map;
+  }
+}
+
 @Freezed(makeCollectionsUnmodifiable: false)
 abstract class WebChapter with _$WebChapter {
   const WebChapter._();
@@ -150,7 +225,7 @@ abstract class WebChapter with _$WebChapter {
     String? volume,
     @EpochTimestampSerializer() DateTime? lastUpdated,
     @MappedEpochTimestampSerializer() DateTime? releaseDate,
-    required Map<String, dynamic> groups,
+    @ChapterGroupSerializer() required Map<String, dynamic> groups,
     dynamic data,
   }) = _WebChapter;
 

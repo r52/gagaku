@@ -103,6 +103,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
       title: '${handle.sourceId}: ${manga.title}',
       url: handle.getURL(),
       cover: manga.cover,
+      handle: handle,
     );
 
     final extdata = manga.data;

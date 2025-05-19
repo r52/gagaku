@@ -275,7 +275,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
         }
         final mangas =
             section.items
-                .map((e) => HistoryLink.fromPartialSourceManga(source.id, e))
+                .map((e) => HistoryLink.fromPartialSourceManga(source, e))
                 .toList();
         homepageWidgets.add(MangaCarousel(items: mangas));
       }
@@ -380,7 +380,7 @@ class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
           .getHomeSectionMore(widget.section.id, metadata);
 
       final m = results.results?.map(
-        (e) => HistoryLink.fromPartialSourceManga(widget.source.id, e),
+        (e) => HistoryLink.fromPartialSourceManga(widget.source, e),
       );
 
       metadata = results.metadata;

@@ -53,6 +53,10 @@ _HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => _HistoryLink(
   title: json['title'] as String,
   url: json['url'] as String,
   cover: json['cover'] as String?,
+  handle:
+      json['handle'] == null
+          ? null
+          : SourceHandler.fromJson(json['handle'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$HistoryLinkToJson(_HistoryLink instance) =>
@@ -60,6 +64,7 @@ Map<String, dynamic> _$HistoryLinkToJson(_HistoryLink instance) =>
       'title': instance.title,
       'url': instance.url,
       'cover': instance.cover,
+      'handle': instance.handle?.toJson(),
     };
 
 _WebManga _$WebMangaFromJson(Map<String, dynamic> json) => _WebManga(
@@ -96,7 +101,7 @@ _WebChapter _$WebChapterFromJson(Map<String, dynamic> json) => _WebChapter(
   releaseDate: const MappedEpochTimestampSerializer().fromJson(
     json['release_date'],
   ),
-  groups: json['groups'] as Map<String, dynamic>,
+  groups: const ChapterGroupSerializer().fromJson(json['groups']),
   data: json['data'],
 );
 
@@ -109,7 +114,7 @@ Map<String, dynamic> _$WebChapterToJson(
   'release_date': const MappedEpochTimestampSerializer().toJson(
     instance.releaseDate,
   ),
-  'groups': instance.groups,
+  'groups': const ChapterGroupSerializer().toJson(instance.groups),
   'data': instance.data,
 };
 

@@ -52,6 +52,7 @@ abstract class WebSourceConfig with _$WebSourceConfig {
     @RepoConverter() @Default([]) List<RepoInfo> repoList,
     @Default([_defaultCategory]) List<WebSourceCategory> categories,
     @Default(_defaultUUID) String defaultCategory,
+    @Default([]) List<String> categoriesToUpdate,
   }) = _WebSourceConfig;
 
   factory WebSourceConfig.fromJson(Map<String, dynamic> json) =>
@@ -84,6 +85,7 @@ class WebConfig extends _$WebConfig {
     List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
     String? defaultCategory,
+    List<String>? categoriesToUpdate,
   }) {
     var update = state;
 
@@ -101,6 +103,10 @@ class WebConfig extends _$WebConfig {
 
     if (defaultCategory != null) {
       update = update.copyWith(defaultCategory: defaultCategory);
+    }
+
+    if (categoriesToUpdate != null) {
+      update = update.copyWith(categoriesToUpdate: categoriesToUpdate);
     }
 
     state = update;

@@ -25,6 +25,35 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
+void openWebSource(BuildContext context, SourceHandler handle) {
+  if (handle.chapter != null) {
+    WebReaderData? readerData;
+
+    if (handle.sourceId == 'imgur') {
+      final code = '/read/api/imgur/chapter/${handle.location}';
+      readerData = WebReaderData(source: code, handle: handle);
+    }
+
+    AutoRouter.of(context).push(
+      ProxyWebSourceReaderRoute(
+        proxy: handle.sourceId,
+        code: handle.location,
+        chapter: handle.chapter!,
+        page: '1',
+        readerData: readerData,
+      ),
+    );
+  } else {
+    AutoRouter.of(context).push(
+      WebMangaViewRoute(
+        sourceId: handle.sourceId,
+        mangaId: handle.location,
+        handle: handle,
+      ),
+    );
+  }
+}
+
 @Riverpod(keepAlive: true)
 ProxyHandler proxy(Ref ref) {
   return ProxyHandler(ref);
@@ -62,94 +91,56 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
-  Future<bool> handleUrl({
-    required String url,
-    required BuildContext context,
-  }) async {
+  Future<SourceHandler?> handleUrl({required String url}) async {
     if (url.startsWith('https://imgur.com/a/')) {
       final src = url.substring(20);
-      final code = '/read/api/imgur/chapter/$src';
-      AutoRouter.of(context).push(
-        ProxyWebSourceReaderRoute(
-          proxy: 'imgur',
-          code: src,
-          chapter: '1',
-          page: '1',
-          readerData: WebReaderData(
-            source: code,
-            handle: SourceHandler(
+      final handle = SourceHandler(
               type: SourceType.proxy,
               sourceId: 'imgur',
               location: src,
-            ),
-          ),
-        ),
+        chapter: '1',
       );
 
-      ref.read(webSourceHistoryProvider.add)(HistoryLink(title: url, url: url));
-      return true;
+      ref.read(webSourceHistoryProvider.add)(
+        HistoryLink(title: url, url: url, handle: handle),
+      );
+
+      return handle;
     }
 
     if (url.startsWith('https://cubari.moe/')) {
-      final info = await _parseProxyUrl(url);
-
-      if (info == null) {
-        return false;
-      }
-
-      if (!context.mounted) return false;
-      if (info.chapter != null) {
-        AutoRouter.of(context).push(
-          ProxyWebSourceReaderRoute(
-            proxy: info.sourceId,
-            code: info.location,
-            chapter: info.chapter!,
-            page: '1',
-          ),
-        );
-      } else {
-        AutoRouter.of(context).push(
-          WebMangaViewRoute(
-            sourceId: info.sourceId,
-            mangaId: info.location,
-            handle: info,
-          ),
-        );
-      }
-
-      return true;
+      final handle = await _parseProxyUrl(url);
+      return handle;
     }
 
     final installed = ref.watch(
       webConfigProvider.select((cfg) => cfg.installedSources),
     );
-    for (final src in installed) {
-      if (url.startsWith('${src.id}/')) {
+
+    final src = installed.firstWhereOrNull(
+      (ext) => url.startsWith('${ext.id}/'),
+    );
+
+    if (src == null) {
+      logger.w('Extension not found. url: $url');
+      return null;
+    }
+
         final parts = url.split('/');
         if (parts.length != 2) {
-          continue;
+      logger.w('Invalid extension url $url');
+      return null;
         }
-        final loc = parts[1];
-        if (!context.mounted) return false;
 
-        AutoRouter.of(context).push(
-          WebMangaViewRoute(
-            sourceId: src.id,
-            mangaId: loc,
-            handle: SourceHandler(
+        final loc = parts[1];
+    final handle = SourceHandler(
               type: SourceType.source,
               sourceId: src.id,
               location: loc,
               parser: src,
-            ),
-          ),
         );
 
-        return true;
-      }
-    }
-
-    return false;
+    return handle;
   }
 
   Future<SourceHandler?> _parseProxyUrl(String url) async {
@@ -230,17 +221,6 @@ class ProxyHandler {
           if (await _cache.exists(key)) {
             logger.d('CacheManager: retrieving entry $key');
             final manga = _cache.get<WebManga>(key, WebManga.fromJson);
-            for (var entry in manga.chapters) {
-              entry.chapter.groups.updateAll((g, element) {
-                if (element is Chapter) {
-                  return element;
-                }
-
-                final processed = Chapter.fromJson(element);
-                return processed;
-              });
-            }
-
             return manga;
           }
 
@@ -798,7 +778,7 @@ class ExtensionSource extends _$ExtensionSource {
         if (response.statusCode != 200) {
           final err = "Failed to load $scriptUrl";
           logger.d(err);
-          completer.completeError(err);
+          completer.completeError(Exception(err));
           return;
         }
 
@@ -815,11 +795,14 @@ class ExtensionSource extends _$ExtensionSource {
           functionBody: "return await ${source.id}?.getSearchTags();",
         );
 
-        if (result == null || result.error != null) {
-          throw Exception('JavaScript error: ${result?.error}');
-        }
+        // if (result == null || result.error != null) {
+        //   completer.completeError(
+        //     Exception('JavaScript error: ${result?.error}'),
+        //   );
+        //   return;
+        // }
 
-        if (result.value != null) {
+        if (result != null && result.value != null) {
           final rsec = result.value as List<dynamic>;
           _tags = rsec.map((e) => TagSection.fromJson(e)).toList();
         }
