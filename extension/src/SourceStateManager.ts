@@ -10,7 +10,7 @@ class GagakuSecureStateManager implements SecureStateManager {
       if (value === undefined) {
         value = null;
       }
-      globalThis.gagaku?.callHandler("setState", key, value);
+      globalThis.gagaku?.callHandler("setSecureState", key, value);
     } else {
       this.objectStore[key] = value;
     }
@@ -18,7 +18,7 @@ class GagakuSecureStateManager implements SecureStateManager {
 
   async retrieve(key: string) {
     if ("gagaku" in globalThis) {
-      return globalThis.gagaku?.callHandler("getState", key);
+      return globalThis.gagaku?.callHandler("getSecureState", key);
     } else {
       return this.objectStore[key];
     }

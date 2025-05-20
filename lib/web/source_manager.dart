@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:expansion_tile_list/expansion_tile_list.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -100,11 +101,15 @@ class SourceManager extends HookConsumerWidget {
                                 -1;
                             final icon =
                                 '${repo.url}/${source.id}/includes/${source.icon}';
+
+                            final capabilities = source.getCapabilities();
+
                             final supportedSource =
-                                source.intents != null &&
-                                (source.intents! &
-                                        SourceIntents.mangaChapters.flag) ==
-                                    0x1;
+                                capabilities.firstWhereOrNull(
+                                  (intent) =>
+                                      intent == SourceIntents.mangaChapters,
+                                ) !=
+                                null;
 
                             if (isInstalled) {
                               orphaned.removeWhere(
@@ -126,7 +131,7 @@ class SourceManager extends HookConsumerWidget {
                                         ? Switch(
                                           activeTrackColor: Colors.green,
                                           value: isInstalled,
-                                          onChanged: (value) {
+                                          onChanged: (value) async {
                                             final messenger =
                                                 ScaffoldMessenger.of(context);
 
@@ -144,9 +149,7 @@ class SourceManager extends HookConsumerWidget {
                                                     repo: repo.url,
                                                     version: repo.version,
                                                     icon: icon,
-                                                    capabilities:
-                                                        source
-                                                            .getCapabilities(),
+                                                    capabilities: capabilities,
                                                   ),
                                                 ],
                                               );

@@ -2,7 +2,6 @@ import { PaperbackPolyfills } from "./PBPolyfills"
 import './RawData'
 import './RequestManager'
 import './SourceStateManager'
-import './network'
 import './DUI'
 import * as cheerio from 'cheerio'
 

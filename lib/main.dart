@@ -14,7 +14,6 @@ import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/version.dart';
-import 'package:gagaku/web/server.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -74,8 +73,6 @@ void main() async {
                 ]))
             : null,
   );
-
-  runExtensionHostServer();
 
   final gdat = GagakuData();
   gdat.gagakuUserAgent = '$kPackageName/$kPackageVersion';

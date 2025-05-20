@@ -16,7 +16,6 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:gagaku/web/server.dart' show port;
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
@@ -729,7 +728,7 @@ class ExtensionSource extends _$ExtensionSource {
     );
 
     _view = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri("http://localhost:$port")),
+      initialUrlRequest: URLRequest(url: WebUri(source.baseUrl)),
       initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
       onWebViewCreated: (controller) {
         controller.addJavaScriptHandler(
@@ -772,6 +771,10 @@ class ExtensionSource extends _$ExtensionSource {
       //   logger.d('Console Message: ${consoleMessage.message}');
       // },
       onLoadStop: (controller, url) async {
+        await controller.injectJavascriptFileFromAsset(
+          assetFilePath: "assets/extensionhost/bundle.js",
+        );
+
         final scriptUrl = '${source.repo}/${source.id}/source.js';
         final response = await http.get(Uri.parse(scriptUrl));
 

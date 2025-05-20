@@ -187,13 +187,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       onTap: () async {
                         final tr = context.t;
                         final messenger = ScaffoldMessenger.of(context);
-                        final parseResult = await api.handleUrl(
-                          url: item.url,
-                          context: context,
-                        );
+                        final result = await api.handleLink(item);
 
                         if (!context.mounted) return;
-                        if (!parseResult) {
+                        if (result.handle == null) {
                           messenger
                             ..removeCurrentSnackBar()
                             ..showSnackBar(
@@ -202,6 +199,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                                 backgroundColor: Colors.red,
                               ),
                             );
+                        } else {
+                          openWebSource(context, result.handle!);
                         }
                       },
                     ),
@@ -234,13 +233,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     onTap: () async {
                       final tr = context.t;
                       final messenger = ScaffoldMessenger.of(context);
-                      final parseResult = await api.handleUrl(
-                        url: item.url,
-                        context: context,
-                      );
+                      final result = await api.handleLink(item);
 
                       if (!context.mounted) return;
-                      if (!parseResult) {
+                      if (result.handle == null) {
                         messenger
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
@@ -249,6 +245,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                               backgroundColor: Colors.red,
                             ),
                           );
+                      } else {
+                        openWebSource(context, result.handle!);
                       }
                     },
                   );
@@ -312,13 +310,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     onTap: () async {
                       final tr = context.t;
                       final messenger = ScaffoldMessenger.of(context);
-                      final parseResult = await api.handleUrl(
-                        url: item.url,
-                        context: context,
-                      );
+                      final result = await api.handleLink(item);
 
                       if (!context.mounted) return;
-                      if (!parseResult) {
+                      if (result.handle == null) {
                         messenger
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
@@ -327,6 +322,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                               backgroundColor: Colors.red,
                             ),
                           );
+                      } else {
+                        openWebSource(context, result.handle!);
                       }
                     },
                   );
@@ -405,13 +402,10 @@ class GridMangaItem extends HookConsumerWidget {
     return InkWell(
       onTap: () async {
         final messenger = ScaffoldMessenger.of(context);
-        final parseResult = await api.handleUrl(
-          url: link.url,
-          context: context,
-        );
+        final result = await api.handleLink(link);
 
         if (!context.mounted) return;
-        if (!parseResult) {
+        if (result.handle == null) {
           messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(
@@ -420,6 +414,8 @@ class GridMangaItem extends HookConsumerWidget {
                 backgroundColor: Colors.red,
               ),
             );
+        } else {
+          openWebSource(context, result.handle!);
         }
       },
       onHover: (hovering) {
