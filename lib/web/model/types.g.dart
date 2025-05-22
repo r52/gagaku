@@ -49,6 +49,18 @@ const _$SourceTypeEnumMap = {
   SourceType.source: 'source',
 };
 
+_UpdateFeedItem _$UpdateFeedItemFromJson(Map<String, dynamic> json) =>
+    _UpdateFeedItem(
+      link: HistoryLink.fromJson(json['link'] as Map<String, dynamic>),
+      manga: WebManga.fromJson(json['manga'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$UpdateFeedItemToJson(_UpdateFeedItem instance) =>
+    <String, dynamic>{
+      'link': instance.link.toJson(),
+      'manga': instance.manga.toJson(),
+    };
+
 _HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => _HistoryLink(
   title: json['title'] as String,
   url: json['url'] as String,

@@ -83,6 +83,9 @@ abstract class UpdateFeedItem with _$UpdateFeedItem {
     required HistoryLink link,
     required WebManga manga,
   }) = _UpdateFeedItem;
+
+  factory UpdateFeedItem.fromJson(Map<String, dynamic> json) =>
+      _$UpdateFeedItemFromJson(json);
 }
 
 @freezed

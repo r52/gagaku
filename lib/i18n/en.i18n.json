@@ -487,6 +487,15 @@
   },
   "chapterFeed": {
     "latestUpdates": "Latest Updates",
-    "updates": "Updates"
+    "updates": "Updates",
+    "updatingFeed": "Updating Feed",
+    "updatingItem": "Updating: $item",
+    "done": "Update complete!",
+    "stop": "Stop Update",
+    "stopping": "Stopping Update..."
+  },
+  "permissions": {
+    "needed": "Permissions Needed",
+    "request": "Extra permissions are required to update your feed in the background."
   }
 }

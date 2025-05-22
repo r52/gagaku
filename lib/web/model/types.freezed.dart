@@ -167,6 +167,7 @@ $WebSourceInfoCopyWith<$Res>? get parser {
 }
 }
 
+
 /// @nodoc
 mixin _$UpdateFeedItem {
 
@@ -177,6 +178,8 @@ mixin _$UpdateFeedItem {
 @pragma('vm:prefer-inline')
 $UpdateFeedItemCopyWith<UpdateFeedItem> get copyWith => _$UpdateFeedItemCopyWithImpl<UpdateFeedItem>(this as UpdateFeedItem, _$identity);
 
+  /// Serializes this UpdateFeedItem to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -184,7 +187,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateFeedItem&&(identical(other.link, link) || other.link == link)&&(identical(other.manga, manga) || other.manga == manga));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,link,manga);
 
@@ -248,11 +251,11 @@ $WebMangaCopyWith<$Res> get manga {
 
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _UpdateFeedItem implements UpdateFeedItem {
   const _UpdateFeedItem({required this.link, required this.manga});
-  
+  factory _UpdateFeedItem.fromJson(Map<String, dynamic> json) => _$UpdateFeedItemFromJson(json);
 
 @override final  HistoryLink link;
 @override final  WebManga manga;
@@ -263,14 +266,17 @@ class _UpdateFeedItem implements UpdateFeedItem {
 @pragma('vm:prefer-inline')
 _$UpdateFeedItemCopyWith<_UpdateFeedItem> get copyWith => __$UpdateFeedItemCopyWithImpl<_UpdateFeedItem>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdateFeedItemToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateFeedItem&&(identical(other.link, link) || other.link == link)&&(identical(other.manga, manga) || other.manga == manga));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,link,manga);
 

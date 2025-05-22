@@ -25,7 +25,7 @@ Future<WebReaderData> _fetchWebChapterInfo(
   if (manga != null) {
     ref.read(webSourceHistoryProvider.add)(
       HistoryLink(
-        title: '${handle.sourceId}: ${manga.title}',
+        title: manga.title,
         url: handle.getURL(),
         cover: manga.cover,
         handle: handle,

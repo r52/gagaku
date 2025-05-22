@@ -36,6 +36,7 @@ class WebSourceHomePage extends HookConsumerWidget {
     return AutoTabsRouter(
       routes: [
         WebSourceFrontRoute(),
+        WebSourceUpdatesRoute(),
         WebSourceFavoritesRoute(),
         WebSourceHistoryRoute(),
       ],
@@ -156,6 +157,10 @@ class WebSourceHomePage extends HookConsumerWidget {
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home),
                 label: tr.webSources.home,
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.menu_book),
+                label: t.chapterFeed.latestUpdates,
               ),
               NavigationDestination(
                 icon: Icon(Icons.favorite_border),

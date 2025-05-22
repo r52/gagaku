@@ -44,6 +44,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       installedSources: config.value.installedSources,
                       categories: config.value.categories,
                       defaultCategory: config.value.defaultCategory,
+                      categoriesToUpdate: config.value.categoriesToUpdate,
                     );
                     ref.read(webSourceFavoritesProvider.reconfigureCategories)(
                       config.value.categories,
@@ -114,6 +115,38 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                         config.value = config.value.copyWith(
                           categories: result.$1,
                           defaultCategory: result.$2,
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.library_add),
+                    label: Text(tr.ui.manage),
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(
+                tr.webSources.settings.categoriesToUpdate,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(tr.webSources.settings.categoriesToUpdateDesc),
+              builder: (context) {
+                return Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      final result = await showDialog<List<String>>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return UpdateCategoryDialog(
+                            categories: config.value.categories,
+                            preselected: config.value.categoriesToUpdate,
+                          );
+                        },
+                      );
+
+                      if (result != null) {
+                        config.value = config.value.copyWith(
+                          categoriesToUpdate: result,
                         );
                       }
                     },
@@ -332,6 +365,64 @@ class NewCategoryDialog extends HookWidget {
                       : null,
               child: Text(rename == null ? tr.ui.add : tr.ui.rename),
             );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class UpdateCategoryDialog extends HookWidget {
+  const UpdateCategoryDialog({
+    super.key,
+    required this.categories,
+    required this.preselected,
+  });
+
+  final List<WebSourceCategory> categories;
+  final List<String> preselected;
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    final selected = useState(preselected);
+
+    return AlertDialog(
+      title: Text(tr.webSources.settings.categoriesToUpdate),
+      content: Column(
+        children: List.generate(
+          categories.length,
+          (index) => Builder(
+            builder: (context) {
+              final cat = categories.elementAt(index);
+              return CheckboxListTile(
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(cat.name),
+                value: selected.value.contains(cat.id),
+                onChanged: (bool? value) async {
+                  if (value == true) {
+                    selected.value = [...selected.value, cat.id];
+                  } else {
+                    selected.value.remove(cat.id);
+                    selected.value = [...selected.value];
+                  }
+                },
+              );
+            },
+          ),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text(tr.ui.cancel),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          child: Text(tr.ui.ok),
+          onPressed: () {
+            Navigator.of(context).pop(selected.value);
           },
         ),
       ],

@@ -80,6 +80,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsCacheEn cache = TranslationsCacheEn.internal(_root);
 	late final TranslationsBackupEn backup = TranslationsBackupEn.internal(_root);
 	late final TranslationsChapterFeedEn chapterFeed = TranslationsChapterFeedEn.internal(_root);
+	late final TranslationsPermissionsEn permissions = TranslationsPermissionsEn.internal(_root);
 }
 
 // Path: ui
@@ -619,6 +620,22 @@ class TranslationsChapterFeedEn {
 	// Translations
 	String get latestUpdates => 'Latest Updates';
 	String get updates => 'Updates';
+	String get updatingFeed => 'Updating Feed';
+	String updatingItem({required Object item}) => 'Updating: ${item}';
+	String get done => 'Update complete!';
+	String get stop => 'Stop Update';
+	String get stopping => 'Stopping Update...';
+}
+
+// Path: permissions
+class TranslationsPermissionsEn {
+	TranslationsPermissionsEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get needed => 'Permissions Needed';
+	String get request => 'Extra permissions are required to update your feed in the background.';
 }
 
 // Path: localLibrary.settings
@@ -1240,6 +1257,13 @@ extension on Translations {
 			case 'backup.dataLocDefault': return 'Default';
 			case 'chapterFeed.latestUpdates': return 'Latest Updates';
 			case 'chapterFeed.updates': return 'Updates';
+			case 'chapterFeed.updatingFeed': return 'Updating Feed';
+			case 'chapterFeed.updatingItem': return ({required Object item}) => 'Updating: ${item}';
+			case 'chapterFeed.done': return 'Update complete!';
+			case 'chapterFeed.stop': return 'Stop Update';
+			case 'chapterFeed.stopping': return 'Stopping Update...';
+			case 'permissions.needed': return 'Permissions Needed';
+			case 'permissions.request': return 'Extra permissions are required to update your feed in the background.';
 			default: return null;
 		}
 	}

@@ -90,13 +90,68 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
+  Future<bool> cacheExists(String key) async => _cache.exists(key);
+
+  T cacheGet<T>(String key, [UnserializeCallback? unserializer]) =>
+      _cache.get<T>(key, unserializer);
+
+  Future<T> cachePut<T>(
+    String key,
+    String data,
+    T reference,
+    bool overwrite, {
+    Duration expiry = const Duration(minutes: 15),
+    UnserializeCallback? unserializer,
+  }) => _cache.put<T>(
+    key,
+    data,
+    reference,
+    overwrite,
+    expiry: expiry,
+    unserializer: unserializer,
+  );
+
+  Future<HistoryLink> handleLink(HistoryLink link) async {
+    if (link.handle != null) {
+      final handle = link.handle!;
+
+      if (handle.type == SourceType.source && handle.parser == null) {
+        final installed = ref.watch(
+          webConfigProvider.select((cfg) => cfg.installedSources),
+        );
+
+        final src = installed.firstWhereOrNull(
+          (ext) => handle.sourceId == ext.id,
+        );
+
+        handle.parser = src;
+      }
+
+      return link;
+    }
+
+    final handle = await handleUrl(url: link.url);
+
+    if (handle == null) {
+      logger.w('Failed to process url ${link.url}');
+      return link;
+    }
+
+    final updatedLink = link.copyWith(handle: handle);
+
+    ref.read(webSourceHistoryProvider.add)(updatedLink);
+    ref.read(webSourceFavoritesProvider.updateAll)(updatedLink);
+
+    return updatedLink;
+  }
+
   Future<SourceHandler?> handleUrl({required String url}) async {
     if (url.startsWith('https://imgur.com/a/')) {
       final src = url.substring(20);
       final handle = SourceHandler(
-              type: SourceType.proxy,
-              sourceId: 'imgur',
-              location: src,
+        type: SourceType.proxy,
+        sourceId: 'imgur',
+        location: src,
         chapter: '1',
       );
 
@@ -125,19 +180,19 @@ class ProxyHandler {
       return null;
     }
 
-        final parts = url.split('/');
-        if (parts.length != 2) {
+    final parts = url.split('/');
+    if (parts.length != 2) {
       logger.w('Invalid extension url $url');
       return null;
-        }
+    }
 
-        final loc = parts[1];
+    final loc = parts[1];
     final handle = SourceHandler(
-              type: SourceType.source,
-              sourceId: src.id,
-              location: loc,
-              parser: src,
-        );
+      type: SourceType.source,
+      sourceId: src.id,
+      location: loc,
+      parser: src,
+    );
 
     return handle;
   }
@@ -986,15 +1041,15 @@ return p;
         chapters
             .map(
               (e) => ChapterEntry.entry(
-          e.chapNum.toString(),
-          WebChapter(
-            title: e.name,
-            volume: e.volume?.toString(),
-            groups: {e.group ?? sourceId: e},
-            releaseDate: e.time,
-            data: e,
-          ),
-        ),
+                e.chapNum.toString(),
+                WebChapter(
+                  title: e.name,
+                  volume: e.volume?.toString(),
+                  groups: {e.group ?? sourceId: e},
+                  releaseDate: e.time,
+                  data: e,
+                ),
+              ),
             )
             .toList();
     chapmap.sort((a, b) => compareNatural(b.name, a.name));

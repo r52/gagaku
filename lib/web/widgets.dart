@@ -729,3 +729,186 @@ class ChapterButtonWidget extends HookConsumerWidget {
     );
   }
 }
+
+class ChapterFeedItem extends HookWidget {
+  const ChapterFeedItem({super.key, required this.state});
+
+  final UpdateFeedItem state;
+
+  @override
+  Widget build(BuildContext context) {
+    useAutomaticKeepAlive();
+    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+
+    final titleBtn = _MangaTitle(
+      key: ValueKey('_MangaTitle(${state.link.handle!.getKey()})'),
+      link: state.link,
+    );
+
+    final coverBtn = _CoverButton(
+      key: ValueKey('_CoverButton(${state.link.handle!.getKey()})'),
+      link: state.link,
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child:
+            screenSizeSmall
+                ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleBtn,
+                    const Divider(height: 4.0),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        coverBtn,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 4.0,
+                            children:
+                                state.manga.chapters
+                                    .take(3)
+                                    .map(
+                                      (e) => ChapterButtonWidget(
+                                        data: e,
+                                        manga: state.manga,
+                                        handle: state.link.handle!,
+                                      ),
+                                    )
+                                    .toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+                : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    coverBtn,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4.0,
+                        children: [
+                          titleBtn,
+                          const Divider(height: 10.0),
+                          ...state.manga.chapters
+                              .take(3)
+                              .map(
+                                (e) => ChapterButtonWidget(
+                                  data: e,
+                                  manga: state.manga,
+                                  handle: state.link.handle!,
+                                ),
+                              ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+      ),
+    );
+  }
+}
+
+class _CoverButton extends ConsumerWidget {
+  const _CoverButton({super.key, required this.link});
+
+  final HistoryLink link;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final api = ref.watch(proxyProvider);
+    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+
+    return TextButton(
+      onPressed: () async {
+        final messenger = ScaffoldMessenger.of(context);
+        final result = await api.handleLink(link);
+
+        if (!context.mounted) return;
+        if (result.handle == null) {
+          messenger
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(tr.errors.unsupportedUrl),
+                backgroundColor: Colors.red,
+              ),
+            );
+        } else {
+          openWebSource(context, result.handle!);
+        }
+      },
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      ),
+      child: CachedNetworkImage(
+        imageUrl: link.cover!,
+        cacheManager: gagakuImageCache,
+        imageBuilder:
+            (context, imageProvider) => DecoratedBox(
+              decoration: BoxDecoration(
+                image: DecorationImage(image: imageProvider),
+                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+              ),
+            ),
+        width: screenSizeSmall ? 64.0 : 128.0,
+        height: screenSizeSmall ? 91.0 : 182.0,
+        progressIndicatorBuilder:
+            (context, url, downloadProgress) =>
+                const Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+}
+
+class _MangaTitle extends ConsumerWidget {
+  final HistoryLink link;
+
+  const _MangaTitle({super.key, required this.link});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final api = ref.watch(proxyProvider);
+    final theme = Theme.of(context);
+
+    return TextButton.icon(
+      style: TextButton.styleFrom(
+        alignment: Alignment.centerLeft,
+        minimumSize: const Size(0.0, 24.0),
+        shape: const RoundedRectangleBorder(),
+        foregroundColor: theme.colorScheme.onSurface,
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
+      ),
+      onPressed: () async {
+        final messenger = ScaffoldMessenger.of(context);
+        final result = await api.handleLink(link);
+
+        if (!context.mounted) return;
+        if (result.handle == null) {
+          messenger
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(tr.errors.unsupportedUrl),
+                backgroundColor: Colors.red,
+              ),
+            );
+        } else {
+          openWebSource(context, result.handle!);
+        }
+      },
+      label: Text(link.title, overflow: TextOverflow.ellipsis),
+    );
+  }
+}
