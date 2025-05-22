@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -74,7 +75,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                           (i) =>
                               i.title.toLowerCase().contains(filterText.text),
                         ),
-                        [filterText],
+                        [filterText, items],
                       );
 
                       return WebMangaListWidget(
@@ -88,6 +89,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                           SliverToBoxAdapter(
                             child: TextField(
                               controller: filterController,
+                              onTapOutside: (event) => unfocusSearchBar(),
                               decoration: InputDecoration(
                                 hintText: tr.ui.filterItems,
                               ),

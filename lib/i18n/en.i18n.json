@@ -493,7 +493,8 @@
     "updatingItem": "Updating: $item",
     "done": "Update complete!",
     "stop": "Stop Update",
-    "stopping": "Stopping Update..."
+    "stopping": "Stopping Update...",
+    "updateRequired": "Update required! No feed data or data out of date"
   },
   "permissions": {
     "needed": "Permissions Needed",

@@ -85,10 +85,8 @@ class ExtensionHomeRoute extends _i29.PageRouteInfo<ExtensionHomeRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionHomeRouteArgs>(
-        orElse:
-            () => ExtensionHomeRouteArgs(
-              sourceId: pathParams.getString('sourceId'),
-            ),
+        orElse: () =>
+            ExtensionHomeRouteArgs(sourceId: pathParams.getString('sourceId')),
       );
       return _i2.ExtensionHomePage(
         key: args.key,
@@ -149,12 +147,11 @@ class ExtensionReaderRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionReaderRouteArgs>(
-        orElse:
-            () => ExtensionReaderRouteArgs(
-              sourceId: pathParams.getString('sourceId'),
-              mangaId: pathParams.getString('mangaId'),
-              chapterId: pathParams.getString('chapterId'),
-            ),
+        orElse: () => ExtensionReaderRouteArgs(
+          sourceId: pathParams.getString('sourceId'),
+          mangaId: pathParams.getString('mangaId'),
+          chapterId: pathParams.getString('chapterId'),
+        ),
       );
       return _i3.ExtensionReaderPage(
         key: args.key,
@@ -221,10 +218,9 @@ class ExtensionSearchRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionSearchRouteArgs>(
-        orElse:
-            () => ExtensionSearchRouteArgs(
-              sourceId: pathParams.getString('sourceId'),
-            ),
+        orElse: () => ExtensionSearchRouteArgs(
+          sourceId: pathParams.getString('sourceId'),
+        ),
       );
       return _i4.ExtensionSearchPage(
         key: args.key,
@@ -360,10 +356,9 @@ class MangaDexCreatorViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexCreatorViewRouteArgs>(
-        orElse:
-            () => MangaDexCreatorViewRouteArgs(
-              creatorId: pathParams.getString('creatorId'),
-            ),
+        orElse: () => MangaDexCreatorViewRouteArgs(
+          creatorId: pathParams.getString('creatorId'),
+        ),
       );
       return _i8.MangaDexCreatorViewPage(
         key: args.key,
@@ -420,11 +415,10 @@ class MangaDexCreatorViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexCreatorViewWithNameRouteArgs>(
-        orElse:
-            () => MangaDexCreatorViewWithNameRouteArgs(
-              creatorId: pathParams.getString('creatorId'),
-              name: pathParams.optString('name'),
-            ),
+        orElse: () => MangaDexCreatorViewWithNameRouteArgs(
+          creatorId: pathParams.getString('creatorId'),
+          name: pathParams.optString('name'),
+        ),
       );
       return _i8.MangaDexCreatorViewWithNamePage(
         key: args.key,
@@ -477,10 +471,8 @@ class MangaDexEditListRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexEditListRouteArgs>(
-        orElse:
-            () => MangaDexEditListRouteArgs(
-              listId: pathParams.optString('listId'),
-            ),
+        orElse: () =>
+            MangaDexEditListRouteArgs(listId: pathParams.optString('listId')),
       );
       return _i7.MangaDexEditListScreen(
         key: args.key,
@@ -588,10 +580,9 @@ class MangaDexGroupViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexGroupViewRouteArgs>(
-        orElse:
-            () => MangaDexGroupViewRouteArgs(
-              groupId: pathParams.getString('groupId'),
-            ),
+        orElse: () => MangaDexGroupViewRouteArgs(
+          groupId: pathParams.getString('groupId'),
+        ),
       );
       return _i11.MangaDexGroupViewPage(
         key: args.key,
@@ -648,11 +639,10 @@ class MangaDexGroupViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexGroupViewWithNameRouteArgs>(
-        orElse:
-            () => MangaDexGroupViewWithNameRouteArgs(
-              groupId: pathParams.getString('groupId'),
-              name: pathParams.optString('name'),
-            ),
+        orElse: () => MangaDexGroupViewWithNameRouteArgs(
+          groupId: pathParams.getString('groupId'),
+          name: pathParams.optString('name'),
+        ),
       );
       return _i11.MangaDexGroupViewWithNamePage(
         key: args.key,
@@ -806,10 +796,8 @@ class MangaDexListViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexListViewRouteArgs>(
-        orElse:
-            () => MangaDexListViewRouteArgs(
-              listId: pathParams.getString('listId'),
-            ),
+        orElse: () =>
+            MangaDexListViewRouteArgs(listId: pathParams.getString('listId')),
       );
       return _i15.MangaDexListViewPage(key: args.key, listId: args.listId);
     },
@@ -856,11 +844,10 @@ class MangaDexListViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexListViewWithNameRouteArgs>(
-        orElse:
-            () => MangaDexListViewWithNameRouteArgs(
-              listId: pathParams.getString('listId'),
-              name: pathParams.optString('name'),
-            ),
+        orElse: () => MangaDexListViewWithNameRouteArgs(
+          listId: pathParams.getString('listId'),
+          name: pathParams.optString('name'),
+        ),
       );
       return _i15.MangaDexListViewWithNamePage(
         key: args.key,
@@ -972,10 +959,9 @@ class MangaDexMangaViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexMangaViewRouteArgs>(
-        orElse:
-            () => MangaDexMangaViewRouteArgs(
-              mangaId: pathParams.getString('mangaId'),
-            ),
+        orElse: () => MangaDexMangaViewRouteArgs(
+          mangaId: pathParams.getString('mangaId'),
+        ),
       );
       return _i18.MangaDexMangaViewPage(
         key: args.key,
@@ -1032,11 +1018,10 @@ class MangaDexMangaViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexMangaViewWithNameRouteArgs>(
-        orElse:
-            () => MangaDexMangaViewWithNameRouteArgs(
-              mangaId: pathParams.getString('mangaId'),
-              name: pathParams.optString('name'),
-            ),
+        orElse: () => MangaDexMangaViewWithNameRouteArgs(
+          mangaId: pathParams.getString('mangaId'),
+          name: pathParams.optString('name'),
+        ),
       );
       return _i18.MangaDexMangaViewWithNamePage(
         key: args.key,
@@ -1092,10 +1077,9 @@ class MangaDexReaderRoute extends _i29.PageRouteInfo<MangaDexReaderRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexReaderRouteArgs>(
-        orElse:
-            () => MangaDexReaderRouteArgs(
-              chapterId: pathParams.getString('chapterId'),
-            ),
+        orElse: () => MangaDexReaderRouteArgs(
+          chapterId: pathParams.getString('chapterId'),
+        ),
       );
       return _i19.MangaDexReaderPage(
         key: args.key,
@@ -1251,9 +1235,8 @@ class MangaDexTagViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexTagViewRouteArgs>(
-        orElse:
-            () =>
-                MangaDexTagViewRouteArgs(tagId: pathParams.getString('tagId')),
+        orElse: () =>
+            MangaDexTagViewRouteArgs(tagId: pathParams.getString('tagId')),
       );
       return _i22.MangaDexTagViewPage(
         key: args.key,
@@ -1306,11 +1289,10 @@ class MangaDexTagViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexTagViewWithNameRouteArgs>(
-        orElse:
-            () => MangaDexTagViewWithNameRouteArgs(
-              tagId: pathParams.getString('tagId'),
-              name: pathParams.optString('name'),
-            ),
+        orElse: () => MangaDexTagViewWithNameRouteArgs(
+          tagId: pathParams.getString('tagId'),
+          name: pathParams.optString('name'),
+        ),
       );
       return _i22.MangaDexTagViewWithNamePage(
         key: args.key,
@@ -1414,12 +1396,11 @@ class ProxyWebSourceReaderRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ProxyWebSourceReaderRouteArgs>(
-        orElse:
-            () => ProxyWebSourceReaderRouteArgs(
-              proxy: pathParams.getString('proxy'),
-              code: pathParams.getString('code'),
-              chapter: pathParams.getString('chapter'),
-            ),
+        orElse: () => ProxyWebSourceReaderRouteArgs(
+          proxy: pathParams.getString('proxy'),
+          code: pathParams.getString('code'),
+          chapter: pathParams.getString('chapter'),
+        ),
       );
       return _i3.ProxyWebSourceReaderPage(
         key: args.key,
@@ -1489,11 +1470,10 @@ class WebMangaViewRoute extends _i29.PageRouteInfo<WebMangaViewRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<WebMangaViewRouteArgs>(
-        orElse:
-            () => WebMangaViewRouteArgs(
-              sourceId: pathParams.getString('sourceId'),
-              mangaId: pathParams.getString('mangaId'),
-            ),
+        orElse: () => WebMangaViewRouteArgs(
+          sourceId: pathParams.getString('sourceId'),
+          mangaId: pathParams.getString('mangaId'),
+        ),
       );
       return _i24.WebMangaViewPage(
         key: args.key,

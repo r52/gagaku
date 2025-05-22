@@ -712,13 +712,15 @@ class ChapterButtonWidget extends HookConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!screenSizeSmall)
-              IconTextChip(
-                icon: const Icon(Icons.group, size: 20),
-                text:
-                    manga.groups != null &&
-                            manga.groups?.containsKey(group) == true
-                        ? manga.groups![group]!
-                        : group,
+              Flexible(
+                child: IconTextChip(
+                  icon: const Icon(Icons.group, size: 20),
+                  text:
+                      manga.groups != null &&
+                              manga.groups?.containsKey(group) == true
+                          ? manga.groups![group]!
+                          : group,
+                ),
               ),
             if (!screenSizeSmall) const SizedBox(width: 10),
             const Icon(Icons.schedule, size: 20),

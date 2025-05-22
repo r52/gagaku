@@ -626,6 +626,7 @@ class TranslationsChapterFeedEn {
 	String get done => 'Update complete!';
 	String get stop => 'Stop Update';
 	String get stopping => 'Stopping Update...';
+	String get updateRequired => 'Update required! No feed data or data out of date';
 }
 
 // Path: permissions
@@ -1264,6 +1265,7 @@ extension on Translations {
 			case 'chapterFeed.done': return 'Update complete!';
 			case 'chapterFeed.stop': return 'Stop Update';
 			case 'chapterFeed.stopping': return 'Stopping Update...';
+			case 'chapterFeed.updateRequired': return 'Update required! No feed data or data out of date';
 			case 'permissions.needed': return 'Permissions Needed';
 			case 'permissions.request': return 'Extra permissions are required to update your feed in the background.';
 			default: return null;

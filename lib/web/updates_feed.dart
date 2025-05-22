@@ -34,6 +34,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
   static const feedKey = 'ExtUpdateFeed';
   _UpdateState runState = _UpdateState.stopped;
   String progress = '';
+  String currentItem = '';
 
   Future<void> _stopFeedUpdate() async {
     setState(() {
@@ -68,6 +69,8 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
     setState(() {
       runState = _UpdateState.running;
+      progress = '';
+      currentItem = '';
     });
 
     // 0. Setup permissions/background execution
@@ -161,17 +164,19 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
     int processedCount = 0;
     for (final link in links) {
+      final updatingTitle = tr.chapterFeed.updatingItem(item: link.title);
       if (isMobile) {
         await NotificationService().updateProgressNotification(
           maxProgress: links.length,
           currentProgress: processedCount,
           title: tr.chapterFeed.updatingFeed,
-          body: tr.chapterFeed.updatingItem(item: link.title),
+          body: updatingTitle,
         );
       }
 
       setState(() {
         progress = '$processedCount/${links.length}';
+        currentItem = updatingTitle;
       });
 
       logger.d('Update progress: $processedCount/${links.length}');
@@ -280,11 +285,12 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
                     : t.chapterFeed.stopping,
               ),
               Text(progress),
+              Text(currentItem),
               if (runState == _UpdateState.running)
                 ElevatedButton.icon(
                   onPressed: () {
                     setState(() {
-                      runState == _UpdateState.stopping;
+                      runState = _UpdateState.stopping;
                     });
                   },
                   label: Text(t.chapterFeed.stop),
@@ -303,7 +309,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10.0,
             children: [
-              Text(t.errors.noitems),
+              Text(t.chapterFeed.updateRequired),
               ElevatedButton.icon(
                 onPressed: () {
                   setState(() {
