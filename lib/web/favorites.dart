@@ -54,8 +54,10 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
               controller: tabController,
               children: [
                 for (final cat in categories)
-                  Consumer(
+                  HookConsumer(
                     builder: (context, ref, child) {
+                      final filterController = useTextEditingController();
+                      final filterText = useValueListenable(filterController);
                       final items = ref.watch(
                         webSourceFavoritesProvider.select(
                           (value) => switch (value) {
@@ -67,17 +69,38 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                           },
                         ),
                       );
-
-                      if (items.isEmpty) {
-                        return Center(child: Text(tr.errors.noitems));
-                      }
+                      final fileredItems = useMemoized(
+                        () => items.where(
+                          (i) =>
+                              i.title.toLowerCase().contains(filterText.text),
+                        ),
+                        [filterText],
+                      );
 
                       return WebMangaListWidget(
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: scrollController,
+                        title: Text(
+                          tr.num_titles(n: fileredItems.length),
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                        leading: [
+                          SliverToBoxAdapter(
+                            child: TextField(
+                              controller: filterController,
+                              decoration: InputDecoration(
+                                hintText: tr.ui.filterItems,
+                              ),
+                            ),
+                          ),
+                        ],
                         children: [
+                          if (fileredItems.isEmpty)
+                            SliverFillRemaining(
+                              child: Center(child: Text(tr.errors.noitems)),
+                            ),
                           WebMangaListViewSliver(
-                            items: items,
+                            items: fileredItems.toList(),
                             favoritesKey: cat.id,
                             reorderable: true,
                             showRemoveButton: false,

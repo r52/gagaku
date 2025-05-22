@@ -32,7 +32,8 @@
     "dragHint": "Hint: Drag to reorder",
     "makeDefault": "Make Default",
     "retry": "Retry",
-    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE"
+    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
+    "filterItems": "Filter Items"
   },
   "errors": {
     "noresults": "No results",

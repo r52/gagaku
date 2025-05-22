@@ -123,6 +123,7 @@ class TranslationsUiEn {
 	String get makeDefault => 'Make Default';
 	String get retry => 'Retry';
 	String get irreversibleWarning => 'NOTE: THIS ACTION IS IRREVERSIBLE';
+	String get filterItems => 'Filter Items';
 }
 
 // Path: errors
@@ -874,6 +875,7 @@ extension on Translations {
 			case 'ui.makeDefault': return 'Make Default';
 			case 'ui.retry': return 'Retry';
 			case 'ui.irreversibleWarning': return 'NOTE: THIS ACTION IS IRREVERSIBLE';
+			case 'ui.filterItems': return 'Filter Items';
 			case 'errors.noresults': return 'No results';
 			case 'errors.notitles': return 'No titles';
 			case 'errors.nomanga': return 'No manga';
