@@ -147,16 +147,47 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                background: CachedNetworkImage(
-                  imageUrl: manga.cover,
-                  cacheManager: gagakuImageCache,
-                  colorBlendMode: BlendMode.modulate,
-                  color: Colors.grey,
-                  fit: BoxFit.cover,
-                  progressIndicatorBuilder:
-                      (context, url, downloadProgress) =>
-                          const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                background: Stack(
+                  fit: StackFit.passthrough,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: manga.cover,
+                      cacheManager: gagakuImageCache,
+                      colorBlendMode: BlendMode.modulate,
+                      color: Colors.grey,
+                      fit: BoxFit.cover,
+                      progressIndicatorBuilder:
+                          (context, url, downloadProgress) =>
+                              const Center(child: CircularProgressIndicator()),
+                      errorWidget:
+                          (context, url, error) => const Icon(Icons.error),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 20.0, bottom: 10.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              handle.sourceId,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (handle.parser != null &&
+                                handle.parser!.icon.isNotEmpty)
+                              Image.network(
+                                handle.parser!.icon,
+                                width: 24,
+                                height: 24,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               actions: [

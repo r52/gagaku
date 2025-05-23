@@ -21,6 +21,27 @@ part 'widgets.g.dart';
 
 enum WebMangaListView { grid, list }
 
+Widget? _getSourceIcon(HistoryLink link) {
+  Widget? sourceIcon;
+
+  if (link.handle != null &&
+      link.handle!.parser != null &&
+      link.handle!.parser!.icon.isNotEmpty) {
+    sourceIcon = Image.network(
+      link.handle!.parser!.icon,
+      width: 24,
+      height: 24,
+    );
+  } else if (link.handle != null) {
+    sourceIcon = Text(
+      link.handle!.sourceId,
+      style: const TextStyle(fontSize: 12),
+    );
+  }
+
+  return sourceIcon;
+}
+
 @Riverpod(keepAlive: true)
 class _MangaListView extends _$MangaListView {
   @override
@@ -173,6 +194,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 // findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
                   final item = items!.elementAt(index);
+                  Widget? sourceIcon = _getSourceIcon(item);
+
                   return ReorderableDelayedDragStartListener(
                     key: ValueKey(item.hashCode),
                     index: index,
@@ -183,7 +206,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                               : theme.colorScheme.surfaceContainerHighest,
                       leading: FavoritesButton(link: item),
                       title: Text(item.title),
-                      textColor: Colors.blue,
+                      textColor: theme.colorScheme.onSurface,
                       onTap: () async {
                         final tr = context.t;
                         final messenger = ScaffoldMessenger.of(context);
@@ -203,6 +226,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           openWebSource(context, result.handle!);
                         }
                       },
+                      trailing: sourceIcon,
                     ),
                   );
                 },
@@ -214,6 +238,8 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final tr = context.t;
                   final item = items!.elementAt(index);
+                  Widget? sourceIcon = _getSourceIcon(item);
+
                   return ListTile(
                     key: ValueKey(item.hashCode),
                     tileColor:
@@ -221,15 +247,21 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             ? theme.colorScheme.surfaceContainer
                             : theme.colorScheme.surfaceContainerHighest,
                     leading: FavoritesButton(link: item),
-                    trailing: IconButton(
-                      tooltip: tr.mangaActions.removeHistory,
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        ref.read(webSourceHistoryProvider.remove)(item);
-                      },
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (sourceIcon != null) sourceIcon,
+                        IconButton(
+                          tooltip: tr.mangaActions.removeHistory,
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () async {
+                            ref.read(webSourceHistoryProvider.remove)(item);
+                          },
+                        ),
+                      ],
                     ),
                     title: Text(item.title),
-                    textColor: Colors.blue,
+                    textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
                       final messenger = ScaffoldMessenger.of(context);
@@ -306,7 +338,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             )
                             : null,
                     title: Text(item.title),
-                    textColor: Colors.blue,
+                    textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
                       final messenger = ScaffoldMessenger.of(context);
@@ -399,6 +431,8 @@ class GridMangaItem extends HookConsumerWidget {
               : const Icon(Icons.menu_book, size: 128.0),
     );
 
+    Widget? sourceIcon = _getSourceIcon(link);
+
     return InkWell(
       onTap: () async {
         final messenger = ScaffoldMessenger.of(context);
@@ -431,6 +465,17 @@ class GridMangaItem extends HookConsumerWidget {
             footer: GridAlbumTextBar(height: 80, text: link.title),
             child: image,
           ),
+          if (sourceIcon != null)
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.only(right: 0.0, bottom: 0.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [sourceIcon],
+                ),
+              ),
+            ),
           if (showFavoriteButton)
             Align(
               alignment: Alignment.topLeft,
