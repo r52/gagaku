@@ -111,7 +111,9 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
       if (!hasPermissions) {
         logger.w('Permissions denied');
-        await _stopFeedUpdate();
+        setState(() {
+          runState = _UpdateState.stopped;
+        });
         return null;
       }
 
@@ -122,7 +124,9 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
       if (!backgroundExecution) {
         logger.w('Failed to enable background execution');
-        await _stopFeedUpdate();
+        setState(() {
+          runState = _UpdateState.stopped;
+        });
         return null;
       }
 
