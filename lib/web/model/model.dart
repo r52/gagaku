@@ -90,27 +90,6 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
-  Future<bool> cacheExists(String key) async => _cache.exists(key);
-
-  T cacheGet<T>(String key, [UnserializeCallback? unserializer]) =>
-      _cache.get<T>(key, unserializer);
-
-  Future<T> cachePut<T>(
-    String key,
-    String data,
-    T reference,
-    bool overwrite, {
-    Duration expiry = const Duration(minutes: 15),
-    UnserializeCallback? unserializer,
-  }) => _cache.put<T>(
-    key,
-    data,
-    reference,
-    overwrite,
-    expiry: expiry,
-    unserializer: unserializer,
-  );
-
   Future<HistoryLink> handleLink(HistoryLink link) async {
     if (link.handle != null) {
       final handle = link.handle!;

@@ -6,6 +6,7 @@ import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/notification_service.dart';
 import 'package:gagaku/util/ui.dart';
@@ -49,11 +50,12 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
   Future<List<UpdateFeedItem>?> _getFeedUpdates() async {
     final isMobile = DeviceContext.isMobile();
     final tr = context.t;
+    final cache = ref.watch(cacheProvider);
     final api = ref.watch(proxyProvider);
 
-    if (await api.cacheExists(feedKey)) {
+    if (await cache.exists(feedKey)) {
       logger.d('CacheManager: retrieving entry $feedKey');
-      List<dynamic> list = api.cacheGet<List<dynamic>>(feedKey);
+      List<dynamic> list = cache.get<List<dynamic>>(feedKey);
       if (list.first is! UpdateFeedItem) {
         list = list.map((e) => UpdateFeedItem.fromJson(e)).toList();
       }
@@ -231,7 +233,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
     const expiry = Duration(days: 1);
 
     logger.d('CacheManager: caching entry $feedKey for ${expiry.toString()}');
-    api.cachePut(feedKey, json.encode(mangas), mangas, true, expiry: expiry);
+    cache.put(feedKey, json.encode(mangas), mangas, true, expiry: expiry);
 
     await NotificationService().updateProgressNotification(
       title: tr.chapterFeed.updatingFeed,
