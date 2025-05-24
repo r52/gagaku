@@ -164,6 +164,11 @@ class ExtensionState extends _$ExtensionState {
     final box = Hive.box(gagakuDataBox);
     box.put('extension-state', json.encode(state));
   }
+
+  void clearAll() {
+    final box = Hive.box(gagakuDataBox);
+    box.delete('extension-state');
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -202,5 +207,10 @@ class ExtensionSecureState extends _$ExtensionSecureState {
 
     final box = Hive.box(gagakuDataBox);
     box.put('extension-secure-state', json.encode(state));
+  }
+
+  void clearAll() {
+    final box = Hive.box(gagakuDataBox);
+    box.delete('extension-secure-state');
   }
 }

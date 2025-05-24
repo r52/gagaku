@@ -706,6 +706,11 @@ class TranslationsWebSourcesSettingsEn {
 	String get usedCategoryWarning => 'Category name already used';
 	String get categoriesToUpdate => 'Categories to Update';
 	String get categoriesToUpdateDesc => 'Select categories which manga will be updated in Updates view';
+	String get clearAll => 'Clear All Extension Settings';
+	String get clearAllDesc => 'Clears all extension settings. Recommended when replacing or upgrading extensions.';
+	String get clearAllWarning => 'Are you sure you want to delete all extension settings?';
+	String get clearSettings => 'Clear Settings';
+	String get clearSuccess => 'Settings Cleared';
 }
 
 // Path: webSources.repo
@@ -947,6 +952,11 @@ extension on Translations {
 			case 'webSources.settings.usedCategoryWarning': return 'Category name already used';
 			case 'webSources.settings.categoriesToUpdate': return 'Categories to Update';
 			case 'webSources.settings.categoriesToUpdateDesc': return 'Select categories which manga will be updated in Updates view';
+			case 'webSources.settings.clearAll': return 'Clear All Extension Settings';
+			case 'webSources.settings.clearAllDesc': return 'Clears all extension settings. Recommended when replacing or upgrading extensions.';
+			case 'webSources.settings.clearAllWarning': return 'Are you sure you want to delete all extension settings?';
+			case 'webSources.settings.clearSettings': return 'Clear Settings';
+			case 'webSources.settings.clearSuccess': return 'Settings Cleared';
 			case 'webSources.repo.list': return 'Repo List';
 			case 'webSources.repo.newRepo': return '${_root.ui.addNew} Repo';
 			case 'webSources.repo.browser': return 'View in browser';

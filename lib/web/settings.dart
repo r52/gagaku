@@ -156,6 +156,70 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                 );
               },
             ),
+            SettingCardWidget(
+              title: Text(
+                t.webSources.settings.clearAll,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(t.webSources.settings.clearAllDesc),
+              builder: (context) {
+                return Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          final nav = Navigator.of(context);
+                          return AlertDialog(
+                            title: Text(t.webSources.settings.clearAll),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.webSources.settings.clearAllWarning),
+                                Text(t.ui.irreversibleWarning),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              ElevatedButton(
+                                child: Text(t.ui.no),
+                                onPressed: () {
+                                  nav.pop(null);
+                                },
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  nav.pop(true);
+                                },
+                                child: Text(t.ui.yes),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (result == true) {
+                        ref.read(extensionStateProvider.notifier).clearAll();
+                        ref
+                            .read(extensionSecureStateProvider.notifier)
+                            .clearAll();
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context)
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: Text(t.webSources.settings.clearSuccess),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                      }
+                    },
+                    icon: const Icon(Icons.delete_sweep),
+                    label: Text(t.webSources.settings.clearSettings),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

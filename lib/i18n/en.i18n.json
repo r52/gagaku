@@ -124,7 +124,12 @@
       "emptyCategoryWarning": "Category name cannot be empty",
       "usedCategoryWarning": "Category name already used",
       "categoriesToUpdate": "Categories to Update",
-      "categoriesToUpdateDesc": "Select categories which manga will be updated in Updates view"
+      "categoriesToUpdateDesc": "Select categories which manga will be updated in Updates view",
+      "clearAll": "Clear All Extension Settings",
+      "clearAllDesc": "Clears all extension settings. Recommended when replacing or upgrading extensions.",
+      "clearAllWarning": "Are you sure you want to delete all extension settings?",
+      "clearSettings": "Clear Settings",
+      "clearSuccess": "Settings Cleared"
     },
     "repo": {
       "list": "Repo List",
