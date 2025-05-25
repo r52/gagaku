@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/settings.dart';
@@ -29,10 +30,23 @@ class SourceManager extends HookConsumerWidget {
       try {
         final data = Versioning.fromJson(json.decode(response.body));
 
-        if (SupportedVersion.values.any(
-              (v) => data.builtWith.types.startsWith(v.version),
-            ) &&
+        // TODO still support 0.8?
+        if (data.builtWith.types.startsWith(SupportedVersion.v0_9.version) &&
             data.sources.isNotEmpty) {
+          final version = SupportedVersion.values.firstWhere(
+            (v) => data.builtWith.types.startsWith(v.version),
+          );
+
+          final sources =
+              data.sources
+                  .map(
+                    (e) =>
+                        version == SupportedVersion.v0_8
+                            ? SourceVersion08.fromJson(e)
+                            : SourceVersion09.fromJson(e),
+                  )
+                  .toList();
+
           list.addEntries([
             MapEntry(
               RepoData.fromInfo(
@@ -41,7 +55,7 @@ class SourceManager extends HookConsumerWidget {
                   (v) => data.builtWith.types.startsWith(v.version),
                 ),
               ),
-              data.sources,
+              sources,
             ),
           ]);
         }
@@ -99,8 +113,7 @@ class SourceManager extends HookConsumerWidget {
                                       e.repo == repo.url && e.id == source.id,
                                 ) !=
                                 -1;
-                            final icon =
-                                '${repo.url}/${source.id}/includes/${source.icon}';
+                            final icon = '${repo.url}/${source.getIconPath()}';
 
                             final capabilities = source.getCapabilities();
 
@@ -122,10 +135,10 @@ class SourceManager extends HookConsumerWidget {
                               child: _SourceItem(
                                 thumbnail: Image.network(icon),
                                 title: source.name,
-                                subtitle: source.desc,
-                                author: source.author,
+                                subtitle: source.getDescription(),
+                                author: source.getAuthor(),
                                 version: source.version,
-                                tags: source.tags,
+                                badges: source.getBadges(),
                                 trailing:
                                     supportedSource
                                         ? Switch(
@@ -144,9 +157,9 @@ class SourceManager extends HookConsumerWidget {
                                                   WebSourceInfo(
                                                     id: source.id,
                                                     name: source.name,
-                                                    baseUrl:
-                                                        source.websiteBaseURL,
                                                     repo: repo.url,
+                                                    baseUrl:
+                                                        source.getBaseUrl(),
                                                     version: repo.version,
                                                     icon: icon,
                                                     capabilities: capabilities,
@@ -311,7 +324,7 @@ class _SourceItem extends StatelessWidget {
     required this.subtitle,
     required this.author,
     required this.version,
-    this.tags,
+    required this.badges,
     this.trailing,
   });
 
@@ -320,7 +333,7 @@ class _SourceItem extends StatelessWidget {
   final String subtitle;
   final String author;
   final String version;
-  final List<Badge>? tags;
+  final List<SourceBadge> badges;
   final Widget? trailing;
 
   @override
@@ -341,7 +354,7 @@ class _SourceItem extends StatelessWidget {
                   subtitle: subtitle,
                   author: author,
                   version: version,
-                  tags: tags,
+                  badges: badges,
                 ),
               ),
             ),
@@ -359,14 +372,14 @@ class _SourceDescription extends StatelessWidget {
     required this.subtitle,
     required this.author,
     required this.version,
-    this.tags,
+    required this.badges,
   });
 
   final String title;
   final String subtitle;
   final String author;
   final String version;
-  final List<Badge>? tags;
+  final List<SourceBadge> badges;
 
   @override
   Widget build(BuildContext context) {
@@ -389,15 +402,15 @@ class _SourceDescription extends StatelessWidget {
           ),
         ),
         Text('by $author, v$version', style: const TextStyle(fontSize: 12.0)),
-        if (tags != null)
+        if (badges.isNotEmpty)
           Row(
             children:
-                tags!
+                badges
                     .map(
                       (e) => IconTextChip(
-                        text: e.text,
-                        color: e.type.color,
-                        style: TextStyle(color: Colors.white),
+                        text: e.label,
+                        color: HexColor.fromHex(e.backgroundColor),
+                        style: TextStyle(color: HexColor.fromHex(e.textColor)),
                       ),
                     )
                     .toList(),

@@ -748,7 +748,8 @@ class ExtensionSource extends _$ExtensionSource {
   InAppWebViewController? get _controller =>
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
 
-  List<TagSection>? _tags;
+  List<SearchFilter>? _filters;
+  final Map<String, SettingsForm> _forms = {};
 
   @override
   Future<WebSourceInfo> build(String sourceId) async {
@@ -761,93 +762,149 @@ class ExtensionSource extends _$ExtensionSource {
       ),
     );
 
-    _view = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri(source.baseUrl)),
-      initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
-      onWebViewCreated: (controller) {
-        controller.addJavaScriptHandler(
-          handlerName: 'getState',
-          callback: (JavaScriptHandlerFunctionData data) {
-            return ref
-                .read(extensionStateProvider.notifier)
-                .getState(sourceId, data.args[0]);
-          },
-        );
+    try {
+      _view = HeadlessInAppWebView(
+        initialUrlRequest: URLRequest(
+          url: WebUri(source.baseUrl ?? 'about:blank'),
+        ),
+        initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
+        onWebViewCreated: (controller) {
+          controller.addJavaScriptHandler(
+            handlerName: 'resetAllState',
+            callback: (JavaScriptHandlerFunctionData data) {
+              ref.read(extensionStateProvider.notifier).resetAllState(sourceId);
+            },
+          );
 
-        controller.addJavaScriptHandler(
-          handlerName: 'setState',
-          callback: (JavaScriptHandlerFunctionData data) {
-            ref
-                .read(extensionStateProvider.notifier)
-                .setState(sourceId, data.args[0], data.args[1]);
-          },
-        );
+          controller.addJavaScriptHandler(
+            handlerName: 'setExtensionState',
+            callback: (JavaScriptHandlerFunctionData data) {
+              ref
+                  .read(extensionStateProvider.notifier)
+                  .setExtensionState(sourceId, data.args[0]);
+            },
+          );
 
-        controller.addJavaScriptHandler(
-          handlerName: 'getSecureState',
-          callback: (JavaScriptHandlerFunctionData data) {
-            return ref
-                .read(extensionSecureStateProvider.notifier)
-                .getState(sourceId, data.args[0]);
-          },
-        );
+          controller.addJavaScriptHandler(
+            handlerName: 'setExtensionSecureState',
+            callback: (JavaScriptHandlerFunctionData data) {
+              ref
+                  .read(extensionSecureStateProvider.notifier)
+                  .setExtensionState(sourceId, data.args[0]);
+            },
+          );
 
-        controller.addJavaScriptHandler(
-          handlerName: 'setSecureState',
-          callback: (JavaScriptHandlerFunctionData data) {
-            ref
-                .read(extensionSecureStateProvider.notifier)
-                .setState(sourceId, data.args[0], data.args[1]);
-          },
-        );
-      },
-      // onConsoleMessage: (controller, consoleMessage) {
-      //   logger.d('Console Message: ${consoleMessage.message}');
-      // },
-      onLoadStop: (controller, url) async {
-        await controller.injectJavascriptFileFromAsset(
-          assetFilePath: "assets/extensionhost/bundle.js",
-        );
+          controller.addJavaScriptHandler(
+            handlerName: 'formDidChange',
+            callback: (JavaScriptHandlerFunctionData data) {
+              final formId = data.args[0] as String;
 
-        final scriptUrl = '${source.repo}/${source.id}/source.js';
-        final response = await http.get(Uri.parse(scriptUrl));
+              if (!_forms.containsKey(formId)) {
+                logger.w('Tried to refresh non-existent form $formId');
+                return;
+              }
 
-        if (response.statusCode != 200) {
-          final err = "Failed to load $scriptUrl";
-          logger.d(err);
-          completer.completeError(Exception(err));
-          return;
-        }
+              _forms[formId]!.reloadForm();
+            },
+          );
 
-        final script = response.body;
-        await controller.evaluateJavascript(source: script);
+          controller.addJavaScriptHandler(
+            handlerName: 'initializeForm',
+            callback: (JavaScriptHandlerFunctionData data) {
+              final formId = data.args[0] as String;
 
-        await controller.evaluateJavascript(
-          source:
-              "var ${source.id} = new window.Sources['${source.id}'](window.cheerio);",
-        );
+              _forms.putIfAbsent(
+                formId,
+                () => SettingsForm(id: formId, controller: controller),
+              );
+            },
+          );
 
-        // Get tags
-        final result = await _controller?.callAsyncJavaScript(
-          functionBody: "return await ${source.id}?.getSearchTags();",
-        );
+          controller.addJavaScriptHandler(
+            handlerName: 'uninitializeForms',
+            callback: (JavaScriptHandlerFunctionData data) {
+              _forms.clear();
+            },
+          );
+        },
+        // onConsoleMessage: (controller, consoleMessage) {
+        //   logger.d('Console Message: ${consoleMessage.message}');
+        // },
+        onLoadStop: (controller, url) async {
+          await controller.injectJavascriptFileFromAsset(
+            assetFilePath: "assets/extensionhost/bundle.js",
+          );
 
-        // if (result == null || result.error != null) {
-        //   completer.completeError(
-        //     Exception('JavaScript error: ${result?.error}'),
-        //   );
-        //   return;
-        // }
+          final sourceFile = switch (source.version) {
+            SupportedVersion.v0_8 => 'source.js',
+            SupportedVersion.v0_9 => 'index.js',
+          };
 
-        if (result != null && result.value != null) {
-          final rsec = result.value as List<dynamic>;
-          _tags = rsec.map((e) => TagSection.fromJson(e)).toList();
-        }
+          final scriptUrl = '${source.repo}/${source.id}/$sourceFile';
+          final response = await http.get(Uri.parse(scriptUrl));
 
-        logger.d("Extension ${source.name} ready");
-        completer.complete();
-      },
-    );
+          if (response.statusCode != 200) {
+            final err = "Failed to load $scriptUrl";
+            logger.d(err);
+            completer.completeError(Exception(err));
+            return;
+          }
+
+          final script = response.body;
+          await controller.evaluateJavascript(source: script);
+
+          if (source.version == SupportedVersion.v0_8) {
+            await controller.evaluateJavascript(
+              source:
+                  "var ${source.id} = window.CompatWrapper({registerHomeSectionsInInitialise: true}, new window.Sources['${source.id}'](window.cheerio));",
+            );
+          } else {
+            // 0.9
+            await controller.evaluateJavascript(
+              source: "var ${source.id} = window.source.${source.id};",
+            );
+          }
+
+          // Set extension state
+          final extstate = ref
+              .read(extensionStateProvider.notifier)
+              .getExtensionState(sourceId);
+          await controller.callAsyncJavaScript(
+            arguments: {'extstate': extstate},
+            functionBody: "window.createExtensionState(extstate);",
+          );
+
+          final extsecstate = ref
+              .read(extensionStateProvider.notifier)
+              .getExtensionState(sourceId);
+          await controller.callAsyncJavaScript(
+            arguments: {'extstate': extsecstate},
+            functionBody: "window.createExtensionSecureState(extstate);",
+          );
+
+          // Init
+          await controller.callAsyncJavaScript(
+            functionBody: "return await ${source.id}.initialise();",
+          );
+
+          // Get tags
+          final result = await controller.callAsyncJavaScript(
+            functionBody: "return await ${source.id}?.getSearchFilters();",
+          );
+
+          if (result != null && result.value != null) {
+            final rsec = result.value as List<dynamic>;
+            _filters = rsec.map((e) => SearchFilter.fromJson(e)).toList();
+          }
+
+          logger.d("Extension ${source.name} ready");
+          completer.complete();
+        },
+      );
+    } catch (e) {
+      logger.w('Error creating extension view', error: e);
+      completer.completeError(e);
+    }
 
     await _view?.run();
     await completer.future;
@@ -873,7 +930,7 @@ class ExtensionSource extends _$ExtensionSource {
     return result?.value;
   }
 
-  Future<DUISection> getSourceMenu() async {
+  Future<SettingsForm> getSettingsForm() async {
     final source = await future;
 
     if (!source.hasCapability(SourceIntents.settingsUI)) {
@@ -881,44 +938,86 @@ class ExtensionSource extends _$ExtensionSource {
     }
 
     final result = await _controller?.callAsyncJavaScript(
-      functionBody: "return await window.processSourceMenu($sourceId)",
+      functionBody: """
+var form = await ${source.id}.getSettingsForm();
+form.formWillAppear?.();
+var id = await window.initializeForm("main", form);
+return id;
+""",
     );
 
     if (result == null || result.error != null) {
       throw Exception('JavaScript error: ${result?.error}');
     }
 
-    final menu = DUIType.fromJson(result.value);
-    if (menu is! DUISection) {
-      throw Exception("Source getSourceMenu() did not return a valid menu");
+    final formid = result.value as FormID;
+
+    if (!_forms.containsKey(formid)) {
+      throw Exception('Failed to create form $formid');
     }
 
-    return menu;
+    return _forms[formid]!;
   }
 
-  Future<List<HomeSection>> getHomePage() async {
+  Future<SettingsForm> getForm(FormID id) async {
     final source = await future;
 
-    if (!source.hasCapability(SourceIntents.homepageSections)) {
-      throw Exception("Source does not support homepages");
+    if (!source.hasCapability(SourceIntents.settingsUI)) {
+      throw Exception("Source does not support settings");
     }
 
     final result = await _controller?.callAsyncJavaScript(
+      arguments: {'formid': id},
       functionBody: """
-var homesections = [];
-var cb = function (section) {
-  var idx = homesections.findIndex((e) => e.id == section.id);
+var form = window.getForm(formid);
+if (typeof form === "undefined") {
+  return null;
+}
 
-  if (idx == -1) {
-    homesections.push(section);
-  } else {
-    homesections[idx] = section;
-  }
-};
+form.formWillAppear?.();
 
-await $sourceId.getHomePageSections(cb);
-return homesections;
+return formid;
 """,
+    );
+
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final formid = result.value as FormID?;
+
+    if (formid == null) {
+      throw Exception('Invalid FormID $id');
+    }
+
+    if (!_forms.containsKey(formid)) {
+      throw Exception('Failed to create form $formid');
+    }
+
+    return _forms[formid]!;
+  }
+
+  Future<void> uninitializeForms() async {
+    final source = await future;
+
+    if (!source.hasCapability(SourceIntents.settingsUI)) {
+      throw Exception("Source does not support settings");
+    }
+
+    await _controller?.evaluateJavascript(
+      source: "window.uninitializeForms();",
+    );
+  }
+
+  Future<List<DiscoverSection>> getDiscoverSections() async {
+    final source = await future;
+
+    if (!source.hasCapability(SourceIntents.discoverSections)) {
+      throw Exception("Source does not support discover sections");
+    }
+
+    final result = await _controller?.callAsyncJavaScript(
+      functionBody: "return await $sourceId.getDiscoverSections();",
     );
 
     if (result == null || result.error != null) {
@@ -926,25 +1025,31 @@ return homesections;
     }
 
     final rsec = result.value as List<dynamic>;
-    final sections = rsec.map((e) => HomeSection.fromJson(e)).toList();
+    final sections = rsec.map((e) => DiscoverSection.fromJson(e)).toList();
 
     return sections;
   }
 
-  Future<PagedResults> getHomeSectionMore(
-    String homepageSectionId,
+  Future<PagedResults<DiscoverSectionItem>> getDiscoverSectionItems(
+    DiscoverSection section,
     dynamic metadata,
   ) async {
     final source = await future;
 
-    if (!source.hasCapability(SourceIntents.homepageSections)) {
+    if (!source.hasCapability(SourceIntents.discoverSections)) {
       throw Exception("Source does not support homepages");
     }
 
     final result = await _controller?.callAsyncJavaScript(
-      arguments: {'homepageSectionId': homepageSectionId, 'metadata': metadata},
+      arguments: {'section': section.toJson(), 'metadata': metadata},
       functionBody: """
-return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
+var p = await $sourceId.getDiscoverSectionItems(section, metadata);
+p.items.forEach((e) => {
+  if ("publishDate" in e) {
+    e.publishDate = e.publishDate?.toISOString();
+  }
+});
+return p;
 """,
     );
 
@@ -952,20 +1057,22 @@ return await $sourceId.getViewMoreItems(homepageSectionId, metadata)
       throw Exception('JavaScript error: ${result?.error}');
     }
 
-    final pmangas = PagedResults.fromJson(result.value);
+    final items = PagedResults.fromJson(
+      result.value,
+      (e) => DiscoverSectionItem.fromJson(e as dynamic),
+    );
 
-    return pmangas;
+    return items;
   }
 
-  Future<PagedResults> searchManga(
-    SearchRequest query,
+  Future<PagedResults<SearchResultItem>> searchManga(
+    SearchQuery query,
     dynamic metadata,
   ) async {
     await future;
 
-    if ((query.title == null || query.title!.isEmpty) &&
-        query.includedTags.isEmpty) {
-      return const PagedResults();
+    if (query.title.isEmpty && query.filters.isEmpty) {
+      return PagedResults<SearchResultItem>(items: []);
     }
 
     final params = query.toJson();
@@ -980,7 +1087,10 @@ return await $sourceId.getSearchResults(query, metadata)
       throw Exception('JavaScript error: ${result?.error}');
     }
 
-    final pmangas = PagedResults.fromJson(result.value);
+    final pmangas = PagedResults.fromJson(
+      result.value,
+      (e) => SearchResultItem.fromJson(e as dynamic),
+    );
 
     return pmangas;
   }
@@ -1003,9 +1113,13 @@ return await $sourceId.getSearchResults(query, metadata)
     final smanga = SourceManga.fromJson(mdeets.value);
 
     final chaps = await _controller?.callAsyncJavaScript(
+      arguments: {'manga': smanga.toJson()},
       functionBody: """
-var p = await $sourceId.getChapters('$mangaId');
-p.forEach((e) => e.time = e.time.toISOString());
+var p = await $sourceId.getChapters(manga);
+p.forEach((e) => {
+  e.publishDate = e.publishDate?.toISOString();
+  e.creationDate = e.creationDate?.toISOString();
+});
 return p;
 """,
     );
@@ -1022,10 +1136,10 @@ return p;
               (e) => ChapterEntry.entry(
                 e.chapNum.toString(),
                 WebChapter(
-                  title: e.name,
+                  title: e.title,
                   volume: e.volume?.toString(),
-                  groups: {e.group ?? sourceId: e},
-                  releaseDate: e.time,
+                  groups: {e.version ?? sourceId: e},
+                  releaseDate: e.publishDate,
                   data: e,
                 ),
               ),
@@ -1034,11 +1148,11 @@ return p;
     chapmap.sort((a, b) => compareNatural(b.name, a.name));
 
     final manga = WebManga(
-      title: smanga.mangaInfo.titles.first,
-      description: smanga.mangaInfo.desc,
+      title: smanga.mangaInfo.primaryTitle,
+      description: smanga.mangaInfo.synopsis,
       artist: smanga.mangaInfo.artist ?? 'Unknown',
       author: smanga.mangaInfo.author ?? 'Unknown',
-      cover: smanga.mangaInfo.image,
+      cover: smanga.mangaInfo.thumbnailUrl,
       chapters: chapmap,
       data: smanga,
     );
@@ -1048,16 +1162,12 @@ return p;
     return manga;
   }
 
-  Future<List<String>> getChapterPages(String mangaId, String chapterId) async {
+  Future<List<String>> getChapterPages(Chapter chapter) async {
     await future;
 
-    if (mangaId.isEmpty || chapterId.isEmpty) {
-      return [];
-    }
-
     final cdeets = await _controller?.callAsyncJavaScript(
-      functionBody:
-          "return await $sourceId.getChapterDetails('$mangaId', '$chapterId')",
+      arguments: {'chapter': chapter.toJson()},
+      functionBody: "return await $sourceId.getChapterDetails(chapter);",
     );
 
     if (cdeets == null || cdeets.error != null) {
@@ -1083,9 +1193,10 @@ return p;
     return result;
   }
 
-  Future<List<TagSection>?> getTags() async {
+  Future<List<SearchFilter>?> getFilters() async {
     await future;
-    return _tags;
+
+    return _filters?.map((e) => e.copyWith()).toList();
   }
 }
 
@@ -1108,4 +1219,109 @@ Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
   final sources = await ref.watch(extensionInfoListProvider.future);
 
   return sources.firstWhere((e) => e.id == sourceId);
+}
+
+class SettingsForm with ChangeNotifier {
+  SettingsForm({required this.id, required InAppWebViewController controller})
+    : _controller = controller;
+
+  final FormID id;
+  final InAppWebViewController _controller;
+
+  Future<List<FormSectionElement>> getSections() async {
+    final result = await _controller.callAsyncJavaScript(
+      functionBody: """
+var form = window.getForm("$id");
+if (typeof form === "undefined") {
+  return [];
+}
+
+var p = form.getSections();
+var a = p.map((e) => {
+  return {
+    id: e.id,
+    header: e.header,
+    footer: e.footer,
+    items: e.items
+  };
+});
+
+a.forEach((e) => {
+  e.items.forEach((i) => {
+    if ("form" in i) {
+      window.initializeForm(i.id, i.form);
+      i.form = i.id;
+    }
+  });
+});
+
+return a;
+""",
+    );
+
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    final sections =
+        (result.value as List<dynamic>)
+            .map((e) => FormSectionElement.fromJson(e))
+            .toList();
+
+    return sections;
+  }
+
+  Future<bool> requiresExplicitSubmission() async {
+    final result = await _controller.callAsyncJavaScript(
+      arguments: {'formid': id},
+      functionBody: """
+var form = window.getForm(formid);
+if (typeof form === "undefined") {
+  return false;
+}
+
+return form.requiresExplicitSubmission();
+""",
+    );
+
+    if (result == null || result.error != null) {
+      throw Exception('JavaScript error: ${result?.error}');
+    }
+
+    return result.value as bool;
+  }
+
+  Future<void> call(String method) async {
+    await _controller.callAsyncJavaScript(
+      arguments: {'formid': id},
+      functionBody: """
+var form = window.getForm(formid);
+if (typeof form === "undefined") {
+  return;
+}
+
+return form.$method?.();
+""",
+    );
+  }
+
+  void reloadForm() {
+    _controller.callAsyncJavaScript(
+      arguments: {'formid': id},
+      functionBody: """
+var form = window.getForm(formid);
+if (typeof form === "undefined") {
+  return;
+}
+
+form.formWillAppear?.();
+""",
+    );
+
+    notifyListeners();
+  }
+
+  void uninitialize() {
+    _controller.evaluateJavascript(source: "window.uninitializeForms();");
+  }
 }

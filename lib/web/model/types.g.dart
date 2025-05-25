@@ -26,7 +26,10 @@ Map<String, dynamic> _$RepoDataToJson(RepoData instance) => <String, dynamic>{
   'version': _$SupportedVersionEnumMap[instance.version]!,
 };
 
-const _$SupportedVersionEnumMap = {SupportedVersion.v0_8: 'v0_8'};
+const _$SupportedVersionEnumMap = {
+  SupportedVersion.v0_8: 'v0_8',
+  SupportedVersion.v0_9: 'v0_9',
+};
 
 _SourceHandler _$SourceHandlerFromJson(Map<String, dynamic> json) =>
     _SourceHandler(
@@ -114,7 +117,10 @@ _WebChapter _$WebChapterFromJson(Map<String, dynamic> json) => _WebChapter(
     json['release_date'],
   ),
   groups: const ChapterGroupSerializer().fromJson(json['groups']),
-  data: json['data'],
+  data:
+      json['data'] == null
+          ? null
+          : Chapter.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$WebChapterToJson(
@@ -127,7 +133,7 @@ Map<String, dynamic> _$WebChapterToJson(
     instance.releaseDate,
   ),
   'groups': const ChapterGroupSerializer().toJson(instance.groups),
-  'data': instance.data,
+  'data': instance.data?.toJson(),
 };
 
 _ImgurPage _$ImgurPageFromJson(Map<String, dynamic> json) => _ImgurPage(
@@ -143,7 +149,7 @@ _WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String,
       repo: json['repo'] as String,
-      baseUrl: json['baseUrl'] as String,
+      baseUrl: json['baseUrl'] as String?,
       version:
           $enumDecodeNullable(_$SupportedVersionEnumMap, json['version']) ??
           SupportedVersion.v0_8,
@@ -167,18 +173,45 @@ Map<String, dynamic> _$WebSourceInfoToJson(_WebSourceInfo instance) =>
           instance.capabilities.map(const SourceIntentParser().toJson).toList(),
     };
 
-_Badge _$BadgeFromJson(Map<String, dynamic> json) => _Badge(
+_Badge08 _$Badge08FromJson(Map<String, dynamic> json) => _Badge08(
   text: json['text'] as String,
   type: const BadgeColorParser().fromJson(json['type']),
 );
 
-Map<String, dynamic> _$BadgeToJson(_Badge instance) => <String, dynamic>{
+Map<String, dynamic> _$Badge08ToJson(_Badge08 instance) => <String, dynamic>{
   'text': instance.text,
   'type': const BadgeColorParser().toJson(instance.type),
 };
 
-_SourceVersion _$SourceVersionFromJson(Map<String, dynamic> json) =>
-    _SourceVersion(
+_SourceBadge _$SourceBadgeFromJson(Map<String, dynamic> json) => _SourceBadge(
+  label: json['label'] as String,
+  textColor: json['textColor'] as String,
+  backgroundColor: json['backgroundColor'] as String,
+);
+
+Map<String, dynamic> _$SourceBadgeToJson(_SourceBadge instance) =>
+    <String, dynamic>{
+      'label': instance.label,
+      'textColor': instance.textColor,
+      'backgroundColor': instance.backgroundColor,
+    };
+
+_SourceDeveloper _$SourceDeveloperFromJson(Map<String, dynamic> json) =>
+    _SourceDeveloper(
+      name: json['name'] as String,
+      website: json['website'] as String?,
+      github: json['github'] as String?,
+    );
+
+Map<String, dynamic> _$SourceDeveloperToJson(_SourceDeveloper instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'website': instance.website,
+      'github': instance.github,
+    };
+
+SourceVersion08 _$SourceVersion08FromJson(Map<String, dynamic> json) =>
+    SourceVersion08(
       id: json['id'] as String,
       name: json['name'] as String,
       author: json['author'] as String,
@@ -189,13 +222,14 @@ _SourceVersion _$SourceVersionFromJson(Map<String, dynamic> json) =>
       icon: json['icon'] as String,
       tags:
           (json['tags'] as List<dynamic>?)
-              ?.map((e) => Badge.fromJson(e as Map<String, dynamic>))
+              ?.map((e) => Badge08.fromJson(e as Map<String, dynamic>))
               .toList(),
       websiteBaseURL: json['websiteBaseURL'] as String,
       intents: (json['intents'] as num?)?.toInt(),
+      $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$SourceVersionToJson(_SourceVersion instance) =>
+Map<String, dynamic> _$SourceVersion08ToJson(SourceVersion08 instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -208,12 +242,53 @@ Map<String, dynamic> _$SourceVersionToJson(_SourceVersion instance) =>
       'tags': instance.tags?.map((e) => e.toJson()).toList(),
       'websiteBaseURL': instance.websiteBaseURL,
       'intents': instance.intents,
+      'runtimeType': instance.$type,
     };
 
 const _$ContentRatingEnumMap = {
   ContentRating.EVERYONE: 'EVERYONE',
   ContentRating.MATURE: 'MATURE',
   ContentRating.ADULT: 'ADULT',
+};
+
+SourceVersion09 _$SourceVersion09FromJson(
+  Map<String, dynamic> json,
+) => SourceVersion09(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  description: json['description'] as String,
+  version: json['version'] as String,
+  icon: json['icon'] as String,
+  language: json['language'] as String?,
+  contentRating: const ContentRatingParser().fromJson(json['contentRating']),
+  badges:
+      (json['badges'] as List<dynamic>)
+          .map((e) => SourceBadge.fromJson(e as Map<String, dynamic>))
+          .toList(),
+  developers:
+      (json['developers'] as List<dynamic>)
+          .map((e) => SourceDeveloper.fromJson(e as Map<String, dynamic>))
+          .toList(),
+  capabilities: const SourceIntentOrListParser().fromJson(json['capabilities']),
+  $type: json['runtimeType'] as String?,
+);
+
+Map<String, dynamic> _$SourceVersion09ToJson(
+  SourceVersion09 instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'description': instance.description,
+  'version': instance.version,
+  'icon': instance.icon,
+  'language': instance.language,
+  'contentRating': const ContentRatingParser().toJson(instance.contentRating),
+  'badges': instance.badges.map((e) => e.toJson()).toList(),
+  'developers': instance.developers.map((e) => e.toJson()).toList(),
+  'capabilities': const SourceIntentOrListParser().toJson(
+    instance.capabilities,
+  ),
+  'runtimeType': instance.$type,
 };
 
 _BuiltWith _$BuiltWithFromJson(Map<String, dynamic> json) => _BuiltWith(
@@ -226,96 +301,161 @@ Map<String, dynamic> _$BuiltWithToJson(_BuiltWith instance) =>
 
 _Versioning _$VersioningFromJson(Map<String, dynamic> json) => _Versioning(
   buildTime: json['buildTime'] as String,
-  sources:
-      (json['sources'] as List<dynamic>)
-          .map((e) => SourceVersion.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  sources: json['sources'] as List<dynamic>,
   builtWith: BuiltWith.fromJson(json['builtWith'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$VersioningToJson(_Versioning instance) =>
     <String, dynamic>{
       'buildTime': instance.buildTime,
-      'sources': instance.sources.map((e) => e.toJson()).toList(),
+      'sources': instance.sources,
       'builtWith': instance.builtWith.toJson(),
     };
 
-_PartialSourceManga _$PartialSourceMangaFromJson(Map<String, dynamic> json) =>
-    _PartialSourceManga(
-      mangaId: json['mangaId'] as String,
-      image: json['image'] as String,
-      title: json['title'] as String,
-      subtitle: json['subtitle'] as String?,
+OAuthTokenResponse _$OAuthTokenResponseFromJson(Map<String, dynamic> json) =>
+    OAuthTokenResponse($type: json['type'] as String?);
+
+Map<String, dynamic> _$OAuthTokenResponseToJson(OAuthTokenResponse instance) =>
+    <String, dynamic>{'type': instance.$type};
+
+OAuthCodeResponse _$OAuthCodeResponseFromJson(Map<String, dynamic> json) =>
+    OAuthCodeResponse(
+      tokenEndpoint: json['tokenEndpoint'] as String,
+      $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$PartialSourceMangaToJson(_PartialSourceManga instance) =>
+Map<String, dynamic> _$OAuthCodeResponseToJson(OAuthCodeResponse instance) =>
     <String, dynamic>{
-      'mangaId': instance.mangaId,
-      'image': instance.image,
-      'title': instance.title,
-      'subtitle': instance.subtitle,
+      'tokenEndpoint': instance.tokenEndpoint,
+      'type': instance.$type,
     };
 
-_PagedResults _$PagedResultsFromJson(Map<String, dynamic> json) =>
-    _PagedResults(
-      results:
-          (json['results'] as List<dynamic>?)
-              ?.map(
-                (e) => PartialSourceManga.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+OAuthPKCEResponse _$OAuthPKCEResponseFromJson(Map<String, dynamic> json) =>
+    OAuthPKCEResponse(
+      tokenEndpoint: json['tokenEndpoint'] as String,
+      pkceCodeLength: json['pkceCodeLength'] as num,
+      pkceCodeMethod: json['pkceCodeMethod'] as String,
+      formEncodeGrant: json['formEncodeGrant'] as bool,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$OAuthPKCEResponseToJson(OAuthPKCEResponse instance) =>
+    <String, dynamic>{
+      'tokenEndpoint': instance.tokenEndpoint,
+      'pkceCodeLength': instance.pkceCodeLength,
+      'pkceCodeMethod': instance.pkceCodeMethod,
+      'formEncodeGrant': instance.formEncodeGrant,
+      'type': instance.$type,
+    };
+
+_SearchQuery _$SearchQueryFromJson(Map<String, dynamic> json) => _SearchQuery(
+  title: json['title'] as String,
+  filters:
+      (json['filters'] as List<dynamic>?)
+          ?.map((e) => SearchFilterValue.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$SearchQueryToJson(_SearchQuery instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'filters': instance.filters.map((e) => e.toJson()).toList(),
+    };
+
+_SearchResultItem _$SearchResultItemFromJson(Map<String, dynamic> json) =>
+    _SearchResultItem(
+      mangaId: json['mangaId'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      imageUrl: json['imageUrl'] as String,
       metadata: json['metadata'],
     );
 
-Map<String, dynamic> _$PagedResultsToJson(_PagedResults instance) =>
+Map<String, dynamic> _$SearchResultItemToJson(_SearchResultItem instance) =>
     <String, dynamic>{
-      'results': instance.results?.map((e) => e.toJson()).toList(),
+      'mangaId': instance.mangaId,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
+      'imageUrl': instance.imageUrl,
       'metadata': instance.metadata,
     };
 
-_MangaInfo _$MangaInfoFromJson(Map<String, dynamic> json) => _MangaInfo(
-  image: json['image'] as String,
-  artist: json['artist'] as String?,
-  author: json['author'] as String?,
-  desc: json['desc'] as String,
-  status: json['status'] as String,
-  hentai: json['hentai'] as bool?,
-  titles: (json['titles'] as List<dynamic>).map((e) => e as String).toList(),
-  banner: json['banner'] as String?,
-  rating: json['rating'] as num?,
-  tags:
-      (json['tags'] as List<dynamic>?)
-          ?.map((e) => TagSection.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  covers: (json['covers'] as List<dynamic>?)?.map((e) => e as String).toList(),
+_PagedResults<T> _$PagedResultsFromJson<T>(
+  Map<String, dynamic> json,
+  T Function(Object? json) fromJsonT,
+) => _PagedResults<T>(
+  items: (json['items'] as List<dynamic>).map(fromJsonT).toList(),
+  metadata: json['metadata'],
 );
 
-Map<String, dynamic> _$MangaInfoToJson(_MangaInfo instance) =>
+Map<String, dynamic> _$PagedResultsToJson<T>(
+  _PagedResults<T> instance,
+  Object? Function(T value) toJsonT,
+) => <String, dynamic>{
+  'items': instance.items.map(toJsonT).toList(),
+  'metadata': instance.metadata,
+};
+
+_SourceManga _$SourceMangaFromJson(Map<String, dynamic> json) => _SourceManga(
+  mangaId: json['mangaId'] as String,
+  mangaInfo: MangaInfo.fromJson(json['mangaInfo'] as Map<String, dynamic>),
+);
+
+Map<String, dynamic> _$SourceMangaToJson(_SourceManga instance) =>
     <String, dynamic>{
-      'image': instance.image,
-      'artist': instance.artist,
-      'author': instance.author,
-      'desc': instance.desc,
-      'status': instance.status,
-      'hentai': instance.hentai,
-      'titles': instance.titles,
-      'banner': instance.banner,
-      'rating': instance.rating,
-      'tags': instance.tags?.map((e) => e.toJson()).toList(),
-      'covers': instance.covers,
+      'mangaId': instance.mangaId,
+      'mangaInfo': instance.mangaInfo.toJson(),
     };
 
-_Tag _$TagFromJson(Map<String, dynamic> json) =>
-    _Tag(id: json['id'] as String, label: json['label'] as String);
+_MangaInfo _$MangaInfoFromJson(Map<String, dynamic> json) => _MangaInfo(
+  thumbnailUrl: json['thumbnailUrl'] as String,
+  synopsis: json['synopsis'] as String,
+  primaryTitle: json['primaryTitle'] as String,
+  secondaryTitles:
+      (json['secondaryTitles'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+  contentRating: const ContentRatingParser().fromJson(json['contentRating']),
+  status: json['status'] as String?,
+  artist: json['artist'] as String?,
+  author: json['author'] as String?,
+  bannerUrl: json['bannerUrl'] as String?,
+  rating: json['rating'] as num?,
+  tagGroups:
+      (json['tagGroups'] as List<dynamic>?)
+          ?.map((e) => TagSection.fromJson(e as Map<String, dynamic>))
+          .toList(),
+  artworkUrls:
+      (json['artworkUrls'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  additionalInfo: (json['additionalInfo'] as Map<String, dynamic>?)?.map(
+    (k, e) => MapEntry(k, e as String),
+  ),
+  shareUrl: json['shareUrl'] as String?,
+);
 
-Map<String, dynamic> _$TagToJson(_Tag instance) => <String, dynamic>{
-  'id': instance.id,
-  'label': instance.label,
+Map<String, dynamic> _$MangaInfoToJson(
+  _MangaInfo instance,
+) => <String, dynamic>{
+  'thumbnailUrl': instance.thumbnailUrl,
+  'synopsis': instance.synopsis,
+  'primaryTitle': instance.primaryTitle,
+  'secondaryTitles': instance.secondaryTitles,
+  'contentRating': const ContentRatingParser().toJson(instance.contentRating),
+  'status': instance.status,
+  'artist': instance.artist,
+  'author': instance.author,
+  'bannerUrl': instance.bannerUrl,
+  'rating': instance.rating,
+  'tagGroups': instance.tagGroups?.map((e) => e.toJson()).toList(),
+  'artworkUrls': instance.artworkUrls,
+  'additionalInfo': instance.additionalInfo,
+  'shareUrl': instance.shareUrl,
 };
 
 _TagSection _$TagSectionFromJson(Map<String, dynamic> json) => _TagSection(
   id: json['id'] as String,
-  label: json['label'] as String,
+  title: json['title'] as String,
   tags:
       (json['tags'] as List<dynamic>)
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
@@ -325,40 +465,55 @@ _TagSection _$TagSectionFromJson(Map<String, dynamic> json) => _TagSection(
 Map<String, dynamic> _$TagSectionToJson(_TagSection instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'label': instance.label,
+      'title': instance.title,
       'tags': instance.tags.map((e) => e.toJson()).toList(),
     };
 
-_SourceManga _$SourceMangaFromJson(Map<String, dynamic> json) => _SourceManga(
-  id: json['id'] as String,
-  mangaInfo: MangaInfo.fromJson(json['mangaInfo'] as Map<String, dynamic>),
-);
+_Tag _$TagFromJson(Map<String, dynamic> json) =>
+    _Tag(id: json['id'] as String, title: json['title'] as String);
 
-Map<String, dynamic> _$SourceMangaToJson(_SourceManga instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'mangaInfo': instance.mangaInfo.toJson(),
-    };
+Map<String, dynamic> _$TagToJson(_Tag instance) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+};
 
 _Chapter _$ChapterFromJson(Map<String, dynamic> json) => _Chapter(
-  id: json['id'] as String,
+  chapterId: json['chapterId'] as String,
+  sourceManga: SourceManga.fromJson(
+    json['sourceManga'] as Map<String, dynamic>,
+  ),
+  langCode: json['langCode'] as String,
   chapNum: json['chapNum'] as num,
-  langCode: json['langCode'] as String?,
-  name: json['name'] as String?,
+  title: json['title'] as String?,
+  version: json['version'] as String?,
   volume: json['volume'] as num?,
-  group: json['group'] as String?,
-  time: const NullableTimestampSerializer().fromJson(json['time']),
+  additionalInfo: (json['additionalInfo'] as Map<String, dynamic>?)?.map(
+    (k, e) => MapEntry(k, e as String),
+  ),
+  publishDate: const NullableTimestampSerializer().fromJson(
+    json['publishDate'],
+  ),
+  creationDate: const NullableTimestampSerializer().fromJson(
+    json['creationDate'],
+  ),
   sortingIndex: json['sortingIndex'] as num?,
 );
 
 Map<String, dynamic> _$ChapterToJson(_Chapter instance) => <String, dynamic>{
-  'id': instance.id,
-  'chapNum': instance.chapNum,
+  'chapterId': instance.chapterId,
+  'sourceManga': instance.sourceManga.toJson(),
   'langCode': instance.langCode,
-  'name': instance.name,
+  'chapNum': instance.chapNum,
+  'title': instance.title,
+  'version': instance.version,
   'volume': instance.volume,
-  'group': instance.group,
-  'time': const NullableTimestampSerializer().toJson(instance.time),
+  'additionalInfo': instance.additionalInfo,
+  'publishDate': const NullableTimestampSerializer().toJson(
+    instance.publishDate,
+  ),
+  'creationDate': const NullableTimestampSerializer().toJson(
+    instance.creationDate,
+  ),
   'sortingIndex': instance.sortingIndex,
 };
 
@@ -376,301 +531,434 @@ Map<String, dynamic> _$ChapterDetailsToJson(_ChapterDetails instance) =>
       'pages': instance.pages,
     };
 
-_SearchRequest _$SearchRequestFromJson(Map<String, dynamic> json) =>
-    _SearchRequest(
-      title: json['title'] as String?,
-      includedTags:
-          (json['includedTags'] as List<dynamic>?)
-              ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      excludedTags:
-          (json['excludedTags'] as List<dynamic>?)
-              ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
+_DiscoverSection _$DiscoverSectionFromJson(Map<String, dynamic> json) =>
+    _DiscoverSection(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      type: const DiscoverSectionTypeParser().fromJson(json['type']),
     );
 
-Map<String, dynamic> _$SearchRequestToJson(_SearchRequest instance) =>
+Map<String, dynamic> _$DiscoverSectionToJson(_DiscoverSection instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'title': instance.title,
-      'includedTags': instance.includedTags.map((e) => e.toJson()).toList(),
-      'excludedTags': instance.excludedTags.map((e) => e.toJson()).toList(),
+      'subtitle': instance.subtitle,
+      'type': const DiscoverSectionTypeParser().toJson(instance.type),
     };
 
-_HomeSection _$HomeSectionFromJson(Map<String, dynamic> json) => _HomeSection(
-  id: json['id'] as String,
+GenresCarouselItem _$GenresCarouselItemFromJson(Map<String, dynamic> json) =>
+    GenresCarouselItem(
+      searchQuery: SearchQuery.fromJson(
+        json['searchQuery'] as Map<String, dynamic>,
+      ),
+      name: json['name'] as String,
+      metadata: json['metadata'],
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$GenresCarouselItemToJson(GenresCarouselItem instance) =>
+    <String, dynamic>{
+      'searchQuery': instance.searchQuery.toJson(),
+      'name': instance.name,
+      'metadata': instance.metadata,
+      'type': instance.$type,
+    };
+
+ChapterUpdatesCarouselItem _$ChapterUpdatesCarouselItemFromJson(
+  Map<String, dynamic> json,
+) => ChapterUpdatesCarouselItem(
+  mangaId: json['mangaId'] as String,
+  chapterId: json['chapterId'] as String,
+  imageUrl: json['imageUrl'] as String,
   title: json['title'] as String,
-  items:
-      (json['items'] as List<dynamic>)
-          .map((e) => PartialSourceManga.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  containsMoreItems: json['containsMoreItems'] as bool,
+  subtitle: json['subtitle'] as String?,
+  publishDate: const NullableTimestampSerializer().fromJson(
+    json['publishDate'],
+  ),
+  metadata: json['metadata'],
+  $type: json['type'] as String?,
 );
 
-Map<String, dynamic> _$HomeSectionToJson(_HomeSection instance) =>
+Map<String, dynamic> _$ChapterUpdatesCarouselItemToJson(
+  ChapterUpdatesCarouselItem instance,
+) => <String, dynamic>{
+  'mangaId': instance.mangaId,
+  'chapterId': instance.chapterId,
+  'imageUrl': instance.imageUrl,
+  'title': instance.title,
+  'subtitle': instance.subtitle,
+  'publishDate': const NullableTimestampSerializer().toJson(
+    instance.publishDate,
+  ),
+  'metadata': instance.metadata,
+  'type': instance.$type,
+};
+
+ProminentCarouselItem _$ProminentCarouselItemFromJson(
+  Map<String, dynamic> json,
+) => ProminentCarouselItem(
+  mangaId: json['mangaId'] as String,
+  imageUrl: json['imageUrl'] as String,
+  title: json['title'] as String,
+  subtitle: json['subtitle'] as String?,
+  metadata: json['metadata'],
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$ProminentCarouselItemToJson(
+  ProminentCarouselItem instance,
+) => <String, dynamic>{
+  'mangaId': instance.mangaId,
+  'imageUrl': instance.imageUrl,
+  'title': instance.title,
+  'subtitle': instance.subtitle,
+  'metadata': instance.metadata,
+  'type': instance.$type,
+};
+
+SimpleCarouselItem _$SimpleCarouselItemFromJson(Map<String, dynamic> json) =>
+    SimpleCarouselItem(
+      mangaId: json['mangaId'] as String,
+      imageUrl: json['imageUrl'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      metadata: json['metadata'],
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$SimpleCarouselItemToJson(SimpleCarouselItem instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'mangaId': instance.mangaId,
+      'imageUrl': instance.imageUrl,
       'title': instance.title,
-      'items': instance.items.map((e) => e.toJson()).toList(),
-      'containsMoreItems': instance.containsMoreItems,
+      'subtitle': instance.subtitle,
+      'metadata': instance.metadata,
+      'type': instance.$type,
     };
 
-DUIOAuthTokenResponse _$DUIOAuthTokenResponseFromJson(
+FeaturedCarouselItem _$FeaturedCarouselItemFromJson(
   Map<String, dynamic> json,
-) => DUIOAuthTokenResponse($type: json['type'] as String?);
-
-Map<String, dynamic> _$DUIOAuthTokenResponseToJson(
-  DUIOAuthTokenResponse instance,
-) => <String, dynamic>{'type': instance.$type};
-
-DUIOAuthCodeResponse _$DUIOAuthCodeResponseFromJson(
-  Map<String, dynamic> json,
-) => DUIOAuthCodeResponse(
-  tokenEndpoint: json['tokenEndpoint'] as String,
+) => FeaturedCarouselItem(
+  mangaId: json['mangaId'] as String,
+  imageUrl: json['imageUrl'] as String,
+  title: json['title'] as String,
+  supertitle: json['supertitle'] as String?,
+  metadata: json['metadata'],
   $type: json['type'] as String?,
 );
 
-Map<String, dynamic> _$DUIOAuthCodeResponseToJson(
-  DUIOAuthCodeResponse instance,
+Map<String, dynamic> _$FeaturedCarouselItemToJson(
+  FeaturedCarouselItem instance,
 ) => <String, dynamic>{
-  'tokenEndpoint': instance.tokenEndpoint,
+  'mangaId': instance.mangaId,
+  'imageUrl': instance.imageUrl,
+  'title': instance.title,
+  'supertitle': instance.supertitle,
+  'metadata': instance.metadata,
   'type': instance.$type,
 };
 
-DUIOAuthPKCEResponse _$DUIOAuthPKCEResponseFromJson(
-  Map<String, dynamic> json,
-) => DUIOAuthPKCEResponse(
-  tokenEndpoint: json['tokenEndpoint'] as String,
-  pkceCodeLength: json['pkceCodeLength'] as num,
-  pkceCodeMethod: json['pkceCodeMethod'] as String,
-  formEncodeGrant: json['formEncodeGrant'] as bool,
-  $type: json['type'] as String?,
-);
+_SelectRowOption _$SelectRowOptionFromJson(Map<String, dynamic> json) =>
+    _SelectRowOption(id: json['id'] as String, title: json['title'] as String);
 
-Map<String, dynamic> _$DUIOAuthPKCEResponseToJson(
-  DUIOAuthPKCEResponse instance,
-) => <String, dynamic>{
-  'tokenEndpoint': instance.tokenEndpoint,
-  'pkceCodeLength': instance.pkceCodeLength,
-  'pkceCodeMethod': instance.pkceCodeMethod,
-  'formEncodeGrant': instance.formEncodeGrant,
-  'type': instance.$type,
-};
+Map<String, dynamic> _$SelectRowOptionToJson(_SelectRowOption instance) =>
+    <String, dynamic>{'id': instance.id, 'title': instance.title};
 
-DUISection _$DUISectionFromJson(Map<String, dynamic> json) => DUISection(
-  id: json['id'] as String,
-  header: json['header'] as String?,
-  footer: json['footer'] as String?,
-  isHidden: json['isHidden'] as bool,
-  rows:
-      (json['rows'] as List<dynamic>)
-          .map((e) => DUIType.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  $type: json['type'] as String?,
-);
+LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
+    LabelRowElement(
+      id: json['id'] as String,
+      isHidden: json['isHidden'] as bool,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      value: json['value'] as String?,
+      $type: json['type'] as String?,
+    );
 
-Map<String, dynamic> _$DUISectionToJson(DUISection instance) =>
+Map<String, dynamic> _$LabelRowElementToJson(LabelRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'header': instance.header,
-      'footer': instance.footer,
       'isHidden': instance.isHidden,
-      'rows': instance.rows.map((e) => e.toJson()).toList(),
-      'type': instance.$type,
-    };
-
-DUISelect _$DUISelectFromJson(Map<String, dynamic> json) => DUISelect(
-  id: json['id'] as String,
-  label: json['label'] as String,
-  options: (json['options'] as List<dynamic>).map((e) => e as String).toList(),
-  allowsMultiselect: json['allowsMultiselect'] as bool,
-  labels: Map<String, String>.from(json['labels'] as Map),
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DUISelectToJson(DUISelect instance) => <String, dynamic>{
-  'id': instance.id,
-  'label': instance.label,
-  'options': instance.options,
-  'allowsMultiselect': instance.allowsMultiselect,
-  'labels': instance.labels,
-  'type': instance.$type,
-};
-
-DUIInputField _$DUIInputFieldFromJson(Map<String, dynamic> json) =>
-    DUIInputField(
-      id: json['id'] as String,
-      label: json['label'] as String,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$DUIInputFieldToJson(DUIInputField instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'label': instance.label,
-      'type': instance.$type,
-    };
-
-DUISecureInputField _$DUISecureInputFieldFromJson(Map<String, dynamic> json) =>
-    DUISecureInputField(
-      id: json['id'] as String,
-      label: json['label'] as String,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$DUISecureInputFieldToJson(
-  DUISecureInputField instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'label': instance.label,
-  'type': instance.$type,
-};
-
-DUIStepper _$DUIStepperFromJson(Map<String, dynamic> json) => DUIStepper(
-  id: json['id'] as String,
-  label: json['label'] as String,
-  min: json['min'] as num?,
-  max: json['max'] as num?,
-  step: json['step'] as num?,
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DUIStepperToJson(DUIStepper instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'label': instance.label,
-      'min': instance.min,
-      'max': instance.max,
-      'step': instance.step,
-      'type': instance.$type,
-    };
-
-DUILabel _$DUILabelFromJson(Map<String, dynamic> json) => DUILabel(
-  id: json['id'] as String,
-  label: json['label'] as String,
-  value: json['value'] as String?,
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DUILabelToJson(DUILabel instance) => <String, dynamic>{
-  'id': instance.id,
-  'label': instance.label,
-  'value': instance.value,
-  'type': instance.$type,
-};
-
-DUIMultilineLabel _$DUIMultilineLabelFromJson(Map<String, dynamic> json) =>
-    DUIMultilineLabel(
-      id: json['id'] as String,
-      label: json['label'] as String,
-      value: json['value'] as String,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$DUIMultilineLabelToJson(DUIMultilineLabel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'label': instance.label,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
       'value': instance.value,
       'type': instance.$type,
     };
 
-DUIHeader _$DUIHeaderFromJson(Map<String, dynamic> json) => DUIHeader(
-  id: json['id'] as String,
-  imageUrl: json['imageUrl'] as String,
-  title: json['title'] as String,
-  subtitle: json['subtitle'] as String?,
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DUIHeaderToJson(DUIHeader instance) => <String, dynamic>{
-  'id': instance.id,
-  'imageUrl': instance.imageUrl,
-  'title': instance.title,
-  'subtitle': instance.subtitle,
-  'type': instance.$type,
-};
-
-DUIButton _$DUIButtonFromJson(Map<String, dynamic> json) => DUIButton(
-  id: json['id'] as String,
-  label: json['label'] as String,
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DUIButtonToJson(DUIButton instance) => <String, dynamic>{
-  'id': instance.id,
-  'label': instance.label,
-  'type': instance.$type,
-};
-
-DUINavigationButton _$DUINavigationButtonFromJson(Map<String, dynamic> json) =>
-    DUINavigationButton(
+InputRowElement _$InputRowElementFromJson(Map<String, dynamic> json) =>
+    InputRowElement(
       id: json['id'] as String,
-      label: json['label'] as String,
-      form: DUIForm.fromJson(json['form'] as Map<String, dynamic>),
+      isHidden: json['isHidden'] as bool,
+      title: json['title'] as String,
+      value: json['value'] as String,
+      onValueChange: json['onValueChange'] as String,
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$DUINavigationButtonToJson(
-  DUINavigationButton instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'label': instance.label,
-  'form': instance.form.toJson(),
-  'type': instance.$type,
-};
-
-DUISwitch _$DUISwitchFromJson(Map<String, dynamic> json) => DUISwitch(
-  id: json['id'] as String,
-  label: json['label'] as String,
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DUISwitchToJson(DUISwitch instance) => <String, dynamic>{
-  'id': instance.id,
-  'label': instance.label,
-  'type': instance.$type,
-};
-
-DUIOAuthButton _$DUIOAuthButtonFromJson(Map<String, dynamic> json) =>
-    DUIOAuthButton(
-      id: json['id'] as String,
-      label: json['label'] as String,
-      authorizeEndpoint: json['authorizeEndpoint'] as String,
-      clientId: json['clientId'] as String,
-      responseType: DUIOAuthResponseType.fromJson(
-        json['responseType'] as Map<String, dynamic>,
-      ),
-      redirectUri: json['redirectUri'] as String?,
-      scopes:
-          (json['scopes'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$DUIOAuthButtonToJson(DUIOAuthButton instance) =>
+Map<String, dynamic> _$InputRowElementToJson(InputRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'label': instance.label,
-      'authorizeEndpoint': instance.authorizeEndpoint,
-      'clientId': instance.clientId,
-      'responseType': instance.responseType.toJson(),
-      'redirectUri': instance.redirectUri,
-      'scopes': instance.scopes,
+      'isHidden': instance.isHidden,
+      'title': instance.title,
+      'value': instance.value,
+      'onValueChange': instance.onValueChange,
       'type': instance.$type,
     };
 
-DUIForm _$DUIFormFromJson(Map<String, dynamic> json) => DUIForm(
-  sections:
-      (json['sections'] as List<dynamic>)
-          .map((e) => DUISection.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  hasSubmit: json['hasSubmit'] as bool,
+ToggleRowElement _$ToggleRowElementFromJson(Map<String, dynamic> json) =>
+    ToggleRowElement(
+      id: json['id'] as String,
+      isHidden: json['isHidden'] as bool,
+      title: json['title'] as String,
+      value: json['value'] as bool,
+      onValueChange: json['onValueChange'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$ToggleRowElementToJson(ToggleRowElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'isHidden': instance.isHidden,
+      'title': instance.title,
+      'value': instance.value,
+      'onValueChange': instance.onValueChange,
+      'type': instance.$type,
+    };
+
+SelectRowElement _$SelectRowElementFromJson(Map<String, dynamic> json) =>
+    SelectRowElement(
+      id: json['id'] as String,
+      isHidden: json['isHidden'] as bool,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      value: (json['value'] as List<dynamic>).map((e) => e as String).toList(),
+      minItemCount: (json['minItemCount'] as num).toInt(),
+      maxItemCount: (json['maxItemCount'] as num?)?.toInt(),
+      options:
+          (json['options'] as List<dynamic>)
+              .map((e) => SelectRowOption.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      onValueChange: json['onValueChange'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$SelectRowElementToJson(SelectRowElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'isHidden': instance.isHidden,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
+      'value': instance.value,
+      'minItemCount': instance.minItemCount,
+      'maxItemCount': instance.maxItemCount,
+      'options': instance.options.map((e) => e.toJson()).toList(),
+      'onValueChange': instance.onValueChange,
+      'type': instance.$type,
+    };
+
+ButtonRowElement _$ButtonRowElementFromJson(Map<String, dynamic> json) =>
+    ButtonRowElement(
+      id: json['id'] as String,
+      isHidden: json['isHidden'] as bool,
+      title: json['title'] as String,
+      onSelect: json['onSelect'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$ButtonRowElementToJson(ButtonRowElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'isHidden': instance.isHidden,
+      'title': instance.title,
+      'onSelect': instance.onSelect,
+      'type': instance.$type,
+    };
+
+NavigationRowElement _$NavigationRowElementFromJson(
+  Map<String, dynamic> json,
+) => NavigationRowElement(
+  id: json['id'] as String,
+  isHidden: json['isHidden'] as bool,
+  title: json['title'] as String,
+  subtitle: json['subtitle'] as String?,
+  value: json['value'] as String?,
+  form: json['form'] as String,
   $type: json['type'] as String?,
 );
 
-Map<String, dynamic> _$DUIFormToJson(DUIForm instance) => <String, dynamic>{
-  'sections': instance.sections.map((e) => e.toJson()).toList(),
-  'hasSubmit': instance.hasSubmit,
+Map<String, dynamic> _$NavigationRowElementToJson(
+  NavigationRowElement instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'isHidden': instance.isHidden,
+  'title': instance.title,
+  'subtitle': instance.subtitle,
+  'value': instance.value,
+  'form': instance.form,
   'type': instance.$type,
 };
+
+OAuthButtonRowElement _$OAuthButtonRowElementFromJson(
+  Map<String, dynamic> json,
+) => OAuthButtonRowElement(
+  id: json['id'] as String,
+  isHidden: json['isHidden'] as bool,
+  title: json['title'] as String,
+  subtitle: json['subtitle'] as String?,
+  onSuccess: json['onSuccess'] as String,
+  authorizeEndpoint: json['authorizeEndpoint'] as String,
+  responseType: OAuthResponseType.fromJson(
+    json['responseType'] as Map<String, dynamic>,
+  ),
+  clientId: json['clientId'] as String?,
+  redirectUri: json['redirectUri'] as String?,
+  scopes: (json['scopes'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$OAuthButtonRowElementToJson(
+  OAuthButtonRowElement instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'isHidden': instance.isHidden,
+  'title': instance.title,
+  'subtitle': instance.subtitle,
+  'onSuccess': instance.onSuccess,
+  'authorizeEndpoint': instance.authorizeEndpoint,
+  'responseType': instance.responseType.toJson(),
+  'clientId': instance.clientId,
+  'redirectUri': instance.redirectUri,
+  'scopes': instance.scopes,
+  'type': instance.$type,
+};
+
+_FormSectionElement _$FormSectionElementFromJson(Map<String, dynamic> json) =>
+    _FormSectionElement(
+      id: json['id'] as String,
+      header: json['header'] as String?,
+      footer: json['footer'] as String?,
+      items:
+          (json['items'] as List<dynamic>)
+              .map((e) => FormItemElement.fromJson(e as Map<String, dynamic>))
+              .toList(),
+    );
+
+Map<String, dynamic> _$FormSectionElementToJson(_FormSectionElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'header': instance.header,
+      'footer': instance.footer,
+      'items': instance.items.map((e) => e.toJson()).toList(),
+    };
+
+_FilterOption _$FilterOptionFromJson(Map<String, dynamic> json) =>
+    _FilterOption(id: json['id'] as String, value: json['value'] as String);
+
+Map<String, dynamic> _$FilterOptionToJson(_FilterOption instance) =>
+    <String, dynamic>{'id': instance.id, 'value': instance.value};
+
+DropdownSearchFilter _$DropdownSearchFilterFromJson(
+  Map<String, dynamic> json,
+) => DropdownSearchFilter(
+  id: json['id'] as String,
+  title: json['title'] as String,
+  options:
+      (json['options'] as List<dynamic>)
+          .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
+          .toList(),
+  value: json['value'] as String,
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$DropdownSearchFilterToJson(
+  DropdownSearchFilter instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'options': instance.options.map((e) => e.toJson()).toList(),
+  'value': instance.value,
+  'type': instance.$type,
+};
+
+SelectSearchFilter _$SelectSearchFilterFromJson(Map<String, dynamic> json) =>
+    SelectSearchFilter(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      options:
+          (json['options'] as List<dynamic>)
+              .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      value: Map<String, String>.from(json['value'] as Map),
+      allowExclusion: json['allowExclusion'] as bool,
+      allowEmptySelection: json['allowEmptySelection'] as bool,
+      maximum: json['maximum'] as num?,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$SelectSearchFilterToJson(SelectSearchFilter instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'options': instance.options.map((e) => e.toJson()).toList(),
+      'value': instance.value,
+      'allowExclusion': instance.allowExclusion,
+      'allowEmptySelection': instance.allowEmptySelection,
+      'maximum': instance.maximum,
+      'type': instance.$type,
+    };
+
+TagSearchFilter _$TagSearchFilterFromJson(Map<String, dynamic> json) =>
+    TagSearchFilter(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      sections:
+          (json['sections'] as List<dynamic>)
+              .map((e) => TagSection.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      value: (json['value'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
+      ),
+      allowExclusion: json['allowExclusion'] as bool,
+      allowEmptySelection: json['allowEmptySelection'] as bool,
+      maximum: json['maximum'] as num?,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$TagSearchFilterToJson(TagSearchFilter instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'sections': instance.sections.map((e) => e.toJson()).toList(),
+      'value': instance.value,
+      'allowExclusion': instance.allowExclusion,
+      'allowEmptySelection': instance.allowEmptySelection,
+      'maximum': instance.maximum,
+      'type': instance.$type,
+    };
+
+InputSearchFilter _$InputSearchFilterFromJson(Map<String, dynamic> json) =>
+    InputSearchFilter(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      placeholder: json['placeholder'] as String,
+      value: json['value'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$InputSearchFilterToJson(InputSearchFilter instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'placeholder': instance.placeholder,
+      'value': instance.value,
+      'type': instance.$type,
+    };
+
+_SearchFilterValue _$SearchFilterValueFromJson(Map<String, dynamic> json) =>
+    _SearchFilterValue(
+      id: json['id'] as String,
+      value: json['value'] as Object,
+    );
+
+Map<String, dynamic> _$SearchFilterValueToJson(_SearchFilterValue instance) =>
+    <String, dynamic>{'id': instance.id, 'value': instance.value};

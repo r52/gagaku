@@ -149,17 +149,20 @@ class ExtensionState extends _$ExtensionState {
     return _fetch();
   }
 
-  dynamic getState(String sourceId, String stateName) {
-    final result = state[sourceId]?[stateName];
+  dynamic getExtensionState(String sourceId) {
+    final result = state[sourceId];
     return result;
   }
 
-  void setState(String sourceId, String stateName, dynamic data) {
-    if (!state.containsKey(sourceId)) {
-      state[sourceId] = {};
-    }
+  void setExtensionState(String sourceId, dynamic data) {
+    state[sourceId] = data;
 
-    state[sourceId]![stateName] = data;
+    final box = Hive.box(gagakuDataBox);
+    box.put('extension-state', json.encode(state));
+  }
+
+  void resetAllState(String sourceId) {
+    state.remove(sourceId);
 
     final box = Hive.box(gagakuDataBox);
     box.put('extension-state', json.encode(state));
@@ -193,17 +196,13 @@ class ExtensionSecureState extends _$ExtensionSecureState {
     return _fetch();
   }
 
-  dynamic getState(String sourceId, String stateName) {
-    final result = state[sourceId]?[stateName];
+  dynamic getExtensionState(String sourceId) {
+    final result = state[sourceId];
     return result;
   }
 
-  void setState(String sourceId, String stateName, dynamic data) {
-    if (!state.containsKey(sourceId)) {
-      state[sourceId] = {};
-    }
-
-    state[sourceId]![stateName] = data;
+  void setExtensionState(String sourceId, dynamic data) {
+    state[sourceId] = data;
 
     final box = Hive.box(gagakuDataBox);
     box.put('extension-secure-state', json.encode(state));

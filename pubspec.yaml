@@ -71,7 +71,6 @@ dependencies:
   flutter_inappwebview: ^6.2.0-beta.2
   mime: ^2.0.0
   expansion_tile_list: ^2.0.0
-  input_quantity: ^2.5.1
   auto_route: ^10.0.0
   infinite_scroll_pagination: ^5.0.0
   flutter_cache_manager: ^3.4.1

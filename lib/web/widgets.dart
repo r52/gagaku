@@ -673,6 +673,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
       timestamp = timeago.format(data.chapter.releaseDate!, locale: lang);
     }
 
+    final language =
+        data.chapter.data != null
+            ? CountryFlag(flag: data.chapter.data!.langCode, size: 12)
+            : null;
+
     final border = Border(
       left: BorderSide(
         color: isRead == true ? tileColor : Colors.blue,
@@ -732,7 +737,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
       route = ExtensionReaderRoute(
         sourceId: handle.sourceId,
         mangaId: handle.location,
-        chapterId: (data.chapter.groups.entries.first.value as Chapter).id,
+        chapterId:
+            (data.chapter.groups.entries.first.value as Chapter).chapterId,
         readerData: readerData,
       );
     }
@@ -756,6 +762,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (language != null) language,
             if (!screenSizeSmall)
               Flexible(
                 child: IconTextChip(

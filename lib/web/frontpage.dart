@@ -23,6 +23,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final tr = context.t;
     final scrollController =
@@ -115,7 +116,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
         final homepageSources = <WebSourceInfo>[];
 
         for (final source in sources) {
-          if (source.hasCapability(SourceIntents.homepageSections)) {
+          if (source.hasCapability(SourceIntents.discoverSections)) {
             homepageSources.add(source);
           }
         }
@@ -153,18 +154,42 @@ class WebSourceFrontPage extends HookConsumerWidget {
                           ExtensionHomeRoute(sourceId: item.id, source: item),
                         );
                       },
-                      // XXX: needs search capability check for 0.9
-                      trailing: IconButton(
-                        color: theme.colorScheme.onPrimaryContainer,
-                        icon: const Icon(Icons.search),
-                        onPressed:
-                            () => context.router.push(
-                              ExtensionSearchRoute(
-                                sourceId: item.id,
-                                source: item,
-                              ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (item.hasCapability(SourceIntents.settingsUI))
+                            IconButton(
+                              color: theme.colorScheme.onPrimaryContainer,
+                              icon: const Icon(Icons.settings),
+                              onPressed:
+                                  () => nav.push(
+                                    SlideTransitionRouteBuilder(
+                                      pageBuilder:
+                                          (
+                                            context,
+                                            animation,
+                                            secondaryAnimation,
+                                          ) => ExtensionSettingsPage(
+                                            source: item,
+                                          ),
+                                    ),
+                                  ),
+                              tooltip: tr.webSources.source.settings,
                             ),
-                        tooltip: tr.search.arg(arg: item.name),
+                          if (item.hasCapability(SourceIntents.mangaSearch))
+                            IconButton(
+                              color: theme.colorScheme.onPrimaryContainer,
+                              icon: const Icon(Icons.search),
+                              onPressed:
+                                  () => context.router.push(
+                                    ExtensionSearchRoute(
+                                      sourceId: item.id,
+                                      source: item,
+                                    ),
+                                  ),
+                              tooltip: tr.search.arg(arg: item.name),
+                            ),
+                        ],
                       ),
                     ),
                   );
@@ -219,7 +244,10 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     final controller = useScrollController();
     final refresh = useState(0);
     final results = useMemoized(
-      () => ref.read(extensionSourceProvider(source.id).notifier).getHomePage(),
+      () =>
+          ref
+              .read(extensionSourceProvider(source.id).notifier)
+              .getDiscoverSections(),
       [source, refresh.value],
     );
     final future = useFuture(results);
@@ -228,7 +256,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     if (future.hasError) {
       final error = future.error!;
       final stackTrace = future.stackTrace!;
-      final msg = "ExtensionSource(${source.id}).getHomePage() failed";
+      final msg = "ExtensionSource(${source.id}).getDiscoverSections() failed";
 
       Styles.showErrorSnackBar(messenger, '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
@@ -251,33 +279,82 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     if (future.data != null) {
       final data = future.data!;
       final homepageWidgets = <Widget>[];
+      final sectionItems = useMemoized(
+        () => Future.wait(
+          data.map(
+            (e) => ref
+                .read(extensionSourceProvider(source.id).notifier)
+                .getDiscoverSectionItems(e, null),
+          ),
+        ),
+        [source, refresh.value],
+      );
+      final itemFuture = useFuture(sectionItems);
 
-      for (final section in data) {
-        if (section.containsMoreItems) {
-          homepageWidgets.add(
-            TextButton.icon(
-              onPressed: () {
-                nav.push(
-                  SlideTransitionRouteBuilder(
-                    pageBuilder:
-                        (context, animation, secondaryAnimation) =>
-                            _HomeSectionPage(source: source, section: section),
-                  ),
-                );
-              },
-              label: Text(section.title, style: style),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-            ),
-          );
-        } else {
-          homepageWidgets.add(Center(child: Text(section.title, style: style)));
+      if (itemFuture.hasError) {
+        final error = itemFuture.error!;
+        final stackTrace = itemFuture.stackTrace!;
+        final msg =
+            "ExtensionSource(${source.id}).getDiscoverSectionItems() failed";
+
+        Styles.showErrorSnackBar(messenger, '$error');
+        logger.e(msg, error: error, stackTrace: stackTrace);
+
+        slivers.add(
+          SliverList.list(
+            children: [Text('$error'), Text(stackTrace.toString())],
+          ),
+        );
+      }
+
+      if (itemFuture.connectionState == ConnectionState.waiting ||
+          !itemFuture.hasData) {
+        slivers.add(
+          const SliverToBoxAdapter(
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        );
+      }
+
+      if (itemFuture.hasData) {
+        for (final (idx, section) in data.indexed) {
+          final sectionResults = itemFuture.data!.elementAt(idx);
+          if (sectionResults.metadata != null) {
+            homepageWidgets.add(
+              TextButton.icon(
+                onPressed: () {
+                  nav.push(
+                    SlideTransitionRouteBuilder(
+                      pageBuilder:
+                          (context, animation, secondaryAnimation) =>
+                              _DiscoverSectionPage(
+                                source: source,
+                                section: section,
+                              ),
+                    ),
+                  );
+                },
+                label: Text(section.title, style: style),
+                icon: const Icon(Icons.arrow_forward),
+                iconAlignment: IconAlignment.end,
+              ),
+            );
+          } else {
+            homepageWidgets.add(
+              Center(child: Text(section.title, style: style)),
+            );
+          }
+
+          if (section.type != DiscoverSectionType.genres) {
+            final mangas =
+                sectionResults.items
+                    .map(
+                      (e) => HistoryLink.fromDiscoverySectionItem(source.id, e),
+                    )
+                    .toList();
+            homepageWidgets.add(MangaCarousel(items: mangas));
+          }
         }
-        final mangas =
-            section.items
-                .map((e) => HistoryLink.fromPartialSourceManga(source, e))
-                .toList();
-        homepageWidgets.add(MangaCarousel(items: mangas));
       }
 
       if (homepageWidgets.isNotEmpty) {
@@ -310,16 +387,19 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           OverflowBar(
             spacing: 0.0,
             children: [
-              // XXX: needs search capability check for 0.9
-              IconButton(
-                color: theme.colorScheme.onPrimaryContainer,
-                icon: const Icon(Icons.search),
-                onPressed:
-                    () => context.router.push(
-                      ExtensionSearchRoute(sourceId: source.id, source: source),
-                    ),
-                tooltip: tr.search.arg(arg: source.name),
-              ),
+              if (source.hasCapability(SourceIntents.mangaSearch))
+                IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  icon: const Icon(Icons.search),
+                  onPressed:
+                      () => context.router.push(
+                        ExtensionSearchRoute(
+                          sourceId: source.id,
+                          source: source,
+                        ),
+                      ),
+                  tooltip: tr.search.arg(arg: source.name),
+                ),
               if (source.hasCapability(SourceIntents.settingsUI))
                 IconButton(
                   color: theme.colorScheme.onPrimaryContainer,
@@ -357,18 +437,18 @@ class ExtensionHomeWidget extends HookConsumerWidget {
   }
 }
 
-class _HomeSectionPage extends StatefulHookConsumerWidget {
-  const _HomeSectionPage({required this.source, required this.section});
+class _DiscoverSectionPage extends StatefulHookConsumerWidget {
+  const _DiscoverSectionPage({required this.source, required this.section});
 
   final WebSourceInfo source;
-  final HomeSection section;
+  final DiscoverSection section;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      __HomeSectionPageState();
+      __DiscoverSectionPageState();
 }
 
-class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
+class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
   Map<String, dynamic>? metadata = {'page': 1};
 
   late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
@@ -377,19 +457,15 @@ class __HomeSectionPageState extends ConsumerState<_HomeSectionPage> {
     fetchPage: (pageKey) async {
       final results = await ref
           .read(extensionSourceProvider(widget.source.id).notifier)
-          .getHomeSectionMore(widget.section.id, metadata);
+          .getDiscoverSectionItems(widget.section, metadata);
 
-      final m = results.results?.map(
-        (e) => HistoryLink.fromPartialSourceManga(widget.source, e),
+      final m = results.items.map(
+        (e) => HistoryLink.fromDiscoverySectionItem(widget.source.id, e),
       );
 
       metadata = results.metadata;
 
-      if (m != null) {
-        return PageResultsMetaData(m.toList());
-      }
-
-      return PageResultsMetaData([]);
+      return PageResultsMetaData(m.toList());
     },
     getIsLastPage: (_, __) => metadata == null,
     refresh: () async {

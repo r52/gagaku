@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -293,24 +292,31 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     ),
                     if (extdata != null)
                       for (final tagsec
-                          in (extdata.mangaInfo.tags ?? <TagSection>[]))
+                          in (extdata.mangaInfo.tagGroups ?? <TagSection>[]))
                         MultiChildExpansionTile(
-                          title: tagsec.label.capitalize(),
+                          title: tagsec.title.capitalize(),
                           children:
                               tagsec.tags
                                   .map(
                                     (e) => IconTextChip(
-                                      text: e.label,
-                                      onPressed:
-                                          () => context.router.push(
-                                            ExtensionSearchRoute(
-                                              sourceId: handle.sourceId,
-                                              source: handle.parser,
-                                              query: SearchRequest(
-                                                includedTags: [e],
-                                              ),
-                                            ),
-                                          ),
+                                      text: e.title,
+                                      // TODO is this revivable?
+                                      // onPressed:
+                                      //     () => context.router.push(
+                                      //       ExtensionSearchRoute(
+                                      //         sourceId: handle.sourceId,
+                                      //         source: handle.parser,
+                                      //         query: SearchQuery(
+                                      //           title: '',
+                                      //           filters: [
+                                      //             SearchFilterValue(
+                                      //               id: tagsec.id,
+                                      //               value: {e.id: 'included'},
+                                      //             ),
+                                      //           ],
+                                      //         ),
+                                      //       ),
+                                      //     ),
                                     ),
                                   )
                                   .toList(),
@@ -332,34 +338,19 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             },
                             text: tr.mangaView.openOn(arg: 'cubari.moe'),
                           ),
-                        if (handle.type == SourceType.source)
-                          SimpleFutureBuilder(
-                            futureBuilder:
-                                () => ref
-                                    .read(
-                                      extensionSourceProvider(
-                                        handle.sourceId,
-                                      ).notifier,
-                                    )
-                                    .getMangaURL(handle.location),
-                            keys: [handle],
-                            builder: (context, data) {
-                              if (data == null) {
-                                return SizedBox.shrink();
+                        if (handle.type == SourceType.source &&
+                            extdata != null &&
+                            extdata.mangaInfo.shareUrl != null)
+                          ButtonChip(
+                            onPressed: () async {
+                              final url = extdata.mangaInfo.shareUrl!;
+                              final uri = Uri.parse(url);
+
+                              if (!await launchUrl(uri)) {
+                                throw 'Could not launch $url';
                               }
-
-                              return ButtonChip(
-                                onPressed: () async {
-                                  final url = data;
-                                  final uri = Uri.parse(url);
-
-                                  if (!await launchUrl(uri)) {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                text: tr.mangaView.openOn(arg: handle.sourceId),
-                              );
                             },
+                            text: tr.mangaView.openOn(arg: handle.sourceId),
                           ),
                       ],
                     ),

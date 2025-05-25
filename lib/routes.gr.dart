@@ -197,7 +197,7 @@ class ExtensionSearchRoute
     _i30.Key? key,
     required String sourceId,
     _i31.WebSourceInfo? source,
-    _i31.SearchRequest? query,
+    _i31.SearchQuery? query,
     List<_i29.PageRouteInfo>? children,
   }) : super(
          ExtensionSearchRoute.name,
@@ -246,7 +246,7 @@ class ExtensionSearchRouteArgs {
 
   final _i31.WebSourceInfo? source;
 
-  final _i31.SearchRequest? query;
+  final _i31.SearchQuery? query;
 
   @override
   String toString() {

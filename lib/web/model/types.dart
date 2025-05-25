@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/reader/main.dart' show CtxCallback;
 import 'package:gagaku/util/freezed.dart';
+import 'package:gagaku/util/util.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
@@ -102,20 +103,63 @@ abstract class HistoryLink with _$HistoryLink {
   factory HistoryLink.fromJson(Map<String, dynamic> json) =>
       _$HistoryLinkFromJson(json);
 
-  factory HistoryLink.fromPartialSourceManga(
+  // factory HistoryLink.fromPartialSourceManga(
+  //   WebSourceInfo source,
+  //   PartialSourceManga manga,
+  // ) => HistoryLink(
+  //   title: manga.title,
+  //   url: '${source.id}/${manga.mangaId}',
+  //   cover: manga.image,
+  //   handle: SourceHandler(
+  //     type: SourceType.source,
+  //     sourceId: source.id,
+  //     location: manga.mangaId,
+  //     parser: source,
+  //   ),
+
+  factory HistoryLink.fromSearchReultItem(
     WebSourceInfo source,
-    PartialSourceManga manga,
+    SearchResultItem item,
   ) => HistoryLink(
-    title: manga.title,
-    url: '${source.id}/${manga.mangaId}',
-    cover: manga.image,
+    title: item.title,
+    url: '${source.id}/${item.mangaId}',
+    cover: item.imageUrl,
     handle: SourceHandler(
       type: SourceType.source,
       sourceId: source.id,
-      location: manga.mangaId,
+      location: item.mangaId,
       parser: source,
     ),
   );
+
+  factory HistoryLink.fromDiscoverySectionItem(
+    String sourceId,
+    DiscoverSectionItem item,
+  ) {
+    return switch (item) {
+      GenresCarouselItem() => throw UnsupportedError('Unsupported type'),
+      ChapterUpdatesCarouselItem() => HistoryLink(
+        title: item.title,
+        url: '$sourceId/${item.mangaId}',
+        cover: item.imageUrl,
+      ),
+      ProminentCarouselItem() => HistoryLink(
+        title: item.title,
+        url: '$sourceId/${item.mangaId}',
+        cover: item.imageUrl,
+      ),
+      SimpleCarouselItem() => HistoryLink(
+        title: item.title,
+        url: '$sourceId/${item.mangaId}',
+        cover: item.imageUrl,
+      ),
+      FeaturedCarouselItem() => HistoryLink(
+        title: item.title,
+        url: '$sourceId/${item.mangaId}',
+        cover: item.imageUrl,
+      ),
+    };
+  }
 
   @override
   bool operator ==(Object other) {
@@ -188,7 +232,8 @@ class ChapterGroupSerializer
       final entry = map.entries.first;
       final content = entry.value;
 
-      if (content is Map && content.containsKey('id')) {
+      if (content is Map &&
+          (content.containsKey('id') || content.containsKey('chapterId'))) {
         map.updateAll((g, element) {
           return Chapter.fromJson(element);
         });
@@ -229,7 +274,7 @@ abstract class WebChapter with _$WebChapter {
     @EpochTimestampSerializer() DateTime? lastUpdated,
     @MappedEpochTimestampSerializer() DateTime? releaseDate,
     @ChapterGroupSerializer() required Map<String, dynamic> groups,
-    dynamic data,
+    Chapter? data,
   }) = _WebChapter;
 
   factory WebChapter.fromJson(Map<String, dynamic> json) =>
@@ -267,7 +312,7 @@ abstract class WebSourceInfo with _$WebSourceInfo {
     required String id,
     required String name,
     required String repo,
-    required String baseUrl,
+    String? baseUrl,
     @Default(SupportedVersion.v0_8) SupportedVersion version,
     required String icon,
     @Default([SourceIntents.mangaChapters])
@@ -284,7 +329,8 @@ abstract class WebSourceInfo with _$WebSourceInfo {
 }
 
 enum SupportedVersion {
-  v0_8('0.8');
+  v0_8('0.8'),
+  v0_9('1.0.0');
 
   final String version;
   const SupportedVersion(this.version);
@@ -294,11 +340,12 @@ enum SupportedVersion {
 
 enum SourceIntents {
   mangaChapters(1 << 0),
-  mangaTracking(1 << 1),
-  homepageSections(1 << 2),
+  mangaProgress(1 << 1),
+  discoverSections(1 << 2),
   collectionManagement(1 << 3),
   cloudflareBypassRequired(1 << 4),
-  settingsUI(1 << 5);
+  settingsUI(1 << 5),
+  mangaSearch(1 << 6);
 
   final int flag;
   const SourceIntents(this.flag);
@@ -356,13 +403,32 @@ class BadgeColorParser implements JsonConverter<BadgeColor, dynamic> {
 }
 
 @freezed
-abstract class Badge with _$Badge {
-  const factory Badge({
+abstract class Badge08 with _$Badge08 {
+  const factory Badge08({
     required String text,
     @BadgeColorParser() required BadgeColor type,
-  }) = _Badge;
+  }) = _Badge08;
 
-  factory Badge.fromJson(Map<String, dynamic> json) => _$BadgeFromJson(json);
+  factory Badge08.fromJson(Map<String, dynamic> json) =>
+      _$Badge08FromJson(json);
+}
+
+@freezed
+abstract class SourceBadge with _$SourceBadge {
+  const factory SourceBadge({
+    required String label,
+    required String textColor,
+    required String backgroundColor,
+  }) = _SourceBadge;
+
+  factory SourceBadge.fromJson(Map<String, dynamic> json) =>
+      _$SourceBadgeFromJson(json);
+
+  factory SourceBadge.fromBadge08(Badge08 badge) => SourceBadge(
+    label: badge.text,
+    textColor: '#000000',
+    backgroundColor: badge.type.color.toHex(),
+  );
 }
 
 enum BadgeColor {
@@ -377,10 +443,22 @@ enum BadgeColor {
 }
 
 @freezed
-abstract class SourceVersion with _$SourceVersion {
+abstract class SourceDeveloper with _$SourceDeveloper {
+  const factory SourceDeveloper({
+    required String name,
+    String? website,
+    String? github,
+  }) = _SourceDeveloper;
+
+  factory SourceDeveloper.fromJson(Map<String, dynamic> json) =>
+      _$SourceDeveloperFromJson(json);
+}
+
+@freezed
+sealed class SourceVersion with _$SourceVersion {
   const SourceVersion._();
 
-  const factory SourceVersion({
+  const factory SourceVersion.zero_eight({
     required String id,
     required String name,
     required String author,
@@ -389,23 +467,86 @@ abstract class SourceVersion with _$SourceVersion {
     required ContentRating contentRating,
     required String version,
     required String icon,
-    List<Badge>? tags,
+    List<Badge08>? tags,
     required String websiteBaseURL,
     int? intents,
-  }) = _SourceVersion;
+  }) = SourceVersion08;
+
+  const factory SourceVersion.zero_nine({
+    required String id,
+    required String name,
+    required String description,
+    required String version,
+    required String icon,
+    String? language,
+    @ContentRatingParser() required ContentRating contentRating,
+    required List<SourceBadge> badges,
+    required List<SourceDeveloper> developers,
+    @SourceIntentOrListParser() required List<SourceIntents> capabilities,
+  }) = SourceVersion09;
 
   factory SourceVersion.fromJson(Map<String, dynamic> json) =>
       _$SourceVersionFromJson(json);
 
+  String getDescription() {
+    return switch (this) {
+      SourceVersion08(:final desc) => desc,
+      SourceVersion09(:final description) => description,
+    };
+  }
+
+  String getAuthor() {
+    return switch (this) {
+      SourceVersion08(:final author) => author,
+      SourceVersion09(:final developers) => developers.first.name,
+    };
+  }
+
+  List<SourceBadge> getBadges() {
+    return switch (this) {
+      SourceVersion08(:final tags) =>
+        tags == null
+            ? []
+            : tags.map((e) => SourceBadge.fromBadge08(e)).toList(),
+      SourceVersion09(:final badges) => badges,
+    };
+  }
+
   List<SourceIntents> getCapabilities() {
-    return intents == null
-        ? []
-        : SourceIntents.values.fold([], (list, intent) {
-          if ((intents! & intent.flag) == intent.flag) {
-            list.add(intent);
-          }
-          return list;
-        });
+    return switch (this) {
+      SourceVersion08(:final intents) =>
+        intents == null
+            ? []
+            : SourceIntents.values.fold([], (list, intent) {
+              if ((intents & intent.flag) == intent.flag) {
+                list.add(intent);
+              }
+              return list;
+            }),
+      SourceVersion09(:final capabilities) => capabilities,
+    };
+  }
+
+  String getIconPath() {
+    return switch (this) {
+      SourceVersion08() => '$id/includes/$icon',
+      SourceVersion09() => '$id/static/$icon',
+    };
+  }
+
+  String? getBaseUrl() {
+    RegExp exp = RegExp(r'((https:\/\/)?\w+\.\w+)');
+
+    String? result = switch (this) {
+      SourceVersion08(:final websiteBaseURL) => websiteBaseURL,
+      SourceVersion09(:final description) => exp.firstMatch(description)?[0],
+    };
+
+    if (result != null && !result.startsWith('https://')) {
+      result = 'https://$result';
+    }
+
+    return result;
   }
 }
 
@@ -422,7 +563,7 @@ abstract class BuiltWith with _$BuiltWith {
 abstract class Versioning with _$Versioning {
   const factory Versioning({
     required String buildTime,
-    required List<SourceVersion> sources,
+    required List<dynamic> sources,
     required BuiltWith builtWith,
   }) = _Versioning;
 
@@ -472,82 +613,197 @@ class RepoData with _$RepoData implements RepoInfo {
   Map<String, dynamic> toJson() => _$RepoDataToJson(this);
 }
 
+// abstract class DUIFormRow {
+//   String get id;
+// }
+
+// abstract class DUIInputType extends DUIFormRow {
+//   String get label;
+// }
+
+// abstract class DUILabelType extends DUIFormRow {
+//   String get label;
+// }
+
+@Freezed(unionKey: 'type')
+abstract class OAuthResponseType with _$OAuthResponseType {
+  const factory OAuthResponseType.token() = OAuthTokenResponse;
+
+  const factory OAuthResponseType.code({required String tokenEndpoint}) =
+      OAuthCodeResponse;
+
+  const factory OAuthResponseType.pkce({
+    required String tokenEndpoint,
+    required num pkceCodeLength,
+    required String pkceCodeMethod,
+    required bool formEncodeGrant,
+  }) = OAuthPKCEResponse;
+
+  factory OAuthResponseType.fromJson(Map<String, dynamic> json) =>
+      _$OAuthResponseTypeFromJson(json);
+}
+
+// @Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
+// sealed class DUIType with _$DUIType {
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUISection({
+//     required String id,
+//     String? header,
+//     String? footer,
+//     required bool isHidden,
+//     required List<DUIType> rows,
+//   }) = DUISection;
+
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUISelect({
+//     required String id,
+//     required String label,
+//     required List<String> options,
+//     required bool allowsMultiselect,
+//     required Map<String, String> labels,
+//   }) = DUISelect;
+
+//   @Implements<DUIInputType>()
+//   const factory DUIType.DUIInputField({
+//     required String id,
+//     required String label,
+//   }) = DUIInputField;
+
+//   @Implements<DUIInputType>()
+//   const factory DUIType.DUISecureInputField({
+//     required String id,
+//     required String label,
+//   }) = DUISecureInputField;
+
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUIStepper({
+//     required String id,
+//     required String label,
+//     num? min,
+//     num? max,
+//     num? step,
+//   }) = DUIStepper;
+
+//   @Implements<DUILabelType>()
+//   const factory DUIType.DUILabel({
+//     required String id,
+//     required String label,
+//     String? value,
+//   }) = DUILabel;
+
+//   @Implements<DUILabelType>()
+//   const factory DUIType.DUIMultilineLabel({
+//     required String id,
+//     required String label,
+//     required String value,
+//   }) = DUIMultilineLabel;
+
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUIHeader({
+//     required String id,
+//     required String imageUrl,
+//     required String title,
+//     String? subtitle,
+//   }) = DUIHeader;
+
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUIButton({required String id, required String label}) =
+//       DUIButton;
+
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUINavigationButton({
+//     required String id,
+//     required String label,
+//     required DUIForm form,
+//   }) = DUINavigationButton;
+
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUISwitch({required String id, required String label}) =
+//       DUISwitch;
+
+//   @Implements<DUIFormRow>()
+//   const factory DUIType.DUIOAuthButton({
+//     required String id,
+//     required String label,
+//     required String authorizeEndpoint,
+//     required String clientId,
+//     required OAuthResponseType responseType,
+//     String? redirectUri,
+//     List<String>? scopes,
+//   }) = DUIOAuthButton;
+
+//   const factory DUIType.DUIForm({
+//     required List<DUISection> sections,
+//     required bool hasSubmit,
+//   }) = DUIForm;
+
+//   factory DUIType.fromJson(Map<String, dynamic> json) =>
+//       _$DUITypeFromJson(json);
+// }
+
+////////////////////// 0.9
+
+class ContentRatingParser implements JsonConverter<ContentRating, dynamic> {
+  const ContentRatingParser();
+
+  @override
+  ContentRating fromJson(dynamic rating) =>
+      rating == 'SAFE'
+          ? ContentRating.EVERYONE
+          : ContentRating.values.byName(rating);
+
+  @override
+  dynamic toJson(ContentRating rating) =>
+      rating == ContentRating.EVERYONE ? 'SAFE' : rating.name;
+}
+
 // ignore: constant_identifier_names
 enum ContentRating { EVERYONE, MATURE, ADULT }
 
 @freezed
-abstract class PartialSourceManga with _$PartialSourceManga {
-  const factory PartialSourceManga({
+abstract class SearchQuery with _$SearchQuery {
+  const SearchQuery._();
+
+  const factory SearchQuery({
+    required String title,
+    @Default([]) List<SearchFilterValue> filters,
+  }) = _SearchQuery;
+
+  factory SearchQuery.fromJson(Map<String, dynamic> json) =>
+      _$SearchQueryFromJson(json);
+
+  bool get isEmpty => title.isEmpty && filters.isEmpty;
+}
+
+@freezed
+abstract class SearchResultItem with _$SearchResultItem {
+  const factory SearchResultItem({
     required String mangaId,
-    required String image,
     required String title,
     String? subtitle,
-  }) = _PartialSourceManga;
-
-  factory PartialSourceManga.fromJson(Map<String, dynamic> json) =>
-      _$PartialSourceMangaFromJson(json);
-}
-
-@freezed
-abstract class PagedResults with _$PagedResults {
-  const factory PagedResults({
-    List<PartialSourceManga>? results,
+    required String imageUrl,
     dynamic metadata,
-  }) = _PagedResults;
+  }) = _SearchResultItem;
 
-  factory PagedResults.fromJson(Map<String, dynamic> json) =>
-      _$PagedResultsFromJson(json);
+  factory SearchResultItem.fromJson(Map<String, dynamic> json) =>
+      _$SearchResultItemFromJson(json);
 }
 
-@freezed
-abstract class MangaInfo with _$MangaInfo {
-  const factory MangaInfo({
-    required String image,
-    String? artist,
-    String? author,
-    required String desc,
-    required String status,
-    bool? hentai,
-    required List<String> titles,
-    String? banner,
-    num? rating,
-    List<TagSection>? tags,
-    List<String>? covers,
-    // required num avgRating,
-    // required num follows,
-    // required String langFlag,
-    // required String langName,
-    // required num users,
-    // required num views,
-  }) = _MangaInfo;
+@Freezed(genericArgumentFactories: true)
+abstract class PagedResults<T> with _$PagedResults<T> {
+  factory PagedResults({required List<T> items, dynamic metadata}) =
+      _PagedResults<T>;
 
-  factory MangaInfo.fromJson(Map<String, dynamic> json) =>
-      _$MangaInfoFromJson(json);
-}
-
-@freezed
-abstract class Tag with _$Tag {
-  const factory Tag({required String id, required String label}) = _Tag;
-
-  factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
-}
-
-@freezed
-abstract class TagSection with _$TagSection {
-  const factory TagSection({
-    required String id,
-    required String label,
-    required List<Tag> tags,
-  }) = _TagSection;
-
-  factory TagSection.fromJson(Map<String, dynamic> json) =>
-      _$TagSectionFromJson(json);
+  factory PagedResults.fromJson(
+    Map<String, dynamic> json,
+    T Function(Object? json) fromJsonT,
+  ) => _$PagedResultsFromJson<T>(json, fromJsonT);
 }
 
 @freezed
 abstract class SourceManga with _$SourceManga {
   const factory SourceManga({
-    required String id,
+    required String mangaId,
     required MangaInfo mangaInfo,
   }) = _SourceManga;
 
@@ -556,15 +812,60 @@ abstract class SourceManga with _$SourceManga {
 }
 
 @freezed
+abstract class MangaInfo with _$MangaInfo {
+  const factory MangaInfo({
+    required String thumbnailUrl,
+    required String synopsis,
+    required String primaryTitle,
+    required List<String> secondaryTitles,
+    @ContentRatingParser() required ContentRating contentRating,
+    String? status,
+    String? artist,
+    String? author,
+    String? bannerUrl,
+    num? rating,
+    List<TagSection>? tagGroups,
+    List<String>? artworkUrls,
+    Map<String, String>? additionalInfo,
+    String? shareUrl,
+  }) = _MangaInfo;
+
+  factory MangaInfo.fromJson(Map<String, dynamic> json) =>
+      _$MangaInfoFromJson(json);
+}
+
+@freezed
+abstract class TagSection with _$TagSection {
+  const factory TagSection({
+    required String id,
+    required String title,
+    required List<Tag> tags,
+  }) = _TagSection;
+
+  factory TagSection.fromJson(Map<String, dynamic> json) =>
+      _$TagSectionFromJson(json);
+}
+
+@freezed
+abstract class Tag with _$Tag {
+  const factory Tag({required String id, required String title}) = _Tag;
+
+  factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
+}
+
+@freezed
 abstract class Chapter with _$Chapter {
   const factory Chapter({
-    required String id,
+    required String chapterId,
+    required SourceManga sourceManga,
+    required String langCode,
     required num chapNum,
-    String? langCode,
-    String? name,
+    String? title,
+    String? version,
     num? volume,
-    String? group,
-    @NullableTimestampSerializer() DateTime? time,
+    Map<String, String>? additionalInfo,
+    @NullableTimestampSerializer() DateTime? publishDate,
+    @NullableTimestampSerializer() DateTime? creationDate,
     num? sortingIndex,
   }) = _Chapter;
 
@@ -584,164 +885,241 @@ abstract class ChapterDetails with _$ChapterDetails {
       _$ChapterDetailsFromJson(json);
 }
 
-@freezed
-abstract class SearchRequest with _$SearchRequest {
-  const SearchRequest._();
+enum DiscoverSectionType {
+  featured,
+  simpleCarousel,
+  prominentCarousel,
+  chapterUpdates,
+  genres,
+}
 
-  const factory SearchRequest({
-    String? title,
-    @Default([]) List<Tag> includedTags,
-    @Default([]) List<Tag> excludedTags,
-  }) = _SearchRequest;
+class DiscoverSectionTypeParser
+    implements JsonConverter<DiscoverSectionType, dynamic> {
+  const DiscoverSectionTypeParser();
 
-  factory SearchRequest.fromJson(Map<String, dynamic> json) =>
-      _$SearchRequestFromJson(json);
+  @override
+  DiscoverSectionType fromJson(dynamic type) =>
+      DiscoverSectionType.values.elementAt(type);
 
-  bool get isEmpty =>
-      (title == null || title!.isEmpty) &&
-      includedTags.isEmpty &&
-      excludedTags.isEmpty;
-
-  bool get isFiltersEmpty => includedTags.isEmpty && excludedTags.isEmpty;
+  @override
+  dynamic toJson(DiscoverSectionType type) => type.index;
 }
 
 @freezed
-abstract class HomeSection with _$HomeSection {
-  const factory HomeSection({
+abstract class DiscoverSection with _$DiscoverSection {
+  const factory DiscoverSection({
     required String id,
     required String title,
-    required List<PartialSourceManga> items,
-    required bool containsMoreItems,
-  }) = _HomeSection;
+    String? subtitle,
+    @DiscoverSectionTypeParser() required DiscoverSectionType type,
+  }) = _DiscoverSection;
 
-  factory HomeSection.fromJson(Map<String, dynamic> json) =>
-      _$HomeSectionFromJson(json);
-}
-
-abstract class DUIFormRow {
-  String get id;
-}
-
-abstract class DUIInputType extends DUIFormRow {
-  String get label;
-}
-
-abstract class DUILabelType extends DUIFormRow {
-  String get label;
+  factory DiscoverSection.fromJson(Map<String, dynamic> json) =>
+      _$DiscoverSectionFromJson(json);
 }
 
 @Freezed(unionKey: 'type')
-abstract class DUIOAuthResponseType with _$DUIOAuthResponseType {
-  const factory DUIOAuthResponseType.token() = DUIOAuthTokenResponse;
+sealed class DiscoverSectionItem with _$DiscoverSectionItem {
+  const factory DiscoverSectionItem.genresCarouselItem({
+    required SearchQuery searchQuery,
+    required String name,
+    dynamic metadata,
+  }) = GenresCarouselItem;
 
-  const factory DUIOAuthResponseType.code({required String tokenEndpoint}) =
-      DUIOAuthCodeResponse;
-
-  const factory DUIOAuthResponseType.pkce({
-    required String tokenEndpoint,
-    required num pkceCodeLength,
-    required String pkceCodeMethod,
-    required bool formEncodeGrant,
-  }) = DUIOAuthPKCEResponse;
-
-  factory DUIOAuthResponseType.fromJson(Map<String, dynamic> json) =>
-      _$DUIOAuthResponseTypeFromJson(json);
-}
-
-@Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
-sealed class DUIType with _$DUIType {
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUISection({
-    required String id,
-    String? header,
-    String? footer,
-    required bool isHidden,
-    required List<DUIType> rows,
-  }) = DUISection;
-
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUISelect({
-    required String id,
-    required String label,
-    required List<String> options,
-    required bool allowsMultiselect,
-    required Map<String, String> labels,
-  }) = DUISelect;
-
-  @Implements<DUIInputType>()
-  const factory DUIType.DUIInputField({
-    required String id,
-    required String label,
-  }) = DUIInputField;
-
-  @Implements<DUIInputType>()
-  const factory DUIType.DUISecureInputField({
-    required String id,
-    required String label,
-  }) = DUISecureInputField;
-
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUIStepper({
-    required String id,
-    required String label,
-    num? min,
-    num? max,
-    num? step,
-  }) = DUIStepper;
-
-  @Implements<DUILabelType>()
-  const factory DUIType.DUILabel({
-    required String id,
-    required String label,
-    String? value,
-  }) = DUILabel;
-
-  @Implements<DUILabelType>()
-  const factory DUIType.DUIMultilineLabel({
-    required String id,
-    required String label,
-    required String value,
-  }) = DUIMultilineLabel;
-
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUIHeader({
-    required String id,
+  const factory DiscoverSectionItem.chapterUpdatesCarouselItem({
+    required String mangaId,
+    required String chapterId,
     required String imageUrl,
     required String title,
     String? subtitle,
-  }) = DUIHeader;
+    @NullableTimestampSerializer() DateTime? publishDate,
+    dynamic metadata,
+  }) = ChapterUpdatesCarouselItem;
 
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUIButton({required String id, required String label}) =
-      DUIButton;
+  const factory DiscoverSectionItem.prominentCarouselItem({
+    required String mangaId,
+    required String imageUrl,
+    required String title,
+    String? subtitle,
+    dynamic metadata,
+  }) = ProminentCarouselItem;
 
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUINavigationButton({
+  const factory DiscoverSectionItem.simpleCarouselItem({
+    required String mangaId,
+    required String imageUrl,
+    required String title,
+    String? subtitle,
+    dynamic metadata,
+  }) = SimpleCarouselItem;
+
+  const factory DiscoverSectionItem.featuredCarouselItem({
+    required String mangaId,
+    required String imageUrl,
+    required String title,
+    String? supertitle,
+    dynamic metadata,
+  }) = FeaturedCarouselItem;
+
+  factory DiscoverSectionItem.fromJson(Map<String, dynamic> json) =>
+      _$DiscoverSectionItemFromJson(json);
+}
+
+typedef SelectorID = String;
+typedef FormID = String;
+
+@freezed
+abstract class SelectRowOption with _$SelectRowOption {
+  const factory SelectRowOption({required String id, required String title}) =
+      _SelectRowOption;
+
+  factory SelectRowOption.fromJson(Map<String, dynamic> json) =>
+      _$SelectRowOptionFromJson(json);
+}
+
+@Freezed(unionKey: 'type')
+sealed class FormItemElement with _$FormItemElement {
+  const factory FormItemElement.labelRow({
     required String id,
-    required String label,
-    required DUIForm form,
-  }) = DUINavigationButton;
+    required bool isHidden,
+    required String title,
+    String? subtitle,
+    String? value,
+  }) = LabelRowElement;
 
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUISwitch({required String id, required String label}) =
-      DUISwitch;
-
-  @Implements<DUIFormRow>()
-  const factory DUIType.DUIOAuthButton({
+  const factory FormItemElement.inputRow({
     required String id,
-    required String label,
+    required bool isHidden,
+    required String title,
+    required String value,
+    required SelectorID onValueChange, // (value: string) => Promise<void>
+  }) = InputRowElement;
+
+  const factory FormItemElement.toggleRow({
+    required String id,
+    required bool isHidden,
+    required String title,
+    required bool value,
+    required SelectorID onValueChange, // (value: boolean) => Promise<void>
+  }) = ToggleRowElement;
+
+  const factory FormItemElement.selectRow({
+    required String id,
+    required bool isHidden,
+    required String title,
+    String? subtitle,
+    required List<String> value,
+    required int minItemCount,
+    int? maxItemCount,
+    required List<SelectRowOption> options,
+    required SelectorID onValueChange, // (value: string[]) => Promise<void>
+  }) = SelectRowElement;
+
+  const factory FormItemElement.buttonRow({
+    required String id,
+    required bool isHidden,
+    required String title,
+    required SelectorID onSelect, // () => Promise<void>
+  }) = ButtonRowElement;
+
+  const factory FormItemElement.navigationRow({
+    required String id,
+    required bool isHidden,
+    required String title,
+    String? subtitle,
+    String? value,
+    required FormID form,
+  }) = NavigationRowElement;
+
+  const factory FormItemElement.oauthButtonRow({
+    required String id,
+    required bool isHidden,
+    required String title,
+    String? subtitle,
+    required SelectorID
+    onSuccess, // (refreshToken: string, accessToken: string) => Promise<void>
     required String authorizeEndpoint,
-    required String clientId,
-    required DUIOAuthResponseType responseType,
+    required OAuthResponseType responseType,
+    String? clientId,
     String? redirectUri,
     List<String>? scopes,
-  }) = DUIOAuthButton;
+  }) = OAuthButtonRowElement;
 
-  const factory DUIType.DUIForm({
-    required List<DUISection> sections,
-    required bool hasSubmit,
-  }) = DUIForm;
+  factory FormItemElement.fromJson(Map<String, dynamic> json) =>
+      _$FormItemElementFromJson(json);
+}
 
-  factory DUIType.fromJson(Map<String, dynamic> json) =>
-      _$DUITypeFromJson(json);
+@freezed
+abstract class FormSectionElement with _$FormSectionElement {
+  const factory FormSectionElement({
+    required String id,
+    String? header,
+    String? footer,
+    required List<FormItemElement> items,
+  }) = _FormSectionElement;
+
+  factory FormSectionElement.fromJson(Map<String, dynamic> json) =>
+      _$FormSectionElementFromJson(json);
+}
+
+@freezed
+abstract class FilterOption with _$FilterOption {
+  const factory FilterOption({required String id, required String value}) =
+      _FilterOption;
+
+  factory FilterOption.fromJson(Map<String, dynamic> json) =>
+      _$FilterOptionFromJson(json);
+}
+
+@Freezed(unionKey: 'type')
+sealed class SearchFilter with _$SearchFilter {
+  const factory SearchFilter.dropdown({
+    required String id,
+    required String title,
+    required List<FilterOption> options,
+    required String value,
+  }) = DropdownSearchFilter;
+
+  const factory SearchFilter.multiselect({
+    required String id,
+    required String title,
+    required List<FilterOption> options,
+    required Map<String, String> value,
+    required bool allowExclusion,
+    required bool allowEmptySelection,
+    num? maximum,
+  }) = SelectSearchFilter;
+
+  const factory SearchFilter.tags({
+    required String id,
+    required String title,
+    required List<TagSection> sections,
+    required Map<String, Map<String, String>> value,
+    required bool allowExclusion,
+    required bool allowEmptySelection,
+    num? maximum,
+  }) = TagSearchFilter;
+
+  const factory SearchFilter.input({
+    required String id,
+    required String title,
+    required String placeholder,
+    required String value,
+  }) = InputSearchFilter;
+
+  factory SearchFilter.fromJson(Map<String, dynamic> json) =>
+      _$SearchFilterFromJson(json);
+}
+
+@freezed
+abstract class SearchFilterValue with _$SearchFilterValue {
+  const SearchFilterValue._();
+
+  const factory SearchFilterValue({required String id, required Object value}) =
+      _SearchFilterValue;
+
+  factory SearchFilterValue.fromJson(Map<String, dynamic> json) =>
+      _$SearchFilterValueFromJson(json);
+
+  factory SearchFilterValue.fromSearchFilter(SearchFilter filter) =>
+      SearchFilterValue(id: filter.id, value: filter.value);
 }

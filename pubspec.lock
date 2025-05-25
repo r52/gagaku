@@ -789,14 +789,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
-  input_quantity:
-    dependency: "direct main"
-    description:
-      name: input_quantity
-      sha256: "18a0785ad7b5e081ef05d585f2ff7a31512ba29637efa38048281d5d0512e0ff"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.1"
   intl:
     dependency: "direct main"
     description:

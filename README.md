@@ -4,7 +4,9 @@
 
 ![License](https://img.shields.io/github/license/r52/gagaku)
 
-Gagaku is a minimalist, super lightweight MangaDex client (with a few extra features). Currently supports (and is tested on) Windows and Android.
+Gagaku is a minimalist, lightweight manga reader with 3 main features: a MangaDex client, a local library reader, and a PB extension host.
+
+Currently supports (and is tested on) Windows and Android.
 
 Gagaku does NOT feature offline library management, chapter downloads, or any similar features.
 
@@ -15,8 +17,10 @@ Gagaku is licensed under the MIT license.
 ## Features
 
 - MangaDex client
-- Local CBZ/CBT file support, directory cataloging/scanning
-- Basic PB extension support (not all features supported)
+- Local CBZ/CBT file and image directory support, directory cataloging/scanning
+- Basic PB extension support
+  - v0.9 extensions only
+  - manga source providers only (tracking extensions not supported)
 - cubari.moe links
 - Deep link support
   - Android only, supports mangadex.org/cubari.moe links

@@ -92,6 +92,10 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                               onTapOutside: (event) => unfocusSearchBar(),
                               decoration: InputDecoration(
                                 hintText: tr.ui.filterItems,
+                                suffixIcon: IconButton(
+                                  onPressed: filterController.clear,
+                                  icon: Icon(Icons.clear),
+                                ),
                               ),
                             ),
                           ),

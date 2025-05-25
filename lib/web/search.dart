@@ -35,7 +35,7 @@ class ExtensionSearchPage extends StatelessWidget {
 
   final String sourceId;
   final WebSourceInfo? source;
-  final SearchRequest? query;
+  final SearchQuery? query;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,7 @@ class ExtensionSearchWidget extends StatefulHookConsumerWidget {
   const ExtensionSearchWidget({super.key, required this.source, this.query});
 
   final WebSourceInfo source;
-  final SearchRequest? query;
+  final SearchQuery? query;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -66,7 +66,7 @@ class ExtensionSearchWidget extends StatefulHookConsumerWidget {
 
 class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   Map<String, dynamic>? metadata = {'page': 1};
-  SearchRequest? query;
+  SearchQuery? query;
 
   late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
     getNextPageKey:
@@ -80,17 +80,13 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
           .read(extensionSourceProvider(widget.source.id).notifier)
           .searchManga(query!, metadata);
 
-      final m = results.results?.map(
-        (e) => HistoryLink.fromPartialSourceManga(widget.source, e),
+      final m = results.items.map(
+        (e) => HistoryLink.fromSearchReultItem(widget.source, e),
       );
 
       metadata = results.metadata;
 
-      if (m != null) {
-        return PageResultsMetaData(m.toList());
-      }
-
-      return PageResultsMetaData([]);
+      return PageResultsMetaData(m.toList());
     },
     getIsLastPage: (_, __) => metadata == null,
     refresh: () async {
@@ -164,7 +160,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                       query =
                           query != null
                               ? query!.copyWith(title: term.toLowerCase())
-                              : SearchRequest(title: term.toLowerCase());
+                              : SearchQuery(title: term.toLowerCase());
                     });
                     _pagingController.refresh();
                   },
@@ -173,35 +169,33 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                       message: tr.search.filters,
                       child: IconButton(
                         onPressed: () async {
-                          final result = await nav.push<(List<Tag>, List<Tag>)>(
-                            SlideTransitionRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      _ExtensionFilterWidget(
+                          final result = await nav
+                              .push<List<SearchFilterValue>>(
+                                SlideTransitionRouteBuilder(
+                                  pageBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                      ) => _ExtensionFilterWidget(
                                         source: widget.source,
-                                        filter: query,
+                                        query: query,
                                       ),
-                            ),
-                          );
+                                ),
+                              );
 
                           if (result != null) {
                             setState(() {
                               query =
                                   query != null
-                                      ? query!.copyWith(
-                                        includedTags: result.$1,
-                                        excludedTags: result.$2,
-                                      )
-                                      : SearchRequest(
-                                        includedTags: result.$1,
-                                        excludedTags: result.$2,
-                                      );
+                                      ? query!.copyWith(filters: result)
+                                      : SearchQuery(title: '', filters: result);
                             });
                             _pagingController.refresh();
                           }
                         },
                         color:
-                            (query == null || query!.isFiltersEmpty)
+                            (query == null || query!.filters.isEmpty)
                                 ? theme.disabledColor
                                 : null,
                         icon: const Icon(Icons.filter_list),
@@ -228,7 +222,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                   query =
                       query != null
                           ? query!.copyWith(title: term.toLowerCase())
-                          : SearchRequest(title: term.toLowerCase());
+                          : SearchQuery(title: term.toLowerCase());
                 });
                 _pagingController.refresh();
               },
@@ -260,7 +254,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                             query =
                                 query != null
                                     ? query!.copyWith(title: term.toLowerCase())
-                                    : SearchRequest(title: term.toLowerCase());
+                                    : SearchQuery(title: term.toLowerCase());
                           });
                           _pagingController.refresh();
                         },
@@ -282,24 +276,74 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   }
 }
 
-class _ExtensionFilterWidget extends HookConsumerWidget {
-  const _ExtensionFilterWidget({required this.source, this.filter});
+class _ExtensionFilterWidget extends StatefulHookConsumerWidget {
+  const _ExtensionFilterWidget({required this.source, this.query});
 
   final WebSourceInfo source;
-  final SearchRequest? filter;
+  final SearchQuery? query;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ExtensionFilterWidget> createState() =>
+      _ExtensionFilterWidgetState();
+}
+
+class _ExtensionFilterWidgetState
+    extends ConsumerState<_ExtensionFilterWidget> {
+  late ValueNotifier<List<SearchFilterValue>> fil;
+
+  ExpansionPanel _buildFilterPanel(SearchFilter filter, bool isExpanded) {
+    final tr = context.t;
+    return ExpansionPanel(
+      canTapOnHeader: true,
+      isExpanded: isExpanded,
+      headerBuilder:
+          (context, isExpanded) => switch (filter) {
+            // TODO: Handle this case.
+            DropdownSearchFilter() => throw UnimplementedError(),
+            // TODO: Handle this case.
+            SelectSearchFilter() => throw UnimplementedError(),
+            // TODO: Handle this case.
+            TagSearchFilter() => throw UnimplementedError(),
+            // TODO: Handle this case.
+            InputSearchFilter() => throw UnimplementedError(),
+          },
+      body: SizedBox(
+        width: double.infinity,
+        child: switch (filter) {
+          // TODO: Handle this case.
+          DropdownSearchFilter() => throw UnimplementedError(),
+          // TODO: Handle this case.
+          SelectSearchFilter() => throw UnimplementedError(),
+          // TODO: Handle this case.
+          TagSearchFilter() => throw UnimplementedError(),
+          // TODO: Handle this case.
+          InputSearchFilter() => throw UnimplementedError(),
+        },
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    fil = ValueNotifier(widget.query?.filters ?? []);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SimpleFutureBuilder(
       futureBuilder:
-          () => ref.read(extensionSourceProvider(source.id).notifier).getTags(),
+          () =>
+              ref
+                  .read(extensionSourceProvider(widget.source.id).notifier)
+                  .getFilters(),
+      keys: [widget.source],
       builder: (context, data) {
         final tr = context.t;
         final nav = Navigator.of(context);
-        final fil = useValueNotifier<(List<Tag>, List<Tag>)>((
-          filter?.includedTags ?? [],
-          filter?.excludedTags ?? [],
-        ));
+        // final fil = useValueNotifier<List<SearchFilter>>(
+        //   widget.query?.filters ?? [],
+        // );
 
         if (data == null) {
           return Scaffold(
@@ -331,7 +375,7 @@ class _ExtensionFilterWidget extends HookConsumerWidget {
                     message: tr.search.resetFilters,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        fil.value = ([], []);
+                        fil.value = [];
                       },
                       icon: const Icon(Icons.clear_all),
                       label: Text(tr.search.resetFilters),
@@ -353,170 +397,173 @@ class _ExtensionFilterWidget extends HookConsumerWidget {
           ),
           body: HookBuilder(
             builder: (context) {
-              final expanded = useState([false]);
+              // TODO filters
+              return Center(child: Text('TODO'));
 
-              final panelItems = [
-                ExpansionPanel(
-                  canTapOnHeader: true,
-                  isExpanded: expanded.value[0],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final included = useListenableSelector(
-                            fil,
-                            () => fil.value.$1,
-                          );
-                          final excluded = useListenableSelector(
-                            fil,
-                            () => fil.value.$2,
-                          );
+              // final expanded = useState([false]);
 
-                          final includedString = included
-                              .map((e) => e.label)
-                              .join(', ');
-                          final excludedString = excluded
-                              .map((e) => e.label)
-                              .join(', ');
+              // final panelItems = [
+              //   ExpansionPanel(
+              //     canTapOnHeader: true,
+              //     isExpanded: expanded.value[0],
+              //     headerBuilder:
+              //         (context, isExpanded) => HookBuilder(
+              //           builder: (context) {
+              //             final included = useListenableSelector(
+              //               fil,
+              //               () => fil.value.$1,
+              //             );
+              //             final excluded = useListenableSelector(
+              //               fil,
+              //               () => fil.value.$2,
+              //             );
 
-                          return ListTile(
-                            title: Text(
-                              tr.search.filterTags,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle:
-                                included.isEmpty && excluded.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          if (included.isNotEmpty)
-                                            TextSpan(
-                                              text: '+ ',
-                                              style: const TextStyle(
-                                                color: Colors.green,
-                                              ),
-                                            ),
-                                          if (included.isNotEmpty)
-                                            TextSpan(text: includedString),
-                                          if (included.isNotEmpty &&
-                                              excluded.isNotEmpty)
-                                            TextSpan(text: ', '),
-                                          if (excluded.isNotEmpty)
-                                            TextSpan(
-                                              text: '- ',
-                                              style: const TextStyle(
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          if (excluded.isNotEmpty)
-                                            TextSpan(text: excludedString),
-                                        ],
-                                      ),
-                                    ),
-                          );
-                        },
-                      ),
-                  body: SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final group in data) ...[
-                          _SectionHeader(
-                            key: ValueKey(group.label),
-                            header: group.label,
-                          ),
-                          _SectionChildren(
-                            key: ValueKey("_${group.label}Children"),
-                            children:
-                                group.tags
-                                    .map(
-                                      (e) => HookBuilder(
-                                        builder: (context) {
-                                          final value = useListenableSelector(
-                                            fil,
-                                            () =>
-                                                fil.value.$1.contains(e)
-                                                    ? true
-                                                    : (fil.value.$2.contains(e)
-                                                        ? false
-                                                        : null),
-                                          );
+              //             final includedString = included
+              //                 .map((e) => e.label)
+              //                 .join(', ');
+              //             final excludedString = excluded
+              //                 .map((e) => e.label)
+              //                 .join(', ');
 
-                                          return TriStateChip(
-                                            label: Text(e.label),
-                                            selectedColor: Colors.green,
-                                            unselectedColor: Colors.red,
-                                            onChanged: (bool? value) {
-                                              switch (value) {
-                                                case null:
-                                                  fil.value = (
-                                                    fil.value.$1
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                    fil.value.$2
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                  );
-                                                  break;
-                                                case true:
-                                                  fil.value = (
-                                                    [...fil.value.$1, e],
-                                                    fil.value.$2
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                  );
-                                                  break;
-                                                case false:
-                                                  fil.value = (
-                                                    fil.value.$1
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                    [...fil.value.$2, e],
-                                                  );
-                                                  break;
-                                              }
-                                            },
-                                            value: value,
-                                          );
-                                        },
-                                      ),
-                                    )
-                                    .toList(),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ];
+              //             return ListTile(
+              //               title: Text(
+              //                 tr.search.filterTags,
+              //                 style: const TextStyle(
+              //                   fontSize: 18,
+              //                   fontWeight: FontWeight.bold,
+              //                 ),
+              //               ),
+              //               subtitle:
+              //                   included.isEmpty && excluded.isEmpty
+              //                       ? Text(tr.search.any)
+              //                       : Text.rich(
+              //                         TextSpan(
+              //                           children: [
+              //                             if (included.isNotEmpty)
+              //                               TextSpan(
+              //                                 text: '+ ',
+              //                                 style: const TextStyle(
+              //                                   color: Colors.green,
+              //                                 ),
+              //                               ),
+              //                             if (included.isNotEmpty)
+              //                               TextSpan(text: includedString),
+              //                             if (included.isNotEmpty &&
+              //                                 excluded.isNotEmpty)
+              //                               TextSpan(text: ', '),
+              //                             if (excluded.isNotEmpty)
+              //                               TextSpan(
+              //                                 text: '- ',
+              //                                 style: const TextStyle(
+              //                                   color: Colors.red,
+              //                                 ),
+              //                               ),
+              //                             if (excluded.isNotEmpty)
+              //                               TextSpan(text: excludedString),
+              //                           ],
+              //                         ),
+              //                       ),
+              //             );
+              //           },
+              //         ),
+              //     body: SizedBox(
+              //       width: double.infinity,
+              //       child: Column(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           for (final group in data) ...[
+              //             _SectionHeader(
+              //               key: ValueKey(group.label),
+              //               header: group.label,
+              //             ),
+              //             _SectionChildren(
+              //               key: ValueKey("_${group.label}Children"),
+              //               children:
+              //                   group.tags
+              //                       .map(
+              //                         (e) => HookBuilder(
+              //                           builder: (context) {
+              //                             final value = useListenableSelector(
+              //                               fil,
+              //                               () =>
+              //                                   fil.value.$1.contains(e)
+              //                                       ? true
+              //                                       : (fil.value.$2.contains(e)
+              //                                           ? false
+              //                                           : null),
+              //                             );
 
-              return SafeArea(
-                child: SingleChildScrollView(
-                  child: ExpansionPanelList(
-                    expansionCallback: (panelIndex, isExpanded) {
-                      expanded.value[panelIndex] = isExpanded;
-                      expanded.value = [...expanded.value];
-                    },
-                    children: panelItems,
-                  ),
-                ),
-              );
+              //                             return TriStateChip(
+              //                               label: Text(e.label),
+              //                               selectedColor: Colors.green,
+              //                               unselectedColor: Colors.red,
+              //                               onChanged: (bool? value) {
+              //                                 switch (value) {
+              //                                   case null:
+              //                                     fil.value = (
+              //                                       fil.value.$1
+              //                                           .where(
+              //                                             (element) =>
+              //                                                 element != e,
+              //                                           )
+              //                                           .toList(),
+              //                                       fil.value.$2
+              //                                           .where(
+              //                                             (element) =>
+              //                                                 element != e,
+              //                                           )
+              //                                           .toList(),
+              //                                     );
+              //                                     break;
+              //                                   case true:
+              //                                     fil.value = (
+              //                                       [...fil.value.$1, e],
+              //                                       fil.value.$2
+              //                                           .where(
+              //                                             (element) =>
+              //                                                 element != e,
+              //                                           )
+              //                                           .toList(),
+              //                                     );
+              //                                     break;
+              //                                   case false:
+              //                                     fil.value = (
+              //                                       fil.value.$1
+              //                                           .where(
+              //                                             (element) =>
+              //                                                 element != e,
+              //                                           )
+              //                                           .toList(),
+              //                                       [...fil.value.$2, e],
+              //                                     );
+              //                                     break;
+              //                                 }
+              //                               },
+              //                               value: value,
+              //                             );
+              //                           },
+              //                         ),
+              //                       )
+              //                       .toList(),
+              //             ),
+              //           ],
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ];
+
+              // return SafeArea(
+              //   child: SingleChildScrollView(
+              //     child: ExpansionPanelList(
+              //       expansionCallback: (panelIndex, isExpanded) {
+              //         expanded.value[panelIndex] = isExpanded;
+              //         expanded.value = [...expanded.value];
+              //       },
+              //       children: panelItems,
+              //     ),
+              //   ),
+              // );
             },
           ),
         );
