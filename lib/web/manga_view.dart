@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -258,6 +259,41 @@ class WebMangaViewWidget extends HookConsumerWidget {
             ),
             SliverList.list(
               children: [
+                if (extdata != null &&
+                    extdata.mangaInfo.secondaryTitles.isNotEmpty)
+                  ExpansionTile(
+                    title: Text(tr.mangaView.altTitles),
+                    children: [
+                      for (final alttitle in extdata.mangaInfo.secondaryTitles)
+                        SizedBox(
+                          width: double.infinity,
+                          child: Material(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            child: InkWell(
+                              onTap:
+                                  () => Clipboard.setData(
+                                    ClipboardData(text: alttitle),
+                                  ).then((_) {
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        showCloseIcon: true,
+                                        duration: const Duration(
+                                          milliseconds: 1000,
+                                        ),
+                                        content: Text(tr.ui.copyClipboard),
+                                      ),
+                                    );
+                                  }),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(alttitle),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 if (manga.description.isNotEmpty)
                   ExpansionTile(
                     expandedCrossAxisAlignment: CrossAxisAlignment.start,
