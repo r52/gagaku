@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -300,23 +301,22 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                   .map(
                                     (e) => IconTextChip(
                                       text: e.title,
-                                      // TODO is this revivable?
-                                      // onPressed:
-                                      //     () => context.router.push(
-                                      //       ExtensionSearchRoute(
-                                      //         sourceId: handle.sourceId,
-                                      //         source: handle.parser,
-                                      //         query: SearchQuery(
-                                      //           title: '',
-                                      //           filters: [
-                                      //             SearchFilterValue(
-                                      //               id: tagsec.id,
-                                      //               value: {e.id: 'included'},
-                                      //             ),
-                                      //           ],
-                                      //         ),
-                                      //       ),
-                                      //     ),
+                                      onPressed:
+                                          () => context.router.push(
+                                            ExtensionSearchRoute(
+                                              sourceId: handle.sourceId,
+                                              source: handle.parser,
+                                              query: SearchQuery(
+                                                title: '',
+                                                filters: [
+                                                  SearchFilterValue(
+                                                    id: tagsec.id,
+                                                    value: {e.id: 'included'},
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
                                     ),
                                   )
                                   .toList(),
