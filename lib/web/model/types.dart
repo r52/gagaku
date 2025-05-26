@@ -274,7 +274,6 @@ abstract class WebChapter with _$WebChapter {
     @EpochTimestampSerializer() DateTime? lastUpdated,
     @MappedEpochTimestampSerializer() DateTime? releaseDate,
     @ChapterGroupSerializer() required Map<String, dynamic> groups,
-    Chapter? data,
   }) = _WebChapter;
 
   factory WebChapter.fromJson(Map<String, dynamic> json) =>

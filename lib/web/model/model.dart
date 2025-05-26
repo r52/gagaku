@@ -1140,7 +1140,6 @@ return p;
                   volume: e.volume?.toString(),
                   groups: {e.version ?? sourceId: e},
                   releaseDate: e.publishDate,
-                  data: e,
                 ),
               ),
             )

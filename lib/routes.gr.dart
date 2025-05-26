@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i29;
+import 'package:collection/collection.dart' as _i34;
 import 'package:flutter/foundation.dart' as _i33;
 import 'package:flutter/material.dart' as _i30;
 import 'package:gagaku/local/main.dart' as _i5;
@@ -85,8 +86,10 @@ class ExtensionHomeRoute extends _i29.PageRouteInfo<ExtensionHomeRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionHomeRouteArgs>(
-        orElse: () =>
-            ExtensionHomeRouteArgs(sourceId: pathParams.getString('sourceId')),
+        orElse:
+            () => ExtensionHomeRouteArgs(
+              sourceId: pathParams.getString('sourceId'),
+            ),
       );
       return _i2.ExtensionHomePage(
         key: args.key,
@@ -110,6 +113,18 @@ class ExtensionHomeRouteArgs {
   String toString() {
     return 'ExtensionHomeRouteArgs{key: $key, sourceId: $sourceId, source: $source}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ExtensionHomeRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        source == other.source;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ sourceId.hashCode ^ source.hashCode;
 }
 
 /// generated route for
@@ -147,11 +162,12 @@ class ExtensionReaderRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionReaderRouteArgs>(
-        orElse: () => ExtensionReaderRouteArgs(
-          sourceId: pathParams.getString('sourceId'),
-          mangaId: pathParams.getString('mangaId'),
-          chapterId: pathParams.getString('chapterId'),
-        ),
+        orElse:
+            () => ExtensionReaderRouteArgs(
+              sourceId: pathParams.getString('sourceId'),
+              mangaId: pathParams.getString('mangaId'),
+              chapterId: pathParams.getString('chapterId'),
+            ),
       );
       return _i3.ExtensionReaderPage(
         key: args.key,
@@ -187,6 +203,25 @@ class ExtensionReaderRouteArgs {
   String toString() {
     return 'ExtensionReaderRouteArgs{key: $key, sourceId: $sourceId, mangaId: $mangaId, chapterId: $chapterId, readerData: $readerData}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ExtensionReaderRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        mangaId == other.mangaId &&
+        chapterId == other.chapterId &&
+        readerData == other.readerData;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      sourceId.hashCode ^
+      mangaId.hashCode ^
+      chapterId.hashCode ^
+      readerData.hashCode;
 }
 
 /// generated route for
@@ -218,9 +253,10 @@ class ExtensionSearchRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionSearchRouteArgs>(
-        orElse: () => ExtensionSearchRouteArgs(
-          sourceId: pathParams.getString('sourceId'),
-        ),
+        orElse:
+            () => ExtensionSearchRouteArgs(
+              sourceId: pathParams.getString('sourceId'),
+            ),
       );
       return _i4.ExtensionSearchPage(
         key: args.key,
@@ -252,6 +288,20 @@ class ExtensionSearchRouteArgs {
   String toString() {
     return 'ExtensionSearchRouteArgs{key: $key, sourceId: $sourceId, source: $source, query: $query}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ExtensionSearchRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        source == other.source &&
+        query == other.query;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ sourceId.hashCode ^ source.hashCode ^ query.hashCode;
 }
 
 /// generated route for
@@ -311,6 +361,16 @@ class MangaDexChapterFeedRouteArgs {
   String toString() {
     return 'MangaDexChapterFeedRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexChapterFeedRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -356,9 +416,10 @@ class MangaDexCreatorViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexCreatorViewRouteArgs>(
-        orElse: () => MangaDexCreatorViewRouteArgs(
-          creatorId: pathParams.getString('creatorId'),
-        ),
+        orElse:
+            () => MangaDexCreatorViewRouteArgs(
+              creatorId: pathParams.getString('creatorId'),
+            ),
       );
       return _i8.MangaDexCreatorViewPage(
         key: args.key,
@@ -386,6 +447,18 @@ class MangaDexCreatorViewRouteArgs {
   String toString() {
     return 'MangaDexCreatorViewRouteArgs{key: $key, creatorId: $creatorId, creator: $creator}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexCreatorViewRouteArgs) return false;
+    return key == other.key &&
+        creatorId == other.creatorId &&
+        creator == other.creator;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ creatorId.hashCode ^ creator.hashCode;
 }
 
 /// generated route for
@@ -415,10 +488,11 @@ class MangaDexCreatorViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexCreatorViewWithNameRouteArgs>(
-        orElse: () => MangaDexCreatorViewWithNameRouteArgs(
-          creatorId: pathParams.getString('creatorId'),
-          name: pathParams.optString('name'),
-        ),
+        orElse:
+            () => MangaDexCreatorViewWithNameRouteArgs(
+              creatorId: pathParams.getString('creatorId'),
+              name: pathParams.optString('name'),
+            ),
       );
       return _i8.MangaDexCreatorViewWithNamePage(
         key: args.key,
@@ -446,6 +520,18 @@ class MangaDexCreatorViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexCreatorViewWithNameRouteArgs{key: $key, creatorId: $creatorId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexCreatorViewWithNameRouteArgs) return false;
+    return key == other.key &&
+        creatorId == other.creatorId &&
+        name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ creatorId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
@@ -471,8 +557,10 @@ class MangaDexEditListRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexEditListRouteArgs>(
-        orElse: () =>
-            MangaDexEditListRouteArgs(listId: pathParams.optString('listId')),
+        orElse:
+            () => MangaDexEditListRouteArgs(
+              listId: pathParams.optString('listId'),
+            ),
       );
       return _i7.MangaDexEditListScreen(
         key: args.key,
@@ -496,6 +584,16 @@ class MangaDexEditListRouteArgs {
   String toString() {
     return 'MangaDexEditListRouteArgs{key: $key, listId: $listId, list: $list}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexEditListRouteArgs) return false;
+    return key == other.key && listId == other.listId && list == other.list;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ listId.hashCode ^ list.hashCode;
 }
 
 /// generated route for
@@ -535,6 +633,16 @@ class MangaDexFrontRouteArgs {
   String toString() {
     return 'MangaDexFrontRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexFrontRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -580,9 +688,10 @@ class MangaDexGroupViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexGroupViewRouteArgs>(
-        orElse: () => MangaDexGroupViewRouteArgs(
-          groupId: pathParams.getString('groupId'),
-        ),
+        orElse:
+            () => MangaDexGroupViewRouteArgs(
+              groupId: pathParams.getString('groupId'),
+            ),
       );
       return _i11.MangaDexGroupViewPage(
         key: args.key,
@@ -610,6 +719,16 @@ class MangaDexGroupViewRouteArgs {
   String toString() {
     return 'MangaDexGroupViewRouteArgs{key: $key, groupId: $groupId, group: $group}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexGroupViewRouteArgs) return false;
+    return key == other.key && groupId == other.groupId && group == other.group;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ groupId.hashCode ^ group.hashCode;
 }
 
 /// generated route for
@@ -639,10 +758,11 @@ class MangaDexGroupViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexGroupViewWithNameRouteArgs>(
-        orElse: () => MangaDexGroupViewWithNameRouteArgs(
-          groupId: pathParams.getString('groupId'),
-          name: pathParams.optString('name'),
-        ),
+        orElse:
+            () => MangaDexGroupViewWithNameRouteArgs(
+              groupId: pathParams.getString('groupId'),
+              name: pathParams.optString('name'),
+            ),
       );
       return _i11.MangaDexGroupViewWithNamePage(
         key: args.key,
@@ -670,6 +790,16 @@ class MangaDexGroupViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexGroupViewWithNameRouteArgs{key: $key, groupId: $groupId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexGroupViewWithNameRouteArgs) return false;
+    return key == other.key && groupId == other.groupId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ groupId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
@@ -713,6 +843,16 @@ class MangaDexHistoryFeedRouteArgs {
   String toString() {
     return 'MangaDexHistoryFeedRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexHistoryFeedRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -772,6 +912,16 @@ class MangaDexLibraryRouteArgs {
   String toString() {
     return 'MangaDexLibraryRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexLibraryRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -796,8 +946,10 @@ class MangaDexListViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexListViewRouteArgs>(
-        orElse: () =>
-            MangaDexListViewRouteArgs(listId: pathParams.getString('listId')),
+        orElse:
+            () => MangaDexListViewRouteArgs(
+              listId: pathParams.getString('listId'),
+            ),
       );
       return _i15.MangaDexListViewPage(key: args.key, listId: args.listId);
     },
@@ -815,6 +967,16 @@ class MangaDexListViewRouteArgs {
   String toString() {
     return 'MangaDexListViewRouteArgs{key: $key, listId: $listId}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexListViewRouteArgs) return false;
+    return key == other.key && listId == other.listId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ listId.hashCode;
 }
 
 /// generated route for
@@ -844,10 +1006,11 @@ class MangaDexListViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexListViewWithNameRouteArgs>(
-        orElse: () => MangaDexListViewWithNameRouteArgs(
-          listId: pathParams.getString('listId'),
-          name: pathParams.optString('name'),
-        ),
+        orElse:
+            () => MangaDexListViewWithNameRouteArgs(
+              listId: pathParams.getString('listId'),
+              name: pathParams.optString('name'),
+            ),
       );
       return _i15.MangaDexListViewWithNamePage(
         key: args.key,
@@ -875,6 +1038,16 @@ class MangaDexListViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexListViewWithNameRouteArgs{key: $key, listId: $listId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexListViewWithNameRouteArgs) return false;
+    return key == other.key && listId == other.listId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ listId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
@@ -914,6 +1087,16 @@ class MangaDexListsRouteArgs {
   String toString() {
     return 'MangaDexListsRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexListsRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -959,9 +1142,10 @@ class MangaDexMangaViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexMangaViewRouteArgs>(
-        orElse: () => MangaDexMangaViewRouteArgs(
-          mangaId: pathParams.getString('mangaId'),
-        ),
+        orElse:
+            () => MangaDexMangaViewRouteArgs(
+              mangaId: pathParams.getString('mangaId'),
+            ),
       );
       return _i18.MangaDexMangaViewPage(
         key: args.key,
@@ -989,6 +1173,16 @@ class MangaDexMangaViewRouteArgs {
   String toString() {
     return 'MangaDexMangaViewRouteArgs{key: $key, mangaId: $mangaId, manga: $manga}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexMangaViewRouteArgs) return false;
+    return key == other.key && mangaId == other.mangaId && manga == other.manga;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ mangaId.hashCode ^ manga.hashCode;
 }
 
 /// generated route for
@@ -1018,10 +1212,11 @@ class MangaDexMangaViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexMangaViewWithNameRouteArgs>(
-        orElse: () => MangaDexMangaViewWithNameRouteArgs(
-          mangaId: pathParams.getString('mangaId'),
-          name: pathParams.optString('name'),
-        ),
+        orElse:
+            () => MangaDexMangaViewWithNameRouteArgs(
+              mangaId: pathParams.getString('mangaId'),
+              name: pathParams.optString('name'),
+            ),
       );
       return _i18.MangaDexMangaViewWithNamePage(
         key: args.key,
@@ -1049,6 +1244,16 @@ class MangaDexMangaViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexMangaViewWithNameRouteArgs{key: $key, mangaId: $mangaId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexMangaViewWithNameRouteArgs) return false;
+    return key == other.key && mangaId == other.mangaId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ mangaId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
@@ -1077,9 +1282,10 @@ class MangaDexReaderRoute extends _i29.PageRouteInfo<MangaDexReaderRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexReaderRouteArgs>(
-        orElse: () => MangaDexReaderRouteArgs(
-          chapterId: pathParams.getString('chapterId'),
-        ),
+        orElse:
+            () => MangaDexReaderRouteArgs(
+              chapterId: pathParams.getString('chapterId'),
+            ),
       );
       return _i19.MangaDexReaderPage(
         key: args.key,
@@ -1107,6 +1313,18 @@ class MangaDexReaderRouteArgs {
   String toString() {
     return 'MangaDexReaderRouteArgs{key: $key, chapterId: $chapterId, readerData: $readerData}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexReaderRouteArgs) return false;
+    return key == other.key &&
+        chapterId == other.chapterId &&
+        readerData == other.readerData;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ chapterId.hashCode ^ readerData.hashCode;
 }
 
 /// generated route for
@@ -1150,6 +1368,16 @@ class MangaDexRecentFeedRouteArgs {
   String toString() {
     return 'MangaDexRecentFeedRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexRecentFeedRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -1210,6 +1438,23 @@ class MangaDexSearchRouteArgs {
   String toString() {
     return 'MangaDexSearchRouteArgs{key: $key, selectMode: $selectMode, selectedTitles: $selectedTitles, parameters: $parameters}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexSearchRouteArgs) return false;
+    return key == other.key &&
+        selectMode == other.selectMode &&
+        const _i34.SetEquality().equals(selectedTitles, other.selectedTitles) &&
+        parameters == other.parameters;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      selectMode.hashCode ^
+      const _i34.SetEquality().hash(selectedTitles) ^
+      parameters.hashCode;
 }
 
 /// generated route for
@@ -1235,8 +1480,9 @@ class MangaDexTagViewRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexTagViewRouteArgs>(
-        orElse: () =>
-            MangaDexTagViewRouteArgs(tagId: pathParams.getString('tagId')),
+        orElse:
+            () =>
+                MangaDexTagViewRouteArgs(tagId: pathParams.getString('tagId')),
       );
       return _i22.MangaDexTagViewPage(
         key: args.key,
@@ -1260,6 +1506,16 @@ class MangaDexTagViewRouteArgs {
   String toString() {
     return 'MangaDexTagViewRouteArgs{key: $key, tagId: $tagId, tag: $tag}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexTagViewRouteArgs) return false;
+    return key == other.key && tagId == other.tagId && tag == other.tag;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ tagId.hashCode ^ tag.hashCode;
 }
 
 /// generated route for
@@ -1289,10 +1545,11 @@ class MangaDexTagViewWithNameRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<MangaDexTagViewWithNameRouteArgs>(
-        orElse: () => MangaDexTagViewWithNameRouteArgs(
-          tagId: pathParams.getString('tagId'),
-          name: pathParams.optString('name'),
-        ),
+        orElse:
+            () => MangaDexTagViewWithNameRouteArgs(
+              tagId: pathParams.getString('tagId'),
+              name: pathParams.optString('name'),
+            ),
       );
       return _i22.MangaDexTagViewWithNamePage(
         key: args.key,
@@ -1320,6 +1577,16 @@ class MangaDexTagViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexTagViewWithNameRouteArgs{key: $key, tagId: $tagId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexTagViewWithNameRouteArgs) return false;
+    return key == other.key && tagId == other.tagId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ tagId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
@@ -1361,6 +1628,16 @@ class NotFoundRouteArgs {
   String toString() {
     return 'NotFoundRouteArgs{key: $key, uri: $uri}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! NotFoundRouteArgs) return false;
+    return key == other.key && uri == other.uri;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ uri.hashCode;
 }
 
 /// generated route for
@@ -1396,11 +1673,12 @@ class ProxyWebSourceReaderRoute
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ProxyWebSourceReaderRouteArgs>(
-        orElse: () => ProxyWebSourceReaderRouteArgs(
-          proxy: pathParams.getString('proxy'),
-          code: pathParams.getString('code'),
-          chapter: pathParams.getString('chapter'),
-        ),
+        orElse:
+            () => ProxyWebSourceReaderRouteArgs(
+              proxy: pathParams.getString('proxy'),
+              code: pathParams.getString('code'),
+              chapter: pathParams.getString('chapter'),
+            ),
       );
       return _i3.ProxyWebSourceReaderPage(
         key: args.key,
@@ -1440,6 +1718,27 @@ class ProxyWebSourceReaderRouteArgs {
   String toString() {
     return 'ProxyWebSourceReaderRouteArgs{key: $key, proxy: $proxy, code: $code, chapter: $chapter, page: $page, readerData: $readerData}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ProxyWebSourceReaderRouteArgs) return false;
+    return key == other.key &&
+        proxy == other.proxy &&
+        code == other.code &&
+        chapter == other.chapter &&
+        page == other.page &&
+        readerData == other.readerData;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      proxy.hashCode ^
+      code.hashCode ^
+      chapter.hashCode ^
+      page.hashCode ^
+      readerData.hashCode;
 }
 
 /// generated route for
@@ -1470,10 +1769,11 @@ class WebMangaViewRoute extends _i29.PageRouteInfo<WebMangaViewRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<WebMangaViewRouteArgs>(
-        orElse: () => WebMangaViewRouteArgs(
-          sourceId: pathParams.getString('sourceId'),
-          mangaId: pathParams.getString('mangaId'),
-        ),
+        orElse:
+            () => WebMangaViewRouteArgs(
+              sourceId: pathParams.getString('sourceId'),
+              mangaId: pathParams.getString('mangaId'),
+            ),
       );
       return _i24.WebMangaViewPage(
         key: args.key,
@@ -1505,6 +1805,20 @@ class WebMangaViewRouteArgs {
   String toString() {
     return 'WebMangaViewRouteArgs{key: $key, sourceId: $sourceId, mangaId: $mangaId, handle: $handle}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebMangaViewRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        mangaId == other.mangaId &&
+        handle == other.handle;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ sourceId.hashCode ^ mangaId.hashCode ^ handle.hashCode;
 }
 
 /// generated route for
@@ -1548,6 +1862,16 @@ class WebSourceFavoritesRouteArgs {
   String toString() {
     return 'WebSourceFavoritesRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceFavoritesRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -1598,6 +1922,18 @@ class WebSourceFrontRouteArgs {
   String toString() {
     return 'WebSourceFrontRouteArgs{key: $key, controller: $controller, process: $process}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceFrontRouteArgs) return false;
+    return key == other.key &&
+        controller == other.controller &&
+        process == other.process;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode ^ process.hashCode;
 }
 
 /// generated route for
@@ -1641,6 +1977,16 @@ class WebSourceHistoryRouteArgs {
   String toString() {
     return 'WebSourceHistoryRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceHistoryRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
@@ -1700,4 +2046,14 @@ class WebSourceUpdatesRouteArgs {
   String toString() {
     return 'WebSourceUpdatesRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceUpdatesRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }

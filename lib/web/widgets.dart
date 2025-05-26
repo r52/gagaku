@@ -659,6 +659,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ),
     );
 
+    final sourceValue = data.chapter.groups.entries.first.value;
     String title = data.chapter.getTitle(chapterkey);
     final groupKey = data.chapter.groups.entries.first.key;
     final groupText =
@@ -678,8 +679,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
     }
 
     final language =
-        data.chapter.data != null
-            ? CountryFlag(flag: data.chapter.data!.langCode, size: 12)
+        sourceValue is Chapter
+            ? CountryFlag(flag: sourceValue.langCode, size: 12)
             : null;
 
     final border = Border(
@@ -722,7 +723,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     );
 
     final readerData = WebReaderData(
-      source: data.chapter.groups.entries.first.value,
+      source: sourceValue,
       title: title,
       link: manga.title,
       handle: handle,
@@ -741,8 +742,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       route = ExtensionReaderRoute(
         sourceId: handle.sourceId,
         mangaId: handle.location,
-        chapterId:
-            (data.chapter.groups.entries.first.value as Chapter).chapterId,
+        chapterId: (sourceValue as Chapter).chapterId,
         readerData: readerData,
       );
     }

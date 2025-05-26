@@ -659,7 +659,7 @@ $SourceMangaCopyWith<$Res>? get data {
 /// @nodoc
 mixin _$WebChapter {
 
- String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate;@ChapterGroupSerializer() Map<String, dynamic> get groups; Chapter? get data;
+ String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate;@ChapterGroupSerializer() Map<String, dynamic> get groups;
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -672,16 +672,16 @@ $WebChapterCopyWith<WebChapter> get copyWith => _$WebChapterCopyWithImpl<WebChap
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups)&&(identical(other.data, data) || other.data == data));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups),data);
+int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups));
 
 @override
 String toString() {
-  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups, data: $data)';
+  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
 }
 
 
@@ -692,11 +692,11 @@ abstract mixin class $WebChapterCopyWith<$Res>  {
   factory $WebChapterCopyWith(WebChapter value, $Res Function(WebChapter) _then) = _$WebChapterCopyWithImpl;
 @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups, Chapter? data
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups
 });
 
 
-$ChapterCopyWith<$Res>? get data;
+
 
 }
 /// @nodoc
@@ -709,30 +709,17 @@ class _$WebChapterCopyWithImpl<$Res>
 
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,Object? data = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,}) {
   return _then(_self.copyWith(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,releaseDate: freezed == releaseDate ? _self.releaseDate : releaseDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,groups: null == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as Chapter?,
+as Map<String, dynamic>,
   ));
 }
-/// Create a copy of WebChapter
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$ChapterCopyWith<$Res>? get data {
-    if (_self.data == null) {
-    return null;
-  }
 
-  return $ChapterCopyWith<$Res>(_self.data!, (value) {
-    return _then(_self.copyWith(data: value));
-  });
-}
 }
 
 
@@ -740,7 +727,7 @@ $ChapterCopyWith<$Res>? get data {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _WebChapter extends WebChapter {
-  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, @ChapterGroupSerializer() required this.groups, this.data}): super._();
+  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, @ChapterGroupSerializer() required this.groups}): super._();
   factory _WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
 
 @override final  String? title;
@@ -748,7 +735,6 @@ class _WebChapter extends WebChapter {
 @override@EpochTimestampSerializer() final  DateTime? lastUpdated;
 @override@MappedEpochTimestampSerializer() final  DateTime? releaseDate;
 @override@ChapterGroupSerializer() final  Map<String, dynamic> groups;
-@override final  Chapter? data;
 
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
@@ -763,16 +749,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups)&&(identical(other.data, data) || other.data == data));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups),data);
+int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups));
 
 @override
 String toString() {
-  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups, data: $data)';
+  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
 }
 
 
@@ -783,11 +769,11 @@ abstract mixin class _$WebChapterCopyWith<$Res> implements $WebChapterCopyWith<$
   factory _$WebChapterCopyWith(_WebChapter value, $Res Function(_WebChapter) _then) = __$WebChapterCopyWithImpl;
 @override @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups, Chapter? data
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups
 });
 
 
-@override $ChapterCopyWith<$Res>? get data;
+
 
 }
 /// @nodoc
@@ -800,31 +786,18 @@ class __$WebChapterCopyWithImpl<$Res>
 
 /// Create a copy of WebChapter
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,Object? data = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,}) {
   return _then(_WebChapter(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,releaseDate: freezed == releaseDate ? _self.releaseDate : releaseDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,groups: null == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as Chapter?,
+as Map<String, dynamic>,
   ));
 }
 
-/// Create a copy of WebChapter
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$ChapterCopyWith<$Res>? get data {
-    if (_self.data == null) {
-    return null;
-  }
 
-  return $ChapterCopyWith<$Res>(_self.data!, (value) {
-    return _then(_self.copyWith(data: value));
-  });
-}
 }
 
 

@@ -117,10 +117,6 @@ _WebChapter _$WebChapterFromJson(Map<String, dynamic> json) => _WebChapter(
     json['release_date'],
   ),
   groups: const ChapterGroupSerializer().fromJson(json['groups']),
-  data:
-      json['data'] == null
-          ? null
-          : Chapter.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$WebChapterToJson(
@@ -133,7 +129,6 @@ Map<String, dynamic> _$WebChapterToJson(
     instance.releaseDate,
   ),
   'groups': const ChapterGroupSerializer().toJson(instance.groups),
-  'data': instance.data?.toJson(),
 };
 
 _ImgurPage _$ImgurPageFromJson(Map<String, dynamic> json) => _ImgurPage(
