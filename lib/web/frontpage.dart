@@ -243,19 +243,19 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     const style = TextStyle(fontSize: 24);
     final controller = useScrollController();
     final refresh = useState(0);
-    final results = useMemoized(
+    final sectionsFuture = useMemoized(
       () =>
           ref
               .read(extensionSourceProvider(source.id).notifier)
               .getDiscoverSections(),
       [source, refresh.value],
     );
-    final future = useFuture(results);
+    final sectionsSnapshot = useFuture(sectionsFuture);
     final slivers = <Widget>[];
 
-    if (future.hasError) {
-      final error = future.error!;
-      final stackTrace = future.stackTrace!;
+    if (sectionsSnapshot.hasError) {
+      final error = sectionsSnapshot.error!;
+      final stackTrace = sectionsSnapshot.stackTrace!;
       final msg = "ExtensionSource(${source.id}).getDiscoverSections() failed";
 
       Styles.showErrorSnackBar(messenger, '$error');
@@ -268,7 +268,8 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       );
     }
 
-    if (future.connectionState == ConnectionState.waiting || !future.hasData) {
+    if (sectionsSnapshot.connectionState == ConnectionState.waiting ||
+        !sectionsSnapshot.hasData) {
       slivers.add(
         const SliverToBoxAdapter(
           child: Center(child: CircularProgressIndicator()),
@@ -276,12 +277,12 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       );
     }
 
-    if (future.data != null) {
-      final data = future.data!;
+    if (sectionsSnapshot.data != null) {
+      final sections = sectionsSnapshot.data!;
       final homepageWidgets = <Widget>[];
       final sectionItems = useMemoized(
         () => Future.wait(
-          data.map(
+          sections.map(
             (e) => ref
                 .read(extensionSourceProvider(source.id).notifier)
                 .getDiscoverSectionItems(e, null),
@@ -317,7 +318,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       }
 
       if (itemFuture.hasData) {
-        for (final (idx, section) in data.indexed) {
+        for (final (idx, section) in sections.indexed) {
           final sectionResults = itemFuture.data!.elementAt(idx);
           if (sectionResults.metadata != null) {
             homepageWidgets.add(
@@ -353,6 +354,56 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                     )
                     .toList();
             homepageWidgets.add(MangaCarousel(items: mangas));
+          } else {
+            homepageWidgets.add(
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 256),
+                  child: CarouselView(
+                    itemExtent: 180,
+                    shrinkExtent: 180,
+                    enableSplash: true,
+                    onTap: (idx) {
+                      final element =
+                          sectionResults.items.elementAt(idx)
+                              as GenresCarouselItem;
+
+                      context.router.push(
+                        ExtensionSearchRoute(
+                          sourceId: source.id,
+                          source: source,
+                          query: element.searchQuery,
+                        ),
+                      );
+                    },
+                    children:
+                        sectionResults.items
+                            .map(
+                              (e) => ColoredBox(
+                                color: theme.colorScheme.primaryContainer,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.theater_comedy, size: 32.0),
+                                      Text(
+                                        (e as GenresCarouselItem).name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.clip,
+                                        softWrap: false,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                ),
+              ),
+            );
           }
         }
       }
@@ -421,7 +472,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () {
           refresh.value++;
-          return results;
+          return sectionsFuture;
         },
         child: ScrollConfiguration(
           behavior: const MouseTouchScrollBehavior(),

@@ -554,6 +554,9 @@ GenresCarouselItem _$GenresCarouselItemFromJson(Map<String, dynamic> json) =>
       ),
       name: json['name'] as String,
       metadata: json['metadata'],
+      contentRating: const NullableContentRatingParser().fromJson(
+        json['contentRating'],
+      ),
       $type: json['type'] as String?,
     );
 
@@ -562,6 +565,9 @@ Map<String, dynamic> _$GenresCarouselItemToJson(GenresCarouselItem instance) =>
       'searchQuery': instance.searchQuery.toJson(),
       'name': instance.name,
       'metadata': instance.metadata,
+      'contentRating': const NullableContentRatingParser().toJson(
+        instance.contentRating,
+      ),
       'type': instance.$type,
     };
 
@@ -577,6 +583,9 @@ ChapterUpdatesCarouselItem _$ChapterUpdatesCarouselItemFromJson(
     json['publishDate'],
   ),
   metadata: json['metadata'],
+  contentRating: const NullableContentRatingParser().fromJson(
+    json['contentRating'],
+  ),
   $type: json['type'] as String?,
 );
 
@@ -592,6 +601,9 @@ Map<String, dynamic> _$ChapterUpdatesCarouselItemToJson(
     instance.publishDate,
   ),
   'metadata': instance.metadata,
+  'contentRating': const NullableContentRatingParser().toJson(
+    instance.contentRating,
+  ),
   'type': instance.$type,
 };
 
@@ -603,6 +615,9 @@ ProminentCarouselItem _$ProminentCarouselItemFromJson(
   title: json['title'] as String,
   subtitle: json['subtitle'] as String?,
   metadata: json['metadata'],
+  contentRating: const NullableContentRatingParser().fromJson(
+    json['contentRating'],
+  ),
   $type: json['type'] as String?,
 );
 
@@ -614,6 +629,9 @@ Map<String, dynamic> _$ProminentCarouselItemToJson(
   'title': instance.title,
   'subtitle': instance.subtitle,
   'metadata': instance.metadata,
+  'contentRating': const NullableContentRatingParser().toJson(
+    instance.contentRating,
+  ),
   'type': instance.$type,
 };
 
@@ -624,6 +642,9 @@ SimpleCarouselItem _$SimpleCarouselItemFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       subtitle: json['subtitle'] as String?,
       metadata: json['metadata'],
+      contentRating: const NullableContentRatingParser().fromJson(
+        json['contentRating'],
+      ),
       $type: json['type'] as String?,
     );
 
@@ -634,6 +655,9 @@ Map<String, dynamic> _$SimpleCarouselItemToJson(SimpleCarouselItem instance) =>
       'title': instance.title,
       'subtitle': instance.subtitle,
       'metadata': instance.metadata,
+      'contentRating': const NullableContentRatingParser().toJson(
+        instance.contentRating,
+      ),
       'type': instance.$type,
     };
 
@@ -645,6 +669,9 @@ FeaturedCarouselItem _$FeaturedCarouselItemFromJson(
   title: json['title'] as String,
   supertitle: json['supertitle'] as String?,
   metadata: json['metadata'],
+  contentRating: const NullableContentRatingParser().fromJson(
+    json['contentRating'],
+  ),
   $type: json['type'] as String?,
 );
 
@@ -656,6 +683,9 @@ Map<String, dynamic> _$FeaturedCarouselItemToJson(
   'title': instance.title,
   'supertitle': instance.supertitle,
   'metadata': instance.metadata,
+  'contentRating': const NullableContentRatingParser().toJson(
+    instance.contentRating,
+  ),
   'type': instance.$type,
 };
 

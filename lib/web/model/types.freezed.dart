@@ -4093,7 +4093,7 @@ DiscoverSectionItem _$DiscoverSectionItemFromJson(
 /// @nodoc
 mixin _$DiscoverSectionItem {
 
- dynamic get metadata;
+ dynamic get metadata;@NullableContentRatingParser() ContentRating? get contentRating;
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -4106,16 +4106,16 @@ $DiscoverSectionItemCopyWith<DiscoverSectionItem> get copyWith => _$DiscoverSect
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverSectionItem&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverSectionItem&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(metadata));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(metadata),contentRating);
 
 @override
 String toString() {
-  return 'DiscoverSectionItem(metadata: $metadata)';
+  return 'DiscoverSectionItem(metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -4126,7 +4126,7 @@ abstract mixin class $DiscoverSectionItemCopyWith<$Res>  {
   factory $DiscoverSectionItemCopyWith(DiscoverSectionItem value, $Res Function(DiscoverSectionItem) _then) = _$DiscoverSectionItemCopyWithImpl;
 @useResult
 $Res call({
- dynamic metadata
+ dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
 });
 
 
@@ -4143,10 +4143,11 @@ class _$DiscoverSectionItemCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? metadata = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? metadata = freezed,Object? contentRating = freezed,}) {
   return _then(_self.copyWith(
 metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,contentRating: freezed == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
+as ContentRating?,
   ));
 }
 
@@ -4157,12 +4158,13 @@ as dynamic,
 @JsonSerializable()
 
 class GenresCarouselItem implements DiscoverSectionItem {
-  const GenresCarouselItem({required this.searchQuery, required this.name, this.metadata, final  String? $type}): $type = $type ?? 'genresCarouselItem';
+  const GenresCarouselItem({required this.searchQuery, required this.name, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'genresCarouselItem';
   factory GenresCarouselItem.fromJson(Map<String, dynamic> json) => _$GenresCarouselItemFromJson(json);
 
  final  SearchQuery searchQuery;
  final  String name;
 @override final  dynamic metadata;
+@override@NullableContentRatingParser() final  ContentRating? contentRating;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -4181,16 +4183,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GenresCarouselItem&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GenresCarouselItem&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,searchQuery,name,const DeepCollectionEquality().hash(metadata));
+int get hashCode => Object.hash(runtimeType,searchQuery,name,const DeepCollectionEquality().hash(metadata),contentRating);
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.genresCarouselItem(searchQuery: $searchQuery, name: $name, metadata: $metadata)';
+  return 'DiscoverSectionItem.genresCarouselItem(searchQuery: $searchQuery, name: $name, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -4201,7 +4203,7 @@ abstract mixin class $GenresCarouselItemCopyWith<$Res> implements $DiscoverSecti
   factory $GenresCarouselItemCopyWith(GenresCarouselItem value, $Res Function(GenresCarouselItem) _then) = _$GenresCarouselItemCopyWithImpl;
 @override @useResult
 $Res call({
- SearchQuery searchQuery, String name, dynamic metadata
+ SearchQuery searchQuery, String name, dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
 });
 
 
@@ -4218,12 +4220,13 @@ class _$GenresCarouselItemCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchQuery = null,Object? name = null,Object? metadata = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchQuery = null,Object? name = null,Object? metadata = freezed,Object? contentRating = freezed,}) {
   return _then(GenresCarouselItem(
 searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
 as SearchQuery,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,contentRating: freezed == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
+as ContentRating?,
   ));
 }
 
@@ -4243,7 +4246,7 @@ $SearchQueryCopyWith<$Res> get searchQuery {
 @JsonSerializable()
 
 class ChapterUpdatesCarouselItem implements DiscoverSectionItem {
-  const ChapterUpdatesCarouselItem({required this.mangaId, required this.chapterId, required this.imageUrl, required this.title, this.subtitle, @NullableTimestampSerializer() this.publishDate, this.metadata, final  String? $type}): $type = $type ?? 'chapterUpdatesCarouselItem';
+  const ChapterUpdatesCarouselItem({required this.mangaId, required this.chapterId, required this.imageUrl, required this.title, this.subtitle, @NullableTimestampSerializer() this.publishDate, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'chapterUpdatesCarouselItem';
   factory ChapterUpdatesCarouselItem.fromJson(Map<String, dynamic> json) => _$ChapterUpdatesCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -4253,6 +4256,7 @@ class ChapterUpdatesCarouselItem implements DiscoverSectionItem {
  final  String? subtitle;
 @NullableTimestampSerializer() final  DateTime? publishDate;
 @override final  dynamic metadata;
+@override@NullableContentRatingParser() final  ContentRating? contentRating;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -4271,16 +4275,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterUpdatesCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.publishDate, publishDate) || other.publishDate == publishDate)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterUpdatesCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.publishDate, publishDate) || other.publishDate == publishDate)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,chapterId,imageUrl,title,subtitle,publishDate,const DeepCollectionEquality().hash(metadata));
+int get hashCode => Object.hash(runtimeType,mangaId,chapterId,imageUrl,title,subtitle,publishDate,const DeepCollectionEquality().hash(metadata),contentRating);
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.chapterUpdatesCarouselItem(mangaId: $mangaId, chapterId: $chapterId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, publishDate: $publishDate, metadata: $metadata)';
+  return 'DiscoverSectionItem.chapterUpdatesCarouselItem(mangaId: $mangaId, chapterId: $chapterId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, publishDate: $publishDate, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -4291,7 +4295,7 @@ abstract mixin class $ChapterUpdatesCarouselItemCopyWith<$Res> implements $Disco
   factory $ChapterUpdatesCarouselItemCopyWith(ChapterUpdatesCarouselItem value, $Res Function(ChapterUpdatesCarouselItem) _then) = _$ChapterUpdatesCarouselItemCopyWithImpl;
 @override @useResult
 $Res call({
- String mangaId, String chapterId, String imageUrl, String title, String? subtitle,@NullableTimestampSerializer() DateTime? publishDate, dynamic metadata
+ String mangaId, String chapterId, String imageUrl, String title, String? subtitle,@NullableTimestampSerializer() DateTime? publishDate, dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
 });
 
 
@@ -4308,7 +4312,7 @@ class _$ChapterUpdatesCarouselItemCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? chapterId = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,Object? publishDate = freezed,Object? metadata = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? chapterId = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,Object? publishDate = freezed,Object? metadata = freezed,Object? contentRating = freezed,}) {
   return _then(ChapterUpdatesCarouselItem(
 mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
@@ -4317,7 +4321,8 @@ as String,title: null == title ? _self.title : title // ignore: cast_nullable_to
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,publishDate: freezed == publishDate ? _self.publishDate : publishDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,contentRating: freezed == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
+as ContentRating?,
   ));
 }
 
@@ -4328,7 +4333,7 @@ as dynamic,
 @JsonSerializable()
 
 class ProminentCarouselItem implements DiscoverSectionItem {
-  const ProminentCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, final  String? $type}): $type = $type ?? 'prominentCarouselItem';
+  const ProminentCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'prominentCarouselItem';
   factory ProminentCarouselItem.fromJson(Map<String, dynamic> json) => _$ProminentCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -4336,6 +4341,7 @@ class ProminentCarouselItem implements DiscoverSectionItem {
  final  String title;
  final  String? subtitle;
 @override final  dynamic metadata;
+@override@NullableContentRatingParser() final  ContentRating? contentRating;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -4354,16 +4360,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProminentCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProminentCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata));
+int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata),contentRating);
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.prominentCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata)';
+  return 'DiscoverSectionItem.prominentCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -4374,7 +4380,7 @@ abstract mixin class $ProminentCarouselItemCopyWith<$Res> implements $DiscoverSe
   factory $ProminentCarouselItemCopyWith(ProminentCarouselItem value, $Res Function(ProminentCarouselItem) _then) = _$ProminentCarouselItemCopyWithImpl;
 @override @useResult
 $Res call({
- String mangaId, String imageUrl, String title, String? subtitle, dynamic metadata
+ String mangaId, String imageUrl, String title, String? subtitle, dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
 });
 
 
@@ -4391,14 +4397,15 @@ class _$ProminentCarouselItemCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,Object? metadata = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,Object? metadata = freezed,Object? contentRating = freezed,}) {
   return _then(ProminentCarouselItem(
 mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,contentRating: freezed == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
+as ContentRating?,
   ));
 }
 
@@ -4409,7 +4416,7 @@ as dynamic,
 @JsonSerializable()
 
 class SimpleCarouselItem implements DiscoverSectionItem {
-  const SimpleCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, final  String? $type}): $type = $type ?? 'simpleCarouselItem';
+  const SimpleCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'simpleCarouselItem';
   factory SimpleCarouselItem.fromJson(Map<String, dynamic> json) => _$SimpleCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -4417,6 +4424,7 @@ class SimpleCarouselItem implements DiscoverSectionItem {
  final  String title;
  final  String? subtitle;
 @override final  dynamic metadata;
+@override@NullableContentRatingParser() final  ContentRating? contentRating;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -4435,16 +4443,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SimpleCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SimpleCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata));
+int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata),contentRating);
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.simpleCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata)';
+  return 'DiscoverSectionItem.simpleCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -4455,7 +4463,7 @@ abstract mixin class $SimpleCarouselItemCopyWith<$Res> implements $DiscoverSecti
   factory $SimpleCarouselItemCopyWith(SimpleCarouselItem value, $Res Function(SimpleCarouselItem) _then) = _$SimpleCarouselItemCopyWithImpl;
 @override @useResult
 $Res call({
- String mangaId, String imageUrl, String title, String? subtitle, dynamic metadata
+ String mangaId, String imageUrl, String title, String? subtitle, dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
 });
 
 
@@ -4472,14 +4480,15 @@ class _$SimpleCarouselItemCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,Object? metadata = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,Object? metadata = freezed,Object? contentRating = freezed,}) {
   return _then(SimpleCarouselItem(
 mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,contentRating: freezed == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
+as ContentRating?,
   ));
 }
 
@@ -4490,7 +4499,7 @@ as dynamic,
 @JsonSerializable()
 
 class FeaturedCarouselItem implements DiscoverSectionItem {
-  const FeaturedCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.supertitle, this.metadata, final  String? $type}): $type = $type ?? 'featuredCarouselItem';
+  const FeaturedCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.supertitle, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'featuredCarouselItem';
   factory FeaturedCarouselItem.fromJson(Map<String, dynamic> json) => _$FeaturedCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -4498,6 +4507,7 @@ class FeaturedCarouselItem implements DiscoverSectionItem {
  final  String title;
  final  String? supertitle;
 @override final  dynamic metadata;
+@override@NullableContentRatingParser() final  ContentRating? contentRating;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -4516,16 +4526,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeaturedCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.supertitle, supertitle) || other.supertitle == supertitle)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeaturedCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.supertitle, supertitle) || other.supertitle == supertitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,supertitle,const DeepCollectionEquality().hash(metadata));
+int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,supertitle,const DeepCollectionEquality().hash(metadata),contentRating);
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.featuredCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, supertitle: $supertitle, metadata: $metadata)';
+  return 'DiscoverSectionItem.featuredCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, supertitle: $supertitle, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -4536,7 +4546,7 @@ abstract mixin class $FeaturedCarouselItemCopyWith<$Res> implements $DiscoverSec
   factory $FeaturedCarouselItemCopyWith(FeaturedCarouselItem value, $Res Function(FeaturedCarouselItem) _then) = _$FeaturedCarouselItemCopyWithImpl;
 @override @useResult
 $Res call({
- String mangaId, String imageUrl, String title, String? supertitle, dynamic metadata
+ String mangaId, String imageUrl, String title, String? supertitle, dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
 });
 
 
@@ -4553,14 +4563,15 @@ class _$FeaturedCarouselItemCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? supertitle = freezed,Object? metadata = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? supertitle = freezed,Object? metadata = freezed,Object? contentRating = freezed,}) {
   return _then(FeaturedCarouselItem(
 mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,supertitle: freezed == supertitle ? _self.supertitle : supertitle // ignore: cast_nullable_to_non_nullable
 as String?,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,contentRating: freezed == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
+as ContentRating?,
   ));
 }
 

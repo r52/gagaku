@@ -757,6 +757,19 @@ class ContentRatingParser implements JsonConverter<ContentRating, dynamic> {
       rating == ContentRating.EVERYONE ? 'SAFE' : rating.name;
 }
 
+class NullableContentRatingParser
+    implements JsonConverter<ContentRating?, dynamic> {
+  const NullableContentRatingParser();
+
+  @override
+  ContentRating? fromJson(dynamic rating) =>
+      rating != null ? const ContentRatingParser().fromJson(rating) : null;
+
+  @override
+  dynamic toJson(ContentRating? rating) =>
+      rating != null ? const ContentRatingParser().toJson(rating) : null;
+}
+
 // ignore: constant_identifier_names
 enum ContentRating { EVERYONE, MATURE, ADULT }
 
@@ -924,6 +937,7 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
     required SearchQuery searchQuery,
     required String name,
     dynamic metadata,
+    @NullableContentRatingParser() ContentRating? contentRating,
   }) = GenresCarouselItem;
 
   const factory DiscoverSectionItem.chapterUpdatesCarouselItem({
@@ -934,6 +948,7 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
     String? subtitle,
     @NullableTimestampSerializer() DateTime? publishDate,
     dynamic metadata,
+    @NullableContentRatingParser() ContentRating? contentRating,
   }) = ChapterUpdatesCarouselItem;
 
   const factory DiscoverSectionItem.prominentCarouselItem({
@@ -942,6 +957,7 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
     required String title,
     String? subtitle,
     dynamic metadata,
+    @NullableContentRatingParser() ContentRating? contentRating,
   }) = ProminentCarouselItem;
 
   const factory DiscoverSectionItem.simpleCarouselItem({
@@ -950,6 +966,7 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
     required String title,
     String? subtitle,
     dynamic metadata,
+    @NullableContentRatingParser() ContentRating? contentRating,
   }) = SimpleCarouselItem;
 
   const factory DiscoverSectionItem.featuredCarouselItem({
@@ -958,6 +975,7 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
     required String title,
     String? supertitle,
     dynamic metadata,
+    @NullableContentRatingParser() ContentRating? contentRating,
   }) = FeaturedCarouselItem;
 
   factory DiscoverSectionItem.fromJson(Map<String, dynamic> json) =>
