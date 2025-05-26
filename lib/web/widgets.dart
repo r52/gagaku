@@ -660,7 +660,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
     );
 
     String title = data.chapter.getTitle(chapterkey);
-    String group = data.chapter.groups.entries.first.key;
+    final groupKey = data.chapter.groups.entries.first.key;
+    final groupText =
+        manga.groups != null && manga.groups?.containsKey(groupKey) == true
+            ? manga.groups![groupKey]!
+            : groupKey;
 
     final lang = tr.$meta.locale.languageCode;
     //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
@@ -757,6 +761,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
       leading: markReadBtn,
       shape: border,
       title: Text(title, style: textstyle),
+      subtitle: screenSizeSmall ? Text(groupText) : null,
       trailing: FittedBox(
         fit: BoxFit.fill,
         child: Row(
@@ -767,11 +772,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
               Flexible(
                 child: IconTextChip(
                   icon: const Icon(Icons.group, size: 20),
-                  text:
-                      manga.groups != null &&
-                              manga.groups?.containsKey(group) == true
-                          ? manga.groups![group]!
-                          : group,
+                  text: groupText,
                 ),
               ),
             if (!screenSizeSmall) const SizedBox(width: 10),
