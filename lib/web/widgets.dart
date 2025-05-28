@@ -643,9 +643,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     useAutomaticKeepAlive();
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final tileColor = theme.colorScheme.primaryContainer;
     final chapterkey = data.name;
     final mangakey = handle.getKey();
 
@@ -682,13 +680,6 @@ class ChapterButtonWidget extends HookConsumerWidget {
         sourceValue is Chapter
             ? CountryFlag(flag: sourceValue.langCode, size: 12)
             : null;
-
-    final border = Border(
-      left: BorderSide(
-        color: isRead == true ? tileColor : Colors.blue,
-        width: 4.0,
-      ),
-    );
 
     final textstyle = TextStyle(
       color: (isRead == true ? theme.disabledColor : theme.colorScheme.primary),
@@ -747,40 +738,103 @@ class ChapterButtonWidget extends HookConsumerWidget {
       );
     }
 
-    return ListTile(
+    final tile = Table(
+      columnWidths: const <int, TableColumnWidth>{
+        0: FixedColumnWidth(24),
+        1: FixedColumnWidth(6),
+        2: FlexColumnWidth(),
+        3: FixedColumnWidth(150),
+      },
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      children: <TableRow>[
+        TableRow(
+          children: <Widget>[
+            markReadBtn,
+            const SizedBox.shrink(),
+            Text(title, style: textstyle),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [if (language != null) language],
+            ),
+          ],
+        ),
+        TableRow(
+          children: <Widget>[
+            const Icon(Icons.group, size: 20),
+            const SizedBox.shrink(),
+            Text(groupText),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Icon(Icons.schedule, size: 20),
+                if (timestamp != null) Text(' $timestamp'),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+
+    return InkWell(
       onTap: () {
         context.router.push(route);
       },
-      tileColor: theme.colorScheme.primaryContainer,
-      dense: true,
-      minVerticalPadding: 0.0,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: (screenSizeSmall ? 4.0 : 10.0),
+      child: _ChapterButtonCard(
+        key: ValueKey('_ChapterButtonCard($chapterkey)'),
+        mangaKey: mangakey,
+        chapterKey: chapterkey,
+        child: tile,
       ),
-      minLeadingWidth: 0.0,
-      leading: markReadBtn,
-      shape: border,
-      title: Text(title, style: textstyle),
-      subtitle: screenSizeSmall ? Text(groupText) : null,
-      trailing: FittedBox(
-        fit: BoxFit.fill,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (language != null) language,
-            if (!screenSizeSmall)
-              Flexible(
-                child: IconTextChip(
-                  icon: const Icon(Icons.group, size: 20),
-                  text: groupText,
-                ),
-              ),
-            if (!screenSizeSmall) const SizedBox(width: 10),
-            const Icon(Icons.schedule, size: 20),
-            if (timestamp != null) Text(' $timestamp'),
-          ],
+    );
+  }
+}
+
+class _ChapterButtonCard extends ConsumerWidget {
+  final String chapterKey;
+  final String mangaKey;
+  final Widget child;
+
+  const _ChapterButtonCard({
+    super.key,
+    required this.chapterKey,
+    required this.mangaKey,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final theme = Theme.of(context);
+    final tileColor = theme.colorScheme.primaryContainer;
+
+    final isRead = ref.watch(
+      webReadMarkersProvider.select(
+        (value) => switch (value) {
+          AsyncValue(value: final map?) =>
+            map[mangaKey]?.contains(chapterKey) ?? false,
+          _ => false,
+        },
+      ),
+    );
+
+    return Ink(
+      padding: EdgeInsets.symmetric(
+        horizontal: (screenSizeSmall ? 6.0 : 10.0),
+        vertical: 4.0,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        color: tileColor,
+        border: Border(
+          left: BorderSide(
+            color: isRead == true ? tileColor : Colors.blue,
+            width: 4.0,
+          ),
         ),
       ),
+      child: child,
     );
   }
 }

@@ -20,10 +20,10 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final scrollController =
-        DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
-        controller ??
-        useScrollController();
+    // final scrollController =
+    //     DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
+    //     controller ??
+    //     useScrollController();
     final categories = ref.watch(
       webConfigProvider.select((cfg) => cfg.categories),
     );
@@ -80,7 +80,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
 
                       return WebMangaListWidget(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        controller: scrollController,
+                        // controller: scrollController,
                         title: Text(
                           tr.num_titles(n: fileredItems.length),
                           style: const TextStyle(fontSize: 24),
