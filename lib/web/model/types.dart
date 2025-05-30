@@ -1047,6 +1047,19 @@ sealed class FormItemElement with _$FormItemElement {
     required FormID form,
   }) = NavigationRowElement;
 
+  const factory FormItemElement.stepperRow({
+    required String id,
+    required bool isHidden,
+    required String title,
+    String? subtitle,
+    required num value,
+    required num minValue,
+    required num maxValue,
+    required num stepValue,
+    required bool loopOver,
+    required SelectorID onValueChange, // (value: number) => Promise<void>
+  }) = StepperRowElement;
+
   const factory FormItemElement.oauthButtonRow({
     required String id,
     required bool isHidden,
@@ -1060,6 +1073,12 @@ sealed class FormItemElement with _$FormItemElement {
     String? redirectUri,
     List<String>? scopes,
   }) = OAuthButtonRowElement;
+
+  const factory FormItemElement.webViewRow({
+    required String id,
+    required bool isHidden,
+    required String title,
+  }) = WebViewRowElement;
 
   factory FormItemElement.fromJson(Map<String, dynamic> json) =>
       _$FormItemElementFromJson(json);

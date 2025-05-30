@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -108,7 +109,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
       );
     }
 
-    // TODO submit
+    // TODO submit button support?
 
     return Scaffold(
       appBar: AppBar(
@@ -164,8 +165,19 @@ class FormItemDelegateBuilder extends StatelessWidget {
           source: source,
           element: element as LabelRowElement,
         );
+      case StepperRowElement():
+        return StepperRowBuilder(
+          source: source,
+          element: element as StepperRowElement,
+        );
       case OAuthButtonRowElement():
-        return OAuthButtonRowBuilder(
+        // TODO: support this?
+        return UnsupportedRowBuilder(
+          source: source,
+          element: element as OAuthButtonRowElement,
+        );
+      case WebViewRowElement():
+        return UnsupportedRowBuilder(
           source: source,
           element: element as OAuthButtonRowElement,
         );
@@ -529,55 +541,40 @@ class ToggleRowBuilder extends HookConsumerWidget {
   }
 }
 
-// class DUIStepperBuilder extends HookConsumerWidget {
-//   const DUIStepperBuilder({
-//     super.key,
-//     required this.source,
-//     required this.element,
-//   });
+class StepperRowBuilder extends HookConsumerWidget {
+  const StepperRowBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
 
-//   final WebSourceInfo source;
-//   final DUIStepper element;
+  final WebSourceInfo source;
+  final StepperRowElement element;
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final initFuture = useMemoized(
-//       () => ref
-//           .read(extensionSourceProvider(source.id).notifier)
-//           .callBinding('${element.id}.get'),
-//     );
-//     final initial = useFuture(initFuture);
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentVal = useState(element.value);
 
-//     if (initial.connectionState == ConnectionState.waiting) {
-//       return const Center(child: CircularProgressIndicator());
-//     }
-
-//     final data = useState(
-//       initial.hasData
-//           ? (initial.data != null ? initial.data! as num : null)
-//           : null,
-//     );
-
-//     return SettingCardWidget(
-//       title: Text(element.label),
-//       builder: (context) {
-//         return InputQty(
-//           initVal: data.value ?? 0,
-//           minVal: element.min ?? 0,
-//           maxVal: element.max ?? double.maxFinite,
-//           steps: element.step ?? 1,
-//           onQtyChanged: (value) {
-//             ref.read(extensionSourceProvider(source.id).notifier).callBinding(
-//               '${element.id}.set',
-//               [value],
-//             );
-//             data.value = value;
-//           },
-//         );
-//       },
-//     );
-//   }
-// }
+    return SettingCardWidget(
+      title: Text(element.title),
+      builder: (context) {
+        return SpinBox(
+          value: currentVal.value.toDouble(),
+          min: element.minValue.toDouble(),
+          max: element.maxValue.toDouble(),
+          step: element.stepValue.toDouble(),
+          onChanged: (value) {
+            ref.read(extensionSourceProvider(source.id).notifier).callBinding(
+              element.onValueChange,
+              [value],
+            );
+            currentVal.value = value;
+          },
+        );
+      },
+    );
+  }
+}
 
 class LabelRowBuilder extends StatelessWidget {
   const LabelRowBuilder({
@@ -604,15 +601,15 @@ class LabelRowBuilder extends StatelessWidget {
   }
 }
 
-class OAuthButtonRowBuilder extends ConsumerWidget {
-  const OAuthButtonRowBuilder({
+class UnsupportedRowBuilder extends ConsumerWidget {
+  const UnsupportedRowBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final OAuthButtonRowElement element;
+  final FormItemElement element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -620,7 +617,8 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    // TODO support this?
-    return Card(child: ListTile(title: Text("Unsupported"), enabled: false));
+    return Card(
+      child: ListTile(title: Text("Unsupported element"), enabled: false),
+    );
   }
 }

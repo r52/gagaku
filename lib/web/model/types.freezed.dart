@@ -4715,8 +4715,16 @@ FormItemElement _$FormItemElementFromJson(
           return NavigationRowElement.fromJson(
             json
           );
+                case 'stepperRow':
+          return StepperRowElement.fromJson(
+            json
+          );
                 case 'oauthButtonRow':
           return OAuthButtonRowElement.fromJson(
+            json
+          );
+                case 'webViewRow':
+          return WebViewRowElement.fromJson(
             json
           );
         
@@ -5305,6 +5313,97 @@ as FormID,
 /// @nodoc
 @JsonSerializable()
 
+class StepperRowElement implements FormItemElement {
+  const StepperRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.value, required this.minValue, required this.maxValue, required this.stepValue, required this.loopOver, required this.onValueChange, final  String? $type}): $type = $type ?? 'stepperRow';
+  factory StepperRowElement.fromJson(Map<String, dynamic> json) => _$StepperRowElementFromJson(json);
+
+@override final  String id;
+@override final  bool isHidden;
+@override final  String title;
+ final  String? subtitle;
+ final  num value;
+ final  num minValue;
+ final  num maxValue;
+ final  num stepValue;
+ final  bool loopOver;
+ final  SelectorID onValueChange;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$StepperRowElementCopyWith<StepperRowElement> get copyWith => _$StepperRowElementCopyWithImpl<StepperRowElement>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$StepperRowElementToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StepperRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.minValue, minValue) || other.minValue == minValue)&&(identical(other.maxValue, maxValue) || other.maxValue == maxValue)&&(identical(other.stepValue, stepValue) || other.stepValue == stepValue)&&(identical(other.loopOver, loopOver) || other.loopOver == loopOver)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,value,minValue,maxValue,stepValue,loopOver,onValueChange);
+
+@override
+String toString() {
+  return 'FormItemElement.stepperRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, minValue: $minValue, maxValue: $maxValue, stepValue: $stepValue, loopOver: $loopOver, onValueChange: $onValueChange)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $StepperRowElementCopyWith<$Res> implements $FormItemElementCopyWith<$Res> {
+  factory $StepperRowElementCopyWith(StepperRowElement value, $Res Function(StepperRowElement) _then) = _$StepperRowElementCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, bool isHidden, String title, String? subtitle, num value, num minValue, num maxValue, num stepValue, bool loopOver, SelectorID onValueChange
+});
+
+
+
+
+}
+/// @nodoc
+class _$StepperRowElementCopyWithImpl<$Res>
+    implements $StepperRowElementCopyWith<$Res> {
+  _$StepperRowElementCopyWithImpl(this._self, this._then);
+
+  final StepperRowElement _self;
+  final $Res Function(StepperRowElement) _then;
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = null,Object? minValue = null,Object? maxValue = null,Object? stepValue = null,Object? loopOver = null,Object? onValueChange = null,}) {
+  return _then(StepperRowElement(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
+as String?,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+as num,minValue: null == minValue ? _self.minValue : minValue // ignore: cast_nullable_to_non_nullable
+as num,maxValue: null == maxValue ? _self.maxValue : maxValue // ignore: cast_nullable_to_non_nullable
+as num,stepValue: null == stepValue ? _self.stepValue : stepValue // ignore: cast_nullable_to_non_nullable
+as num,loopOver: null == loopOver ? _self.loopOver : loopOver // ignore: cast_nullable_to_non_nullable
+as bool,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
+as SelectorID,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
 class OAuthButtonRowElement implements FormItemElement {
   const OAuthButtonRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.onSuccess, required this.authorizeEndpoint, required this.responseType, this.clientId, this.redirectUri, final  List<String>? scopes, final  String? $type}): _scopes = scopes,$type = $type ?? 'oauthButtonRow';
   factory OAuthButtonRowElement.fromJson(Map<String, dynamic> json) => _$OAuthButtonRowElementFromJson(json);
@@ -5409,6 +5508,83 @@ $OAuthResponseTypeCopyWith<$Res> get responseType {
     return _then(_self.copyWith(responseType: value));
   });
 }
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class WebViewRowElement implements FormItemElement {
+  const WebViewRowElement({required this.id, required this.isHidden, required this.title, final  String? $type}): $type = $type ?? 'webViewRow';
+  factory WebViewRowElement.fromJson(Map<String, dynamic> json) => _$WebViewRowElementFromJson(json);
+
+@override final  String id;
+@override final  bool isHidden;
+@override final  String title;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebViewRowElementCopyWith<WebViewRowElement> get copyWith => _$WebViewRowElementCopyWithImpl<WebViewRowElement>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WebViewRowElementToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,isHidden,title);
+
+@override
+String toString() {
+  return 'FormItemElement.webViewRow(id: $id, isHidden: $isHidden, title: $title)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebViewRowElementCopyWith<$Res> implements $FormItemElementCopyWith<$Res> {
+  factory $WebViewRowElementCopyWith(WebViewRowElement value, $Res Function(WebViewRowElement) _then) = _$WebViewRowElementCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, bool isHidden, String title
+});
+
+
+
+
+}
+/// @nodoc
+class _$WebViewRowElementCopyWithImpl<$Res>
+    implements $WebViewRowElementCopyWith<$Res> {
+  _$WebViewRowElementCopyWithImpl(this._self, this._then);
+
+  final WebViewRowElement _self;
+  final $Res Function(WebViewRowElement) _then;
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,}) {
+  return _then(WebViewRowElement(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
 }
 
 

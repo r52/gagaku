@@ -823,6 +823,36 @@ Map<String, dynamic> _$NavigationRowElementToJson(
   'type': instance.$type,
 };
 
+StepperRowElement _$StepperRowElementFromJson(Map<String, dynamic> json) =>
+    StepperRowElement(
+      id: json['id'] as String,
+      isHidden: json['isHidden'] as bool,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      value: json['value'] as num,
+      minValue: json['minValue'] as num,
+      maxValue: json['maxValue'] as num,
+      stepValue: json['stepValue'] as num,
+      loopOver: json['loopOver'] as bool,
+      onValueChange: json['onValueChange'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$StepperRowElementToJson(StepperRowElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'isHidden': instance.isHidden,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
+      'value': instance.value,
+      'minValue': instance.minValue,
+      'maxValue': instance.maxValue,
+      'stepValue': instance.stepValue,
+      'loopOver': instance.loopOver,
+      'onValueChange': instance.onValueChange,
+      'type': instance.$type,
+    };
+
 OAuthButtonRowElement _$OAuthButtonRowElementFromJson(
   Map<String, dynamic> json,
 ) => OAuthButtonRowElement(
@@ -856,6 +886,22 @@ Map<String, dynamic> _$OAuthButtonRowElementToJson(
   'scopes': instance.scopes,
   'type': instance.$type,
 };
+
+WebViewRowElement _$WebViewRowElementFromJson(Map<String, dynamic> json) =>
+    WebViewRowElement(
+      id: json['id'] as String,
+      isHidden: json['isHidden'] as bool,
+      title: json['title'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$WebViewRowElementToJson(WebViewRowElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'isHidden': instance.isHidden,
+      'title': instance.title,
+      'type': instance.$type,
+    };
 
 _FormSectionElement _$FormSectionElementFromJson(Map<String, dynamic> json) =>
     _FormSectionElement(
