@@ -25,10 +25,21 @@ class MangaDexLoginWidget extends ConsumerWidget {
     final meProvider = ref.watch(loggedUserProvider);
 
     return switch (meProvider) {
-      AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-        error: error,
-        stackTrace: stackTrace,
-        message: "loggedUserProvider failed",
+      AsyncValue(:final error?, :final stackTrace?) => Center(
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            MangaDexSliverAppBar(),
+            SliverFillRemaining(
+              child: ErrorList(
+                error: error,
+                stackTrace: stackTrace,
+                message: "loggedUserProvider failed",
+              ),
+            ),
+          ],
+        ),
       ),
       AsyncValue(hasValue: true, value: final me) when me != null => builder(
         context,
@@ -54,20 +65,29 @@ class MangaDexLoginWidget extends ConsumerWidget {
         ),
       ),
       AsyncValue(:final progress) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 20.0,
-          children: [
-            Text(
-              tr.auth.authenticating,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.normal,
-                fontSize: 18,
-                decoration: TextDecoration.none,
+        child: CustomScrollView(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            MangaDexSliverAppBar(),
+            SliverFillRemaining(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 20.0,
+                children: [
+                  Text(
+                    tr.auth.authenticating,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.normal,
+                      fontSize: 18,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  CircularProgressIndicator(value: progress?.toDouble()),
+                ],
               ),
             ),
-            CircularProgressIndicator(value: progress?.toDouble()),
           ],
         ),
       ),
