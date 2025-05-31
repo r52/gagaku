@@ -194,7 +194,11 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
         mangas.add(UpdateFeedItem(link: link, manga: manga));
       }
 
-      if (processedCount % 5 == 0) {
+      if (processedCount % 50 == 0) {
+        await Future.delayed(const Duration(seconds: 10));
+      } else if (processedCount % 25 == 0) {
+        await Future.delayed(const Duration(seconds: 5));
+      } else if (processedCount % 5 == 0) {
         await Future.delayed(const Duration(seconds: 1));
       }
 
