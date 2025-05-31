@@ -96,6 +96,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
     }, [tabController]);
 
     return NestedScrollView(
+      scrollBehavior: const MouseTouchScrollBehavior(),
       controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [

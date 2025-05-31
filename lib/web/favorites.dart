@@ -20,10 +20,10 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    // final scrollController =
-    //     DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
-    //     controller ??
-    //     useScrollController();
+    final scrollController =
+        DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
+        controller ??
+        useScrollController();
     final categories = ref.watch(
       webConfigProvider.select((cfg) => cfg.categories),
     );
@@ -31,93 +31,101 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
       initialLength: categories.length,
       keys: [categories],
     );
+    final filterController = useTextEditingController();
 
     // Pre-initialize sources
     final _ = ref.watch(extensionInfoListProvider);
 
-    return Material(
-      child: Column(
-        children: [
-          ScrollConfiguration(
-            behavior: const MouseTouchScrollBehavior(),
-            child: TabBar(
-              tabAlignment: TabAlignment.center,
-              isScrollable: true,
-              controller: tabController,
-              tabs: List<Tab>.generate(
-                categories.length,
-                (int index) => Tab(text: categories.elementAt(index).name),
+    return NestedScrollView(
+      scrollBehavior: const MouseTouchScrollBehavior(),
+      controller: scrollController,
+      headerSliverBuilder: (context, innerBoxIsScrolled) {
+        return [
+          SliverOverlapAbsorber(
+            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+            sliver: SliverAppBar(
+              forceElevated: innerBoxIsScrolled,
+              automaticallyImplyLeading: false,
+              primary: false,
+              pinned: false,
+              title: TextField(
+                controller: filterController,
+                onTapOutside: (event) => unfocusSearchBar(),
+                decoration: InputDecoration(
+                  hintText: tr.ui.filterItems,
+                  suffixIcon: IconButton(
+                    onPressed: filterController.clear,
+                    icon: Icon(Icons.clear),
+                  ),
+                ),
+              ),
+              bottom: TabBar(
+                tabAlignment: TabAlignment.center,
+                isScrollable: true,
+                controller: tabController,
+                tabs: List<Tab>.generate(
+                  categories.length,
+                  (int index) => Tab(text: categories.elementAt(index).name),
+                ),
               ),
             ),
           ),
-          Expanded(
-            child: TabBarView(
-              controller: tabController,
-              children: [
-                for (final cat in categories)
-                  HookConsumer(
-                    builder: (context, ref, child) {
-                      final filterController = useTextEditingController();
-                      final filterText = useValueListenable(filterController);
-                      final items = ref.watch(
-                        webSourceFavoritesProvider.select(
-                          (value) => switch (value) {
-                            AsyncValue(value: final data?) =>
-                              data.containsKey(cat.id)
-                                  ? data[cat.id]!
-                                  : <HistoryLink>[],
-                            _ => <HistoryLink>[],
-                          },
-                        ),
-                      );
-                      final fileredItems = useMemoized(
-                        () => items.where(
-                          (i) =>
-                              i.title.toLowerCase().contains(filterText.text),
-                        ),
-                        [filterText, items],
-                      );
-
-                      return WebMangaListWidget(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        // controller: scrollController,
-                        title: Text(
-                          tr.num_titles(n: fileredItems.length),
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        leading: [
-                          SliverToBoxAdapter(
-                            child: TextField(
-                              controller: filterController,
-                              onTapOutside: (event) => unfocusSearchBar(),
-                              decoration: InputDecoration(
-                                hintText: tr.ui.filterItems,
-                                suffixIcon: IconButton(
-                                  onPressed: filterController.clear,
-                                  icon: Icon(Icons.clear),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        children: [
-                          if (fileredItems.isEmpty)
-                            SliverFillRemaining(
-                              child: Center(child: Text(tr.errors.noitems)),
-                            ),
-                          WebMangaListViewSliver(
-                            items: fileredItems.toList(),
-                            favoritesKey: cat.id,
-                            reorderable: true,
-                            showRemoveButton: false,
-                          ),
-                        ],
-                      );
+        ];
+      },
+      body: TabBarView(
+        controller: tabController,
+        children: [
+          for (final cat in categories)
+            HookConsumer(
+              builder: (context, ref, child) {
+                final filterText = useValueListenable(filterController);
+                final items = ref.watch(
+                  webSourceFavoritesProvider.select(
+                    (value) => switch (value) {
+                      AsyncValue(value: final data?) =>
+                        data.containsKey(cat.id)
+                            ? data[cat.id]!
+                            : <HistoryLink>[],
+                      _ => <HistoryLink>[],
                     },
                   ),
-              ],
+                );
+                final fileredItems = useMemoized(
+                  () => items.where(
+                    (i) => i.title.toLowerCase().contains(filterText.text),
+                  ),
+                  [filterText, items],
+                );
+
+                return WebMangaListWidget(
+                  noController: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  title: Text(
+                    tr.num_titles(n: fileredItems.length),
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  leading: [
+                    SliverOverlapInjector(
+                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        context,
+                      ),
+                    ),
+                  ],
+                  children: [
+                    if (fileredItems.isEmpty)
+                      SliverFillRemaining(
+                        child: Center(child: Text(tr.errors.noitems)),
+                      ),
+                    WebMangaListViewSliver(
+                      items: fileredItems.toList(),
+                      favoritesKey: cat.id,
+                      reorderable: true,
+                      showRemoveButton: false,
+                    ),
+                  ],
+                );
+              },
             ),
-          ),
         ],
       ),
     );

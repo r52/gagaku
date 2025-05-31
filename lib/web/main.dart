@@ -19,12 +19,13 @@ class WebSourceHomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final controllers = List.generate(3, (idx) => useScrollController());
+    final controllers = List.generate(4, (idx) => useScrollController());
     final controllerSet = useMemoized(
       () => {
         'WebSourceFrontPage': controllers[0],
-        'WebSourceFavoritesPage': controllers[1],
-        'WebSourceHistoryPage': controllers[2],
+        'WebSourceUpdatesPage': controllers[1],
+        'WebSourceFavoritesPage': controllers[2],
+        'WebSourceHistoryPage': controllers[3],
       },
       [controllers],
     );
