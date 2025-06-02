@@ -15,10 +15,10 @@ Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
   );
 
   if (result != null && context.mounted) {
-    final parseResult = await api.handleUrl(url: result, context: context);
+    final parseResult = await api.handleUrl(url: result);
 
     if (!context.mounted) return;
-    if (!parseResult) {
+    if (parseResult == null) {
       messenger
         ..removeCurrentSnackBar()
         ..showSnackBar(
@@ -27,6 +27,8 @@ Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
             backgroundColor: Colors.red,
           ),
         );
+    } else {
+      openWebSource(context, parseResult);
     }
   }
 }

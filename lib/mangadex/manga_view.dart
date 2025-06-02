@@ -567,6 +567,10 @@ class _MangaDexMangaViewWidgetState
                                             context,
                                           ).showSnackBar(
                                             SnackBar(
+                                              showCloseIcon: true,
+                                              duration: const Duration(
+                                                milliseconds: 1000,
+                                              ),
                                               content: Text(
                                                 tr.ui.copyClipboard,
                                               ),

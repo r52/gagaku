@@ -32,6 +32,11 @@ _WebSourceConfig _$WebSourceConfigFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [_defaultCategory],
       defaultCategory: json['defaultCategory'] as String? ?? _defaultUUID,
+      categoriesToUpdate:
+          (json['categoriesToUpdate'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$WebSourceConfigToJson(
@@ -41,6 +46,7 @@ Map<String, dynamic> _$WebSourceConfigToJson(
   'repoList': instance.repoList.map(const RepoConverter().toJson).toList(),
   'categories': instance.categories.map((e) => e.toJson()).toList(),
   'defaultCategory': instance.defaultCategory,
+  'categoriesToUpdate': instance.categoriesToUpdate,
 };
 
 // **************************************************************************
@@ -100,7 +106,7 @@ final class WebConfigProvider
   }
 }
 
-String _$webConfigHash() => r'5e40dc510f838ca2882eaeb08c0606319221de0c';
+String _$webConfigHash() => r'02fd3ba9bd9a4f62fac7c2c4bf1ebbdd044f85d1';
 
 abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();
@@ -167,6 +173,7 @@ sealed class WebConfig$SaveWith extends MutationBase<WebSourceConfig> {
     List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
     String? defaultCategory,
+    List<String>? categoriesToUpdate,
   });
 }
 
@@ -187,6 +194,7 @@ final class _$WebConfig$SaveWith
     List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
     String? defaultCategory,
+    List<String>? categoriesToUpdate,
   }) {
     return mutate(
       Invocation.method(#saveWith, [], {
@@ -194,12 +202,14 @@ final class _$WebConfig$SaveWith
         #repoList: repoList,
         #categories: categories,
         #defaultCategory: defaultCategory,
+        #categoriesToUpdate: categoriesToUpdate,
       }),
       ($notifier) => $notifier.saveWith(
         installedSources: installedSources,
         repoList: repoList,
         categories: categories,
         defaultCategory: defaultCategory,
+        categoriesToUpdate: categoriesToUpdate,
       ),
     );
   }
@@ -293,7 +303,7 @@ final class ExtensionStateProvider
   }
 }
 
-String _$extensionStateHash() => r'8ec3920b979e1c5550ad879c1d2dc3c02efcf5c9';
+String _$extensionStateHash() => r'8041816f19647b41f164799cc6063757a6997893';
 
 abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
   ExtensionStateMap build();
@@ -352,7 +362,7 @@ final class ExtensionSecureStateProvider
 }
 
 String _$extensionSecureStateHash() =>
-    r'387043ca4bdfa573aff2cfc76037785ea430b5d8';
+    r'25399becce16ba4d5389b121f40921d5f46772ec';
 
 abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateMap> {
   ExtensionStateMap build();

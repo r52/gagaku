@@ -55,7 +55,7 @@ final class _FetchWebMangaInfoProvider
   }
 }
 
-String _$fetchWebMangaInfoHash() => r'0622112342007844d48abb8e95b93836544d76dc';
+String _$fetchWebMangaInfoHash() => r'e745e301b87e533d34606a34767ffee04286b1ec';
 
 final class _FetchWebMangaInfoFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebManga>, SourceHandler> {

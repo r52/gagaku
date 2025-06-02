@@ -27,6 +27,7 @@ abstract class GagakuRoute {
   static const local = '/local';
 
   static const extension = '/extensions';
+  static const extensionUpdates = 'updates';
   static const extensionSaved = 'saved';
   static const extensionHistory = 'history';
   static const extensionHomePage = '/extensions/:sourceId/home';

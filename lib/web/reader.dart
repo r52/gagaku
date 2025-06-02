@@ -20,14 +20,15 @@ Future<WebReaderData> _fetchWebChapterInfo(
   SourceHandler handle,
 ) async {
   final api = ref.watch(proxyProvider);
-  final manga = await api.handleSource(handle);
+  final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
     ref.read(webSourceHistoryProvider.add)(
       HistoryLink(
-        title: '${handle.sourceId}: ${manga.title}',
+        title: manga.title,
         url: handle.getURL(),
         cover: manga.cover,
+        handle: handle,
       ),
     );
 
@@ -83,12 +84,6 @@ Future<List<ReaderPage>> _getSourcePages(
   dynamic chapter,
   SourceHandler handle,
 ) async {
-  var id = chapter;
-
-  if (chapter is Chapter) {
-    id = chapter.id;
-  }
-
   String referer = '';
   List<String>? links = [];
 
@@ -114,11 +109,18 @@ Future<List<ReaderPage>> _getSourcePages(
   final ext = await ref.watch(extensionSourceProvider(sourceId).future);
   links = await ref
       .read(extensionSourceProvider(sourceId).notifier)
-      .getChapterPages(handle.location, id);
-  referer = ext.baseUrl;
+      .getChapterPages(chapter as Chapter);
 
-  if (referer.isNotEmpty && !referer.endsWith('/')) {
-    referer = '$referer/';
+  referer = ext.baseUrl ?? '';
+
+  if (referer.isNotEmpty) {
+    if (!referer.startsWith('https://')) {
+      referer = 'https://$referer';
+    }
+
+    if (!referer.endsWith('/')) {
+      referer = '$referer/';
+    }
   }
 
   final pages =

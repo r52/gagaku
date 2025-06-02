@@ -79,6 +79,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsColorsEn colors = TranslationsColorsEn.internal(_root);
 	late final TranslationsCacheEn cache = TranslationsCacheEn.internal(_root);
 	late final TranslationsBackupEn backup = TranslationsBackupEn.internal(_root);
+	late final TranslationsChapterFeedEn chapterFeed = TranslationsChapterFeedEn.internal(_root);
+	late final TranslationsPermissionsEn permissions = TranslationsPermissionsEn.internal(_root);
 }
 
 // Path: ui
@@ -109,6 +111,7 @@ class TranslationsUiEn {
 	String get save => 'Save';
 	String get delete => 'Delete';
 	String get rename => 'Rename';
+	String get clear => 'Clear';
 	String get gridView => 'Grid view';
 	String get listView => 'List view';
 	String get detailedView => 'Detailed view';
@@ -120,6 +123,7 @@ class TranslationsUiEn {
 	String get makeDefault => 'Make Default';
 	String get retry => 'Retry';
 	String get irreversibleWarning => 'NOTE: THIS ACTION IS IRREVERSIBLE';
+	String get filterItems => 'Filter Items';
 }
 
 // Path: errors
@@ -299,11 +303,9 @@ class TranslationsMangadexEn {
 	String get myLists => 'My Lists';
 	String get followedLists => 'Followed Lists';
 	String get popularNewTitles => 'Popular New Titles';
-	String get latestUpdates => 'Latest Updates';
 	String get staffPicks => 'Staff Picks';
 	String get seasonal => 'Seasonal';
 	String get recentlyAdded => 'Recently Added';
-	String get updates => 'Updates';
 	String get byChapter => 'By Chapter';
 	String get byManga => 'By Manga';
 	String get localHistory => 'Reading History (local)';
@@ -610,6 +612,34 @@ class TranslationsBackupEn {
 	String get dataLocDefault => 'Default';
 }
 
+// Path: chapterFeed
+class TranslationsChapterFeedEn {
+	TranslationsChapterFeedEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get latestUpdates => 'Latest Updates';
+	String get updates => 'Updates';
+	String get updatingFeed => 'Updating Feed';
+	String updatingItem({required Object item}) => 'Updating: ${item}';
+	String get done => 'Update complete!';
+	String get stop => 'Stop Update';
+	String get stopping => 'Stopping Update...';
+	String get updateRequired => 'Update required! No feed data or data out of date';
+}
+
+// Path: permissions
+class TranslationsPermissionsEn {
+	TranslationsPermissionsEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get needed => 'Permissions Needed';
+	String get request => 'Extra permissions are required to update your feed in the background.';
+}
+
 // Path: localLibrary.settings
 class TranslationsLocalLibrarySettingsEn {
 	TranslationsLocalLibrarySettingsEn.internal(this._root);
@@ -666,14 +696,21 @@ class TranslationsWebSourcesSettingsEn {
 	// Translations
 	String get repos => 'Repos';
 	String get reposDesc => 'Configure source repos';
-	String get categories => 'Categories';
-	String get categoriesDesc => 'Set up categories';
+	String get categories => 'Favorite Categories';
+	String get categoriesDesc => 'Set up favourite list categories';
 	String get newCategory => '${_root.ui.addNew} Category';
 	String get addCategory => '${_root.ui.add} Category';
 	String get renameCategory => '${_root.ui.rename} Category';
 	String get categoryName => 'Category name';
 	String get emptyCategoryWarning => 'Category name cannot be empty';
 	String get usedCategoryWarning => 'Category name already used';
+	String get categoriesToUpdate => 'Categories to Update';
+	String get categoriesToUpdateDesc => 'Select categories which manga will be updated in Updates view';
+	String get clearAll => 'Clear All Extension Settings';
+	String get clearAllDesc => 'Clears all extension settings. Recommended when replacing or upgrading extensions.';
+	String get clearAllWarning => 'Are you sure you want to delete all extension settings?';
+	String get clearSettings => 'Clear Settings';
+	String get clearSuccess => 'Settings Cleared';
 }
 
 // Path: webSources.repo
@@ -832,6 +869,7 @@ extension on Translations {
 			case 'ui.save': return 'Save';
 			case 'ui.delete': return 'Delete';
 			case 'ui.rename': return 'Rename';
+			case 'ui.clear': return 'Clear';
 			case 'ui.gridView': return 'Grid view';
 			case 'ui.listView': return 'List view';
 			case 'ui.detailedView': return 'Detailed view';
@@ -843,6 +881,7 @@ extension on Translations {
 			case 'ui.makeDefault': return 'Make Default';
 			case 'ui.retry': return 'Retry';
 			case 'ui.irreversibleWarning': return 'NOTE: THIS ACTION IS IRREVERSIBLE';
+			case 'ui.filterItems': return 'Filter Items';
 			case 'errors.noresults': return 'No results';
 			case 'errors.notitles': return 'No titles';
 			case 'errors.nomanga': return 'No manga';
@@ -903,14 +942,21 @@ extension on Translations {
 			case 'webSources.supportedUrl.arg': return ({required Object arg}) => '${_root.webSources.supportedUrl.text}:${arg}';
 			case 'webSources.settings.repos': return 'Repos';
 			case 'webSources.settings.reposDesc': return 'Configure source repos';
-			case 'webSources.settings.categories': return 'Categories';
-			case 'webSources.settings.categoriesDesc': return 'Set up categories';
+			case 'webSources.settings.categories': return 'Favorite Categories';
+			case 'webSources.settings.categoriesDesc': return 'Set up favourite list categories';
 			case 'webSources.settings.newCategory': return '${_root.ui.addNew} Category';
 			case 'webSources.settings.addCategory': return '${_root.ui.add} Category';
 			case 'webSources.settings.renameCategory': return '${_root.ui.rename} Category';
 			case 'webSources.settings.categoryName': return 'Category name';
 			case 'webSources.settings.emptyCategoryWarning': return 'Category name cannot be empty';
 			case 'webSources.settings.usedCategoryWarning': return 'Category name already used';
+			case 'webSources.settings.categoriesToUpdate': return 'Categories to Update';
+			case 'webSources.settings.categoriesToUpdateDesc': return 'Select categories which manga will be updated in Updates view';
+			case 'webSources.settings.clearAll': return 'Clear All Extension Settings';
+			case 'webSources.settings.clearAllDesc': return 'Clears all extension settings. Recommended when replacing or upgrading extensions.';
+			case 'webSources.settings.clearAllWarning': return 'Are you sure you want to delete all extension settings?';
+			case 'webSources.settings.clearSettings': return 'Clear Settings';
+			case 'webSources.settings.clearSuccess': return 'Settings Cleared';
 			case 'webSources.repo.list': return 'Repo List';
 			case 'webSources.repo.newRepo': return '${_root.ui.addNew} Repo';
 			case 'webSources.repo.browser': return 'View in browser';
@@ -992,11 +1038,9 @@ extension on Translations {
 			case 'mangadex.myLists': return 'My Lists';
 			case 'mangadex.followedLists': return 'Followed Lists';
 			case 'mangadex.popularNewTitles': return 'Popular New Titles';
-			case 'mangadex.latestUpdates': return 'Latest Updates';
 			case 'mangadex.staffPicks': return 'Staff Picks';
 			case 'mangadex.seasonal': return 'Seasonal';
 			case 'mangadex.recentlyAdded': return 'Recently Added';
-			case 'mangadex.updates': return 'Updates';
 			case 'mangadex.byChapter': return 'By Chapter';
 			case 'mangadex.byManga': return 'By Manga';
 			case 'mangadex.localHistory': return 'Reading History (local)';
@@ -1224,6 +1268,16 @@ extension on Translations {
 			case 'backup.dataLocation': return 'Database Directory';
 			case 'backup.dataLocSub': return 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.';
 			case 'backup.dataLocDefault': return 'Default';
+			case 'chapterFeed.latestUpdates': return 'Latest Updates';
+			case 'chapterFeed.updates': return 'Updates';
+			case 'chapterFeed.updatingFeed': return 'Updating Feed';
+			case 'chapterFeed.updatingItem': return ({required Object item}) => 'Updating: ${item}';
+			case 'chapterFeed.done': return 'Update complete!';
+			case 'chapterFeed.stop': return 'Stop Update';
+			case 'chapterFeed.stopping': return 'Stopping Update...';
+			case 'chapterFeed.updateRequired': return 'Update required! No feed data or data out of date';
+			case 'permissions.needed': return 'Permissions Needed';
+			case 'permissions.request': return 'Extra permissions are required to update your feed in the background.';
 			default: return null;
 		}
 	}

@@ -9,9 +9,10 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i28;
-import 'package:flutter/foundation.dart' as _i32;
-import 'package:flutter/material.dart' as _i29;
+import 'package:auto_route/auto_route.dart' as _i29;
+import 'package:collection/collection.dart' as _i34;
+import 'package:flutter/foundation.dart' as _i33;
+import 'package:flutter/material.dart' as _i30;
 import 'package:gagaku/local/main.dart' as _i5;
 import 'package:gagaku/main.dart' as _i23;
 import 'package:gagaku/mangadex/chapter_feed.dart' as _i6;
@@ -27,7 +28,7 @@ import 'package:gagaku/mangadex/lists.dart' as _i16;
 import 'package:gagaku/mangadex/login_password.dart' as _i17;
 import 'package:gagaku/mangadex/main.dart' as _i13;
 import 'package:gagaku/mangadex/manga_view.dart' as _i18;
-import 'package:gagaku/mangadex/model/types.dart' as _i31;
+import 'package:gagaku/mangadex/model/types.dart' as _i32;
 import 'package:gagaku/mangadex/reader.dart' as _i19;
 import 'package:gagaku/mangadex/recent_feed.dart' as _i20;
 import 'package:gagaku/mangadex/search.dart' as _i21;
@@ -38,19 +39,20 @@ import 'package:gagaku/web/frontpage.dart' as _i2;
 import 'package:gagaku/web/history.dart' as _i26;
 import 'package:gagaku/web/main.dart' as _i27;
 import 'package:gagaku/web/manga_view.dart' as _i24;
-import 'package:gagaku/web/model/types.dart' as _i30;
+import 'package:gagaku/web/model/types.dart' as _i31;
 import 'package:gagaku/web/reader.dart' as _i3;
 import 'package:gagaku/web/search.dart' as _i4;
+import 'package:gagaku/web/updates_feed.dart' as _i28;
 
 /// generated route for
 /// [_i1.AppSettingsPage]
-class AppSettingsRoute extends _i28.PageRouteInfo<void> {
-  const AppSettingsRoute({List<_i28.PageRouteInfo>? children})
+class AppSettingsRoute extends _i29.PageRouteInfo<void> {
+  const AppSettingsRoute({List<_i29.PageRouteInfo>? children})
     : super(AppSettingsRoute.name, initialChildren: children);
 
   static const String name = 'AppSettingsRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       return const _i1.AppSettingsPage();
@@ -60,12 +62,12 @@ class AppSettingsRoute extends _i28.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.ExtensionHomePage]
-class ExtensionHomeRoute extends _i28.PageRouteInfo<ExtensionHomeRouteArgs> {
+class ExtensionHomeRoute extends _i29.PageRouteInfo<ExtensionHomeRouteArgs> {
   ExtensionHomeRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String sourceId,
-    _i30.WebSourceInfo? source,
-    List<_i28.PageRouteInfo>? children,
+    _i31.WebSourceInfo? source,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          ExtensionHomeRoute.name,
          args: ExtensionHomeRouteArgs(
@@ -79,7 +81,7 @@ class ExtensionHomeRoute extends _i28.PageRouteInfo<ExtensionHomeRouteArgs> {
 
   static const String name = 'ExtensionHomeRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -101,29 +103,41 @@ class ExtensionHomeRoute extends _i28.PageRouteInfo<ExtensionHomeRouteArgs> {
 class ExtensionHomeRouteArgs {
   const ExtensionHomeRouteArgs({this.key, required this.sourceId, this.source});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String sourceId;
 
-  final _i30.WebSourceInfo? source;
+  final _i31.WebSourceInfo? source;
 
   @override
   String toString() {
     return 'ExtensionHomeRouteArgs{key: $key, sourceId: $sourceId, source: $source}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ExtensionHomeRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        source == other.source;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ sourceId.hashCode ^ source.hashCode;
 }
 
 /// generated route for
 /// [_i3.ExtensionReaderPage]
 class ExtensionReaderRoute
-    extends _i28.PageRouteInfo<ExtensionReaderRouteArgs> {
+    extends _i29.PageRouteInfo<ExtensionReaderRouteArgs> {
   ExtensionReaderRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String sourceId,
     required String mangaId,
     required String chapterId,
-    _i30.WebReaderData? readerData,
-    List<_i28.PageRouteInfo>? children,
+    _i31.WebReaderData? readerData,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          ExtensionReaderRoute.name,
          args: ExtensionReaderRouteArgs(
@@ -143,7 +157,7 @@ class ExtensionReaderRoute
 
   static const String name = 'ExtensionReaderRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -175,7 +189,7 @@ class ExtensionReaderRouteArgs {
     this.readerData,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String sourceId;
 
@@ -183,24 +197,43 @@ class ExtensionReaderRouteArgs {
 
   final String chapterId;
 
-  final _i30.WebReaderData? readerData;
+  final _i31.WebReaderData? readerData;
 
   @override
   String toString() {
     return 'ExtensionReaderRouteArgs{key: $key, sourceId: $sourceId, mangaId: $mangaId, chapterId: $chapterId, readerData: $readerData}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ExtensionReaderRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        mangaId == other.mangaId &&
+        chapterId == other.chapterId &&
+        readerData == other.readerData;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      sourceId.hashCode ^
+      mangaId.hashCode ^
+      chapterId.hashCode ^
+      readerData.hashCode;
 }
 
 /// generated route for
 /// [_i4.ExtensionSearchPage]
 class ExtensionSearchRoute
-    extends _i28.PageRouteInfo<ExtensionSearchRouteArgs> {
+    extends _i29.PageRouteInfo<ExtensionSearchRouteArgs> {
   ExtensionSearchRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String sourceId,
-    _i30.WebSourceInfo? source,
-    _i30.SearchRequest? query,
-    List<_i28.PageRouteInfo>? children,
+    _i31.WebSourceInfo? source,
+    _i31.SearchQuery? query,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          ExtensionSearchRoute.name,
          args: ExtensionSearchRouteArgs(
@@ -215,7 +248,7 @@ class ExtensionSearchRoute
 
   static const String name = 'ExtensionSearchRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -243,29 +276,43 @@ class ExtensionSearchRouteArgs {
     this.query,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String sourceId;
 
-  final _i30.WebSourceInfo? source;
+  final _i31.WebSourceInfo? source;
 
-  final _i30.SearchRequest? query;
+  final _i31.SearchQuery? query;
 
   @override
   String toString() {
     return 'ExtensionSearchRouteArgs{key: $key, sourceId: $sourceId, source: $source, query: $query}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ExtensionSearchRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        source == other.source &&
+        query == other.query;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ sourceId.hashCode ^ source.hashCode ^ query.hashCode;
 }
 
 /// generated route for
 /// [_i5.LocalLibraryHomeScreen]
-class LocalLibraryHomeRoute extends _i28.PageRouteInfo<void> {
-  const LocalLibraryHomeRoute({List<_i28.PageRouteInfo>? children})
+class LocalLibraryHomeRoute extends _i29.PageRouteInfo<void> {
+  const LocalLibraryHomeRoute({List<_i29.PageRouteInfo>? children})
     : super(LocalLibraryHomeRoute.name, initialChildren: children);
 
   static const String name = 'LocalLibraryHomeRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       return const _i5.LocalLibraryHomeScreen();
@@ -276,11 +323,11 @@ class LocalLibraryHomeRoute extends _i28.PageRouteInfo<void> {
 /// generated route for
 /// [_i6.MangaDexChapterFeedPage]
 class MangaDexChapterFeedRoute
-    extends _i28.PageRouteInfo<MangaDexChapterFeedRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexChapterFeedRouteArgs> {
   MangaDexChapterFeedRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexChapterFeedRoute.name,
          args: MangaDexChapterFeedRouteArgs(key: key, controller: controller),
@@ -289,7 +336,7 @@ class MangaDexChapterFeedRoute
 
   static const String name = 'MangaDexChapterFeedRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexChapterFeedRouteArgs>(
@@ -306,25 +353,35 @@ class MangaDexChapterFeedRoute
 class MangaDexChapterFeedRouteArgs {
   const MangaDexChapterFeedRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'MangaDexChapterFeedRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexChapterFeedRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i7.MangaDexCreateListScreen]
-class MangaDexCreateListRoute extends _i28.PageRouteInfo<void> {
-  const MangaDexCreateListRoute({List<_i28.PageRouteInfo>? children})
+class MangaDexCreateListRoute extends _i29.PageRouteInfo<void> {
+  const MangaDexCreateListRoute({List<_i29.PageRouteInfo>? children})
     : super(MangaDexCreateListRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexCreateListRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       return const _i7.MangaDexCreateListScreen();
@@ -335,12 +392,12 @@ class MangaDexCreateListRoute extends _i28.PageRouteInfo<void> {
 /// generated route for
 /// [_i8.MangaDexCreatorViewPage]
 class MangaDexCreatorViewRoute
-    extends _i28.PageRouteInfo<MangaDexCreatorViewRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexCreatorViewRouteArgs> {
   MangaDexCreatorViewRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String creatorId,
-    _i31.CreatorType? creator,
-    List<_i28.PageRouteInfo>? children,
+    _i32.CreatorType? creator,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexCreatorViewRoute.name,
          args: MangaDexCreatorViewRouteArgs(
@@ -354,7 +411,7 @@ class MangaDexCreatorViewRoute
 
   static const String name = 'MangaDexCreatorViewRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -380,27 +437,39 @@ class MangaDexCreatorViewRouteArgs {
     this.creator,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String creatorId;
 
-  final _i31.CreatorType? creator;
+  final _i32.CreatorType? creator;
 
   @override
   String toString() {
     return 'MangaDexCreatorViewRouteArgs{key: $key, creatorId: $creatorId, creator: $creator}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexCreatorViewRouteArgs) return false;
+    return key == other.key &&
+        creatorId == other.creatorId &&
+        creator == other.creator;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ creatorId.hashCode ^ creator.hashCode;
 }
 
 /// generated route for
 /// [_i8.MangaDexCreatorViewWithNamePage]
 class MangaDexCreatorViewWithNameRoute
-    extends _i28.PageRouteInfo<MangaDexCreatorViewWithNameRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexCreatorViewWithNameRouteArgs> {
   MangaDexCreatorViewWithNameRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String creatorId,
     String? name,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexCreatorViewWithNameRoute.name,
          args: MangaDexCreatorViewWithNameRouteArgs(
@@ -414,7 +483,7 @@ class MangaDexCreatorViewWithNameRoute
 
   static const String name = 'MangaDexCreatorViewWithNameRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -441,7 +510,7 @@ class MangaDexCreatorViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String creatorId;
 
@@ -451,17 +520,29 @@ class MangaDexCreatorViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexCreatorViewWithNameRouteArgs{key: $key, creatorId: $creatorId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexCreatorViewWithNameRouteArgs) return false;
+    return key == other.key &&
+        creatorId == other.creatorId &&
+        name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ creatorId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
 /// [_i7.MangaDexEditListScreen]
 class MangaDexEditListRoute
-    extends _i28.PageRouteInfo<MangaDexEditListRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexEditListRouteArgs> {
   MangaDexEditListRoute({
-    _i32.Key? key,
+    _i33.Key? key,
     String? listId,
-    _i31.CustomList? list,
-    List<_i28.PageRouteInfo>? children,
+    _i32.CustomList? list,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexEditListRoute.name,
          args: MangaDexEditListRouteArgs(key: key, listId: listId, list: list),
@@ -471,7 +552,7 @@ class MangaDexEditListRoute
 
   static const String name = 'MangaDexEditListRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -493,25 +574,35 @@ class MangaDexEditListRoute
 class MangaDexEditListRouteArgs {
   const MangaDexEditListRouteArgs({this.key, this.listId, this.list});
 
-  final _i32.Key? key;
+  final _i33.Key? key;
 
   final String? listId;
 
-  final _i31.CustomList? list;
+  final _i32.CustomList? list;
 
   @override
   String toString() {
     return 'MangaDexEditListRouteArgs{key: $key, listId: $listId, list: $list}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexEditListRouteArgs) return false;
+    return key == other.key && listId == other.listId && list == other.list;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ listId.hashCode ^ list.hashCode;
 }
 
 /// generated route for
 /// [_i9.MangaDexFrontPage]
-class MangaDexFrontRoute extends _i28.PageRouteInfo<MangaDexFrontRouteArgs> {
+class MangaDexFrontRoute extends _i29.PageRouteInfo<MangaDexFrontRouteArgs> {
   MangaDexFrontRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexFrontRoute.name,
          args: MangaDexFrontRouteArgs(key: key, controller: controller),
@@ -520,7 +611,7 @@ class MangaDexFrontRoute extends _i28.PageRouteInfo<MangaDexFrontRouteArgs> {
 
   static const String name = 'MangaDexFrontRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexFrontRouteArgs>(
@@ -534,25 +625,35 @@ class MangaDexFrontRoute extends _i28.PageRouteInfo<MangaDexFrontRouteArgs> {
 class MangaDexFrontRouteArgs {
   const MangaDexFrontRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'MangaDexFrontRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexFrontRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i10.MangaDexGlobalFeedPage]
-class MangaDexGlobalFeedRoute extends _i28.PageRouteInfo<void> {
-  const MangaDexGlobalFeedRoute({List<_i28.PageRouteInfo>? children})
+class MangaDexGlobalFeedRoute extends _i29.PageRouteInfo<void> {
+  const MangaDexGlobalFeedRoute({List<_i29.PageRouteInfo>? children})
     : super(MangaDexGlobalFeedRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexGlobalFeedRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       return const _i10.MangaDexGlobalFeedPage();
@@ -563,12 +664,12 @@ class MangaDexGlobalFeedRoute extends _i28.PageRouteInfo<void> {
 /// generated route for
 /// [_i11.MangaDexGroupViewPage]
 class MangaDexGroupViewRoute
-    extends _i28.PageRouteInfo<MangaDexGroupViewRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexGroupViewRouteArgs> {
   MangaDexGroupViewRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String groupId,
-    _i31.Group? group,
-    List<_i28.PageRouteInfo>? children,
+    _i32.Group? group,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexGroupViewRoute.name,
          args: MangaDexGroupViewRouteArgs(
@@ -582,7 +683,7 @@ class MangaDexGroupViewRoute
 
   static const String name = 'MangaDexGroupViewRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -608,27 +709,37 @@ class MangaDexGroupViewRouteArgs {
     this.group,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String groupId;
 
-  final _i31.Group? group;
+  final _i32.Group? group;
 
   @override
   String toString() {
     return 'MangaDexGroupViewRouteArgs{key: $key, groupId: $groupId, group: $group}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexGroupViewRouteArgs) return false;
+    return key == other.key && groupId == other.groupId && group == other.group;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ groupId.hashCode ^ group.hashCode;
 }
 
 /// generated route for
 /// [_i11.MangaDexGroupViewWithNamePage]
 class MangaDexGroupViewWithNameRoute
-    extends _i28.PageRouteInfo<MangaDexGroupViewWithNameRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexGroupViewWithNameRouteArgs> {
   MangaDexGroupViewWithNameRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String groupId,
     String? name,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexGroupViewWithNameRoute.name,
          args: MangaDexGroupViewWithNameRouteArgs(
@@ -642,7 +753,7 @@ class MangaDexGroupViewWithNameRoute
 
   static const String name = 'MangaDexGroupViewWithNameRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -669,7 +780,7 @@ class MangaDexGroupViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String groupId;
 
@@ -679,16 +790,26 @@ class MangaDexGroupViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexGroupViewWithNameRouteArgs{key: $key, groupId: $groupId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexGroupViewWithNameRouteArgs) return false;
+    return key == other.key && groupId == other.groupId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ groupId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
 /// [_i12.MangaDexHistoryFeedPage]
 class MangaDexHistoryFeedRoute
-    extends _i28.PageRouteInfo<MangaDexHistoryFeedRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexHistoryFeedRouteArgs> {
   MangaDexHistoryFeedRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexHistoryFeedRoute.name,
          args: MangaDexHistoryFeedRouteArgs(key: key, controller: controller),
@@ -697,7 +818,7 @@ class MangaDexHistoryFeedRoute
 
   static const String name = 'MangaDexHistoryFeedRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexHistoryFeedRouteArgs>(
@@ -714,25 +835,35 @@ class MangaDexHistoryFeedRoute
 class MangaDexHistoryFeedRouteArgs {
   const MangaDexHistoryFeedRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'MangaDexHistoryFeedRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexHistoryFeedRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i13.MangaDexHomePage]
-class MangaDexHomeRoute extends _i28.PageRouteInfo<void> {
-  const MangaDexHomeRoute({List<_i28.PageRouteInfo>? children})
+class MangaDexHomeRoute extends _i29.PageRouteInfo<void> {
+  const MangaDexHomeRoute({List<_i29.PageRouteInfo>? children})
     : super(MangaDexHomeRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexHomeRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       return const _i13.MangaDexHomePage();
@@ -743,11 +874,11 @@ class MangaDexHomeRoute extends _i28.PageRouteInfo<void> {
 /// generated route for
 /// [_i14.MangaDexLibraryPage]
 class MangaDexLibraryRoute
-    extends _i28.PageRouteInfo<MangaDexLibraryRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexLibraryRouteArgs> {
   MangaDexLibraryRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexLibraryRoute.name,
          args: MangaDexLibraryRouteArgs(key: key, controller: controller),
@@ -756,7 +887,7 @@ class MangaDexLibraryRoute
 
   static const String name = 'MangaDexLibraryRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexLibraryRouteArgs>(
@@ -773,24 +904,34 @@ class MangaDexLibraryRoute
 class MangaDexLibraryRouteArgs {
   const MangaDexLibraryRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'MangaDexLibraryRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexLibraryRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i15.MangaDexListViewPage]
 class MangaDexListViewRoute
-    extends _i28.PageRouteInfo<MangaDexListViewRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexListViewRouteArgs> {
   MangaDexListViewRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String listId,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexListViewRoute.name,
          args: MangaDexListViewRouteArgs(key: key, listId: listId),
@@ -800,7 +941,7 @@ class MangaDexListViewRoute
 
   static const String name = 'MangaDexListViewRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -818,7 +959,7 @@ class MangaDexListViewRoute
 class MangaDexListViewRouteArgs {
   const MangaDexListViewRouteArgs({this.key, required this.listId});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String listId;
 
@@ -826,17 +967,27 @@ class MangaDexListViewRouteArgs {
   String toString() {
     return 'MangaDexListViewRouteArgs{key: $key, listId: $listId}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexListViewRouteArgs) return false;
+    return key == other.key && listId == other.listId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ listId.hashCode;
 }
 
 /// generated route for
 /// [_i15.MangaDexListViewWithNamePage]
 class MangaDexListViewWithNameRoute
-    extends _i28.PageRouteInfo<MangaDexListViewWithNameRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexListViewWithNameRouteArgs> {
   MangaDexListViewWithNameRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String listId,
     String? name,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexListViewWithNameRoute.name,
          args: MangaDexListViewWithNameRouteArgs(
@@ -850,7 +1001,7 @@ class MangaDexListViewWithNameRoute
 
   static const String name = 'MangaDexListViewWithNameRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -877,7 +1028,7 @@ class MangaDexListViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String listId;
 
@@ -887,15 +1038,25 @@ class MangaDexListViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexListViewWithNameRouteArgs{key: $key, listId: $listId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexListViewWithNameRouteArgs) return false;
+    return key == other.key && listId == other.listId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ listId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
 /// [_i16.MangaDexListsPage]
-class MangaDexListsRoute extends _i28.PageRouteInfo<MangaDexListsRouteArgs> {
+class MangaDexListsRoute extends _i29.PageRouteInfo<MangaDexListsRouteArgs> {
   MangaDexListsRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexListsRoute.name,
          args: MangaDexListsRouteArgs(key: key, controller: controller),
@@ -904,7 +1065,7 @@ class MangaDexListsRoute extends _i28.PageRouteInfo<MangaDexListsRouteArgs> {
 
   static const String name = 'MangaDexListsRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexListsRouteArgs>(
@@ -918,25 +1079,35 @@ class MangaDexListsRoute extends _i28.PageRouteInfo<MangaDexListsRouteArgs> {
 class MangaDexListsRouteArgs {
   const MangaDexListsRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'MangaDexListsRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexListsRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i17.MangaDexLoginScreen]
-class MangaDexLoginRoute extends _i28.PageRouteInfo<void> {
-  const MangaDexLoginRoute({List<_i28.PageRouteInfo>? children})
+class MangaDexLoginRoute extends _i29.PageRouteInfo<void> {
+  const MangaDexLoginRoute({List<_i29.PageRouteInfo>? children})
     : super(MangaDexLoginRoute.name, initialChildren: children);
 
   static const String name = 'MangaDexLoginRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       return const _i17.MangaDexLoginScreen();
@@ -947,12 +1118,12 @@ class MangaDexLoginRoute extends _i28.PageRouteInfo<void> {
 /// generated route for
 /// [_i18.MangaDexMangaViewPage]
 class MangaDexMangaViewRoute
-    extends _i28.PageRouteInfo<MangaDexMangaViewRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexMangaViewRouteArgs> {
   MangaDexMangaViewRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String mangaId,
-    _i31.Manga? manga,
-    List<_i28.PageRouteInfo>? children,
+    _i32.Manga? manga,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexMangaViewRoute.name,
          args: MangaDexMangaViewRouteArgs(
@@ -966,7 +1137,7 @@ class MangaDexMangaViewRoute
 
   static const String name = 'MangaDexMangaViewRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -992,27 +1163,37 @@ class MangaDexMangaViewRouteArgs {
     this.manga,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String mangaId;
 
-  final _i31.Manga? manga;
+  final _i32.Manga? manga;
 
   @override
   String toString() {
     return 'MangaDexMangaViewRouteArgs{key: $key, mangaId: $mangaId, manga: $manga}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexMangaViewRouteArgs) return false;
+    return key == other.key && mangaId == other.mangaId && manga == other.manga;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ mangaId.hashCode ^ manga.hashCode;
 }
 
 /// generated route for
 /// [_i18.MangaDexMangaViewWithNamePage]
 class MangaDexMangaViewWithNameRoute
-    extends _i28.PageRouteInfo<MangaDexMangaViewWithNameRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexMangaViewWithNameRouteArgs> {
   MangaDexMangaViewWithNameRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String mangaId,
     String? name,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexMangaViewWithNameRoute.name,
          args: MangaDexMangaViewWithNameRouteArgs(
@@ -1026,7 +1207,7 @@ class MangaDexMangaViewWithNameRoute
 
   static const String name = 'MangaDexMangaViewWithNameRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1053,7 +1234,7 @@ class MangaDexMangaViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String mangaId;
 
@@ -1063,16 +1244,26 @@ class MangaDexMangaViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexMangaViewWithNameRouteArgs{key: $key, mangaId: $mangaId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexMangaViewWithNameRouteArgs) return false;
+    return key == other.key && mangaId == other.mangaId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ mangaId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
 /// [_i19.MangaDexReaderPage]
-class MangaDexReaderRoute extends _i28.PageRouteInfo<MangaDexReaderRouteArgs> {
+class MangaDexReaderRoute extends _i29.PageRouteInfo<MangaDexReaderRouteArgs> {
   MangaDexReaderRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String chapterId,
     _i19.ReaderData? readerData,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexReaderRoute.name,
          args: MangaDexReaderRouteArgs(
@@ -1086,7 +1277,7 @@ class MangaDexReaderRoute extends _i28.PageRouteInfo<MangaDexReaderRouteArgs> {
 
   static const String name = 'MangaDexReaderRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1112,7 +1303,7 @@ class MangaDexReaderRouteArgs {
     this.readerData,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String chapterId;
 
@@ -1122,16 +1313,28 @@ class MangaDexReaderRouteArgs {
   String toString() {
     return 'MangaDexReaderRouteArgs{key: $key, chapterId: $chapterId, readerData: $readerData}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexReaderRouteArgs) return false;
+    return key == other.key &&
+        chapterId == other.chapterId &&
+        readerData == other.readerData;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ chapterId.hashCode ^ readerData.hashCode;
 }
 
 /// generated route for
 /// [_i20.MangaDexRecentFeedPage]
 class MangaDexRecentFeedRoute
-    extends _i28.PageRouteInfo<MangaDexRecentFeedRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexRecentFeedRouteArgs> {
   MangaDexRecentFeedRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexRecentFeedRoute.name,
          args: MangaDexRecentFeedRouteArgs(key: key, controller: controller),
@@ -1140,7 +1343,7 @@ class MangaDexRecentFeedRoute
 
   static const String name = 'MangaDexRecentFeedRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexRecentFeedRouteArgs>(
@@ -1157,25 +1360,35 @@ class MangaDexRecentFeedRoute
 class MangaDexRecentFeedRouteArgs {
   const MangaDexRecentFeedRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'MangaDexRecentFeedRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexRecentFeedRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i21.MangaDexSearchPage]
-class MangaDexSearchRoute extends _i28.PageRouteInfo<MangaDexSearchRouteArgs> {
+class MangaDexSearchRoute extends _i29.PageRouteInfo<MangaDexSearchRouteArgs> {
   MangaDexSearchRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     bool selectMode = false,
     Set<String>? selectedTitles,
-    _i31.MangaSearchParameters? parameters,
-    List<_i28.PageRouteInfo>? children,
+    _i32.MangaSearchParameters? parameters,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexSearchRoute.name,
          args: MangaDexSearchRouteArgs(
@@ -1189,7 +1402,7 @@ class MangaDexSearchRoute extends _i28.PageRouteInfo<MangaDexSearchRouteArgs> {
 
   static const String name = 'MangaDexSearchRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MangaDexSearchRouteArgs>(
@@ -1213,29 +1426,46 @@ class MangaDexSearchRouteArgs {
     this.parameters,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final bool selectMode;
 
   final Set<String>? selectedTitles;
 
-  final _i31.MangaSearchParameters? parameters;
+  final _i32.MangaSearchParameters? parameters;
 
   @override
   String toString() {
     return 'MangaDexSearchRouteArgs{key: $key, selectMode: $selectMode, selectedTitles: $selectedTitles, parameters: $parameters}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexSearchRouteArgs) return false;
+    return key == other.key &&
+        selectMode == other.selectMode &&
+        const _i34.SetEquality().equals(selectedTitles, other.selectedTitles) &&
+        parameters == other.parameters;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      selectMode.hashCode ^
+      const _i34.SetEquality().hash(selectedTitles) ^
+      parameters.hashCode;
 }
 
 /// generated route for
 /// [_i22.MangaDexTagViewPage]
 class MangaDexTagViewRoute
-    extends _i28.PageRouteInfo<MangaDexTagViewRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexTagViewRouteArgs> {
   MangaDexTagViewRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String tagId,
-    _i31.Tag? tag,
-    List<_i28.PageRouteInfo>? children,
+    _i32.Tag? tag,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexTagViewRoute.name,
          args: MangaDexTagViewRouteArgs(key: key, tagId: tagId, tag: tag),
@@ -1245,7 +1475,7 @@ class MangaDexTagViewRoute
 
   static const String name = 'MangaDexTagViewRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1266,27 +1496,37 @@ class MangaDexTagViewRoute
 class MangaDexTagViewRouteArgs {
   const MangaDexTagViewRouteArgs({this.key, required this.tagId, this.tag});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String tagId;
 
-  final _i31.Tag? tag;
+  final _i32.Tag? tag;
 
   @override
   String toString() {
     return 'MangaDexTagViewRouteArgs{key: $key, tagId: $tagId, tag: $tag}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexTagViewRouteArgs) return false;
+    return key == other.key && tagId == other.tagId && tag == other.tag;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ tagId.hashCode ^ tag.hashCode;
 }
 
 /// generated route for
 /// [_i22.MangaDexTagViewWithNamePage]
 class MangaDexTagViewWithNameRoute
-    extends _i28.PageRouteInfo<MangaDexTagViewWithNameRouteArgs> {
+    extends _i29.PageRouteInfo<MangaDexTagViewWithNameRouteArgs> {
   MangaDexTagViewWithNameRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String tagId,
     String? name,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          MangaDexTagViewWithNameRoute.name,
          args: MangaDexTagViewWithNameRouteArgs(
@@ -1300,7 +1540,7 @@ class MangaDexTagViewWithNameRoute
 
   static const String name = 'MangaDexTagViewWithNameRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1327,7 +1567,7 @@ class MangaDexTagViewWithNameRouteArgs {
     this.name,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String tagId;
 
@@ -1337,15 +1577,25 @@ class MangaDexTagViewWithNameRouteArgs {
   String toString() {
     return 'MangaDexTagViewWithNameRouteArgs{key: $key, tagId: $tagId, name: $name}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MangaDexTagViewWithNameRouteArgs) return false;
+    return key == other.key && tagId == other.tagId && name == other.name;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ tagId.hashCode ^ name.hashCode;
 }
 
 /// generated route for
 /// [_i23.NotFoundScreen]
-class NotFoundRoute extends _i28.PageRouteInfo<NotFoundRouteArgs> {
+class NotFoundRoute extends _i29.PageRouteInfo<NotFoundRouteArgs> {
   NotFoundRoute({
-    _i32.Key? key,
+    _i33.Key? key,
     String uri = '',
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          NotFoundRoute.name,
          args: NotFoundRouteArgs(key: key, uri: uri),
@@ -1355,7 +1605,7 @@ class NotFoundRoute extends _i28.PageRouteInfo<NotFoundRouteArgs> {
 
   static const String name = 'NotFoundRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final queryParams = data.queryParams;
@@ -1370,7 +1620,7 @@ class NotFoundRoute extends _i28.PageRouteInfo<NotFoundRouteArgs> {
 class NotFoundRouteArgs {
   const NotFoundRouteArgs({this.key, this.uri = ''});
 
-  final _i32.Key? key;
+  final _i33.Key? key;
 
   final String uri;
 
@@ -1378,20 +1628,30 @@ class NotFoundRouteArgs {
   String toString() {
     return 'NotFoundRouteArgs{key: $key, uri: $uri}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! NotFoundRouteArgs) return false;
+    return key == other.key && uri == other.uri;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ uri.hashCode;
 }
 
 /// generated route for
 /// [_i3.ProxyWebSourceReaderPage]
 class ProxyWebSourceReaderRoute
-    extends _i28.PageRouteInfo<ProxyWebSourceReaderRouteArgs> {
+    extends _i29.PageRouteInfo<ProxyWebSourceReaderRouteArgs> {
   ProxyWebSourceReaderRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String proxy,
     required String code,
     required String chapter,
     String? page,
-    _i30.WebReaderData? readerData,
-    List<_i28.PageRouteInfo>? children,
+    _i31.WebReaderData? readerData,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          ProxyWebSourceReaderRoute.name,
          args: ProxyWebSourceReaderRouteArgs(
@@ -1408,7 +1668,7 @@ class ProxyWebSourceReaderRoute
 
   static const String name = 'ProxyWebSourceReaderRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1442,7 +1702,7 @@ class ProxyWebSourceReaderRouteArgs {
     this.readerData,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String proxy;
 
@@ -1452,23 +1712,44 @@ class ProxyWebSourceReaderRouteArgs {
 
   final String? page;
 
-  final _i30.WebReaderData? readerData;
+  final _i31.WebReaderData? readerData;
 
   @override
   String toString() {
     return 'ProxyWebSourceReaderRouteArgs{key: $key, proxy: $proxy, code: $code, chapter: $chapter, page: $page, readerData: $readerData}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ProxyWebSourceReaderRouteArgs) return false;
+    return key == other.key &&
+        proxy == other.proxy &&
+        code == other.code &&
+        chapter == other.chapter &&
+        page == other.page &&
+        readerData == other.readerData;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      proxy.hashCode ^
+      code.hashCode ^
+      chapter.hashCode ^
+      page.hashCode ^
+      readerData.hashCode;
 }
 
 /// generated route for
 /// [_i24.WebMangaViewPage]
-class WebMangaViewRoute extends _i28.PageRouteInfo<WebMangaViewRouteArgs> {
+class WebMangaViewRoute extends _i29.PageRouteInfo<WebMangaViewRouteArgs> {
   WebMangaViewRoute({
-    _i29.Key? key,
+    _i30.Key? key,
     required String sourceId,
     required String mangaId,
-    _i30.SourceHandler? handle,
-    List<_i28.PageRouteInfo>? children,
+    _i31.SourceHandler? handle,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          WebMangaViewRoute.name,
          args: WebMangaViewRouteArgs(
@@ -1483,7 +1764,7 @@ class WebMangaViewRoute extends _i28.PageRouteInfo<WebMangaViewRouteArgs> {
 
   static const String name = 'WebMangaViewRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1512,28 +1793,42 @@ class WebMangaViewRouteArgs {
     this.handle,
   });
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
   final String sourceId;
 
   final String mangaId;
 
-  final _i30.SourceHandler? handle;
+  final _i31.SourceHandler? handle;
 
   @override
   String toString() {
     return 'WebMangaViewRouteArgs{key: $key, sourceId: $sourceId, mangaId: $mangaId, handle: $handle}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebMangaViewRouteArgs) return false;
+    return key == other.key &&
+        sourceId == other.sourceId &&
+        mangaId == other.mangaId &&
+        handle == other.handle;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ sourceId.hashCode ^ mangaId.hashCode ^ handle.hashCode;
 }
 
 /// generated route for
 /// [_i25.WebSourceFavoritesPage]
 class WebSourceFavoritesRoute
-    extends _i28.PageRouteInfo<WebSourceFavoritesRouteArgs> {
+    extends _i29.PageRouteInfo<WebSourceFavoritesRouteArgs> {
   WebSourceFavoritesRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          WebSourceFavoritesRoute.name,
          args: WebSourceFavoritesRouteArgs(key: key, controller: controller),
@@ -1542,7 +1837,7 @@ class WebSourceFavoritesRoute
 
   static const String name = 'WebSourceFavoritesRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<WebSourceFavoritesRouteArgs>(
@@ -1559,24 +1854,34 @@ class WebSourceFavoritesRoute
 class WebSourceFavoritesRouteArgs {
   const WebSourceFavoritesRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'WebSourceFavoritesRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceFavoritesRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i2.WebSourceFrontPage]
-class WebSourceFrontRoute extends _i28.PageRouteInfo<WebSourceFrontRouteArgs> {
+class WebSourceFrontRoute extends _i29.PageRouteInfo<WebSourceFrontRouteArgs> {
   WebSourceFrontRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
     Uri? process,
-    List<_i28.PageRouteInfo>? children,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          WebSourceFrontRoute.name,
          args: WebSourceFrontRouteArgs(
@@ -1589,7 +1894,7 @@ class WebSourceFrontRoute extends _i28.PageRouteInfo<WebSourceFrontRouteArgs> {
 
   static const String name = 'WebSourceFrontRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<WebSourceFrontRouteArgs>(
@@ -1607,9 +1912,9 @@ class WebSourceFrontRoute extends _i28.PageRouteInfo<WebSourceFrontRouteArgs> {
 class WebSourceFrontRouteArgs {
   const WebSourceFrontRouteArgs({this.key, this.controller, this.process});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   final Uri? process;
 
@@ -1617,16 +1922,28 @@ class WebSourceFrontRouteArgs {
   String toString() {
     return 'WebSourceFrontRouteArgs{key: $key, controller: $controller, process: $process}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceFrontRouteArgs) return false;
+    return key == other.key &&
+        controller == other.controller &&
+        process == other.process;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode ^ process.hashCode;
 }
 
 /// generated route for
 /// [_i26.WebSourceHistoryPage]
 class WebSourceHistoryRoute
-    extends _i28.PageRouteInfo<WebSourceHistoryRouteArgs> {
+    extends _i29.PageRouteInfo<WebSourceHistoryRouteArgs> {
   WebSourceHistoryRoute({
-    _i29.Key? key,
-    _i29.ScrollController? controller,
-    List<_i28.PageRouteInfo>? children,
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
   }) : super(
          WebSourceHistoryRoute.name,
          args: WebSourceHistoryRouteArgs(key: key, controller: controller),
@@ -1635,7 +1952,7 @@ class WebSourceHistoryRoute
 
   static const String name = 'WebSourceHistoryRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<WebSourceHistoryRouteArgs>(
@@ -1652,28 +1969,91 @@ class WebSourceHistoryRoute
 class WebSourceHistoryRouteArgs {
   const WebSourceHistoryRouteArgs({this.key, this.controller});
 
-  final _i29.Key? key;
+  final _i30.Key? key;
 
-  final _i29.ScrollController? controller;
+  final _i30.ScrollController? controller;
 
   @override
   String toString() {
     return 'WebSourceHistoryRouteArgs{key: $key, controller: $controller}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceHistoryRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }
 
 /// generated route for
 /// [_i27.WebSourceHomePage]
-class WebSourceHomeRoute extends _i28.PageRouteInfo<void> {
-  const WebSourceHomeRoute({List<_i28.PageRouteInfo>? children})
+class WebSourceHomeRoute extends _i29.PageRouteInfo<void> {
+  const WebSourceHomeRoute({List<_i29.PageRouteInfo>? children})
     : super(WebSourceHomeRoute.name, initialChildren: children);
 
   static const String name = 'WebSourceHomeRoute';
 
-  static _i28.PageInfo page = _i28.PageInfo(
+  static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
       return const _i27.WebSourceHomePage();
     },
   );
+}
+
+/// generated route for
+/// [_i28.WebSourceUpdatesPage]
+class WebSourceUpdatesRoute
+    extends _i29.PageRouteInfo<WebSourceUpdatesRouteArgs> {
+  WebSourceUpdatesRoute({
+    _i30.Key? key,
+    _i30.ScrollController? controller,
+    List<_i29.PageRouteInfo>? children,
+  }) : super(
+         WebSourceUpdatesRoute.name,
+         args: WebSourceUpdatesRouteArgs(key: key, controller: controller),
+         initialChildren: children,
+       );
+
+  static const String name = 'WebSourceUpdatesRoute';
+
+  static _i29.PageInfo page = _i29.PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<WebSourceUpdatesRouteArgs>(
+        orElse: () => const WebSourceUpdatesRouteArgs(),
+      );
+      return _i28.WebSourceUpdatesPage(
+        key: args.key,
+        controller: args.controller,
+      );
+    },
+  );
+}
+
+class WebSourceUpdatesRouteArgs {
+  const WebSourceUpdatesRouteArgs({this.key, this.controller});
+
+  final _i30.Key? key;
+
+  final _i30.ScrollController? controller;
+
+  @override
+  String toString() {
+    return 'WebSourceUpdatesRouteArgs{key: $key, controller: $controller}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WebSourceUpdatesRouteArgs) return false;
+    return key == other.key && controller == other.controller;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ controller.hashCode;
 }

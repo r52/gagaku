@@ -180,6 +180,11 @@ class AppRouter extends RootStackRouter {
           transitionsBuilder: Styles.fadeThroughTransitionBuilder,
         ),
         CustomRoute(
+          path: GagakuRoute.extensionUpdates,
+          page: WebSourceUpdatesRoute.page,
+          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
+        ),
+        CustomRoute(
           path: GagakuRoute.extensionSaved,
           page: WebSourceFavoritesRoute.page,
           transitionsBuilder: Styles.fadeThroughTransitionBuilder,

@@ -26,7 +26,7 @@ class MangaDexGlobalFeedPage extends HookWidget {
               curve: Curves.easeOutCirc,
             );
           },
-          child: TitleFlexBar(title: t.mangadex.latestUpdates),
+          child: TitleFlexBar(title: t.chapterFeed.latestUpdates),
         ),
         leading: AutoLeadingButton(),
       ),

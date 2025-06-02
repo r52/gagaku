@@ -21,6 +21,7 @@
     "save": "Save",
     "delete": "Delete",
     "rename": "Rename",
+    "clear": "Clear",
     "gridView": "Grid view",
     "listView": "List view",
     "detailedView": "Detailed view",
@@ -31,7 +32,8 @@
     "dragHint": "Hint: Drag to reorder",
     "makeDefault": "Make Default",
     "retry": "Retry",
-    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE"
+    "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
+    "filterItems": "Filter Items"
   },
   "errors": {
     "noresults": "No results",
@@ -113,14 +115,21 @@
     "settings": {
       "repos": "Repos",
       "reposDesc": "Configure source repos",
-      "categories": "Categories",
-      "categoriesDesc": "Set up categories",
+      "categories": "Favorite Categories",
+      "categoriesDesc": "Set up favourite list categories",
       "newCategory": "@:ui.addNew Category",
       "addCategory": "@:ui.add Category",
       "renameCategory": "@:ui.rename Category",
       "categoryName": "Category name",
       "emptyCategoryWarning": "Category name cannot be empty",
-      "usedCategoryWarning": "Category name already used"
+      "usedCategoryWarning": "Category name already used",
+      "categoriesToUpdate": "Categories to Update",
+      "categoriesToUpdateDesc": "Select categories which manga will be updated in Updates view",
+      "clearAll": "Clear All Extension Settings",
+      "clearAllDesc": "Clears all extension settings. Recommended when replacing or upgrading extensions.",
+      "clearAllWarning": "Are you sure you want to delete all extension settings?",
+      "clearSettings": "Clear Settings",
+      "clearSuccess": "Settings Cleared"
     },
     "repo": {
       "list": "Repo List",
@@ -219,11 +228,9 @@
     "myLists": "My Lists",
     "followedLists": "Followed Lists",
     "popularNewTitles": "Popular New Titles",
-    "latestUpdates": "Latest Updates",
     "staffPicks": "Staff Picks",
     "seasonal": "Seasonal",
     "recentlyAdded": "Recently Added",
-    "updates": "Updates",
     "byChapter": "By Chapter",
     "byManga": "By Manga",
     "localHistory": "Reading History (local)",
@@ -483,5 +490,19 @@
     "dataLocation": "Database Directory",
     "dataLocSub": "Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.",
     "dataLocDefault": "Default"
+  },
+  "chapterFeed": {
+    "latestUpdates": "Latest Updates",
+    "updates": "Updates",
+    "updatingFeed": "Updating Feed",
+    "updatingItem": "Updating: $item",
+    "done": "Update complete!",
+    "stop": "Stop Update",
+    "stopping": "Stopping Update...",
+    "updateRequired": "Update required! No feed data or data out of date"
+  },
+  "permissions": {
+    "needed": "Permissions Needed",
+    "request": "Extra permissions are required to update your feed in the background."
   }
 }

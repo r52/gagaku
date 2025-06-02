@@ -1,12 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:input_quantity/input_quantity.dart';
 
 class ExtensionSettingsPage extends HookConsumerWidget {
   const ExtensionSettingsPage({super.key, required this.source});
@@ -18,7 +18,9 @@ class ExtensionSettingsPage extends HookConsumerWidget {
     final tr = context.t;
     final results = useMemoized(
       () =>
-          ref.read(extensionSourceProvider(source.id).notifier).getSourceMenu(),
+          ref
+              .read(extensionSourceProvider(source.id).notifier)
+              .getSettingsForm(),
       [source],
     );
     final future = useFuture(results);
@@ -34,7 +36,7 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
     if (future.data != null) {
       final data = future.data!;
-      body = DUIDelegateBuilder(source: source, element: data);
+      return FormBuilder(source: source, form: data, isTopLevel: true);
     }
 
     return Scaffold(
@@ -47,164 +49,220 @@ class ExtensionSettingsPage extends HookConsumerWidget {
   }
 }
 
-class DUIDelegateBuilder extends StatelessWidget {
-  const DUIDelegateBuilder({
+class FormBuilder extends StatefulHookConsumerWidget {
+  const FormBuilder({
+    super.key,
+    required this.source,
+    required this.form,
+    required this.isTopLevel,
+  });
+
+  final WebSourceInfo source;
+  final SettingsForm form;
+  final bool isTopLevel;
+
+  @override
+  ConsumerState<FormBuilder> createState() => _FormBuilderState();
+}
+
+class _FormBuilderState extends ConsumerState<FormBuilder> {
+  @override
+  void dispose() {
+    if (widget.isTopLevel) {
+      widget.form.uninitialize();
+    }
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    final form = useListenable(widget.form);
+    final results = useMemoized(() => form.getSections(), [
+      widget.source,
+      form,
+    ]);
+    final future = useFuture(results);
+
+    Widget body = Center(child: CircularProgressIndicator());
+
+    if (future.hasError) {
+      body = ErrorList(error: future.error!, stackTrace: future.stackTrace!);
+    } else if (future.connectionState == ConnectionState.waiting ||
+        !future.hasData) {
+      body = Center(child: CircularProgressIndicator());
+    }
+
+    if (future.data != null) {
+      final data = future.data!;
+
+      body = ListView.separated(
+        itemCount: data.length,
+        separatorBuilder: (context, index) => const Divider(),
+        itemBuilder: (context, index) {
+          return FormSectionBuilder(
+            source: widget.source,
+            section: data.elementAt(index),
+          );
+        },
+      );
+    }
+
+    // TODO submit button support?
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(tr.arg_settings(arg: widget.source.name)),
+        leading: AutoLeadingButton(),
+      ),
+      body: SafeArea(child: body),
+    );
+  }
+}
+
+class FormItemDelegateBuilder extends StatelessWidget {
+  const FormItemDelegateBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final DUIType element;
+  final FormItemElement element;
 
   @override
   Widget build(BuildContext context) {
     switch (element) {
-      case DUISection():
-        return DUISectionBuilder(
+      case NavigationRowElement():
+        return NavigationRowBuilder(
           source: source,
-          element: element as DUISection,
+          element: element as NavigationRowElement,
         );
-      case DUINavigationButton():
-        return DUINavigationButtonBuilder(
+      case SelectRowElement():
+        return SelectRowBuilder(
           source: source,
-          element: element as DUINavigationButton,
+          element: element as SelectRowElement,
         );
-      case DUISelect():
-        return DUISelectBuilder(source: source, element: element as DUISelect);
-      case DUIInputField():
-      case DUISecureInputField():
-        return DUIInputFieldBuilder(
+      case InputRowElement():
+        return InputRowBuilder(
           source: source,
-          element: element as DUIInputType,
-          secure: element is DUISecureInputField,
+          element: element as InputRowElement,
+          secure: false,
         );
-      case DUIButton():
-        return DUIButtonBuilder(source: source, element: element as DUIButton);
-      case DUISwitch():
-        return DUISwitchBuilder(source: source, element: element as DUISwitch);
-      case DUIForm():
-        return DUIFormBuilder(
+      case ButtonRowElement():
+        return ButtonRowBuilder(
           source: source,
-          element: element as DUIForm,
-          parent: element,
+          element: element as ButtonRowElement,
         );
-      case DUIStepper():
-        return DUIStepperBuilder(
+      case ToggleRowElement():
+        return ToggleRowBuilder(
           source: source,
-          element: element as DUIStepper,
+          element: element as ToggleRowElement,
         );
-      case DUILabel():
-      case DUIMultilineLabel():
-        return DUILabelBuilder(
+      case LabelRowElement():
+        return LabelRowBuilder(
           source: source,
-          element: element as DUILabelType,
+          element: element as LabelRowElement,
         );
-      case DUIHeader():
-        return DUIHeaderBuilder(source: source, element: element as DUIHeader);
-      case DUIOAuthButton():
-        return DUIOAuthButtonBuilder(
+      case StepperRowElement():
+        return StepperRowBuilder(
           source: source,
-          element: element as DUIOAuthButton,
+          element: element as StepperRowElement,
+        );
+      case OAuthButtonRowElement():
+        // TODO: support this?
+        return UnsupportedRowBuilder(
+          source: source,
+          element: element as OAuthButtonRowElement,
+        );
+      case WebViewRowElement():
+        return UnsupportedRowBuilder(
+          source: source,
+          element: element as OAuthButtonRowElement,
         );
     }
   }
 }
 
-class DUISectionBuilder extends StatelessWidget {
-  const DUISectionBuilder({
+class FormSectionBuilder extends StatelessWidget {
+  const FormSectionBuilder({
     super.key,
     required this.source,
-    required this.element,
+    required this.section,
   });
 
   final WebSourceInfo source;
-  final DUISection element;
+  final FormSectionElement section;
 
   @override
   Widget build(BuildContext context) {
-    if (element.isHidden) {
-      return SizedBox.shrink();
-    }
-
     return Column(
       children: [
-        if (element.header != null)
+        if (section.header != null)
           Text(
-            element.header!,
+            section.header!,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-        for (final row in element.rows)
-          DUIDelegateBuilder(source: source, element: row),
-        if (element.footer != null) Text(element.footer!),
+        for (final item in section.items)
+          FormItemDelegateBuilder(source: source, element: item),
+        if (section.footer != null) Text(section.footer!),
       ],
     );
   }
 }
 
-class DUIButtonBuilder extends ConsumerWidget {
-  const DUIButtonBuilder({
+class ButtonRowBuilder extends ConsumerWidget {
+  const ButtonRowBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final DUIButton element;
+  final ButtonRowElement element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (element.isHidden) {
+      return const SizedBox.shrink();
+    }
+
     return Card(
       child: ListTile(
-        title: Text(element.label),
+        title: Text(element.title),
         onTap: () async {
           await ref
               .read(extensionSourceProvider(source.id).notifier)
-              .callBinding(element.id);
+              .callBinding(element.onSelect);
         },
       ),
     );
   }
 }
 
-class DUISelectBuilder extends HookConsumerWidget {
-  const DUISelectBuilder({
+class SelectRowBuilder extends HookConsumerWidget {
+  const SelectRowBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final DUISelect element;
+  final SelectRowElement element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final initFuture = useMemoized(
-      () => ref
-          .read(extensionSourceProvider(source.id).notifier)
-          .callBinding('${element.id}.get'),
-    );
-    final initial = useFuture(initFuture);
-
-    if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final data = useState(
-      initial.hasData
-          ? (initial.data != null
-              ? List<String>.from(initial.data! as List)
-              : <String>[])
-          : <String>[],
-    );
+    final data = useState(element.value);
 
     return SettingCardWidget(
-      title: Text(element.label),
+      title: Text(element.title),
+      subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
       builder: (context) {
         return HookBuilder(
           builder: (context) {
-            if (!element.allowsMultiselect) {
+            if (element.maxItemCount == 1) {
               return Center(
                 child: DropdownMenu<String>(
                   initialSelection:
@@ -213,19 +271,17 @@ class DUISelectBuilder extends HookConsumerWidget {
                   enableSearch: false,
                   enableFilter: false,
                   dropdownMenuEntries: [
-                    for (final MapEntry(key: option, value: label)
-                        in element.labels.entries)
-                      DropdownMenuEntry(value: option, label: label),
+                    for (final option in element.options)
+                      DropdownMenuEntry(value: option.id, label: option.title),
                   ],
                   onSelected: (String? value) {
                     if (value != null) {
+                      data.value = [value];
                       ref
                           .read(extensionSourceProvider(source.id).notifier)
-                          .callBinding('${element.id}.set', [
-                            [value],
+                          .callBinding(element.onValueChange, [
+                            [data.value],
                           ]);
-
-                      data.value = [value];
                     }
                   },
                 ),
@@ -257,26 +313,36 @@ class DUISelectBuilder extends HookConsumerWidget {
                         ),
                       ),
                   menuChildren: List.generate(
-                    element.labels.entries.length,
+                    element.options.length,
                     (index) => Builder(
                       builder: (_) {
-                        final option = element.labels.entries.elementAt(index);
+                        final option = element.options.elementAt(index);
                         return CheckboxListTile(
                           controlAffinity: ListTileControlAffinity.leading,
-                          title: Text(option.value),
-                          value: data.value.contains(option.key),
+                          title: Text(option.title),
+                          value: data.value.contains(option.id),
                           onChanged: (bool? value) async {
                             if (value == true) {
-                              data.value = [...data.value, option.key];
+                              if (element.maxItemCount != null &&
+                                  data.value.length == element.maxItemCount) {
+                                return;
+                              }
+
+                              data.value = [...data.value, option.id];
                             } else {
-                              data.value = [...data.value..remove(option.key)];
+                              if (data.value.length == element.minItemCount) {
+                                return;
+                              }
+                              data.value = [...data.value..remove(option.id)];
                             }
 
                             ref
                                 .read(
                                   extensionSourceProvider(source.id).notifier,
                                 )
-                                .callBinding('${element.id}.set', [data.value]);
+                                .callBinding(element.onValueChange, [
+                                  data.value,
+                                ]);
                           },
                         );
                       },
@@ -298,12 +364,16 @@ class DUISelectBuilder extends HookConsumerWidget {
                                         source.id,
                                       ).notifier,
                                     )
-                                    .callBinding('${element.id}.set', [
+                                    .callBinding(element.onValueChange, [
                                       data.value,
                                     ]);
                               },
                               icon: const Icon(Icons.close),
-                              label: Text(element.labels[option]!),
+                              label: Text(
+                                element.options
+                                    .firstWhere((e) => e.id == option)
+                                    .title,
+                              ),
                             ),
                         ],
                       ),
@@ -320,8 +390,8 @@ class DUISelectBuilder extends HookConsumerWidget {
   }
 }
 
-class DUIInputFieldBuilder extends HookConsumerWidget {
-  const DUIInputFieldBuilder({
+class InputRowBuilder extends HookConsumerWidget {
+  const InputRowBuilder({
     super.key,
     required this.source,
     required this.element,
@@ -329,34 +399,21 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
   });
 
   final WebSourceInfo source;
-  final DUIInputType element;
+  final InputRowElement element;
   final bool secure;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final initFuture = useMemoized(
-      () => ref
-          .read(extensionSourceProvider(source.id).notifier)
-          .callBinding('${element.id}.get'),
-    );
-    final initial = useFuture(initFuture);
-
-    if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
+    if (element.isHidden) {
+      return const SizedBox.shrink();
     }
 
-    final data = useState(
-      initial.hasData
-          ? (initial.data != null ? initial.data! as String : null)
-          : null,
-    );
-
     return SettingCardWidget(
-      title: Text(element.label),
+      title: Text(element.title),
       builder: (context) {
         return HookBuilder(
           builder: (context) {
-            final controller = useTextEditingController(text: data.value);
+            final controller = useTextEditingController(text: element.value);
             final settingText = useListenableSelector(
               controller,
               () => controller.text,
@@ -371,7 +428,7 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
                 if (debouncedInput != null) {
                   ref
                       .read(extensionSourceProvider(source.id).notifier)
-                      .callBinding('${element.id}.set', [debouncedInput]);
+                      .callBinding(element.onValueChange, [debouncedInput]);
                 }
               });
               return null;
@@ -389,82 +446,94 @@ class DUIInputFieldBuilder extends HookConsumerWidget {
   }
 }
 
-class DUINavigationButtonBuilder extends StatelessWidget {
-  const DUINavigationButtonBuilder({
+class NavigationRowBuilder extends HookConsumerWidget {
+  const NavigationRowBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final DUINavigationButton element;
-
-  @override
-  Widget build(BuildContext context) {
-    final nav = Navigator.of(context);
-
-    return Card(
-      child: ListTile(
-        title: Text(element.label),
-        trailing: Icon(Icons.arrow_forward_ios),
-        onTap:
-            () => nav.push(
-              PageTransitionRouteBuilder(
-                pageTransitionsBuilder:
-                    const FadeForwardsPageTransitionsBuilder(),
-                pageBuilder:
-                    (context, animation, secondaryAnimation) => DUIFormBuilder(
-                      source: source,
-                      element: element.form,
-                      parent: element,
-                    ),
-              ),
-            ),
-      ),
-    );
-  }
-}
-
-class DUISwitchBuilder extends HookConsumerWidget {
-  const DUISwitchBuilder({
-    super.key,
-    required this.source,
-    required this.element,
-  });
-
-  final WebSourceInfo source;
-  final DUISwitch element;
+  final NavigationRowElement element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final initFuture = useMemoized(
+    final nav = Navigator.of(context);
+    final results = useMemoized(
       () => ref
           .read(extensionSourceProvider(source.id).notifier)
-          .callBinding('${element.id}.get'),
+          .getForm(element.form),
+      [source],
     );
-    final initial = useFuture(initFuture);
+    final future = useFuture(results);
 
-    if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
+    Widget body = Center(child: CircularProgressIndicator());
+
+    if (future.hasError) {
+      body = ErrorList(error: future.error!, stackTrace: future.stackTrace!);
+    } else if (future.connectionState == ConnectionState.waiting ||
+        !future.hasData) {
+      body = Center(child: CircularProgressIndicator());
     }
 
-    final data = useState(
-      initial.hasData
-          ? (initial.data != null ? initial.data! as bool : false)
-          : false,
-    );
+    if (future.data != null) {
+      final data = future.data!;
+
+      body = Card(
+        child: ListTile(
+          title: Text(element.title),
+          subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
+          trailing: Icon(Icons.arrow_forward_ios),
+          onTap:
+              () => nav.push(
+                PageTransitionRouteBuilder(
+                  pageTransitionsBuilder:
+                      const FadeForwardsPageTransitionsBuilder(),
+                  pageBuilder:
+                      (context, animation, secondaryAnimation) => FormBuilder(
+                        source: source,
+                        form: data,
+                        isTopLevel: false,
+                      ),
+                ),
+              ),
+        ),
+      );
+    }
+
+    return body;
+  }
+}
+
+class ToggleRowBuilder extends HookConsumerWidget {
+  const ToggleRowBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
+
+  final WebSourceInfo source;
+  final ToggleRowElement element;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (element.isHidden) {
+      return const SizedBox.shrink();
+    }
+
+    final currentVal = useState(element.value);
 
     return SettingCardWidget(
-      title: Text(element.label),
+      title: Text(element.title),
       builder: (context) {
         return Switch(
-          value: data.value,
+          value: currentVal.value,
           onChanged: (value) {
             ref.read(extensionSourceProvider(source.id).notifier).callBinding(
-              '${element.id}.set',
+              element.onValueChange,
               [value],
             );
-            data.value = value;
+            currentVal.value = value;
           },
         );
       },
@@ -472,49 +541,34 @@ class DUISwitchBuilder extends HookConsumerWidget {
   }
 }
 
-class DUIStepperBuilder extends HookConsumerWidget {
-  const DUIStepperBuilder({
+class StepperRowBuilder extends HookConsumerWidget {
+  const StepperRowBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final DUIStepper element;
+  final StepperRowElement element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final initFuture = useMemoized(
-      () => ref
-          .read(extensionSourceProvider(source.id).notifier)
-          .callBinding('${element.id}.get'),
-    );
-    final initial = useFuture(initFuture);
-
-    if (initial.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final data = useState(
-      initial.hasData
-          ? (initial.data != null ? initial.data! as num : null)
-          : null,
-    );
+    final currentVal = useState(element.value);
 
     return SettingCardWidget(
-      title: Text(element.label),
+      title: Text(element.title),
       builder: (context) {
-        return InputQty(
-          initVal: data.value ?? 0,
-          minVal: element.min ?? 0,
-          maxVal: element.max ?? double.maxFinite,
-          steps: element.step ?? 1,
-          onQtyChanged: (value) {
+        return SpinBox(
+          value: currentVal.value.toDouble(),
+          min: element.minValue.toDouble(),
+          max: element.maxValue.toDouble(),
+          step: element.stepValue.toDouble(),
+          onChanged: (value) {
             ref.read(extensionSourceProvider(source.id).notifier).callBinding(
-              '${element.id}.set',
+              element.onValueChange,
               [value],
             );
-            data.value = value;
+            currentVal.value = value;
           },
         );
       },
@@ -522,37 +576,24 @@ class DUIStepperBuilder extends HookConsumerWidget {
   }
 }
 
-class DUILabelBuilder extends StatelessWidget {
-  const DUILabelBuilder({
+class LabelRowBuilder extends StatelessWidget {
+  const LabelRowBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final DUILabelType element;
+  final LabelRowElement element;
 
   @override
   Widget build(BuildContext context) {
-    return Card(child: Text(element.label));
-  }
-}
+    if (element.isHidden) {
+      return const SizedBox.shrink();
+    }
 
-class DUIHeaderBuilder extends StatelessWidget {
-  const DUIHeaderBuilder({
-    super.key,
-    required this.source,
-    required this.element,
-  });
-
-  final WebSourceInfo source;
-  final DUIHeader element;
-
-  @override
-  Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: Image.network(element.imageUrl),
         title: Text(element.title),
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
       ),
@@ -560,49 +601,24 @@ class DUIHeaderBuilder extends StatelessWidget {
   }
 }
 
-class DUIOAuthButtonBuilder extends ConsumerWidget {
-  const DUIOAuthButtonBuilder({
+class UnsupportedRowBuilder extends ConsumerWidget {
+  const UnsupportedRowBuilder({
     super.key,
     required this.source,
     required this.element,
   });
 
   final WebSourceInfo source;
-  final DUIOAuthButton element;
+  final FormItemElement element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO
-    return Card(child: ListTile(title: Text("Unsupported"), enabled: false));
-  }
-}
+    if (element.isHidden) {
+      return const SizedBox.shrink();
+    }
 
-class DUIFormBuilder extends StatelessWidget {
-  const DUIFormBuilder({
-    super.key,
-    required this.source,
-    required this.element,
-    required this.parent,
-  });
-
-  final WebSourceInfo source;
-  final DUIForm element;
-  final DUIType parent;
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO submit
-
-    return Scaffold(
-      appBar: AppBar(leading: AutoLeadingButton()),
-      body: SafeArea(
-        child: ListView(
-          children: [
-            for (final sec in element.sections)
-              DUISectionBuilder(source: source, element: sec),
-          ],
-        ),
-      ),
+    return Card(
+      child: ListTile(title: Text("Unsupported element"), enabled: false),
     );
   }
 }

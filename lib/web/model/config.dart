@@ -52,6 +52,7 @@ abstract class WebSourceConfig with _$WebSourceConfig {
     @RepoConverter() @Default([]) List<RepoInfo> repoList,
     @Default([_defaultCategory]) List<WebSourceCategory> categories,
     @Default(_defaultUUID) String defaultCategory,
+    @Default([]) List<String> categoriesToUpdate,
   }) = _WebSourceConfig;
 
   factory WebSourceConfig.fromJson(Map<String, dynamic> json) =>
@@ -84,6 +85,7 @@ class WebConfig extends _$WebConfig {
     List<RepoInfo>? repoList,
     List<WebSourceCategory>? categories,
     String? defaultCategory,
+    List<String>? categoriesToUpdate,
   }) {
     var update = state;
 
@@ -101,6 +103,10 @@ class WebConfig extends _$WebConfig {
 
     if (defaultCategory != null) {
       update = update.copyWith(defaultCategory: defaultCategory);
+    }
+
+    if (categoriesToUpdate != null) {
+      update = update.copyWith(categoriesToUpdate: categoriesToUpdate);
     }
 
     state = update;
@@ -143,20 +149,28 @@ class ExtensionState extends _$ExtensionState {
     return _fetch();
   }
 
-  dynamic getState(String sourceId, String stateName) {
-    final result = state[sourceId]?[stateName];
+  dynamic getExtensionState(String sourceId) {
+    final result = state[sourceId];
     return result;
   }
 
-  void setState(String sourceId, String stateName, dynamic data) {
-    if (!state.containsKey(sourceId)) {
-      state[sourceId] = {};
-    }
-
-    state[sourceId]![stateName] = data;
+  void setExtensionState(String sourceId, dynamic data) {
+    state[sourceId] = data;
 
     final box = Hive.box(gagakuDataBox);
     box.put('extension-state', json.encode(state));
+  }
+
+  void resetAllState(String sourceId) {
+    state.remove(sourceId);
+
+    final box = Hive.box(gagakuDataBox);
+    box.put('extension-state', json.encode(state));
+  }
+
+  void clearAll() {
+    final box = Hive.box(gagakuDataBox);
+    box.delete('extension-state');
   }
 }
 
@@ -182,19 +196,20 @@ class ExtensionSecureState extends _$ExtensionSecureState {
     return _fetch();
   }
 
-  dynamic getState(String sourceId, String stateName) {
-    final result = state[sourceId]?[stateName];
+  dynamic getExtensionState(String sourceId) {
+    final result = state[sourceId];
     return result;
   }
 
-  void setState(String sourceId, String stateName, dynamic data) {
-    if (!state.containsKey(sourceId)) {
-      state[sourceId] = {};
-    }
-
-    state[sourceId]![stateName] = data;
+  void setExtensionState(String sourceId, dynamic data) {
+    state[sourceId] = data;
 
     final box = Hive.box(gagakuDataBox);
     box.put('extension-secure-state', json.encode(state));
+  }
+
+  void clearAll() {
+    final box = Hive.box(gagakuDataBox);
+    box.delete('extension-secure-state');
   }
 }

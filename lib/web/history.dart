@@ -4,7 +4,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/ui.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -20,9 +19,6 @@ class WebSourceHistoryPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final api = ref.watch(proxyProvider);
-    final defaultCategory = ref.watch(
-      webConfigProvider.select((cfg) => cfg.defaultCategory),
-    );
 
     final scrollController =
         DefaultScrollController.maybeOf(context, 'WebSourceHistoryPage') ??
@@ -107,13 +103,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
               ],
             ),
           ],
-          children: [
-            WebMangaListViewSliver(
-              items: history.toList(),
-              favoritesKey: defaultCategory,
-              removeFromAll: true,
-            ),
-          ],
+          children: [WebMangaListViewSliver(items: history.toList())],
         ),
         AsyncValue(:final error?, :final stackTrace?) => ErrorList(
           error: error,

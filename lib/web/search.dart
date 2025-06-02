@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -36,7 +36,7 @@ class ExtensionSearchPage extends StatelessWidget {
 
   final String sourceId;
   final WebSourceInfo? source;
-  final SearchRequest? query;
+  final SearchQuery? query;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,7 @@ class ExtensionSearchWidget extends StatefulHookConsumerWidget {
   const ExtensionSearchWidget({super.key, required this.source, this.query});
 
   final WebSourceInfo source;
-  final SearchRequest? query;
+  final SearchQuery? query;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -67,7 +67,7 @@ class ExtensionSearchWidget extends StatefulHookConsumerWidget {
 
 class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   Map<String, dynamic>? metadata = {'page': 1};
-  SearchRequest? query;
+  SearchQuery? query;
 
   late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
     getNextPageKey:
@@ -81,17 +81,13 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
           .read(extensionSourceProvider(widget.source.id).notifier)
           .searchManga(query!, metadata);
 
-      final m = results.results?.map(
-        (e) => HistoryLink.fromPartialSourceManga(widget.source.id, e),
+      final m = results.items.map(
+        (e) => HistoryLink.fromSearchReultItem(widget.source, e),
       );
 
       metadata = results.metadata;
 
-      if (m != null) {
-        return PageResultsMetaData(m.toList());
-      }
-
-      return PageResultsMetaData([]);
+      return PageResultsMetaData(m.toList());
     },
     getIsLastPage: (_, __) => metadata == null,
     refresh: () async {
@@ -116,9 +112,6 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
     final tr = context.t;
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
-    final defaultCategory = ref.watch(
-      webConfigProvider.select((cfg) => cfg.defaultCategory),
-    );
     final controller = useSearchController();
 
     return Scaffold(
@@ -168,7 +161,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                       query =
                           query != null
                               ? query!.copyWith(title: term.toLowerCase())
-                              : SearchRequest(title: term.toLowerCase());
+                              : SearchQuery(title: term.toLowerCase());
                     });
                     _pagingController.refresh();
                   },
@@ -177,35 +170,33 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                       message: tr.search.filters,
                       child: IconButton(
                         onPressed: () async {
-                          final result = await nav.push<(List<Tag>, List<Tag>)>(
-                            SlideTransitionRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      _ExtensionFilterWidget(
+                          final result = await nav
+                              .push<List<SearchFilterValue>>(
+                                SlideTransitionRouteBuilder(
+                                  pageBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                      ) => _ExtensionFilterWidget(
                                         source: widget.source,
-                                        filter: query,
+                                        query: query,
                                       ),
-                            ),
-                          );
+                                ),
+                              );
 
                           if (result != null) {
                             setState(() {
                               query =
                                   query != null
-                                      ? query!.copyWith(
-                                        includedTags: result.$1,
-                                        excludedTags: result.$2,
-                                      )
-                                      : SearchRequest(
-                                        includedTags: result.$1,
-                                        excludedTags: result.$2,
-                                      );
+                                      ? query!.copyWith(filters: result)
+                                      : SearchQuery(title: '', filters: result);
                             });
                             _pagingController.refresh();
                           }
                         },
                         color:
-                            (query == null || query!.isFiltersEmpty)
+                            (query == null || query!.filters.isEmpty)
                                 ? theme.disabledColor
                                 : null,
                         icon: const Icon(Icons.filter_list),
@@ -232,7 +223,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                   query =
                       query != null
                           ? query!.copyWith(title: term.toLowerCase())
-                          : SearchRequest(title: term.toLowerCase());
+                          : SearchQuery(title: term.toLowerCase());
                 });
                 _pagingController.refresh();
               },
@@ -264,7 +255,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                             query =
                                 query != null
                                     ? query!.copyWith(title: term.toLowerCase())
-                                    : SearchRequest(title: term.toLowerCase());
+                                    : SearchQuery(title: term.toLowerCase());
                           });
                           _pagingController.refresh();
                         },
@@ -278,9 +269,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         children: [
           WebMangaListViewSliver(
             controller: _pagingController,
-            favoritesKey: defaultCategory,
             showRemoveButton: false,
-            removeFromAll: true,
           ),
         ],
       ),
@@ -288,26 +277,245 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   }
 }
 
-class _ExtensionFilterWidget extends HookConsumerWidget {
-  const _ExtensionFilterWidget({required this.source, this.filter});
+class _ExtensionFilterWidget extends StatefulHookConsumerWidget {
+  const _ExtensionFilterWidget({required this.source, this.query});
 
   final WebSourceInfo source;
-  final SearchRequest? filter;
+  final SearchQuery? query;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ExtensionFilterWidget> createState() =>
+      _ExtensionFilterWidgetState();
+}
+
+class _ExtensionFilterWidgetState
+    extends ConsumerState<_ExtensionFilterWidget> {
+  late ValueNotifier<List<SearchFilterValue>> fil;
+
+  ExpansionPanel _buildFilterPanel(SearchFilter filter, bool isExpanded) {
+    return ExpansionPanel(
+      canTapOnHeader: true,
+      isExpanded: isExpanded,
+      headerBuilder:
+          (context, isExpanded) => ListTile(
+            title: Text(
+              filter.title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+      body: SizedBox(
+        width: double.infinity,
+        child: switch (filter) {
+          DropdownSearchFilter(:final id, :final options) => Center(
+            child: DropdownMenu<String>(
+              initialSelection:
+                  fil.value.firstWhereOrNull((f) => f.id == id)?.value
+                      as String?,
+              width: 200,
+              requestFocusOnTap: false,
+              enableSearch: false,
+              enableFilter: false,
+              dropdownMenuEntries:
+                  options
+                      .map(
+                        (opt) =>
+                            DropdownMenuEntry(value: opt.id, label: opt.value),
+                      )
+                      .toList(),
+              onSelected: (String? opt) {
+                if (opt != null) {
+                  fil.value.removeWhere((f) => f.id == id);
+
+                  fil.value = [
+                    ...fil.value,
+                    SearchFilterValue(id: id, value: opt),
+                  ];
+                }
+              },
+            ),
+          ),
+
+          SelectSearchFilter(
+            :final id,
+            :final options,
+            :final allowExclusion,
+            :final allowEmptySelection,
+            :final maximum,
+          ) =>
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SectionChildren(
+                  key: ValueKey('_SectionChildren($id)'),
+                  children:
+                      options
+                          .map(
+                            (opt) => HookBuilder(
+                              builder: (context) {
+                                final value = useListenableSelector(
+                                  fil,
+                                  () =>
+                                      (fil.value
+                                              .firstWhereOrNull(
+                                                (f) => f.id == id,
+                                              )
+                                              ?.value
+                                          as Map<String, dynamic>?)?[opt.id],
+                                );
+
+                                if (allowExclusion) {
+                                  return TriStateChip(
+                                    label: Text(opt.value),
+                                    selectedColor: Colors.green,
+                                    unselectedColor: Colors.red,
+                                    onChanged: (bool? value) {
+                                      Map<String, dynamic>? map = {
+                                        ...?(fil.value
+                                                .firstWhereOrNull(
+                                                  (f) => f.id == id,
+                                                )
+                                                ?.value
+                                            as Map<String, dynamic>?),
+                                      };
+
+                                      switch (value) {
+                                        case null:
+                                          map.remove(opt.id);
+                                          break;
+                                        case true:
+                                          if (maximum == null ||
+                                              (map.entries.length < maximum)) {
+                                            map[opt.id] = 'included';
+                                          }
+                                          break;
+                                        case false:
+                                          map[opt.id] = 'excluded';
+                                          break;
+                                      }
+
+                                      fil.value.removeWhere((f) => f.id == id);
+                                      fil.value = [
+                                        ...fil.value,
+                                        if (map.isNotEmpty)
+                                          SearchFilterValue(id: id, value: map),
+                                      ];
+                                    },
+                                    value: switch (value) {
+                                      'included' => true,
+                                      'excluded' => false,
+                                      null => null,
+                                      Object() => null,
+                                    },
+                                  );
+                                } else {
+                                  return InputChip(
+                                    label: Text(opt.value),
+                                    selected: value == 'included',
+                                    onSelected: (selected) {
+                                      Map<String, dynamic>? map = {
+                                        ...?(fil.value
+                                                .firstWhereOrNull(
+                                                  (f) => f.id == id,
+                                                )
+                                                ?.value
+                                            as Map<String, dynamic>?),
+                                      };
+
+                                      switch (selected) {
+                                        case true:
+                                          if (maximum == null ||
+                                              (map.entries.length < maximum)) {
+                                            map[opt.id] = 'included';
+                                          }
+                                          break;
+                                        case false:
+                                          if (allowEmptySelection ||
+                                              map.entries.length > 1) {
+                                            map.remove(opt.id);
+                                          }
+                                          break;
+                                      }
+
+                                      fil.value.removeWhere((f) => f.id == id);
+                                      fil.value = [
+                                        ...fil.value,
+                                        if (map.isNotEmpty)
+                                          SearchFilterValue(id: id, value: map),
+                                      ];
+                                    },
+                                  );
+                                }
+                              },
+                            ),
+                          )
+                          .toList(),
+                ),
+              ],
+            ),
+          InputSearchFilter(:final id, :final placeholder) => Center(
+            child: HookBuilder(
+              builder: (context) {
+                final controller = useTextEditingController();
+                final text = useValueListenable(controller);
+
+                final debouncedInput = useDebounced(
+                  text.text,
+                  Duration(milliseconds: 500),
+                );
+
+                useEffect(() {
+                  fil.value.removeWhere((f) => f.id == id);
+                  fil.value = [
+                    ...fil.value,
+                    if (debouncedInput != null && debouncedInput.isNotEmpty)
+                      SearchFilterValue(id: id, value: debouncedInput),
+                  ];
+                  // Use debouncedInput as a dependency
+                  return null;
+                }, [debouncedInput]);
+
+                return TextField(
+                  controller: controller,
+                  onTapOutside: (event) => unfocusSearchBar(),
+                  decoration: InputDecoration(
+                    hintText: placeholder,
+                    suffixIcon: IconButton(
+                      onPressed: controller.clear,
+                      icon: Icon(Icons.clear),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          TagSearchFilter() => throw UnimplementedError('TagSearchFilter'),
+        },
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    fil = ValueNotifier(
+      widget.query?.filters.map((f) => f.copyWith()).toList() ?? [],
+    );
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SimpleFutureBuilder(
       futureBuilder:
-          () => ref.read(extensionSourceProvider(source.id).notifier).getTags(),
-      builder: (context, data) {
+          () =>
+              ref
+                  .read(extensionSourceProvider(widget.source.id).notifier)
+                  .getFilters(),
+      keys: [widget.source],
+      builder: (context, extFilters) {
         final tr = context.t;
         final nav = Navigator.of(context);
-        final fil = useValueNotifier<(List<Tag>, List<Tag>)>((
-          filter?.includedTags ?? [],
-          filter?.excludedTags ?? [],
-        ));
 
-        if (data == null) {
+        if (extFilters == null) {
           return Scaffold(
             appBar: AppBar(
               leading: BackButton(
@@ -337,7 +545,7 @@ class _ExtensionFilterWidget extends HookConsumerWidget {
                     message: tr.search.resetFilters,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        fil.value = ([], []);
+                        fil.value = [];
                       },
                       icon: const Icon(Icons.clear_all),
                       label: Text(tr.search.resetFilters),
@@ -359,157 +567,13 @@ class _ExtensionFilterWidget extends HookConsumerWidget {
           ),
           body: HookBuilder(
             builder: (context) {
-              final expanded = useState([false]);
+              final expanded = useState(
+                List.generate(extFilters.length, (idx) => false),
+              );
 
               final panelItems = [
-                ExpansionPanel(
-                  canTapOnHeader: true,
-                  isExpanded: expanded.value[0],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final included = useListenableSelector(
-                            fil,
-                            () => fil.value.$1,
-                          );
-                          final excluded = useListenableSelector(
-                            fil,
-                            () => fil.value.$2,
-                          );
-
-                          final includedString = included
-                              .map((e) => e.label)
-                              .join(', ');
-                          final excludedString = excluded
-                              .map((e) => e.label)
-                              .join(', ');
-
-                          return ListTile(
-                            title: Text(
-                              tr.search.filterTags,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle:
-                                included.isEmpty && excluded.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          if (included.isNotEmpty)
-                                            TextSpan(
-                                              text: '+ ',
-                                              style: const TextStyle(
-                                                color: Colors.green,
-                                              ),
-                                            ),
-                                          if (included.isNotEmpty)
-                                            TextSpan(text: includedString),
-                                          if (included.isNotEmpty &&
-                                              excluded.isNotEmpty)
-                                            TextSpan(text: ', '),
-                                          if (excluded.isNotEmpty)
-                                            TextSpan(
-                                              text: '- ',
-                                              style: const TextStyle(
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          if (excluded.isNotEmpty)
-                                            TextSpan(text: excludedString),
-                                        ],
-                                      ),
-                                    ),
-                          );
-                        },
-                      ),
-                  body: SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final group in data) ...[
-                          _SectionHeader(
-                            key: ValueKey(group.label),
-                            header: group.label,
-                          ),
-                          _SectionChildren(
-                            key: ValueKey("_${group.label}Children"),
-                            children:
-                                group.tags
-                                    .map(
-                                      (e) => HookBuilder(
-                                        builder: (context) {
-                                          final value = useListenableSelector(
-                                            fil,
-                                            () =>
-                                                fil.value.$1.contains(e)
-                                                    ? true
-                                                    : (fil.value.$2.contains(e)
-                                                        ? false
-                                                        : null),
-                                          );
-
-                                          return TriStateChip(
-                                            label: Text(e.label),
-                                            selectedColor: Colors.green,
-                                            unselectedColor: Colors.red,
-                                            onChanged: (bool? value) {
-                                              switch (value) {
-                                                case null:
-                                                  fil.value = (
-                                                    fil.value.$1
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                    fil.value.$2
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                  );
-                                                  break;
-                                                case true:
-                                                  fil.value = (
-                                                    [...fil.value.$1, e],
-                                                    fil.value.$2
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                  );
-                                                  break;
-                                                case false:
-                                                  fil.value = (
-                                                    fil.value.$1
-                                                        .where(
-                                                          (element) =>
-                                                              element != e,
-                                                        )
-                                                        .toList(),
-                                                    [...fil.value.$2, e],
-                                                  );
-                                                  break;
-                                              }
-                                            },
-                                            value: value,
-                                          );
-                                        },
-                                      ),
-                                    )
-                                    .toList(),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
+                for (final (idx, f) in extFilters.indexed)
+                  _buildFilterPanel(f, expanded.value[idx]),
               ];
 
               return SafeArea(
@@ -531,22 +595,22 @@ class _ExtensionFilterWidget extends HookConsumerWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  final String header;
+// class _SectionHeader extends StatelessWidget {
+//   final String header;
 
-  const _SectionHeader({super.key, required this.header});
+//   const _SectionHeader({super.key, required this.header});
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        header,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: Text(
+//         header,
+//         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//       ),
+//     );
+//   }
+// }
 
 class _SectionChildren extends StatelessWidget {
   final List<Widget> children;

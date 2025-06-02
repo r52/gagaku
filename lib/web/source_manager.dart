@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:expansion_tile_list/expansion_tile_list.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/settings.dart';
@@ -28,10 +30,23 @@ class SourceManager extends HookConsumerWidget {
       try {
         final data = Versioning.fromJson(json.decode(response.body));
 
-        if (SupportedVersion.values.any(
-              (v) => data.builtWith.types.startsWith(v.version),
-            ) &&
+        // TODO still support 0.8?
+        if (data.builtWith.types.startsWith(SupportedVersion.v0_9.version) &&
             data.sources.isNotEmpty) {
+          final version = SupportedVersion.values.firstWhere(
+            (v) => data.builtWith.types.startsWith(v.version),
+          );
+
+          final sources =
+              data.sources
+                  .map(
+                    (e) =>
+                        version == SupportedVersion.v0_8
+                            ? SourceVersion08.fromJson(e)
+                            : SourceVersion09.fromJson(e),
+                  )
+                  .toList();
+
           list.addEntries([
             MapEntry(
               RepoData.fromInfo(
@@ -40,7 +55,7 @@ class SourceManager extends HookConsumerWidget {
                   (v) => data.builtWith.types.startsWith(v.version),
                 ),
               ),
-              data.sources,
+              sources,
             ),
           ]);
         }
@@ -80,212 +95,202 @@ class SourceManager extends HookConsumerWidget {
       body =
           installed.isEmpty && availableSources.data!.isEmpty
               ? Center(child: Text(tr.webSources.source.noDataWarning))
-              : SingleChildScrollView(
-                child: ExpansionTileList(
-                  children: [
-                    for (final MapEntry(key: repo, value: list)
-                        in availableSources.data!.entries)
-                      ExpansionTile(
-                        title: Text(repo.name),
-                        leading: Icon(Icons.rss_feed),
-                        maintainState: true,
-                        shape: const Border(),
-                        trailing: const Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 20,
-                        ),
-                        children:
-                            list.map((source) {
-                              final isInstalled =
-                                  installed.indexWhere(
-                                    (e) =>
-                                        e.repo == repo.url && e.id == source.id,
-                                  ) !=
-                                  -1;
-                              final icon =
-                                  '${repo.url}/${source.id}/includes/${source.icon}';
-                              final supportedSource =
-                                  source.intents != null &&
-                                  (source.intents! &
-                                          SourceIntents.mangaChapters.flag) ==
-                                      0x1;
-
-                              if (isInstalled) {
-                                orphaned.removeWhere(
+              : ExpansionTileList(
+                children: [
+                  for (final MapEntry(key: repo, value: list)
+                      in availableSources.data!.entries)
+                    ExpansionTile(
+                      title: Text(repo.name),
+                      leading: Icon(Icons.rss_feed),
+                      maintainState: true,
+                      shape: const Border(),
+                      trailing: const Icon(Icons.keyboard_arrow_down, size: 20),
+                      children:
+                          list.map((source) {
+                            final isInstalled =
+                                installed.indexWhere(
                                   (e) =>
                                       e.repo == repo.url && e.id == source.id,
-                                );
-                              }
+                                ) !=
+                                -1;
+                            final icon = '${repo.url}/${source.getIconPath()}';
 
-                              return Card(
-                                key: ValueKey('${repo.url}/${source.id}'),
-                                child: _SourceItem(
-                                  thumbnail: Image.network(icon),
-                                  title: source.name,
-                                  subtitle: source.desc,
-                                  author: source.author,
-                                  version: source.version,
-                                  tags: source.tags,
-                                  trailing:
-                                      supportedSource
-                                          ? Switch(
-                                            activeTrackColor: Colors.green,
-                                            value: isInstalled,
-                                            onChanged: (value) {
-                                              final messenger =
-                                                  ScaffoldMessenger.of(context);
+                            final capabilities = source.getCapabilities();
 
-                                              if (value) {
-                                                ref.read(
-                                                  webConfigProvider.saveWith,
-                                                )(
-                                                  installedSources: [
-                                                    ...cfg.installedSources,
-                                                    WebSourceInfo(
-                                                      id: source.id,
-                                                      name: source.name,
-                                                      baseUrl:
-                                                          source.websiteBaseURL,
-                                                      repo: repo.url,
-                                                      version: repo.version,
-                                                      icon: icon,
-                                                      capabilities:
-                                                          source
-                                                              .getCapabilities(),
-                                                    ),
-                                                  ],
-                                                );
+                            final supportedSource =
+                                capabilities.firstWhereOrNull(
+                                  (intent) =>
+                                      intent == SourceIntents.mangaChapters,
+                                ) !=
+                                null;
 
-                                                messenger
-                                                  ..removeCurrentSnackBar()
-                                                  ..showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        tr
-                                                            .webSources
-                                                            .source
-                                                            .sourceAddOK,
-                                                      ),
-                                                      backgroundColor:
-                                                          Colors.green,
-                                                    ),
-                                                  );
-                                              } else {
-                                                ref.invalidate(
-                                                  extensionSourceProvider(
-                                                    source.id,
-                                                  ),
-                                                );
-                                                ref.read(
-                                                  webConfigProvider.saveWith,
-                                                )(
-                                                  installedSources: [
-                                                    ...cfg.installedSources,
-                                                  ]..removeWhere(
-                                                    (e) =>
-                                                        e.id == source.id &&
-                                                        e.repo == repo.url,
-                                                  ),
-                                                );
-
-                                                messenger
-                                                  ..removeCurrentSnackBar()
-                                                  ..showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        tr
-                                                            .webSources
-                                                            .source
-                                                            .sourceDeleteOK,
-                                                      ),
-                                                      backgroundColor:
-                                                          Colors.green,
-                                                    ),
-                                                  );
-                                              }
-                                            },
-                                          )
-                                          : Tooltip(
-                                            message:
-                                                tr.errors.unsupportedSource,
-                                            child: Icon(Icons.error),
-                                          ),
-                                ),
+                            if (isInstalled) {
+                              orphaned.removeWhere(
+                                (e) => e.repo == repo.url && e.id == source.id,
                               );
-                            }).toList(),
-                      ),
-                    if (orphaned.isNotEmpty)
-                      ExpansionTile(
-                        title: Text(tr.webSources.repo.missingRepo),
-                        leading: Icon(Icons.question_mark),
-                        maintainState: true,
-                        shape: const Border(),
-                        trailing: const Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 20,
-                        ),
-                        children:
-                            orphaned.map((item) {
-                              final actions = <Widget>[
-                                IconButton(
-                                  tooltip: tr.webSources.source.delete(
-                                    arg: item.name,
-                                  ),
-                                  onPressed: () {
-                                    final messenger = ScaffoldMessenger.of(
-                                      context,
-                                    );
-                                    ref.invalidate(
-                                      extensionSourceProvider(item.id),
-                                    );
-                                    ref.read(webConfigProvider.saveWith)(
-                                      installedSources: [
-                                        ...cfg.installedSources,
-                                      ]..removeWhere(
+                            }
+
+                            return Card(
+                              key: ValueKey('${repo.url}/${source.id}'),
+                              child: _SourceItem(
+                                thumbnail: Image.network(icon),
+                                title: source.name,
+                                subtitle: source.getDescription(),
+                                author: source.getAuthor(),
+                                version: source.version,
+                                badges: source.getBadges(),
+                                trailing:
+                                    supportedSource
+                                        ? Switch(
+                                          activeTrackColor: Colors.green,
+                                          value: isInstalled,
+                                          onChanged: (value) async {
+                                            final messenger =
+                                                ScaffoldMessenger.of(context);
+
+                                            if (value) {
+                                              ref.read(
+                                                webConfigProvider.saveWith,
+                                              )(
+                                                installedSources: [
+                                                  ...cfg.installedSources,
+                                                  WebSourceInfo(
+                                                    id: source.id,
+                                                    name: source.name,
+                                                    repo: repo.url,
+                                                    baseUrl:
+                                                        source.getBaseUrl(),
+                                                    version: repo.version,
+                                                    icon: icon,
+                                                    capabilities: capabilities,
+                                                  ),
+                                                ],
+                                              );
+
+                                              messenger
+                                                ..removeCurrentSnackBar()
+                                                ..showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      tr
+                                                          .webSources
+                                                          .source
+                                                          .sourceAddOK,
+                                                    ),
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                  ),
+                                                );
+                                            } else {
+                                              ref.invalidate(
+                                                extensionSourceProvider(
+                                                  source.id,
+                                                ),
+                                              );
+                                              ref.read(
+                                                webConfigProvider.saveWith,
+                                              )(
+                                                installedSources: [
+                                                  ...cfg.installedSources,
+                                                ]..removeWhere(
+                                                  (e) =>
+                                                      e.id == source.id &&
+                                                      e.repo == repo.url,
+                                                ),
+                                              );
+
+                                              messenger
+                                                ..removeCurrentSnackBar()
+                                                ..showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      tr
+                                                          .webSources
+                                                          .source
+                                                          .sourceDeleteOK,
+                                                    ),
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                  ),
+                                                );
+                                            }
+                                          },
+                                        )
+                                        : Tooltip(
+                                          message: tr.errors.unsupportedSource,
+                                          child: Icon(Icons.error),
+                                        ),
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  if (orphaned.isNotEmpty)
+                    ExpansionTile(
+                      title: Text(tr.webSources.repo.missingRepo),
+                      leading: Icon(Icons.question_mark),
+                      maintainState: true,
+                      shape: const Border(),
+                      trailing: const Icon(Icons.keyboard_arrow_down, size: 20),
+                      children:
+                          orphaned.map((item) {
+                            final actions = <Widget>[
+                              IconButton(
+                                tooltip: tr.webSources.source.delete(
+                                  arg: item.name,
+                                ),
+                                onPressed: () {
+                                  final messenger = ScaffoldMessenger.of(
+                                    context,
+                                  );
+                                  ref.invalidate(
+                                    extensionSourceProvider(item.id),
+                                  );
+                                  ref.read(webConfigProvider.saveWith)(
+                                    installedSources: [...cfg.installedSources]
+                                      ..removeWhere(
                                         (e) =>
                                             e.id == item.id &&
                                             e.repo == item.repo,
                                       ),
-                                    );
+                                  );
 
-                                    messenger
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            tr.webSources.source.sourceDeleteOK,
-                                          ),
-                                          backgroundColor: Colors.green,
+                                  messenger
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          tr.webSources.source.sourceDeleteOK,
                                         ),
-                                      );
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                },
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
                                 ),
-                              ];
+                              ),
+                            ];
 
-                              return Card(
-                                key: ValueKey(item.id),
-                                child: ListTile(
-                                  leading:
-                                      item.icon.isNotEmpty
-                                          ? Image.network(
-                                            item.icon,
-                                            width: 36,
-                                            height: 36,
-                                          )
-                                          : const Icon(Icons.rss_feed),
-                                  title: Text(item.name),
-                                  subtitle: Text(item.repo),
-                                  trailing: OverflowBar(children: actions),
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                  ],
-                ),
+                            return Card(
+                              key: ValueKey(item.id),
+                              child: ListTile(
+                                leading:
+                                    item.icon.isNotEmpty
+                                        ? Image.network(
+                                          item.icon,
+                                          width: 36,
+                                          height: 36,
+                                        )
+                                        : const Icon(Icons.rss_feed),
+                                title: Text(item.name),
+                                subtitle: Text(item.repo),
+                                trailing: OverflowBar(children: actions),
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                ],
               );
     }
 
@@ -319,7 +324,7 @@ class _SourceItem extends StatelessWidget {
     required this.subtitle,
     required this.author,
     required this.version,
-    this.tags,
+    required this.badges,
     this.trailing,
   });
 
@@ -328,7 +333,7 @@ class _SourceItem extends StatelessWidget {
   final String subtitle;
   final String author;
   final String version;
-  final List<Badge>? tags;
+  final List<SourceBadge> badges;
   final Widget? trailing;
 
   @override
@@ -349,7 +354,7 @@ class _SourceItem extends StatelessWidget {
                   subtitle: subtitle,
                   author: author,
                   version: version,
-                  tags: tags,
+                  badges: badges,
                 ),
               ),
             ),
@@ -367,14 +372,14 @@ class _SourceDescription extends StatelessWidget {
     required this.subtitle,
     required this.author,
     required this.version,
-    this.tags,
+    required this.badges,
   });
 
   final String title;
   final String subtitle;
   final String author;
   final String version;
-  final List<Badge>? tags;
+  final List<SourceBadge> badges;
 
   @override
   Widget build(BuildContext context) {
@@ -397,15 +402,15 @@ class _SourceDescription extends StatelessWidget {
           ),
         ),
         Text('by $author, v$version', style: const TextStyle(fontSize: 12.0)),
-        if (tags != null)
+        if (badges.isNotEmpty)
           Row(
             children:
-                tags!
+                badges
                     .map(
                       (e) => IconTextChip(
-                        text: e.text,
-                        color: e.type.color,
-                        style: TextStyle(color: Colors.white),
+                        text: e.label,
+                        color: HexColor.fromHex(e.backgroundColor),
+                        style: TextStyle(color: HexColor.fromHex(e.textColor)),
                       ),
                     )
                     .toList(),

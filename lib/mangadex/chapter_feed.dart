@@ -45,7 +45,7 @@ class MangaDexChapterFeedWidget extends HookWidget {
       SliverAppBar(
         automaticallyImplyLeading: false,
         pinned: true,
-        title: Text(tr.mangadex.updates, style: TextStyle(fontSize: 24)),
+        title: Text(tr.chapterFeed.updates, style: TextStyle(fontSize: 24)),
         actions: [
           SegmentedButton<_FeedViewType>(
             style: SegmentedButton.styleFrom(
