@@ -100,7 +100,7 @@ PaperbackPolyfills.scheduleRequest = async function (
     method: <Method>request.method,
     headers: headers,
     data: decodedData,
-    timeout: 5000,
+    timeout: 10000,
     responseType: "arraybuffer",
   });
 
