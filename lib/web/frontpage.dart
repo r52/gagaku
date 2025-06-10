@@ -14,6 +14,75 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+class _ExtensionHomeCard extends ConsumerWidget {
+  final WebSourceInfo extensionInfo;
+
+  const _ExtensionHomeCard({super.key, required this.extensionInfo});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nav = Navigator.of(context);
+    final theme = Theme.of(context);
+    final tr = context.t;
+
+    return DataProviderWhenWidget(
+      provider: extensionSourceProvider(extensionInfo.id),
+      errorBuilder:
+          (context, defaultChild, error, stacktrace) =>
+              Card(child: defaultChild),
+      builder: (BuildContext context, source) {
+        return Card(
+          child: ListTile(
+            leading:
+                source.icon.isNotEmpty
+                    ? Image.network(source.icon, width: 36, height: 36)
+                    : const Icon(Icons.rss_feed),
+            title: Text(source.name),
+            onTap:
+                source.hasCapability(SourceIntents.discoverSections)
+                    ? () => context.router.push(
+                      ExtensionHomeRoute(sourceId: source.id, source: source),
+                    )
+                    : null,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (source.hasCapability(SourceIntents.settingsUI))
+                  IconButton(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    icon: const Icon(Icons.settings),
+                    onPressed:
+                        () => nav.push(
+                          SlideTransitionRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    ExtensionSettingsPage(source: source),
+                          ),
+                        ),
+                    tooltip: tr.webSources.source.settings,
+                  ),
+                if (source.hasCapability(SourceIntents.mangaSearch))
+                  IconButton(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    icon: const Icon(Icons.search),
+                    onPressed:
+                        () => context.router.push(
+                          ExtensionSearchRoute(
+                            sourceId: source.id,
+                            source: source,
+                          ),
+                        ),
+                    tooltip: tr.search.arg(arg: source.name),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 @RoutePage()
 class WebSourceFrontPage extends HookConsumerWidget {
   const WebSourceFrontPage({super.key, this.controller, this.process});
@@ -23,8 +92,6 @@ class WebSourceFrontPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
-    final theme = Theme.of(context);
     final tr = context.t;
     final scrollController =
         DefaultScrollController.maybeOf(context, 'WebSourceFrontPage') ??
@@ -110,94 +177,43 @@ class WebSourceFrontPage extends HookConsumerWidget {
       return null;
     }, []);
 
-    return DataProviderWhenWidget(
-      provider: extensionInfoListProvider,
-      builder: (BuildContext context, sources) {
-        final homepageSources = <WebSourceInfo>[];
+    final installed = ref.watch(
+      webConfigProvider.select((cfg) => cfg.installedSources),
+    );
 
-        for (final source in sources) {
-          if (source.hasCapability(SourceIntents.discoverSections)) {
-            homepageSources.add(source);
-          }
-        }
+    final homepageSources = <WebSourceInfo>[];
 
-        return CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              pinned: true,
-              title: Text(
-                tr.webSources.homepages,
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-            if (homepageSources.isEmpty)
-              SliverToBoxAdapter(
-                child: Center(child: Text(tr.webSources.noSourcesWarning)),
-              ),
-            if (homepageSources.isNotEmpty)
-              SliverList.builder(
-                itemCount: homepageSources.length,
-                itemBuilder: (context, index) {
-                  final item = homepageSources.elementAt(index);
+    for (final source in installed) {
+      if (source.hasCapability(SourceIntents.mangaChapters)) {
+        homepageSources.add(source);
+      }
+    }
 
-                  return Card(
-                    child: ListTile(
-                      leading:
-                          item.icon.isNotEmpty
-                              ? Image.network(item.icon, width: 36, height: 36)
-                              : const Icon(Icons.rss_feed),
-                      title: Text(item.name),
-                      onTap: () {
-                        context.router.push(
-                          ExtensionHomeRoute(sourceId: item.id, source: item),
-                        );
-                      },
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (item.hasCapability(SourceIntents.settingsUI))
-                            IconButton(
-                              color: theme.colorScheme.onPrimaryContainer,
-                              icon: const Icon(Icons.settings),
-                              onPressed:
-                                  () => nav.push(
-                                    SlideTransitionRouteBuilder(
-                                      pageBuilder:
-                                          (
-                                            context,
-                                            animation,
-                                            secondaryAnimation,
-                                          ) => ExtensionSettingsPage(
-                                            source: item,
-                                          ),
-                                    ),
-                                  ),
-                              tooltip: tr.webSources.source.settings,
-                            ),
-                          if (item.hasCapability(SourceIntents.mangaSearch))
-                            IconButton(
-                              color: theme.colorScheme.onPrimaryContainer,
-                              icon: const Icon(Icons.search),
-                              onPressed:
-                                  () => context.router.push(
-                                    ExtensionSearchRoute(
-                                      sourceId: item.id,
-                                      source: item,
-                                    ),
-                                  ),
-                              tooltip: tr.search.arg(arg: item.name),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-          ],
-        );
-      },
+    return CustomScrollView(
+      controller: scrollController,
+      slivers: [
+        SliverAppBar(
+          automaticallyImplyLeading: false,
+          pinned: true,
+          title: Text(tr.webSources.homepages, style: TextStyle(fontSize: 24)),
+        ),
+        if (homepageSources.isEmpty)
+          SliverToBoxAdapter(
+            child: Center(child: Text(tr.webSources.noSourcesWarning)),
+          ),
+        if (homepageSources.isNotEmpty)
+          SliverList.builder(
+            itemCount: homepageSources.length,
+            itemBuilder: (context, index) {
+              final item = homepageSources.elementAt(index);
+
+              return _ExtensionHomeCard(
+                key: ValueKey(item.id),
+                extensionInfo: item,
+              );
+            },
+          ),
+      ],
     );
   }
 }
