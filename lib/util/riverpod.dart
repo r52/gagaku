@@ -169,7 +169,7 @@ extension RefWorkaround on Ref {
 
   T readFuture<T>(ProviderListenable<T> listenable) {
     T result;
-    final sub = listen(listenable, (_, __) {});
+    final sub = listen(listenable, (_, _) {});
 
     try {
       result = sub.read();

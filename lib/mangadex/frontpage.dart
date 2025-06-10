@@ -140,7 +140,7 @@ class MangaDexFrontPage extends StatelessWidget {
     return DataProviderWhenWidget(
       provider: _fetchFrontPageDataProvider,
       errorBuilder:
-          (context, child, _, __) => Consumer(
+          (context, child, _, _) => Consumer(
             child: child,
             builder:
                 (context, ref, child) => RefreshIndicator(

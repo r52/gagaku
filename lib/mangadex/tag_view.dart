@@ -118,7 +118,7 @@ class MangaDexTagViewPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchTagFromIdProvider(tagId),
-      errorBuilder: (context, child, _, __) => Scaffold(body: child),
+      errorBuilder: (context, child, _, _) => Scaffold(body: child),
       builder: (context, data) {
         return MangaDexTagViewWidget(tag: data);
       },

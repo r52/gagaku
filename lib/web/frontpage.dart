@@ -237,7 +237,7 @@ class ExtensionHomePage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: getExtensionFromIdProvider(sourceId),
-      errorBuilder: (context, child, _, __) => Scaffold(body: child),
+      errorBuilder: (context, child, _, _) => Scaffold(body: child),
       builder: (context, data) {
         return ExtensionHomeWidget(source: data);
       },
@@ -534,7 +534,7 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
 
       return PageResultsMetaData(m.toList());
     },
-    getIsLastPage: (_, __) => metadata == null,
+    getIsLastPage: (_, _) => metadata == null,
     refresh: () async {
       metadata = {'page': 1};
     },

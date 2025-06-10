@@ -101,7 +101,7 @@ class DirectoryReaderWidget extends StatelessWidget {
     return DataProviderWhenWidget(
       provider: _getDirectoryPagesProvider(path),
       errorBuilder:
-          (context, child, _, __) => Scaffold(
+          (context, child, _, _) => Scaffold(
             appBar: AppBar(leading: const BackButton()),
             body: child,
           ),
