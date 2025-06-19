@@ -64,7 +64,7 @@ class WebMangaViewPage extends ConsumerWidget {
     return DataProviderWhenWidget(
       provider: _fetchWebMangaInfoProvider(hndl),
       errorBuilder:
-          (context, child, _, __) => Scaffold(
+          (context, child, _, _) => Scaffold(
             appBar: AppBar(leading: AutoLeadingButton()),
             body: Consumer(
               child: child,
@@ -490,7 +490,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 );
                 return val >= 0 ? val : null;
               },
-              separatorBuilder: (_, __) => const SizedBox(height: 4.0),
+              separatorBuilder: (_, _) => const SizedBox(height: 4.0),
               itemBuilder: (BuildContext context, int index) {
                 final e = manga.chapters.elementAt(index);
 

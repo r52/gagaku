@@ -53,7 +53,7 @@ class MangaDexCreatorViewPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchCreatorFromIdProvider(creatorId),
-      errorBuilder: (context, child, _, __) => Scaffold(body: child),
+      errorBuilder: (context, child, _, _) => Scaffold(body: child),
       builder: (context, data) {
         return MangaDexCreatorViewWidget(creator: data);
       },

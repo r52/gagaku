@@ -46,7 +46,7 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
     refresh: () async {
       ref.invalidate(mangaDexHistoryProvider);
     },
-    getIsLastPage: (_, __) => true,
+    getIsLastPage: (_, _) => true,
   );
 
   @override

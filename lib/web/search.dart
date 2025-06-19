@@ -46,7 +46,7 @@ class ExtensionSearchPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: getExtensionFromIdProvider(sourceId),
-      errorBuilder: (context, child, _, __) => Scaffold(body: child),
+      errorBuilder: (context, child, _, _) => Scaffold(body: child),
       builder: (context, data) {
         return ExtensionSearchWidget(source: data, query: query);
       },
@@ -66,6 +66,7 @@ class ExtensionSearchWidget extends StatefulHookConsumerWidget {
 }
 
 class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
+  late WebSourceInfo source;
   Map<String, dynamic>? metadata = {'page': 1};
   SearchQuery? query;
 
@@ -78,18 +79,18 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
       }
 
       final results = await ref
-          .read(extensionSourceProvider(widget.source.id).notifier)
+          .read(extensionSourceProvider(source.id).notifier)
           .searchManga(query!, metadata);
 
       final m = results.items.map(
-        (e) => HistoryLink.fromSearchReultItem(widget.source, e),
+        (e) => HistoryLink.fromSearchReultItem(source, e),
       );
 
       metadata = results.metadata;
 
       return PageResultsMetaData(m.toList());
     },
-    getIsLastPage: (_, __) => metadata == null,
+    getIsLastPage: (_, _) => metadata == null,
     refresh: () async {
       metadata = {'page': 1};
     },
@@ -97,6 +98,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
   @override
   void initState() {
+    source = widget.source;
     query = widget.query;
     super.initState();
   }
@@ -118,9 +120,55 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
       body: WebMangaListWidget(
         physics: const AlwaysScrollableScrollPhysics(),
         showToggle: false,
-        title: Text(
-          tr.webSources.sourceSearch,
-          style: const TextStyle(fontSize: 24),
+        title: DataProviderWhenWidget(
+          provider: extensionInfoListProvider,
+          errorBuilder:
+              (context, defaultChild, error, stacktrace) => Tooltip(
+                message: tr.webSources.loadInstalledSourcesError,
+                child: Icon(Icons.error),
+              ),
+          builder:
+              (context, extensions) => HookBuilder(
+                builder: (context) {
+                  final searchExtensions = useMemoized(
+                    () =>
+                        extensions
+                            .where(
+                              (e) => e.hasCapability(SourceIntents.mangaSearch),
+                            )
+                            .toList(),
+                    [extensions],
+                  );
+
+                  return DropdownMenu<WebSourceInfo>(
+                    initialSelection: searchExtensions.firstWhereOrNull(
+                      (f) => f.id == source.id,
+                    ),
+                    width: 200,
+                    requestFocusOnTap: false,
+                    enableSearch: false,
+                    enableFilter: false,
+                    dropdownMenuEntries:
+                        searchExtensions
+                            .map(
+                              (opt) => DropdownMenuEntry(
+                                value: opt,
+                                label: opt.name,
+                              ),
+                            )
+                            .toList(),
+                    onSelected: (WebSourceInfo? opt) {
+                      if (opt != null) {
+                        setState(() {
+                          source = opt;
+                          query = query?.copyWith(filters: []);
+                        });
+                        _pagingController.refresh();
+                      }
+                    },
+                  );
+                },
+              ),
         ),
         leading: [
           SliverAppBar(
@@ -136,7 +184,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
               builder: (context, controller) {
                 return SearchBar(
                   controller: controller,
-                  hintText: tr.search.arg(arg: widget.source.name),
+                  hintText: tr.search.arg(arg: source.name),
                   onTap: () {
                     controller.openView();
                   },
@@ -179,7 +227,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                                         animation,
                                         secondaryAnimation,
                                       ) => _ExtensionFilterWidget(
-                                        source: widget.source,
+                                        source: source,
                                         query: query,
                                       ),
                                 ),

@@ -167,7 +167,8 @@
     "resetReadWarning": "Are you sure you want to reset all read markers for this manga?",
     "resetAllRead": "Reset all Read Markers",
     "resetAllReadWarning": "Are you sure you want to reset all read markers?",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "loadInstalledSourcesError": "Error loading installed sources"
   },
   "search": {
     "text": "Search",

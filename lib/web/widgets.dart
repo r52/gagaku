@@ -233,7 +233,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
               )
               : SliverList.separated(
                 itemCount: items!.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 4.0),
+                separatorBuilder: (_, _) => const SizedBox(height: 4.0),
                 findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
                   final tr = context.t;
@@ -315,7 +315,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
             return PagedSliverList.separated(
               state: state,
               fetchNextPage: fetchNextPage,
-              separatorBuilder: (_, __) => const SizedBox(height: 4.0),
+              separatorBuilder: (_, _) => const SizedBox(height: 4.0),
               builderDelegate: PagedChildBuilderDelegate<HistoryLink>(
                 animateTransitions: true,
                 itemBuilder: (context, item, index) {
