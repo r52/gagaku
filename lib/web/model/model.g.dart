@@ -76,7 +76,7 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'b98e46b5fb695e524ddf5313aad2e616eff36ee9';
+    r'c8183125f0ca25be2c0ab0b100dfd16a567f9b94';
 
 abstract class _$WebSourceFavorites
     extends $AsyncNotifier<Map<String, List<HistoryLink>>> {
@@ -300,7 +300,8 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
 const extensionInfoListProvider = ExtensionInfoListProvider._();
 
 final class ExtensionInfoListProvider
-    extends $AsyncNotifierProvider<ExtensionInfoList, List<WebSourceInfo>> {
+    extends
+        $AsyncNotifierProvider<ExtensionInfoList, Map<String, WebSourceInfo>> {
   const ExtensionInfoListProvider._()
     : super(
         from: null,
@@ -320,21 +321,29 @@ final class ExtensionInfoListProvider
   ExtensionInfoList create() => ExtensionInfoList();
 }
 
-String _$extensionInfoListHash() => r'0665e8257c6673036644f3e598bf43e023b1bd12';
+String _$extensionInfoListHash() => r'05c7ab9b9fbd82c74fe15598b6cb718c4253a4a0';
 
-abstract class _$ExtensionInfoList extends $AsyncNotifier<List<WebSourceInfo>> {
-  FutureOr<List<WebSourceInfo>> build();
+abstract class _$ExtensionInfoList
+    extends $AsyncNotifier<Map<String, WebSourceInfo>> {
+  FutureOr<Map<String, WebSourceInfo>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
     final ref =
-        this.ref as $Ref<AsyncValue<List<WebSourceInfo>>, List<WebSourceInfo>>;
+        this.ref
+            as $Ref<
+              AsyncValue<Map<String, WebSourceInfo>>,
+              Map<String, WebSourceInfo>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<WebSourceInfo>>, List<WebSourceInfo>>,
-              AsyncValue<List<WebSourceInfo>>,
+              AnyNotifier<
+                AsyncValue<Map<String, WebSourceInfo>>,
+                Map<String, WebSourceInfo>
+              >,
+              AsyncValue<Map<String, WebSourceInfo>>,
               Object?,
               Object?
             >;
@@ -398,7 +407,7 @@ final class GetExtensionFromIdProvider
 }
 
 String _$getExtensionFromIdHash() =>
-    r'b5bf3c8a25a75348d4400be94e8864bff3bafdea';
+    r'29cbd9751aed6812bbe6bdafc4ecb1a632f17c6b';
 
 final class GetExtensionFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebSourceInfo>, String> {

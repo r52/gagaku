@@ -131,25 +131,22 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
               (context, extensions) => HookBuilder(
                 builder: (context) {
                   final searchExtensions = useMemoized(
-                    () =>
-                        extensions
-                            .where(
-                              (e) => e.hasCapability(SourceIntents.mangaSearch),
-                            )
-                            .toList(),
+                    () => Map.fromEntries(
+                      extensions.entries.where(
+                        (e) => e.value.hasCapability(SourceIntents.mangaSearch),
+                      ),
+                    ),
                     [extensions],
                   );
 
                   return DropdownMenu<WebSourceInfo>(
-                    initialSelection: searchExtensions.firstWhereOrNull(
-                      (f) => f.id == source.id,
-                    ),
+                    initialSelection: searchExtensions[source.id],
                     width: 200,
                     requestFocusOnTap: false,
                     enableSearch: false,
                     enableFilter: false,
                     dropdownMenuEntries:
-                        searchExtensions
+                        searchExtensions.values
                             .map(
                               (opt) => DropdownMenuEntry(
                                 value: opt,

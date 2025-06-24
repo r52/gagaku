@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SourceHandler {
 
- SourceType get type; set type(SourceType value); String get sourceId; set sourceId(String value); String get location; set location(String value); String? get chapter; set chapter(String? value);@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? get parser;@JsonKey(includeFromJson: false, includeToJson: false) set parser(WebSourceInfo? value);
+ SourceType get type; set type(SourceType value); String get sourceId; set sourceId(String value); String get location; set location(String value); String? get chapter; set chapter(String? value);
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,7 +31,7 @@ $SourceHandlerCopyWith<SourceHandler> get copyWith => _$SourceHandlerCopyWithImp
 
 @override
 String toString() {
-  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter, parser: $parser)';
+  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter)';
 }
 
 
@@ -42,11 +42,11 @@ abstract mixin class $SourceHandlerCopyWith<$Res>  {
   factory $SourceHandlerCopyWith(SourceHandler value, $Res Function(SourceHandler) _then) = _$SourceHandlerCopyWithImpl;
 @useResult
 $Res call({
- SourceType type, String sourceId, String location, String? chapter,@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? parser
+ SourceType type, String sourceId, String location, String? chapter
 });
 
 
-$WebSourceInfoCopyWith<$Res>? get parser;
+
 
 }
 /// @nodoc
@@ -59,29 +59,16 @@ class _$SourceHandlerCopyWithImpl<$Res>
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as SourceType,sourceId: null == sourceId ? _self.sourceId : sourceId // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,chapter: freezed == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
-as String?,parser: freezed == parser ? _self.parser : parser // ignore: cast_nullable_to_non_nullable
-as WebSourceInfo?,
+as String?,
   ));
 }
-/// Create a copy of SourceHandler
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebSourceInfoCopyWith<$Res>? get parser {
-    if (_self.parser == null) {
-    return null;
-  }
 
-  return $WebSourceInfoCopyWith<$Res>(_self.parser!, (value) {
-    return _then(_self.copyWith(parser: value));
-  });
-}
 }
 
 
@@ -89,14 +76,13 @@ $WebSourceInfoCopyWith<$Res>? get parser {
 @JsonSerializable()
 
 class _SourceHandler extends SourceHandler {
-   _SourceHandler({required this.type, required this.sourceId, required this.location, this.chapter, @JsonKey(includeFromJson: false, includeToJson: false) this.parser}): super._();
+   _SourceHandler({required this.type, required this.sourceId, required this.location, this.chapter}): super._();
   factory _SourceHandler.fromJson(Map<String, dynamic> json) => _$SourceHandlerFromJson(json);
 
 @override  SourceType type;
 @override  String sourceId;
 @override  String location;
 @override  String? chapter;
-@override@JsonKey(includeFromJson: false, includeToJson: false)  WebSourceInfo? parser;
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
@@ -113,7 +99,7 @@ Map<String, dynamic> toJson() {
 
 @override
 String toString() {
-  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter, parser: $parser)';
+  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter)';
 }
 
 
@@ -124,11 +110,11 @@ abstract mixin class _$SourceHandlerCopyWith<$Res> implements $SourceHandlerCopy
   factory _$SourceHandlerCopyWith(_SourceHandler value, $Res Function(_SourceHandler) _then) = __$SourceHandlerCopyWithImpl;
 @override @useResult
 $Res call({
- SourceType type, String sourceId, String location, String? chapter,@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? parser
+ SourceType type, String sourceId, String location, String? chapter
 });
 
 
-@override $WebSourceInfoCopyWith<$Res>? get parser;
+
 
 }
 /// @nodoc
@@ -141,30 +127,17 @@ class __$SourceHandlerCopyWithImpl<$Res>
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,}) {
   return _then(_SourceHandler(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as SourceType,sourceId: null == sourceId ? _self.sourceId : sourceId // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,chapter: freezed == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
-as String?,parser: freezed == parser ? _self.parser : parser // ignore: cast_nullable_to_non_nullable
-as WebSourceInfo?,
+as String?,
   ));
 }
 
-/// Create a copy of SourceHandler
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebSourceInfoCopyWith<$Res>? get parser {
-    if (_self.parser == null) {
-    return null;
-  }
 
-  return $WebSourceInfoCopyWith<$Res>(_self.parser!, (value) {
-    return _then(_self.copyWith(parser: value));
-  });
-}
 }
 
 

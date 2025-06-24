@@ -98,6 +98,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final parser = ref.watch(
+      getExtensionFromIdProvider(handle.sourceId).select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) => data,
+          _ => null,
+        },
+      ),
+    );
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
     final link = HistoryLink(
@@ -160,6 +168,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     CachedNetworkImage(
                       imageUrl: manga.cover,
                       cacheManager: gagakuImageCache,
+                      memCacheWidth: 512,
+                      maxWidthDiskCache: 512,
                       colorBlendMode: BlendMode.modulate,
                       color: Colors.grey,
                       fit: BoxFit.cover,
@@ -183,13 +193,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            if (handle.parser != null &&
-                                handle.parser!.icon.isNotEmpty)
-                              Image.network(
-                                handle.parser!.icon,
-                                width: 24,
-                                height: 24,
-                              ),
+                            if (parser != null && parser.icon.isNotEmpty)
+                              Image.network(parser.icon, width: 24, height: 24),
                           ],
                         ),
                       ),
@@ -351,7 +356,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                           () => context.router.push(
                                             ExtensionSearchRoute(
                                               sourceId: handle.sourceId,
-                                              source: handle.parser,
+                                              source: parser,
                                               query: SearchQuery(
                                                 title: '',
                                                 filters: [

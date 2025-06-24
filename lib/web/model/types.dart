@@ -46,8 +46,6 @@ abstract class SourceHandler with _$SourceHandler {
     required String sourceId,
     required String location,
     String? chapter,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    WebSourceInfo? parser,
   }) = _SourceHandler;
 
   String getURL() =>
@@ -75,7 +73,7 @@ abstract class SourceHandler with _$SourceHandler {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, type, sourceId, location, chapter, parser);
+      Object.hash(runtimeType, type, sourceId, location, chapter);
 }
 
 @freezed
@@ -128,7 +126,6 @@ abstract class HistoryLink with _$HistoryLink {
       type: SourceType.source,
       sourceId: source.id,
       location: item.mangaId,
-      parser: source,
     ),
   );
 
@@ -159,6 +156,13 @@ abstract class HistoryLink with _$HistoryLink {
         cover: item.imageUrl,
       ),
     };
+  }
+
+  bool isExact(HistoryLink other) {
+    return this == other &&
+        title == other.title &&
+        cover == other.cover &&
+        handle == other.handle;
   }
 
   @override

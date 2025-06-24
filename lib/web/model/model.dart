@@ -34,7 +34,7 @@ void openWebSource(BuildContext context, SourceHandler handle) {
       readerData = WebReaderData(source: code, handle: handle);
     }
 
-    AutoRouter.of(context).push(
+    context.router.push(
       ProxyWebSourceReaderRoute(
         proxy: handle.sourceId,
         code: handle.location,
@@ -44,7 +44,7 @@ void openWebSource(BuildContext context, SourceHandler handle) {
       ),
     );
   } else {
-    AutoRouter.of(context).push(
+    context.router.push(
       WebMangaViewRoute(
         sourceId: handle.sourceId,
         mangaId: handle.location,
@@ -93,20 +93,6 @@ class ProxyHandler {
 
   Future<HistoryLink> handleLink(HistoryLink link) async {
     if (link.handle != null) {
-      final handle = link.handle!;
-
-      if (handle.type == SourceType.source && handle.parser == null) {
-        final installed = ref.watch(
-          webConfigProvider.select((cfg) => cfg.installedSources),
-        );
-
-        final src = installed.firstWhereOrNull(
-          (ext) => handle.sourceId == ext.id,
-        );
-
-        handle.parser = src;
-      }
-
       return link;
     }
 
@@ -156,22 +142,19 @@ class ProxyHandler {
       return handle;
     }
 
-    final installed = ref.watch(
-      webConfigProvider.select((cfg) => cfg.installedSources),
-    );
-
-    final src = installed.firstWhereOrNull(
-      (ext) => url.startsWith('${ext.id}/'),
-    );
-
-    if (src == null) {
-      logger.w('Extension not found. url: $url');
-      return null;
-    }
-
     final parts = url.split('/');
     if (parts.length != 2) {
       logger.w('Invalid extension url $url');
+      return null;
+    }
+
+    final srcId = parts[0];
+
+    final installed = await ref.watch(extensionInfoListProvider.future);
+    final src = installed[srcId];
+
+    if (src == null) {
+      logger.w('Extension not found. url: $url');
       return null;
     }
 
@@ -180,7 +163,6 @@ class ProxyHandler {
       type: SourceType.source,
       sourceId: src.id,
       location: loc,
-      parser: src,
     );
 
     return handle;
@@ -245,51 +227,33 @@ class ProxyHandler {
   Future<WebManga?> getMangaFromSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
-        String? sourceId;
-        if (handle.parser != null) {
-          sourceId = handle.parser!.id;
-        } else {
-          final installed = await ref.watch(extensionInfoListProvider.future);
-          for (final src in installed) {
-            if (handle.sourceId == src.id) {
-              sourceId = handle.sourceId;
-              break;
-            }
-          }
-        }
+        final key = handle.getKey();
 
-        if (sourceId != null) {
-          final key = handle.getKey();
-
-          if (await _cache.exists(key)) {
-            logger.d('CacheManager: retrieving entry $key');
-            final manga = _cache.get<WebManga>(key, WebManga.fromJson);
-            return manga;
-          }
-
-          final manga = await ref
-              .read(extensionSourceProvider(sourceId).notifier)
-              .getManga(handle.location);
-
-          if (manga != null) {
-            const expiry = Duration(days: 1);
-
-            logger.d(
-              'CacheManager: caching entry $key for ${expiry.toString()}',
-            );
-            _cache.put(
-              key,
-              json.encode(manga.toJson()),
-              manga,
-              true,
-              expiry: expiry,
-            );
-          }
-
+        if (await _cache.exists(key)) {
+          logger.d('CacheManager: retrieving entry $key');
+          final manga = _cache.get<WebManga>(key, WebManga.fromJson);
           return manga;
         }
 
-        return null;
+        final manga = await ref
+            .read(extensionSourceProvider(handle.sourceId).notifier)
+            .getManga(handle.location);
+
+        if (manga != null) {
+          const expiry = Duration(days: 1);
+
+          logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
+          _cache.put(
+            key,
+            json.encode(manga.toJson()),
+            manga,
+            true,
+            expiry: expiry,
+          );
+        }
+
+        return manga;
+
       case SourceType.proxy:
         return await _getMangaFromProxy(handle);
     }
@@ -419,13 +383,20 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 
   Future<Map<String, List<HistoryLink>>> updateAll(HistoryLink link) async {
+    bool updated = false;
+
     final oldstate = await future;
     for (final cat in oldstate.keys) {
       final idx = oldstate[cat]!.indexOf(link);
 
-      if (idx != -1) {
+      if (idx != -1 && !link.isExact(oldstate[cat]![idx])) {
         oldstate[cat]![idx] = link;
+        updated = true;
       }
+    }
+
+    if (!updated) {
+      return oldstate;
     }
 
     final udp = {...oldstate};
@@ -1207,14 +1178,18 @@ return p;
 @riverpod
 class ExtensionInfoList extends _$ExtensionInfoList {
   @override
-  Future<List<WebSourceInfo>> build() async {
+  Future<Map<String, WebSourceInfo>> build() async {
     final installed = ref.watch(
       webConfigProvider.select((cfg) => cfg.installedSources),
     );
 
-    return await Future.wait(
+    final list = await Future.wait(
       installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
     );
+
+    final map = <String, WebSourceInfo>{for (var e in list) e.id: e};
+
+    return map;
   }
 }
 
@@ -1222,7 +1197,11 @@ class ExtensionInfoList extends _$ExtensionInfoList {
 Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
   final sources = await ref.watch(extensionInfoListProvider.future);
 
-  return sources.firstWhere((e) => e.id == sourceId);
+  if (sources.containsKey(sourceId)) {
+    return sources[sourceId]!;
+  }
+
+  throw Exception("Invalid missing/source '$sourceId'");
 }
 
 class SettingsForm with ChangeNotifier {
