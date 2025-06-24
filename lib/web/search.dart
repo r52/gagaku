@@ -116,6 +116,13 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
     final theme = Theme.of(context);
     final controller = useSearchController();
 
+    useEffect(() {
+      if (widget.query != null && widget.query!.title.isNotEmpty) {
+        controller.text = widget.query!.title;
+      }
+      return null;
+    }, [widget.query]);
+
     return Scaffold(
       body: WebMangaListWidget(
         physics: const AlwaysScrollableScrollPhysics(),

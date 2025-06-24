@@ -168,7 +168,8 @@
     "resetAllRead": "Reset all Read Markers",
     "resetAllReadWarning": "Are you sure you want to reset all read markers?",
     "favorites": "Favorites",
-    "loadInstalledSourcesError": "Error loading installed sources"
+    "loadInstalledSourcesError": "Error loading installed sources",
+    "searchThisName": "Search this Manga name"
   },
   "search": {
     "text": "Search",

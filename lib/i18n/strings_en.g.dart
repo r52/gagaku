@@ -239,6 +239,7 @@ class TranslationsWebSourcesEn {
 	String get resetAllReadWarning => 'Are you sure you want to reset all read markers?';
 	String get favorites => 'Favorites';
 	String get loadInstalledSourcesError => 'Error loading installed sources';
+	String get searchThisName => 'Search this Manga name';
 }
 
 // Path: search
@@ -992,6 +993,7 @@ extension on Translations {
 			case 'webSources.resetAllReadWarning': return 'Are you sure you want to reset all read markers?';
 			case 'webSources.favorites': return 'Favorites';
 			case 'webSources.loadInstalledSourcesError': return 'Error loading installed sources';
+			case 'webSources.searchThisName': return 'Search this Manga name';
 			case 'search.text': return 'Search';
 			case 'search.arg': return ({required Object arg}) => 'Search ${arg}';
 			case 'search.filters': return 'Search Filters';

@@ -267,6 +267,23 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         );
                       },
                     ),
+                    IconButton(
+                      tooltip: tr.webSources.searchThisName,
+                      style: Styles.squareIconButtonStyle(
+                        backgroundColor: theme.colorScheme.surface.withAlpha(
+                          200,
+                        ),
+                      ),
+                      onPressed:
+                          () => context.router.push(
+                            ExtensionSearchRoute(
+                              sourceId: handle.sourceId,
+                              source: parser,
+                              query: SearchQuery(title: manga.title),
+                            ),
+                          ),
+                      icon: const Icon(Icons.search),
+                    ),
                     const SizedBox(width: 2),
                   ],
                 ),
@@ -287,28 +304,40 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       for (final alttitle in extdata.mangaInfo.secondaryTitles)
                         SizedBox(
                           width: double.infinity,
-                          child: Material(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            child: InkWell(
-                              onTap:
-                                  () => Clipboard.setData(
-                                    ClipboardData(text: alttitle),
-                                  ).then((_) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        showCloseIcon: true,
-                                        duration: const Duration(
-                                          milliseconds: 1000,
-                                        ),
-                                        content: Text(tr.ui.copyClipboard),
+                          child: ListTile(
+                            tileColor:
+                                theme.colorScheme.surfaceContainerHighest,
+                            title: Text(alttitle),
+                            onTap:
+                                () => Clipboard.setData(
+                                  ClipboardData(text: alttitle),
+                                ).then((_) {
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      showCloseIcon: true,
+                                      duration: const Duration(
+                                        milliseconds: 1000,
                                       ),
-                                    );
-                                  }),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(alttitle),
+                                      content: Text(tr.ui.copyClipboard),
+                                    ),
+                                  );
+                                }),
+                            trailing: IconButton(
+                              tooltip: tr.webSources.searchThisName,
+                              style: Styles.squareIconButtonStyle(
+                                backgroundColor: theme.colorScheme.surface
+                                    .withAlpha(200),
                               ),
+                              onPressed:
+                                  () => context.router.push(
+                                    ExtensionSearchRoute(
+                                      sourceId: handle.sourceId,
+                                      source: parser,
+                                      query: SearchQuery(title: alttitle),
+                                    ),
+                                  ),
+                              icon: const Icon(Icons.search),
                             ),
                           ),
                         ),
