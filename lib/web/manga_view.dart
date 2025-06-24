@@ -274,6 +274,11 @@ class WebMangaViewWidget extends HookConsumerWidget {
             ),
             SliverList.list(
               children: [
+                if (extdata != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: MangaStatisticsRow(manga: extdata),
+                  ),
                 if (extdata != null &&
                     extdata.mangaInfo.secondaryTitles.isNotEmpty)
                   ExpansionTile(
@@ -525,6 +530,59 @@ class WebMangaViewWidget extends HookConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MangaStatisticsRow extends StatelessWidget {
+  const MangaStatisticsRow({super.key, required this.manga});
+
+  final SourceManga manga;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      runSpacing: 4.0,
+      spacing: 5.0,
+      children: [
+        ContentChip(content: manga.mangaInfo.contentRating),
+        if (manga.mangaInfo.rating != null)
+          IconTextChip(
+            icon: const Icon(
+              Icons.star_border,
+              color: Colors.amber,
+              size: 18,
+              shadows: [Shadow(offset: Offset(1.0, 1.0))],
+            ),
+            text: (manga.mangaInfo.rating! * 10).toStringAsFixed(2),
+            style: const TextStyle(
+              color: Colors.amber,
+              shadows: [Shadow(offset: Offset(1.0, 1.0))],
+            ),
+          ),
+        const SizedBox.shrink(),
+        if (manga.mangaInfo.status != null)
+          IconTextChip(text: manga.mangaInfo.status!),
+      ],
+    );
+  }
+}
+
+class ContentChip extends StatelessWidget {
+  const ContentChip({super.key, required this.content});
+
+  final ContentRating content;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = content.name.capitalize();
+    return IconTextChip(
+      color: switch (content) {
+        ContentRating.ADULT => Colors.red,
+        ContentRating.MATURE => Colors.red,
+        _ => Colors.green,
+      },
+      text: label,
     );
   }
 }
