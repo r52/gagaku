@@ -187,9 +187,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
           return reorderable
               ? SliverReorderableList(
                 onReorder:
-                    (int oldIndex, int newIndex) => ref.read(
-                      webSourceFavoritesProvider.updateList,
-                    )(favoritesKey!, oldIndex, newIndex),
+                    (int oldIndex, int newIndex) =>
+                        webSourceFavoritesMutation.run(ref, (ref) async {
+                          return await ref
+                              .get(webSourceFavoritesProvider.notifier)
+                              .updateList(favoritesKey!, oldIndex, newIndex);
+                        }),
                 itemCount: items!.length,
                 // findChildIndexCallback: _findChildIndexCb,
                 itemBuilder: (context, index) {
@@ -255,7 +258,11 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           tooltip: tr.mangaActions.removeHistory,
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
-                            ref.read(webSourceHistoryProvider.remove)(item);
+                            webSourceHistoryMutation.run(ref, (ref) async {
+                              return await ref
+                                  .get(webSourceHistoryProvider.notifier)
+                                  .remove(item);
+                            });
                           },
                         ),
                       ],
@@ -333,7 +340,11 @@ class WebMangaListViewSliver extends ConsumerWidget {
                               tooltip: tr.mangaActions.removeHistory,
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () async {
-                                ref.read(webSourceHistoryProvider.remove)(item);
+                                webSourceHistoryMutation.run(ref, (ref) async {
+                                  return await ref
+                                      .get(webSourceHistoryProvider.notifier)
+                                      .remove(item);
+                                });
                               },
                             )
                             : null,
@@ -490,7 +501,11 @@ class GridMangaItem extends HookConsumerWidget {
                 shape: const CircleBorder(),
                 tooltip: tr.mangaActions.removeHistory,
                 onPressed: () async {
-                  ref.read(webSourceHistoryProvider.remove)(link);
+                  webSourceHistoryMutation.run(ref, (ref) async {
+                    return await ref
+                        .get(webSourceHistoryProvider.notifier)
+                        .remove(link);
+                  });
                 },
                 backgroundColor: theme.colorScheme.errorContainer,
                 child: Icon(
@@ -589,15 +604,17 @@ class FavoritesButton extends HookConsumerWidget {
                         value: favorites[cat.id]?.contains(link) ?? false,
                         onChanged: (bool? value) async {
                           if (value == true) {
-                            await ref.read(webSourceFavoritesProvider.add)(
-                              cat.id,
-                              link,
-                            );
+                            webSourceFavoritesMutation.run(ref, (ref) async {
+                              return await ref
+                                  .get(webSourceFavoritesProvider.notifier)
+                                  .add(cat.id, link);
+                            });
                           } else {
-                            await ref.read(webSourceFavoritesProvider.remove)(
-                              cat.id,
-                              link,
-                            );
+                            webSourceFavoritesMutation.run(ref, (ref) async {
+                              return await ref
+                                  .get(webSourceFavoritesProvider.notifier)
+                                  .remove(cat.id, link);
+                            });
                           }
                         },
                       );
@@ -606,10 +623,11 @@ class FavoritesButton extends HookConsumerWidget {
                 ),
                 MenuItemButton(
                   onPressed:
-                      () => ref.read(webSourceFavoritesProvider.remove)(
-                        'all',
-                        link,
-                      ),
+                      () => webSourceFavoritesMutation.run(ref, (ref) async {
+                        return await ref
+                            .get(webSourceFavoritesProvider.notifier)
+                            .remove('all', link);
+                      }),
                   child: Text(tr.ui.clear),
                 ),
               ]
@@ -689,7 +707,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
       onPressed: () async {
         bool set = !isRead;
 
-        ref.read(webReadMarkersProvider.set)(mangakey, chapterkey, set);
+        webReadMarkerMutation.run(ref, (ref) async {
+          return await ref
+              .get(webReadMarkersProvider.notifier)
+              .set(mangakey, chapterkey, set);
+        });
       },
       padding: const EdgeInsets.all(0.0),
       splashRadius: 15,

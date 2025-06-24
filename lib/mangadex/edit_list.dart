@@ -12,7 +12,7 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 
 class QueriedMangaDexEditListScreen extends ConsumerWidget {
   const QueriedMangaDexEditListScreen({super.key, required this.listId});
@@ -61,6 +61,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final messenger = ScaffoldMessenger.of(context);
     final router = AutoRouter.of(context);
     final me = ref.watch(loggedUserProvider).value;
     final listNameController = useTextEditingController(
@@ -72,10 +73,9 @@ class MangaDexEditListScreen extends HookConsumerWidget {
       list != null ? list!.attributes.visibility : CustomListVisibility.private,
     );
 
-    final editList = ref.watch(userListsProvider(me?.id).editList);
-    final newList = ref.watch(userListsProvider(me?.id).newList);
-    final isLoading =
-        editList.state is PendingMutation || newList.state is PendingMutation;
+    final editList = ref.watch(userListModifyMutation(me?.id));
+    final newList = ref.watch(userListNewMutation(me?.id));
+    final isLoading = editList is MutationPending || newList is MutationPending;
 
     final selected = useReducer(
       MangaSetAction.modify,
@@ -85,43 +85,23 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
     final currentPage = useValueNotifier(0);
 
-    ref.listen(userListsProvider(me?.id).editList, (_, edit) {
-      if (edit.state is ErrorMutation) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                tr.mangadex.editListError(
-                  error: (edit.state as ErrorMutation).error.toString(),
-                ),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-      }
+    if (editList is MutationError) {
+      Styles.showSnackBar(
+        messenger,
+        content: tr.mangadex.editListError(
+          error: (editList as MutationError).error.toString(),
+        ),
+      );
+    }
 
-      return;
-    });
-
-    ref.listen(userListsProvider(me?.id).newList, (_, state) {
-      if (state.state is ErrorMutation) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                tr.mangadex.newListError(
-                  error: (state.state as ErrorMutation).error.toString(),
-                ),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-      }
-
-      return;
-    });
+    if (newList is MutationError) {
+      Styles.showSnackBar(
+        messenger,
+        content: tr.mangadex.newListError(
+          error: (newList as MutationError).error.toString(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -163,21 +143,33 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                               final messenger = ScaffoldMessenger.of(context);
 
                               if (listNameController.text.isNotEmpty) {
-                                Future<CustomList> success;
+                                Future<CustomList?> success;
 
                                 if (list != null) {
-                                  success = editList(
-                                    list!,
-                                    listNameController.text,
-                                    vis,
-                                    selected.state,
-                                  );
+                                  success = userListModifyMutation(
+                                    me?.id,
+                                  ).run(ref, (ref) async {
+                                    return await ref
+                                        .get(userListsProvider(me?.id).notifier)
+                                        .editList(
+                                          list!,
+                                          listNameController.text,
+                                          vis,
+                                          selected.state,
+                                        );
+                                  });
                                 } else {
-                                  success = newList(
-                                    listNameController.text,
-                                    vis,
-                                    selected.state,
-                                  );
+                                  success = userListNewMutation(
+                                    me?.id,
+                                  ).run(ref, (ref) async {
+                                    return await ref
+                                        .get(userListsProvider(me?.id).notifier)
+                                        .newList(
+                                          listNameController.text,
+                                          vis,
+                                          selected.state,
+                                        );
+                                  });
                                 }
 
                                 success.then((_) {

@@ -19,7 +19,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -46,9 +46,15 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   );
 
   await (
-    ref.read(statisticsProvider.get)(manga),
-    ref.read(readChaptersProvider(me?.id).get)(manga),
-    ref.read(ratingsProvider(me?.id).get)(manga),
+    statisticsMutation.run(ref, (ref) async {
+      return await ref.get(statisticsProvider.notifier).get(manga);
+    }),
+    readChaptersMutation(me?.id).run(ref, (ref) async {
+      return await ref.get(readChaptersProvider(me?.id).notifier).get(manga);
+    }),
+    ratingsMutation(me?.id).run(ref, (ref) async {
+      await ref.get(ratingsProvider(me?.id).notifier).get(manga);
+    }),
   ).wait;
 
   return manga.first;
@@ -134,7 +140,9 @@ class _MangaDexMangaViewWidgetState
 
       final chapters = chapterlist.data.cast<Chapter>();
 
-      await ref.read(chapterStatsProvider.get)(chapters);
+      chapterStatsMutation.run(ref, (ref) async {
+        return await ref.get(chapterStatsProvider.notifier).get(chapters);
+      });
 
       return PageResultsMetaData(chapters, chapterlist.total);
     },
@@ -197,8 +205,17 @@ class _MangaDexMangaViewWidgetState
       );
 
       await (
-        ref.read(statisticsProvider.get)(mangas),
-        ref.read(readChaptersProvider(me?.id).get)(mangas),
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(mangas);
+        }),
+        readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref
+              .get(readChaptersProvider(me?.id).notifier)
+              .get(mangas);
+        }),
+        ratingsMutation(me?.id).run(ref, (ref) async {
+          await ref.get(ratingsProvider(me?.id).notifier).get(mangas);
+        }),
       ).wait;
 
       return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
@@ -216,6 +233,7 @@ class _MangaDexMangaViewWidgetState
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
+    final messenger = ScaffoldMessenger.of(context);
     final router = AutoRouter.of(context);
     final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
@@ -273,33 +291,22 @@ class _MangaDexMangaViewWidgetState
       });
     }, [widget.manga]);
 
-    ref.listen(userListsProvider(me?.id).newList, (_, state) {
-      if (state.state is ErrorMutation) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                tr.mangadex.newListError(
-                  error: (state.state as ErrorMutation).error.toString(),
-                ),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-      } else if (state.state is SuccessMutation) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(tr.mangadex.newListOk),
-              backgroundColor: Colors.green,
-            ),
-          );
-      }
+    final newListMutation = ref.watch(userListNewMutation(me?.id));
 
-      return;
-    });
+    if (newListMutation is MutationError) {
+      Styles.showSnackBar(
+        messenger,
+        content: tr.mangadex.newListError(
+          error: (newListMutation as MutationError).error.toString(),
+        ),
+      );
+    } else if (newListMutation is MutationSuccess) {
+      Styles.showSnackBar(
+        messenger,
+        content: tr.mangadex.newListOk,
+        color: Colors.green,
+      );
+    }
 
     return Scaffold(
       body: RefreshIndicator(
@@ -407,7 +414,7 @@ class _MangaDexMangaViewWidgetState
                                   );
                                   final following = followProvider.value;
                                   final setFollowing = ref.watch(
-                                    followingStatusProvider(widget.manga).set,
+                                    followStatusMutation(widget.manga),
                                   );
                                   final statusProvider = ref.watch(
                                     readingStatusProvider(widget.manga),
@@ -416,7 +423,7 @@ class _MangaDexMangaViewWidgetState
 
                                   if (following == null ||
                                       statusProvider.isLoading ||
-                                      setFollowing.state is PendingMutation) {
+                                      setFollowing is MutationPending) {
                                     return _loadingAction;
                                   }
 
@@ -434,13 +441,29 @@ class _MangaDexMangaViewWidgetState
                                         );
 
                                         if (result != null) {
-                                          ref.read(
-                                            readingStatusProvider(
-                                              widget.manga,
-                                            ).set,
-                                          )(result.$1);
+                                          readingStatusMutation(
+                                            widget.manga,
+                                          ).run(ref, (ref) async {
+                                            return await ref
+                                                .get(
+                                                  readingStatusProvider(
+                                                    widget.manga,
+                                                  ).notifier,
+                                                )
+                                                .set(result.$1);
+                                          });
 
-                                          setFollowing(result.$2);
+                                          followStatusMutation(
+                                            widget.manga,
+                                          ).run(ref, (ref) async {
+                                            return await ref
+                                                .get(
+                                                  followingStatusProvider(
+                                                    widget.manga,
+                                                  ).notifier,
+                                                )
+                                                .set(result.$2);
+                                          });
                                         }
                                       },
                                       child: Text(tr.mangaActions.addToLibrary),
@@ -463,7 +486,18 @@ class _MangaDexMangaViewWidgetState
                                       color: theme.colorScheme.primary,
                                       onPressed: () async {
                                         bool set = !following;
-                                        setFollowing(set);
+                                        followStatusMutation(widget.manga).run(
+                                          ref,
+                                          (ref) async {
+                                            return await ref
+                                                .get(
+                                                  followingStatusProvider(
+                                                    widget.manga,
+                                                  ).notifier,
+                                                )
+                                                .set(set);
+                                          },
+                                        );
                                       },
                                       icon: Icon(
                                         following
@@ -483,12 +517,11 @@ class _MangaDexMangaViewWidgetState
                                   );
                                   final reading = readProvider.value;
                                   final setReadingStatus = ref.watch(
-                                    readingStatusProvider(widget.manga).set,
+                                    readingStatusMutation(widget.manga),
                                   );
 
                                   if (readProvider.isLoading ||
-                                      setReadingStatus.state
-                                          is PendingMutation) {
+                                      setReadingStatus is MutationPending) {
                                     return _loadingAction;
                                   }
 
@@ -899,11 +932,21 @@ class _MangaDexMangaViewWidgetState
                                   );
 
                                   if (chapters != null && result == true) {
-                                    ref.read(readChaptersProvider(me.id).set)(
-                                      widget.manga,
-                                      read: !allRead ? chapters : null,
-                                      unread: allRead ? chapters : null,
-                                    );
+                                    readChaptersMutation(me.id).run(ref, (
+                                      ref,
+                                    ) async {
+                                      return await ref
+                                          .get(
+                                            readChaptersProvider(
+                                              me.id,
+                                            ).notifier,
+                                          )
+                                          .set(
+                                            widget.manga,
+                                            read: !allRead ? chapters : null,
+                                            unread: allRead ? chapters : null,
+                                          );
+                                    });
                                   }
                                 },
                                 child: Text(
@@ -1165,7 +1208,6 @@ class _ChapterListSliver extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final me = ref.watch(loggedUserProvider).value;
-    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
     // final sort = ref.watch(mangaChaptersListSortProvider);
     // final sortfunc = sort == ListSort.ascending
     //     ? compareNatural
@@ -1176,7 +1218,11 @@ class _ChapterListSliver extends HookConsumerWidget {
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        await getReadChapters([manga]);
+        await readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref.get(readChaptersProvider(me?.id).notifier).get([
+            manga,
+          ]);
+        });
       });
       return null;
     }, [manga, me]);
@@ -1444,10 +1490,18 @@ class _ReadingStatusDropdown extends ConsumerWidget {
         ),
       ),
       onSelected: (MangaReadingStatus? status) async {
-        ref.read(readingStatusProvider(manga).set)(status);
+        readingStatusMutation(manga).run(ref, (ref) async {
+          return await ref
+              .get(readingStatusProvider(manga).notifier)
+              .set(status);
+        });
 
         if (status == null || status == MangaReadingStatus.remove) {
-          ref.read(followingStatusProvider(manga).set)(false);
+          followStatusMutation(manga).run(ref, (ref) async {
+            return await ref
+                .get(followingStatusProvider(manga).notifier)
+                .set(false);
+          });
         }
       },
       dropdownMenuEntries: List<DropdownMenuEntry<MangaReadingStatus>>.generate(
@@ -1473,21 +1527,19 @@ class _RatingMenu extends HookConsumerWidget {
     final me = ref.watch(loggedUserProvider).value;
     final ratingProv = ref.watch(ratingsProvider(me?.id));
     final ratings = ratingProv.value;
-    final getRating = ref.watch(ratingsProvider(me?.id).get);
-    final setRating = ref.watch(ratingsProvider(me?.id).set);
+    final ratingsMut = ref.watch(ratingsMutation(me?.id));
     final hasRating =
         (ratings != null &&
             ratings.containsKey(manga.id) &&
             ratings[manga.id]!.rating > 0);
-    final isLoading =
-        getRating.state is PendingMutation ||
-        setRating.state is PendingMutation ||
-        ratingProv.isLoading;
+    final isLoading = ratingsMut is MutationPending || ratingProv.isLoading;
 
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        await getRating([manga]);
+        await ratingsMutation(me?.id).run(ref, (ref) async {
+          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
+        });
       });
       return null;
     }, [manga, me]);
@@ -1519,13 +1571,23 @@ class _RatingMenu extends HookConsumerWidget {
         ...List.generate(
           10,
           (index) => MenuItemButton(
-            onPressed: () => setRating(manga, index + 1),
+            onPressed:
+                () => ratingsMutation(me?.id).run(ref, (ref) async {
+                  await ref
+                      .get(ratingsProvider(me?.id).notifier)
+                      .set(manga, index + 1);
+                }),
             child: Text(tr.mangadex.ratings[index + 1]),
           ),
         ).reversed,
         if (hasRating)
           MenuItemButton(
-            onPressed: () => setRating(manga, null),
+            onPressed:
+                () => ratingsMutation(me?.id).run(ref, (ref) async {
+                  await ref
+                      .get(ratingsProvider(me?.id).notifier)
+                      .set(manga, null);
+                }),
             child: Text(tr.mangadex.ratings[0]),
           ),
       ],
@@ -1562,11 +1624,10 @@ class _UserListsMenu extends ConsumerWidget {
     final theme = Theme.of(context);
     final me = ref.watch(loggedUserProvider).value;
     final userListsProv = ref.watch(userListsProvider(me?.id));
-    final updateList = ref.watch(userListsProvider(me?.id).updateList);
-    final newList = ref.watch(userListsProvider(me?.id).newList);
+    final updateList = ref.watch(userListModifyMutation(me?.id));
     final userLists = userListsProv.value;
     final isLoading =
-        updateList.state is PendingMutation ||
+        updateList is MutationPending ||
         userListsProv.isLoading ||
         userLists == null;
 
@@ -1599,11 +1660,15 @@ class _UserListsMenu extends ConsumerWidget {
               title: Text(userLists.elementAt(index).attributes.name),
               value: userLists.elementAt(index).set.contains(manga.id),
               onChanged: (bool? value) async {
-                await updateList(
-                  userLists.elementAt(index),
-                  manga,
-                  value == true,
-                );
+                userListModifyMutation(me?.id).run(ref, (ref) async {
+                  return await ref
+                      .get(userListsProvider(me?.id).notifier)
+                      .updateList(
+                        userLists.elementAt(index),
+                        manga,
+                        value == true,
+                      );
+                });
               },
             ),
           ),
@@ -1696,7 +1761,11 @@ class _UserListsMenu extends ConsumerWidget {
             );
 
             if (result != null) {
-              await newList(result.$1, result.$2, []);
+              userListNewMutation(me?.id).run(ref, (ref) async {
+                return await ref
+                    .get(userListsProvider(me?.id).notifier)
+                    .newList(result.$1, result.$2, []);
+              });
             }
           },
         ),

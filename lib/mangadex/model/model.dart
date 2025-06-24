@@ -21,7 +21,7 @@ import 'package:meta/meta.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
@@ -1918,7 +1918,6 @@ class ReadChapters extends _$ReadChapters {
   }
 
   /// Fetch read chapters for the provided list of mangas
-  @mutation
   Future<ReadChaptersMap> get(Iterable<Manga> mangas) async {
     if (userId == null) {
       return {};
@@ -1941,7 +1940,6 @@ class ReadChapters extends _$ReadChapters {
   }
 
   /// Sets a list of chapters for a manga read or unread
-  @mutation
   Future<ReadChaptersMap> set(
     Manga manga, {
     Iterable<Chapter>? read,
@@ -1988,6 +1986,8 @@ class ReadChapters extends _$ReadChapters {
   }
 }
 
+final readChaptersMutation = Mutation<ReadChaptersMap>();
+
 @riverpod
 class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
   @override
@@ -2008,7 +2008,6 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
     return library;
   }
 
-  @mutation
   Future<Map<String, MangaReadingStatus>> set(
     Manga manga,
     MangaReadingStatus? status,
@@ -2034,6 +2033,8 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
     ref.invalidateSelf();
   }
 }
+
+final userLibraryMutation = Mutation<Map<String, MangaReadingStatus>>();
 
 @riverpod
 class UserLists extends _$UserLists
@@ -2064,7 +2065,6 @@ class UserLists extends _$UserLists
     return fetchData(0);
   }
 
-  @mutation
   Future<CustomList?> updateList(CustomList list, Manga manga, bool add) async {
     final api = ref.watch(mangadexProvider);
 
@@ -2084,7 +2084,6 @@ class UserLists extends _$UserLists
     return result;
   }
 
-  @mutation
   Future<CustomList> editList(
     CustomList list,
     String name,
@@ -2106,7 +2105,6 @@ class UserLists extends _$UserLists
     return result;
   }
 
-  @mutation
   Future<CustomList> deleteList(CustomList list) async {
     final api = ref.watch(mangadexProvider);
 
@@ -2123,7 +2121,6 @@ class UserLists extends _$UserLists
     return list;
   }
 
-  @mutation
   Future<CustomList> newList(
     String name,
     CustomListVisibility visibility,
@@ -2148,13 +2145,12 @@ class UserLists extends _$UserLists
 
     state = AsyncData([...oldstate]);
   }
-
-  @override
-  @mutation
-  Future<List<CustomList>> getNextPage() async {
-    return await getMore();
-  }
 }
+
+final userListNewMutation = Mutation<CustomList>();
+final userListModifyMutation = Mutation<CustomList?>();
+final userListDeleteMutation = Mutation<CustomList>();
+final userListNextPageMutation = Mutation<List<CustomList>>();
 
 @riverpod
 class FollowedLists extends _$FollowedLists
@@ -2185,7 +2181,6 @@ class FollowedLists extends _$FollowedLists
     return fetchData(0);
   }
 
-  @mutation
   Future<bool> setFollow(CustomList list, bool follow) async {
     final api = ref.watch(mangadexProvider);
 
@@ -2217,13 +2212,10 @@ class FollowedLists extends _$FollowedLists
 
     state = AsyncData([...oldstate]);
   }
-
-  @override
-  @mutation
-  Future<List<CustomList>> getNextPage() async {
-    return await getMore();
-  }
 }
+
+final followedListMutation = Mutation<bool>();
+final followedListNextPageMutation = Mutation<List<CustomList>>();
 
 Future<List<Manga>> getMangaListByPage(
   WidgetRef ref,
@@ -2241,7 +2233,9 @@ Future<List<Manga>> getMangaListByPage(
     ids: range,
   );
 
-  await ref.read(statisticsProvider.get)(mangas);
+  statisticsMutation.run(ref, (ref) async {
+    return await ref.get(statisticsProvider.notifier).get(mangas);
+  });
 
   return mangas;
 }
@@ -2306,7 +2300,6 @@ class Statistics extends _$Statistics {
   }
 
   /// Fetch statistics for the provided list of mangas
-  @mutation
   Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) async {
     final oldstate = await future;
     final mg = mangas.where((m) => !oldstate.containsKey(m.id));
@@ -2322,6 +2315,8 @@ class Statistics extends _$Statistics {
     return map;
   }
 }
+
+final statisticsMutation = Mutation<Map<String, MangaStatistics>>();
 
 @Riverpod(keepAlive: true)
 class ChapterStats extends _$ChapterStats {
@@ -2344,7 +2339,6 @@ class ChapterStats extends _$ChapterStats {
   }
 
   /// Fetch statistics for the provided list of mangas
-  @mutation
   Future<Map<String, ChapterStatistics>> get(Iterable<Chapter> chapters) async {
     final oldstate = await future;
     final mg = chapters.where((c) => !oldstate.containsKey(c.id));
@@ -2360,6 +2354,8 @@ class ChapterStats extends _$ChapterStats {
     return map;
   }
 }
+
+final chapterStatsMutation = Mutation<Map<String, ChapterStatistics>>();
 
 @Riverpod(keepAlive: true)
 class Ratings extends _$Ratings {
@@ -2383,7 +2379,6 @@ class Ratings extends _$Ratings {
   }
 
   /// Fetch user's self-ratings for the provided list of mangas
-  @mutation
   Future<Map<String, SelfRating>> get(Iterable<Manga> mangas) async {
     if (userId == null) {
       return {};
@@ -2406,7 +2401,6 @@ class Ratings extends _$Ratings {
   }
 
   /// Sets a self-rating for a manga
-  @mutation
   Future<bool> set(Manga manga, int? rating) async {
     if (userId == null) {
       throw StateError('User not logged in');
@@ -2440,6 +2434,8 @@ class Ratings extends _$Ratings {
   }
 }
 
+final ratingsMutation = Mutation<void>();
+
 @riverpod
 class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
   @override
@@ -2458,7 +2454,6 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
     return status;
   }
 
-  @mutation
   Future<bool> set(MangaReadingStatus? status) async {
     final me = await ref.readFuture(loggedUserProvider.future);
 
@@ -2473,7 +2468,11 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
     bool success = await api.setMangaReadingStatus(manga, resolved);
     if (success) {
       if (ref.exists(userLibraryProvider(me.id))) {
-        await ref.read(userLibraryProvider(me.id).set)(manga, resolved);
+        userLibraryMutation(me.id).run(ref, (ref) async {
+          return await ref
+              .get(userLibraryProvider(me.id).notifier)
+              .set(manga, resolved);
+        });
       }
 
       state = AsyncData(resolved);
@@ -2482,6 +2481,8 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
     return success;
   }
 }
+
+final readingStatusMutation = Mutation<bool>();
 
 @riverpod
 class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
@@ -2501,7 +2502,6 @@ class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
     return status;
   }
 
-  @mutation
   Future<bool> set(bool following) async {
     final me = await ref.readFuture(loggedUserProvider.future);
 
@@ -2519,6 +2519,8 @@ class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
     return success;
   }
 }
+
+final followStatusMutation = Mutation<bool>();
 
 @Riverpod(keepAlive: true)
 class MangaDexHistory extends _$MangaDexHistory {
@@ -2539,12 +2541,13 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final chapters = await api.fetchChapters(uuids);
 
-    await ref.read(chapterStatsProvider.get)(chapters);
+    chapterStatsMutation.run(ref, (ref) async {
+      return await ref.get(chapterStatsProvider.notifier).get(chapters);
+    });
 
     return Queue.of(chapters);
   }
 
-  @mutation
   Future<Chapter> add(Chapter chapter) async {
     final oldstate = await future;
     final cpy = Queue.of(oldstate);
@@ -2569,6 +2572,8 @@ class MangaDexHistory extends _$MangaDexHistory {
     return chapter;
   }
 }
+
+final mangadexHistoryMutation = Mutation<Chapter>();
 
 @Riverpod(keepAlive: true)
 class LoggedUser extends _$LoggedUser {
@@ -2595,7 +2600,6 @@ class AuthControl extends _$AuthControl {
     yield* api.authenticationStatus;
   }
 
-  @mutation
   Future<bool> login(
     String user,
     String pass,
@@ -2625,3 +2629,5 @@ class AuthControl extends _$AuthControl {
     await api.logout();
   }
 }
+
+final authControlLoginMutation = Mutation<bool>();

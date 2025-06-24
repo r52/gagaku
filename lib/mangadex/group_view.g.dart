@@ -10,7 +10,7 @@ part of 'group_view.dart';
 const _fetchGroupFromIdProvider = _FetchGroupFromIdFamily._();
 
 final class _FetchGroupFromIdProvider
-    extends $FunctionalProvider<AsyncValue<Group>, FutureOr<Group>>
+    extends $FunctionalProvider<AsyncValue<Group>, Group, FutureOr<Group>>
     with $FutureModifier<Group>, $FutureProvider<Group> {
   const _FetchGroupFromIdProvider._({
     required _FetchGroupFromIdFamily super.from,

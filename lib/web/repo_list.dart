@@ -44,7 +44,11 @@ class RepoListManager extends HookConsumerWidget {
           IconButton(
             tooltip: tr.ui.save,
             onPressed: () {
-              ref.read(webConfigProvider.saveWith)(repoList: list.value);
+              webConfigSaveMutation.run(ref, (ref) async {
+                return ref
+                    .get(webConfigProvider.notifier)
+                    .saveWith(repoList: list.value);
+              });
               nav.pop();
             },
             icon: const Icon(Icons.save),

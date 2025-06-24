@@ -19,10 +19,6 @@ mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   @mustBeOverridden
   Future<List<T>> fetchData(int offset);
 
-  @mustBeOverridden
-  Future<List<T>> getNextPage();
-
-  @protected
   Future<List<T>> getMore() async {
     final current = await future;
 
@@ -51,7 +47,7 @@ mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
   }
 }
 
-mixin AutoDisposeExpiryMix<T> on AnyNotifier<AsyncValue<T>> {
+mixin AutoDisposeExpiryMix<T> on AnyNotifier<AsyncValue<T>, T> {
   Timer? _staleTimer;
   DateTime? _expiry;
 

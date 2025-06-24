@@ -47,7 +47,11 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text(tr.saveSettings),
                   onPressed: () {
-                    ref.read(mdConfigProvider.save)(config.value);
+                    mdConfigSaveMutation.run(ref, (ref) async {
+                      return ref
+                          .get(mdConfigProvider.notifier)
+                          .save(config.value);
+                    });
                     nav.pop();
                   },
                 ),
@@ -405,7 +409,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                     break;
                   case AsyncValue(:final error?, :final stackTrace?):
                     final messenger = ScaffoldMessenger.of(context);
-                    Styles.showErrorSnackBar(messenger, '$error');
+                    Styles.showSnackBar(messenger, content: '$error');
                     logger.e(
                       "_fetchGroupDataProvider failed",
                       error: error,

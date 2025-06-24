@@ -44,7 +44,9 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await ref.read(statisticsProvider.get)(mangas);
+      statisticsMutation.run(ref, (ref) async {
+        return await ref.get(statisticsProvider.notifier).get(mangas);
+      });
 
       return PageResultsMetaData(mangas, chapterlist.total);
     },

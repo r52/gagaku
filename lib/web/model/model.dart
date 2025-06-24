@@ -17,9 +17,10 @@ import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
@@ -118,8 +119,15 @@ class ProxyHandler {
 
     final updatedLink = link.copyWith(handle: handle);
 
-    ref.read(webSourceHistoryProvider.add)(updatedLink);
-    ref.read(webSourceFavoritesProvider.updateAll)(updatedLink);
+    webSourceHistoryMutation.run(ref, (ref) async {
+      return await ref.get(webSourceHistoryProvider.notifier).add(updatedLink);
+    });
+
+    webSourceFavoritesMutation.run(ref, (ref) async {
+      return await ref
+          .get(webSourceFavoritesProvider.notifier)
+          .updateAll(updatedLink);
+    });
 
     return updatedLink;
   }
@@ -134,9 +142,11 @@ class ProxyHandler {
         chapter: '1',
       );
 
-      ref.read(webSourceHistoryProvider.add)(
-        HistoryLink(title: url, url: url, handle: handle),
-      );
+      webSourceHistoryMutation.run(ref, (ref) async {
+        return await ref
+            .get(webSourceHistoryProvider.notifier)
+            .add(HistoryLink(title: url, url: url, handle: handle));
+      });
 
       return handle;
     }
@@ -373,8 +383,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return _fetch();
   }
 
-  @mutation
-  Future<void> clear() async {
+  Future<Map<String, List<HistoryLink>>> clear() async {
     await future;
     final empty = <String, List<HistoryLink>>{};
 
@@ -382,9 +391,10 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     await box.put('web_favorites', json.encode(empty));
 
     state = AsyncData(empty);
+
+    return empty;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> add(
     String category,
     HistoryLink link,
@@ -408,7 +418,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> updateAll(HistoryLink link) async {
     final oldstate = await future;
     for (final cat in oldstate.keys) {
@@ -429,7 +438,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> remove(
     String category,
     HistoryLink link,
@@ -459,7 +467,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> updateList(
     String category,
     int oldIndex,
@@ -486,7 +493,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> reconfigureCategories(
     List<WebSourceCategory> categories,
     String defaultCategory,
@@ -513,6 +519,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 }
 
+final webSourceFavoritesMutation = Mutation<Map<String, List<HistoryLink>>>();
+
 @Riverpod(keepAlive: true)
 class WebSourceHistory extends _$WebSourceHistory {
   static const _numItems = 250;
@@ -536,7 +544,6 @@ class WebSourceHistory extends _$WebSourceHistory {
     return _fetch();
   }
 
-  @mutation
   Future<Queue<HistoryLink>> clear() async {
     await future;
 
@@ -551,7 +558,6 @@ class WebSourceHistory extends _$WebSourceHistory {
     return empty;
   }
 
-  @mutation
   Future<Queue<HistoryLink>> add(HistoryLink link) async {
     final oldstate = await future;
     final cpy = Queue.of(oldstate);
@@ -576,7 +582,6 @@ class WebSourceHistory extends _$WebSourceHistory {
     return cpy;
   }
 
-  @mutation
   Future<Queue<HistoryLink>> remove(HistoryLink link) async {
     final oldstate = await future;
     final cpy = Queue.of(oldstate);
@@ -600,6 +605,8 @@ class WebSourceHistory extends _$WebSourceHistory {
   }
 }
 
+final webSourceHistoryMutation = Mutation<Queue<HistoryLink>>();
+
 @Riverpod(keepAlive: true)
 class WebReadMarkers extends _$WebReadMarkers {
   Future<Map<String, Set<String>>> _fetch() async {
@@ -621,7 +628,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return _fetch();
   }
 
-  @mutation
   Future<Map<String, Set<String>>> clear() async {
     await future;
     final empty = <String, Set<String>>{};
@@ -634,7 +640,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return empty;
   }
 
-  @mutation
   Future<Map<String, Set<String>>> set(
     String manga,
     String chapter,
@@ -675,7 +680,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return oldstate;
   }
 
-  @mutation
   Future<Map<String, Set<String>>> setBulk(
     String manga, {
     Iterable<String>? read,
@@ -719,7 +723,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return oldstate;
   }
 
-  @mutation
   Future<Map<String, Set<String>>> deleteKey(String manga) async {
     final oldstate = await future;
     final keyExists = oldstate.containsKey(manga);
@@ -741,6 +744,8 @@ class WebReadMarkers extends _$WebReadMarkers {
     return oldstate;
   }
 }
+
+final webReadMarkerMutation = Mutation<Map<String, Set<String>>>();
 
 @Riverpod(keepAlive: true)
 class ExtensionSource extends _$ExtensionSource {

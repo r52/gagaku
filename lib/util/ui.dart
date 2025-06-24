@@ -42,7 +42,10 @@ class GridExtentSlider extends ConsumerWidget {
             final c = cfg.copyWith(
               gridAlbumExtent: GridAlbumExtent.values.elementAt(value.toInt()),
             );
-            ref.read(gagakuSettingsProvider.save)(c);
+
+            gagakuConfigSaveMutation.run(ref, (ref) async {
+              return ref.get(gagakuSettingsProvider.notifier).save(c);
+            });
           },
         ),
       ],
@@ -560,7 +563,7 @@ class ErrorList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final messenger = ScaffoldMessenger.of(context);
-    Styles.showErrorSnackBar(messenger, '$error');
+    Styles.showSnackBar(messenger, content: '$error');
     logger.e(message, error: error, stackTrace: stackTrace);
 
     return Center(
@@ -741,14 +744,18 @@ class Styles {
     Center(child: CircularProgressIndicator()),
   ];
 
-  static void showErrorSnackBar(ScaffoldMessengerState state, String content) {
+  static void showSnackBar(
+    ScaffoldMessengerState state, {
+    required String content,
+    Color color = Colors.red,
+  }) {
     Future.delayed(
       Duration.zero,
       () =>
           state
             ..removeCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text(content), backgroundColor: Colors.red),
+              SnackBar(content: Text(content), backgroundColor: color),
             ),
     );
   }

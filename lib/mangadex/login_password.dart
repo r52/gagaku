@@ -12,7 +12,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 
 class MangaDexLoginWidget extends ConsumerWidget {
   const MangaDexLoginWidget({required this.builder, super.key});
@@ -102,6 +102,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    var messenger = ScaffoldMessenger.of(context);
     final storage = Hive.box(gagakuLocalBox);
 
     final credstr = storage.get('mangadex_credentials');
@@ -119,26 +120,16 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final clientIdController = useTextEditingController(text: clientId);
     final clientSecretController = useTextEditingController(text: clientSecret);
 
-    final login = ref.watch(authControlProvider.login);
+    final login = ref.watch(authControlLoginMutation);
 
-    ref.listen(authControlProvider.login, (_, login) {
-      if (login.state is ErrorMutation) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                tr.errors.loginFail(
-                  reason: (login.state as ErrorMutation).error.toString(),
-                ),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-      }
-
-      return;
-    });
+    if (login is MutationError) {
+      Styles.showSnackBar(
+        messenger,
+        content: tr.errors.loginFail(
+          reason: (login as MutationError).error.toString(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -253,7 +244,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                         passwordIsEmpty ||
                                         clientIdIsEmpty ||
                                         clientSecretIsEmpty ||
-                                        login.state is PendingMutation)
+                                        login is MutationPending)
                                     ? null
                                     : () async {
                                       final router = AutoRouter.of(context);
@@ -267,12 +258,22 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                                           clientSecretController
                                               .text
                                               .isNotEmpty) {
-                                        final loginSuccess = login(
-                                          usernameController.text,
-                                          passwordController.text,
-                                          clientIdController.text,
-                                          clientSecretController.text,
-                                        );
+                                        final loginSuccess =
+                                            authControlLoginMutation.run(ref, (
+                                              ref,
+                                            ) async {
+                                              return await ref
+                                                  .get(
+                                                    authControlProvider
+                                                        .notifier,
+                                                  )
+                                                  .login(
+                                                    usernameController.text,
+                                                    passwordController.text,
+                                                    clientIdController.text,
+                                                    clientSecretController.text,
+                                                  );
+                                            });
 
                                         loginSuccess.then((success) {
                                           if (!context.mounted) return;
@@ -304,7 +305,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (login.state is PendingMutation) ...Styles.loadingOverlay,
+          if (login is MutationPending) ...Styles.loadingOverlay,
         ],
       ),
     );

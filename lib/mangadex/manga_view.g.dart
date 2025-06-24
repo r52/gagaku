@@ -10,7 +10,7 @@ part of 'manga_view.dart';
 const _fetchMangaFromIdProvider = _FetchMangaFromIdFamily._();
 
 final class _FetchMangaFromIdProvider
-    extends $FunctionalProvider<AsyncValue<Manga>, FutureOr<Manga>>
+    extends $FunctionalProvider<AsyncValue<Manga>, Manga, FutureOr<Manga>>
     with $FutureModifier<Manga>, $FutureProvider<Manga> {
   const _FetchMangaFromIdProvider._({
     required _FetchMangaFromIdFamily super.from,
@@ -55,7 +55,7 @@ final class _FetchMangaFromIdProvider
   }
 }
 
-String _$fetchMangaFromIdHash() => r'f11168728df0795fab0444b6a2aef73dc2f16b4b';
+String _$fetchMangaFromIdHash() => r'047578691fe54f1a5551c53900021afda1928da6';
 
 final class _FetchMangaFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Manga>, String> {

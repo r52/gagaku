@@ -29,17 +29,11 @@ final class _SearchHistoryProvider
   @override
   _SearchHistory create() => _SearchHistory();
 
-  @$internal
-  @override
-  $NotifierProviderElement<_SearchHistory, List<String>> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(pointer);
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<String> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<List<String>>(value),
+      providerOverride: $SyncValueProvider<List<String>>(value),
     );
   }
 }
@@ -52,11 +46,11 @@ abstract class _$SearchHistory extends $Notifier<List<String>> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<String>>;
+    final ref = this.ref as $Ref<List<String>, List<String>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<String>>,
+              AnyNotifier<List<String>, List<String>>,
               List<String>,
               Object?,
               Object?

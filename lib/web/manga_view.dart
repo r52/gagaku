@@ -111,8 +111,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
-        ref.read(webSourceHistoryProvider.add)(link);
-        ref.read(webSourceFavoritesProvider.updateAll)(link);
+        webSourceHistoryMutation.run(ref, (ref) async {
+          return await ref.get(webSourceHistoryProvider.notifier).add(link);
+        });
+        webSourceFavoritesMutation.run(ref, (ref) async {
+          return await ref
+              .get(webSourceFavoritesProvider.notifier)
+              .updateAll(link);
+        });
       });
       return null;
     }, []);
@@ -245,7 +251,11 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             );
 
                             if (result == true) {
-                              ref.read(webReadMarkersProvider.deleteKey)(key);
+                              webReadMarkerMutation.run(ref, (ref) async {
+                                return await ref
+                                    .get(webReadMarkersProvider.notifier)
+                                    .deleteKey(key);
+                              });
                             }
                           },
                           icon: const Icon(Icons.restore),
@@ -466,11 +476,15 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               );
 
                               if (result == true) {
-                                ref.read(webReadMarkersProvider.setBulk)(
-                                  mangakey,
-                                  read: !allRead ? chapterkeys : null,
-                                  unread: allRead ? chapterkeys : null,
-                                );
+                                webReadMarkerMutation.run(ref, (ref) async {
+                                  return await ref
+                                      .get(webReadMarkersProvider.notifier)
+                                      .setBulk(
+                                        mangakey,
+                                        read: !allRead ? chapterkeys : null,
+                                        unread: allRead ? chapterkeys : null,
+                                      );
+                                });
                               }
                             },
                             child: Text(tr.mangaView.markAllAs(arg: opt)),

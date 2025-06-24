@@ -87,28 +87,16 @@ final class GagakuSettingsProvider
   @override
   GagakuSettings create() => GagakuSettings();
 
-  @$internal
-  @override
-  _$GagakuSettingsElement $createElement($ProviderPointer pointer) =>
-      _$GagakuSettingsElement(pointer);
-
-  ProviderListenable<GagakuSettings$Save> get save =>
-      $LazyProxyListenable<GagakuSettings$Save, GagakuConfig>(this, (element) {
-        element as _$GagakuSettingsElement;
-
-        return element._$save;
-      });
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(GagakuConfig value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<GagakuConfig>(value),
+      providerOverride: $SyncValueProvider<GagakuConfig>(value),
     );
   }
 }
 
-String _$gagakuSettingsHash() => r'3174dadb28b7bc4f1b2521e6e41201bdbe5d0814';
+String _$gagakuSettingsHash() => r'fe542021bde33b2b0d97ab5ccd4354255d348e1c';
 
 abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();
@@ -116,84 +104,17 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<GagakuConfig>;
+    final ref = this.ref as $Ref<GagakuConfig, GagakuConfig>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<GagakuConfig>,
+              AnyNotifier<GagakuConfig, GagakuConfig>,
               GagakuConfig,
               Object?,
               Object?
             >;
     element.handleValue(ref, created);
   }
-}
-
-class _$GagakuSettingsElement
-    extends $NotifierProviderElement<GagakuSettings, GagakuConfig> {
-  _$GagakuSettingsElement(super.pointer) {
-    _$save.result = $Result.data(_$GagakuSettings$Save(this));
-  }
-  final _$save = $ElementLense<_$GagakuSettings$Save>();
-  @override
-  void mount() {
-    super.mount();
-    _$save.result!.value!.reset();
-  }
-
-  @override
-  void visitListenables(
-    void Function($ElementLense element) listenableVisitor,
-  ) {
-    super.visitListenables(listenableVisitor);
-
-    listenableVisitor(_$save);
-  }
-}
-
-sealed class GagakuSettings$Save extends MutationBase<GagakuConfig> {
-  /// Starts the mutation.
-  ///
-  /// This will first set the state to [PendingMutation], then
-  /// will call [GagakuSettings.save] with the provided parameters.
-  ///
-  /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutation] or [ErrorMutation] based on if the method
-  /// threw or not.
-  ///
-  /// **Note**:
-  /// If the notifier threw in its constructor, the mutation won't start
-  /// and [call] will throw.
-  /// This should generally never happen though, as Notifiers are not supposed
-  /// to have logic in their constructors.
-  GagakuConfig call(GagakuConfig update);
-}
-
-final class _$GagakuSettings$Save
-    extends
-        $SyncMutationBase<GagakuConfig, _$GagakuSettings$Save, GagakuSettings>
-    implements GagakuSettings$Save {
-  _$GagakuSettings$Save(this.element, {super.state, super.key});
-
-  @override
-  final _$GagakuSettingsElement element;
-
-  @override
-  $ElementLense<_$GagakuSettings$Save> get listenable => element._$save;
-
-  @override
-  GagakuConfig call(GagakuConfig update) {
-    return mutate(
-      Invocation.method(#save, [update]),
-      ($notifier) => $notifier.save(update),
-    );
-  }
-
-  @override
-  _$GagakuSettings$Save copyWith(
-    MutationState<GagakuConfig> state, {
-    Object? key,
-  }) => _$GagakuSettings$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

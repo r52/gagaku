@@ -158,9 +158,14 @@ class WebSourceFrontPage extends HookConsumerWidget {
                     ),
                   );
               } else {
-                ref.read(webConfigProvider.saveWith)(
-                  repoList: [...list, RepoInfo(name: name, url: url)],
-                );
+                webConfigSaveMutation.run(ref, (ref) async {
+                  return ref
+                      .get(webConfigProvider.notifier)
+                      .saveWith(
+                        repoList: [...list, RepoInfo(name: name, url: url)],
+                      );
+                });
+
                 messenger
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
@@ -274,7 +279,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       final stackTrace = sectionsSnapshot.stackTrace!;
       final msg = "ExtensionSource(${source.id}).getDiscoverSections() failed";
 
-      Styles.showErrorSnackBar(messenger, '$error');
+      Styles.showSnackBar(messenger, content: '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
 
       slivers.add(
@@ -314,7 +319,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
         final msg =
             "ExtensionSource(${source.id}).getDiscoverSectionItems() failed";
 
-        Styles.showErrorSnackBar(messenger, '$error');
+        Styles.showSnackBar(messenger, content: '$error');
         logger.e(msg, error: error, stackTrace: stackTrace);
 
         slivers.add(

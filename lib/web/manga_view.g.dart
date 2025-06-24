@@ -10,7 +10,8 @@ part of 'manga_view.dart';
 const _fetchWebMangaInfoProvider = _FetchWebMangaInfoFamily._();
 
 final class _FetchWebMangaInfoProvider
-    extends $FunctionalProvider<AsyncValue<WebManga>, FutureOr<WebManga>>
+    extends
+        $FunctionalProvider<AsyncValue<WebManga>, WebManga, FutureOr<WebManga>>
     with $FutureModifier<WebManga>, $FutureProvider<WebManga> {
   const _FetchWebMangaInfoProvider._({
     required _FetchWebMangaInfoFamily super.from,

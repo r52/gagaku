@@ -10,7 +10,12 @@ part of 'frontpage.dart';
 const _popularTitlesProvider = _PopularTitlesProvider._();
 
 final class _PopularTitlesProvider
-    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Manga>>,
+          List<Manga>,
+          FutureOr<List<Manga>>
+        >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _PopularTitlesProvider._()
     : super(
@@ -44,7 +49,12 @@ String _$popularTitlesHash() => r'bd736590bbe6e6adcb7fbb060e3794725e3fc049';
 const _recentlyAddedProvider = _RecentlyAddedProvider._();
 
 final class _RecentlyAddedProvider
-    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Manga>>,
+          List<Manga>,
+          FutureOr<List<Manga>>
+        >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _RecentlyAddedProvider._()
     : super(
@@ -78,7 +88,12 @@ String _$recentlyAddedHash() => r'c674998b67a04d66d78727ed66605b1af2dfa8db';
 const _latestUpdatesProvider = _LatestUpdatesProvider._();
 
 final class _LatestUpdatesProvider
-    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Manga>>,
+          List<Manga>,
+          FutureOr<List<Manga>>
+        >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _LatestUpdatesProvider._()
     : super(
@@ -112,7 +127,12 @@ String _$latestUpdatesHash() => r'7681a094cf7bb2e9c23ef54b0bd3d06a8fc198ec';
 const _fetchCustomListMangaProvider = _FetchCustomListMangaFamily._();
 
 final class _FetchCustomListMangaProvider
-    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Manga>>,
+          List<Manga>,
+          FutureOr<List<Manga>>
+        >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _FetchCustomListMangaProvider._({
     required _FetchCustomListMangaFamily super.from,
@@ -184,7 +204,11 @@ const _fetchFrontPageDataProvider = _FetchFrontPageDataProvider._();
 
 final class _FetchFrontPageDataProvider
     extends
-        $FunctionalProvider<AsyncValue<FrontPageData>, FutureOr<FrontPageData>>
+        $FunctionalProvider<
+          AsyncValue<FrontPageData>,
+          FrontPageData,
+          FutureOr<FrontPageData>
+        >
     with $FutureModifier<FrontPageData>, $FutureProvider<FrontPageData> {
   const _FetchFrontPageDataProvider._()
     : super(

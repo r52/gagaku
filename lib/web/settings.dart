@@ -40,16 +40,25 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text(tr.saveSettings),
                   onPressed: () {
-                    ref.read(webConfigProvider.saveWith)(
-                      installedSources: config.value.installedSources,
-                      categories: config.value.categories,
-                      defaultCategory: config.value.defaultCategory,
-                      categoriesToUpdate: config.value.categoriesToUpdate,
-                    );
-                    ref.read(webSourceFavoritesProvider.reconfigureCategories)(
-                      config.value.categories,
-                      config.value.defaultCategory,
-                    );
+                    webConfigSaveMutation.run(ref, (ref) async {
+                      return ref
+                          .get(webConfigProvider.notifier)
+                          .saveWith(
+                            installedSources: config.value.installedSources,
+                            categories: config.value.categories,
+                            defaultCategory: config.value.defaultCategory,
+                            categoriesToUpdate: config.value.categoriesToUpdate,
+                          );
+                    });
+                    webSourceFavoritesMutation.run(ref, (ref) async {
+                      return await ref
+                          .get(webSourceFavoritesProvider.notifier)
+                          .reconfigureCategories(
+                            config.value.categories,
+                            config.value.defaultCategory,
+                          );
+                    });
+
                     nav.pop();
                   },
                 ),

@@ -10,7 +10,12 @@ part of 'creator_view.dart';
 const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily._();
 
 final class _FetchCreatorFromIdProvider
-    extends $FunctionalProvider<AsyncValue<CreatorType>, FutureOr<CreatorType>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<CreatorType>,
+          CreatorType,
+          FutureOr<CreatorType>
+        >
     with $FutureModifier<CreatorType>, $FutureProvider<CreatorType> {
   const _FetchCreatorFromIdProvider._({
     required _FetchCreatorFromIdFamily super.from,

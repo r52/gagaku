@@ -7,7 +7,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config.freezed.dart';
@@ -64,7 +64,6 @@ class GagakuSettings extends _$GagakuSettings {
     return _fetch();
   }
 
-  @mutation
   GagakuConfig save(GagakuConfig update) {
     state = update;
     final box = Hive.box(gagakuDataBox);
@@ -73,3 +72,5 @@ class GagakuSettings extends _$GagakuSettings {
     return update;
   }
 }
+
+final gagakuConfigSaveMutation = Mutation<GagakuConfig>();

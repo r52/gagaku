@@ -88,9 +88,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                     builder: (context, ref, child) {
                       final followedLists =
                           ref.watch(followedListsProvider(me?.id)).value;
-                      final followList = ref.watch(
-                        followedListsProvider(me?.id).setFollow,
-                      );
+
                       final idx = followedLists?.indexWhere(
                         (e) => e.id == list.id,
                       );
@@ -103,7 +101,14 @@ class MangaDexListViewPage extends HookConsumerWidget {
                         style: Styles.squareIconButtonStyle(
                           backgroundColor: theme.colorScheme.surfaceContainer,
                         ),
-                        onPressed: () => followList(list, idx == -1),
+                        onPressed:
+                            () => followedListMutation(me?.id).run(ref, (
+                              ref,
+                            ) async {
+                              return await ref
+                                  .get(followedListsProvider(me?.id).notifier)
+                                  .setFollow(list, idx == -1);
+                            }),
                         icon: Icon(
                           idx == -1 ? Icons.bookmark_border : Icons.bookmark,
                           color: idx == -1 ? null : theme.colorScheme.primary,

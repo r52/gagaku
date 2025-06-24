@@ -10,7 +10,12 @@ part of 'settings.dart';
 const _fetchGroupDataProvider = _FetchGroupDataFamily._();
 
 final class _FetchGroupDataProvider
-    extends $FunctionalProvider<AsyncValue<Set<Group>>, FutureOr<Set<Group>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<Set<Group>>,
+          Set<Group>,
+          FutureOr<Set<Group>>
+        >
     with $FutureModifier<Set<Group>>, $FutureProvider<Set<Group>> {
   const _FetchGroupDataProvider._({
     required _FetchGroupDataFamily super.from,
