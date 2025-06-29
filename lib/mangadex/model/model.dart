@@ -353,16 +353,12 @@ class MangaDexModel {
           "refreshToken() returned error ${tokenresp['error']}",
           error: tokenresp.toString(),
         );
-
-        throw RevokeTokenException;
       } catch (e) {
         logger.w("refreshToken() error ${e.toString()}", error: e);
-
-        throw RevokeTokenException;
       }
     }
 
-    throw RevokeTokenException;
+    throw RevokeTokenException();
   }
 
   Future<bool> authenticate(
