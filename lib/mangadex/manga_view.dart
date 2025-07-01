@@ -16,6 +16,7 @@ import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/types.dart' show SearchQuery;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
@@ -397,6 +398,30 @@ class _MangaDexMangaViewWidgetState
                           ),
                         ),
                       ),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 20.0, bottom: 50.0),
+                          child: IconButton(
+                            tooltip: tr.webSources.searchThisName,
+                            style: Styles.squareIconButtonStyle(
+                              backgroundColor: theme.colorScheme.surface
+                                  .withAlpha(200),
+                            ),
+                            onPressed:
+                                () => context.router.push(
+                                  ExtensionSearchRoute(
+                                    query: SearchQuery(
+                                      title: widget.manga.attributes!.title.get(
+                                        tr.$meta.locale.languageCode,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            icon: const Icon(Icons.search),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -585,35 +610,42 @@ class _MangaDexMangaViewWidgetState
                             children: [
                               SizedBox(
                                 width: double.infinity,
-                                child: Material(
-                                  color:
+                                child: ListTile(
+                                  tileColor:
                                       theme.colorScheme.surfaceContainerHighest,
-                                  child: InkWell(
-                                    onTap:
-                                        () => Clipboard.setData(
-                                          ClipboardData(
-                                            text: entry.first.value,
-                                          ),
-                                        ).then((_) {
-                                          if (!context.mounted) return;
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              showCloseIcon: true,
-                                              duration: const Duration(
-                                                milliseconds: 1000,
-                                              ),
-                                              content: Text(
-                                                tr.ui.copyClipboard,
-                                              ),
+                                  title: Text(entry.first.value),
+                                  onTap:
+                                      () => Clipboard.setData(
+                                        ClipboardData(text: entry.first.value),
+                                      ).then((_) {
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            showCloseIcon: true,
+                                            duration: const Duration(
+                                              milliseconds: 1000,
                                             ),
-                                          );
-                                        }),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(entry.first.value),
+                                            content: Text(tr.ui.copyClipboard),
+                                          ),
+                                        );
+                                      }),
+                                  trailing: IconButton(
+                                    tooltip: tr.webSources.searchThisName,
+                                    style: Styles.squareIconButtonStyle(
+                                      backgroundColor: theme.colorScheme.surface
+                                          .withAlpha(200),
                                     ),
+                                    onPressed:
+                                        () => context.router.push(
+                                          ExtensionSearchRoute(
+                                            query: SearchQuery(
+                                              title: entry.first.value,
+                                            ),
+                                          ),
+                                        ),
+                                    icon: const Icon(Icons.search),
                                   ),
                                 ),
                               ),
